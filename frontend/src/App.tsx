@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { SessionProvider } from "./context/SessionContext";
-import type { McqQuestion, Section, StudyContent } from "./api/client";
+import type {
+  McqQuestion,
+  OutlineSection,
+  Section,
+  StudyContent,
+} from "./api/client";
 import {
   ALL_SECTIONS,
   MASTERY_THRESHOLD,
   SECTION_TITLES,
   generateQuiz,
   generateRetest,
+  gradeSelfCheck,
   getStudyContent,
   gradeQuiz,
   uploadSlide,
@@ -43,7 +49,11 @@ function App() {
   const [masteredSections, setMasteredSections] = useState<Section[]>([]);
 
   const [studyContent, setStudyContent] = useState<StudyContent[]>([]);
+  const [activeMode, setActiveMode] = useState(true);
   const [wrongItems, setWrongItems] = useState<WrongItem[]>([]);
+
+  const sectionTitle = (id: Section) =>
+    outline.find((o) => o.section_id === id)?.title ?? id;
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
@@ -55,12 +65,20 @@ function App() {
 
   const handleCreateQuiz = async () => {
     setIsLoading(true);
-    const quiz = await generateQuiz();
-    setQuizMode("round1");
-    setQuestions(quiz);
-    setAnswers([]);
-    setCurrentIndex(0);
-    setStage("quiz");
+    setErrorMessage("");
+    try {
+      const { outline: newOutline, questions: newQuestions } =
+        await generateQuiz();
+      setOutline(newOutline);
+      setRound1Questions(newQuestions);
+      setQuizMode("round1");
+      setQuestions(newQuestions);
+      setAnswers([]);
+      setCurrentIndex(0);
+      setStage("quiz");
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    }
     setIsLoading(false);
   };
 
@@ -90,7 +108,10 @@ function App() {
     setFinalAccuracy(result.accuracy);
 
     if (result.accuracy >= MASTERY_THRESHOLD) {
-      const mastered = retestSource === "verify" ? ALL_SECTIONS : weakSections;
+      const mastered =
+        retestSource === "verify"
+          ? outline.map((o) => o.section_id)
+          : weakSections;
       setMasteredSections(mastered);
       setStage("report");
     } else {
@@ -137,13 +158,34 @@ function App() {
   };
 
   // ---- Phase 3: STYLE -> AL + RM -> Roadmap ----
-  const handleStyleSubmit = async (_style: string, _timeframe: string) => {
+  const handleStyleSubmit = async (
+    _style: string,
+    _timeframe: string,
+    selectedActiveMode: boolean,
+  ) => {
     setIsLoading(true);
-    const content = await getStudyContent(weakSections);
+    const content = await getStudyContent(
+      weakSections,
+      outline,
+      round1Questions,
+    );
     setStudyContent(content);
     setStage("roadmap");
     setIsLoading(false);
   };
+
+  const handleGradeSelfCheck = (input: {
+    section: Section;
+    question: string;
+    answer: string;
+    sourceContext: string;
+  }): Promise<SelfCheckGrade> =>
+    gradeSelfCheck({
+      section_id: input.section,
+      question: input.question,
+      learner_answer: input.answer,
+      source_context: input.sourceContext,
+    });
 
   // ---- FINISH -> RET ----
   const handleFinishLearning = () => {
@@ -168,13 +210,13 @@ function App() {
     setFinalAccuracy(0);
     setMasteredSections([]);
     setStudyContent([]);
+    setActiveMode(true);
     setWrongItems([]);
   };
 
-  const studyContentBySection = Object.fromEntries(studyContent.map((c) => [c.section, c])) as Record<
-    string,
-    StudyContent
-  >;
+  const studyContentBySection = Object.fromEntries(
+    studyContent.map((c) => [c.section, c]),
+  ) as Record<string, StudyContent>;
 
   return (
     <SessionProvider>
@@ -184,13 +226,22 @@ function App() {
             <p className="eyebrow">Vlearn AI Agent</p>
             <h1>Học nhanh với slide, luyện MCQ, và ôn lại kiến thức</h1>
             <p className="hero-copy">
-              Tải lên slide/PDF, để AI phân loại nội dung, trích xuất outline theo 5 chủ đề, rồi tạo 20 câu MCQ chẩn
-              đoán. AI xác định phần bạn yếu, tạo lộ trình ôn tập cá nhân hoá, và kiểm tra lại đến khi đạt mức hiểu
-              vững.
+              AI sinh 20 câu MCQ thật từ transcript bài giảng thật (không
+              hardcode), chẩn đoán phần bạn yếu, và giúp bạn ôn lại đến khi đạt
+              mức hiểu vững.
             </p>
           </div>
           <ChatPanel stage={stage} quizMode={quizMode} />
         </div>
+
+        {errorMessage && (
+          <section className="card">
+            <p className="hint" style={{ color: "#dc2626" }}>
+              Lỗi: {errorMessage} — kiểm tra backend đã chạy ở
+              http://127.0.0.1:8000 chưa.
+            </p>
+          </section>
+        )}
 
         {isLoading && (
           <section className="card">
@@ -202,7 +253,10 @@ function App() {
           <div className="flow-grid">
             <section className="card upload-card">
               <h2>1. Upload slide / PDF</h2>
-              <p>AI sẽ chuyển nội dung slide thành file text.md, phân loại nội dung giảng dạy và trích xuất outline.</p>
+              <p>
+                Demo dùng transcript thật từ data pack (chưa nối bước PDF→text
+                thật — xem docs).
+              </p>
               <UploadStep onUpload={handleUpload} disabled={isLoading} />
               {slideText && (
                 <div className="preview-box">
@@ -213,9 +267,16 @@ function App() {
             </section>
 
             <section className="card action-card">
-              <h2>2. Tạo MCQ chẩn đoán</h2>
-              <p>Nhấn tạo để bắt đầu bài quiz trắc nghiệm 20 câu, trải đều 5 chủ đề đã trích xuất.</p>
-              <button className="primary-button" onClick={handleCreateQuiz} disabled={!slideText || isLoading}>
+              <h2>2. Tạo MCQ chẩn đoán (AI thật)</h2>
+              <p>
+                Gọi backend thật (OpenAI) để sinh MCQ trực tiếp từ transcript,
+                có trích dẫn segment_id.
+              </p>
+              <button
+                className="primary-button"
+                onClick={handleCreateQuiz}
+                disabled={!slideText || isLoading}
+              >
                 Tạo MCQ
               </button>
               {isLoading && <p className="hint">Đang xử lý...</p>}
@@ -230,7 +291,11 @@ function App() {
               index={currentIndex + 1}
               total={questions.length}
               selected={answers[currentIndex] || ""}
-              modeLabel={quizMode === "round1" ? "Phase 2 — Quiz chẩn đoán ban đầu" : "Phase 4 — Kiểm tra lại (Retest)"}
+              modeLabel={
+                quizMode === "round1"
+                  ? "Phase 2 — Quiz chẩn đoán ban đầu"
+                  : "Phase 4 — Kiểm tra lại (Retest)"
+              }
               onSelectAnswer={handleAnswer}
               onNext={handleNextQuestion}
             />
@@ -240,9 +305,13 @@ function App() {
         {stage === "diagnosis" && !isLoading && (
           <section className="card result-card">
             <RetestResultView
-              goodTitles={goodSections.map((s) => SECTION_TITLES[s])}
-              weakTitles={weakSections.map((s) => SECTION_TITLES[s])}
-              ctaLabel={weakSections.length > 0 ? "Chọn cách ôn tập →" : "Làm bài kiểm tra xác nhận →"}
+              goodTitles={goodSections.map(sectionTitle)}
+              weakTitles={weakSections.map(sectionTitle)}
+              ctaLabel={
+                weakSections.length > 0
+                  ? "Chọn cách ôn tập →"
+                  : "Làm bài kiểm tra xác nhận →"
+              }
               onContinue={handleDec1}
             />
           </section>
@@ -252,20 +321,36 @@ function App() {
           <section className="card review-card">
             <p className="eyebrow">Phase 3 — Adaptive Re-teaching</p>
             <h2>Bạn muốn ôn theo cách nào?</h2>
-            <StyleTimeSelect weakTitles={weakSections.map((s) => SECTION_TITLES[s])} onSubmit={handleStyleSubmit} />
-            {isLoading && <p className="hint">AI đang đối chiếu phần yếu với transcript và tạo lộ trình...</p>}
+            <StyleTimeSelect
+              weakTitles={weakSections.map(sectionTitle)}
+              onSubmit={handleStyleSubmit}
+            />
+            {isLoading && (
+              <p className="hint">
+                AI đang đối chiếu phần yếu với transcript và tạo lộ trình...
+              </p>
+            )}
           </section>
         )}
 
         {stage === "roadmap" && studyContent.length > 0 && (
           <section className="card review-card">
-            <RoadmapView content={studyContent} onFinish={handleFinishLearning} />
+            <RoadmapView
+              content={studyContent}
+              activeMode={activeMode}
+              onGradeSelfCheck={handleGradeSelfCheck}
+              onFinish={handleFinishLearning}
+            />
           </section>
         )}
 
         {stage === "review" && !isLoading && (
           <section className="card review-card">
-            <ReviewList wrongItems={wrongItems} studyContentBySection={studyContentBySection} onLoop={handleLoopToStyle} />
+            <ReviewList
+              wrongItems={wrongItems}
+              studyContentBySection={studyContentBySection}
+              onLoop={handleLoopToStyle}
+            />
           </section>
         )}
 
