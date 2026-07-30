@@ -8,7 +8,7 @@ import json
 from typing import Any
 
 from .client import GmailMcpClient
-from .config import load_codebase_env
+from .config import load_mcp_env
 
 
 def _json_default(value: Any) -> Any:
@@ -32,7 +32,7 @@ async def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    load_codebase_env()
+    load_mcp_env()
     parser = argparse.ArgumentParser(description="Connect to a Gmail MCP server")
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("tools", help="List tools exposed by the MCP server")

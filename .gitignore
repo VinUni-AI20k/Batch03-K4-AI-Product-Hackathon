@@ -4,7 +4,7 @@ node_modules/
 gmail_secret.json
 docs/
 example
-*/.venv
+**/.venv
 __pycache__/
 *.pyc
-mcp/google_calendar_mcp/credentials/*.json
+codebase/mcp/google_calendar_mcp/credentials/*.json
