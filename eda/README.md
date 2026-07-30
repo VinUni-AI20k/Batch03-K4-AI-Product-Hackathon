@@ -3,6 +3,8 @@
 Notebook `vlearn_ai_tutor_eda.ipynb` ghép dữ liệu theo từng lượt hỏi–đáp, kiểm tra
 chất lượng dữ liệu và sàng lọc các pain signal có thể kiểm lại.
 
+- Báo cáo đề xuất bài toán: `bao-cao-de-xuat-bai-toan.md`
+
 ## Chạy bằng uv
 
 ```bash
