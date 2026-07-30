@@ -10,20 +10,20 @@ import {
   RotateCcw,
 } from "lucide-react";
 import type {
-  LearningTrace,
+  LearningDay,
   ReviewStatus,
 } from "@/types/learning-trace";
 import type { EvidenceDetail } from "@/components/EvidenceModal";
 
 interface PersonalizedNoteProps {
-  trace: LearningTrace;
+  day: LearningDay;
   statuses: Record<string, ReviewStatus>;
   onSetStatus: (id: string, status: ReviewStatus) => void;
   onOpenEvidence: (detail: EvidenceDetail) => void;
 }
 
 export function PersonalizedNote({
-  trace,
+  day,
   statuses,
   onSetStatus,
   onOpenEvidence,
@@ -44,12 +44,12 @@ export function PersonalizedNote({
             </h2>
           </div>
           <span className="rounded-full bg-[#edf3fb] px-3 py-1.5 text-xs font-bold text-[#2e5596]">
-            {trace.topics.length} chủ đề
+            {day.label} · {day.topics.length} chủ đề
           </span>
         </div>
 
         <div className="mt-4 grid gap-3">
-          {trace.topics.map((topic, index) => (
+          {day.topics.map((topic, index) => (
             <article
               key={topic.id}
               className="group rounded-[18px] border border-[#dfe6ef] bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-[#c9d7e8] hover:shadow-[0_10px_30px_rgba(25,54,91,0.08)]"
@@ -97,7 +97,7 @@ export function PersonalizedNote({
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#b87514]">
-              Gợi ý cần xác nhận
+              Gợi ý cần xác nhận · {day.label}
             </p>
             <h2
               id="review-heading"
@@ -112,7 +112,7 @@ export function PersonalizedNote({
         </div>
 
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
-          {trace.reviewItems.map((item) => {
+          {day.reviewItems.map((item) => {
             const status = statuses[item.id] ?? "suggested";
             const isConfirmed = status === "confirmed";
             const isReview = status === "review";
@@ -235,7 +235,7 @@ export function PersonalizedNote({
             Chưa đủ dữ liệu để kết luận
           </h3>
           <p className="mt-1 text-sm leading-6 text-[#687790]">
-            {trace.unassessableNote}
+            {day.unassessableNote}
           </p>
         </div>
       </section>

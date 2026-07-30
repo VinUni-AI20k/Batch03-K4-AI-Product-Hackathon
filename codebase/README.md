@@ -18,14 +18,16 @@ Mở [http://localhost:3000](http://localhost:3000).
 
 1. Học viên kết thúc buổi và bấm **Xem Learning Trace**.
 2. UI hiển thị trạng thái đang đối chiếu lịch sử hỏi Tutor với học liệu.
-3. Personalized Note phân biệt:
+3. Chọn **Day01**, **Day02** hoặc **Day03** để xem learning trace của từng
+   ngày.
+4. Personalized Note phân biệt:
    - chủ đề đã tìm hiểu;
    - gợi ý có thể cần xem lại;
    - nội dung chưa đủ dữ liệu để kết luận.
-4. Học viên chuyển sang **Bản đồ kiến thức**.
-5. Học viên chọn **Mình đã hiểu** hoặc **Cần xem lại**.
-6. Metric, note, mindmap và sidebar phản hồi được cập nhật đồng bộ.
-7. Citation và lượt hỏi mở được panel căn cứ.
+5. Học viên chuyển sang **Bản đồ kiến thức** của cùng ngày đang chọn.
+6. Học viên chọn **Mình đã hiểu** hoặc **Cần xem lại**.
+7. Metric, note, mindmap và sidebar phản hồi được cập nhật đồng bộ theo ngày.
+8. Citation và lượt hỏi mở được panel căn cứ.
 
 ## Phạm vi CP2
 

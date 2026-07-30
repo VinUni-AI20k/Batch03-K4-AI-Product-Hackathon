@@ -9,6 +9,7 @@ export interface Topic {
   slide: string;
   transcript: string;
   learnedLabel: string;
+  mindmapChild: string;
 }
 
 export interface ReviewItem {
@@ -37,19 +38,29 @@ export interface TutorInteraction {
   topicId: string;
 }
 
+export interface LearningDay {
+  id: string;
+  number: string;
+  label: string;
+  title: string;
+  statusLabel: string;
+  slideCount: number;
+  interactionCount: number;
+  groundedSourceCount: number;
+  topics: Topic[];
+  reviewItems: ReviewItem[];
+  sources: SourceReference[];
+  interactions: TutorInteraction[];
+  unassessableNote: string;
+}
+
 export interface LearningTrace {
   session: {
     eyebrow: string;
     title: string;
     subtitle: string;
     course: string;
-    sessionLabel: string;
-    interactionCount: number;
-    groundedSourceCount: number;
+    collectionLabel: string;
   };
-  topics: Topic[];
-  reviewItems: ReviewItem[];
-  sources: SourceReference[];
-  interactions: TutorInteraction[];
-  unassessableNote: string;
+  days: LearningDay[];
 }

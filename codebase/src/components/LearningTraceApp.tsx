@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ContextSidebar } from "@/components/ContextSidebar";
+import { DaySelector } from "@/components/DaySelector";
 import {
   EvidenceModal,
   type EvidenceDetail,
@@ -36,20 +37,29 @@ const trace = mockLearningTrace;
 export function LearningTraceApp() {
   const [phase, setPhase] = useState<AppPhase>("preview");
   const [activeTab, setActiveTab] = useState<ActiveTab>("note");
+  const [activeDayId, setActiveDayId] = useState("day-02");
   const [evidenceDetail, setEvidenceDetail] =
     useState<EvidenceDetail | null>(null);
   const [statuses, setStatuses] = useState<Record<string, ReviewStatus>>(() =>
     Object.fromEntries(
-      trace.reviewItems.map((item) => [item.id, "suggested" as const]),
+      trace.days
+        .flatMap((day) => day.reviewItems)
+        .map((item) => [item.id, "suggested" as const]),
     ),
   );
 
+  const activeDay =
+    trace.days.find((day) => day.id === activeDayId) ?? trace.days[0];
+
   const confirmedCount = useMemo(
-    () => Object.values(statuses).filter((status) => status === "confirmed").length,
-    [statuses],
+    () =>
+      activeDay.reviewItems.filter(
+        (item) => statuses[item.id] === "confirmed",
+      ).length,
+    [activeDay, statuses],
   );
 
-  const reviewCount = trace.reviewItems.length - confirmedCount;
+  const reviewCount = activeDay.reviewItems.length - confirmedCount;
 
   const startAnalysis = () => {
     if (phase === "analyzing") return;
@@ -60,10 +70,10 @@ export function LearningTraceApp() {
   const openStudyMaterial = () => {
     setEvidenceDetail({
       eyebrow: "Học liệu đang mở",
-      title: "Day 2 · Xác định bài toán kinh doanh cho AI",
+      title: `${activeDay.label} · ${activeDay.title}`,
       description:
-        "Prototype CP2 mô phỏng liên kết quay lại slide và transcript chính thức của buổi học.",
-      meta: "29 slide · 43 đoạn transcript",
+        "Prototype CP2 mô phỏng liên kết quay lại slide và transcript chính thức của ngày học đang chọn.",
+      meta: `${activeDay.slideCount} slide · ${activeDay.groundedSourceCount} nguồn đã đối chiếu`,
     });
   };
 
@@ -93,7 +103,7 @@ export function LearningTraceApp() {
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 rounded-xl border border-[#dce4ee] bg-[#f8fafc] px-3 py-2 text-xs font-bold text-[#405674]">
                   <BookOpenText aria-hidden="true" className="h-4 w-4 text-[#2e5596]" />
-                  {trace.session.sessionLabel}
+                  {trace.session.collectionLabel}
                 </span>
                 <span className="text-xs font-semibold text-[#8995a8]">
                   {trace.session.course}
@@ -153,14 +163,14 @@ export function LearningTraceApp() {
             <MetricCard
               icon={<MessageSquareText className="h-5 w-5" />}
               label="Lượt hỏi Tutor"
-              value={trace.session.interactionCount}
-              helper="trong buổi"
+              value={activeDay.interactionCount}
+              helper={activeDay.label}
             />
             <MetricCard
               icon={<NotebookTabs className="h-5 w-5" />}
               label="Chủ đề đã tìm hiểu"
-              value={trace.topics.length}
-              helper="đã có note"
+              value={activeDay.topics.length}
+              helper={activeDay.label}
               accent="green"
             />
             <MetricCard
@@ -173,8 +183,8 @@ export function LearningTraceApp() {
             <MetricCard
               icon={<FileCheck2 className="h-5 w-5" />}
               label="Nguồn có căn cứ"
-              value={trace.session.groundedSourceCount}
-              helper="slide & transcript"
+              value={activeDay.groundedSourceCount}
+              helper={activeDay.label}
               accent="red"
             />
           </section>
@@ -296,11 +306,11 @@ export function LearningTraceApp() {
                   <span className="analysis-progress block h-full rounded-full bg-[#2e5596]" />
                 </div>
                 <div className="mt-4 flex items-center justify-center gap-5 text-[11px] font-bold text-[#8390a3]">
-                  <span>6 lượt hỏi</span>
+                  <span>{activeDay.interactionCount} lượt hỏi</span>
                   <span className="h-1 w-1 rounded-full bg-[#aab5c4]" />
-                  <span>8 nguồn</span>
+                  <span>{activeDay.groundedSourceCount} nguồn</span>
                   <span className="h-1 w-1 rounded-full bg-[#aab5c4]" />
-                  <span>3 chủ đề</span>
+                  <span>{activeDay.topics.length} chủ đề</span>
                 </div>
               </div>
             </section>
@@ -356,6 +366,13 @@ export function LearningTraceApp() {
                     </button>
                   </div>
 
+                  <DaySelector
+                    days={trace.days}
+                    activeDayId={activeDay.id}
+                    statuses={statuses}
+                    onSelectDay={setActiveDayId}
+                  />
+
                   <div
                     className="p-5 sm:p-6"
                     role="tabpanel"
@@ -367,7 +384,7 @@ export function LearningTraceApp() {
                   >
                     {activeTab === "note" ? (
                       <PersonalizedNote
-                        trace={trace}
+                        day={activeDay}
                         statuses={statuses}
                         onSetStatus={(id, status) =>
                           setStatuses((current) => ({
@@ -378,13 +395,16 @@ export function LearningTraceApp() {
                         onOpenEvidence={setEvidenceDetail}
                       />
                     ) : (
-                      <KnowledgeMindmap statuses={statuses} />
+                      <KnowledgeMindmap
+                        day={activeDay}
+                        statuses={statuses}
+                      />
                     )}
                   </div>
                 </div>
 
                 <ContextSidebar
-                  trace={trace}
+                  day={activeDay}
                   confirmedCount={confirmedCount}
                   onOpenEvidence={setEvidenceDetail}
                 />

@@ -7,17 +7,17 @@ import {
   MessageSquareText,
   Sparkles,
 } from "lucide-react";
-import type { LearningTrace } from "@/types/learning-trace";
+import type { LearningDay } from "@/types/learning-trace";
 import type { EvidenceDetail } from "@/components/EvidenceModal";
 
 interface ContextSidebarProps {
-  trace: LearningTrace;
+  day: LearningDay;
   confirmedCount: number;
   onOpenEvidence: (detail: EvidenceDetail) => void;
 }
 
 export function ContextSidebar({
-  trace,
+  day,
   confirmedCount,
   onOpenEvidence,
 }: ContextSidebarProps) {
@@ -41,7 +41,7 @@ export function ContextSidebar({
           Mỗi giải thích được đối chiếu với học liệu chính thức.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {trace.sources.map((source) => (
+          {day.sources.map((source) => (
             <button
               key={source.id}
               type="button"
@@ -74,12 +74,12 @@ export function ContextSidebar({
               Lịch sử hỏi AI
             </h2>
             <p className="text-[11px] text-[#8290a4]">
-              {trace.session.interactionCount} lượt trong buổi
+              {day.interactionCount} lượt trong {day.label}
             </p>
           </div>
         </div>
         <div className="mt-4 space-y-2.5">
-          {trace.interactions.map((interaction) => (
+          {day.interactions.map((interaction) => (
             <button
               key={interaction.turnId}
               type="button"
