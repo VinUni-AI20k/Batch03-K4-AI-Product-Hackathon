@@ -86,4 +86,9 @@ Dữ liệu trong `data/` là dữ liệu thật của khoá học (đã ẩn da
 5. **Không cố suy ngược danh tính** từ dữ liệu đã ẩn danh (`[học viên]`, mã `U`/`C`/`T`/`M`).
 6. Sau sự kiện, **xoá các bản sao data pack** khỏi máy cá nhân và các công cụ đã upload nếu ban tổ chức yêu cầu.
 
-Không commit API key. Key chỉ đọc trong server route qua `process.env` — không đặt tên `NEXT_PUBLIC_*` cho key vì biến đó đi vào bundle JS công khai.
+Không commit API key. Key chỉ đọc trong **server route** qua `process.env` — không đặt tên `NEXT_PUBLIC_*` cho key vì biến đó đi vào bundle JS công khai. `.gitignore` đã bắt `.env`, `.env.local` và mọi biến thể.
+
+## Ghi nhận
+
+Codebase khởi tạo từ template [ai-website-cloner-template](https://github.com/JCodesMore/ai-website-cloner-template) — MIT, JCodesMore.
+
