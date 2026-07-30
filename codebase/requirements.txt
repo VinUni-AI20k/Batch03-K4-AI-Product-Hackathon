@@ -1,0 +1,6 @@
+discord.py==2.4.0     # lớp ① — đọc/gửi tin nhắn Discord
+anthropic>=0.69       # lớp ③ — gọi Claude
+pydantic>=2.9         # schema quyết định AI
+python-dotenv>=1.0    # đọc .env khi chạy local
+PyYAML>=6.0           # đọc eval/golden-set.yaml
+pytest>=8.3           # test
