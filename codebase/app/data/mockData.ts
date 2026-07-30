@@ -1,11 +1,6 @@
 import type { ChatMessageData, Lecture } from "../types";
 
-export const initialLectures: Lecture[] = [
-  { id: "lecture-foundation", name: "AI & LLM Foundation.pdf", uploadedAt: "Hôm nay, 09:42", pageCount: 29, status: "ready", fileType: "pdf" },
-  { id: "lecture-product", name: "Xác định bài toán cho AI.pdf", uploadedAt: "Hôm qua, 16:18", pageCount: 29, status: "ready", fileType: "pdf" },
-  { id: "lecture-transformer", name: "Transformer nâng cao.pptx", uploadedAt: "28/07/2026, 14:05", status: "processing", fileType: "pptx" },
-  { id: "lecture-error", name: "Workshop notes.pdf", uploadedAt: "26/07/2026, 10:11", status: "error", fileType: "pdf" },
-];
+export const initialLectures: Lecture[] = [];
 
 export const initialMessages: ChatMessageData[] = [{
   id: "welcome", role: "assistant", text: "",

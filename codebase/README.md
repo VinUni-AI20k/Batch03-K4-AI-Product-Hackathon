@@ -22,11 +22,12 @@ npm run lint
 
 ## Phần đang dùng mock
 
-- Danh sách bài giảng ban đầu và nội dung 5 slide mẫu.
-- Upload PDF/PPTX: kiểm tra định dạng, kích thước và mô phỏng độ trễ; chưa lưu file lên server.
-- Số trang của file PDF mới được gán giả là 12; PPTX hiển thị trạng thái chuyển đổi.
+- Nội dung 5 trang của bài giảng mẫu chỉ xuất hiện trước lần upload đầu tiên.
+- Upload PDF/PPTX kiểm tra định dạng, kích thước và mô phỏng độ trễ; file chỉ được giữ trong bộ nhớ trình duyệt, chưa lưu lên server.
+- PDF thật được render bằng PDF.js từ object URL và đọc đúng tổng số trang.
+- PPTX được giữ trong danh sách nhưng chưa có dịch vụ chuyển đổi sang PDF.
 - Câu trả lời AI, citation, confidence score và hai lựa chọn hỏi lại G10.
 - Lưu phản hồi 👍/👎 và nội dung góp ý trong state của phiên hiện tại.
-- Viewer hiển thị layout slide mô phỏng; chưa tích hợp PDF.js hoặc dịch vụ render PowerPoint.
+- Lịch sử tài liệu upload không tồn tại sau khi tải lại trang.
 
 Các API mock được gom trong `app/services/mockApi.ts` để có thể thay bằng API thật mà không đổi contract của component.

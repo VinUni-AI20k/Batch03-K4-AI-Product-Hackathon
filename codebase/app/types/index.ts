@@ -8,6 +8,8 @@ export interface Lecture {
   status: LectureStatus;
   fileType: "pdf" | "pptx";
   progress?: number;
+  file?: File;
+  fileUrl?: string;
 }
 
 export interface Citation { page: number; label: string; }

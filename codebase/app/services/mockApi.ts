@@ -2,10 +2,18 @@ import type { Lecture, TutorAnswer } from "../types";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export async function uploadLecture(file: File): Promise<Lecture> {
-  await delay(1100);
+export async function uploadLecture(file: File, id: string, fileUrl: string): Promise<Lecture> {
+  await delay(450);
   const fileType = file.name.toLowerCase().endsWith(".pptx") ? "pptx" : "pdf";
-  return { id: `lecture-${Date.now()}`, name: file.name, uploadedAt: "Vừa xong", pageCount: fileType === "pdf" ? 12 : undefined, status: fileType === "pdf" ? "ready" : "processing", fileType };
+  return {
+    id,
+    name: file.name,
+    uploadedAt: new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" }).format(new Date()),
+    status: fileType === "pdf" ? "ready" : "processing",
+    fileType,
+    file,
+    fileUrl,
+  };
 }
 
 export async function askTutor(question: string, page: number): Promise<TutorAnswer> {
