@@ -620,16 +620,21 @@ button {
 
 .tutor-avatar {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   flex: none;
   place-items: center;
-  border-radius: 10px 10px 4px;
-  background: var(--navy);
-  color: #fff;
-  font-weight: 900;
-  font-size: 0.85rem;
-  box-shadow: 4px 4px 0 var(--red);
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(18, 79, 140, 0.12);
+}
+
+.tutor-avatar img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
 }
 
 .tutor-bubble {

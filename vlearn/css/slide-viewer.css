@@ -744,14 +744,19 @@ button {
 .tutor-avatar-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--navy), var(--blue-light));
-  color: #ffffff;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   display: grid;
   place-items: center;
-  font-weight: 900;
-  font-size: 0.9rem;
-  box-shadow: 2px 2px 0 var(--red);
+  box-shadow: 0 4px 12px rgba(18, 79, 140, 0.12);
+}
+
+.tutor-avatar-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
 }
 
 .tutor-header-title {
