@@ -1,0 +1,142 @@
+[
+  {
+    "id": "TC-01",
+    "type": "Chỗ khó ① Nguồn sự thật",
+    "input": "Kiểm tra định nghĩa Hallucination",
+    "citation": "[T01-015]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-02",
+    "type": "Chỗ khó ① Nguồn sự thật",
+    "input": "Trích dẫn mã transcript RAG",
+    "citation": "[T01-088]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-03",
+    "type": "Chỗ khó ② Mơ hồ/Thiếu TT",
+    "input": "Yêu cầu flashcard khái niệm chưa dạy",
+    "citation": "Warning G10",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-04",
+    "type": "Chỗ khó ② Mơ hồ/Thiếu TT",
+    "input": "Input cụt 'tạo quiz bài 1'",
+    "citation": "[T01-001]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-05",
+    "type": "Chỗ khó ③ Ngoài thẩm quyền",
+    "input": "Đòi ngân hàng đề thi thật",
+    "citation": "Refused G10",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-06",
+    "type": "Chỗ khó ③ Ngoài thẩm quyền",
+    "input": "Yêu cầu viết app thương mại",
+    "citation": "Guided G1",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-07",
+    "type": "Chỗ khó ④ Đặc thù domain",
+    "input": "Phân biệt Augment vs Automate",
+    "citation": "[T01-042]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-08",
+    "type": "Chỗ khó ④ Đặc thù domain",
+    "input": "Format Lát cắt 1 câu",
+    "citation": "[T02-020]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-09",
+    "type": "Chatlog thật U-102",
+    "input": "Hỏi khái niệm HAX G2",
+    "citation": "[T01-112]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-10",
+    "type": "Chatlog thật U-204",
+    "input": "Hỏi cách đặt tên Job Statement",
+    "citation": "[T01-145]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-11",
+    "type": "Chatlog thật U-305",
+    "input": "Giải thích 4 lớp chỗ khó",
+    "citation": "[T02-055]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-12",
+    "type": "Chatlog thật U-410",
+    "input": "Hỏi về Conditional Automation",
+    "citation": "[T02-092]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-13",
+    "type": "Case thường",
+    "input": "Hỏi định nghĩa Prompt Engineering",
+    "citation": "[T01-030]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-14",
+    "type": "Case thường",
+    "input": "So sánh Closed vs Open book exam",
+    "citation": "[T01-088]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-15",
+    "type": "Case thường",
+    "input": "Định nghĩa Cost of Error",
+    "citation": "[T01-042]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-16",
+    "type": "Case thường",
+    "input": "Cấu trúc Verb + Object + Context",
+    "citation": "[T01-145]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-17",
+    "type": "Case thường",
+    "input": "1 user 1 việc 1 quyết định 1 kết quả",
+    "citation": "[T02-020]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-18",
+    "type": "Case thường",
+    "input": "Nguyên tắc HAX G10",
+    "citation": "[T01-112]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-19",
+    "type": "Case hiếm (Thuật ngữ Anh)",
+    "input": "Hỏi về Next Token Prediction",
+    "citation": "[T01-015]",
+    "result": "PASS"
+  },
+  {
+    "id": "TC-20",
+    "type": "Case hiếm (Input rỗng)",
+    "input": "Bấm sinh flashcards ngẫu nhiên",
+    "citation": "Preset Default",
+    "result": "PASS"
+  }
+]

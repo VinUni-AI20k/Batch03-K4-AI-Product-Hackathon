@@ -678,9 +678,22 @@ class VLearnApp {
     }, 600);
   }
 
-  renderGoldenSetTable() {
+  async renderGoldenSetTable() {
     if (!this.evalTableBody) return;
-    this.evalTableBody.innerHTML = GOLDEN_SET_CASES.map(c => `
+    let cases = GOLDEN_SET_CASES;
+    try {
+      const paths = ['../../eval/golden_set.json', '../eval/golden_set.json', 'eval/golden_set.json'];
+      for (const p of paths) {
+        const res = await fetch(p);
+        if (res.ok) {
+          cases = await res.json();
+          break;
+        }
+      }
+    } catch (e) {
+      // Fallback silently to GOLDEN_SET_CASES
+    }
+    this.evalTableBody.innerHTML = cases.map(c => `
       <tr>
         <td><b>${c.id}</b></td>
         <td><span class="badge badge-topic">${c.type}</span></td>
