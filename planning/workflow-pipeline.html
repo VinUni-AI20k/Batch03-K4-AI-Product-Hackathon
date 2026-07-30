@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Quiz VLearn — Pipeline & Timeline</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2438;
+    --border:#2a3350; --text:#e8ecf7; --muted:#8f9ac2;
+    --accent:#6c8dff; --accent2:#8f6cff; --green:#3ecf8e;
+    --amber:#f5b74a; --red:#f0616d; --cyan:#4fd1c5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Segoe UI","Inter",system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+  }
+  header{
+    padding:36px 48px 24px; border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#161d2e,#0f1420);
+  }
+  header h1{margin:0 0 6px; font-size:26px; letter-spacing:.2px;}
+  header .sub{color:var(--muted); font-size:14.5px;}
+  header .tags{margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;}
+  .tag{
+    font-size:12.5px; padding:4px 10px; border-radius:20px;
+    border:1px solid var(--border); color:var(--muted); background:var(--panel);
+  }
+  main{padding:36px 48px 64px; max-width:1280px; margin:0 auto;}
+  section{margin-bottom:56px;}
+  .section-head{display:flex; align-items:baseline; gap:12px; margin-bottom:20px;}
+  .section-head .num{
+    font-size:13px; color:var(--bg); background:var(--accent);
+    width:26px; height:26px; border-radius:50%; display:flex;
+    align-items:center; justify-content:center; font-weight:700;
+  }
+  .section-head h2{margin:0; font-size:19px;}
+  .section-head .desc{color:var(--muted); font-size:13.5px; margin-left:auto;}
+
+  /* ---------- PIPELINE ---------- */
+  .pipeline{
+    display:flex; align-items:stretch; gap:0; overflow-x:auto; padding-bottom:8px;
+  }
+  .pnode{
+    min-width:168px; max-width:168px; background:var(--panel);
+    border:1px solid var(--border); border-radius:10px; padding:14px 12px;
+    position:relative; flex-shrink:0;
+  }
+  .pnode .k{font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:6px;}
+  .pnode .t{font-size:13.5px; font-weight:600; margin-bottom:4px;}
+  .pnode .d{font-size:12px; color:var(--muted);}
+  .arrow{
+    display:flex; align-items:center; justify-content:center; min-width:34px; color:var(--muted); font-size:18px;
+  }
+  .pnode.input{border-color:#3a4a7a;}
+  .pnode.ai{border-color:var(--accent2); box-shadow:0 0 0 1px rgba(143,108,255,.15);}
+  .pnode.ai .k{color:var(--accent2);}
+  .pnode.check{border-color:var(--amber);}
+  .pnode.check .k{color:var(--amber);}
+  .pnode.human{border-color:var(--cyan);}
+  .pnode.human .k{color:var(--cyan);}
+  .pnode.output{border-color:var(--green);}
+  .pnode.output .k{color:var(--green);}
+
+  .loop-note{
+    margin-top:14px; font-size:12.5px; color:var(--muted);
+    border-left:2px solid var(--accent); padding-left:10px;
+  }
+
+  .risk-grid{
+    margin-top:22px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .risk-card{
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:14px;
+  }
+  .risk-card .n{font-size:11px; color:var(--red); font-weight:700; letter-spacing:.4px; margin-bottom:6px;}
+  .risk-card .q{font-size:13px; font-weight:600; margin-bottom:6px;}
+  .risk-card .a{font-size:12px; color:var(--muted);}
+
+  .automation-note{
+    margin-top:18px; background:var(--panel2); border:1px solid var(--border);
+    border-radius:10px; padding:16px 18px; font-size:13.5px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .automation-note .badge{
+    flex-shrink:0; background:rgba(245,183,74,.15); color:var(--amber);
+    border:1px solid rgba(245,183,74,.4); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:700;
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline{position:relative; margin-left:14px; padding-left:28px; border-left:2px solid var(--border);}
+  .tl-item{position:relative; margin-bottom:26px;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-dot{
+    position:absolute; left:-35px; top:2px; width:14px; height:14px; border-radius:50%;
+    background:var(--accent); border:3px solid var(--bg); box-shadow:0 0 0 2px var(--accent);
+  }
+  .tl-item.now .tl-dot{background:var(--amber); box-shadow:0 0 0 2px var(--amber);}
+  .tl-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px;
+  }
+  .tl-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .tl-time{font-size:12px; color:var(--accent); font-weight:700; background:rgba(108,141,255,.12); padding:2px 8px; border-radius:6px;}
+  .tl-title{font-weight:700; font-size:14.5px;}
+  .tl-now-badge{font-size:11px; color:var(--amber); border:1px solid var(--amber); padding:1px 7px; border-radius:20px;}
+  .tl-tasks{font-size:12.8px; color:var(--muted); margin:0; padding-left:18px;}
+  .tl-tasks li{margin-bottom:2px;}
+  .tl-owner{font-size:11.5px; color:var(--cyan); margin-top:6px;}
+
+  .capacity-bar-wrap{margin-top:24px; background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 18px;}
+  .capacity-bar-wrap .row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+  .bar{height:10px; border-radius:6px; background:#0f1420; overflow:hidden; display:flex;}
+  .bar .fill{background:linear-gradient(90deg,var(--green),var(--accent)); height:100%;}
+  .bar .buffer{background:#2a3350; height:100%;}
+
+  .team-note{
+    margin-top:18px; font-size:12.5px; color:var(--red); background:rgba(240,97,109,.08);
+    border:1px solid rgba(240,97,109,.35); padding:10px 14px; border-radius:8px;
+  }
+
+  footer{padding:24px 48px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); text-align:center;}
+
+  @media (max-width:900px){
+    header,main{padding-left:20px; padding-right:20px;}
+    .risk-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AI tạo quiz cuối bài — VLearn</h1>
+  <div class="sub">Hướng A · Tính năng AI mới · Nhóm 3 người · Khoá 4 · Mini Hackathon AI Batch 03</div>
+  <div class="tags">
+    <span class="tag">Automation: Augment</span>
+    <span class="tag">Cost-of-error: Cao</span>
+    <span class="tag">Câu hỏi: Ứng dụng, không phải ghi nhớ</span>
+    <span class="tag">3/4-5 người</span>
+    <span class="tag">Hiện tại: giữa CP1</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= PIPELINE ================= -->
+  <section>
+    <div class="section-head">
+      <div class="num">1</div>
+      <h2>Pipeline kỹ thuật — sinh quiz từ bài giảng</h2>
+      <div class="desc">1 user (học viên) · 1 việc (kiểm tra hiểu bài) · 1 quyết định AI (sinh câu hỏi) · 1 kết quả (quiz có trích dẫn)</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pnode input">
+        <div class="k">Input</div>
+        <div class="t">Transcript bài giảng</div>
+        <div class="d">Từ data/vlearn-pack, có mã đoạn trích dẫn</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode input">
+        <div class="k">Chuẩn bị</div>
+        <div class="t">Trích đoạn theo mã</div>
+        <div class="d">Chunk nội dung theo mã đoạn để trích dẫn ngược</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode ai">
+        <div class="k">Prompt</div>
+        <div class="t">Ràng buộc nguồn + dạng câu hỏi</div>
+        <div class="d">"Chỉ dùng nội dung đoạn X" + "hỏi ứng dụng (Áp dụng), không hỏi ghi nhớ/định nghĩa"</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode ai">
+        <div class="k">AI call thật</div>
+        <div class="t">Sinh câu hỏi ứng dụng</div>
+        <div class="d">Tình huống thực tế áp dụng khái niệm — Gemini (Google AI Studio free tier)</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode check">
+        <div class="k">Kiểm tra tự động</div>
+        <div class="t">Chống bịa (lớp ①)</div>
+        <div class="d">Khái niệm + tình huống ứng dụng phải trace về mã đoạn nguồn, không thì loại</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode human">
+        <div class="k">Người duyệt</div>
+        <div class="t">GV/TA xem trước</div>
+        <div class="d">Vì augment: AI gợi ý, người quyết trước khi phát cho học viên</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pnode output">
+        <div class="k">Output</div>
+        <div class="t">Quiz cuối bài</div>
+        <div class="d">Câu hỏi + đáp án + trích dẫn [đoạn N] hiện cho học viên</div>
+      </div>
+    </div>
+
+    <div class="loop-note">
+      ↺ Vòng lặp đo lường: Golden set (≥20 case từ 6 transcript) chạy qua toàn bộ pipeline → chấm theo quality bar đã chốt → chọn 1 failure đau nhất → sửa prompt/kiểm tra → chạy lại trọn bộ (không chỉ case vừa sửa).
+    </div>
+
+    <div class="automation-note" style="border-color:rgba(79,209,197,.4); background:rgba(79,209,197,.06);">
+      <div class="badge" style="background:rgba(79,209,197,.15); color:var(--cyan); border-color:rgba(79,209,197,.4);">Quyết định thiết kế</div>
+      <div><b>Câu hỏi ứng dụng thực tế, không phải câu hỏi ghi nhớ/định nghĩa.</b> Thay vì "Định nghĩa X là gì?", quiz hỏi kiểu "Trong tình huống Y, áp dụng khái niệm X thế nào?" — đúng tầng Apply/Analyze của Bloom's Taxonomy, buộc học viên hiểu thật thay vì học thuộc. Đây là điểm khác biệt so với quiz tự động thông thường (giải pháp tương tự đa số dừng ở câu hỏi ghi nhớ — đưa vào spec §3).
+        <br><br><b>Đánh đổi cần biết:</b> câu ứng dụng khó bám sát nguồn hơn câu ghi nhớ — AI phải "dựng" một tình huống, dễ lấn sang lớp ① (bịa chi tiết không có trong bài giảng) hơn là trích nguyên văn. Vì vậy kiểm tra tự động (node "Chống bịa") phải soát cả: khái niệm dùng trong tình huống có đúng đoạn nguồn không, chứ không chỉ soát câu hỏi có trích dẫn hay không.</div>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="n">① NGUỒN SỰ THẬT</div>
+        <div class="q">AI dựng tình huống ứng dụng có chi tiết không có trong bài giảng?</div>
+        <div class="a">Rủi ro cao hơn câu ghi nhớ vì phải "dựng" bối cảnh. Kiểm tra: khái niệm cốt lõi trong tình huống phải trace được về đoạn nguồn; chi tiết bối cảnh (số liệu, tên riêng...) không được bịa thêm ngoài đoạn đó.</div>
+      </div>
+      <div class="risk-card">
+        <div class="n">② MƠ HỒ / THIẾU TT</div>
+        <div class="q">Bài giảng chỉ có lý thuyết, không có ví dụ ứng dụng nào để mượn?</div>
+        <div class="a">Không cố ép ra câu ứng dụng nếu bài giảng thuần định nghĩa — hạ xuống câu hỏi hiểu khái niệm (comprehension) và báo rõ, thay vì bịa tình huống.</div>
+      </div>
+      <div class="risk-card">
+        <div class="n">③ NGOÀI PHẠM VI</div>
+        <div class="q">Học viên đòi tình huống ứng dụng ở ngành/lĩnh vực khác bài học?</div>
+        <div class="a">Từ chối kèm hướng dẫn: "tình huống ứng dụng bám theo ví dụ trong bài này; muốn khác lĩnh vực dùng [kênh khác]".</div>
+      </div>
+      <div class="risk-card">
+        <div class="n">④ ĐẶC THÙ DOMAIN</div>
+        <div class="q">Tình huống ứng dụng đúng khái niệm nhưng sai ngữ cảnh thực tế → học viên áp dụng sai ngoài đời</div>
+        <div class="a">Rủi ro nghiêm trọng nhất của câu hỏi ứng dụng — bắt buộc GV/TA duyệt cả tính hợp lý của tình huống, không chỉ đúng-sai đáp án.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TIMELINE ================= -->
+  <section>
+    <div class="section-head">
+      <div class="num">2</div>
+      <h2>Timeline & phân công nhóm — Khoá 4</h2>
+      <div class="desc">3 người, chưa chia vai cố định — điền tên khi chốt</div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item now">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">15:00 N1 · CP1</span>
+            <span class="tl-title">Chốt Canvas</span>
+            <span class="tl-now-badge">ĐANG Ở ĐÂY</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Hoàn thiện Canvas 7 dòng + evidence đầu</li>
+            <li>⚠️ Hỏi TA ngay: nhóm 3 người có hợp lệ không (thể lệ yêu cầu 4-5)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">15:00 → 17:00 N1</span>
+            <span class="tl-title">Build tới CP2</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Flow chính bấm được (Sketch/Mock, data giả, chưa cần AI)</li>
+            <li>Song song: nghiên cứu 1 sản phẩm tương tự/người (15'/người)</li>
+            <li>Thiết kế lát cắt 1 câu + non-goals + ≥4 nguyên tắc HAX/PAIR</li>
+          </ul>
+          <div class="tl-owner">Chủ lực: Người 3 (build) · Người 2 (thiết kế/spec)</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">17:00 N1 · CP2</span>
+            <span class="tl-title">Show được thứ bấm được</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Mốc hỗ trợ kỹ thuật — kẹt >20' gọi TA ngay</li>
+            <li>Commit đầu tiên lên repo</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">17:00 N1 → 10:30 N2 (qua đêm)</span>
+            <span class="tl-title">Tích hợp AI thật + golden set + chốt spec</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>AI call thật vào quyết định trung tâm (sinh quiz)</li>
+            <li>Golden set ≥20 case từ 6 transcript có sẵn</li>
+            <li>4 lớp chỗ khó + ≥8 kịch bản rủi ro</li>
+            <li>Viết spec.md §1-§9 hoàn chỉnh</li>
+            <li>⚠️ Ngủ luân phiên — không cả 3 người thức trắng</li>
+            <li>⚠️ Commit spec.md trước 23:59 N1 (xem cảnh báo deadline)</li>
+          </ul>
+          <div class="tl-owner">Chủ lực: Người 3 (AI call) · Người 1 (golden set) · Người 2 (spec)</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">10:30 N2 · CP3</span>
+            <span class="tl-title">AI chạy thật + đo lượt đầu</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Chạy trọn golden set → bảng % lượt 1</li>
+            <li>Không hardcode — TA kiểm tra lời gọi AI thật</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">12:00 N2 · CP4</span>
+            <span class="tl-title">Chốt tiến độ</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Evidence chuẩn A/B có log · bảng impact + ứng viên đã loại</li>
+            <li>4 lớp cụ thể · ≥4 nguyên tắc có vị trí áp dụng · quality bar bằng số</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">12:00 → 14:00 N2</span>
+            <span class="tl-title">Validation với người thật</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>≥5 người ngoài nhóm thử — ưu tiên willing users đã khai ở CP1</li>
+            <li>3 câu hỏi chuẩn, log nguyên văn + đổi 1-2 thứ vào changelog</li>
+          </ul>
+          <div class="tl-owner">Cả nhóm chia nhau đi hỏi (đổi chéo zone khác nhanh nhất)</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">14:00 N2 · CP5</span>
+            <span class="tl-title">Xác minh + dry run</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>Feedback log ≥5 mẩu có tên · changelog · slide final</li>
+            <li>Dry run có bấm giờ · mọi người sẵn sàng bị hỏi ngẫu nhiên phần mình làm</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-time">15:00 N2 · CP6</span>
+            <span class="tl-title">Demo</span>
+          </div>
+          <ul class="tl-tasks">
+            <li>5' trình bày (slide 6 trang, 1 case chuẩn + 1 case chỗ khó live) + 5' Q&A</li>
+            <li>Backup video/screenshot phòng live hỏng</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="capacity-bar-wrap">
+      <div class="row"><span>Effort ước lượng: ~24.5 giờ-người</span><span>Capacity: ~36 giờ-người (không tính buffer khuya)</span></div>
+      <div class="bar"><div class="fill" style="width:68%"></div><div class="buffer" style="width:32%"></div></div>
+      <div class="row"><span></span><span>Buffer ~32% — giữ lại cho sửa lỗi sau CP3, không lấp đầy bằng task mới</span></div>
+    </div>
+
+    <div class="team-note">
+      ⚠️ Nhóm 3 người trong khi thể lệ yêu cầu 4-5 — xác nhận với TA ngay tại CP1. Deadline spec.md cũng có mâu thuẫn giữa rubric (23:59 N1) và bảng mốc CP4 Khoá 4 (12:00 N2) — hỏi TA tại CP2 để tránh mất 5 điểm nộp oan.
+    </div>
+  </section>
+
+</main>
+
+<footer>Sprint plan gốc: planning/sprint-plan.md · Nguồn: 01-de-bai.md · 02-guide.md · 04-rubric.md</footer>
+
+</body>
+</html>
