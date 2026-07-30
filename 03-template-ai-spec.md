@@ -24,14 +24,17 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 
 | Ứng viên ý tưởng | Bao nhiêu người gặp | Tần suất | Tốn gì mỗi lần | Khả thi build | Chọn? |
 |---|---|---|---|---|---|
-| **1. Context-Aware AI Tutor (Bôi đen slide + Micro-Quiz + Auto Jump)** | 18/24 HV K3&K4 khảo sát (75%) | Hàng ngày / Mỗi buổi học | 10-15 phút chuyển tab & đọc giải thích lệch bối cảnh | Cao (Web Prototype + AI Call) | **CHỌN** |
-| **2. Chatbot tra cứu tài liệu tổng hợp (RAG Chatbot chung)** | 12/24 HV K3&K4 khảo sát (50%) | 2-3 lần/tuần | 5-7 phút gõ prompt mô tả lại slide | Trung bình | LOẠI |
+| **1. Context-Aware AI Tutor (Tóm tắt Slide + Bôi đen chữ / Khoanh hình ảnh sơ đồ + Micro-Quiz ôn tập + Auto Jump lấp lỗ hổng)** | 21/24 HV K3&K4 khảo sát (87.5%) | Hàng ngày / Mỗi buổi học | 10-15 phút chuyển tab, gõ lại sơ đồ & đọc giải thích lệch bối cảnh | Cao (Web Prototype + AI Call / Vision) | **CHỌN** |
+| **2. Chatbot tra cứu tài liệu tổng hợp (RAG Chatbot dạng Chat riêng)** | 12/24 HV K3&K4 khảo sát (50%) | 2-3 lần/tuần | 5-7 phút gõ prompt mô tả lại slide/sơ đồ | Trung bình | LOẠI |
 | **3. Tự động dịch Slide sang tiếng Việt** | 8/24 HV K3&K4 khảo sát (33%) | Thỉnh thoảng | 2-3 phút đọc bản dịch thô | Cao | LOẠI |
 
 - Ứng viên ĐÃ LOẠI + vì sao:
-  * *Chatbot RAG chung:* Bị loại vì học viên vẫn phải chủ động gõ/mô tả lại ngữ cảnh ("Tôi đang xem Slide X..."), không giải quyết triệt để vấn đề ngắt quãng luồng học.
-  * *Tự động dịch Slide:* Bị loại vì không giải quyết được vấn đề hiểu sai bản chất kiến thức chuyên ngành, dịch thô dễ gây hiểu nhầm hơn.
-- Ứng viên CHỌN + vì sao: Chọn **Ứng viên 1** vì bằng chứng tác động rõ ràng nhất ($18/24$ HV K3&K4 gặp, tần suất cao), giải quyết trực tiếp 0.5s bôi đen bối cảnh và có cơ chế Micro-Quiz + Auto-Jump lấp lỗ hổng kiến thức ngay lập tức.
+  * *Chatbot RAG chung:* Bị loại vì học viên vẫn phải gõ thủ công mô tả bối cảnh hoặc không thể gửi nhanh vùng hình ảnh/sơ đồ trên slide, chưa giải quyết triệt me vấn đề ngắt quãng luồng tư duy.
+  * *Tự động dịch Slide:* Bị loại vì dịch thô không giúp học viên hiểu bản chất các sơ đồ kiến thức chuyên ngành (như Microservices/Coupling), dễ gây hiểu sai.
+- Ứng viên CHỌN + vì sao: Chọn **Ứng viên 1** vì tác động vượt trội ($21/24$ HV K3&K4 gặp), giải quyết trực tiếp 3 nhu cầu cốt lõi:
+  * **Tóm tắt Slide tự động:** Lập tức cô đọng 3 ý chính của slide ngay khi chuyển trang.
+  * **Bôi đen chữ / Khoanh vùng hình ảnh (Image Selection):** Giúp học viên hỏi ngay lập tức về các đoạn văn hoặc sơ đồ phức tạp mà không cần gõ mô tả lại.
+  * **Micro-Quiz ôn tập & Auto-Jump:** Đánh giá độ hiểu bài ngay tại chỗ và tự động nhảy về slide kiến thức nền để lấp lỗ hổng nếu học viên trả lời sai.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 - **Khanmigo (Khan Academy):**
@@ -69,7 +72,7 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 | STT | Tình huống cụ thể | Lớp chỗ khó | Hành vi mong muốn (Nói gì, hiện gì, cho user làm gì tiếp) | Nguyên tắc áp (HAX/PAIR) |
 |:---:|---|---|---|---|
 | 1 | Học viên hỏi thuật ngữ không hề có trong nội dung slide hiện tại | ① Nguồn sự thật | AI báo rõ: *"Khái niệm này không có trong Slide 12. Theo kiến thức chung..."* và hiển thị nhãn `[Ngoài Slide]`. | G2 / PAIR Trust |
-| 2 | Học viên bôi đen một từ quá ngắn hoặc vô nghĩa (VD: *"và"*, *"là"*) | ② Mơ hồ/Thiếu thông tin | AI không giải thích tràn lan mà phản hồi: *"Bạn đang chọn từ chưa rõ bối cảnh. Hãy chọn lại thuật ngữ cần hỏi nhé."* | G10 (Thu hẹp phạm vi) |
+| 2 | Học viên khoanh một vùng ảnh quá nhỏ hoặc bôi đen từ vô nghĩa (VD: *"và"*, *"là"*) | ② Mơ hồ/Thiếu thông tin | AI không giải thích tràn lan mà phản hồi: *"Vùng chọn chưa rõ bối cảnh. Bạn vui lòng khoanh lại sơ đồ hoặc chọn lại thuật ngữ cần hỏi nhé."* | G10 (Thu hẹp phạm vi) |
 | 3 | Học viên yêu cầu AI giải bài tập nộp điểm / làm hộ Assignment | ③ Ngoài phạm vi/Thẩm quyền | AI từ chối giải hộ: *"Mình không thể làm bài hộ bạn, nhưng mình có thể giải thích lý thuyết Slide 12 để bạn tự làm nhé!"* | G1 (Rõ phạm vi) |
 | 4 | Học viên nhầm lẫn khái niệm Microservices (Slide 12) với Monolith (Slide 5) | ④ Đặc thù Domain | AI chỉ ra lỗi sai kiến thức cốt lõi và đính kèm Card: `📌 Open Slide 5: Loose Coupling Concepts`. | G11 (Giải thích lý do) |
 | 5 | AI sinh câu hỏi Micro-Quiz quá dài hoặc quá khó vượt trình độ slide | ④ Đặc thù Domain | Prompt được thiết kế giới hạn câu hỏi Quiz chỉ 1 câu dạng Trắc nghiệm / Đúng-Sai trực diện. | G2 (Phù hợp năng lực) |
@@ -92,13 +95,13 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
   3. *Độ ngắn gọn (Conciseness):* Đoạn giải thích $\le 3$ câu, Micro-Quiz $\le 2$ câu (Pass/Fail).
   4. *Trải nghiệm lấp lỗ hổng (Gap Bridging):* Phát hiện trả lời sai và kích hoạt đúng Card chuyển slide (Pass/Fail).
 - Golden set: Bộ $\ge 20$ test cases lưu tại file `eval/golden-set.json` (Gồm 10 case lấy từ chatlog thật + 8 case phủ 4 lớp chỗ khó + 2 case hiếm).
-- Quality bar: **"Đạt khi $\ge 80\%$ qua bộ test Golden Set, và 100% các case thuộc Lớp ④ (Đặc thù Domain) không được sai kiến thức cốt lõi."**
-- Kết quả các lượt chạy:
+- Quality bar: "Đạt khi ≥ 80% qua bộ test Golden Set, và 100% các case thuộc Lớp ④ (Đặc thù Domain) không được sai kiến thức cốt lõi."
+- Kết quả các lượt chạy (Cập nhật qua các mốc CP3 - CP6):
 
-| Lượt chạy | Ngày chạy | Số case Đạt / Tổng | Tỷ lệ (%) | Ghi chú / Failure chính |
+| Lượt chạy | Mốc thời gian | Số case Đạt / Tổng | Tỷ lệ (%) | Ghi chú / Failure chính |
 |:---:|:---:|:---:|:---:|---|
-| Lượt 1 (Baseline) | N1 | 13/20 | 65% | AI trả lời quá dài, chưa tự sinh Micro-Quiz |
-| Lượt 2 (Fix Prompt) | N1 | 17/20 | 85% | Đã đạt Quality Bar! Còn lỗi nhỏ ở teen-code |
+| Lượt 1 (Test Prompt nháp) | CP3 (Sáng N2) | _ / 20 | _ % | (Sẽ cập nhật sau khi nối AI Call thật tại CP3) |
+| Lượt 2 (Sau khi fix Prompt) | CP4 (Trưa N2) | _ / 20 | _ % | (Dự kiến chạy lại toàn bộ bộ test để chốt % cho Demo) |
 
 ## §8. Phân công & kế hoạch
 - Phân công có tên:

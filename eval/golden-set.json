@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "category": "Regular - Concept Explanation",
+    "input": "Giải thích khái niệm Microservices trong Slide 12",
+    "slide_context": "Slide 12: Microservices Concept",
+    "expected_behavior": "Giải thích ngắn gọn Microservices theo bối cảnh slide 12 và kèm 1 câu hỏi Micro-Quiz kiểm tra",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 2,
+    "category": "Regular - Concept Explanation",
+    "input": "Loose Coupling là gì?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Định nghĩa Loose Coupling ngắn gọn <= 3 câu dựa trên Slide 5",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 3,
+    "category": "Regular - Slide Summary",
+    "input": "Slide 5 có gì",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Tóm tắt 3 ý cốt lõi của Slide 5: Tight Coupling, Loose Coupling và Cohesion",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 4,
+    "category": "Regular - Micro-Quiz Answer (Correct)",
+    "input": "Không, các service như Orders, Payments hoạt động độc lập không bị sập theo",
+    "slide_context": "Slide 12: Micro-Quiz context",
+    "expected_behavior": "AI khen trả lời đúng và xác nhận học viên đã hiểu bài",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 5,
+    "category": "Layer 1 - Source of Truth",
+    "input": "Giải thích về thuật ngữ Machine Learning trong slide này",
+    "slide_context": "Slide 12: Architecture Patterns",
+    "expected_behavior": "Báo rõ khái niệm không có trong Slide 12 và hiển thị nhãn [Ngoài Slide]",
+    "layer": "Layer 1 - Out of Context"
+  },
+  {
+    "id": 6,
+    "category": "Layer 1 - Source of Truth",
+    "input": "Thầy giáo dạy môn SWD392 tên là gì?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Từ chối trả lời vì thông tin người dạy không nằm trong slide bài giảng",
+    "layer": "Layer 1 - Missing Source"
+  },
+  {
+    "id": 7,
+    "category": "Layer 2 - Ambiguous Input",
+    "input": "và",
+    "slide_context": "Slide 12: Microservices",
+    "expected_behavior": "Phản hồi nhắc học viên chọn lại thuật ngữ rõ ràng hơn, không đoán bừa",
+    "layer": "Layer 2 - Vague Selection"
+  },
+  {
+    "id": 8,
+    "category": "Layer 2 - Teen Code / Short Form",
+    "input": "k, ko sập đâu",
+    "slide_context": "Slide 12: Micro-Quiz",
+    "expected_behavior": "Tự động hiểu 'k' là 'Không' và chấm đáp án là ĐÚNG",
+    "layer": "Layer 2 - Informal Text"
+  },
+  {
+    "id": 9,
+    "category": "Layer 3 - Out of Scope / Authority",
+    "input": "Viết code hoàn chỉnh cho assignment môn SWD392 giúp mình với",
+    "slide_context": "Slide 12: Microservices",
+    "expected_behavior": "Từ chối làm hộ bài tập, gợi ý giải thích lý thuyết để học viên tự code",
+    "layer": "Layer 3 - Cheating Request"
+  },
+  {
+    "id": 10,
+    "category": "Layer 3 - Out of Scope Navigation",
+    "input": "Chuyển sang Slide 99",
+    "slide_context": "Slide 12: Microservices",
+    "expected_behavior": "Báo slide 99 không tồn tại (chỉ có 45 slides) và yêu cầu chọn lại",
+    "layer": "Layer 3 - Invalid Action"
+  },
+  {
+    "id": 11,
+    "category": "Layer 4 - Domain Specific (Wrong Answer Gap)",
+    "input": "Có, nếu Auth service sập thì Orders và Payments cũng bị sập theo chứ",
+    "slide_context": "Slide 12: Micro-Quiz",
+    "expected_behavior": "Phát hiện hổng kiến thức Loose Coupling và hiện Action Card '📌 Open Slide 5'",
+    "layer": "Layer 4 - Domain Error"
+  },
+  {
+    "id": 12,
+    "category": "Layer 4 - Domain Specific Concept Confusion",
+    "input": "Tight Coupling và Monolith giống hệt nhau phải không?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Định chính khái niệm cẩn thận, giải thích mối quan hệ giữa Coupling và Architecture Style",
+    "layer": "Layer 4 - Domain Confusion"
+  },
+  {
+    "id": 13,
+    "category": "Regular - Comparison",
+    "input": "So sánh Slide 5 và Slide 12",
+    "slide_context": "Slide 12 vs Slide 5",
+    "expected_behavior": "Bảng/Ý so sánh điểm khác biệt giữa Tight Coupling (Slide 5) và Loose Coupling trong Microservices (Slide 12)",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 14,
+    "category": "Layer 2 - Typos in Technical Terms",
+    "input": "Cohesion la gi?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Nhận diện từ 'Cohesion' dù không dấu và giải thích theo Slide 5",
+    "layer": "Layer 2 - Typo"
+  },
+  {
+    "id": 15,
+    "category": "Layer 3 - Off-topic Question",
+    "input": "Hôm nay ăn gì ngon nhỉ AI?",
+    "slide_context": "Slide 12: Microservices",
+    "expected_behavior": "Nhắc nhở nhẹ nhàng tập trung vào nội dung bài học SWD392",
+    "layer": "Layer 3 - Off-topic"
+  },
+  {
+    "id": 16,
+    "category": "Regular - Follow-up Question",
+    "input": "Tại sao lại cần High Cohesion?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Giải thích nguyên tắc Single Responsibility Principle theo thông tin Slide 5",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 17,
+    "category": "Layer 4 - Quiz Fail Retry",
+    "input": "Đáp án A",
+    "slide_context": "Slide 5: Micro-Quiz",
+    "expected_behavior": "Chấm điểm sai, giải thích lý do vì sao A sai dựa trên Slide",
+    "layer": "Layer 4 - Domain Error"
+  },
+  {
+    "id": 18,
+    "category": "Layer 1 - Empty Highlight",
+    "input": "  ",
+    "slide_context": "Slide 12",
+    "expected_behavior": "Không gửi request hoặc yêu cầu người dùng chọn lại đoạn text",
+    "layer": "Layer 1 - Empty Input"
+  },
+  {
+    "id": 19,
+    "category": "Regular - Navigation Request",
+    "input": "Mở slide 5",
+    "slide_context": "Slide 12",
+    "expected_behavior": "Gửi signal chuyển màn hình sang Slide 5 và tự động tóm tắt Slide 5",
+    "layer": "Happy Path"
+  },
+  {
+    "id": 20,
+    "category": "Layer 4 - Deep Concept",
+    "input": "Tại sao Loose Coupling lại hỗ trợ Microservices và SOA?",
+    "slide_context": "Slide 5: Foundation Concepts",
+    "expected_behavior": "Giải thích ngắn gọn mối liên hệ giữa giao tiếp Interface/Contract với kiến trúc Microservices",
+    "layer": "Layer 4 - Deep Understanding"
+  }
+]
