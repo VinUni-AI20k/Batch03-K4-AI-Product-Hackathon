@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Campus Companion - AI Thuc Chien</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="server-bar" aria-label="Discord server bar">
+        <div class="server-logo">AI</div>
+        <div class="server-dot"></div>
+        <div class="server-dot muted"></div>
+        <div class="server-dot muted"></div>
+      </aside>
+
+      <aside class="channel-panel" aria-label="Channel list">
+        <div class="course-card">
+          <p class="eyebrow">VinUni x AI Thực Chiến</p>
+          <h1>Campus Companion</h1>
+          <p>Tra cứu nhanh thông tin sinh hoạt và quy định khi học tại campus.</p>
+        </div>
+
+        <nav class="channels">
+          <span class="channel-label">Kênh khóa học</span>
+          <a class="channel active" href="#"># campus-help</a>
+          <a class="channel" href="#"># announcements</a>
+          <a class="channel" href="#"># lab-support</a>
+          <a class="channel" href="#"># resources</a>
+        </nav>
+
+        <div class="status-card">
+          <span class="status-dot"></span>
+          <div>
+            <strong>CP3 Prototype</strong>
+            <p>UI gọi AI thật qua server local.</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="chat-panel">
+        <header class="chat-header">
+          <div>
+            <p class="eyebrow"># campus-help</p>
+            <h2>Trợ lý sinh hoạt campus</h2>
+          </div>
+          <div class="source-chip">Nguồn: KB chính thức mẫu + AI decision</div>
+        </header>
+
+        <section class="quick-prompts" aria-label="Câu hỏi mẫu">
+          <button type="button" data-prompt="Trưa nay em ăn ở đâu được?">Ăn trưa ở đâu?</button>
+          <button type="button" data-prompt="Em ngủ trưa ở đâu được?">Ngủ trưa ở đâu?</button>
+          <button type="button" data-prompt="Thư viện mở đến mấy giờ?">Giờ thư viện</button>
+          <button type="button" data-prompt="Em nghỉ ở đâu được?">Câu hỏi mơ hồ</button>
+          <button type="button" data-prompt="Hôm nay lớp mình có voucher ăn trưa không?">Thiếu nguồn</button>
+        </section>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <article class="message bot">
+            <div class="avatar">CC</div>
+            <div class="bubble">
+              <div class="message-meta">
+                <strong>Campus Companion</strong>
+                <span>Hôm nay lúc 09:00</span>
+              </div>
+              <p>Chào bạn. Mình có thể hỗ trợ các câu hỏi sinh hoạt campus cho học viên AI Thực Chiến như ăn trưa, nghỉ trưa, thư viện, gửi xe, phòng học và quy định riêng của khóa.</p>
+            </div>
+          </article>
+        </section>
+
+        <form id="chat-form" class="composer">
+          <label class="sr-only" for="question-input">Nhập câu hỏi</label>
+          <input id="question-input" type="text" autocomplete="off" placeholder="Hỏi ví dụ: Trưa nay em ăn ở đâu được?">
+          <button type="submit">Gửi</button>
+        </form>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

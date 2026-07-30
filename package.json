@@ -1,0 +1,10 @@
+{
+  "name": "campus-companion-cp3",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node CP2-campus-assistant/server.mjs",
+    "eval": "node eval/run_eval.mjs"
+  }
+}
