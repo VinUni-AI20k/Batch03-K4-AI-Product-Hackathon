@@ -58,16 +58,21 @@ export function ReaderSidebar({
       )}
 
       <aside
-        className={`fixed bottom-0 top-14 z-40 flex w-[320px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900 ${
+        className={`fixed bottom-0 top-16 z-40 flex w-[340px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 dark:border-slate-800 dark:bg-slate-950 ${
           isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Sidebar Header: Search & Course info */}
         <div className="border-b border-slate-100 p-4 dark:border-slate-800">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              Khoá 3 + 4 Phase 1
-            </h2>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                Học liệu môn học
+              </h2>
+              <p className="mt-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                Chương, slide và tài liệu đã upload
+              </p>
+            </div>
             <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-[#124f8c] dark:bg-sky-950 dark:text-sky-400">
               COMP2010
             </span>

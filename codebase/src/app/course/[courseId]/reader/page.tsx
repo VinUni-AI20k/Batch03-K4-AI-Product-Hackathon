@@ -161,7 +161,7 @@ export default function ReaderPage() {
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [isConfusionModalOpen, setIsConfusionModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"mindmap" | "flashcards" | "notes" | "tutor">("tutor");
 
@@ -185,7 +185,11 @@ export default function ReaderPage() {
   return (
     <div className="flex h-screen flex-col bg-slate-50 text-slate-900 overflow-hidden dark:bg-slate-950 dark:text-slate-100">
       {/* Top Main Navigation Header */}
-      <Header onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} />
+      <Header
+        materialTitle={selectedMaterial.title}
+        materialCode="COMP2010"
+        onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+      />
 
       {/* Main Reader Layout Body */}
       <div className="flex flex-1 overflow-hidden relative">
@@ -199,7 +203,7 @@ export default function ReaderPage() {
         />
 
         {/* Reader Center Canvas Area */}
-        <main className="flex flex-1 flex-col overflow-hidden lg:pl-[320px]">
+        <main className="ml-0 flex min-w-0 flex-1 flex-col overflow-hidden lg:ml-[340px]">
           {/* Reader Top Action Toolbar */}
           <ReaderToolbar
             title={selectedMaterial.title}
