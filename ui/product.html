@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLearn AI Tutor - Slide Reading & Context Learning</title>
+    
+    <!-- Google Fonts & PDF.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Custom Dark Slide Viewer CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ==========================================================================
+         TOP NAVBAR
+         ========================================================================== -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button class="back-btn" id="nav-back-btn" title="Quay lại">❮</button>
+
+            <div class="brand-group">
+                <div class="brand-triangles">
+                    <div class="triangle-blue"></div>
+                    <div class="triangle-red"></div>
+                </div>
+                <span class="brand-text">VLearn</span>
+            </div>
+
+            <div class="doc-info-badge">
+                <div style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">📖</div>
+                <div>
+                    <div class="doc-name-text" id="current-doc-name">day01_302.pdf</div>
+                    <div class="doc-sub-text" id="current-doc-meta">COMP2010 · Lecture_material_ms2039d0_hnxpxy</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <button class="lang-btn" id="lang-btn">VI</button>
+            <button class="theme-btn" id="theme-btn" title="Chuyển chế độ Tối/Sáng">☀️</button>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         MAIN WORKSPACE LAYOUT
+         ========================================================================== -->
+    <div class="app-layout">
+
+        <!-- ----------------------------------------------------------------------
+             LEFT SIDEBAR (HỌC LIỆU MÔN HỌC)
+             ---------------------------------------------------------------------- -->
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <div class="book-icon-box">📖</div>
+                <div>
+                    <h2>Học liệu môn học</h2>
+                    <p>Chương, slide và tài liệu đã upload</p>
+                </div>
+            </div>
+
+            <div class="accordion-list">
+                <!-- Day01 Module (Expanded & Active) -->
+                <div class="accordion-item expanded" id="acc-day01">
+                    <button class="accordion-btn">
+                        <div class="acc-left">
+                            <div class="play-btn-circle">▶</div>
+                            <span class="acc-title">Day01</span>
+                        </div>
+                        <div class="acc-right">
+                            <span class="acc-meta">2 TÀI LIỆU · PUBLISHED</span>
+                            <span class="badge-studying">STUDYING</span>
+                            <span class="acc-arrow">▲</span>
+                        </div>
+                    </button>
+                    
+                    <div class="accordion-body">
+                        <!-- Active Document Card -->
+                        <div class="doc-card active" data-file="day01_302.pdf">
+                            <div>
+                                <div class="doc-card-name">day01_302.pdf</div>
+                                <div class="doc-card-pages">83 trang</div>
+                            </div>
+                            <div class="check-circle">✓</div>
+                        </div>
+
+                        <!-- Secondary Document Card -->
+                        <div class="doc-card" data-file="material_mrxpq9zu_t8e6xs.pdf">
+                            <div>
+                                <div class="doc-card-name">material_mrxpq9zu_t8e6xs.p...</div>
+                                <div class="doc-card-pages">32 trang</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day02 Module -->
+                <div class="accordion-item" id="acc-day02">
+                    <button class="accordion-btn">
+                        <div class="acc-left">
+                            <div class="play-btn-circle">▶</div>
+                            <span class="acc-title">Day02</span>
+                        </div>
+                        <div class="acc-right">
+                            <span class="acc-meta">1 TÀI LIỆU · PUBLISHED</span>
+                            <span class="acc-arrow">▼</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Day03 Module -->
+                <div class="accordion-item" id="acc-day03">
+                    <button class="accordion-btn">
+                        <div class="acc-left">
+                            <div class="play-btn-circle">▶</div>
+                            <span class="acc-title">Day03</span>
+                        </div>
+                        <div class="acc-right">
+                            <span class="acc-meta">2 TÀI LIỆU · PUBLISHED</span>
+                            <span class="acc-arrow">▼</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Day04 Module -->
+                <div class="accordion-item" id="acc-day04">
+                    <button class="accordion-btn">
+                        <div class="acc-left">
+                            <div class="play-btn-circle">▶</div>
+                            <span class="acc-title">Day04</span>
+                        </div>
+                        <div class="acc-right">
+                            <span class="acc-meta">3 TÀI LIỆU · PUBLISHED</span>
+                            <span class="acc-arrow">▼</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Day05 Module -->
+                <div class="accordion-item" id="acc-day05">
+                    <button class="accordion-btn">
+                        <div class="acc-left">
+                            <div class="play-btn-circle">▶</div>
+                            <span class="acc-title">Day05</span>
+                        </div>
+                        <div class="acc-right">
+                            <span class="acc-meta">3 TÀI LIỆU · PUBLISHED</span>
+                            <span class="acc-arrow">▼</span>
+                        </div>
+                    </button>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ----------------------------------------------------------------------
+             CENTER VIEWER (SLIDE STAGE & FLOATING CONTROL BAR)
+             ---------------------------------------------------------------------- -->
+        <main class="viewer-center">
+
+            <!-- Floating Control Bar -->
+            <div class="floating-toolbar">
+                <button class="pill-tool-btn active" id="tool-read">📍 Đọc</button>
+                <button class="pill-tool-btn" id="tool-pen">✏️ Bút</button>
+                <button class="pill-tool-btn" id="tool-highlight">🖍️ Highlight</button>
+                <button class="pill-tool-btn" id="tool-more">..</button>
+
+                <div class="v-line"></div>
+                <span class="note-pill" id="note-counter-pill">Trang 1 · 1 note</span>
+
+                <div class="v-line"></div>
+                <div class="zoom-wrapper">
+                    <button class="zoom-action-btn" id="zoom-out-btn">-</button>
+                    <span id="zoom-value-text">100%</span>
+                    <button class="zoom-action-btn" id="zoom-in-btn">+</button>
+                </div>
+
+                <div class="v-line"></div>
+                <button class="tool-icon-btn" id="btn-add-note" title="Thêm note">+</button>
+                <button class="tool-icon-btn" id="btn-collapse-stage" title="Thu nhỏ">-</button>
+                <button class="tool-icon-btn" id="btn-download-pdf" title="Tải file PDF">📥</button>
+                <button class="tool-icon-btn" id="btn-bookmark" title="Bookmark">🔖</button>
+                <button class="tool-icon-btn" id="btn-undo" title="Undo">↩</button>
+                <button class="tool-icon-btn" id="btn-delete" title="Xóa">🗑</button>
+            </div>
+
+            <!-- Stage Viewport Area -->
+            <div class="stage-area">
+                <button class="side-arrow-btn side-prev" id="side-prev-btn">❮</button>
+
+                <div class="slide-stack">
+                    <div class="slide-outer-box">
+                        <div class="slide-top-meta">
+                            <span id="slide-page-text">Trang 1 / 83</span>
+                            <span id="slide-file-text">day01_302.pdf</span>
+                        </div>
+
+                        <!-- Inner Sage Green Slide Card -->
+                        <div class="slide-inner-sage">
+                            <div class="watermark-subtle">SON90751@GMAIL.COM</div>
+                            <div>
+                                <div class="slide-tag-header">AI IN ACTION - Day 1</div>
+                                <h1 class="slide-title-main" id="slide-main-h1">AI & LLM Foundation</h1>
+                                <p class="slide-sub-main" id="slide-sub-p">Bạn đang dùng AI mỗi ngày — nhưng thực sự bên trong nó đang làm gì?</p>
+                            </div>
+                            <div class="slide-instructor" id="slide-instructor-text">Instructor: Mai Anh Nguyen (Blue)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="side-arrow-btn side-next" id="side-next-btn">❯</button>
+            </div>
+
+            <!-- Bottom Page Nav Footer -->
+            <div class="bottom-nav-footer">
+                <button class="foot-arrow-btn" id="foot-prev-btn">❮</button>
+                <span style="font-size: 0.8rem; font-weight: 600;" id="foot-page-text">Trang 1 / 83</span>
+                <button class="foot-arrow-btn" id="foot-next-btn">❯</button>
+            </div>
+
+            <!-- RIGHT EDGE ROBOT DRAWER TOGGLE BUTTON (🤖) -->
+            <button class="robot-drawer-toggle-btn" id="robot-toggle-btn" title="Mở Trợ Lý VLearn Tutor">🤖</button>
+
+            <!-- RIGHT TOGGLEABLE AI TUTOR DRAWER PANEL -->
+            <aside class="tutor-drawer-panel collapsed" id="tutor-drawer">
+                <div class="drawer-header">
+                    <div class="drawer-bot-title">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">🤖</div>
+                        <div>
+                            <h3>VLearn Tutor</h3>
+                            <p>Trợ lý học theo ngữ cảnh</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 6px;">
+                        <button class="foot-arrow-btn" id="close-drawer-btn" title="Đóng">✕</button>
+                    </div>
+                </div>
+
+                <div class="drawer-context-bar" id="drawer-context-text">
+                    Ngữ cảnh: Slide trang 1
+                </div>
+
+                <div class="drawer-chat-body" id="drawer-chat-messages">
+                    <div class="bot-card">
+                        Xin chào! Mình là VLearn Tutor. Bạn có thể bôi đen một đoạn trên slide để hỏi hoặc gửi câu hỏi tự do nhé!
+                    </div>
+                </div>
+
+                <div class="drawer-chat-footer">
+                    <div class="drawer-input-pill">
+                        <input type="text" id="drawer-user-input" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu...">
+                        <button class="drawer-send-btn" id="drawer-send-btn">✈</button>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
