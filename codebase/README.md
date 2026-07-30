@@ -2,6 +2,14 @@
 
 Mở `index.html` bằng trình duyệt (không cần server, không cần build, không cần deploy).
 
+## CP2 · Show được thứ bấm được
+
+> Checklist theo `04-rubric.md` — mốc hỗ trợ kỹ thuật, TA xác nhận 2 điều: flow chính bấm hết được, và repo có commit.
+
+- [x] Flow chính bấm đi hết được: sidebar chọn tài liệu → slide bấm bôi đen → Hỏi AI → 4 tab (Chat / Context / Luồng / Eval) đều thao tác được, chạy trên data giả (`mock-doc.js`), không cần API key.
+- [x] Repo có commit đầu của prototype (`codebase/`).
+- Chưa cần AI thật ở mốc này — lời gọi AI thật (`callGemini`/`callClaude`) đã có sẵn trong code, bật ở CP3 khi cắm key.
+
 ## Mức prototype khai báo: **Mock**
 
 Flow bấm được end-to-end với data giả, **AI thật ở quyết định trung tâm**.
