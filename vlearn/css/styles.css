@@ -319,7 +319,9 @@ button {
    ============================================ */
 .hero {
   position: relative;
-  background: linear-gradient(112deg, var(--navy) 0, #1e5e97 47%, #eef4f8 47.2%, #e7eff5 100%);
+  background: radial-gradient(circle at 85% 25%, rgba(214, 34, 47, 0.22) 0%, transparent 45%),
+              radial-gradient(circle at 15% 75%, rgba(56, 189, 248, 0.18) 0%, transparent 50%),
+              linear-gradient(135deg, #0b253c 0%, #071726 100%);
   overflow: hidden;
 }
 
@@ -327,8 +329,8 @@ button {
   position: absolute;
   inset: 0;
   background: url('../images/hoc-phi-vinuni-1.jpg') center/cover no-repeat;
-  opacity: 0.12;
-  mix-blend-mode: overlay;
+  opacity: 0.15;
+  filter: contrast(1.1) brightness(0.8);
   pointer-events: none;
 }
 
@@ -336,11 +338,11 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -348,138 +350,62 @@ button {
   margin-bottom: 20px;
 }
 
-/* ============================================
-   STATS BANNER
-   ============================================ */
-.stats-banner {
-  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
-  color: #ffffff;
-  padding: 40px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  z-index: 10;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 30px;
-  text-align: center;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.stat-num {
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.stat-label {
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.dark .hero {
-  background: linear-gradient(112deg, var(--navy-dark) 0, #123a5c 47%, #0c2536 47.2%, #081b2b 100%);
-}
-
+/* An hoan toan hinh thoi do bi loi cat xe */
 .hero::before,
-.hero::after {
-  content: "";
-  position: absolute;
-  transform: rotate(45deg);
-  background: var(--red);
-}
-
-.hero::before {
-  bottom: 30px;
-  left: -36px;
-  width: 70px;
-  height: 70px;
-}
-
-.hero::after {
-  top: 54px;
-  right: 12%;
-  width: 72px;
-  height: 72px;
+.hero::after,
+.red-diamond {
+  display: none !important;
 }
 
 .hero-grid {
   position: relative;
   z-index: 2;
   display: grid;
-  min-height: 590px;
-  grid-template-columns: 1.05fr 0.95fr;
+  min-height: 580px;
+  grid-template-columns: 1.08fr 0.92fr;
   align-items: center;
-  gap: 80px;
-  padding-block: 68px;
+  gap: 50px;
+  padding-block: 64px;
 }
 
 .hero-copy {
   color: #fff;
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.13em;
-}
-
-.eyebrow::before {
-  content: "";
-  width: 9px;
-  height: 9px;
-  transform: rotate(45deg);
-  background: var(--red);
-}
-
 .hero h1 {
   max-width: 720px;
-  margin-top: 22px;
-  font-size: clamp(2.4rem, 3.7vw, 3.7rem);
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 1.05;
-  text-transform: uppercase;
-  text-wrap: balance;
+  margin-top: 18px;
+  font-size: clamp(2.4rem, 3.6vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-transform: none;
+  color: #ffffff;
 }
 
 .hero h1 span {
-  text-decoration: underline;
-  text-decoration-color: var(--red);
-  text-decoration-thickness: 6px;
-  text-underline-offset: 8px;
+  background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  display: inline-block;
+  border-bottom: 3px solid var(--red);
+  padding-bottom: 2px;
 }
 
 .hero-copy > p {
-  max-width: 610px;
-  margin-top: 28px;
-  color: rgb(255 255 255 / 84%);
-  font-size: 1.04rem;
-  line-height: 1.75;
+  max-width: 580px;
+  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.05rem;
+  line-height: 1.7;
 }
 
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 30px;
+  gap: 14px;
+  margin-top: 32px;
 }
 
 .trust-line {
@@ -487,8 +413,8 @@ button {
   align-items: center;
   gap: 8px;
   margin-top: 24px;
-  color: rgb(255 255 255 / 72%);
-  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8rem;
   font-weight: 650;
 }
 
@@ -496,32 +422,107 @@ button {
   width: 17px;
   height: 17px;
   flex-shrink: 0;
+  color: #38bdf8;
 }
 
-/* --- Hero Visual (Tutor Preview Card) --- */
+/* --- Hero Visual (Sleek Glassmorphic Tutor Console) --- */
 .hero-visual {
   position: relative;
-}
-
-.red-diamond {
-  position: absolute;
-  top: -28px;
-  right: 52px;
-  width: 68px;
-  height: 68px;
-  transform: rotate(45deg);
-  background: var(--red);
 }
 
 .tutor-preview {
   position: relative;
   z-index: 2;
   overflow: hidden;
-  border: 1px solid rgb(18 79 140 / 15%);
-  border-top: 5px solid var(--navy);
-  border-radius: 22px;
-  background: rgb(255 255 255 / 97%);
-  box-shadow: 0 32px 65px var(--shadow-strong);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-top: 4px solid var(--red);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  transform: perspective(1000px) rotateY(-3deg) rotateX(2deg);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tutor-preview:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-4px);
+  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.55);
+}
+
+/* ============================================
+   BRAND PARTNER LOGO TICKER (Nền trắng, Logo thuần túy không viền)
+   ============================================ */
+.brand-ticker-section {
+  background: #ffffff;
+  padding: 32px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid #eef4f8;
+}
+
+.dark .brand-ticker-section {
+  background: #081b2b;
+  border-bottom-color: #12314b;
+}
+
+.brand-ticker-container {
+  display: flex;
+  align-items: center;
+}
+
+.marquee-wrapper {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: max-content;
+  animation: brandMarquee 20s linear infinite;
+}
+
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.partner-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 35px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.partner-logo-item:hover {
+  transform: scale(1.08);
+}
+
+.partner-logo-item img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  filter: none;
+}
+
+@keyframes brandMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
 }
 
 .dark .tutor-preview {
@@ -619,16 +620,21 @@ button {
 
 .tutor-avatar {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   flex: none;
   place-items: center;
-  border-radius: 10px 10px 4px;
-  background: var(--navy);
-  color: #fff;
-  font-weight: 900;
-  font-size: 0.85rem;
-  box-shadow: 4px 4px 0 var(--red);
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(18, 79, 140, 0.12);
+}
+
+.tutor-avatar img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
 }
 
 .tutor-bubble {

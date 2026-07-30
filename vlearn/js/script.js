@@ -154,10 +154,82 @@
     });
   }
 
+  // --- Scroll Progress Bar Indicator ---
+  function initScrollProgressBar() {
+    var progressBar = document.createElement('div');
+    progressBar.id = 'scroll-progress-bar';
+    progressBar.style.position = 'fixed';
+    progressBar.style.top = '0';
+    progressBar.style.left = '0';
+    progressBar.style.height = '3px';
+    progressBar.style.width = '0%';
+    progressBar.style.background = 'linear-gradient(90deg, #d6222f 0%, #124f8c 50%, #38bdf8 100%)';
+    progressBar.style.zIndex = '9999';
+    progressBar.style.transition = 'width 0.1s ease-out';
+    progressBar.style.boxShadow = '0 0 10px rgba(214, 34, 47, 0.6)';
+    document.body.appendChild(progressBar);
+
+    window.addEventListener('scroll', function () {
+      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrolled = (winScroll / height) * 100;
+      progressBar.style.width = scrolled + '%';
+    }, { passive: true });
+  }
+
+  // --- Animated Counter for Stats Banner ---
+  function initCounterAnimation() {
+    var statsSection = document.querySelector('.stats-banner');
+    if (!statsSection || !('IntersectionObserver' in window)) return;
+
+    var numElements = document.querySelectorAll('.stat-num');
+    var animated = false;
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !animated) {
+          animated = true;
+          numElements.forEach(function (el) {
+            var text = el.textContent.trim();
+            var hasPlus = text.includes('+');
+            var hasPercent = text.includes('%');
+            var target = parseInt(text.replace(/[^0-9]/g, ''), 10);
+            
+            if (isNaN(target)) return;
+
+            var count = 0;
+            var duration = 1500;
+            var stepTime = 30;
+            var steps = duration / stepTime;
+            var increment = target / steps;
+
+            var timer = setInterval(function () {
+              count += increment;
+              if (count >= target) {
+                count = target;
+                clearInterval(timer);
+              }
+              var formatted = Math.floor(count).toLocaleString();
+              if (hasPlus) formatted += '+';
+              if (hasPercent) formatted += '%';
+              if (text.includes('Ngày')) formatted += ' Ngày';
+              if (text.includes('KC')) formatted += ' KC';
+              if (text.includes('/')) formatted = text; // Keep 24/7 static
+              el.textContent = formatted;
+            }, stepTime);
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    observer.observe(statsSection);
+  }
+
   // --- Animate Elements on Scroll (Intersection Observer) ---
   function initScrollAnimations() {
     var animatedElements = document.querySelectorAll(
-      '.loop-card, .feature-card, .vision-grid, .instructor-grid, .insight-panel, .cta-section > .container'
+      '.hero-copy, .hero-visual, .stat-item, .loop-card, .feature-card, .landing-course-card, .vision-grid, .instructor-grid, .insight-panel, .cta-section > .container'
     );
 
     if (!('IntersectionObserver' in window) || animatedElements.length === 0) return;
@@ -165,21 +237,20 @@
     // Add initial hidden state
     animatedElements.forEach(function (el) {
       el.style.opacity = '0';
-      el.style.transform = 'translateY(30px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      el.style.transform = 'translateY(36px)';
+      el.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
     });
 
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
-            // Stagger animation for cards
             var delay = 0;
             var parent = entry.target.parentElement;
             if (parent) {
               var siblings = Array.from(parent.children);
               var index = siblings.indexOf(entry.target);
-              delay = index * 100;
+              delay = Math.min(index * 90, 400);
             }
 
             setTimeout(function () {
@@ -191,7 +262,7 @@
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
 
     animatedElements.forEach(function (el) {
@@ -205,7 +276,7 @@
     if (!progressBar || !('IntersectionObserver' in window)) return;
 
     progressBar.style.width = '0%';
-    progressBar.style.transition = 'width 1.2s ease';
+    progressBar.style.transition = 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
 
     var observer = new IntersectionObserver(
       function (entries) {
@@ -229,6 +300,8 @@
   initScrollSpy();
   initMobileMenu();
   initSmoothScroll();
+  initScrollProgressBar();
+  initCounterAnimation();
   initScrollAnimations();
   initProgressAnimation();
 })();
