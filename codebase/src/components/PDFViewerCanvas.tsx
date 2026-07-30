@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 
 interface SlideSection {
   type: "hero" | "text" | "highlights" | "code" | "formula" | "note" | "diagram";
@@ -154,21 +155,18 @@ def generate_text(prompt, model, max_tokens=50):
   return (
     <div
       ref={containerRef}
-      className="flex flex-1 flex-col items-center justify-start overflow-auto bg-slate-100/70 p-6 dark:bg-slate-950/80"
-      style={{ minHeight: "calc(100vh - 6.5rem)" }}
+      className="flex min-h-0 flex-1 flex-col items-center justify-start overflow-auto bg-[#edf3f8] p-4 dark:bg-slate-950"
     >
       {/* Slide Container with Scaled Zoom & Shadow */}
       <div
-        className="w-full max-w-4xl transition-transform duration-200"
+        className="w-full max-w-5xl transition-transform duration-200"
         style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}
       >
-        <div className="relative min-h-[580px] rounded-2xl border border-slate-200 bg-white p-8 shadow-xl transition-all dark:border-slate-800 dark:bg-slate-900">
+        <div className="relative min-h-[580px] rounded-2xl border border-sky-300 bg-[#fffdf6] p-8 shadow-[0_8px_24px_rgba(15,56,96,0.10)] transition-all dark:border-sky-900 dark:bg-slate-900">
           {/* Slide Top Banner */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#124f8c] text-xs font-bold text-white">
-                V
-              </span>
+              <BrandMark className="h-6 w-6" />
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 VinUni AI Thực Chiến · COMP2010
               </span>
@@ -270,7 +268,7 @@ def generate_text(prompt, model, max_tokens=50):
       </div>
 
       {/* Floating Bottom Navigator for Quick Page Flipping */}
-      <div className="fixed bottom-6 z-30 flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 shadow-lg backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
+      <div className="sticky bottom-4 z-30 mt-5 flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-4 py-2 shadow-lg backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage <= 1}

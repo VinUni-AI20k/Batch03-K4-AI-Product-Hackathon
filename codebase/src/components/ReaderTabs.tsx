@@ -9,7 +9,9 @@ import {
   Send,
   Plus,
   X,
-  Bot
+  Bot,
+  Clock3,
+  MessageSquarePlus
 } from "lucide-react";
 
 interface ReaderTabsProps {
@@ -110,24 +112,54 @@ export function ReaderTabs({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-0 right-0 top-14 z-40 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl transition-all sm:w-[420px] dark:border-slate-800 dark:bg-slate-900">
-      {/* Drawer Header & Tabs Switcher */}
-      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
-        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+    <aside className="fixed bottom-0 right-0 top-16 z-40 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl transition-all sm:w-[420px] xl:static xl:h-full xl:w-[420px] xl:shrink-0 xl:shadow-none dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-4 dark:border-slate-800">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[#155493] dark:bg-sky-950/70 dark:text-sky-300">
+            <Bot className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-extrabold text-slate-900 dark:text-white">VLearn Tutor</p>
+            <p className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              Trợ lý học theo ngữ cảnh
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800" aria-label="Lịch sử trò chuyện">
+            <Clock3 className="h-4 w-4" />
+          </button>
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800" aria-label="Cuộc trò chuyện mới">
+            <MessageSquarePlus className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+            aria-label="Đóng VLearn Tutor"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="shrink-0 border-b border-slate-200 px-3 py-2 dark:border-slate-800">
+        <div className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-900">
           <button
             onClick={() => setActiveTab("tutor")}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold transition-all ${
               activeTab === "tutor"
                 ? "bg-white text-[#124f8c] shadow-sm dark:bg-slate-700 dark:text-sky-400"
                 : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" />
-            AI Tutor
+            Tutor
           </button>
           <button
             onClick={() => setActiveTab("mindmap")}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold transition-all ${
               activeTab === "mindmap"
                 ? "bg-white text-[#124f8c] shadow-sm dark:bg-slate-700 dark:text-sky-400"
                 : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
@@ -138,7 +170,7 @@ export function ReaderTabs({
           </button>
           <button
             onClick={() => setActiveTab("flashcards")}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold transition-all ${
               activeTab === "flashcards"
                 ? "bg-white text-[#124f8c] shadow-sm dark:bg-slate-700 dark:text-sky-400"
                 : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
@@ -149,7 +181,7 @@ export function ReaderTabs({
           </button>
           <button
             onClick={() => setActiveTab("notes")}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold transition-all ${
               activeTab === "notes"
                 ? "bg-white text-[#124f8c] shadow-sm dark:bg-slate-700 dark:text-sky-400"
                 : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
@@ -159,13 +191,6 @@ export function ReaderTabs({
             Ghi chú
           </button>
         </div>
-
-        <button
-          onClick={onClose}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
-        >
-          <X className="h-4 w-4" />
-        </button>
       </div>
 
       {/* Tab Content Body */}
@@ -351,7 +376,7 @@ export function ReaderTabs({
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 }
 
