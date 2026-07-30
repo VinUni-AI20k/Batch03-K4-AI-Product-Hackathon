@@ -108,7 +108,7 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
   * **Nguyễn Ngọc Chi (2A202602024):** Lập trình Frontend Prototype (React/Tailwind), nối Gemini API & xử lý luồng chat AI.
   * **Trần Thanh Bình (2A202601174):** Xử lý sự kiện Text Selection (Bôi đen), tính năng chuyển Slide tự động (Slide Jump) & chuẩn bị Demo Script.
 - Willing users (≥3 tên) + kế hoạch vòng validation CP5:
-  * *Danh sách HV thử nghiệm:* Nguyễn Văn A (Học viên Khóa 3), Trần Thị B (Học viên Khóa 4), Lê Văn C (Học viên Khóa 4).
+  * *Danh sách HV thử nghiệm:* Nguyễn Quang Minh (Học viên Khóa 3), Trịnh Hải Đăng (Học viên Khóa 4), Nguyễn Minh Công (Học viên Khóa 4).
   * *Kế hoạch CP5:* Cho học viên thực hiện task "Học Slide 12 và trả lời Quiz", quan sát im lặng, hỏi 3 câu hỏi trải nghiệm và ghi log nguyên văn vào folder `validation/`.
 - Multi-prototype:
   * *Phương án A (Chờ gọi):* Chỉ khi bôi đen bấm nút mới hiện AI giải thích.
