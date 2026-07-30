@@ -29,6 +29,8 @@ def test_bundled_procedure_settings_are_valid() -> None:
         "audience",
     ]
     assert "EVIDENCE" in settings.grounded_response_prompt
+    assert settings.form_candidates["BIRTH_REGISTRATION_FORM"].export_style.font_family == "LiberationSerif"
+    assert settings.form_candidates["BIRTH_REGISTRATION_FORM"].export_style.baseline_offset == 4.5
 
 
 def test_runtime_override_bundle_is_loaded_from_its_directory(tmp_path: Path) -> None:

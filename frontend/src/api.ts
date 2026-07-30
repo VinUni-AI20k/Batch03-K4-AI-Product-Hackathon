@@ -278,9 +278,19 @@ export async function exportFormPdf(formCode: string, validationId: string): Pro
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ validation_id: validationId }),
     });
-    if (response.ok) return response.blob();
-  } catch {
-    // fallback
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { detail?: string };
+      throw new ApiError(response.status, body.detail ?? "pdf_export_failed");
+    }
+
+    const data = await response.arrayBuffer();
+    const signature = new TextDecoder("ascii").decode(data.slice(0, 5));
+    if (!signature.startsWith("%PDF-")) {
+      throw new ApiError(502, "invalid_pdf_response");
+    }
+    return new Blob([data], { type: "application/pdf" });
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(503, "pdf_export_unavailable");
   }
-  return new Blob(["Mock PDF Content"], { type: "application/pdf" });
 }

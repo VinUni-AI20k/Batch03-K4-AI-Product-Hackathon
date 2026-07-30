@@ -3,12 +3,12 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    ffmpeg fontconfig poppler-utils tesseract-ocr tesseract-ocr-vie fonts-noto-core \
+    ffmpeg fontconfig poppler-utils tesseract-ocr tesseract-ocr-vie fonts-noto-core fonts-liberation2 \
     && fc-cache -f \
-    && fc-match -f '%{file}' 'Noto Sans' | grep -q 'NotoSans-Regular.ttf' \
+    && fc-match -f '%{file}' 'Liberation Serif' | grep -q 'LiberationSerif-Regular.ttf' \
     && rm -rf /var/lib/apt/lists/*
-# fonts-noto-core provides /usr/share/fonts/truetype/noto/NotoSans-Regular.ttf, which
-# app/form_export.py registers for Vietnamese-diacritic PDF overlay rendering.
+# fonts-liberation2 provides the same serif family embedded by the official form
+# templates; app/form_export.py registers it for Vietnamese PDF overlays.
 RUN uv sync --no-dev --no-install-project
 COPY . .
 ENV PATH="/opt/venv/bin:$PATH"

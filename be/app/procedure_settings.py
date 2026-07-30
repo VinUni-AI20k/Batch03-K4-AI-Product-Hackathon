@@ -87,6 +87,13 @@ class FormGroup:
 
 
 @dataclass(frozen=True)
+class FormExportStyle:
+    font_family: str
+    font_size: float
+    baseline_offset: float
+
+
+@dataclass(frozen=True)
 class CrossFieldRule:
     """Compares the *year* of two fields (either may be a full date or a bare 4-digit year).
 
@@ -111,6 +118,7 @@ class FormCandidate:
     title_vi: str
     source_pdf: str
     scenario_excerpt: str
+    export_style: FormExportStyle
     groups: tuple[FormGroup, ...]
     fields: tuple[FormField, ...]
     cross_field_rules: tuple[CrossFieldRule, ...] = ()
@@ -315,6 +323,18 @@ def _form_candidate(payload: dict[str, Any]) -> FormCandidate:
         raise ValueError(f"form_candidate_metadata_invalid:{form_code}")
     if not isinstance(scenario_excerpt, str) or not scenario_excerpt.strip():
         raise ValueError(f"form_candidate_scenario_excerpt_invalid:{form_code}")
+    raw_export_style = payload.get("export_style")
+    if not isinstance(raw_export_style, dict):
+        raise ValueError(f"form_candidate_export_style_required:{form_code}")
+    font_family = raw_export_style.get("font_family")
+    font_size = raw_export_style.get("font_size")
+    baseline_offset = raw_export_style.get("baseline_offset")
+    if not isinstance(font_family, str) or not font_family.strip():
+        raise ValueError(f"form_candidate_export_font_invalid:{form_code}")
+    if not isinstance(font_size, (int, float)) or font_size <= 0:
+        raise ValueError(f"form_candidate_export_font_size_invalid:{form_code}")
+    if not isinstance(baseline_offset, (int, float)) or not 0 <= baseline_offset <= 10:
+        raise ValueError(f"form_candidate_export_baseline_invalid:{form_code}")
     raw_groups = payload.get("groups")
     if not isinstance(raw_groups, list) or not raw_groups:
         raise ValueError(f"form_candidate_groups_required:{form_code}")
@@ -346,6 +366,7 @@ def _form_candidate(payload: dict[str, Any]) -> FormCandidate:
         title_vi=title_vi.strip(),
         source_pdf=source_pdf.strip(),
         scenario_excerpt=scenario_excerpt.strip(),
+        export_style=FormExportStyle(font_family.strip(), float(font_size), float(baseline_offset)),
         groups=tuple(groups),
         fields=tuple(fields),
         cross_field_rules=tuple(cross_field_rules),

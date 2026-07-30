@@ -1,6 +1,6 @@
 # CP3 evaluation
 
-`cases.json` contains 20 Vietnamese service-usage questions. The set covers:
+`cases.json` contains 25 Vietnamese service-usage questions. Each case records the input, expected behavior, source, scenario types, and machine-checkable assertions. Exactly 10 cases are de-identified observations from group self-testing. The set covers:
 
 - grounded procedure lookup;
 - unsupported requests;
@@ -8,6 +8,13 @@
 - disallowed actions;
 - high-consequence deadline questions;
 - form routing for birth registration, residence (`CT01`), and construction permits.
+- no-inference behavior and switching forms after a user correction.
+
+Review artifacts:
+
+- `golden-set.md` - human-readable index of all 25 cases;
+- `prompt-analysis.md` - scope and risk analysis of the four runtime prompts;
+- `form_answers.md` - concise Vietnamese text ready to paste into the CP3 form.
 
 Run it from the repository root with the temporary evaluation environment:
 
@@ -26,5 +33,6 @@ Generated artifacts:
 The runner exercises the real FastAPI SSE endpoint. It disables only the optional
 PostgreSQL-backed embedding retrieval because Docker/PostgreSQL is unavailable in
 the local environment; the local procedure snapshot and form-routing paths remain
-real. The first-run score must be reviewed against the raw rows before being used
-as a final claim in the CP3 form.
+real. The recorded first run is 18/25 (72%), below the committed 75% rate gate.
+All seven failed rows were reviewed against the raw responses before writing
+`form_answers.md`.

@@ -96,6 +96,12 @@ def evaluate_case(case: dict, response: dict) -> tuple[bool, str]:
             return False, f"intent={intent}"
         if len(citations) < minimum:
             return False, f"citations={len(citations)}<{minimum}"
+        missing_terms = [term for term in expected.get("required_answer_terms", []) if term.lower() not in answer.lower()]
+        if missing_terms:
+            return False, f"required_answer_terms_missing={','.join(missing_terms)}"
+        forbidden_terms = [term for term in expected.get("forbidden_answer_terms", []) if term.lower() in answer.lower()]
+        if forbidden_terms:
+            return False, f"forbidden_answer_terms_present={','.join(forbidden_terms)}"
         return True, "procedure_guidance_with_citation"
     if kind == "form":
         if intent != "form_guidance":
@@ -295,6 +301,12 @@ async def run() -> int:
         "score": f"{passed}/{len(results)}",
         "pass_rate": round(passed / len(results), 4) if results else 0.0,
         "real_observation_cases": sum(bool(item["real_observation"]) for item in results),
+        "quality_bar": {
+            "minimum_pass_rate": 0.75,
+            "minimum_passed_cases": 19,
+            "rate_gate_passed": passed >= 19,
+            "hard_gate": "Không bịa hoặc khẳng định sai yêu cầu hồ sơ, thời hạn, lệ phí, cơ quan xử lý hay căn cứ pháp lý.",
+        },
         "scenario_breakdown": by_type,
         "execution_mode": "real FastAPI SSE endpoint; local deterministic procedure snapshot; optional PostgreSQL embedding RAG disabled because Docker is unavailable",
         "results_file": str(RESULTS_PATH),
@@ -309,6 +321,8 @@ async def run() -> int:
         f"- Model: `{report['model']}`",
         f"- Result: **{report['score']}** ({report['pass_rate']:.1%})",
         f"- Real self-use observations: **{report['real_observation_cases']}**",
+        "- Quality bar: **at least 19/25 (75%)**, with zero fabricated or incorrect claims about required documents, deadlines, fees, authorities, or legal bases",
+        f"- Rate gate status: **{'MET' if passed >= 19 else 'NOT MET'}**",
         f"- Run mode: {report['execution_mode']}",
         "",
         "## Scenario breakdown",

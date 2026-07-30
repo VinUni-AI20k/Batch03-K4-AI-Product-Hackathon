@@ -1,6 +1,7 @@
 """Render a filled form draft as a PDF overlay on the original source template."""
 
 import io
+import os
 import subprocess
 from pathlib import Path
 
@@ -13,14 +14,19 @@ from app.procedure_settings import FormCandidate, FormField
 
 TEMPLATES_DIR = Path(__file__).resolve().with_name("assets") / "form_templates"
 
-# Search order: a repo-bundled font (developer-provided) first, then the path the
-# Debian `fonts-noto-core` package installs to (see be/Dockerfile), which is what
-# the deployed container actually uses. ReportLab's own bundled fonts (Vera/Helvetica)
-# lack Vietnamese diacritic glyphs and must never be used for this renderer.
-_FONT_NAME = "NotoSans"
+# The source forms embed Liberation Serif. Times New Roman is its metric-compatible
+# local Windows counterpart; production installs the exact Liberation font.
+# A serif fallback is mandatory so filled values do not visually clash with the
+# official form's headings and body copy.
+_FONT_NAME = "LiberationSerif"
+_WINDOWS_FONTS_DIR = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
 _FONT_CANDIDATES = (
-    Path(__file__).resolve().with_name("assets") / "fonts" / "NotoSans-Regular.ttf",
-    Path("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"),
+    Path(__file__).resolve().with_name("assets") / "fonts" / "LiberationSerif-Regular.ttf",
+    Path("/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf"),
+    Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"),
+    _WINDOWS_FONTS_DIR / "times.ttf",
+    Path("/System/Library/Fonts/Supplemental/Times New Roman.ttf"),
+    Path("/usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf"),
 )
 _registered = False
 
@@ -49,19 +55,22 @@ def ensure_vietnamese_font() -> None:
 
 
 def _fontconfig_match() -> Path | None:
-    """Ask Fontconfig for Noto Sans when distributions use a non-Debian path."""
-    try:
-        result = subprocess.run(
-            ["fc-match", "-f", "%{family}\n%{file}", "Noto Sans"],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=2,
-        )
-    except (FileNotFoundError, subprocess.SubprocessError):
-        return None
-    family, _, value = result.stdout.strip().partition("\n")
-    return Path(value) if family.startswith("Noto Sans") and value else None
+    """Ask Fontconfig for a Vietnamese-capable serif at non-standard paths."""
+    for requested_family in ("Liberation Serif", "Noto Serif"):
+        try:
+            result = subprocess.run(
+                ["fc-match", "-f", "%{family}\n%{file}", requested_family],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+        except (FileNotFoundError, subprocess.SubprocessError):
+            return None
+        family, _, value = result.stdout.strip().partition("\n")
+        if family.startswith(requested_family) and value:
+            return Path(value)
+    return None
 
 
 def _format_value(value: object, field: FormField) -> str:
@@ -103,15 +112,16 @@ def _wrap_text(text_value: str, width: float, font_size: float) -> list[str] | N
     return lines
 
 
-def _fit_lines(text_value: str, field: FormField) -> tuple[list[str], float]:
+def _fit_lines(text_value: str, field: FormField, preferred_font_size: float | None = None) -> tuple[list[str], float]:
     export = field.export
     assert export is not None
+    maximum_font_size = preferred_font_size or export.font_size
     if export.overflow_policy == "reject":
-        if pdfmetrics.stringWidth(text_value, _FONT_NAME, export.font_size) > export.width:
+        if pdfmetrics.stringWidth(text_value, _FONT_NAME, maximum_font_size) > export.width:
             raise ExportError(field.field_code, "text_exceeds_field_width")
-        return [text_value], export.font_size
+        return [text_value], maximum_font_size
 
-    font_size = export.font_size
+    font_size = maximum_font_size
     while font_size >= export.min_font_size:
         lines = _wrap_text(text_value, export.width, font_size)
         if lines is not None and len(lines) <= export.max_lines:
@@ -120,12 +130,18 @@ def _fit_lines(text_value: str, field: FormField) -> tuple[list[str], float]:
     raise ExportError(field.field_code, "text_exceeds_field_width")
 
 
-def _draw_lines(canvas_obj: canvas.Canvas, field: FormField, lines: list[str], font_size: float) -> None:
+def _draw_lines(
+    canvas_obj: canvas.Canvas,
+    field: FormField,
+    lines: list[str],
+    font_size: float,
+    baseline_offset: float = 0,
+) -> None:
     export = field.export
     assert export is not None
     canvas_obj.setFont(_FONT_NAME, font_size)
     for index, line in enumerate(lines):
-        y = export.y - (index * export.line_height)
+        y = export.y + baseline_offset - (index * export.line_height)
         if export.align == "right":
             canvas_obj.drawRightString(export.x + export.width, y, line)
         elif export.align == "center":
@@ -136,6 +152,8 @@ def _draw_lines(canvas_obj: canvas.Canvas, field: FormField, lines: list[str], f
 
 def render_export(candidate: FormCandidate, values: dict) -> bytes:
     _ensure_font_registered()
+    if candidate.export_style.font_family != _FONT_NAME:
+        raise ExportError(None, "unsupported_form_font")
     base_path = TEMPLATES_DIR / candidate.source_pdf
     base_reader = PdfReader(base_path)
     writer = PdfWriter()
@@ -150,8 +168,9 @@ def render_export(candidate: FormCandidate, values: dict) -> bytes:
             for field in overlay_fields:
                 export = field.export
                 text_value = _format_value(values.get(field.field_code), field)
-                lines, font_size = _fit_lines(text_value, field)
-                _draw_lines(canvas_obj, field, lines, font_size)
+                preferred_font_size = export.font_size if field.data_type == "table" else candidate.export_style.font_size
+                lines, font_size = _fit_lines(text_value, field, preferred_font_size)
+                _draw_lines(canvas_obj, field, lines, font_size, candidate.export_style.baseline_offset)
             canvas_obj.save()
             buffer.seek(0)
             page.merge_page(PdfReader(buffer).pages[0])

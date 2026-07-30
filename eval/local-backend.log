@@ -13,3 +13,112 @@ INFO:     127.0.0.1:55096 - "GET /health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55096 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
 INFO:     127.0.0.1:55096 - "POST /api/v1/chat/stream HTTP/1.1" 400 Bad Request
 INFO:     127.0.0.1:64645 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64847 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:59928 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64847 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64847 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59928 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54146 - "OPTIONS /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59928 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+[17:47:37] WARNING  form_llm_fallback reason=ConnectError       form_llm.py:105
+                    provider_status=None                                       
+                    form_code=CONSTRUCTION_PERMIT_REQUEST_FORM                 
+INFO:     127.0.0.1:57055 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55673 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:61483 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55673 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55673 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61483 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50354 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55673 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61483 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50354 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50354 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61483 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64510 - "OPTIONS /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64295 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64295 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60555 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60555 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60555 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60555 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61411 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61411 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57466 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59609 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62308 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63608 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60374 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60374 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60374 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50223 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55751 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57825 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49542 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49542 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52627 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64934 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55174 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51563 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51563 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51563 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58488 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+[19:36:08] WARNING  form_ai_review_fallback               form_ai_review.py:102
+                    reason=ConnectError                                        
+                    provider_status=None                                       
+                    form_code=BIRTH_REGISTRATION_FORM                          
+INFO:     127.0.0.1:58488 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53354 - "OPTIONS /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58488 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:58488 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:58685 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58488 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58488 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58685 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53490 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58488 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58685 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53490 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53490 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58685 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+[19:36:23] WARNING  form_ai_review_fallback               form_ai_review.py:102
+                    reason=ConnectError                                        
+                    provider_status=None                                       
+                    form_code=BIRTH_REGISTRATION_FORM                          
+INFO:     127.0.0.1:58685 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58685 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:64057 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:53677 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:59588 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53677 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50895 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55814 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+[19:51:09] WARNING  form_ai_review_fallback               form_ai_review.py:102
+                    reason=ConnectError                                        
+                    provider_status=None                                       
+                    form_code=BIRTH_REGISTRATION_FORM                          
+INFO:     127.0.0.1:55814 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59598 - "OPTIONS /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55814 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:60114 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+[19:54:05] WARNING  form_ai_review_fallback               form_ai_review.py:102
+                    reason=ConnectError                                        
+                    provider_status=None                                       
+                    form_code=BIRTH_REGISTRATION_FORM                          
+INFO:     127.0.0.1:60114 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60114 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:55760 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:62736 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55760 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
