@@ -303,6 +303,16 @@ document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   load(b.dataset.tab);
 });
 
+// Deep-link tab qua #hash (vd .../#skills) — tiện chia sẻ link tới đúng module.
+function _tabFromHash() {
+  const h = location.hash.slice(1);
+  if (!h) return;
+  const b = document.querySelector('#nav button[data-tab="' + h + '"]');
+  if (b) b.click();
+}
+window.addEventListener('hashchange', _tabFromHash);
+_tabFromHash();
+
 async function load(tab) {
   try {
     if (tab === 'overview') {

@@ -2,6 +2,8 @@
 
 **Trợ giảng AI cá nhân — open source, self-host.** Học viên chat trên **Telegram / Discord**, gửi slide · video · ghi âm → agent biến thành knowledge base rồi trả lời **có trích nguồn, không bịa**, dạy theo các kỹ thuật học tập đã được khoa học chứng minh.
 
+> 🌐 **Trang giới thiệu (live): [vlearn-agent.vercel.app](https://vlearn-agent.vercel.app)**
+>
 > Bài dự thi của **team VLagent** — VinUni AI20K. Đề bài & rubric hackathon: [HACKATHON.md](HACKATHON.md).
 
 ```

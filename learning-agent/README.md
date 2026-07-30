@@ -1,5 +1,7 @@
 # Vlearn Agent
 
+🌐 **Trang giới thiệu (live demo): https://vlearn-agent.vercel.app**
+
 **Trợ giảng AI cá nhân, open source, self-host** — cài về là chạy. Một gateway nhiều kênh chat (Telegram + Discord), skills chuẩn [agentskills.io](https://agentskills.io), scheduler tự làm việc hằng ngày, memory 3 tầng, dashboard quản trị web. Knowledge base dạng vault markdown tương thích Obsidian — toàn bộ code do đội Vlearn Agent tự build.
 
 Học viên gửi tài liệu (slide, video, ghi âm) cho bot hoặc bỏ vào thư mục; Vlearn Agent xử lý thành knowledge base, rồi trả lời mọi câu hỏi **kèm trích nguồn, không bịa**, dạy theo các kỹ thuật học tập đã được khoa học chứng minh.
