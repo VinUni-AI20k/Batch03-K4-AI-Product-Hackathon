@@ -49,23 +49,25 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
   * Mình khác gì: Đóng vai trò Trợ lý gia sư (Tutor) tương tác 2 chiều (giải thích + đố lại bằng Micro-Quiz), không chỉ là công cụ tra cứu thụ động.
 
 ## §4. Thiết kế
-- Lát cắt MỘT CÂU: "Một học viên Khóa 3/Khóa 4 bôi đen thuật ngữ trên Slide 12 để AI giải thích ngắn gọn đúng bối cảnh slide kèm 1 câu hỏi Micro-Quiz kiểm tra, và khi học viên trả lời sai, AI phát hiện hổng kiến thức nền rồi chủ động đưa nút bấm tự động nhảy về Slide 5 kèm tóm tắt kiến thức cũ để lấp lỗ hổng ngay lập tức."
+- Lát cắt MỘT CÂU: "Một học viên Khóa 3/Khóa 4 bôi đen thuật ngữ hoặc khoanh vùng sơ đồ trên Slide 12 để AI tóm tắt/giải thích ngắn gọn đúng bối cảnh slide kèm 1 câu hỏi Micro-Quiz ôn tập kiểm tra, và khi học viên trả lời sai, AI phát hiện hổng kiến thức nền rồi chủ động đưa nút bấm tự động nhảy về Slide 5 kèm tóm tắt kiến thức cũ để lấp lỗ hổng ngay lập tức."
 - Non-goals (≥3 thứ KHÔNG build):
   1. KHÔNG build hệ thống quản lý lớp học / chấm điểm toàn diện cho Giảng viên.
   2. KHÔNG build tính năng nhận diện giọng nói hoặc cuộc gọi video call thoại với AI.
-  3. KHÔNG build hệ thống OCR tự động trích xuất chữ từ hình ảnh phức tạp trên slide trong mốc CP2/CP3.
-- Mức prototype nhắm tới: [x] Mock — Phần Mock: Dữ liệu slide giả lập (Slide 5, Slide 12) và luồng giao diện UI; Phần Thật: Lời gọi AI API (Gemini API) xử lý giải thích ngữ cảnh và tạo Micro-Quiz.
-- Automation: [x] augment — Lý do theo cost-of-error: Kiến thức chuyên ngành nếu AI tự quyết định thay hoặc trả lời sai sẽ khiến học viên tiếp thu sai bản chất (Cost-of-error đắt). Do đó, AI chỉ đóng vai trò **Augment** (gợi ý giải thích, đặt câu hỏi kiểm tra, đưa Card đề xuất), quyền bấm chuyển slide hay chọn đáp án hoàn toàn do học viên quyết định.
+  3. KHÔNG build công cụ chỉnh sửa/vẽ trực tiếp sơ đồ đồ họa phức tạp trên slide.
+- Mức prototype nhắm tới: [x] Mock
+  * **Phần Mock:** Dữ liệu slide bài giảng giả lập (Slide 5, Slide 12), khung khoanh chọn ảnh giả lập và giao diện ứng dụng (UI Framework).
+  * **Phần Thật (Thực hiện ở CP3 - N2):** Lời gọi Gemini API thật xử lý Tóm tắt Slide, giải thích bối cảnh bôi đen text/ảnh sơ đồ và sinh Micro-Quiz ôn tập.
+- Automation: [x] augment — Lý do theo cost-of-error: Kiến thức chuyên ngành nếu AI tự quyết định thay hoặc trả lời sai sẽ khiến học viên tiếp thu sai bản chất (Cost-of-error đắt). Do đó, AI chỉ đóng vai trò **Augment** (gợi ý tóm tắt, giải thích hình ảnh, đặt câu hỏi ôn tập, đưa Card đề xuất), quyền bấm chuyển slide hay chọn đáp án hoàn toàn do học viên quyết định.
 
 - §4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR):
 
   | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
   |---|---|
-  | **G1 — Làm rõ hệ thống làm được gì** | Ngay góc trên Sidepanel hiện Badge xanh: `🟢 Context Synced: Slide 12 (Chương 3)` để học viên biết AI đang làm việc trong phạm vi Slide 12. |
-  | **G2 — Làm rõ làm tốt đến đâu** | AI luôn mở đầu câu trả lời bằng: *"Theo Slide 12, [khái niệm] là..."* để minh bạch căn cứ câu trả lời nằm trong slide. |
+  | **G1 — Làm rõ hệ thống làm được gì** | Ngay góc trên Sidepanel hiện Badge xanh: `🟢 Context Synced: Slide 12 (Chương 3)` và các nút chức năng rõ ràng (`Tóm tắt Slide`, `Khoanh vùng sơ đồ`, `Hỏi AI`). |
+  | **G2 — Làm rõ làm tốt đến đâu** | AI luôn mở đầu câu trả lời bằng: *"Theo sơ đồ/nội dung Slide 12, [khái niệm] là..."* để minh bạch căn cứ câu trả lời nằm trong slide. |
   | **G8 — Gạt bỏ dễ dàng** | Khi AI đưa ra Card gợi ý `📌 Open Slide 5`, học viên có thể lờ đi tiếp tục học mà không bị chặn (block) giao diện. |
-  | **G10 — Thu hẹp phạm vi khi nghi ngờ** | Khi học viên hỏi câu nằm ngoài slide hoặc trả lời sai Quiz, AI không đoán bừa mà phát hiện lỗ hổng và thu hẹp bối cảnh bằng cách gợi ý xem lại kiến thức nền ở Slide 5. |
-  | **G11 — Giải thích vì sao** | Khi hiện Card gợi ý chuyển Slide, AI ghi rõ lý do: *"Có vẻ bạn đang nhầm lẫn với Tight Coupling ở Slide 5"*. |
+  | **G10 — Thu hẹp phạm vi khi nghi ngờ** | Khi học viên chọn vùng ảnh mờ hoặc trả lời sai Quiz ôn tập, AI không đoán bừa mà phát hiện lỗ hổng và thu hẹp bối cảnh bằng cách gợi ý xem lại kiến thức nền ở Slide 5. |
+  | **G11 — Giải thích vì sao** | Khi hiện Card gợi ý chuyển Slide, AI ghi rõ lý do: *"Có vẻ bạn đang nhầm lẫn sơ đồ Microservices với Tight Coupling ở Slide 5"*. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8)
 
