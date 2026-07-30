@@ -4,6 +4,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Bỏ qua thư mục data
+data/
+
 # Secrets and local environment
 .env
 .env.*
