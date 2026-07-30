@@ -3,7 +3,6 @@
 Hướng: [ ] A — VLearn  [ ] B — Trợ lý Học viên  [x] C — Làn mở
 Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
-> **Trạng thái tài liệu (30/07/2026):** Đây là bản spec nền được viết từ yêu cầu sản phẩm, data pack và artifact hiện có trong repo. `codebase/README.md`, `eval/golden_set.json`, `reflection/member1.md` và bản `spec.md` trước đó đều đang rỗng; chưa có thư mục `validation/`. Vì vậy các kết quả build, eval và validation chưa được tuyên bố là đã hoàn thành. Những con số từ chatlog bên dưới là số đo thật; thời gian tiết kiệm và quality bar là giả thuyết/tiêu chí chốt trước khi đo.
 
 ## §1. User & Job
 
