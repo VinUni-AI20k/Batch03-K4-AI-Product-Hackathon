@@ -1,0 +1,449 @@
+{
+  "transcript_id": "v3.7_openrouter_20260729T165840543656",
+  "version": "v3.7",
+  "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+  "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+  "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T16:58:40",
+  "updated_at": "2026-07-29T16:59:20",
+  "turns": [
+    {
+      "turn_index": 1,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T16:58:40",
+      "user": "Tìm các bài báo mới về Transformers",
+      "status": "answered",
+      "assistant_text": "Here are some of the latest papers related to Transformers:\n\n1. **[VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening](http://arxiv.org/abs/2607.26042v1)**\n   - **Authors:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n   - **Published:** July 28, 2026\n   - **Summary:** This paper presents VetClaw, a system for early veterinary disease screening that uses a camera module and a vision-language model for zero-shot disease classification. The system enhances static image classification by enabling the collection of visual evidence and generating diagnostic-support alerts.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26042v1)**\n\n2. **[Impact of different neutrino decoherence formalisms at the future long-baseline Experiments](http://arxiv.org/abs/2604.20977v3)**\n   - **Authors:** Rudra Majhi, Koushik Pal, Monojit Ghosh, Rukmani Mohanta\n   - **Published:** April 22, 2026\n   - **Summary:** This study examines the impact of two different quantum decoherence formalisms on the sensitivities of future long-baseline experiments, demonstrating how these formalisms yield different results under varying conditions.\n   - **[PDF Link](https://arxiv.org/pdf/2604.20977v3)**\n\n3. **[Weighted Webs: Morphology-Informed Marked Fields](http://arxiv.org/abs/2607.26021v1)**\n   - **Authors:** Mikel Martin Barandiaran, Jessica A. Cowell, David Alonso, Javier Carrón Duque, Juan García-Bellido\n   - **Published:** July 28, 2026\n   - **Summary:** This work explores the potential of marked power spectra to access higher-order cosmological information by studying the density field marked by local environmental density, enhancing cosmological constraints.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26021v1)**\n\n4. **[Systematic Analysis of Large Language Models and Transformer-Based Machine Translation for English-Tamil and Tamil-English Across Diverse Datasets](http://arxiv.org/abs/2607.24515v2)**\n   - **Authors:** Sriharshaa S, Sangeetha Sivanesan, Jaya Nirmala S\n   - **Published:** July 27, 2026\n   - **Summary:** This research evaluates the performance of multilingual translation models on English-Tamil and Tamil-English translations, highlighting the impact of dataset quality and domain alignment on model performance.\n   - **[PDF Link](https://arxiv.org/pdf/2607.24515v2)**\n\n5. **[MDTransformer: A Hardware-Software Co-Design of Mode-Division Photonic Transformer Accelerator with Inverse-Designed Coherent Crossbar](http://arxiv.org/abs/2607.26016v1)**\n   - **Authors:** Solomon Micheal Serunjogi, Rachmad Vidya Wicaksana Putra, Ayat Taha, Muhammad Shafique, Mahmoud Rasras\n   - **Published:** July 28, 2026\n   - **Summary:** This paper proposes MDTransformer, a novel hardware-software co-design for photonic transformer accelerators that improves speed and energy efficiency for Transformer inference.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26016v1)**\n\nFeel free to ask if you need more information on any specific paper!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "papers",
+              "args": {
+                "query": "Transformers",
+                "max_results": 5,
+                "sort_by": "lastUpdatedDate"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "papers",
+              "args": {
+                "query": "Transformers",
+                "max_results": 5,
+                "sort_by": "lastUpdatedDate"
+              },
+              "result": {
+                "tool": "arxiv_search",
+                "query": "Transformers",
+                "api_query": "all:Transformers",
+                "total_results": 174311,
+                "items": [
+                  {
+                    "arxiv_id": "2607.26042v1",
+                    "title": "VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening",
+                    "summary": "We present VetClaw, an edge-cloud multimodal agentic system for early veterinary disease screening. VetClaw uses a camera module as an edge sensing device and sends captured images, together with optional symptom descriptions, to a server-hosted vision-language model for zero-shot disease classification. The system separates agent interaction from workflow orchestration: OpenClaw provides scheduling, tool access, user interaction, and notification services on the edge device, while LangGraph manages the stateful screening workflow, including input validation, image transmission, model invocation, safety checks, conditional routing, failure handling, and structured logging. This design moves beyond static image classification by enabling the system to collect visual evidence, invoke external models, apply deterministic safety rules, and generate diagnostic-support alerts. Results show that image-only VLM prediction remains limited, whereas symptom-guided and multimodal inputs improve zero-shot classification performance. Thus, VetClaw transforms a static prediction model into a coordinated, safety-aware system that can use tools, manage workflows, handle failures, and escalate uncertain cases.",
+                    "authors": [
+                      "Syed Mhamudul Hasan",
+                      "Anas AlSobeh",
+                      "Hussein Zangoti",
+                      "Abdur R. Shahid"
+                    ],
+                    "published": "2026-07-28T17:50:25Z",
+                    "updated": "2026-07-28T17:50:25Z",
+                    "url": "http://arxiv.org/abs/2607.26042v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.26042v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV",
+                      "cs.LG"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2604.20977v3",
+                    "title": "Impact of different neutrino decoherence formalisms at the future long-baseline Experiments",
+                    "summary": "In this paper, we have studied the impact of two different formalisms of quantum decoherence in determining the sensitivities of the two future long-baseline experiments DUNE and P2SO. In formalism-A, we will assume that the decoherence matrix is defined in a matter mass eigenstate basis which is the basis that diagonalizes the Hamiltonian for neutrinos in matter, with a constant matter density. In formalism-B, we will define the decoherence matrix in the vacuum mass eigenstate basis and then rotate it to matter mass basis via an unitary transformation. By using different values of the decoherence parameter $Γ$, we will show how these two formalisms differ at the probability level and then we will demonstrate how the sensitivities can differ at the $χ^2$ level. Our results show that if the values of $Γ$ are small, then these two formalisms yield same probability in vacuum. However, if the values of $Γ$ is large or if there is strong matter effect, then these two formalisms yield very different results.",
+                    "authors": [
+                      "Rudra Majhi",
+                      "Koushik Pal",
+                      "Monojit Ghosh",
+                      "Rukmani Mohanta"
+                    ],
+                    "published": "2026-04-22T18:06:33Z",
+                    "updated": "2026-07-28T17:41:05Z",
+                    "url": "http://arxiv.org/abs/2604.20977v3",
+                    "pdf_url": "https://arxiv.org/pdf/2604.20977v3",
+                    "source": "arxiv.org",
+                    "primary_category": "hep-ph",
+                    "categories": [
+                      "hep-ph"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2607.26021v1",
+                    "title": "Weighted Webs: Morphology-Informed Marked Fields",
+                    "summary": "The morphology of the cosmic web formed by the late-time matter distribution encodes cosmological information beyond that contained in standard two-point statistics. Marked power spectra provide a computationally efficient framework to access this higher-order information, by studying the two-point statistics of the density field ``marked'' (i.e. weighted) by a function of its local environmental density. In this work we explore the potential of marks that are sensitive to the morphology of this local environment, rather than simply its density. We study a broad range of such marks, considering mark functions based on the smoothed density, tidal shear amplitude, local degree of isotropy and filamentarity, Gaussian transformations of these quantities and a local fractal dimension estimator. We quantify the merit of different marks in terms of their constraints on key cosmological parameters, including the matter abundance $Ω_m$, the amplitude of fluctuations $σ_8$, and the mass of neutrinos $M_ν$. We have found that density-dependent marks continue to provide the largest improvements over the standard power spectrum, while morphology-based marks yield more modest improvements on their own. Nevertheless, combining density- and morphology-based marks consistently enhances cosmological constraints beyond what either class achieves separately, demonstrating that they probe complementary aspects of the underlying matter distribution. These results provide a systematic assessment of morphology-based marked statistics and explore which geometric properties of the cosmic web contribute most effectively to cosmological parameter inference. They also establish a physically motivated framework for future investigations of optimal marks and their perturbative connection to higher-order correlation functions.",
+                    "authors": [
+                      "Mikel Martin Barandiaran",
+                      "Jessica A. Cowell",
+                      "David Alonso",
+                      "Javier Carrón Duque",
+                      "Juan García-Bellido"
+                    ],
+                    "published": "2026-07-28T17:32:56Z",
+                    "updated": "2026-07-28T17:32:56Z",
+                    "url": "http://arxiv.org/abs/2607.26021v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.26021v1",
+                    "source": "arxiv.org",
+                    "primary_category": "astro-ph.CO",
+                    "categories": [
+                      "astro-ph.CO"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2607.24515v2",
+                    "title": "Systematic Analysis of Large Language Models and Transformer-Based Machine Translation for English-Tamil and Tamil-English Across Diverse Datasets",
+                    "summary": "The challenge of Machine Translation for low resource languages such as Tamil is primarily caused by the restricted amount of parallel data for these languages, as well as their substantial amount of domain variation and morphological complexity. This research presents the comprehensive evaluation of the performance of several multilingual translation models on English-Tamil and Tamil-English translations across multiple datasets: NTREX, EnTamV2, WikiMatrix and PMIndia. This study evaluates supervised NMT systems, NLLB and mBART, using both the BLEU and chrF metric, and examines how these systems perform on data of different quality levels and domains. This performs an attention-based analysis to increase model interpretability by visualising the alignments of tokens in an English source text and their Tamil translations and vice-versa to provide insight into how they make translations. This study also demonstrates that using in-context prompting can provide an excellent way to perform a few-shot translation of English to Tamil and Tamil-English using a Tamil capable TamilLaMA model, and compare this to supervised approaches qualitatively. These findings show that the quality of the datasets and their alignment with the domain will greatly affect the performance of the model, that attention-based mechanisms can aid in explain ability, and that few-shot large language models can still produce structurally coherent translations of Tamil.",
+                    "authors": [
+                      "Sriharshaa S",
+                      "Sangeetha Sivanesan",
+                      "Jaya Nirmala S"
+                    ],
+                    "published": "2026-07-27T14:54:01Z",
+                    "updated": "2026-07-28T17:28:27Z",
+                    "url": "http://arxiv.org/abs/2607.24515v2",
+                    "pdf_url": "https://arxiv.org/pdf/2607.24515v2",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CL",
+                    "categories": [
+                      "cs.CL"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2607.26016v1",
+                    "title": "MDTransformer: A Hardware-Software Co-Design of Mode-Division Photonic Transformer Accelerator with Inverse-Designed Coherent Crossbar",
+                    "summary": "Recently, photonic transformer accelerators (PTAs) have successfully achieved significant speedup and energy efficiency improvements over electronic accelerators for expediting Transformer inference. However, state-of-the-art rely on expensive multi-wavelength light generation and large dot-product units due to active phase-shifter components, thus making their approach inefficient and impractical. To address this, we propose MDTransformer, a novel hardware-software co-design of PTA based on mode-division optical dataflow and operations. Specifically, MDTransformer performs complex matrix operations using spatial-mode interference, that leverages the inverse-designed multi-mode couplers, crossings, and Mach-Zehnder IQ modulators into a compact mode-division photonic tensor core (MPTC), capable of executing matrix multiplications in the optical domain. Its each guided mode (i.e., TE0-TE3) acts as an independent computational lane, enabling four-fold parallelism-per-waveguide without spectral filtering or free-spectral-range limitations. Moreover, its coherent detection and IQ modulation jointly encode amplitude and phase, realizing complex-valued arithmetic for full-range operations in transformers. MDTransformer offers analog multiplication with sub-4-bit effective precision and inter-modal crosstalk below -30 dB. Its inverse-designed approach also offers scalable and full compatibility with single-laser continuous-wave operation at 1550 nm. Experimental results show that MDTransformer achieves 40.4% area reduction, 63.6% power saving, 40.6% energy saving, and comparable latency over the state-of-the-art PTA across different workloads (i.e., DeiT-Tiny/Small/Base and BERT-Base/Large). These results show that MDTransformer offers a practical solution for high-performance and energy-efficient transformer-based systems.",
+                    "authors": [
+                      "Solomon Micheal Serunjogi",
+                      "Rachmad Vidya Wicaksana Putra",
+                      "Ayat Taha",
+                      "Muhammad Shafique",
+                      "Mahmoud Rasras"
+                    ],
+                    "published": "2026-07-28T17:27:49Z",
+                    "updated": "2026-07-28T17:27:49Z",
+                    "url": "http://arxiv.org/abs/2607.26016v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.26016v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.AR",
+                    "categories": [
+                      "cs.AR",
+                      "cs.AI",
+                      "cs.DC"
+                    ]
+                  }
+                ],
+                "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Here are some of the latest papers related to Transformers:\n\n1. **[VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening](http://arxiv.org/abs/2607.26042v1)**\n   - **Authors:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n   - **Published:** July 28, 2026\n   - **Summary:** This paper presents VetClaw, a system for early veterinary disease screening that uses a camera module and a vision-language model for zero-shot disease classification. The system enhances static image classification by enabling the collection of visual evidence and generating diagnostic-support alerts.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26042v1)**\n\n2. **[Impact of different neutrino decoherence formalisms at the future long-baseline Experiments](http://arxiv.org/abs/2604.20977v3)**\n   - **Authors:** Rudra Majhi, Koushik Pal, Monojit Ghosh, Rukmani Mohanta\n   - **Published:** April 22, 2026\n   - **Summary:** This study examines the impact of two different quantum decoherence formalisms on the sensitivities of future long-baseline experiments, demonstrating how these formalisms yield different results under varying conditions.\n   - **[PDF Link](https://arxiv.org/pdf/2604.20977v3)**\n\n3. **[Weighted Webs: Morphology-Informed Marked Fields](http://arxiv.org/abs/2607.26021v1)**\n   - **Authors:** Mikel Martin Barandiaran, Jessica A. Cowell, David Alonso, Javier Carrón Duque, Juan García-Bellido\n   - **Published:** July 28, 2026\n   - **Summary:** This work explores the potential of marked power spectra to access higher-order cosmological information by studying the density field marked by local environmental density, enhancing cosmological constraints.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26021v1)**\n\n4. **[Systematic Analysis of Large Language Models and Transformer-Based Machine Translation for English-Tamil and Tamil-English Across Diverse Datasets](http://arxiv.org/abs/2607.24515v2)**\n   - **Authors:** Sriharshaa S, Sangeetha Sivanesan, Jaya Nirmala S\n   - **Published:** July 27, 2026\n   - **Summary:** This research evaluates the performance of multilingual translation models on English-Tamil and Tamil-English translations, highlighting the impact of dataset quality and domain alignment on model performance.\n   - **[PDF Link](https://arxiv.org/pdf/2607.24515v2)**\n\n5. **[MDTransformer: A Hardware-Software Co-Design of Mode-Division Photonic Transformer Accelerator with Inverse-Designed Coherent Crossbar](http://arxiv.org/abs/2607.26016v1)**\n   - **Authors:** Solomon Micheal Serunjogi, Rachmad Vidya Wicaksana Putra, Ayat Taha, Muhammad Shafique, Mahmoud Rasras\n   - **Published:** July 28, 2026\n   - **Summary:** This paper proposes MDTransformer, a novel hardware-software co-design for photonic transformer accelerators that improves speed and energy efficiency for Transformer inference.\n   - **[PDF Link](https://arxiv.org/pdf/2607.26016v1)**\n\nFeel free to ask if you need more information on any specific paper!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Transformers",
+            "max_results": 5,
+            "sort_by": "lastUpdatedDate"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "Transformers",
+            "api_query": "all:Transformers",
+            "total_results": 174311,
+            "items": [
+              {
+                "arxiv_id": "2607.26042v1",
+                "title": "VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening",
+                "summary": "We present VetClaw, an edge-cloud multimodal agentic system for early veterinary disease screening. VetClaw uses a camera module as an edge sensing device and sends captured images, together with optional symptom descriptions, to a server-hosted vision-language model for zero-shot disease classification. The system separates agent interaction from workflow orchestration: OpenClaw provides scheduling, tool access, user interaction, and notification services on the edge device, while LangGraph manages the stateful screening workflow, including input validation, image transmission, model invocation, safety checks, conditional routing, failure handling, and structured logging. This design moves beyond static image classification by enabling the system to collect visual evidence, invoke external models, apply deterministic safety rules, and generate diagnostic-support alerts. Results show that image-only VLM prediction remains limited, whereas symptom-guided and multimodal inputs improve zero-shot classification performance. Thus, VetClaw transforms a static prediction model into a coordinated, safety-aware system that can use tools, manage workflows, handle failures, and escalate uncertain cases.",
+                "authors": [
+                  "Syed Mhamudul Hasan",
+                  "Anas AlSobeh",
+                  "Hussein Zangoti",
+                  "Abdur R. Shahid"
+                ],
+                "published": "2026-07-28T17:50:25Z",
+                "updated": "2026-07-28T17:50:25Z",
+                "url": "http://arxiv.org/abs/2607.26042v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.26042v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV",
+                  "cs.LG"
+                ]
+              },
+              {
+                "arxiv_id": "2604.20977v3",
+                "title": "Impact of different neutrino decoherence formalisms at the future long-baseline Experiments",
+                "summary": "In this paper, we have studied the impact of two different formalisms of quantum decoherence in determining the sensitivities of the two future long-baseline experiments DUNE and P2SO. In formalism-A, we will assume that the decoherence matrix is defined in a matter mass eigenstate basis which is the basis that diagonalizes the Hamiltonian for neutrinos in matter, with a constant matter density. In formalism-B, we will define the decoherence matrix in the vacuum mass eigenstate basis and then rotate it to matter mass basis via an unitary transformation. By using different values of the decoherence parameter $Γ$, we will show how these two formalisms differ at the probability level and then we will demonstrate how the sensitivities can differ at the $χ^2$ level. Our results show that if the values of $Γ$ are small, then these two formalisms yield same probability in vacuum. However, if the values of $Γ$ is large or if there is strong matter effect, then these two formalisms yield very different results.",
+                "authors": [
+                  "Rudra Majhi",
+                  "Koushik Pal",
+                  "Monojit Ghosh",
+                  "Rukmani Mohanta"
+                ],
+                "published": "2026-04-22T18:06:33Z",
+                "updated": "2026-07-28T17:41:05Z",
+                "url": "http://arxiv.org/abs/2604.20977v3",
+                "pdf_url": "https://arxiv.org/pdf/2604.20977v3",
+                "source": "arxiv.org",
+                "primary_category": "hep-ph",
+                "categories": [
+                  "hep-ph"
+                ]
+              },
+              {
+                "arxiv_id": "2607.26021v1",
+                "title": "Weighted Webs: Morphology-Informed Marked Fields",
+                "summary": "The morphology of the cosmic web formed by the late-time matter distribution encodes cosmological information beyond that contained in standard two-point statistics. Marked power spectra provide a computationally efficient framework to access this higher-order information, by studying the two-point statistics of the density field ``marked'' (i.e. weighted) by a function of its local environmental density. In this work we explore the potential of marks that are sensitive to the morphology of this local environment, rather than simply its density. We study a broad range of such marks, considering mark functions based on the smoothed density, tidal shear amplitude, local degree of isotropy and filamentarity, Gaussian transformations of these quantities and a local fractal dimension estimator. We quantify the merit of different marks in terms of their constraints on key cosmological parameters, including the matter abundance $Ω_m$, the amplitude of fluctuations $σ_8$, and the mass of neutrinos $M_ν$. We have found that density-dependent marks continue to provide the largest improvements over the standard power spectrum, while morphology-based marks yield more modest improvements on their own. Nevertheless, combining density- and morphology-based marks consistently enhances cosmological constraints beyond what either class achieves separately, demonstrating that they probe complementary aspects of the underlying matter distribution. These results provide a systematic assessment of morphology-based marked statistics and explore which geometric properties of the cosmic web contribute most effectively to cosmological parameter inference. They also establish a physically motivated framework for future investigations of optimal marks and their perturbative connection to higher-order correlation functions.",
+                "authors": [
+                  "Mikel Martin Barandiaran",
+                  "Jessica A. Cowell",
+                  "David Alonso",
+                  "Javier Carrón Duque",
+                  "Juan García-Bellido"
+                ],
+                "published": "2026-07-28T17:32:56Z",
+                "updated": "2026-07-28T17:32:56Z",
+                "url": "http://arxiv.org/abs/2607.26021v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.26021v1",
+                "source": "arxiv.org",
+                "primary_category": "astro-ph.CO",
+                "categories": [
+                  "astro-ph.CO"
+                ]
+              },
+              {
+                "arxiv_id": "2607.24515v2",
+                "title": "Systematic Analysis of Large Language Models and Transformer-Based Machine Translation for English-Tamil and Tamil-English Across Diverse Datasets",
+                "summary": "The challenge of Machine Translation for low resource languages such as Tamil is primarily caused by the restricted amount of parallel data for these languages, as well as their substantial amount of domain variation and morphological complexity. This research presents the comprehensive evaluation of the performance of several multilingual translation models on English-Tamil and Tamil-English translations across multiple datasets: NTREX, EnTamV2, WikiMatrix and PMIndia. This study evaluates supervised NMT systems, NLLB and mBART, using both the BLEU and chrF metric, and examines how these systems perform on data of different quality levels and domains. This performs an attention-based analysis to increase model interpretability by visualising the alignments of tokens in an English source text and their Tamil translations and vice-versa to provide insight into how they make translations. This study also demonstrates that using in-context prompting can provide an excellent way to perform a few-shot translation of English to Tamil and Tamil-English using a Tamil capable TamilLaMA model, and compare this to supervised approaches qualitatively. These findings show that the quality of the datasets and their alignment with the domain will greatly affect the performance of the model, that attention-based mechanisms can aid in explain ability, and that few-shot large language models can still produce structurally coherent translations of Tamil.",
+                "authors": [
+                  "Sriharshaa S",
+                  "Sangeetha Sivanesan",
+                  "Jaya Nirmala S"
+                ],
+                "published": "2026-07-27T14:54:01Z",
+                "updated": "2026-07-28T17:28:27Z",
+                "url": "http://arxiv.org/abs/2607.24515v2",
+                "pdf_url": "https://arxiv.org/pdf/2607.24515v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.CL",
+                "categories": [
+                  "cs.CL"
+                ]
+              },
+              {
+                "arxiv_id": "2607.26016v1",
+                "title": "MDTransformer: A Hardware-Software Co-Design of Mode-Division Photonic Transformer Accelerator with Inverse-Designed Coherent Crossbar",
+                "summary": "Recently, photonic transformer accelerators (PTAs) have successfully achieved significant speedup and energy efficiency improvements over electronic accelerators for expediting Transformer inference. However, state-of-the-art rely on expensive multi-wavelength light generation and large dot-product units due to active phase-shifter components, thus making their approach inefficient and impractical. To address this, we propose MDTransformer, a novel hardware-software co-design of PTA based on mode-division optical dataflow and operations. Specifically, MDTransformer performs complex matrix operations using spatial-mode interference, that leverages the inverse-designed multi-mode couplers, crossings, and Mach-Zehnder IQ modulators into a compact mode-division photonic tensor core (MPTC), capable of executing matrix multiplications in the optical domain. Its each guided mode (i.e., TE0-TE3) acts as an independent computational lane, enabling four-fold parallelism-per-waveguide without spectral filtering or free-spectral-range limitations. Moreover, its coherent detection and IQ modulation jointly encode amplitude and phase, realizing complex-valued arithmetic for full-range operations in transformers. MDTransformer offers analog multiplication with sub-4-bit effective precision and inter-modal crosstalk below -30 dB. Its inverse-designed approach also offers scalable and full compatibility with single-laser continuous-wave operation at 1550 nm. Experimental results show that MDTransformer achieves 40.4% area reduction, 63.6% power saving, 40.6% energy saving, and comparable latency over the state-of-the-art PTA across different workloads (i.e., DeiT-Tiny/Small/Base and BERT-Base/Large). These results show that MDTransformer offers a practical solution for high-performance and energy-efficient transformer-based systems.",
+                "authors": [
+                  "Solomon Micheal Serunjogi",
+                  "Rachmad Vidya Wicaksana Putra",
+                  "Ayat Taha",
+                  "Muhammad Shafique",
+                  "Mahmoud Rasras"
+                ],
+                "published": "2026-07-28T17:27:49Z",
+                "updated": "2026-07-28T17:27:49Z",
+                "url": "http://arxiv.org/abs/2607.26016v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.26016v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.AR",
+                "categories": [
+                  "cs.AR",
+                  "cs.AI",
+                  "cs.DC"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:58:50"
+    },
+    {
+      "turn_index": 2,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T16:58:58",
+      "user": "Tóm tắt bài báo đầu tiên",
+      "status": "answered",
+      "assistant_text": "### Tóm tắt bài báo: VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening\n\n**Tác giả:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n\n**Tóm tắt:**\nBài báo giới thiệu VetClaw, một hệ thống đa phương tiện agentic dựa trên mô hình đám mây và biên, được thiết kế để sàng lọc bệnh thú y sớm. VetClaw sử dụng một mô-đun camera như một thiết bị cảm biến biên, gửi hình ảnh đã chụp cùng với mô tả triệu chứng tùy chọn đến một mô hình ngôn ngữ-vision (VLM) được lưu trữ trên máy chủ để phân loại bệnh không cần học trước (zero-shot).\n\nHệ thống tách biệt tương tác của agent khỏi việc điều phối quy trình làm việc: OpenClaw cung cấp lịch trình, truy cập công cụ, tương tác với người dùng và dịch vụ thông báo trên thiết bị biên, trong khi LangGraph quản lý quy trình sàng lọc có trạng thái, bao gồm xác thực đầu vào, truyền hình ảnh, gọi mô hình, kiểm tra an toàn, định tuyến có điều kiện, xử lý lỗi và ghi nhật ký có cấu trúc.\n\nKết quả cho thấy rằng dự đoán chỉ dựa vào hình ảnh của VLM vẫn còn hạn chế, trong khi đầu vào hướng dẫn triệu chứng và đa phương thức cải thiện hiệu suất phân loại không cần học trước. Do đó, VetClaw biến một mô hình dự đoán tĩnh thành một hệ thống phối hợp, nhận thức an toàn có thể sử dụng công cụ, quản lý quy trình làm việc, xử lý lỗi và nâng cao các trường hợp không chắc chắn.\n\n**Từ khóa:** Chăn nuôi chính xác, Điện toán biên-đám mây, Mô hình ngôn ngữ-vision, AI agentic, Sàng lọc bệnh thú y, Cảm biến đa phương thức, Giám sát sức khỏe động vật.\n\n**Liên kết bài báo:** [VetClaw trên arXiv](https://arxiv.org/abs/2607.26042v1) \n\nNếu bạn cần thêm thông tin chi tiết hoặc có câu hỏi khác, hãy cho tôi biết!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "paper_text",
+              "args": {
+                "arxiv_url": "http://arxiv.org/abs/2607.26042v1"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "paper_text",
+              "args": {
+                "arxiv_url": "http://arxiv.org/abs/2607.26042v1"
+              },
+              "result": {
+                "tool": "get_arxiv_paper_text",
+                "arxiv_id": "2607.26042v1",
+                "url": "https://arxiv.org/abs/2607.26042v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.26042v1.pdf",
+                "pdf_path": "/Users/hundz/DAY04_G19_E403/starter_v0/arxiv_papers/2607.26042v1.pdf",
+                "txt_path": "/Users/hundz/DAY04_G19_E403/starter_v0/arxiv_papers/2607.26042v1.txt",
+                "page_count": 13,
+                "pages_read": 5,
+                "chars_returned": 8000,
+                "items": [
+                  {
+                    "title": "arXiv paper 2607.26042v1",
+                    "url": "https://arxiv.org/abs/2607.26042v1",
+                    "source": "arxiv.org",
+                    "summary": "VetClaw: An Edge-Cloud Multimodal Agentic\nSystem for Veterinary Disease Screening\nSyed Mhamudul Hasan1*, Anas AlSobeh2, Hussein Zangoti3,\nAbdur R. Shahid1\n1School of Computing, Southern Illinois University, Carbondale, 62901,\nIL, USA.\n2Information Systems and Technology, Utah Valley University, Orem,\nOrem, 84058, UT, USA.\n3College of Engineering and Computer Science, Jazan University, Saudi\nArabia.\n*Corresponding author(s). E-mail(s): syedmhamudul.hasan@siu.edu;\nContributing authors: anas.alsobeh@uvu.edu;\nhmzangoti@jazanu.edu.sa; shahid@cs.siu.edu;\nAbstract\nWe present VetClaw, an edge–cloud multimodal agentic system for early vet-\nerinary disease screening. VetClaw uses a camera module as an edge sensing\ndevice and sends captured images, together with optional symptom descriptions,\nto a server-hosted vision-language model for zero-shot disease classification. The\nsystem separates agent interaction from workflow orchestration: OpenClaw pro-\nvides scheduling, tool access, user interaction, and notification services on the\nedge device, while LangGraph manages the stateful screening workflow, including\ninput validation, image transmission, model invocation, safety checks, conditional\nrouting, failure handling, and structured logging. This design moves beyond\nstatic image classification by enabling the system to collect visual evidence,\ninvoke external models, apply deterministic safety rules, and generate diagnostic-\nsupport alerts. Results show that image-only VLM prediction remains limited,\nwhereas symptom-guided and multimodal inputs improve zero-shot classification\nperformance. Thus, VetClaw transforms a static prediction model into a coordi-\nnated, safety-aware system that can use tools, manage workflows, handle failures,\nand escalate uncertain cases.\n1\narXiv:2607.26042v1  [cs.CV]  28 Jul 2026\n\nKeywords:Precision livestock farming, Edge–cloud computing, Vision-language\nmodels, Agentic AI, Veterinary disease screening, Multimodal sensing, Animal health\nmonitoring\n1 Introduction\nAnimal biosecurity comprises preventive measures designed to reduce the transmis-\nsion of infectious diseases among animals. For instance, skin disease is one of the\nmain clinical signs observed in livestock when biosecurity fails and a highly contagious\ngerm spreads through the animal colony [1–3]. Artificial intelligence has a wide range\nof applications in veterinary medicine, including automated disease prediction [4–7].\nHowever, veterinary diagnosis presents distinct challenges because animals cannot ver-\nbally describe symptoms, and disease presentations can vary across species, anatomy,\nphysiology, behaviour, and baseline health patterns. Generative AI may help address\nthis challenge by integrating multiple sources of observable and contextual evidence\nthat can support early animal disease screening through multimodal reasoning and\nsafety-aware response generation [8]. Instead of relying on a single data type, genera-\ntive AI can integrate several sources of evidence. This is similar to how veterinarians\ncombine physical examination, imaging, lab results, and observed behavior in real\npractice to improve veterinary diagnosis by combining different data types such as\nmedical images, clinical notes, lab reports, behavioral videos, and audio recordings to\nprovide more accurate and holistic diagnostic support for animal healthcare [9, 10].\nAgentic AI extends this capability by shifting from static prediction towards adaptive\nsystems that can reason, use tools, coordinate workflows, and support personalised\ndecision-making [11].\nTo demonstrate the application of Agentic AI, we implement an agentic veteri-\nnary monitoring pipeline named VetClaw, using an existing veterinary disease dataset\ncontaining animal images and associated symptom information to measure zero-shot\ndisease classification performance. The proposed system is designed for real-world edge\ndeployment, where a Raspberry Pi camera module can capture animal images and\ntransmit them, together with user-provided symptom text, to a server-hosted VLM\nfor automated disease screening.\n2 Background\n2.1 OpenClaw\nOpenClaw is an open-source autonomous-agent framework that provides an inter-\nface between language models, external tools, local scripts, scheduled tasks, and\ncommunication channels [12].\n2\n\n2.2 LangGraph\nLangGraph is a graph-based framework for implementing stateful language-model and\nagent workflows. It represents a workflow as a set of nodes connected through deter-\nministic or conditional transitions where each node performs a defined operation,\nsuch as validating an input, calling an external model, checking a safety condition, or\nrecording an execution result [13].\n2.3 Multimodal AI\nMultimodal AI refers to systems that can process and reason across multiple types\nof data such as text, images, audio, and video rather than being limited to a single\nmodality. For instance, a VLM is a specific type of multimodal AI that combines vision\nfor image understanding and language for text generation and reasoning [14].\n2.4 Related Work\nAI has strong potential for the early detection and management of animal dis-\neases [15–17]. Multimodal AI can extend this potential by integrating visual, textual,\nphysiological, and behavioural signals, making it a promising foundation for veteri-\nnary diagnostic support [10, 18–20]. Agentic AI can further strengthen such systems\nby coordinating tools, maintaining workflow state, handling failures, and supporting\nadaptive decision processes [21]. Prior work has explored several relevant directions.\nVetTag [22] is a large-scale NLP system for automatically assigning veterinary diag-\nnosis codes from free-text clinical notes. In a similar way, Lee et al. [23] proposed a\nmulti-agent system for clinical problem detection in human healthcare, and Sun et\nal. [24] investigated LLM-based diagnosis in human healthcare using external planners\nand simulated patient dialogues. Although their work did not address veterinary appli-\ncations. Hennessey et al. [9] reviewed the broader role of AI in veterinary medicine,\nincluding diagnostic imaging and disease prediction. Related work has also examined\ncloud-connected sensing systems for livestock monitoring. For example, Darvesh et\nal. [25] developed an IoT and machine learning platform that uses real-time sensor\nmeasurements, including skin temperature, heart rate, and motion, to monitor cattle\nhealth, predict potential medical conditions, and notify producers through a mobile\napplication. However, their system does not incorporate an agentic orchestration layer\nfor multimodal reasoning.\n2.5 Contributions\nTo fill this gap, this paper makes three contributions.\n1. We introduce VetClaw, an OpenClaw-based edge-cloud agentic workflow for veteri-\nnary disease screening using images captured by a Raspberry Pi and server-hosted\nVLM.\n2. We evaluate two VLMs under image-only, text-only, and text-image zero-shot\nsettings across two public veterinary disease datasets.\n3. We analyze the role of symptom descriptions and multimodal fusion, showing that\ntext-guided VLM reasoning improves performance over image-only prediction while\n3\n\nFig. 1Edge-cloud Architecture of the VetClaw Veterinary Assistant Deployed on a Raspberry Pi\nfor Early Skin Disease Prediction.\nintroducing potential leakage and safety risks that require controlled prompting\nand rule-based review.\n3 VetClaw Architecture\n(System Component.) VetClaw consists of an edge deployment layer and a server-\nside inference layer, as illustrated in Figure 1. The edge layer contains a Raspberry Pi,\nCamera Module 3, OpenClaw, a lightweight local language model, and a LangGraph\nworkflow. OpenClaw acts as the edge-facing agent. It schedules image capture, invokes\nlocal tools, accepts optional symptom information, starts the LangGraph workflow,\nand delivers screening notifications. A lightweight local language model may support\ninstruction interpretation and user interaction, but it does not perform the final dis-\ne"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "### Tóm tắt bài báo: VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening\n\n**Tác giả:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n\n**Tóm tắt:**\nBài báo giới thiệu VetClaw, một hệ thống đa phương tiện agentic dựa trên mô hình đám mây và biên, được thiết kế để sàng lọc bệnh thú y sớm. VetClaw sử dụng một mô-đun camera như một thiết bị cảm biến biên, gửi hình ảnh đã chụp cùng với mô tả triệu chứng tùy chọn đến một mô hình ngôn ngữ-vision (VLM) được lưu trữ trên máy chủ để phân loại bệnh không cần học trước (zero-shot).\n\nHệ thống tách biệt tương tác của agent khỏi việc điều phối quy trình làm việc: OpenClaw cung cấp lịch trình, truy cập công cụ, tương tác với người dùng và dịch vụ thông báo trên thiết bị biên, trong khi LangGraph quản lý quy trình sàng lọc có trạng thái, bao gồm xác thực đầu vào, truyền hình ảnh, gọi mô hình, kiểm tra an toàn, định tuyến có điều kiện, xử lý lỗi và ghi nhật ký có cấu trúc.\n\nKết quả cho thấy rằng dự đoán chỉ dựa vào hình ảnh của VLM vẫn còn hạn chế, trong khi đầu vào hướng dẫn triệu chứng và đa phương thức cải thiện hiệu suất phân loại không cần học trước. Do đó, VetClaw biến một mô hình dự đoán tĩnh thành một hệ thống phối hợp, nhận thức an toàn có thể sử dụng công cụ, quản lý quy trình làm việc, xử lý lỗi và nâng cao các trường hợp không chắc chắn.\n\n**Từ khóa:** Chăn nuôi chính xác, Điện toán biên-đám mây, Mô hình ngôn ngữ-vision, AI agentic, Sàng lọc bệnh thú y, Cảm biến đa phương thức, Giám sát sức khỏe động vật.\n\n**Liên kết bài báo:** [VetClaw trên arXiv](https://arxiv.org/abs/2607.26042v1) \n\nNếu bạn cần thêm thông tin chi tiết hoặc có câu hỏi khác, hãy cho tôi biết!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "http://arxiv.org/abs/2607.26042v1"
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "arxiv_id": "2607.26042v1",
+            "url": "https://arxiv.org/abs/2607.26042v1",
+            "pdf_url": "https://arxiv.org/pdf/2607.26042v1.pdf",
+            "pdf_path": "/Users/hundz/DAY04_G19_E403/starter_v0/arxiv_papers/2607.26042v1.pdf",
+            "txt_path": "/Users/hundz/DAY04_G19_E403/starter_v0/arxiv_papers/2607.26042v1.txt",
+            "page_count": 13,
+            "pages_read": 5,
+            "chars_returned": 8000,
+            "items": [
+              {
+                "title": "arXiv paper 2607.26042v1",
+                "url": "https://arxiv.org/abs/2607.26042v1",
+                "source": "arxiv.org",
+                "summary": "VetClaw: An Edge-Cloud Multimodal Agentic\nSystem for Veterinary Disease Screening\nSyed Mhamudul Hasan1*, Anas AlSobeh2, Hussein Zangoti3,\nAbdur R. Shahid1\n1School of Computing, Southern Illinois University, Carbondale, 62901,\nIL, USA.\n2Information Systems and Technology, Utah Valley University, Orem,\nOrem, 84058, UT, USA.\n3College of Engineering and Computer Science, Jazan University, Saudi\nArabia.\n*Corresponding author(s). E-mail(s): syedmhamudul.hasan@siu.edu;\nContributing authors: anas.alsobeh@uvu.edu;\nhmzangoti@jazanu.edu.sa; shahid@cs.siu.edu;\nAbstract\nWe present VetClaw, an edge–cloud multimodal agentic system for early vet-\nerinary disease screening. VetClaw uses a camera module as an edge sensing\ndevice and sends captured images, together with optional symptom descriptions,\nto a server-hosted vision-language model for zero-shot disease classification. The\nsystem separates agent interaction from workflow orchestration: OpenClaw pro-\nvides scheduling, tool access, user interaction, and notification services on the\nedge device, while LangGraph manages the stateful screening workflow, including\ninput validation, image transmission, model invocation, safety checks, conditional\nrouting, failure handling, and structured logging. This design moves beyond\nstatic image classification by enabling the system to collect visual evidence,\ninvoke external models, apply deterministic safety rules, and generate diagnostic-\nsupport alerts. Results show that image-only VLM prediction remains limited,\nwhereas symptom-guided and multimodal inputs improve zero-shot classification\nperformance. Thus, VetClaw transforms a static prediction model into a coordi-\nnated, safety-aware system that can use tools, manage workflows, handle failures,\nand escalate uncertain cases.\n1\narXiv:2607.26042v1  [cs.CV]  28 Jul 2026\n\nKeywords:Precision livestock farming, Edge–cloud computing, Vision-language\nmodels, Agentic AI, Veterinary disease screening, Multimodal sensing, Animal health\nmonitoring\n1 Introduction\nAnimal biosecurity comprises preventive measures designed to reduce the transmis-\nsion of infectious diseases among animals. For instance, skin disease is one of the\nmain clinical signs observed in livestock when biosecurity fails and a highly contagious\ngerm spreads through the animal colony [1–3]. Artificial intelligence has a wide range\nof applications in veterinary medicine, including automated disease prediction [4–7].\nHowever, veterinary diagnosis presents distinct challenges because animals cannot ver-\nbally describe symptoms, and disease presentations can vary across species, anatomy,\nphysiology, behaviour, and baseline health patterns. Generative AI may help address\nthis challenge by integrating multiple sources of observable and contextual evidence\nthat can support early animal disease screening through multimodal reasoning and\nsafety-aware response generation [8]. Instead of relying on a single data type, genera-\ntive AI can integrate several sources of evidence. This is similar to how veterinarians\ncombine physical examination, imaging, lab results, and observed behavior in real\npractice to improve veterinary diagnosis by combining different data types such as\nmedical images, clinical notes, lab reports, behavioral videos, and audio recordings to\nprovide more accurate and holistic diagnostic support for animal healthcare [9, 10].\nAgentic AI extends this capability by shifting from static prediction towards adaptive\nsystems that can reason, use tools, coordinate workflows, and support personalised\ndecision-making [11].\nTo demonstrate the application of Agentic AI, we implement an agentic veteri-\nnary monitoring pipeline named VetClaw, using an existing veterinary disease dataset\ncontaining animal images and associated symptom information to measure zero-shot\ndisease classification performance. The proposed system is designed for real-world edge\ndeployment, where a Raspberry Pi camera module can capture animal images and\ntransmit them, together with user-provided symptom text, to a server-hosted VLM\nfor automated disease screening.\n2 Background\n2.1 OpenClaw\nOpenClaw is an open-source autonomous-agent framework that provides an inter-\nface between language models, external tools, local scripts, scheduled tasks, and\ncommunication channels [12].\n2\n\n2.2 LangGraph\nLangGraph is a graph-based framework for implementing stateful language-model and\nagent workflows. It represents a workflow as a set of nodes connected through deter-\nministic or conditional transitions where each node performs a defined operation,\nsuch as validating an input, calling an external model, checking a safety condition, or\nrecording an execution result [13].\n2.3 Multimodal AI\nMultimodal AI refers to systems that can process and reason across multiple types\nof data such as text, images, audio, and video rather than being limited to a single\nmodality. For instance, a VLM is a specific type of multimodal AI that combines vision\nfor image understanding and language for text generation and reasoning [14].\n2.4 Related Work\nAI has strong potential for the early detection and management of animal dis-\neases [15–17]. Multimodal AI can extend this potential by integrating visual, textual,\nphysiological, and behavioural signals, making it a promising foundation for veteri-\nnary diagnostic support [10, 18–20]. Agentic AI can further strengthen such systems\nby coordinating tools, maintaining workflow state, handling failures, and supporting\nadaptive decision processes [21]. Prior work has explored several relevant directions.\nVetTag [22] is a large-scale NLP system for automatically assigning veterinary diag-\nnosis codes from free-text clinical notes. In a similar way, Lee et al. [23] proposed a\nmulti-agent system for clinical problem detection in human healthcare, and Sun et\nal. [24] investigated LLM-based diagnosis in human healthcare using external planners\nand simulated patient dialogues. Although their work did not address veterinary appli-\ncations. Hennessey et al. [9] reviewed the broader role of AI in veterinary medicine,\nincluding diagnostic imaging and disease prediction. Related work has also examined\ncloud-connected sensing systems for livestock monitoring. For example, Darvesh et\nal. [25] developed an IoT and machine learning platform that uses real-time sensor\nmeasurements, including skin temperature, heart rate, and motion, to monitor cattle\nhealth, predict potential medical conditions, and notify producers through a mobile\napplication. However, their system does not incorporate an agentic orchestration layer\nfor multimodal reasoning.\n2.5 Contributions\nTo fill this gap, this paper makes three contributions.\n1. We introduce VetClaw, an OpenClaw-based edge-cloud agentic workflow for veteri-\nnary disease screening using images captured by a Raspberry Pi and server-hosted\nVLM.\n2. We evaluate two VLMs under image-only, text-only, and text-image zero-shot\nsettings across two public veterinary disease datasets.\n3. We analyze the role of symptom descriptions and multimodal fusion, showing that\ntext-guided VLM reasoning improves performance over image-only prediction while\n3\n\nFig. 1Edge-cloud Architecture of the VetClaw Veterinary Assistant Deployed on a Raspberry Pi\nfor Early Skin Disease Prediction.\nintroducing potential leakage and safety risks that require controlled prompting\nand rule-based review.\n3 VetClaw Architecture\n(System Component.) VetClaw consists of an edge deployment layer and a server-\nside inference layer, as illustrated in Figure 1. The edge layer contains a Raspberry Pi,\nCamera Module 3, OpenClaw, a lightweight local language model, and a LangGraph\nworkflow. OpenClaw acts as the edge-facing agent. It schedules image capture, invokes\nlocal tools, accepts optional symptom information, starts the LangGraph workflow,\nand delivers screening notifications. A lightweight local language model may support\ninstruction interpretation and user interaction, but it does not perform the final dis-\ne"
+              }
+            ]
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:59:07"
+    },
+    {
+      "turn_index": 3,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T16:59:13",
+      "user": "Gửi cho telegram",
+      "status": "action_completed",
+      "assistant_text": "Đã gửi nội dung lên Telegram.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "send",
+              "args": {
+                "text": "### Tóm tắt bài báo: VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening\n\n**Tác giả:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n\n**Tóm tắt:**\nBài báo giới thiệu VetClaw, một hệ thống đa phương tiện agentic dựa trên mô hình đám mây và biên, được thiết kế để sàng lọc bệnh thú y sớm. VetClaw sử dụng một mô-đun camera như một thiết bị cảm biến biên, gửi hình ảnh đã chụp cùng với mô tả triệu chứng tùy chọn đến một mô hình ngôn ngữ-vision (VLM) được lưu trữ trên máy chủ để phân loại bệnh không cần học trước (zero-shot).\n\nHệ thống tách biệt tương tác của agent khỏi việc điều phối quy trình làm việc: OpenClaw cung cấp lịch trình, truy cập công cụ, tương tác với người dùng và dịch vụ thông báo trên thiết bị biên, trong khi LangGraph quản lý quy trình sàng lọc có trạng thái, bao gồm xác thực đầu vào, truyền hình ảnh, gọi mô hình, kiểm tra an toàn, định tuyến có điều kiện, xử lý lỗi và ghi nhật ký có cấu trúc.\n\nKết quả cho thấy rằng dự đoán chỉ dựa vào hình ảnh của VLM vẫn còn hạn chế, trong khi đầu vào hướng dẫn triệu chứng và đa phương thức cải thiện hiệu suất phân loại không cần học trước. Do đó, VetClaw biến một mô hình dự đoán tĩnh thành một hệ thống phối hợp, nhận thức an toàn có thể sử dụng công cụ, quản lý quy trình làm việc, xử lý lỗi và nâng cao các trường hợp không chắc chắn.\n\n**Từ khóa:** Chăn nuôi chính xác, Điện toán biên-đám mây, Mô hình ngôn ngữ-vision, AI agentic, Sàng lọc bệnh thú y, Cảm biến đa phương thức, Giám sát sức khỏe động vật.\n\n**Liên kết bài báo:** [VetClaw trên arXiv](https://arxiv.org/abs/2607.26042v1)",
+                "confirmed": true
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "send",
+              "args": {
+                "text": "### Tóm tắt bài báo: VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening\n\n**Tác giả:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n\n**Tóm tắt:**\nBài báo giới thiệu VetClaw, một hệ thống đa phương tiện agentic dựa trên mô hình đám mây và biên, được thiết kế để sàng lọc bệnh thú y sớm. VetClaw sử dụng một mô-đun camera như một thiết bị cảm biến biên, gửi hình ảnh đã chụp cùng với mô tả triệu chứng tùy chọn đến một mô hình ngôn ngữ-vision (VLM) được lưu trữ trên máy chủ để phân loại bệnh không cần học trước (zero-shot).\n\nHệ thống tách biệt tương tác của agent khỏi việc điều phối quy trình làm việc: OpenClaw cung cấp lịch trình, truy cập công cụ, tương tác với người dùng và dịch vụ thông báo trên thiết bị biên, trong khi LangGraph quản lý quy trình sàng lọc có trạng thái, bao gồm xác thực đầu vào, truyền hình ảnh, gọi mô hình, kiểm tra an toàn, định tuyến có điều kiện, xử lý lỗi và ghi nhật ký có cấu trúc.\n\nKết quả cho thấy rằng dự đoán chỉ dựa vào hình ảnh của VLM vẫn còn hạn chế, trong khi đầu vào hướng dẫn triệu chứng và đa phương thức cải thiện hiệu suất phân loại không cần học trước. Do đó, VetClaw biến một mô hình dự đoán tĩnh thành một hệ thống phối hợp, nhận thức an toàn có thể sử dụng công cụ, quản lý quy trình làm việc, xử lý lỗi và nâng cao các trường hợp không chắc chắn.\n\n**Từ khóa:** Chăn nuôi chính xác, Điện toán biên-đám mây, Mô hình ngôn ngữ-vision, AI agentic, Sàng lọc bệnh thú y, Cảm biến đa phương thức, Giám sát sức khỏe động vật.\n\n**Liên kết bài báo:** [VetClaw trên arXiv](https://arxiv.org/abs/2607.26042v1)",
+                "confirmed": true
+              },
+              "result": {
+                "tool": "send_telegram",
+                "status": "sent",
+                "action_completed": true,
+                "messages_sent": 1,
+                "message_ids": [
+                  11
+                ],
+                "message": "Đã gửi nội dung lên Telegram."
+              }
+            }
+          ]
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "### Tóm tắt bài báo: VetClaw: An Edge-Cloud Multimodal Agentic System for Veterinary Disease Screening\n\n**Tác giả:** Syed Mhamudul Hasan, Anas AlSobeh, Hussein Zangoti, Abdur R. Shahid\n\n**Tóm tắt:**\nBài báo giới thiệu VetClaw, một hệ thống đa phương tiện agentic dựa trên mô hình đám mây và biên, được thiết kế để sàng lọc bệnh thú y sớm. VetClaw sử dụng một mô-đun camera như một thiết bị cảm biến biên, gửi hình ảnh đã chụp cùng với mô tả triệu chứng tùy chọn đến một mô hình ngôn ngữ-vision (VLM) được lưu trữ trên máy chủ để phân loại bệnh không cần học trước (zero-shot).\n\nHệ thống tách biệt tương tác của agent khỏi việc điều phối quy trình làm việc: OpenClaw cung cấp lịch trình, truy cập công cụ, tương tác với người dùng và dịch vụ thông báo trên thiết bị biên, trong khi LangGraph quản lý quy trình sàng lọc có trạng thái, bao gồm xác thực đầu vào, truyền hình ảnh, gọi mô hình, kiểm tra an toàn, định tuyến có điều kiện, xử lý lỗi và ghi nhật ký có cấu trúc.\n\nKết quả cho thấy rằng dự đoán chỉ dựa vào hình ảnh của VLM vẫn còn hạn chế, trong khi đầu vào hướng dẫn triệu chứng và đa phương thức cải thiện hiệu suất phân loại không cần học trước. Do đó, VetClaw biến một mô hình dự đoán tĩnh thành một hệ thống phối hợp, nhận thức an toàn có thể sử dụng công cụ, quản lý quy trình làm việc, xử lý lỗi và nâng cao các trường hợp không chắc chắn.\n\n**Từ khóa:** Chăn nuôi chính xác, Điện toán biên-đám mây, Mô hình ngôn ngữ-vision, AI agentic, Sàng lọc bệnh thú y, Cảm biến đa phương thức, Giám sát sức khỏe động vật.\n\n**Liên kết bài báo:** [VetClaw trên arXiv](https://arxiv.org/abs/2607.26042v1)",
+            "confirmed": true
+          },
+          "result": {
+            "tool": "send_telegram",
+            "status": "sent",
+            "action_completed": true,
+            "messages_sent": 1,
+            "message_ids": [
+              11
+            ],
+            "message": "Đã gửi nội dung lên Telegram."
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:59:20"
+    }
+  ],
+  "surface": "streamlit_ui"
+}

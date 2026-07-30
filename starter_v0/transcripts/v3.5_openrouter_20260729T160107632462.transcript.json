@@ -1,0 +1,35 @@
+{
+  "transcript_id": "v3.5_openrouter_20260729T160107632462",
+  "version": "v3.5",
+  "artifact_version": "v3.5+p2def95469a55+te17eb09eafbf",
+  "prompt_hash": "2def95469a552547606a9ad0926444cf92377cf47c07c14f903fb7d76eadd21d",
+  "tools_hash": "e17eb09eafbf53a219f45c75ea5b62c6297f6aa01ac34dca5744553d0ff95ae3",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "artifacts/system_prompt.md",
+  "tools": "artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T16:01:07",
+  "updated_at": "2026-07-29T16:01:10",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-07-29T16:01:07",
+      "user": "Bạn là gì và có thể làm gì?",
+      "status": "answered",
+      "assistant_text": "Tôi là một trợ lý ảo được thiết kế để hỗ trợ bạn trong việc tìm kiếm thông tin, nghiên cứu, và trả lời các câu hỏi liên quan đến tin tức, bài viết học thuật, và các tài liệu đã được thu thập. Tôi có thể giúp bạn:\n\n1. Tìm kiếm tin tức và thông tin từ web.\n2. Tìm kiếm và đọc các bài báo khoa học từ arXiv.\n3. Cung cấp thông tin từ các bài viết hoặc URL cụ thể.\n4. Tìm kiếm các bài đăng trên mạng xã hội về một chủ đề cụ thể.\n\nNếu bạn có câu hỏi cụ thể hoặc cần tìm kiếm thông tin nào, hãy cho tôi biết!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": "Tôi là một trợ lý ảo được thiết kế để hỗ trợ bạn trong việc tìm kiếm thông tin, nghiên cứu, và trả lời các câu hỏi liên quan đến tin tức, bài viết học thuật, và các tài liệu đã được thu thập. Tôi có thể giúp bạn:\n\n1. Tìm kiếm tin tức và thông tin từ web.\n2. Tìm kiếm và đọc các bài báo khoa học từ arXiv.\n3. Cung cấp thông tin từ các bài viết hoặc URL cụ thể.\n4. Tìm kiếm các bài đăng trên mạng xã hội về một chủ đề cụ thể.\n\nNếu bạn có câu hỏi cụ thể hoặc cần tìm kiếm thông tin nào, hãy cho tôi biết!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [],
+      "ended_at": "2026-07-29T16:01:10"
+    }
+  ],
+  "surface": "streamlit_ui"
+}

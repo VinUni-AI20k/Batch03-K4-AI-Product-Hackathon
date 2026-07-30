@@ -1,0 +1,145 @@
+# starter_v0 — tool declarations (intentionally vague).
+# Names and descriptions here are a rough first draft. Routing rules, name->handle
+# mapping, arg conventions (news/timeframe/Top), and the send-confirmation boundary
+# are NOT spelled out anywhere yet. Your job is to make these declarations + the
+# system prompt good enough that the agent routes correctly on the eval.
+#
+# If you rename a tool, keep the name in sync across:
+#   this file  ->  tools/__init__.py (TOOL_FUNCTIONS)  ->  data/eval_base.json + data/eval_research_extension.json
+tools:
+  # ---------------- Core tools ----------------
+  - name: ask_for_missing_info
+    description: "Ask one required free-text research question. MUST use when an account/handle or referenced URL is absent; never guess those values. A generic request for N latest tweets/posts without an account and without a topic is missing the account, EXCEPT when the user explicitly asks for random/ngẫu nhiên Twitter/X posts; that request is complete and must call search_social_topic immediately. Do not use for action confirmation and do not use when an explicit public URL is already present."
+    parameters:
+      type: object
+      properties:
+        question: {type: string, default: "", description: "Câu hỏi"}
+        response_type: {type: string, enum: [text], default: "text", description: "Always text for missing research information."}
+      required: [question, response_type]
+
+  - name: confirm_action
+    description: "Ask for explicit yes/no confirmation before an external action when the user explicitly asks to review/confirm first OR exact sendable content is absent from earlier turns. A standalone phrase such as 'bản tin này', 'tóm tắt này', 'it', or 'that' is not content. Example: for the single-turn request 'Đăng bản tin này lên Telegram giúp mình', MUST call this tool with response_type=yes_no and MUST NOT call send. Do NOT use for Telegram only when an earlier turn actually contains the complete content and the user directly says send/post it. This tool only asks and never performs the action."
+    parameters:
+      type: object
+      properties:
+        question: {type: string, default: "", description: "A yes/no question asking whether to perform the requested external action."}
+        response_type: {type: string, enum: [yes_no], default: "yes_no", description: "Always yes_no for action confirmation."}
+      required: [question, response_type]
+
+  - name: send
+    description: "Immediately send exact content from an EARLIER conversation turn to the configured Telegram chat when the latest user directly asks to send/post it. A direct send request is authorization: do not call confirm_action first and do not ask again. Copy the complete requested earlier content into text; never invent, shorten, send the instruction itself, or turn a demonstrative reference into content. A standalone reference such as 'bản tin này', 'tóm tắt này', 'it', or 'that' is not content. NEVER use this tool in a single-turn conversation with no earlier content; for 'Đăng bản tin này lên Telegram giúp mình', use confirm_action instead. Call exactly once with confirmed=true."
+    parameters:
+      type: object
+      properties:
+        text: {type: string, minLength: 1, description: "Complete exact content to send to Telegram."}
+        confirmed: {type: boolean, enum: [true], default: true, description: "Always true for a direct user send request."}
+      required: [text, confirmed]
+
+  - name: timeline
+    description: "Get recent posts FROM one explicitly identified account. Use for 'posts/tweets của/from <person or handle>', strip a leading @, and preserve the requested limit. Do not use when the account is missing (use ask_for_missing_info), when the user wants posts ABOUT a topic, or when the user explicitly asks for random/ngẫu nhiên posts (use search_social_topic)."
+    parameters:
+      type: object
+      properties:
+        screenname: {type: string, default: "", description: "Tên tài khoản"}
+        limit: {type: integer, default: 5, description: "Số lượng"}
+      required: [screenname]
+
+  - name: search_social_topic
+    description: "Search social/X posts ABOUT a topic or browse random posts when social/X remains an ACTIVE source. For explicit random/ngẫu nhiên requests, MUST call immediately with query='random', random_mode=true, and the requested limit; never ask for a topic/account. For normal topic search, pass the non-empty topic with random_mode=false. NEVER call if a later turn drops/stops Twitter, switches to web, or replaces the social task. Do not use for posts FROM one account. Use Top for popular/top and Latest for recent/latest."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, minLength: 1, description: "Non-empty topic keyword; never use an empty string."}
+        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp"}
+        limit: {type: integer, default: 5, description: "Số lượng"}
+        random_mode: {type: boolean, default: false, description: "True only when the user explicitly requests random/ngẫu nhiên posts."}
+      required: [query]
+
+  - name: lookup
+    description: "Search the public web for a subject when no specific URL is supplied. Use topic=news for news/tin/tin tức and map today->day, this week->week, this month->month, this year->year. Keep query as the subject without appending 'news'. When the user switches from social/Twitter to web news, use lookup only and do not retain the discarded search_social_topic route."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Truy vấn"}
+        topic: {type: string, enum: [general, news], default: "general", description: "Phân loại"}
+        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "Khoảng thời gian"}
+        max_results: {type: integer, default: 5, description: "Số kết quả"}
+      required: [query, topic, timeframe]
+
+  - name: fetch
+    description: "Read one explicit non-arXiv URL. Call once per supplied URL. Reading a public URL is read-only: do not ask for confirmation and do not replace an explicit URL with lookup. If no URL exists in the conversation, use ask_for_missing_info instead. If the exact URL is invalid, unsafe, unreachable, or unreadable, its blocked/skipped result is terminal: report it and NEVER call lookup, timeline, search_social_topic, papers, or guess another URL as fallback."
+    parameters:
+      type: object
+      properties:
+        url: {type: string, default: "", description: "Địa chỉ"}
+      required: [url]
+
+  - name: format
+    description: "Trình bày dữ liệu đã có thành văn bản."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          default: []
+          description: "Danh sách item"
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              source: {type: string}
+              summary: {type: string}
+              section: {type: string}
+        template: {type: string, enum: [brief, sections, bullets, thread, daily_ai_vn], default: "sections", description: "Khuôn"}
+        headline: {type: string, default: "", description: "Tiêu đề"}
+      required: [items, template]
+
+  - name: citation_audit
+    description: "Audit citation metadata in research items already provided or collected. Use only when the user explicitly asks to check citation/source-link completeness. Put every available item into ONE citation_audit call; never split, duplicate, or call this tool twice in the same response. Reports missing or invalid URLs, non-HTTPS links, duplicate URLs, and missing titles. It does not search, fetch, format, or verify factual claims."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          default: []
+          description: "Research items to audit; each item should contain a title and source URL."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              source: {type: string}
+        require_https: {type: boolean, default: true, description: "When true, flag HTTP links as insecure."}
+      required: [items]
+
+  # ---------------- Bonus tools ----------------
+  - name: policy
+    description: "Tìm trong tài liệu nội bộ."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Truy vấn"}
+        policy_area: {type: string, enum: [all, ai_research, source_citation, data_privacy, external_publishing, tool_usage], default: "all", description: "Nhóm"}
+        top_k: {type: integer, default: 3, description: "Số mục"}
+      required: [query]
+
+  - name: papers
+    description: "Tìm bài báo khoa học."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Từ khóa"}
+        max_results: {type: integer, default: 5, description: "Số lượng"}
+        sort_by: {type: string, enum: [relevance, lastUpdatedDate, submittedDate], default: "relevance", description: "Sắp xếp"}
+      required: [query]
+
+  - name: paper_text
+    description: "Read one explicit arXiv ID or URL. If that reference is invalid or unreadable, skip it as terminal and never search for or guess a replacement paper."
+    parameters:
+      type: object
+      properties:
+        arxiv_url: {type: string, default: "", description: "ID hoặc địa chỉ"}
+        max_pages: {type: integer, default: 5, description: "Số trang"}
+        max_chars: {type: integer, default: 8000, description: "Số ký tự"}
+      required: [arxiv_url]

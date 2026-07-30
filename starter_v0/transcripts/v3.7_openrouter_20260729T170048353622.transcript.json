@@ -1,0 +1,448 @@
+{
+  "transcript_id": "v3.7_openrouter_20260729T170048353622",
+  "version": "v3.7",
+  "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+  "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+  "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T17:00:48",
+  "updated_at": "2026-07-29T17:01:43",
+  "turns": [
+    {
+      "turn_index": 1,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T17:00:48",
+      "user": "tìm thông tin mới nhất về AI",
+      "status": "answered",
+      "assistant_text": "Here are the latest news articles about AI:\n\n1. **[Mark Zuckerberg Says U.S. Should Accelerate AI Development, Not Restrict It](https://www.wsj.com/tech/ai/mark-zuckerberg-says-u-s-should-accelerate-ai-development-not-restrict-it-3bbe0868)** - Zuckerberg emphasizes the need for optimism about AI's impact and argues against restrictions on its development. (Source: wsj.com)\n\n2. **[Employees at the World’s Biggest AI Companies Are Calling for a Slowdown in AI Development](https://www.cnn.com/2026/07/28/tech/ai-development-tech-employees-open-letter)** - Over 1,000 employees from leading AI firms, including OpenAI, have signed a letter advocating for a deliberate pacing of AI development to allow society to adapt. (Source: cnn.com)\n\n3. **[Meta's Zuckerberg Warns Against Curbs on Chinese AI](https://www.reuters.com/world/china/metas-zuckerberg-says-us-should-not-block-chinese-ai-models-ft-reports-2026-07-29)** - Zuckerberg cautions against blocking Chinese AI models, suggesting that collaboration may be more beneficial. (Source: reuters.com)\n\n4. **[Accenture Wins $821M Pentagon AI Data Platform Contract](https://federalnewsnetwork.com/defense-news/2026/07/accenture-wins-821m-pentagon-ai-data-platform-contract)** - Accenture has secured a significant contract to enhance the Pentagon's AI capabilities, focusing on battlefield data and decision-making. (Source: federalnewsnetwork.com)\n\n5. **[An AI Data Center Is Being Built on My Grandma's Garden](https://www.ncronline.org/opinion/guest-voices/ai-data-center-being-built-my-grandmas-garden)** - This article discusses the environmental impact of AI data centers, highlighting a personal story about a data center being built on private land. (Source: ncronline.org)\n\nFeel free to ask if you need more information on any specific topic!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "query": "AI",
+                "topic": "news",
+                "timeframe": "day",
+                "max_results": 5
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "lookup",
+              "args": {
+                "query": "AI",
+                "topic": "news",
+                "timeframe": "day",
+                "max_results": 5
+              },
+              "result": {
+                "tool": "web_search",
+                "query": "AI",
+                "topic": "news",
+                "timeframe": "day",
+                "items": [
+                  {
+                    "title": "Mark Zuckerberg Says U.S. Should Accelerate AI ...",
+                    "url": "https://www.wsj.com/tech/ai/mark-zuckerberg-says-u-s-should-accelerate-ai-development-not-restrict-it-3bbe0868",
+                    "source": "wsj.com",
+                    "summary": "## Videos\n\n### Most Popular News\n\n### Most Popular\n\n### Further Reading\n\n### CoreWeave’s AI-Native Cloud Faces the Storm\n\n### IBM CEO Arvind Krishna Has Nowhere to Hide From AI\n\n### Japan to Buy Nvidia Chips to Power Its AI Push\n\n### America Needs More Weapons. JPMorgan Wants to Add Its Firepower.\n\n### Microsoft’s Satya Nadella: We Can’t Let AI Giants Eat the Economy [...] Optimism about AI’s impact on the world “should empirically be the default assumption of how this is going to play out,” the Meta Platforms META -0.08%decrease; down pointing triangle chief executive officer said in an interview. He cited historical analogues, recent jobs data and his own personal use of AI for parenting and fitness as informing his positive outlook on the technology.\n\nCopyright ©2026 Dow Jones & Company, Inc. All Rights Reserved. 87990cbe856818d5eddac44c7b1cdeb8\n\n## Videos",
+                    "score": 0.1400965982282754
+                  },
+                  {
+                    "title": "Employees at the world’s biggest AI companies are calling for a slowdown in AI development",
+                    "url": "https://www.cnn.com/2026/07/28/tech/ai-development-tech-employees-open-letter",
+                    "source": "cnn.com",
+                    "summary": "OpenAI said in a statement to CNN they agree with potentially pacing the development of AI, adding they “hope to contribute to work led by the U.S. government, alongside other labs” on the topic.\n\nOpenAI CEO Sam Altman suggested it may be time to slow down AI development in a podcast interview Tuesday. The OpenAI models that broke out of their test environment are fueling “long term questions” about how AI companies should address this new rate of progress. [...] The US government should support an international effort to develop tools that can “deliberately pace the frontier of automated AI development,” according to the letter.\n\nMore than 1,000 employees from frontier AI companies signed the letter, including the chief scientist of OpenAI, one of the ChatGPT developer’s original cofounders, some of Anthropic’s cofoundersand vice presidents at Meta, Google and others. [...] “[W]e may have to pace the rate of AI development to give ourselves enough time for society to harden around these new capability levels,” Altman said.\n\nAnthropic said in a statement they are “glad to see broad agreement” on the need to potentially slow AI development “so society can prepare.”\n\nMeta declined to comment. Google did not immediately respond to a request for comment.",
+                    "score": 0.13529110309550785
+                  },
+                  {
+                    "title": "Meta's Zuckerberg warns against curbs on Chinese AI ...",
+                    "url": "https://www.reuters.com/world/china/metas-zuckerberg-says-us-should-not-block-chinese-ai-models-ft-reports-2026-07-29",
+                    "source": "reuters.com",
+                    "summary": "19 mins agoWorld categorySK Hynix's record profit misses forecasts, shares slump 10% despite robust AI chip demand Image 6: SK Hynix at the Nasdaq market in New York \n   4 hours agoLegal categoryTech employees call for US-backed global effort to manage risks of advanced AI Image 7: Illustration shows words \"Artificial Intelligence AI\\",
+                    "score": 0.130398854452764
+                  },
+                  {
+                    "title": "Accenture wins $821M Pentagon AI data platform contract",
+                    "url": "https://federalnewsnetwork.com/defense-news/2026/07/accenture-wins-821m-pentagon-ai-data-platform-contract",
+                    "source": "federalnewsnetwork.com",
+                    "summary": "#### Advertise with Us\n\n# Accenture wins $821M Pentagon AI data platform contract\n\nAccenture won an $821 million contract to mature the Pentagon's War Data Platform, boosting AI-powered battlefield data and decision-making. [...] The platform aims to combine more than 1,500 data sources, both commercial and military, to securely provide intelligence, targeting data and more to frontline troops and their commands, the AI office said, calling it “one of [DoD]’s most vital data platforms for AI exploitation and mission advantage.” [...] The award advances the Pentagon’s effort to mature its War Data Platform, a clearinghouse of battlefield information that AI applications can crunch to advise troops on potential next moves and speed up wartime decisions.",
+                    "score": 0.1297285959735784
+                  },
+                  {
+                    "title": "An AI data center is being built on my grandma's garden",
+                    "url": "https://www.ncronline.org/opinion/guest-voices/ai-data-center-being-built-my-grandmas-garden",
+                    "source": "ncronline.org",
+                    "summary": "He also reminds us to think of the physical impact of utilizing AI while reminding us that data centers are not neutral. He states: \"Current AI systems require enormous amounts of energy and water … which requires an extensive network of machines, cables, data centers and energy-intensive infrastructure … It is essential to develop more sustainable technological solutions.\" [...] When my grandma sold her house last year, she did not know the purchaser. Now her land and the surrounding 672 acres belong to the developer Vantage, who is building an AI data center that costs $15 billion. [...] the window so that those driving by on Highland Drive could see, and smile.",
+                    "score": 0.12493450552382028
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Here are the latest news articles about AI:\n\n1. **[Mark Zuckerberg Says U.S. Should Accelerate AI Development, Not Restrict It](https://www.wsj.com/tech/ai/mark-zuckerberg-says-u-s-should-accelerate-ai-development-not-restrict-it-3bbe0868)** - Zuckerberg emphasizes the need for optimism about AI's impact and argues against restrictions on its development. (Source: wsj.com)\n\n2. **[Employees at the World’s Biggest AI Companies Are Calling for a Slowdown in AI Development](https://www.cnn.com/2026/07/28/tech/ai-development-tech-employees-open-letter)** - Over 1,000 employees from leading AI firms, including OpenAI, have signed a letter advocating for a deliberate pacing of AI development to allow society to adapt. (Source: cnn.com)\n\n3. **[Meta's Zuckerberg Warns Against Curbs on Chinese AI](https://www.reuters.com/world/china/metas-zuckerberg-says-us-should-not-block-chinese-ai-models-ft-reports-2026-07-29)** - Zuckerberg cautions against blocking Chinese AI models, suggesting that collaboration may be more beneficial. (Source: reuters.com)\n\n4. **[Accenture Wins $821M Pentagon AI Data Platform Contract](https://federalnewsnetwork.com/defense-news/2026/07/accenture-wins-821m-pentagon-ai-data-platform-contract)** - Accenture has secured a significant contract to enhance the Pentagon's AI capabilities, focusing on battlefield data and decision-making. (Source: federalnewsnetwork.com)\n\n5. **[An AI Data Center Is Being Built on My Grandma's Garden](https://www.ncronline.org/opinion/guest-voices/ai-data-center-being-built-my-grandmas-garden)** - This article discusses the environmental impact of AI data centers, highlighting a personal story about a data center being built on private land. (Source: ncronline.org)\n\nFeel free to ask if you need more information on any specific topic!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI",
+            "topic": "news",
+            "timeframe": "day",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Mark Zuckerberg Says U.S. Should Accelerate AI ...",
+                "url": "https://www.wsj.com/tech/ai/mark-zuckerberg-says-u-s-should-accelerate-ai-development-not-restrict-it-3bbe0868",
+                "source": "wsj.com",
+                "summary": "## Videos\n\n### Most Popular News\n\n### Most Popular\n\n### Further Reading\n\n### CoreWeave’s AI-Native Cloud Faces the Storm\n\n### IBM CEO Arvind Krishna Has Nowhere to Hide From AI\n\n### Japan to Buy Nvidia Chips to Power Its AI Push\n\n### America Needs More Weapons. JPMorgan Wants to Add Its Firepower.\n\n### Microsoft’s Satya Nadella: We Can’t Let AI Giants Eat the Economy [...] Optimism about AI’s impact on the world “should empirically be the default assumption of how this is going to play out,” the Meta Platforms META -0.08%decrease; down pointing triangle chief executive officer said in an interview. He cited historical analogues, recent jobs data and his own personal use of AI for parenting and fitness as informing his positive outlook on the technology.\n\nCopyright ©2026 Dow Jones & Company, Inc. All Rights Reserved. 87990cbe856818d5eddac44c7b1cdeb8\n\n## Videos",
+                "score": 0.1400965982282754
+              },
+              {
+                "title": "Employees at the world’s biggest AI companies are calling for a slowdown in AI development",
+                "url": "https://www.cnn.com/2026/07/28/tech/ai-development-tech-employees-open-letter",
+                "source": "cnn.com",
+                "summary": "OpenAI said in a statement to CNN they agree with potentially pacing the development of AI, adding they “hope to contribute to work led by the U.S. government, alongside other labs” on the topic.\n\nOpenAI CEO Sam Altman suggested it may be time to slow down AI development in a podcast interview Tuesday. The OpenAI models that broke out of their test environment are fueling “long term questions” about how AI companies should address this new rate of progress. [...] The US government should support an international effort to develop tools that can “deliberately pace the frontier of automated AI development,” according to the letter.\n\nMore than 1,000 employees from frontier AI companies signed the letter, including the chief scientist of OpenAI, one of the ChatGPT developer’s original cofounders, some of Anthropic’s cofoundersand vice presidents at Meta, Google and others. [...] “[W]e may have to pace the rate of AI development to give ourselves enough time for society to harden around these new capability levels,” Altman said.\n\nAnthropic said in a statement they are “glad to see broad agreement” on the need to potentially slow AI development “so society can prepare.”\n\nMeta declined to comment. Google did not immediately respond to a request for comment.",
+                "score": 0.13529110309550785
+              },
+              {
+                "title": "Meta's Zuckerberg warns against curbs on Chinese AI ...",
+                "url": "https://www.reuters.com/world/china/metas-zuckerberg-says-us-should-not-block-chinese-ai-models-ft-reports-2026-07-29",
+                "source": "reuters.com",
+                "summary": "19 mins agoWorld categorySK Hynix's record profit misses forecasts, shares slump 10% despite robust AI chip demand Image 6: SK Hynix at the Nasdaq market in New York \n   4 hours agoLegal categoryTech employees call for US-backed global effort to manage risks of advanced AI Image 7: Illustration shows words \"Artificial Intelligence AI\\",
+                "score": 0.130398854452764
+              },
+              {
+                "title": "Accenture wins $821M Pentagon AI data platform contract",
+                "url": "https://federalnewsnetwork.com/defense-news/2026/07/accenture-wins-821m-pentagon-ai-data-platform-contract",
+                "source": "federalnewsnetwork.com",
+                "summary": "#### Advertise with Us\n\n# Accenture wins $821M Pentagon AI data platform contract\n\nAccenture won an $821 million contract to mature the Pentagon's War Data Platform, boosting AI-powered battlefield data and decision-making. [...] The platform aims to combine more than 1,500 data sources, both commercial and military, to securely provide intelligence, targeting data and more to frontline troops and their commands, the AI office said, calling it “one of [DoD]’s most vital data platforms for AI exploitation and mission advantage.” [...] The award advances the Pentagon’s effort to mature its War Data Platform, a clearinghouse of battlefield information that AI applications can crunch to advise troops on potential next moves and speed up wartime decisions.",
+                "score": 0.1297285959735784
+              },
+              {
+                "title": "An AI data center is being built on my grandma's garden",
+                "url": "https://www.ncronline.org/opinion/guest-voices/ai-data-center-being-built-my-grandmas-garden",
+                "source": "ncronline.org",
+                "summary": "He also reminds us to think of the physical impact of utilizing AI while reminding us that data centers are not neutral. He states: \"Current AI systems require enormous amounts of energy and water … which requires an extensive network of machines, cables, data centers and energy-intensive infrastructure … It is essential to develop more sustainable technological solutions.\" [...] When my grandma sold her house last year, she did not know the purchaser. Now her land and the surrounding 672 acres belong to the developer Vantage, who is building an AI data center that costs $15 billion. [...] the window so that those driving by on Highland Drive could see, and smile.",
+                "score": 0.12493450552382028
+              }
+            ]
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T17:01:02"
+    },
+    {
+      "turn_index": 2,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T17:01:18",
+      "user": "tìm bài báo về yolo",
+      "status": "answered",
+      "assistant_text": "Here are some recent papers related to YOLO (You Only Look Once):\n\n1. **[DAMO-YOLO: A Report on Real-Time Object Detection Design](http://arxiv.org/abs/2211.15444v4)**  \n   - **Authors**: Xianzhe Xu, Yiqi Jiang, Weihua Chen, Yilun Huang, Yuan Zhang, Xiuyu Sun  \n   - **Published**: November 23, 2022  \n   - **Summary**: This paper presents DAMO-YOLO, a fast and accurate object detection method that outperforms the state-of-the-art YOLO series. It incorporates new technologies such as Neural Architecture Search and a lightweight head with AlignedOTA label assignment. The proposed models achieve high mAPs on COCO with low latency.  \n   - **[PDF Link](https://arxiv.org/pdf/2211.15444v4)**\n\n2. **[YOLO-World: Real-Time Open-Vocabulary Object Detection](http://arxiv.org/abs/2401.17270v3)**  \n   - **Authors**: Tianheng Cheng, Lin Song, Yixiao Ge, Wenyu Liu, Xinggang Wang, Ying Shan  \n   - **Published**: January 30, 2024  \n   - **Summary**: YOLO-World enhances YOLO with open-vocabulary detection capabilities through vision-language modeling. It achieves high efficiency and accuracy in detecting a wide range of objects in a zero-shot manner.  \n   - **[PDF Link](https://arxiv.org/pdf/2401.17270v3)**\n\n3. **[YOLO-IOD: Towards Real Time Incremental Object Detection](http://arxiv.org/abs/2512.22973v2)**  \n   - **Authors**: Shizhou Zhang, Xueqiang Lv, Yinghui Xing, Qirui Wu, Di Xu, Chen Zhao, Yanning Zhang  \n   - **Published**: December 28, 2025  \n   - **Summary**: This paper introduces YOLO-IOD, a framework for real-time incremental object detection that addresses knowledge conflicts in YOLO-based detectors. It proposes methods to refine pseudo-labels and select important convolution kernels for improved performance.  \n   - **[PDF Link](https://arxiv.org/pdf/2512.22973v2)**\n\n4. **[YOLO-CL: Galaxy cluster detection in the SDSS with deep machine learning](http://arxiv.org/abs/2301.09657v2)**  \n   - **Authors**: Kirill Grishin, Simona Mei, Stéphane Ilic  \n   - **Published**: January 23, 2023  \n   - **Summary**: YOLO-CL is a modified YOLO algorithm optimized for detecting galaxy clusters, achieving high detection efficiency compared to traditional methods.  \n   - **[PDF Link](https://arxiv.org/pdf/2301.09657v2)**\n\n5. **[MS-YOLO: Infrared Object Detection for Edge Deployment via MobileNetV4 and SlideLoss](http://arxiv.org/abs/2509.21696v1)**  \n   - **Authors**: Jiali Zhang, Thomas S. White, Haoliang Zhang, Wenqing Hu, Donald C. Wunsch, Jian Liu  \n   - **Published**: September 25, 2025  \n   - **Summary**: This paper presents MS-YOLO, which utilizes MobileNetV4 for infrared object detection, addressing challenges like class imbalance and computational constraints while maintaining high accuracy.  \n   - **[PDF Link](https://arxiv.org/pdf/2509.21696v1)**\n\nIf you need more details on any specific paper, feel free to ask!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "papers",
+              "args": {
+                "query": "YOLO",
+                "max_results": 5
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "papers",
+              "args": {
+                "query": "YOLO",
+                "max_results": 5
+              },
+              "result": {
+                "tool": "arxiv_search",
+                "query": "YOLO",
+                "api_query": "all:YOLO",
+                "total_results": 1311,
+                "items": [
+                  {
+                    "arxiv_id": "2211.15444v4",
+                    "title": "DAMO-YOLO : A Report on Real-Time Object Detection Design",
+                    "summary": "In this report, we present a fast and accurate object detection method dubbed DAMO-YOLO, which achieves higher performance than the state-of-the-art YOLO series. DAMO-YOLO is extended from YOLO with some new technologies, including Neural Architecture Search (NAS), efficient Reparameterized Generalized-FPN (RepGFPN), a lightweight head with AlignedOTA label assignment, and distillation enhancement. In particular, we use MAE-NAS, a method guided by the principle of maximum entropy, to search our detection backbone under the constraints of low latency and high performance, producing ResNet/CSP-like structures with spatial pyramid pooling and focus modules. In the design of necks and heads, we follow the rule of ``large neck, small head''.We import Generalized-FPN with accelerated queen-fusion to build the detector neck and upgrade its CSPNet with efficient layer aggregation networks (ELAN) and reparameterization. Then we investigate how detector head size affects detection performance and find that a heavy neck with only one task projection layer would yield better results.In addition, AlignedOTA is proposed to solve the misalignment problem in label assignment. And a distillation schema is introduced to improve performance to a higher level. Based on these new techs, we build a suite of models at various scales to meet the needs of different scenarios. For general industry requirements, we propose DAMO-YOLO-T/S/M/L. They can achieve 43.6/47.7/50.2/51.9 mAPs on COCO with the latency of 2.78/3.83/5.62/7.95 ms on T4 GPUs respectively. Additionally, for edge devices with limited computing power, we have also proposed DAMO-YOLO-Ns/Nm/Nl lightweight models. They can achieve 32.3/38.2/40.5 mAPs on COCO with the latency of 4.08/5.05/6.69 ms on X86-CPU. Our proposed general and lightweight models have outperformed other YOLO series models in their respective application scenarios.",
+                    "authors": [
+                      "Xianzhe Xu",
+                      "Yiqi Jiang",
+                      "Weihua Chen",
+                      "Yilun Huang",
+                      "Yuan Zhang",
+                      "Xiuyu Sun"
+                    ],
+                    "published": "2022-11-23T17:59:12Z",
+                    "updated": "2023-04-24T03:32:15Z",
+                    "url": "http://arxiv.org/abs/2211.15444v4",
+                    "pdf_url": "https://arxiv.org/pdf/2211.15444v4",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2401.17270v3",
+                    "title": "YOLO-World: Real-Time Open-Vocabulary Object Detection",
+                    "summary": "The You Only Look Once (YOLO) series of detectors have established themselves as efficient and practical tools. However, their reliance on predefined and trained object categories limits their applicability in open scenarios. Addressing this limitation, we introduce YOLO-World, an innovative approach that enhances YOLO with open-vocabulary detection capabilities through vision-language modeling and pre-training on large-scale datasets. Specifically, we propose a new Re-parameterizable Vision-Language Path Aggregation Network (RepVL-PAN) and region-text contrastive loss to facilitate the interaction between visual and linguistic information. Our method excels in detecting a wide range of objects in a zero-shot manner with high efficiency. On the challenging LVIS dataset, YOLO-World achieves 35.4 AP with 52.0 FPS on V100, which outperforms many state-of-the-art methods in terms of both accuracy and speed. Furthermore, the fine-tuned YOLO-World achieves remarkable performance on several downstream tasks, including object detection and open-vocabulary instance segmentation.",
+                    "authors": [
+                      "Tianheng Cheng",
+                      "Lin Song",
+                      "Yixiao Ge",
+                      "Wenyu Liu",
+                      "Xinggang Wang",
+                      "Ying Shan"
+                    ],
+                    "published": "2024-01-30T18:59:38Z",
+                    "updated": "2024-02-22T13:05:52Z",
+                    "url": "http://arxiv.org/abs/2401.17270v3",
+                    "pdf_url": "https://arxiv.org/pdf/2401.17270v3",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2512.22973v2",
+                    "title": "YOLO-IOD: Towards Real Time Incremental Object Detection",
+                    "summary": "Current methods for incremental object detection (IOD) primarily rely on Faster R-CNN or DETR series detectors; however, these approaches do not accommodate the real-time YOLO detection frameworks. In this paper, we first identify three primary types of knowledge conflicts that contribute to catastrophic forgetting in YOLO-based incremental detectors: foreground-background confusion, parameter interference, and misaligned knowledge distillation. Subsequently, we introduce YOLO-IOD, a real-time Incremental Object Detection (IOD) framework that is constructed upon the pretrained YOLO-World model, facilitating incremental learning via a stage-wise parameter-efficient fine-tuning process. Specifically, YOLO-IOD encompasses three principal components: 1) Conflict-Aware Pseudo-Label Refinement (CPR), which mitigates the foreground-background confusion by leveraging the confidence levels of pseudo labels and identifying potential objects relevant to future tasks. 2) Importancebased Kernel Selection (IKS), which identifies and updates the pivotal convolution kernels pertinent to the current task during the current learning stage. 3) Cross-Stage Asymmetric Knowledge Distillation (CAKD), which addresses the misaligned knowledge distillation conflict by transmitting the features of the student target detector through the detection heads of both the previous and current teacher detectors, thereby facilitating asymmetric distillation between existing and newly introduced categories. We further introduce LoCo COCO, a more realistic benchmark that eliminates data leakage across stages. Experiments on both conventional and LoCo COCO benchmarks show that YOLO-IOD achieves superior performance with minimal forgetting.",
+                    "authors": [
+                      "Shizhou Zhang",
+                      "Xueqiang Lv",
+                      "Yinghui Xing",
+                      "Qirui Wu",
+                      "Di Xu",
+                      "Chen Zhao",
+                      "Yanning Zhang"
+                    ],
+                    "published": "2025-12-28T15:35:26Z",
+                    "updated": "2026-01-01T03:38:53Z",
+                    "url": "http://arxiv.org/abs/2512.22973v2",
+                    "pdf_url": "https://arxiv.org/pdf/2512.22973v2",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2301.09657v2",
+                    "title": "YOLO-CL: Galaxy cluster detection in the SDSS with deep machine learning",
+                    "summary": "(Abridged) Galaxy clusters are a powerful probe of cosmological models. Next generation large-scale optical and infrared surveys will reach unprecedented depths over large areas and require highly complete and pure cluster catalogs, with a well defined selection function. We have developed a new cluster detection algorithm YOLO-CL, which is a modified version of the state-of-the-art object detection deep convolutional network YOLO, optimized for the detection of galaxy clusters. We trained YOLO-CL on color images of the redMaPPer cluster detections in the SDSS. We find that YOLO-CL detects $95-98\\%$ of the redMaPPer clusters, with a purity of $95-98\\%$ calculated by applying the network to SDSS blank fields. When compared to the MCXC2021 X-ray catalog in the SDSS footprint,YOLO-CL is more complete then redMaPPer, which means that the neural network improved the cluster detection efficiency of its training sample. The YOLO-CL selection function is approximately constant with redshift, with respect to the MCXC2021 cluster mean X-ray surface brightness. YOLO-CL shows high performance when compared to traditional detection algorithms applied to SDSS. Deep learning networks benefit from a strong advantage over traditional galaxy cluster detection techniques because they do not need galaxy photometric and photometric redshift catalogs. This eliminates systematic uncertainties that can be introduced during source detection, and photometry and photometric redshift measurements. Our results show that YOLO-CL is an efficient alternative to traditional cluster detection methods. In general, this work shows that it is worth exploring the performance of deep convolution networks for future cosmological cluster surveys, such as the Rubin/LSST, Euclid or the Roman Space Telescope surveys.",
+                    "authors": [
+                      "Kirill Grishin",
+                      "Simona Mei",
+                      "Stéphane Ilic"
+                    ],
+                    "published": "2023-01-23T19:00:02Z",
+                    "updated": "2024-10-22T09:20:12Z",
+                    "url": "http://arxiv.org/abs/2301.09657v2",
+                    "pdf_url": "https://arxiv.org/pdf/2301.09657v2",
+                    "source": "arxiv.org",
+                    "primary_category": "astro-ph.CO",
+                    "categories": [
+                      "astro-ph.CO",
+                      "astro-ph.GA"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2509.21696v1",
+                    "title": "MS-YOLO: Infrared Object Detection for Edge Deployment via MobileNetV4 and SlideLoss",
+                    "summary": "Infrared imaging has emerged as a robust solution for urban object detection under low-light and adverse weather conditions, offering significant advantages over traditional visible-light cameras. However, challenges such as class imbalance, thermal noise, and computational constraints can significantly hinder model performance in practical settings. To address these issues, we evaluate multiple YOLO variants on the FLIR ADAS V2 dataset, ultimately selecting YOLOv8 as our baseline due to its balanced accuracy and efficiency. Building on this foundation, we present \\texttt{MS-YOLO} (\\textbf{M}obileNetv4 and \\textbf{S}lideLoss based on YOLO), which replaces YOLOv8's CSPDarknet backbone with the more efficient MobileNetV4, reducing computational overhead by \\textbf{1.5%} while sustaining high accuracy. In addition, we introduce \\emph{SlideLoss}, a novel loss function that dynamically emphasizes under-represented and occluded samples, boosting precision without sacrificing recall. Experiments on the FLIR ADAS V2 benchmark show that \\texttt{MS-YOLO} attains competitive mAP and superior precision while operating at only \\textbf{6.7 GFLOPs}. These results demonstrate that \\texttt{MS-YOLO} effectively addresses the dual challenge of maintaining high detection quality while minimizing computational costs, making it well-suited for real-time edge deployment in urban environments.",
+                    "authors": [
+                      "Jiali Zhang",
+                      "Thomas S. White",
+                      "Haoliang Zhang",
+                      "Wenqing Hu",
+                      "Donald C. Wunsch",
+                      "Jian Liu"
+                    ],
+                    "published": "2025-09-25T23:48:06Z",
+                    "updated": "2025-09-25T23:48:06Z",
+                    "url": "http://arxiv.org/abs/2509.21696v1",
+                    "pdf_url": "https://arxiv.org/pdf/2509.21696v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV"
+                    ]
+                  }
+                ],
+                "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Here are some recent papers related to YOLO (You Only Look Once):\n\n1. **[DAMO-YOLO: A Report on Real-Time Object Detection Design](http://arxiv.org/abs/2211.15444v4)**  \n   - **Authors**: Xianzhe Xu, Yiqi Jiang, Weihua Chen, Yilun Huang, Yuan Zhang, Xiuyu Sun  \n   - **Published**: November 23, 2022  \n   - **Summary**: This paper presents DAMO-YOLO, a fast and accurate object detection method that outperforms the state-of-the-art YOLO series. It incorporates new technologies such as Neural Architecture Search and a lightweight head with AlignedOTA label assignment. The proposed models achieve high mAPs on COCO with low latency.  \n   - **[PDF Link](https://arxiv.org/pdf/2211.15444v4)**\n\n2. **[YOLO-World: Real-Time Open-Vocabulary Object Detection](http://arxiv.org/abs/2401.17270v3)**  \n   - **Authors**: Tianheng Cheng, Lin Song, Yixiao Ge, Wenyu Liu, Xinggang Wang, Ying Shan  \n   - **Published**: January 30, 2024  \n   - **Summary**: YOLO-World enhances YOLO with open-vocabulary detection capabilities through vision-language modeling. It achieves high efficiency and accuracy in detecting a wide range of objects in a zero-shot manner.  \n   - **[PDF Link](https://arxiv.org/pdf/2401.17270v3)**\n\n3. **[YOLO-IOD: Towards Real Time Incremental Object Detection](http://arxiv.org/abs/2512.22973v2)**  \n   - **Authors**: Shizhou Zhang, Xueqiang Lv, Yinghui Xing, Qirui Wu, Di Xu, Chen Zhao, Yanning Zhang  \n   - **Published**: December 28, 2025  \n   - **Summary**: This paper introduces YOLO-IOD, a framework for real-time incremental object detection that addresses knowledge conflicts in YOLO-based detectors. It proposes methods to refine pseudo-labels and select important convolution kernels for improved performance.  \n   - **[PDF Link](https://arxiv.org/pdf/2512.22973v2)**\n\n4. **[YOLO-CL: Galaxy cluster detection in the SDSS with deep machine learning](http://arxiv.org/abs/2301.09657v2)**  \n   - **Authors**: Kirill Grishin, Simona Mei, Stéphane Ilic  \n   - **Published**: January 23, 2023  \n   - **Summary**: YOLO-CL is a modified YOLO algorithm optimized for detecting galaxy clusters, achieving high detection efficiency compared to traditional methods.  \n   - **[PDF Link](https://arxiv.org/pdf/2301.09657v2)**\n\n5. **[MS-YOLO: Infrared Object Detection for Edge Deployment via MobileNetV4 and SlideLoss](http://arxiv.org/abs/2509.21696v1)**  \n   - **Authors**: Jiali Zhang, Thomas S. White, Haoliang Zhang, Wenqing Hu, Donald C. Wunsch, Jian Liu  \n   - **Published**: September 25, 2025  \n   - **Summary**: This paper presents MS-YOLO, which utilizes MobileNetV4 for infrared object detection, addressing challenges like class imbalance and computational constraints while maintaining high accuracy.  \n   - **[PDF Link](https://arxiv.org/pdf/2509.21696v1)**\n\nIf you need more details on any specific paper, feel free to ask!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "YOLO",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "YOLO",
+            "api_query": "all:YOLO",
+            "total_results": 1311,
+            "items": [
+              {
+                "arxiv_id": "2211.15444v4",
+                "title": "DAMO-YOLO : A Report on Real-Time Object Detection Design",
+                "summary": "In this report, we present a fast and accurate object detection method dubbed DAMO-YOLO, which achieves higher performance than the state-of-the-art YOLO series. DAMO-YOLO is extended from YOLO with some new technologies, including Neural Architecture Search (NAS), efficient Reparameterized Generalized-FPN (RepGFPN), a lightweight head with AlignedOTA label assignment, and distillation enhancement. In particular, we use MAE-NAS, a method guided by the principle of maximum entropy, to search our detection backbone under the constraints of low latency and high performance, producing ResNet/CSP-like structures with spatial pyramid pooling and focus modules. In the design of necks and heads, we follow the rule of ``large neck, small head''.We import Generalized-FPN with accelerated queen-fusion to build the detector neck and upgrade its CSPNet with efficient layer aggregation networks (ELAN) and reparameterization. Then we investigate how detector head size affects detection performance and find that a heavy neck with only one task projection layer would yield better results.In addition, AlignedOTA is proposed to solve the misalignment problem in label assignment. And a distillation schema is introduced to improve performance to a higher level. Based on these new techs, we build a suite of models at various scales to meet the needs of different scenarios. For general industry requirements, we propose DAMO-YOLO-T/S/M/L. They can achieve 43.6/47.7/50.2/51.9 mAPs on COCO with the latency of 2.78/3.83/5.62/7.95 ms on T4 GPUs respectively. Additionally, for edge devices with limited computing power, we have also proposed DAMO-YOLO-Ns/Nm/Nl lightweight models. They can achieve 32.3/38.2/40.5 mAPs on COCO with the latency of 4.08/5.05/6.69 ms on X86-CPU. Our proposed general and lightweight models have outperformed other YOLO series models in their respective application scenarios.",
+                "authors": [
+                  "Xianzhe Xu",
+                  "Yiqi Jiang",
+                  "Weihua Chen",
+                  "Yilun Huang",
+                  "Yuan Zhang",
+                  "Xiuyu Sun"
+                ],
+                "published": "2022-11-23T17:59:12Z",
+                "updated": "2023-04-24T03:32:15Z",
+                "url": "http://arxiv.org/abs/2211.15444v4",
+                "pdf_url": "https://arxiv.org/pdf/2211.15444v4",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV"
+                ]
+              },
+              {
+                "arxiv_id": "2401.17270v3",
+                "title": "YOLO-World: Real-Time Open-Vocabulary Object Detection",
+                "summary": "The You Only Look Once (YOLO) series of detectors have established themselves as efficient and practical tools. However, their reliance on predefined and trained object categories limits their applicability in open scenarios. Addressing this limitation, we introduce YOLO-World, an innovative approach that enhances YOLO with open-vocabulary detection capabilities through vision-language modeling and pre-training on large-scale datasets. Specifically, we propose a new Re-parameterizable Vision-Language Path Aggregation Network (RepVL-PAN) and region-text contrastive loss to facilitate the interaction between visual and linguistic information. Our method excels in detecting a wide range of objects in a zero-shot manner with high efficiency. On the challenging LVIS dataset, YOLO-World achieves 35.4 AP with 52.0 FPS on V100, which outperforms many state-of-the-art methods in terms of both accuracy and speed. Furthermore, the fine-tuned YOLO-World achieves remarkable performance on several downstream tasks, including object detection and open-vocabulary instance segmentation.",
+                "authors": [
+                  "Tianheng Cheng",
+                  "Lin Song",
+                  "Yixiao Ge",
+                  "Wenyu Liu",
+                  "Xinggang Wang",
+                  "Ying Shan"
+                ],
+                "published": "2024-01-30T18:59:38Z",
+                "updated": "2024-02-22T13:05:52Z",
+                "url": "http://arxiv.org/abs/2401.17270v3",
+                "pdf_url": "https://arxiv.org/pdf/2401.17270v3",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV"
+                ]
+              },
+              {
+                "arxiv_id": "2512.22973v2",
+                "title": "YOLO-IOD: Towards Real Time Incremental Object Detection",
+                "summary": "Current methods for incremental object detection (IOD) primarily rely on Faster R-CNN or DETR series detectors; however, these approaches do not accommodate the real-time YOLO detection frameworks. In this paper, we first identify three primary types of knowledge conflicts that contribute to catastrophic forgetting in YOLO-based incremental detectors: foreground-background confusion, parameter interference, and misaligned knowledge distillation. Subsequently, we introduce YOLO-IOD, a real-time Incremental Object Detection (IOD) framework that is constructed upon the pretrained YOLO-World model, facilitating incremental learning via a stage-wise parameter-efficient fine-tuning process. Specifically, YOLO-IOD encompasses three principal components: 1) Conflict-Aware Pseudo-Label Refinement (CPR), which mitigates the foreground-background confusion by leveraging the confidence levels of pseudo labels and identifying potential objects relevant to future tasks. 2) Importancebased Kernel Selection (IKS), which identifies and updates the pivotal convolution kernels pertinent to the current task during the current learning stage. 3) Cross-Stage Asymmetric Knowledge Distillation (CAKD), which addresses the misaligned knowledge distillation conflict by transmitting the features of the student target detector through the detection heads of both the previous and current teacher detectors, thereby facilitating asymmetric distillation between existing and newly introduced categories. We further introduce LoCo COCO, a more realistic benchmark that eliminates data leakage across stages. Experiments on both conventional and LoCo COCO benchmarks show that YOLO-IOD achieves superior performance with minimal forgetting.",
+                "authors": [
+                  "Shizhou Zhang",
+                  "Xueqiang Lv",
+                  "Yinghui Xing",
+                  "Qirui Wu",
+                  "Di Xu",
+                  "Chen Zhao",
+                  "Yanning Zhang"
+                ],
+                "published": "2025-12-28T15:35:26Z",
+                "updated": "2026-01-01T03:38:53Z",
+                "url": "http://arxiv.org/abs/2512.22973v2",
+                "pdf_url": "https://arxiv.org/pdf/2512.22973v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV"
+                ]
+              },
+              {
+                "arxiv_id": "2301.09657v2",
+                "title": "YOLO-CL: Galaxy cluster detection in the SDSS with deep machine learning",
+                "summary": "(Abridged) Galaxy clusters are a powerful probe of cosmological models. Next generation large-scale optical and infrared surveys will reach unprecedented depths over large areas and require highly complete and pure cluster catalogs, with a well defined selection function. We have developed a new cluster detection algorithm YOLO-CL, which is a modified version of the state-of-the-art object detection deep convolutional network YOLO, optimized for the detection of galaxy clusters. We trained YOLO-CL on color images of the redMaPPer cluster detections in the SDSS. We find that YOLO-CL detects $95-98\\%$ of the redMaPPer clusters, with a purity of $95-98\\%$ calculated by applying the network to SDSS blank fields. When compared to the MCXC2021 X-ray catalog in the SDSS footprint,YOLO-CL is more complete then redMaPPer, which means that the neural network improved the cluster detection efficiency of its training sample. The YOLO-CL selection function is approximately constant with redshift, with respect to the MCXC2021 cluster mean X-ray surface brightness. YOLO-CL shows high performance when compared to traditional detection algorithms applied to SDSS. Deep learning networks benefit from a strong advantage over traditional galaxy cluster detection techniques because they do not need galaxy photometric and photometric redshift catalogs. This eliminates systematic uncertainties that can be introduced during source detection, and photometry and photometric redshift measurements. Our results show that YOLO-CL is an efficient alternative to traditional cluster detection methods. In general, this work shows that it is worth exploring the performance of deep convolution networks for future cosmological cluster surveys, such as the Rubin/LSST, Euclid or the Roman Space Telescope surveys.",
+                "authors": [
+                  "Kirill Grishin",
+                  "Simona Mei",
+                  "Stéphane Ilic"
+                ],
+                "published": "2023-01-23T19:00:02Z",
+                "updated": "2024-10-22T09:20:12Z",
+                "url": "http://arxiv.org/abs/2301.09657v2",
+                "pdf_url": "https://arxiv.org/pdf/2301.09657v2",
+                "source": "arxiv.org",
+                "primary_category": "astro-ph.CO",
+                "categories": [
+                  "astro-ph.CO",
+                  "astro-ph.GA"
+                ]
+              },
+              {
+                "arxiv_id": "2509.21696v1",
+                "title": "MS-YOLO: Infrared Object Detection for Edge Deployment via MobileNetV4 and SlideLoss",
+                "summary": "Infrared imaging has emerged as a robust solution for urban object detection under low-light and adverse weather conditions, offering significant advantages over traditional visible-light cameras. However, challenges such as class imbalance, thermal noise, and computational constraints can significantly hinder model performance in practical settings. To address these issues, we evaluate multiple YOLO variants on the FLIR ADAS V2 dataset, ultimately selecting YOLOv8 as our baseline due to its balanced accuracy and efficiency. Building on this foundation, we present \\texttt{MS-YOLO} (\\textbf{M}obileNetv4 and \\textbf{S}lideLoss based on YOLO), which replaces YOLOv8's CSPDarknet backbone with the more efficient MobileNetV4, reducing computational overhead by \\textbf{1.5%} while sustaining high accuracy. In addition, we introduce \\emph{SlideLoss}, a novel loss function that dynamically emphasizes under-represented and occluded samples, boosting precision without sacrificing recall. Experiments on the FLIR ADAS V2 benchmark show that \\texttt{MS-YOLO} attains competitive mAP and superior precision while operating at only \\textbf{6.7 GFLOPs}. These results demonstrate that \\texttt{MS-YOLO} effectively addresses the dual challenge of maintaining high detection quality while minimizing computational costs, making it well-suited for real-time edge deployment in urban environments.",
+                "authors": [
+                  "Jiali Zhang",
+                  "Thomas S. White",
+                  "Haoliang Zhang",
+                  "Wenqing Hu",
+                  "Donald C. Wunsch",
+                  "Jian Liu"
+                ],
+                "published": "2025-09-25T23:48:06Z",
+                "updated": "2025-09-25T23:48:06Z",
+                "url": "http://arxiv.org/abs/2509.21696v1",
+                "pdf_url": "https://arxiv.org/pdf/2509.21696v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T17:01:43"
+    }
+  ],
+  "surface": "streamlit_ui"
+}

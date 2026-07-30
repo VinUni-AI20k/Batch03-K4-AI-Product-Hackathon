@@ -1,0 +1,941 @@
+{
+  "run_id": "v3.7_B_group_openrouter_20260729T165009982584",
+  "version": "v3.7",
+  "artifact_version": "v3.7+pfaab8d858fd9+t841cfbb6b871",
+  "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+  "tools_hash": "841cfbb6b87114ff2a306f4eaf7e455f20836c6e7b006c9726df00eedc6b4bf3",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "eval_cases": "data/eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
+  "generated_at": "2026-07-29T16:50:09",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 9,
+    "case_accuracy": 0.9,
+    "tool_routing_accuracy": 0.9,
+    "argument_accuracy": 0.9,
+    "multiturn_accuracy": 0.8,
+    "failure_counts": {
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "extra_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_timeline_explicit_handle_limit",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: bỏ ký tự @ khỏi handle và giữ đúng limit người dùng yêu cầu."
+      },
+      "input": "Lấy 7 bài đăng mới nhất của tài khoản @ylecun trên X.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "ylecun",
+              "limit": 7
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "ylecun",
+              "limit": 7
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "ylecun",
+            "limit": 7
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "ylecun",
+            "items": [
+              {
+                "title": "RT @finkd: Give it a read: https://t.co/Rq4O3xRHdL",
+                "summary": "RT @finkd: Give it a read: https://t.co/Rq4O3xRHdL",
+                "url": "https://x.com/ylecun/status/2082188279588544923",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 19:35:45 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 538,
+                  "views": "4020"
+                }
+              },
+              {
+                "title": "RT @finkd: I wrote about why we believe the future is for everyone. More coming about a positive vision for a world with",
+                "summary": "RT @finkd: I wrote about why we believe the future is for everyone. More coming about a positive vision for a world with superintelligence…",
+                "url": "https://x.com/ylecun/status/2082188225255211172",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 19:35:32 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1892,
+                  "views": "3555"
+                }
+              },
+              {
+                "title": "RT @Dan_Jeffries1: Go ahead and ask yourself, really ask yourself, if all these confident predictors are wrong about job",
+                "summary": "RT @Dan_Jeffries1: Go ahead and ask yourself, really ask yourself, if all these confident predictors are wrong about jobs and not training…",
+                "url": "https://x.com/ylecun/status/2082072377723371552",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 11:55:12 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 42,
+                  "views": "4958"
+                }
+              },
+              {
+                "title": "RT @Dan_Jeffries1: Catalog of incorrect AI predictions.",
+                "summary": "RT @Dan_Jeffries1: Catalog of incorrect AI predictions.\n\nDoomers from the rationalist cosplay community are left out, presumably because th…",
+                "url": "https://x.com/ylecun/status/2081847285932269717",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 21:00:46 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 46,
+                  "views": "4609"
+                }
+              },
+              {
+                "title": "RT @iScienceLuvr: Music-JEPA: Learning a World Model of Sound from Action",
+                "summary": "RT @iScienceLuvr: Music-JEPA: Learning a World Model of Sound from Action\n\n\"we propose to learn a world model of piano sound using JEPA by…",
+                "url": "https://x.com/ylecun/status/2081758662159200422",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:08:36 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 88,
+                  "views": "4843"
+                }
+              },
+              {
+                "title": "RT @togelius: Right now we are defending open source (or open weights) models' right to exist. The debate is not about f",
+                "summary": "RT @togelius: Right now we are defending open source (or open weights) models' right to exist. The debate is not about forcing anyone to op…",
+                "url": "https://x.com/ylecun/status/2081758603128508793",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:08:22 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 7,
+                  "views": "4319"
+                }
+              },
+              {
+                "title": "RT @JensenHuang: Attackers have frontier AI. Defenders need a frontier AI ecosystem—the best open and closed models, for",
+                "summary": "RT @JensenHuang: Attackers have frontier AI. Defenders need a frontier AI ecosystem—the best open and closed models, force-multiplied by a…",
+                "url": "https://x.com/ylecun/status/2081757132752384339",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:02:32 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 4113,
+                  "views": "4264"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_web_news_month",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: map ý định tin tức web và cụm tháng này sang topic=news, timeframe=month."
+      },
+      "input": "Tìm tin tức trên web về AI safety trong tháng này.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI safety",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI safety",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI safety",
+            "topic": "news",
+            "timeframe": "month"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI safety",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "The Most Important Words in the Battle Over AI",
+                "url": "https://www.politico.com/news/magazine/2026/07/17/ai-safety-regulation-debate-factions-00990453",
+                "source": "politico.com",
+                "summary": "“AI safety means systems which serve, not harm, real people — the woman denied a mortgage by an inscrutable algorithm, the teenager whose mental health deteriorates from curated feeds, the company whose critical infrastructure is lost to an AI agent’s irreversible error. Fundamentally, it’s about whether AI systems are safe from bias in consequential decisions, safe from manipulation that undermines democratic discourse, safe for young people’s development, safe for workers’ livelihoods. And do [...] On “AI Safety”\n“‘AI safety’ means protecting America’s national security from advanced AI threats such as weaponization and loss of control. Current AIs, like Claude Mythos, already can hack critical infrastructure. Future AIs will likely be superintelligent, greatly exceeding human expertise. As we accelerate innovation and promote AI’s upside, ‘AI safety’ means having the technical capacity to ensure such systems remain under human stewardship.”\n\n2 of 3⌖\n\n### Evan Swarztrauber [...] On “AI Safety”\n“AI safety is about preventing real harm. That means building a frontier-model vetting system capable of identifying models too risky for public release, and establishing a federal infrastructure with the resources, expertise and agility to monitor emerging threats and respond before they escalate.”\n\n›\n\nAI Safety Factions\n\n## Let It Rip Crowd",
+                "score": 0.90452427
+              },
+              {
+                "title": "A Path Forward on AI Safety for the United States and China",
+                "url": "https://carnegieendowment.org/emissary/2026/07/ai-safety-parallel-us-china",
+                "source": "carnegieendowment.org",
+                "summary": "AI safety in parallel means creating touchpoints and information channels between the United States and China that strengthen the safety capabilities of each side. In practical terms, this could mean limited and strategic sharing of emerging threats and the best practices for detecting and mitigating dangerous AI capabilities. These exchanges can happen through the upcoming U.S.-China governmental dialogue and, for less sensitive areas of engagement, nongovernmental Track II dialogues between [...] Compared with some of the more ambitious proposals for international governance—a non-proliferation treaty for AI, for example—AI safety in parallel is modest in its goals. It treats binding agreements between the countries as a bonus rather than the immediate goal. Depending on where the technology goes in the coming years, this might well prove insufficient. If that’s the case, we will need to adapt quickly. But we have to start somewhere, and beginning with the mental model of safety in [...] Both the U.S. and China have experience worth sharing on AI safety and governance. Technical research on frontier AI safety has deep roots here in the United States but is a relatively newer field in China. One of the most valuable things that could come out of U.S.-China engagement on AI would be sharing approaches to testing for dangerous new capabilities in models: the ability to discover novel pathogens or to intentionally evade the control of a human operator.",
+                "score": 0.8752871
+              },
+              {
+                "title": "Gov. Pritzker Signs Nation-Leading Artificial Intelligence ...",
+                "url": "https://gov-pritzker-newsroom.prezly.com/gov-pritzker-signs-nation-leading-artificial-intelligence-safety-law",
+                "source": "gov-pritzker-newsroom.prezly.com",
+                "summary": "First-in-the-Nation AI Safety Law\n\nThe Artificial Intelligence Safety Measures Act establishes a framework requiring developers of the largest advanced AI systems to publicly disclose safety practices, report significant safety incidents, and maintain robust compliance processes. The law also creates confidential reporting channels and whistleblower protections for employees raising AI safety concerns. [...] Safety Measures Act, a landmark legislation establishing the nation's strongest framework for AI safety, transparency, and accountability. The bipartisan law positions Illinois as the national leader by requiring the largest AI developers to identify, disclose, and mitigate risks while providing independent oversight and protections for workers who report safety concerns. The law earned widespread support, from safety and transparency advocates to technology industry leaders, demonstrating",
+                "score": 0.8412138
+              },
+              {
+                "title": "Industry Leaders Unite in Open Secure AI Alliance for AI Safety and Security",
+                "url": "https://blogs.nvidia.com/blog/open-secure-ai-alliance",
+                "source": "blogs.nvidia.com",
+                "summary": "As policymakers and regulators grapple with AI safety, it will be crucial to recognize open models, harnesses and security tooling as defensive assets, not liabilities, in AI and cybersecurity policy. Blanket restrictions on open frontier AI systems would weaken defensive capacity and risk concentrating power, dependence and vulnerability in a few closed providers. [...] Real AI safety and security depend on the full agent stack — identity, permissions, harnesses, guardrails, logs and evaluation — not just on whether model weights are open or closed. Open harnesses and tools make those controls easier for many defenders to inspect, test and improve.\n\nNVIDIA is contributing open models, model weights, data and new agent harness research to the Open Secure AI Alliance to speed the development of new cybersecurity tools and techniques. [...] The age of AI agents can be one of resilience and shared security. With the right choices, open secure AI systems can give defenders the tools they need, strengthen competition, extend technological leadership and ensure that the safety and security of this extraordinary technology are built in the open for everyone.",
+                "score": 0.82994765
+              },
+              {
+                "title": "The US is advancing AI safety through state and federal action",
+                "url": "https://openai.com/index/advancing-ai-safety-through-state-and-federal-action",
+                "source": "openai.com",
+                "summary": "and create a global approach for the safe deployment of AI that is built on democratic values. If we want to create a safety framework that will truly prioritize getting in place a national and international standard—which is what will best support the safe deployment of AI—it will take hard work, a seriousness of purpose and a strategy that connects the states, the federal government, and the international conversation. A performative or virtue signaling approach will not get the job done [...] Second, companies developing the most capable systems should meet clear requirements, including independent audits, incident reporting, strong security standards, and whistleblower protections.\n\nThird, federal and state efforts should reinforce one another. State laws will not all be identical, and we look forward to working with policymakers across the country to ensure they strengthen safety while maximizing AI’s economic benefits. [...] OpenAI’s frontier safety blueprint lays out what we believe are the essential elements of that framework.\n\nFirst, the federal government should lead the testing and evaluation of the most advanced systems. Frontier AI raises national security and public safety questions that require technical expertise, resources, and access that no state can fully replicate.",
+                "score": 0.8029425
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_citation_audit_routing",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: yêu cầu audit metadata đã có phải dùng tool mới citation_audit, không lookup hoặc fetch."
+      },
+      "input": "Chỉ kiểm tra độ đầy đủ của citation và source link trong danh sách này, không tìm thêm nguồn: [{\"title\": \"AI report\", \"url\": \"https://example.com/report\"}].",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {
+              "items": [
+                {
+                  "title": "AI report",
+                  "url": "https://example.com/report"
+                }
+              ]
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "citation_audit",
+          "args": {
+            "items": [
+              {
+                "title": "AI report",
+                "url": "https://example.com/report"
+              }
+            ]
+          },
+          "result": {
+            "tool": "audit_citations",
+            "items": [
+              {
+                "index": 0,
+                "title": "AI report",
+                "url": "https://example.com/report",
+                "source": "example.com",
+                "valid": true,
+                "issues": []
+              }
+            ],
+            "summary": {
+              "total": 1,
+              "valid": 1,
+              "invalid": 0,
+              "completeness_score": 1.0,
+              "issue_counts": {}
+            },
+            "duplicate_urls": [],
+            "require_https": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_missing_comparison_urls",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: thiếu cả hai URL nên phải hỏi lại, không tự đoán link."
+      },
+      "input": "So sánh nội dung của hai bài viết này giúp tôi.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "ask_for_missing_info",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "ask_for_missing_info",
+            "args": {
+              "question": "Bạn vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh?",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "ask_for_missing_info",
+          "args": {
+            "question": "Bạn vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh?",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_for_missing_info",
+            "question": "Bạn vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh?",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_out_of_scope_marketing_copy",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: sáng tác quảng cáo ngoài phạm vi research nên không gọi tool."
+      },
+      "input": "Viết cho tôi một slogan quảng cáo bán giày thật hài hước.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "\"Giày của chúng tôi: Đi bộ như một ngôi sao, không cần phải là một diễn viên!\"",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_multiturn_switch_topic_to_account",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: chuyển từ tìm theo chủ đề sang timeline tài khoản, carry tên và limit mới."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm các bài đăng đang bàn về AI agents trên X."
+        },
+        {
+          "role": "user",
+          "content": "Đổi lại, tôi muốn bài đăng từ tài khoản Demis Hassabis."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ lấy 4 bài mới nhất của đúng tài khoản đó."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "demishassabis",
+              "limit": 4
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "demishassabis",
+              "limit": 4
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "demishassabis",
+            "limit": 4
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "demishassabis",
+            "items": [
+              {
+                "title": "A strong and secure open ecosystem is important for the world to benefit from AI. We’ve always supported and contributed",
+                "summary": "A strong and secure open ecosystem is important for the world to benefit from AI. We’ve always supported and contributed heavily to open source and science from Jax to Transformers to AlphaFold to Gemma open models which have now been downloaded 300M+ times. And the standards framework we’ve proposed supports responsible deployment of both open and proprietary models.",
+                "url": "https://x.com/demishassabis/status/2081039623422177765",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 15:31:24 +0000 2026",
+                "metrics": {
+                  "favorites": 7377,
+                  "retweets": 772,
+                  "views": "1095679"
+                }
+              },
+              {
+                "title": "just to clarify: Gemma 4 models have been downloaded 300M+ times, the Gemma open model series as a whole has been downlo",
+                "summary": "just to clarify: Gemma 4 models have been downloaded 300M+ times, the Gemma open model series as a whole has been downloaded an incredible 900M+ times!! https://t.co/ezuKBVMr8Q",
+                "url": "https://x.com/demishassabis/status/2081075346208600103",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 17:53:21 +0000 2026",
+                "metrics": {
+                  "favorites": 820,
+                  "retweets": 38,
+                  "views": "94017"
+                }
+              },
+              {
+                "title": "RT @googlegemma: Gemma 4 just crossed 300 million downloads.",
+                "summary": "RT @googlegemma: Gemma 4 just crossed 300 million downloads.\n\nThank you to the developers, researchers, and open-source community building…",
+                "url": "https://x.com/demishassabis/status/2080971777375654089",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 11:01:48 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 112,
+                  "views": "7371"
+                }
+              },
+              {
+                "title": "Congratulations @KanishkaNarayan on your new role as UK's AI Minister in the Cabinet, great news for the UK AI ecosystem",
+                "summary": "Congratulations @KanishkaNarayan on your new role as UK's AI Minister in the Cabinet, great news for the UK AI ecosystem!",
+                "url": "https://x.com/demishassabis/status/2080332282028507234",
+                "source": "@demishassabis",
+                "date": "Thu Jul 23 16:40:41 +0000 2026",
+                "metrics": {
+                  "favorites": 1304,
+                  "retweets": 63,
+                  "views": "210034"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_topic_and_timeframe_correction",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: carry chủ đề đã sửa và ưu tiên timeframe mới nhất."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tin climate tech trong tuần này."
+        },
+        {
+          "role": "user",
+          "content": "Chuyển chủ đề sang quantum computing."
+        },
+        {
+          "role": "user",
+          "content": "Và đổi thành trong tháng này, vẫn là tin tức trên web."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "quantum computing",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "quantum computing",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "quantum computing",
+            "topic": "news",
+            "timeframe": "month"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "quantum computing",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "Trump’s Quantum Computing Orders Set 2028 Goals - IEEE Spectrum",
+                "url": "https://spectrum.ieee.org/quantum-computing-trump-executive-orders",
+                "source": "spectrum.ieee.org",
+                "summary": "On 22 June, President Donald Trump signed two executive orders focused on quantum computing:The first aims to accelerate the development of quantum computers, sensors, and networks. The other seeks to accelerate the timeline for migrating critical infrastructure to cryptographic schemes that are immune to quantum attacks. In response, the U.S. Department of Energy (DOE) has committed to deploy “the world’s first fault-tolerant, scientifically relevant quantum computer” by the ambitious deadline",
+                "score": 0.7795405
+              },
+              {
+                "title": "Pittsburgh Supercomputing Center To Build Supercomputer That Puts Quantum Computing to the Test",
+                "url": "https://www.cmu.edu/news/stories/archives/2026/july/pittsburgh-supercomputing-center-to-build-supercomputer-that-puts-quantum-computing-to-the-test",
+                "source": "cmu.edu",
+                "summary": "Unlike classical computers, which process information with bits represented as zeroes and ones, quantum processors use quantum bits, or qubits, that can exist in combinations of the zero and one states, a property known as superposition. Scientists expect that this ability to “calculate between the lines” will make quantum computers superior to classical computers at solving specialized problems, but researchers are still determining where they offer a meaningful advantage. TangleLab will [...] science and engineering. Carnegie Mellon’s NSF-supported Center for Quantum Computing and Information Technologies(opens in new window) brings together researchers, students, industry partners and government laboratories to explore practical applications in areas including quantum software, computing, communications and sensing. Across campus, CMU researchers are also investigating quantum materials and the fundamental physics that underpin emerging quantum technologies. In addition, CMU is a [...] “With TangleLab, we are really looking into integrating quantum technologies into classical high-performance computing environments to enable hybrid quantum-classical workflows that can display flavors of quantum utility,” said Bruno Abreu, deputy scientific director at PSC.  “We are not deploying a standalone quantum computer. Our goal is to make TangleLab the prototype open platform for a future where quantum information processing and distribution are core elements of advanced",
+                "score": 0.77446437
+              },
+              {
+                "title": "SAXON Q Launches Commercial Diamond-Based NV-Center Quantum Computing Systems",
+                "url": "https://thequantuminsider.com/2026/07/21/saxon-q-diamond-nv-center-quantum-computers",
+                "source": "thequantuminsider.com",
+                "summary": "simulations, accelerate materials research and develop the quantum workflows that will define the next era of computing. [...] “For thirty years, NV-center quantum computing was a question of manufacturing — whether we could place qubits with enough precision and yield to build something that works outside a laboratory. We solved that problem,” said Marius Grundmann, co-founder and CEO of SAXON Q. “The SXQ128 and SXQ512 are quantum computers that operate the way a computer should: reliably, continuously and without a team of specialists to keep it running.” [...] The SAXON Q platform is also the only commercially available NV-center quantum computing system capable of coordinating computation across multiple quantum processing cores simultaneously. Through its proprietary multi-core quantum operating system, the SXQ128 offers eight fully entangled qubits per core, while the SXQ512 features 16 per core. Both units are modular by design, giving organizations the ability to start with the SXQ128 and expand their quantum capability over time by simply",
+                "score": 0.77446437
+              },
+              {
+                "title": "Is Quantum Computing Climate Tech?",
+                "url": "https://heatmap.news/climate-tech/quantum-computing",
+                "source": "heatmap.news",
+                "summary": "But quantum computing could also break many of today’s standard encryption methods, which secure everything from online banking systems and medical records to cryptocurrencies. It could help oil and gas companies with exploration, extraction, and petrochemical processing, helping to make fossil fuel production more efficient and cost competitive with renewables. Or maybe its greatest commercial value lies in, say, helping hedge funds optimize their trading strategies and portfolios — not [...] Neutral atom-based systems are a relative newcomer to the quantum computing landscape, but Cupta believes they have the potential to leapfrog the industry’s dominant architecture: superconducting qubits. Often described as artificial atoms, these qubits are tiny electrical circuits engineered to mimic the quantum behavior of atoms. They underpin the quantum efforts of tech giants like Google and IBM, as well as startups such as Rigetti Computing — founded by Sygaldry’s other co-founder, Chad",
+                "score": 0.76951396
+              },
+              {
+                "title": "Modeling the chemistry of fusion reactor material | IBM Quantum Computing Blog",
+                "url": "https://www.ibm.com/quantum/blog/molten-salts-fusion-quantum",
+                "source": "ibm.com",
+                "summary": "Quantum is aiding in the race to realize fusion energy by taking a step toward making the fuel for a fusion reactor. New work, released on arXiv on 29 June, uses quantum computing to model molten salt—salt in a liquid phase. When wrapped around a fusion reaction like a blanket, molten salt could produce a rare fuel necessary to sustain that reaction: tritium. [...] That workflow relied on a technique called wave function-based embedding (EWF), which fragments the calculation into computationally tractable pieces called “clusters.” Classical computers solve the smaller clusters. Then, a quantum computer uses a method called sample-based quantum diagonalization (SQD) to solve the more complex clusters—those involving more entanglement between atoms. The classical computers then stitch the molecule back together. [...] Quantum-centric supercomputing (QCSC) offers a new problem-solving paradigm for chemistry that could help crack this problem.\n\nDr. Kenneth Merz, PhD, co-author of the preprint and leader of the Merz lab at Cleveland Clinic, led work earlier this year with RIKEN and IBM that used quantum and classical computers together to calculate the electronic structure of a 12,635-atom protein.",
+                "score": 0.75355774
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_confirmation_boundary",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: không coi duyệt nội dung là xác nhận gửi; phải hỏi yes/no trước write action."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Soạn nội dung Telegram: Bản tin AI đã sẵn sàng."
+        },
+        {
+          "role": "user",
+          "content": "Đăng nội dung đó lên Telegram giúp tôi."
+        },
+        {
+          "role": "user",
+          "content": "Nội dung ổn nhưng tôi chưa xác nhận gửi; hãy hỏi xác nhận trước."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "confirm_action",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "confirm_action",
+            "args": {
+              "question": "Bạn có chắc chắn muốn đăng bản tin \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+              "response_type": "yes_no"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "confirm_action",
+          "args": {
+            "question": "Bạn có chắc chắn muốn đăng bản tin \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+            "response_type": "yes_no"
+          },
+          "result": {
+            "tool": "confirm_action",
+            "question": "Bạn có chắc chắn muốn đăng bản tin \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+            "response_type": "yes_no",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_audit_existing_sources",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: dùng tool local mới với dữ liệu carry-over, không gọi live research tools."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi có hai nguồn: https://example.com/a và http://example.org/b."
+        },
+        {
+          "role": "user",
+          "content": "Đừng tìm hay đọc thêm nguồn nào."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ audit citation và kiểm tra các source link hiện có."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {
+              "items": [
+                {
+                  "title": "",
+                  "url": "https://example.com/a",
+                  "source": ""
+                },
+                {
+                  "title": "",
+                  "url": "http://example.org/b",
+                  "source": ""
+                }
+              ]
+            }
+          },
+          {
+            "name": "citation_audit",
+            "args": {
+              "items": [
+                {
+                  "title": "",
+                  "url": "http://example.org/b",
+                  "source": ""
+                }
+              ],
+              "require_https": true
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "extra_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "extra tool call citation_audit"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "citation_audit",
+          "args": {
+            "items": [
+              {
+                "title": "",
+                "url": "https://example.com/a",
+                "source": ""
+              },
+              {
+                "title": "",
+                "url": "http://example.org/b",
+                "source": ""
+              }
+            ]
+          },
+          "result": {
+            "tool": "audit_citations",
+            "items": [
+              {
+                "index": 0,
+                "title": "",
+                "url": "https://example.com/a",
+                "source": "example.com",
+                "valid": false,
+                "issues": [
+                  "missing_title"
+                ]
+              },
+              {
+                "index": 1,
+                "title": "",
+                "url": "http://example.org/b",
+                "source": "example.org",
+                "valid": false,
+                "issues": [
+                  "missing_title",
+                  "insecure_url"
+                ]
+              }
+            ],
+            "summary": {
+              "total": 2,
+              "valid": 0,
+              "invalid": 2,
+              "completeness_score": 0.0,
+              "issue_counts": {
+                "missing_title": 2,
+                "insecure_url": 1
+              }
+            },
+            "duplicate_urls": [],
+            "require_https": true
+          }
+        },
+        {
+          "tool": "citation_audit",
+          "args": {
+            "items": [
+              {
+                "title": "",
+                "url": "http://example.org/b",
+                "source": ""
+              }
+            ],
+            "require_https": true
+          },
+          "result": {
+            "tool": "audit_citations",
+            "items": [
+              {
+                "index": 0,
+                "title": "",
+                "url": "http://example.org/b",
+                "source": "example.org",
+                "valid": false,
+                "issues": [
+                  "missing_title",
+                  "insecure_url"
+                ]
+              }
+            ],
+            "summary": {
+              "total": 1,
+              "valid": 0,
+              "invalid": 1,
+              "completeness_score": 0.0,
+              "issue_counts": {
+                "missing_title": 1,
+                "insecure_url": 1
+              }
+            },
+            "duplicate_urls": [],
+            "require_https": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_cancel_to_no_tool",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu cuối hủy tác vụ và cấm tool phải ghi đè intent research cũ."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tweet mới về GPT-5."
+        },
+        {
+          "role": "user",
+          "content": "Hủy yêu cầu tìm kiếm đó."
+        },
+        {
+          "role": "user",
+          "content": "Không dùng công cụ; chỉ xác nhận là đã hủy."
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Yêu cầu tìm kiếm tweet mới về GPT-5 đã được hủy.",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ]
+}

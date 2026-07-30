@@ -1,0 +1,253 @@
+{
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
+  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
+  "cases": [
+    {
+      "id": "G01_timeline_explicit_handle_limit",
+      "phase": "B",
+      "query": "Lấy 7 bài đăng mới nhất của tài khoản @ylecun trên X.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "ylecun",
+              "limit": 7
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Single-turn: bỏ ký tự @ khỏi handle và giữ đúng limit người dùng yêu cầu."
+      }
+    },
+    {
+      "id": "G02_web_news_month",
+      "phase": "B",
+      "query": "Tìm tin tức trên web về AI safety trong tháng này.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI safety",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Single-turn: map ý định tin tức web và cụm tháng này sang topic=news, timeframe=month."
+      }
+    },
+    {
+      "id": "G03_citation_audit_routing",
+      "phase": "B",
+      "query": "Chỉ kiểm tra độ đầy đủ của citation và source link trong danh sách này, không tìm thêm nguồn: [{\"title\": \"AI report\", \"url\": \"https://example.com/report\"}].",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Single-turn: yêu cầu audit metadata đã có phải dùng tool mới citation_audit, không lookup hoặc fetch."
+      }
+    },
+    {
+      "id": "G04_missing_comparison_urls",
+      "phase": "B",
+      "query": "So sánh nội dung của hai bài viết này giúp tôi.",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "ask_for_missing_info",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Single-turn: thiếu cả hai URL nên phải hỏi lại, không tự đoán link."
+      }
+    },
+    {
+      "id": "G05_out_of_scope_marketing_copy",
+      "phase": "B",
+      "query": "Viết cho tôi một slogan quảng cáo bán giày thật hài hước.",
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "what_it_tests": "Single-turn: sáng tác quảng cáo ngoài phạm vi research nên không gọi tool."
+      }
+    },
+    {
+      "id": "G06_multiturn_switch_topic_to_account",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm các bài đăng đang bàn về AI agents trên X."
+        },
+        {
+          "role": "user",
+          "content": "Đổi lại, tôi muốn bài đăng từ tài khoản Demis Hassabis."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ lấy 4 bài mới nhất của đúng tài khoản đó."
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "demishassabis",
+              "limit": 4
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: chuyển từ tìm theo chủ đề sang timeline tài khoản, carry tên và limit mới."
+      }
+    },
+    {
+      "id": "G07_multiturn_topic_and_timeframe_correction",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tin climate tech trong tuần này."
+        },
+        {
+          "role": "user",
+          "content": "Chuyển chủ đề sang quantum computing."
+        },
+        {
+          "role": "user",
+          "content": "Và đổi thành trong tháng này, vẫn là tin tức trên web."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "quantum computing",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: carry chủ đề đã sửa và ưu tiên timeframe mới nhất."
+      }
+    },
+    {
+      "id": "G08_multiturn_confirmation_boundary",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Soạn nội dung Telegram: Bản tin AI đã sẵn sàng."
+        },
+        {
+          "role": "user",
+          "content": "Đăng nội dung đó lên Telegram giúp tôi."
+        },
+        {
+          "role": "user",
+          "content": "Nội dung ổn nhưng tôi chưa xác nhận gửi; hãy hỏi xác nhận trước."
+        }
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "confirm_action",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: không coi duyệt nội dung là xác nhận gửi; phải hỏi yes/no trước write action."
+      }
+    },
+    {
+      "id": "G09_multiturn_audit_existing_sources",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tôi có hai nguồn: https://example.com/a và http://example.org/b."
+        },
+        {
+          "role": "user",
+          "content": "Đừng tìm hay đọc thêm nguồn nào."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ audit citation và kiểm tra các source link hiện có."
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: dùng tool local mới với dữ liệu carry-over, không gọi live research tools."
+      }
+    },
+    {
+      "id": "G10_multiturn_cancel_to_no_tool",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tweet mới về GPT-5."
+        },
+        {
+          "role": "user",
+          "content": "Hủy yêu cầu tìm kiếm đó."
+        },
+        {
+          "role": "user",
+          "content": "Không dùng công cụ; chỉ xác nhận là đã hủy."
+        }
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu cuối hủy tác vụ và cấm tool phải ghi đè intent research cũ."
+      }
+    }
+  ]
+}
