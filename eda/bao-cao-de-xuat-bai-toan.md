@@ -6,9 +6,9 @@
 **Đơn vị phân tích:** một `turn_id` gồm đúng một câu hỏi của học viên và một câu
 trả lời của Tutor.
 
-> Trạng thái: bằng chứng mining đã đạt cấu trúc yêu cầu B. Nhóm vẫn phải điền tên
-> thành viên, xác nhận willing users và nên khảo sát thêm để lượng hóa hậu quả theo
-> phút/mức độ mất niềm tin trước CP1/CP4.
+> Trạng thái: bằng chứng mining đã đạt cấu trúc yêu cầu B và đã xác nhận ba willing
+> users ngoài nhóm. Nhóm vẫn phải điền tên thành viên/phân công và nên khảo sát
+> thêm để lượng hóa hậu quả theo phút/mức độ mất niềm tin trước CP1/CP4.
 
 ## 1. Tóm tắt quyết định
 
@@ -219,16 +219,16 @@ flow có thể demo bằng một case có nguồn và một case thiếu nguồn
 
 ### Tiêu chí 5 — Có người sẵn sàng thử
 
-**Chưa đạt cho đến khi nhóm điền người thật ngoài nhóm.**
+**Đạt yêu cầu CP1:** đã có ba người thật ngoài nhóm đồng ý thử prototype.
 
 | Người thử | Vai trò | Đã đồng ý? | Thời gian dự kiến |
 |---|---|---|---|
-| `[Tên 1]` | Học viên đang học trên VLearn | `[ ]` | `[ ]` |
-| `[Tên 2]` | Học viên đang học trên VLearn | `[ ]` | `[ ]` |
-| `[Tên 3]` | Học viên đang học trên VLearn | `[ ]` | `[ ]` |
+| Lâm Vũ | Học viên lớp D303 | Có | 14:00 ngày 2 |
+| Lê Văn Tuấn | Học viên lớp D303 | Có | 14:00 ngày 2 |
+| Cao Hương Giang | Học viên lớp D303 | Có | 14:00 ngày 2 |
 
-Không thay các dòng này bằng tên giả. Trước CP5 cần validation với ít nhất 5 người
-ngoài nhóm, trong đó có ít nhất 2 willing users đã khai từ CP1.
+Trước CP5 cần validation với ít nhất 5 người ngoài nhóm, trong đó có ít nhất 2
+người thuộc danh sách willing users trên.
 
 ## 7. Khảo sát tối thiểu cần làm tiếp
 
@@ -272,5 +272,5 @@ downvote. Đây là lựa chọn phù hợp cho hướng A vì:
 - có thể tạo golden set;
 - build và demo được trong thời gian cuộc thi.
 
-**Quyết định cuối chỉ nên chốt sau hai việc:** review tay để xác nhận độ chính xác
-của heuristic và điền ít nhất ba willing users thật.
+**Quyết định cuối chỉ nên chốt sau khi** review tay để xác nhận độ chính xác của
+heuristic. Yêu cầu ba willing users thật đã hoàn thành.

@@ -1,9 +1,9 @@
 # PRODUCT CANVAS — VLEARN GROUNDED TUTOR
 
-**Nhóm:** `[Tên nhóm]`  
-**Zone:** `[Zone]`  
-**Ngày cập nhật:** `[DD/MM/2026]`  
-**Trạng thái:** Canvas CP1 — cần điền willing users và phân công trước khi nộp
+**Nhóm:** `Team Rau Má`
+**Zone:** `Hà Nội`
+**Ngày cập nhật:** `[07/08/2026]`
+**Trạng thái:** Canvas CP1 — đã có willing users; cần điền phân công trước khi nộp
 
 ## A. Canvas 7 dòng để show tại CP1
 
@@ -22,12 +22,14 @@
    căn cứ khi không tìm thấy nguồn, để học viên kiểm tra và tiếp tục học.
 6. **Automation + willing users:** **Conditional** — tự trả lời khi có nguồn đủ
    mạnh, không đủ nguồn thì thu hẹp phạm vi và hỏi lại; willing users:
-   `[Tên 1]`, `[Tên 2]`, `[Tên 3]`.
+   **Lâm Vũ**, **Lê Văn Tuấn**, **Cao Hương Giang** — lớp D303, đã đồng ý thử lúc
+   14:00 ngày 2.
 7. **Phân công:** Evidence/mining — `[Tên]`; product/spec — `[Tên]`;
    retrieval/prompt — `[Tên]`; prototype/code — `[Tên]`; eval/demo —
    `[Tên]`.
 
-> Không nộp CP1 khi ba tên willing users và toàn bộ tên phân công còn để trống.
+> Ba willing users đã được xác nhận. Không nộp CP1 khi tên nhóm, zone và tên phân
+> công còn để trống.
 
 ## B. User và Job-to-be-Done
 
@@ -233,9 +235,9 @@ ngày 1, sau đó không đổi theo kết quả đo.
 
 | Người thật ngoài nhóm | Vai trò | Đã đồng ý thử? | Liên hệ/thời gian |
 |---|---|---|---|
-| `[Tên 1]` | Học viên VLearn | `[ ]` | `[ ]` |
-| `[Tên 2]` | Học viên VLearn | `[ ]` | `[ ]` |
-| `[Tên 3]` | Học viên VLearn | `[ ]` | `[ ]` |
+| Lâm Vũ | Học viên lớp D303 | Có | 14:00 ngày 2 |
+| Lê Văn Tuấn | Học viên lớp D303 | Có | 14:00 ngày 2 |
+| Cao Hương Giang | Học viên lớp D303 | Có | 14:00 ngày 2 |
 
 ### Câu hỏi khảo sát pain
 
@@ -270,7 +272,7 @@ Sau task, hỏi:
 ### Checklist trước CP1
 
 - [ ] Điền tên nhóm và zone.
-- [ ] Có ba willing users thật ngoài nhóm.
+- [x] Có ba willing users thật ngoài nhóm.
 - [ ] Điền tên người phụ trách từng phần.
 - [ ] Đọc tay ít nhất 20 case flagged và ghi tỷ lệ valid.
 - [ ] Nhóm thống nhất câu lát cắt và mức Conditional.
