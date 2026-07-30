@@ -699,8 +699,27 @@ function sendTutorMsg(e) {
   input.value = '';
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  // Simulate Tutor response with extracted page content
-  setTimeout(() => {
+  // Hiển thị trạng thái đang trả lời (loading)
+  const loadingTag = document.createElement('div');
+  loadingTag.className = 'chat-context-tag';
+  loadingTag.textContent = `VLearn AI Tutor đang xử lý...`;
+  chatBody.appendChild(loadingTag);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  // Gọi REST API tới Python RAG Backend
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: text,
+      page_number: currentPage,
+      slide_file: currentPdfPath
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    loadingTag.remove();
+    
     const contextTag = document.createElement('div');
     contextTag.className = 'chat-context-tag';
     contextTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
@@ -708,18 +727,28 @@ function sendTutorMsg(e) {
 
     const botMsg = document.createElement('div');
     botMsg.className = 'tutor-msg assistant';
-
-    // Use extracted page text for smarter mock response
-    const pagePreview = currentPageTextContent.substring(0, 200);
-    botMsg.innerHTML = `<strong>📄 Dựa trên nội dung trang ${currentPage}:</strong><br><br>` +
-      `<em>"${pagePreview}..."</em><br><br>` +
-      `VLearn Tutor đã nhận được câu hỏi: "<strong>${text}</strong>". ` +
-      `Nội dung trang này đã được trích xuất thành công qua PDF.js và sẵn sàng để AI phân tích chi tiết.`;
+    
+    // Format response Markdown đơn giản sang HTML line breaks
+    let formattedText = (data.answer || '')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+    botMsg.innerHTML = formattedText;
 
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
-  }, 800);
+  })
+  .catch(err => {
+    loadingTag.remove();
+    const botMsg = document.createElement('div');
+    botMsg.className = 'tutor-msg assistant';
+    botMsg.innerHTML = `⚠️ Lỗi kết nối tới AI Backend: ${err.message}`;
+    chatBody.appendChild(botMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  });
 }
+
 
 function sendTutorMsgWithText(text) {
   const panel = document.querySelector('.tutor-panel');
