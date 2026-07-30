@@ -22,18 +22,16 @@ Output AI bi ep ve JSON:
 
 | File | Vai tro |
 |---|---|
-| `CP2-campus-assistant/index.html` | Giao dien chat giong Discord |
-| `CP2-campus-assistant/script.js` | Goi API `/api/ask` va hien thi ket qua AI |
-| `CP2-campus-assistant/server.mjs` | Server local phuc vu UI va endpoint AI |
-| `CP2-campus-assistant/ai-core.mjs` | Prompt, JSON schema, provider OpenAI/Gemini, rule mock fallback |
-| `CP2-campus-assistant/knowledge_base.json` | Mock knowledge base gom 12 mau nguon chinh thuc |
-| `eval/golden_set.json` | Golden set 27 cau test |
-| `eval/run_eval.mjs` | Script chay toan bo golden set va ghi bang ket qua |
+| `campus-companion/server.mjs` | API server local cho endpoint AI |
+| `campus-companion/ai-core.mjs` | Prompt, JSON schema, provider OpenAI/Gemini, rule mock fallback |
+| `campus-companion/knowledge_base.json` | Mock knowledge base gom 13 mau nguon chinh thuc |
+| `eval/campus-companion/golden_set.json` | Golden set 31 cau test |
+| `eval/campus-companion/run_eval.mjs` | Script chay toan bo golden set va ghi bang ket qua |
 | `.env.example` | Mau cau hinh API key, khong commit key that |
 
 ## 3. Knowledge base mock
 
-Knowledge base hien tai la du lieu gia lap co cau truc, khong phai text hardcode trong giao dien. Moi mau co:
+Knowledge base hien tai la du lieu gia lap co cau truc, khong phai text hardcode trong client. Sau khi xoa frontend, tat ca cau tra loi deu di qua API server va AI core. Moi mau co:
 
 - `id`
 - `scope`
@@ -43,7 +41,7 @@ Knowledge base hien tai la du lieu gia lap co cau truc, khong phai text hardcode
 - `last_updated`
 - `content`
 
-12 topic dang co:
+13 topic dang co:
 
 1. An trua/can tin
 2. Mang com/do an tu nha va khu duoc phep an
@@ -64,17 +62,17 @@ Nguyen tac: thong tin nao thay doi theo ngay nhu voucher, doi phong, gio mo cua 
 ## 4. Luong xu ly AI
 
 ```text
-User nhap cau hoi
-  -> UI gui POST /api/ask
+Client/API caller gui cau hoi
+  -> POST /api/ask
   -> server.mjs nhan question
   -> ai-core.mjs nap knowledge_base.json
   -> tao system prompt + KB
   -> goi OpenAI hoac Gemini neu co key
   -> validate JSON
-  -> tra ve UI
+  -> tra JSON cho caller
 ```
 
-UI khong con chua cau tra loi hardcode. Neu server/API chua san sang, UI bao loi cau hinh thay vi tu tra loi.
+Frontend da duoc xoa theo yeu cau. Server khong phuc vu HTML/CSS/JS, chi cung cap API AI.
 
 ## 5. Provider AI
 
@@ -89,7 +87,7 @@ Neu khong co key, co the bat:
 ALLOW_MOCK_AI=1
 ```
 
-Mock fallback chi dung de kiem flow UI/eval, khong tinh la AI chay that cho CP3.
+Mock fallback chi dung de kiem API/eval khi chua co key, khong tinh la AI chay that cho CP3.
 
 ## 6. Rule quyet dinh
 
@@ -132,10 +130,10 @@ Ket qua ky vong:
 
 ## 8. Golden set va do luot dau
 
-Golden set hien co 27 case trong:
+Golden set hien co 31 case trong:
 
 ```text
-eval/golden_set.json
+eval/campus-companion/golden_set.json
 ```
 
 Co cau truc:
@@ -156,7 +154,7 @@ npm run eval
 Ket qua duoc ghi thanh file:
 
 ```text
-eval/results-*.json
+eval/campus-companion/results-*.json
 ```
 
 File ket qua giu day du moi case, gom ca case sai neu co. Quality bar tam chot:
@@ -179,16 +177,24 @@ Hoac:
 GEMINI_API_KEY=your_key
 ```
 
-Chay UI:
+Chay API server:
 
 ```bash
 npm start
 ```
 
-Mo:
+Kiem tra service:
 
 ```text
 http://localhost:5173
+```
+
+Endpoint hoi AI:
+
+```bash
+curl -X POST http://localhost:5173/api/ask \
+  -H "Content-Type: application/json" \
+  -d "{\"question\":\"Trua nay em an o dau duoc?\"}"
 ```
 
 Chay golden set:
@@ -213,7 +219,7 @@ Mock:
 
 That:
 
-- UI goi server that qua `/api/ask`.
+- API server nhan cau hoi that qua `/api/ask`.
 - Server goi OpenAI/Gemini neu co API key.
 - AI quyet dinh JSON that o loi `answer / ask_clarifying_question / escalate_to_lab_coach`.
 - Eval chay het golden set va ghi log ket qua.
@@ -222,13 +228,13 @@ That:
 
 - Chua co du lieu campus that, nen source dang la mock official-style.
 - Chua co log AI that neu may chua cau hinh API key.
-- Chua co retrieval theo vector; CP3 hien dua toan bo KB nho vao prompt vi chi co 12 mau.
-- Chua co giao dien admin cap nhat KB; viec sua KB dang lam truc tiep trong `knowledge_base.json`.
+- Chua co retrieval theo vector; CP3 hien dua toan bo KB nho vao prompt vi chi co 13 mau.
+- Chua co cong cu admin cap nhat KB; viec sua KB dang lam truc tiep trong `knowledge_base.json`.
 
 ## 12. Viec can lam tiep cho CP3 hoan chinh
 
 1. Dien API key vao `.env`.
 2. Chay `npm run eval` bang AI that.
-3. Giu file `eval/results-*.json` moi nhat lam bang ket qua luot dau.
-4. Thay 12 mau KB bang nguon chinh thuc that neu nhom co handbook/campus guide/thong bao.
+3. Giu file `eval/campus-companion/results-*.json` moi nhat lam bang ket qua luot dau.
+4. Thay 13 mau KB bang nguon chinh thuc that neu nhom co handbook/campus guide/thong bao.
 5. Dua quality bar va ket qua vao `spec.md` §7.

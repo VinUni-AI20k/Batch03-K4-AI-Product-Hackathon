@@ -412,7 +412,7 @@ export async function decideWithAI(question) {
     provider = "mock";
     raw = mockDecision(question);
   } else {
-    throw new Error("Missing OPENAI_API_KEY or GEMINI_API_KEY. Set ALLOW_MOCK_AI=1 only for fallback UI demos.");
+    throw new Error("Missing OPENAI_API_KEY or GEMINI_API_KEY. Set ALLOW_MOCK_AI=1 only for fallback API tests.");
   }
 
   return {

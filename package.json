@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node CP2-campus-assistant/server.mjs",
-    "eval": "node eval/run_eval.mjs"
+    "start": "node campus-companion/server.mjs",
+    "eval": "node eval/campus-companion/run_eval.mjs"
   }
 }

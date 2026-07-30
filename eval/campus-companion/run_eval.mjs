@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { decideWithAI } from "../CP2-campus-assistant/ai-core.mjs";
+import { decideWithAI } from "../../campus-companion/ai-core.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const goldenPath = path.join(__dirname, "golden_set.json");
