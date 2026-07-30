@@ -133,8 +133,8 @@ Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
 ## §8. Phân công & kế hoạch
 
 - **Phân công có tên**:
-  - Spec + evidence: Trương Văn Thái
-  - Prompt + golden set: Trương Văn Thái
+  - Spec + evidence: Trương Thảo Nguyên
+  - Prompt + golden set: Đinh Quốc Trung
   - Code prototype: Trương Văn Thái
   - Demo: Trương Văn Thái
 
