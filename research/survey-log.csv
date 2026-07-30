@@ -1,0 +1,35 @@
+respondent_id;ai_tutor_sessions;last_use_reason;after_session_review;hard_to_start_sessions;time_to_recap;recent_difficulty;trusted_summary_needs
+R01;2 buổi;Có nội dung chưa hiểu, Muốn tra cứu nhanh, Chỉ muốn thử hệ thống;Không ôn lại;2;Trên 20 phút;Việc vừa nghe giảng cũng như tự đặt câu hỏi cùng vs slide thật sự rất khó vì phải làm đa việc , hỏi Tutor thì có nhiều khi bị lag hoặc đưa ra câu trả lời k rõ ý mà tôi khúc mắc;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm, Lý do hệ thống cho rằng tôi cần xem lại, Khả năng xác nhận hoặc sửa nhận định, Câu hỏi tự kiểm tra
+R02;2 buổi;Có nội dung chưa hiểu, Cần tóm tắt nội dung, Muốn tra cứu nhanh;Dùng ChatGPT/công cụ khác;0 buổi;Trên 20 phút;Không lưu lại lịch sử trò chuyện khiến việc đọc lại của tôi bị gián đoạn;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Mindmap liên kết các khái niệm, Khả năng xác nhận hoặc sửa nhận định
+R03;3 buổi;Muốn kiểm tra lại cách hiểu của mình, Cần ví dụ minh họa;Tự viết ghi chú;2;Tùy chọn 3;Ko;Các chủ đề tôi đã tìm hiểu
+R04;3 buổi;Muốn kiểm tra lại cách hiểu của mình, Cần ví dụ minh họa, Muốn tra cứu nhanh;Hỏi bạn hoặc TA;0 buổi;Tùy chọn 3;Không;Phần tôi có thể cần xem lại
+R05;1 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Muốn tìm hiểu sâu hơn;Tự viết ghi chú;2;Tùy chọn 3;Không;Giải thích ngắn cho từng khái niệm, Mindmap liên kết các khái niệm
+R06;1 buổi;Chỉ muốn thử hệ thống;Tự viết ghi chú;0 buổi;Trên 20 phút;;Citation về đúng slide/tài liệu
+R07;0 buổi;Chỉ muốn thử hệ thống;Dùng ChatGPT/công cụ khác;0 buổi;5–10 phút;;Citation về đúng slide/tài liệu
+R08;0 buổi;Muốn kiểm tra lại cách hiểu của mình, Cần tóm tắt nội dung;Hỏi bạn hoặc TA;2;Tôi đã bỏ qua và không ôn lại;;Phần tôi có thể cần xem lại, Mindmap liên kết các khái niệm, Khả năng xác nhận hoặc sửa nhận định
+R09;2 buổi;Có nội dung chưa hiểu;Dùng ChatGPT/công cụ khác;3;Tôi đã bỏ qua và không ôn lại;;Mindmap liên kết các khái niệm
+R10;0 buổi;Chỉ muốn thử hệ thống;Không ôn lại;2;11–20 phút;Tutor không tóm tắt được đầy đủ nội dung cần thiết;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Mindmap liên kết các khái niệm
+R11;0 buổi;Có nội dung chưa hiểu;Dùng ChatGPT/công cụ khác;2;11–20 phút;;Phần tôi có thể cần xem lại, Khả năng xác nhận hoặc sửa nhận định
+R12;2 buổi;Muốn kiểm tra lại cách hiểu của mình, Muốn tra cứu nhanh;Xem lại video bài giảng;3;11–20 phút;;Giải thích ngắn cho từng khái niệm, Lý do hệ thống cho rằng tôi cần xem lại
+R13;2 buổi;Có nội dung chưa hiểu, Cần tóm tắt nội dung;Mở lại slide/tài liệu;2;Trên 20 phút;ai tutor không thể tổng hợp nội dung nếu chưa được hỏi trước đó;Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm
+R14;1 buổi;Chỉ muốn thử hệ thống;Mở lại slide/tài liệu;0 buổi;11–20 phút;;Các chủ đề tôi đã tìm hiểu, Giải thích ngắn cho từng khái niệm, Câu hỏi tự kiểm tra
+R15;1 buổi;Có nội dung chưa hiểu, Chỉ muốn thử hệ thống;Dùng ChatGPT/công cụ khác;0 buổi;11–20 phút;Mất tgian;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Khả năng xác nhận hoặc sửa nhận định
+R16;3 buổi;Cần ví dụ minh họa;Mở lại slide/tài liệu;3;11–20 phút;Tutor ngốc;Giải thích ngắn cho từng khái niệm
+R17;1 buổi;Cần tóm tắt nội dung, Muốn tra cứu nhanh, Chỉ muốn thử hệ thống;Không ôn lại;0 buổi;Tôi đã bỏ qua và không ôn lại;Totour không trả leoif cho tôi câu hỏi tôi hỏi;Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Mindmap liên kết các khái niệm, Khả năng xác nhận hoặc sửa nhận định, Câu hỏi tự kiểm tra
+R18;2 buổi;Có nội dung chưa hiểu, Muốn tìm hiểu sâu hơn;Không ôn lại;3;Tôi đã bỏ qua và không ôn lại;;Phần tôi có thể cần xem lại, Câu hỏi tự kiểm tra
+R19;2 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Muốn tìm hiểu sâu hơn, Cần ví dụ minh họa, Cần tóm tắt nội dung, Muốn tra cứu nhanh;Mở lại slide/tài liệu;3;Trên 20 phút;;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm, Lý do hệ thống cho rằng tôi cần xem lại, Khả năng xác nhận hoặc sửa nhận định, Câu hỏi tự kiểm tra
+R20;1 buổi;Có nội dung chưa hiểu;Tự viết ghi chú;1;Dưới 5 phút;;Các chủ đề tôi đã tìm hiểu
+R21;0 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Muốn tìm hiểu sâu hơn;Mở lại slide/tài liệu;1;5–10 phút;;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại
+R22;3 buổi;Có nội dung chưa hiểu;Mở lại slide/tài liệu;3;11–20 phút;;Giải thích ngắn cho từng khái niệm
+R23;3 buổi;Muốn kiểm tra lại cách hiểu của mình, Muốn tìm hiểu sâu hơn, Cần ví dụ minh họa;Đọc lại lịch sử chat;3;11–20 phút;Tóm tắt ý chính;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm, Lý do hệ thống cho rằng tôi cần xem lại, Khả năng xác nhận hoặc sửa nhận định, Câu hỏi tự kiểm tra
+R24;1 buổi;Chỉ muốn thử hệ thống;Dùng ChatGPT/công cụ khác;2;5–10 phút;;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm
+R25;1 buổi;Chỉ muốn thử hệ thống;Mở lại slide/tài liệu;1;5–10 phút;;Các chủ đề tôi đã tìm hiểu, Giải thích ngắn cho từng khái niệm, Câu hỏi tự kiểm tra
+R26;1 buổi;Cần ví dụ minh họa, Chỉ muốn thử hệ thống;Không ôn lại;0 buổi;11–20 phút;Nhiều câu hỏi k có dữ liệu trả lời;Các chủ đề tôi đã tìm hiểu, Câu hỏi tự kiểm tra
+R27;1 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Cần tóm tắt nội dung;Đọc lại lịch sử chat;2;11–20 phút;k co;Giải thích ngắn cho từng khái niệm, Citation về đúng slide/tài liệu
+R28;1 buổi;Chỉ muốn thử hệ thống;Không ôn lại;0 buổi;5–10 phút;Mình chưa tìm hiểu nhiều về nó nên vẫn đang cảm thấy ổn;Mindmap liên kết các khái niệm
+R29;1 buổi;Muốn tìm hiểu sâu hơn, Cần ví dụ minh họa;Mở lại slide/tài liệu;1;Tùy chọn 3;Khó nhớ bài;Citation về đúng slide/tài liệu, Mindmap liên kết các khái niệm
+R30;2 buổi;Có nội dung chưa hiểu, Muốn tìm hiểu sâu hơn, Chỉ muốn thử hệ thống;Dùng ChatGPT/công cụ khác;1;11–20 phút;;Các chủ đề tôi đã tìm hiểu, Khả năng xác nhận hoặc sửa nhận định
+R31;2 buổi;Có nội dung chưa hiểu, Muốn tra cứu nhanh;Đọc lại lịch sử chat;2;5–10 phút;Ai không nói chi tiết;Phần tôi có thể cần xem lại
+R32;3 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Cần tóm tắt nội dung;Mở lại slide/tài liệu;3;11–20 phút;;Các chủ đề tôi đã tìm hiểu, Giải thích ngắn cho từng khái niệm, Câu hỏi tự kiểm tra
+R33;0 buổi;Cần ví dụ minh họa, Cần tóm tắt nội dung, Muốn tra cứu nhanh;Đọc lại lịch sử chat;3;11–20 phút;Phải đi research ở ngoài;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Mindmap liên kết các khái niệm, Khả năng xác nhận hoặc sửa nhận định
+R34;3 buổi;Có nội dung chưa hiểu, Muốn kiểm tra lại cách hiểu của mình, Cần ví dụ minh họa;Mở lại slide/tài liệu;3;5–10 phút;;Các chủ đề tôi đã tìm hiểu, Phần tôi có thể cần xem lại, Giải thích ngắn cho từng khái niệm, Câu hỏi tự kiểm tra

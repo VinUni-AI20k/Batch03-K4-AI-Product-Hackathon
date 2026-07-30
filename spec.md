@@ -37,7 +37,26 @@ Sau mỗi buổi học, các dấu vết học tập của học viên đang n�
 - Chỉ có **3 lượt** Tutor đặt câu hỏi kiểm tra lại mức độ hiểu bài (`asked_check_question=True`).
 - **46,2%** phản hồi Tutor không có citation. Vì vậy, câu trả lời của Tutor không được mặc định là nguồn sự thật khi tạo note hoặc mindmap; nội dung sinh ra phải được đối chiếu với slide/transcript chính thức.
 
-Các quan sát trên chứng minh hệ thống chưa có learning trace có cấu trúc. Mức độ đau và hậu quả đối với học viên cần tiếp tục được kiểm chứng bằng mining chi tiết và khảo sát người dùng.
+Các quan sát trên chứng minh hệ thống chưa có learning trace có cấu trúc. Mức độ đau và hậu quả đối với học viên được kiểm chứng sơ bộ bằng mining và khảo sát; khả năng sử dụng prototype sẽ được kiểm tra tiếp ở CP5.
+
+## Bổ sung evidence khảo sát người học
+
+Khảo sát được thực hiện để kiểm chứng pain point sau khi dùng AI Tutor. Bản log ẩn danh và phương pháp tổng hợp nằm tại `research/survey-log.csv` và `research/survey-summary.md`.
+
+> Lưu ý dữ liệu: bản export được nhóm dán vào workspace có 34 dòng phản hồi, trong khi nhóm ghi nhận khoảng 31 người. Các số dưới đây là kết quả sơ bộ trên 34 dòng; trước khi chốt spec, nhóm phải xác minh số người hợp lệ và cập nhật lại mẫu số nếu có dòng test/trùng.
+
+### Kết quả chính
+
+- **25/34 (73,5%)** từng muốn ôn lại nhưng khó xác định nên bắt đầu từ đâu; **20/34 (58,8%)** gặp tình huống này trong ít nhất 2 buổi.
+- Hành vi ôn tập hiện tại phân tán: **10** người mở lại slide/tài liệu, **7** người dùng ChatGPT/công cụ khác, **6** người không ôn lại và **4** người đọc lại lịch sử chat.
+- Nhu cầu output nổi bật: chủ đề đã tìm hiểu (**17/34**), phần có thể cần xem lại (**15/34**), giải thích ngắn (**14/34**) và mindmap (**14/34**).
+- Các câu trả lời mở nhắc đến việc không lưu lịch sử chat, Tutor tóm tắt chưa đủ, phải tự research ngoài và mất thời gian tổng hợp.
+
+### Ý nghĩa đối với quyết định sản phẩm
+
+Khảo sát củng cố việc chọn lát cắt **Learning Trace cuối buổi** thay vì xây thêm một chatbot: người học cần một điểm bắt đầu để ôn và một output có cấu trúc. CP2 ưu tiên Personalized Note theo ngày, gợi ý cần xác nhận/xem lại, citation, mindmap và quyền xác nhận/chỉnh sửa. Quiz tự kiểm tra được giữ ở backlog vì chưa nằm trong lát cắt hiện tại.
+
+Khảo sát xác nhận nhu cầu nhưng chưa chứng minh chất lượng hay tác động học tập của AI. Việc đó sẽ được đo ở CP5 bằng usability test với ít nhất 5 người ngoài nhóm; không dùng survey này để tuyên bố AI đã cải thiện điểm số.
 
 ## §2. Impact & quyết định chọn
 

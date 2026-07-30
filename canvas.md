@@ -17,4 +17,13 @@
 - Chưa phát triển quiz, chấm điểm hoặc xếp loại năng lực.
 - Không kết luận học viên hổng kiến thức chỉ vì họ đặt câu hỏi hoặc Tutor trả lời không tốt.
 - Không xây bản đồ lỗ hổng cấp lớp cho giảng viên trong lát cắt prototype hiện tại.
-- Pain và hậu quả đối với học viên sẽ tiếp tục được kiểm chứng bằng mining chi tiết và khảo sát người dùng.
+- Pain và hậu quả đối với học viên được kiểm chứng sơ bộ bằng mining và khảo sát; nhóm tiếp tục xác minh khả năng sử dụng prototype ở CP5.
+
+## Bổ sung evidence khảo sát sau CP1
+
+- **Nguồn:** khảo sát người học về lần gần nhất sử dụng AI Tutor; log ẩn danh tại `research/survey-log.csv`, tổng hợp tại `research/survey-summary.md`.
+- **Số dòng hiện có:** 34. Nhóm cần kiểm tra lại export vì ban đầu ghi nhận khoảng 31 người; chỉ chốt một con số sau khi loại dòng test/trùng nếu có.
+- **Tín hiệu pain chính:** 25/34 người từng muốn ôn lại nhưng khó xác định nên bắt đầu từ đâu; 20/34 gặp việc này trong ít nhất 2 buổi.
+- **Hành vi hiện tại:** 10 người mở lại slide/tài liệu, 7 người dùng công cụ AI khác, 6 người không ôn lại; việc ôn tập đang bị phân tán.
+- **Nhu cầu output:** các chủ đề đã tìm hiểu (17/34), phần có thể cần xem lại (15/34), giải thích ngắn và mindmap (mỗi loại 14/34).
+- **Tác động đến quyết định:** giữ Personalized Note + mindmap theo ngày, citation và quyền xác nhận/chỉnh sửa trong CP2; quiz để backlog.
