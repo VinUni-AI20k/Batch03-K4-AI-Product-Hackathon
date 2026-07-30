@@ -1,0 +1,54 @@
+# Cấu hình hệ thống learning-agent (secrets để trong .env, không để ở đây)
+
+vault:
+  path: ./vault                # source of truth: markdown, mở được bằng Obsidian
+  git_autocommit: true         # mỗi lần ingest/update -> 1 commit
+
+sources:
+  dir: ./source_mirror         # nơi rclone sync bài giảng về (slide/video/ghi âm)
+  manifest_db: ./data/manifest.sqlite
+
+index:
+  chroma_path: ./data/chroma
+  collection: lessons
+  embedding_provider: voyage   # voyage | local (fallback: embedding mặc định của Chroma)
+  voyage_model: voyage-4
+  top_k: 6
+
+llm:
+  # base_url + api key đọc từ .env (LLM_BASE_URL, LLM_API_KEY) -> đổi provider không cần sửa code
+  model: gpt-4o-mini
+  structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng
+  max_tool_rounds: 8
+
+asr:
+  model: vinai/PhoWhisper-large   # đổi sang đường dẫn bản CTranslate2 khi convert xong
+  language: vi
+
+discord:
+  # token trong .env (DISCORD_BOT_TOKEN); allowlist: DISCORD_ALLOWED_USERS
+  thread_per_question: true       # câu hỏi trong channel chung -> mở thread trả lời
+  max_events_per_minute: 20       # chống bot-loop (pattern OpenClaw)
+
+# telegram: token trong .env (TELEGRAM_BOT_TOKEN); allowlist: TELEGRAM_ALLOWED_USERS
+# Bot API chuẩn chỉ nhận file <=20MB — video lớn bỏ vào source_mirror/ hoặc chạy local bot-api server
+
+agent:
+  skills_dir: ./skills            # skills/<name>/SKILL.md — chuẩn agentskills.io
+  student_memory_dir: students    # nằm trong vault
+  language: vi
+
+# Knowledge packs — bộ bài học cài từ GitHub qua chat (agent chỉ được cài các repo
+# khai báo ở đây, không clone URL tuỳ ý). Thay repo bằng repo bài học thật của bạn.
+knowledge_packs:
+  - name: aaa-lessons
+    repo: https://github.com/CHANGE-ME/aaa-lessons   # <- đổi thành repo bài học của đội
+    description: Bộ bài học AI20K của đội AAA (markdown/slide)
+
+# Cron kiểu Hermes: tick 60s, mỗi job chạy phiên agent mới với skill chỉ định,
+# kết quả gửi về home chat (đặt bằng /sethome trong Discord/Telegram)
+schedules:
+  - name: bao-cao-sang
+    time: "07:30"
+    skill: bao-cao-hang-ngay
+    deliver: all                  # all | telegram | discord
