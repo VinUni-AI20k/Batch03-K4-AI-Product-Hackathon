@@ -7,44 +7,26 @@ import os
 import re
 import shutil
 import sys
-import urllib.error
-import urllib.request
 from datetime import UTC, datetime
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 from urllib.parse import urlparse
 
+from in_quiz_agent import ask_in_quiz
 from lesson_agent import answer_question
 from quiz_agent import run_quiz_agent
-from slide_store import SlideStore
-
-ROOT = Path(__file__).resolve().parents[1]
-STATIC_DIR = ROOT / "codebase"
-TRANSCRIPT = ROOT / "data/vlearn-pack/transcript/transcript-03-clean.md"
-TRACE_DIR = ROOT / "eval/traces"
-DEFAULT_SOURCE_IDS = [f"T03-{number:03d}" for number in range(24, 39)]
-SLIDE_STORE = SlideStore(ROOT / "slide")
-SLIDE_FILES = {
-    lesson["id"]: ROOT / "slide" / lesson["filename"]
-    for lesson in SLIDE_STORE.list_lessons()
-    if lesson["available"]
-}
-
-
-def load_env_file() -> None:
-    path = ROOT / ".env"
-    if not path.exists():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-
-
-load_env_file()
+from llm import call_openai_api
+from prompts import get_quiz_generation_prompt
+from config import (
+    STATIC_DIR,
+    TRANSCRIPT,
+    TRACE_DIR,
+    DEFAULT_SOURCE_IDS,
+    SLIDE_STORE,
+    SLIDE_FILES,
+    get_openai_api_key,
+    get_openai_model
+)
 
 
 def load_chunks(source_ids: list[str]) -> list[dict[str, str]]:
@@ -86,7 +68,7 @@ def validate_quiz(payload: dict, allowed_ids: set[str], question_count: int = 15
     return payload
 
 
-def call_openai(
+def generate_quiz_call(
     lesson_title: str,
     chunks: list[dict[str, str]],
     validation_feedback: str = "",
@@ -94,57 +76,18 @@ def call_openai(
     focus_topics: list[str] | None = None,
     focus_source_ids: list[str] | None = None,
 ) -> tuple[dict, dict]:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("Thiếu OPENAI_API_KEY trong .env")
-    model = os.getenv("OPENAI_MODEL", "gpt-5.6-luna")
-    focus_instruction = ""
-    if focus_topics:
-        focus_instruction = f"""
-Đây là QUIZ CỦNG CỐ cá nhân hoá. Chỉ kiểm tra các nội dung cần củng cố: {", ".join(focus_topics)}.
-Ưu tiên source_ids: {", ".join(focus_source_ids or [])}. Nếu nguồn ưu tiên không đủ để tạo câu công bằng, trả INSUFFICIENT_EVIDENCE.
-"""
-    prompt = f"""Bạn là người thiết kế quiz củng cố cuối buổi cho học viên.
-Chỉ dùng SOURCE_CHUNKS bên dưới. Tạo đúng {question_count} câu MCQ, mỗi câu 4 lựa chọn, một đáp án đúng.
-Không hỏi trivia, không đánh đố, không đưa kiến thức ngoài nguồn.
-Mỗi câu phải có explanation ngắn và source_ids hỗ trợ trực tiếp cả câu hỏi lẫn đáp án.
-Nếu học liệu không đủ để tạo {question_count} câu công bằng, trả status INSUFFICIENT_EVIDENCE và questions rỗng.
-{f"Lần trước output bị từ chối vì: {validation_feedback}. Hãy sửa đúng lỗi này." if validation_feedback else ""}
-{focus_instruction}
-Trả về JSON thuần, không markdown, theo schema:
-{{"status":"OK|INSUFFICIENT_EVIDENCE","message":"...","questions":[{{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","source_ids":["Txx-NNN"]}}]}}
-
-LESSON_TITLE: {lesson_title}
-SOURCE_CHUNKS:
-{json.dumps(chunks, ensure_ascii=False)}"""
-    body = {
-        "model": model,
-        "input": prompt,
-        "reasoning": {"effort": "low"},
-        "text": {"verbosity": "low"},
-    }
-    request = urllib.request.Request(
-        "https://api.openai.com/v1/responses",
-        data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
-        method="POST",
+    prompt = get_quiz_generation_prompt(
+        lesson_title, chunks, validation_feedback, question_count, focus_topics, focus_source_ids
     )
     started = datetime.now(UTC)
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            raw = json.loads(response.read())
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode(errors="replace")[:500]
-        raise RuntimeError(f"OpenAI HTTP {exc.code}: {detail}") from exc
-    text = raw.get("output_text") or "".join(
-        part.get("text", "") for item in raw.get("output", []) for part in item.get("content", [])
-    )
-    text = text.strip()
+    text, raw = call_openai_api(prompt)
+    
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
     quiz = json.loads(text)
+    
     trace = {
         "timestamp_utc": started.isoformat(),
-        "model": model,
+        "model": get_openai_model(),
         "lesson_title": lesson_title,
         "source_ids": [c["id"] for c in chunks],
         "usage": raw.get("usage", raw.get("usageMetadata", {})),
@@ -166,7 +109,7 @@ class Handler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(STATIC_DIR), **kwargs)
 
     def do_POST(self):
-        if self.path not in {"/api/generate-quiz", "/api/ask"}:
+        if self.path not in {"/api/generate-quiz", "/api/ask", "/api/ask-quiz"}:
             self.send_error(HTTPStatus.NOT_FOUND)
             return
         try:
@@ -179,6 +122,12 @@ class Handler(SimpleHTTPRequestHandler):
                     question=request_data.get("question", ""),
                     trace_dir=TRACE_DIR,
                 )
+                self.respond(payload)
+                return
+            if self.path == "/api/ask-quiz":
+                question_context = request_data.get("question_context", {})
+                question_text = request_data.get("question", "")
+                payload = ask_in_quiz(question_context, question_text, TRACE_DIR)
                 self.respond(payload)
                 return
             if request_data.get("purpose", "practice") != "practice":
@@ -198,7 +147,7 @@ class Handler(SimpleHTTPRequestHandler):
             focus_source_ids = request_data.get("focus_source_ids") or []
 
             def generate(title: str, chunks: list[dict[str, str]], feedback: str):
-                return call_openai(
+                return generate_quiz_call(
                     title,
                     chunks,
                     feedback,
@@ -263,7 +212,12 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8000"))
     print(f"VLearn prototype: http://127.0.0.1:{port}")
-    print("AI mode:", "enabled" if os.getenv("OPENAI_API_KEY") else "disabled (missing API key)")
+    try:
+        get_openai_api_key()
+        ai_enabled = True
+    except RuntimeError:
+        ai_enabled = False
+    print("AI mode:", "enabled" if ai_enabled else "disabled (missing API key)")
     try:
         ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
     except KeyboardInterrupt:
