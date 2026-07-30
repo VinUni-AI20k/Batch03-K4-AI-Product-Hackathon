@@ -49,12 +49,22 @@ Số chính, mining **1.261 lượt hỏi-đáp thật** (369 user, 585 hội th
 
 Giới hạn bằng chứng ghi nhận trung thực — gồm cả 2 giả thuyết đã kiểm và **không** đứng vững: [cp1/impact-table.md](cp1/impact-table.md) mục "Giới hạn bằng chứng".
 
+## Chạy prototype CP2
+
+```bash
+cd codebase
+npm install
+npm run dev
+```
+
+Mở `http://localhost:3000`. Bản CP2 dùng dữ liệu mock và không cần API key. Flow demo chi tiết nằm trong [codebase/README.md](codebase/README.md).
+
 ## Tiến độ theo checkpoint
 
 | Đường dẫn | Nội dung | Trạng thái |
 |---|---|---|
 | `cp1/` | Canvas CP1 · bảng impact · kịch bản khảo sát · script đếm | ✅ CP1 |
-| `codebase/` | Prototype — ghi rõ phần nào mock | ⬜ CP2 |
+| `codebase/` | Prototype mock — flow chính bấm đi hết được | ✅ CP2 |
 | `eval/` | Golden set ≥20 case + bảng kết quả các lượt chạy | ⬜ CP3 |
 | `spec.md` | AI Spec theo `03-template-ai-spec.md` | ⬜ **hạn cứng 23:59 N1** |
 | `validation/` | Feedback log ≥5 mẩu từ ≥5 người ngoài nhóm | ⬜ CP5 |
