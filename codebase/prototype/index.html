@@ -232,6 +232,25 @@
   .chat-head .name{ font-weight:700; font-size:14.5px; }
   .chat-head .sub{ font-size:11.5px; color:var(--good); display:flex; align-items:center; gap:5px; }
   .chat-head .sub::before{ content:""; width:6px;height:6px;border-radius:50%; background:var(--good); }
+  .gear-btn{
+    margin-left:auto; border:1px solid var(--border); background:var(--panel); color:var(--muted);
+    width:26px; height:26px; border-radius:7px; cursor:pointer; font-size:13px;
+  }
+  .gear-btn:hover{ border-color:var(--brand); color:var(--brand); }
+  .settings-panel{ display:none; margin-top:10px; background:#f8f9ff; border:1px solid #e2e7fb; border-radius:10px; padding:10px 12px; }
+  .settings-panel.open{ display:block; }
+  .settings-row{ display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+  .settings-row label{ font-size:11px; color:var(--muted); font-weight:600; }
+  .settings-row input{ border:1px solid var(--border); border-radius:7px; padding:7px 9px; font-size:12.5px; }
+  .settings-hint{ font-size:11px; color:var(--muted); line-height:1.5; margin-top:2px; }
+  .log-panel{ display:none; margin-top:10px; max-height:220px; overflow-y:auto; border-top:1px dashed #d7e0ff; padding-top:8px; }
+  .log-panel.open{ display:block; }
+  .log-entry{ font-size:11px; background:#fff; border:1px solid #e6e8f0; border-radius:7px; padding:7px 9px; margin-bottom:6px; }
+  .log-entry .lhead{ display:flex; justify-content:space-between; font-weight:700; color:var(--brand-dark); }
+  .log-entry .lbody{ color:var(--muted); margin-top:3px; white-space:pre-wrap; word-break:break-word; }
+  .ai-badge{ font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px; margin-bottom:6px; display:inline-block; }
+  .ai-badge.real{ background:#e6f7ec; color:#0f7a3d; }
+  .ai-badge.mock{ background:#f1f2f8; color:var(--muted); }
   .quick-actions{ display:flex; flex-wrap:wrap; gap:6px; padding:12px 18px; border-bottom:1px solid var(--border); }
   .qa-btn{
     font-size:12px; border:1px solid var(--brand); color:var(--brand); background:var(--brand-soft);
@@ -416,8 +435,19 @@
               <div class="avatar">V</div>
               <div>
                 <div class="name">VLearn Tutor+</div>
-                <div class="sub">Đã nạp hồ sơ + ngữ cảnh slide</div>
+                <div class="sub" id="chatSubStatus">Đã nạp hồ sơ + ngữ cảnh slide</div>
               </div>
+              <button class="gear-btn" onclick="toggleSettings()" title="Trạng thái backend">⚙</button>
+            </div>
+            <div class="settings-panel" id="settingsPanel">
+              <div class="settings-hint">Key OpenAI nằm ở server (biến môi trường), trình duyệt không bao giờ thấy key thật.
+              Chạy <code>node codebase/server/server.js</code> (xem <code>codebase/server/README.md</code>) rồi mở lại trang qua <code>http://localhost:3000</code>.</div>
+              <div class="btn-row" style="margin-top:8px;">
+                <button class="btn" style="padding:8px 14px;font-size:12.5px;" onclick="checkServerStatus()">Kiểm tra kết nối server</button>
+                <button class="btn secondary" style="padding:8px 14px;font-size:12.5px;" onclick="toggleLog()">Xem log AI calls</button>
+              </div>
+              <div class="settings-hint" id="serverStatusText" style="margin-top:6px;"></div>
+              <div class="log-panel" id="logPanel"></div>
             </div>
           </div>
           <div class="quick-actions">
@@ -429,7 +459,7 @@
             <input id="chatInput" type="text" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu..." onkeydown="if(event.key==='Enter')sendFree()">
             <button onclick="sendFree()">➤</button>
           </div>
-          <div class="footnote">Mock prototype — phản hồi được ghép từ template theo hồ sơ + slide đã chọn, chưa gọi LLM thật (CP3 sẽ thay bằng lời gọi AI thật).</div>
+          <div class="footnote">"Tóm tắt toàn bộ slide" gọi AI thật qua backend nhỏ (<code>codebase/server/</code>, key OpenAI ở server) nếu backend đang chạy, ngược lại tự fallback bản mock — có gắn nhãn 🟢/⚪ rõ ràng. "Lên kế hoạch học tập" và ô hỏi tự do vẫn là Mock (rule-based theo hồ sơ).</div>
         </div>
       </div>
     </section>
@@ -529,6 +559,85 @@ let qi = 0;
 const answers = {}; // id -> {trait, tag, label}
 let persona = null;
 let selectedDoc = null;
+
+/* ============ AI THẬT — gọi qua backend, key nằm ở server ============
+ * Đây là quyết định AI trung tâm của lát cắt: "Tóm tắt toàn bộ slide" gọi
+ * POST /api/summarize (xem codebase/server/server.js) — backend giữ
+ * OPENAI_API_KEY trong .env, KHÔNG BAO GIỜ gửi key xuống trình duyệt.
+ * Prompt (soạn ở backend) chỉ cho phép dùng nội dung slide đã liệt kê (chống
+ * bịa — lớp rủi ro ①), bắt buộc trích trang, điều chỉnh theo persona. Server
+ * không chạy / lỗi mạng / thiếu key → fallback về bản mock, gắn nhãn rõ ràng
+ * (⚪ Mock) — không bao giờ giả vờ là AI thật.
+ */
+const AI_LOG = JSON.parse(localStorage.getItem('vlearn_tutor_plus_ai_log') || '[]');
+
+function toggleSettings(){
+  document.getElementById('settingsPanel').classList.toggle('open');
+  if(document.getElementById('settingsPanel').classList.contains('open')) checkServerStatus();
+}
+async function checkServerStatus(){
+  const el = document.getElementById('serverStatusText');
+  el.textContent = 'Đang kiểm tra...';
+  try{
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    el.textContent = data.hasKey
+      ? '🟢 Server đang chạy, đã có OPENAI_API_KEY (model: '+data.model+')'
+      : '🟡 Server đang chạy nhưng CHƯA có OPENAI_API_KEY trong .env';
+    document.getElementById('chatSubStatus').textContent = data.hasKey ? 'Đã nạp hồ sơ + backend sẵn sàng' : 'Đã nạp hồ sơ + ngữ cảnh slide';
+  } catch(err){
+    el.textContent = '🔴 Không kết nối được server — chạy `node codebase/server/server.js` rồi mở http://localhost:3000';
+  }
+}
+function toggleLog(){
+  document.getElementById('logPanel').classList.toggle('open');
+  renderLog();
+}
+function pushLog(entry){
+  AI_LOG.unshift(entry);
+  if(AI_LOG.length>50) AI_LOG.length = 50;
+  localStorage.setItem('vlearn_tutor_plus_ai_log', JSON.stringify(AI_LOG));
+  renderLog();
+}
+function renderLog(){
+  const panel = document.getElementById('logPanel');
+  if(!panel.classList.contains('open')) return;
+  if(AI_LOG.length===0){ panel.innerHTML = '<div style="font-size:11px;color:var(--muted);">Chưa có lượt gọi AI thật nào.</div>'; return; }
+  panel.innerHTML =
+    '<button class="btn secondary" style="padding:5px 10px;font-size:11px;margin-bottom:6px;" onclick="downloadLog()">⬇ Tải log JSON (để lưu vào eval/ hoặc codebase/)</button>' +
+    AI_LOG.map(l=>
+      '<div class="log-entry"><div class="lhead"><span>'+(l.ok?'🟢 OK':'🔴 LỖI')+' · '+l.model+'</span><span>'+l.latencyMs+'ms</span></div>' +
+      '<div class="lbody">'+l.time+' — '+l.action+'\nPrompt: '+l.promptPreview+'\n'+(l.ok?'Response: '+l.responsePreview:'Lỗi: '+l.error)+'</div></div>'
+    ).join('');
+}
+function downloadLog(){
+  const blob = new Blob([JSON.stringify(AI_LOG, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ai-call-log.json';
+  a.click();
+}
+
+async function callServerSummary(doc, secs, personaObj){
+  const personaTags = personaObj ? personaObj.decisions.map(d=>d.tag) : [];
+  const promptPreview = 'Tóm tắt "'+doc.title+'" ('+secs.length+' mục) + hồ sơ: '+(personaTags.join(', ')||'chưa có');
+  const t0 = performance.now();
+  const logBase = { time:new Date().toISOString(), action:'Tóm tắt toàn bộ slide: '+doc.title, promptPreview };
+  try{
+    const res = await fetch('/api/summarize', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ docTitle: doc.title, sections: secs, personaTags })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok) throw new Error(data.error || ('HTTP '+res.status));
+    pushLog(Object.assign({}, logBase, { ok:true, model:data.model, latencyMs: data.latencyMs || Math.round(performance.now()-t0), responsePreview: data.text.slice(0,220)+'…' }));
+    return data.text;
+  } catch(err){
+    pushLog(Object.assign({}, logBase, { ok:false, model:'—', latencyMs: Math.round(performance.now()-t0), error: String(err.message||err) }));
+    throw err;
+  }
+}
 
 /* ============ NAV ============ */
 function goTo(screen, skipReset){
@@ -747,6 +856,7 @@ function openReader(day, doc){
   document.getElementById('chatBody').innerHTML = '';
   addTutorMsg('Xin chào! Mình là VLearn Tutor+. Mình đã đọc hồ sơ học viên của bạn và nội dung '+doc.title+'. '+
     'Bạn có thể bôi đen một đoạn để hỏi, hoặc dùng 2 nút phía trên: <b>tóm tắt toàn bộ slide</b> và <b>lên kế hoạch học tập cá nhân hoá</b>.');
+  checkServerStatus();
   goTo('reader');
 }
 
@@ -823,45 +933,61 @@ function removeTyping(){
  * (đúng pattern "Key takeaways — N ý để mang về" đã có sẵn trong slide thật), và
  * chỉ hiện khối giải nghĩa thuật ngữ khi persona.jargonLevel==='explain'.
  */
-function askSummary(){
+function renderMockSummaryHtml(doc, secs){
+  const rows = secs.map(s=>
+    '<li><b>'+s.heading+'</b> <span class="cite-inline">(trang '+s.page+')</span><br>'+s.bullets[0]+'</li>'
+  ).join('');
+  const takeaways = secs.map(s=>s.heading).join(' · ');
+
+  let adaptive = '';
+  if(persona){
+    if(persona.depthLevel==='foundation'){
+      adaptive = 'Nói đơn giản: coi mỗi mục trên như 1 bước nối tiếp — chưa rõ mục nào thì bôi đen đúng đoạn đó để hỏi lại, đừng đọc tiếp khi chưa hiểu mục trước.';
+    } else if(persona.exampleDomain==='business'){
+      adaptive = 'Liên hệ nhanh: đọc mỗi mục trên như 1 quyết định kinh doanh — tự hỏi "áp vào bài toán nào của mình?".';
+    } else if(persona.exampleDomain==='technical'){
+      adaptive = 'Đọc sâu hơn: đừng dừng ở gạch đầu dòng — mở phần lab tương ứng và thử chạy lại ví dụ kỹ thuật ngay.';
+    }
+  }
+
+  let glossaryHtml = '';
+  if(persona && persona.jargonLevel==='explain'){
+    const terms = GLOSSARY[doc.name] || GLOSSARY.default;
+    glossaryHtml = '<div class="glossary-box"><div class="gtitle">📖 Thuật ngữ trong bài</div>' +
+      terms.map(t=>'<div class="gterm"><b>'+t.term+'</b> — '+t.plain+'</div>').join('') + '</div>';
+  }
+
+  return '<div class="summary-title">Tóm tắt <b>'+doc.title+'</b> ('+doc.pages+' trang)</div>' +
+    '<ul class="summary-list">'+rows+'</ul>' +
+    '<div class="takeaway-box"><b>Key takeaways:</b> '+takeaways+'</div>' +
+    (adaptive ? '<div style="margin-top:8px;font-size:12.5px;color:#374151;">'+adaptive+'</div>' : '') +
+    glossaryHtml;
+}
+
+// Quyết định AI trung tâm của lát cắt: có key -> gọi Gemini thật (grounded vào
+// đúng nội dung slide, ép trích trang); lỗi/không có key -> fallback mock, luôn
+// gắn nhãn 🟢/⚪ để không bao giờ giả vờ mock là AI thật (nguyên tắc G10).
+async function askSummary(){
   if(!selectedDoc) return;
   addUserMsg('Tóm tắt toàn bộ slide');
   showTyping();
-  setTimeout(()=>{
+  const doc = selectedDoc.doc;
+  const secs = SLIDE_CONTENT[doc.name] || SLIDE_CONTENT.default;
+
+  try{
+    const text = await callServerSummary(doc, secs, persona);
     removeTyping();
-    const doc = selectedDoc.doc;
-    const secs = SLIDE_CONTENT[doc.name] || SLIDE_CONTENT.default;
-    const rows = secs.map(s=>
-      '<li><b>'+s.heading+'</b> <span class="cite-inline">(trang '+s.page+')</span><br>'+s.bullets[0]+'</li>'
-    ).join('');
-    const takeaways = secs.map(s=>s.heading).join(' · ');
+    addTutorMsg('<div class="ai-badge real">🟢 AI thật · qua backend</div><div style="white-space:pre-wrap;">'+escapeHtml(text)+'</div>');
+  } catch(err){
+    removeTyping();
+    addTutorMsg('<div class="ai-badge mock">⚪ Mock — không gọi được AI thật</div>' +
+      '<div style="font-size:12px;color:#b91c1c;margin-bottom:8px;">Lỗi: '+escapeHtml(String(err.message||err))+' — hiển thị bản mock thay thế. Kiểm tra backend đang chạy chưa (nút ⚙ → "Kiểm tra kết nối server").</div>' +
+      renderMockSummaryHtml(doc, secs));
+  }
+}
 
-    let adaptive = '';
-    if(persona){
-      if(persona.depthLevel==='foundation'){
-        adaptive = 'Nói đơn giản: coi mỗi mục trên như 1 bước nối tiếp — chưa rõ mục nào thì bôi đen đúng đoạn đó để hỏi lại, đừng đọc tiếp khi chưa hiểu mục trước.';
-      } else if(persona.exampleDomain==='business'){
-        adaptive = 'Liên hệ nhanh: đọc mỗi mục trên như 1 quyết định kinh doanh — tự hỏi "áp vào bài toán nào của mình?".';
-      } else if(persona.exampleDomain==='technical'){
-        adaptive = 'Đọc sâu hơn: đừng dừng ở gạch đầu dòng — mở phần lab tương ứng và thử chạy lại ví dụ kỹ thuật ngay.';
-      }
-    }
-
-    let glossaryHtml = '';
-    if(persona && persona.jargonLevel==='explain'){
-      const terms = GLOSSARY[doc.name] || GLOSSARY.default;
-      glossaryHtml = '<div class="glossary-box"><div class="gtitle">📖 Thuật ngữ trong bài</div>' +
-        terms.map(t=>'<div class="gterm"><b>'+t.term+'</b> — '+t.plain+'</div>').join('') + '</div>';
-    }
-
-    addTutorMsg(
-      '<div class="summary-title">Tóm tắt <b>'+doc.title+'</b> ('+doc.pages+' trang)</div>' +
-      '<ul class="summary-list">'+rows+'</ul>' +
-      '<div class="takeaway-box"><b>Key takeaways:</b> '+takeaways+'</div>' +
-      (adaptive ? '<div style="margin-top:8px;font-size:12.5px;color:#374151;">'+adaptive+'</div>' : '') +
-      glossaryHtml
-    );
-  }, 900);
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function askPlan(){
