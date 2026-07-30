@@ -83,4 +83,7 @@ app.mount("/", StaticFiles(directory=str(VLEARN_DIR), html=True), name="vlearn_f
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8080))
+    print(f"🚀 VLearn Backend đang khởi chạy tại http://localhost:{port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)
+

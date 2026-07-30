@@ -10,12 +10,14 @@ if str(ROOT_DIR) not in sys.path:
 from config.settings import (
     GEMINI_API_KEY,
     OPENAI_API_KEY,
+    OPENAI_BASE_URL,
     DEFAULT_PROVIDER,
     DEFAULT_GEMINI_MODEL,
     DEFAULT_OPENAI_MODEL,
     DEFAULT_TEMPERATURE,
     MAX_OUTPUT_TOKENS,
 )
+
 
 class LLMClient:
     """
@@ -69,11 +71,13 @@ class LLMClient:
             return
         try:
             from openai import OpenAI
-            self.client = OpenAI(api_key=OPENAI_API_KEY)
+            base_url = OPENAI_BASE_URL if OPENAI_BASE_URL else None
+            self.client = OpenAI(api_key=OPENAI_API_KEY, base_url=base_url)
             self.sdk_type = "openai"
         except ImportError:
             self.client = None
             self.sdk_type = "mock"
+
 
     def generate(self, prompt: str, system_instruction: Optional[str] = None) -> str:
         """
@@ -142,12 +146,19 @@ class LLMClient:
                 messages.append({"role": "system", "content": system_instruction})
             messages.append({"role": "user", "content": prompt})
 
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,
-                temperature=self.temperature,
-                max_tokens=MAX_OUTPUT_TOKENS
-            )
-            return response.choices[0].message.content or ""
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    temperature=self.temperature,
+                    max_tokens=MAX_OUTPUT_TOKENS
+                )
+                return response.choices[0].message.content or ""
+            except Exception as e:
+                err_str = str(e)
+                if "401" in err_str or "API key" in err_str or "authentication" in err_str:
+                    return f"⚠️ **Lỗi xác thực API Key (401):** API Key hiện tại chưa đúng với endpoint `{OPENAI_BASE_URL}`. Vui lòng nhập API key chính xác vào file `.env` (dòng `OPENAI_API_KEY=...`)."
+                raise e
+
 
         return ""

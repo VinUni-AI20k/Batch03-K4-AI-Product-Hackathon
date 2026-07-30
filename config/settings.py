@@ -18,12 +18,14 @@ except ImportError:
 # LLM Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.xah.io/v1")
 
 # Default Model settings
 DEFAULT_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
 
-DEFAULT_OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+DEFAULT_OPENAI_MODEL = os.getenv("OPENAI_MODEL", "phatchau036/gpt-5.4")
 DEFAULT_GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+
 
 DEFAULT_TEMPERATURE = 0.2
 MAX_OUTPUT_TOKENS = 2048
