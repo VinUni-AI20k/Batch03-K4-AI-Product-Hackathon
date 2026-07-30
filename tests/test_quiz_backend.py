@@ -1,10 +1,13 @@
 import json, sys, unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codebase"))
 import api_server
+import lesson_agent
 from quiz_agent import run_quiz_agent
+from slide_store import SlideStore
 
 
 class QuizBackendTests(unittest.TestCase):
@@ -54,6 +57,13 @@ class QuizBackendTests(unittest.TestCase):
         self.assertEqual(calls[0], ("retrieve", ["T03-030"]))
         self.assertEqual(calls[1][0], "generate")
         self.assertEqual(trace["langgraph"]["workflow"], "retrieve_transcript → generate_quiz → validate_quiz")
+
+    def test_slide_agent_forces_responses_api(self):
+        fake_model = MagicMock()
+        fake_model.bind_tools.return_value = fake_model
+        with patch("lesson_agent.ChatOpenAI", return_value=fake_model) as constructor:
+            lesson_agent.build_graph(SlideStore(ROOT / "slide"))
+        self.assertTrue(constructor.call_args.kwargs["use_responses_api"])
 
 
 if __name__ == "__main__": unittest.main()

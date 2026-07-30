@@ -1,31 +1,40 @@
-# DEMO SLIDES — TEAM RAU MÁ
+# DEMO SLIDES — TEAM RAU MÁ · VLEARN MASTERY LOOP
 
-## Slide 1 — User & Job (45 giây)
-- Học viên vừa kết thúc buổi học cần biết mình chưa nắm gì.
-- Core JTBD: kiểm tra ý chính chưa nắm để ôn đúng phần.
-- Evidence: `[PENDING: n, %, quote có nguồn]`.
+> Mạch pitch chuẩn: **Vấn đề → User/JTBD → Giải pháp team → Trải nghiệm → AI đáng tin →
+> Đo lường & bước tiếp**. Số liệu user research chưa có được ghi trung thực, không thay bằng ước lượng.
 
-## Slide 2 — Vì sao chọn tính năng này (45 giây)
-- Bảng impact 3 ứng viên: `[PENDING số khảo sát]`.
-- Chọn primary pain: `[PENDING]`; ứng viên loại: `[PENDING + lý do bằng số]`.
+## 1. Vấn đề
 
-## Slide 3 — Giải pháp & demo live (2 phút)
-- Lát cắt: AI quyết định tạo quiz 15 câu từ học liệu đủ căn cứ.
-- Conditional vì quiz sai có thể làm học viên học sai.
-- Demo: happy path + insufficient/out-of-scope.
+Học viên vừa hoàn thành bài học nhưng chưa có feedback loop ngắn, đáng tin để biết mình đã hiểu
+gì và còn hổng gì. Hệ quả giả thuyết: ôn lan man, bỏ qua điểm yếu, hoặc mang lỗ hổng sang bài sau.
 
-## Slide 4 — Kết quả đo (45 giây)
-- Quality bar: ≥85%; hard constraints 100% nguồn hỗ trợ + ngoài phạm vi.
-- Kết quả run: `[PENDING: pass/20 và %]`.
-- Failure lớn nhất: `[PENDING]`.
+## 2. User & mục tiêu
 
-## Slide 5 — User thật nói gì (45 giây)
-- Quote 1: `[PENDING tên/vai + nguyên văn]`.
-- Quote 2: `[PENDING tên/vai + nguyên văn]`.
-- Thay đổi từ feedback: `[PENDING]`.
+**JTBD:** “Sau khi học xong, tôi muốn kiểm tra nhanh các ý chính để biết chính xác mình cần ôn gì
+tiếp — thay vì tự đoán mình đã hiểu.”
 
-## Slide 6 — Nếu có thêm một tuần (30 giây)
-- Ưu tiên 1: xử lý failure `[PENDING]`.
-- Ưu tiên 2: kiểm định độ khó quiz với nhiều bài.
-- Ưu tiên 3: thử reward/cap với nhóm lớn hơn.
-- Bài học lớn nhất: `[PENDING]`.
+Success demo: 15 câu quiz cuối bài → % theo 4 mục đề cương → 5 câu củng cố đúng phần yếu.
+
+## 3. Giải pháp của Team — VLearn Mastery Loop
+
+- AI hỗ trợ soạn nháp, giảng viên verify, rồi mới release quiz 15 câu cố định.
+- Học viên nhận kết quả theo 4 mục đề cương, không chỉ một điểm tổng.
+- Khi một mục dưới 70%, hệ thống đề xuất Quiz củng cố 5 câu theo đúng phần đó.
+
+## 4. Trải nghiệm sản phẩm
+
+1. Học slide Day03.
+2. Mở Quiz cuối bài đã phát hành ở sidebar.
+3. Xem đúng/sai và tỷ lệ nắm vững theo 4 mục.
+4. Tạo Quiz củng cố ngắn cho phần yếu.
+
+## 5. AI & niềm tin
+
+Quiz củng cố chạy LangGraph: `retrieve_transcript → generate_quiz → validate_quiz → retry`.
+Nguồn là transcript Day03 có source ID; validator chặn output sai schema/nguồn hoặc thiếu evidence.
+
+## 6. Đo lường & bước tiếp
+
+Hiện có 6/6 unit test pass, 20 golden cases đã chuẩn bị, 3 willing users đã xác định. Trước demo
+cuối cần hoàn tất survey ≥20 người, validation ≥5 người và đo golden set thật trước khi tuyên bố
+hiệu quả hoặc đạt quality bar.

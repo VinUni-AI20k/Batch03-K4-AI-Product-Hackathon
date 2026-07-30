@@ -57,6 +57,7 @@ def build_graph(store: SlideStore, model: Any | None = None):
     chat_model = model or ChatOpenAI(
         model=os.getenv("OPENAI_MODEL", "gpt-5.6-luna"),
         reasoning_effort="low",
+        use_responses_api=True,
         timeout=60,
         max_retries=1,
     )
