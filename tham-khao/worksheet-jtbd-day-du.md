@@ -3,7 +3,7 @@
 
 # Worksheet B1 — Chân dung user & Jobs To Be Done
 
-**Nhóm:** _______ · **Hướng:** [ ] A — VLearn [ ] B — Trợ lý Học viên [ ] C — Làn mở
+**Nhóm:** ____My3Mien___ · **Hướng:** [X] A — VLearn [ ] B — Trợ lý Học viên [ ] C — Làn mở
 
 > Quy tắc xuyên suốt: **không rõ job thì đừng bàn feature.**
 > File này điền trực tiếp và nộp kèm trong repo — nó là phần đầu vào của Phiếu nghiệm thu CP1.
