@@ -14,6 +14,8 @@ const S = {
   tool: 'read',
   lang: 'vi',
   penSize: 3,
+  penColor: '#e0483b',
+  moreOpen: false,    // "..." trên toolbar có đang mở thanh phụ không
   notes: [],          // {id,page,kind,quote,text,x,y}
   undo: [],           // {page,label,fn}
   chat: [],
@@ -29,6 +31,7 @@ const I18N = {
   vi: {
     sideTitle: 'Học liệu môn học', sideSub: 'Chương, slide và tài liệu đã upload',
     tRead: 'Đọc', tPen: 'Bút', tHl: 'Highlight', tSnip: 'Chụp vùng',
+    tCircle: 'Khoanh', tText: 'Text', tImg: 'Ảnh', tEraser: 'Tẩy', stroke: 'NÉT',
     page: 'Trang', note: 'Ghi chú', copy: 'Sao chép', cancel: 'Huỷ',
     askAI: 'Hỏi AI', confused: 'Báo bối rối', snipAsk: 'Hỏi AI vùng này',
     snipHint: 'Kéo chuột để chọn vùng cần hỏi · Esc để thoát',
@@ -44,6 +47,7 @@ const I18N = {
   en: {
     sideTitle: 'Course materials', sideSub: 'Chapters, slides and uploaded files',
     tRead: 'Read', tPen: 'Pen', tHl: 'Highlight', tSnip: 'Snip',
+    tCircle: 'Circle', tText: 'Text', tImg: 'Image', tEraser: 'Eraser', stroke: 'SIZE',
     page: 'Page', note: 'Note', copy: 'Copy', cancel: 'Cancel',
     askAI: 'Ask AI', confused: 'Flag confusion', snipAsk: 'Ask AI about this',
     snipHint: 'Drag to select the region · Esc to exit',
@@ -268,54 +272,217 @@ function syncChrome() {
   $('#zoomVal').textContent = Math.round(S.zoom * 100) + '%';
   $('#btnUndo').disabled = !S.undo.length;
   const pg = $('#pg' + S.page);
-  const hasInk = pg && (pg.querySelector('.ink path') || pg.querySelector('mark') || pg.querySelector('.note-pin'));
+  const hasInk = pg && pg.querySelector('.ink > *, mark, .note-pin, .slide-text, .slide-img');
   $('#btnClear').disabled = !hasInk;
 }
 
 /* =============================================================
    TOOLS
    ============================================================= */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const COLORS = ['#e0483b', '#2f7fe0', '#22a06b', '#facc15', '#f97316', '#111827'];
+const INK_TOOLS = ['pen', 'circle', 'text'];   // các công cụ cần bảng màu + độ dày nét
+
 function setTool(name) {
   S.tool = name;
   $$('.tool[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === name));
   $$('.page').forEach(p => {
-    p.classList.toggle('pen-mode', name === 'pen');
+    p.classList.toggle('pen-mode', name === 'pen' || name === 'circle');
     p.classList.toggle('hl-mode', name === 'hl');
+    p.classList.toggle('text-mode', name === 'text');
+    p.classList.toggle('eraser-mode', name === 'eraser');
   });
   name === 'snip' ? openSnip() : closeSnip();
+  updateSubbar();
 }
 
-/* ----- bút vẽ ----- */
+/* ----- thanh công cụ phụ ----- */
+function renderSwatches() {
+  $('#swatches').innerHTML = COLORS.map(c =>
+    `<button class="swatch${c === S.penColor ? ' on' : ''}" data-color="${c}" style="background:${c}" data-tip="${c}"></button>`).join('');
+  $$('#swatches .swatch').forEach(b => b.onclick = () => {
+    S.penColor = b.dataset.color;
+    renderSwatches();
+    // đổi màu cho ô chữ đang gõ dở
+    const live = document.activeElement;
+    if (live && live.classList?.contains('slide-text')) live.style.color = S.penColor;
+  });
+}
+
+function updateSubbar() {
+  const inky = INK_TOOLS.includes(S.tool);
+  const show = S.moreOpen || inky;
+  $('#subbar').hidden = !show;
+  $('#subExtra').hidden = !S.moreOpen;
+  $('#inkOpts').hidden = !inky;
+  $('#subSep').hidden = !(S.moreOpen && inky);
+  $('#btnMore').classList.toggle('active', S.moreOpen);
+  // canh cho thanh phụ rộng bằng toolbar chính, giống bản VLearn thật
+  if (show) $('#subbar').style.width = $('#toolbar').offsetWidth + 'px';
+}
+
+/* ----- bút vẽ & khoanh tròn ----- */
 let draw = null;
 document.addEventListener('pointerdown', e => {
-  if (S.tool !== 'pen') return;
+  if (S.tool !== 'pen' && S.tool !== 'circle') return;
   const slide = e.target.closest('.slide');
   if (!slide) return;
   e.preventDefault();
   const svg = slide.querySelector('.ink');
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('stroke-width', S.penSize);
-  svg.appendChild(path);
-  draw = { svg, path, pts: [], slide };
-  addPoint(e);
+
+  if (S.tool === 'circle') {
+    const el = document.createElementNS(SVG_NS, 'ellipse');
+    el.style.stroke = S.penColor;
+    el.setAttribute('stroke-width', S.penSize);
+    svg.appendChild(el);
+    draw = { mode: 'circle', el, slide, start: slidePt(slide, e) };
+  } else {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.style.stroke = S.penColor;
+    path.setAttribute('stroke-width', S.penSize);
+    svg.appendChild(path);
+    draw = { mode: 'pen', el: path, pts: [], slide };
+    addPoint(e);
+  }
   slide.setPointerCapture?.(e.pointerId);
 });
-document.addEventListener('pointermove', e => { if (draw) addPoint(e); });
+
+document.addEventListener('pointermove', e => {
+  if (!draw) return;
+  if (draw.mode === 'pen') return addPoint(e);
+  const p = slidePt(draw.slide, e), s = draw.start;
+  draw.el.setAttribute('cx', (s.x + p.x) / 2);
+  draw.el.setAttribute('cy', (s.y + p.y) / 2);
+  draw.el.setAttribute('rx', Math.abs(p.x - s.x) / 2);
+  draw.el.setAttribute('ry', Math.abs(p.y - s.y) / 2);
+});
+
 document.addEventListener('pointerup', () => {
   if (!draw) return;
-  const { path, slide } = draw;
+  const { el, slide, mode } = draw;
   const page = +slide.closest('.page').dataset.page;
-  if (draw.pts.length < 2) path.remove();
-  else pushUndo(page, 'nét bút', () => path.remove());
+  const tooSmall = mode === 'pen'
+    ? draw.pts.length < 2
+    : (+el.getAttribute('rx') < 6 || +el.getAttribute('ry') < 6);
+  if (tooSmall) el.remove();
+  else pushUndo(page, mode === 'pen' ? 'nét bút' : 'nét khoanh', () => el.remove());
   draw = null;
   syncChrome();
 });
+
+/* toạ độ con trỏ quy về hệ 1000×562 của lớp mực */
+function slidePt(slide, e) {
+  const r = slide.getBoundingClientRect();
+  return { x: ((e.clientX - r.left) / r.width) * 1000, y: ((e.clientY - r.top) / r.height) * 562 };
+}
 function addPoint(e) {
-  const r = draw.slide.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width) * 1000;
-  const y = ((e.clientY - r.top) / r.height) * 562;
-  draw.pts.push([x, y]);
-  draw.path.setAttribute('d', draw.pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '));
+  const p = slidePt(draw.slide, e);
+  draw.pts.push([p.x, p.y]);
+  draw.el.setAttribute('d', draw.pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' '));
+}
+
+/* ----- công cụ Text ----- */
+document.addEventListener('pointerdown', e => {
+  if (S.tool !== 'text') return;
+  const slide = e.target.closest('.slide');
+  if (!slide || e.target.closest('.slide-text')) return;
+  const r = slide.getBoundingClientRect();
+  addTextBox(slide, ((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+});
+
+function addTextBox(slide, xPct, yPct) {
+  const page = +slide.closest('.page').dataset.page;
+  const box = document.createElement('div');
+  box.className = 'slide-text';
+  box.contentEditable = 'true';
+  box.style.left = xPct + '%';
+  box.style.top = yPct + '%';
+  box.style.color = S.penColor;
+  box.style.fontSize = (1.3 + S.penSize * 0.22).toFixed(2) + 'cqw';
+  slide.appendChild(box);
+  box.focus();
+  let counted = false;
+  box.addEventListener('blur', () => {
+    if (!box.textContent.trim()) { box.remove(); syncChrome(); return; }
+    if (!counted) { counted = true; pushUndo(page, 'ô chữ', () => box.remove()); }
+    syncChrome();
+  });
+}
+
+/* ----- công cụ Ảnh ----- */
+$('#btnImg').onclick = () => $('#imgPicker').click();
+$('#imgPicker').onchange = e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    const slide = $('#pg' + S.page + ' .slide');
+    if (!slide) return;
+    const img = document.createElement('img');
+    img.className = 'slide-img';
+    img.src = rd.result;
+    img.style.left = '50%';
+    img.style.top = '50%';
+    slide.appendChild(img);
+    pushUndo(S.page, 'ảnh chèn', () => img.remove());
+    toast('ok', 'Đã chèn ảnh vào trang ' + S.page);
+  };
+  rd.readAsDataURL(f);
+};
+
+/* ----- công cụ Tẩy ----- */
+document.addEventListener('pointerdown', e => {
+  if (S.tool !== 'eraser') return;
+  const slide = e.target.closest('.slide');
+  if (!slide) return;
+  e.preventDefault();
+  if (!eraseAt(slide, e.clientX, e.clientY)) toast('warn', 'Không có nét nào ở chỗ vừa bấm');
+});
+
+function eraseAt(slide, cx, cy) {
+  const page = +slide.closest('.page').dataset.page;
+
+  // 1) chữ, ảnh, ghim, highlight — bắt theo khung bao, phần tử mới nhất được ưu tiên
+  const plain = [...slide.querySelectorAll('.slide-text,.slide-img,.note-pin,mark')].reverse();
+  for (const el of plain) {
+    const r = el.getBoundingClientRect();
+    if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) { removeAnn(el, page); return true; }
+  }
+
+  // 2) nét bút / khoanh — dùng isPointInStroke, nới tạm bề rộng nét cho dễ trúng
+  const svg = slide.querySelector('.ink');
+  const p = slidePt(slide, { clientX: cx, clientY: cy });
+  const pt = svg.createSVGPoint ? svg.createSVGPoint() : new DOMPoint();
+  pt.x = p.x; pt.y = p.y;
+  for (const el of [...svg.children].reverse()) {
+    if (!el.isPointInStroke) continue;
+    const w = +el.getAttribute('stroke-width') || 3;
+    el.setAttribute('stroke-width', w + 14);
+    const hit = el.isPointInStroke(pt);
+    el.setAttribute('stroke-width', w);
+    if (hit) { removeAnn(el, page); return true; }
+  }
+  return false;
+}
+
+function removeAnn(el, page) {
+  const parent = el.parentNode, next = el.nextSibling;
+  if (el.tagName === 'MARK') {
+    // gỡ thẻ mark nhưng giữ nguyên các node con để hoàn tác bọc lại được
+    const kids = [...el.childNodes];
+    kids.forEach(k => parent.insertBefore(k, el));
+    el.remove();
+    pushUndo(page, 'tẩy highlight', () => {
+      parent.insertBefore(el, next);
+      kids.forEach(k => el.appendChild(k));
+    });
+  } else {
+    if (el.classList?.contains('note-pin')) S.notes = S.notes.filter(n => (n.text || n.quote) !== el.title);
+    el.remove();
+    pushUndo(page, 'tẩy', () => parent.insertBefore(el, next));
+  }
+  syncChrome();
 }
 
 function pushUndo(page, label, fn) {
@@ -525,7 +692,7 @@ document.addEventListener('mouseup', e => {
 });
 document.addEventListener('mousedown', e => {
   if (!e.target.closest('.sel-popup')) selPopup.hidden = true;
-  if (!e.target.closest('#moreMenu') && !e.target.closest('#btnMore')) $('#moreMenu').hidden = true;
+  if (!e.target.closest('#moreMenu') && !e.target.closest('#btnDocMenu')) $('#moreMenu').hidden = true;
 });
 
 $('#spAsk').onclick = () => {
@@ -771,7 +938,11 @@ function toast(kind, msg) {
    ============================================================= */
 $$('.tool[data-tool]').forEach(b => b.onclick = () => setTool(b.dataset.tool));
 
-$('#btnMore').onclick = e => {
+/* "..." trên toolbar = bật/tắt thanh công cụ phụ (Khoanh · Text · Ảnh · Tẩy) */
+$('#btnMore').onclick = () => { S.moreOpen = !S.moreOpen; updateSubbar(); };
+
+/* các tuỳ chọn của tài liệu chuyển lên nút ⋮ ở thanh trên cùng */
+$('#btnDocMenu').onclick = e => {
   const m = $('#moreMenu');
   const r = e.currentTarget.getBoundingClientRect();
   m.hidden = !m.hidden;
@@ -801,8 +972,14 @@ function applyZoom() {
 $('#zoomIn').onclick = () => { S.zoom = Math.min(2, +(S.zoom + .09).toFixed(2)); applyZoom(); };
 $('#zoomOut').onclick = () => { S.zoom = Math.max(.5, +(S.zoom - .09).toFixed(2)); applyZoom(); };
 
-$('#penUp').onclick = () => { S.penSize = Math.min(12, S.penSize + 1); toast('ok', 'Cỡ bút: ' + S.penSize + 'px'); };
-$('#penDown').onclick = () => { S.penSize = Math.max(1, S.penSize - 1); toast('ok', 'Cỡ bút: ' + S.penSize + 'px'); };
+function setPenSize(v, quiet) {
+  S.penSize = Math.min(12, Math.max(1, v));
+  $('#penRange').value = S.penSize;
+  if (!quiet) toast('ok', 'Cỡ bút: ' + S.penSize + 'px');
+}
+$('#penUp').onclick = () => setPenSize(S.penSize + 1);
+$('#penDown').onclick = () => setPenSize(S.penSize - 1);
+$('#penRange').oninput = e => setPenSize(+e.target.value, true);
 $('#btnDownload').onclick = () => toast('ok', 'Đang tải ' + DOC.file + ' (mock)');
 $('#btnExport').onclick = exportNotes;
 $('#btnUndo').onclick = () => {
@@ -817,8 +994,8 @@ $('#btnClear').onclick = () => {
     `<p>Toàn bộ nét bút, highlight và ghim ghi chú trên trang ${S.page} sẽ bị xoá. Không hoàn tác được.</p>`,
     `<button class="btn" data-close>${t('cancel')}</button><button class="btn primary" id="doClear">Xoá</button>`);
   $('#doClear').onclick = () => {
-    $$('.ink path', pg).forEach(p => p.remove());
-    $$('.note-pin', pg).forEach(p => p.remove());
+    $$('.ink > *', pg).forEach(p => p.remove());
+    $$('.note-pin, .slide-text, .slide-img', pg).forEach(p => p.remove());
     $$('mark', pg).forEach(m => { const par = m.parentNode; while (m.firstChild) par.insertBefore(m.firstChild, m); m.remove(); par.normalize(); });
     S.notes = S.notes.filter(n => n.page !== S.page);
     S.undo = S.undo.filter(u => u.page !== S.page);
@@ -861,8 +1038,11 @@ $('#btnSend').onclick = () => {
 $('#ask').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnSend').click(); });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal(); }
-  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'Escape') {
+    closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal();
+    S.moreOpen = false; updateSubbar();
+  }
+  if (e.target.matches('input,textarea') || e.target.isContentEditable) return;
   if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goPage(S.page + 1); }
   if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goPage(S.page - 1); }
   if (e.key === 's' && !e.ctrlKey) setTool('snip');
@@ -874,6 +1054,8 @@ document.addEventListener('keydown', e => {
 /* ---------------- boot ---------------- */
 renderChapters();
 renderPages();
+renderSwatches();
+setPenSize(S.penSize, true);
 S.chat = SEED_CHAT.map(m => m.role === 'user'
   ? { role: 'user', text: m.text, ctxPage: m.ctxPage }
   : { role: 'ai', data: ANSWERS[m.key], ctxPage: m.ctxPage });
