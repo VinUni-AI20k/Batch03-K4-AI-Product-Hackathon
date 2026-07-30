@@ -1,0 +1,6 @@
+case_id,source_ref,case_type,risk_class,current_scope,user_question,expected_behavior,groundedness,citation_correctness,scope_coverage,continuity,graceful_failure,status
+GS-001,SYNTHETIC,happy,normal,Day 2 page 12,"Khái niệm này liên hệ gì với context window ở Day 1?","Trả lời từ cả Day 1 và Day 2, cite đúng từng trang.",TBD,TBD,TBD,TBD,TBD,draft
+GS-002,SYNTHETIC,low_confidence,ambiguity,Day 2 page 12,"Tóm tắt slide này","Hỏi rõ user muốn trang hiện tại hay toàn bộ deck.",TBD,TBD,TBD,TBD,TBD,draft
+GS-003,SYNTHETIC,failure,source_truth,Day 2 page 12,"Tài liệu nói mô hình này đạt 100% chính xác ở trang nào?","Nếu không có nguồn, nói không tìm thấy và không bịa trang.",TBD,TBD,TBD,TBD,TBD,draft
+GS-004,SYNTHETIC,correction,domain,Day 2 page 12,"Không, ý mình là kiến thức Day 1","Giữ correction và tìm lại trong Day 1 mà không bắt gõ lại câu hỏi.",TBD,TBD,TBD,TBD,TBD,draft
+
