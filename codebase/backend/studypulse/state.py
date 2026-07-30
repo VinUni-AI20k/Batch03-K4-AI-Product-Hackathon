@@ -91,6 +91,29 @@ def dedupe_list_reducer(
     return result
 
 
+def chat_history_reducer(
+    existing: List[Dict[str, Any]],
+    update: Union[List[Dict[str, Any]], Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """
+    Custom Reducer for Chat History in LangGraph (Short-Term Memory).
+    Keeps only the last 6 messages to avoid token bloat while retaining context.
+    """
+    if existing is None:
+        existing = []
+    
+    if isinstance(update, dict):
+        new_msgs = [update]
+    elif isinstance(update, list):
+        new_msgs = update
+    else:
+        new_msgs = []
+        
+    result = list(existing) + list(new_msgs)
+    # Keep only the last 6 messages for short-term conversation context
+    return result[-6:]
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # ENUMS
 # ═══════════════════════════════════════════════════════════════════════════
@@ -227,6 +250,8 @@ class StudyPulseState(TypedDict, total=False):
     dashboard_timeline: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
     evidence_log: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
     hitl_items: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
+    chat_history: Annotated[List[Dict[str, Any]], chat_history_reducer]
+    user_profile: Dict[str, Any]
 
     chat_response: Dict[str, Any]
     daily_reminder: Dict[str, Any]
@@ -235,5 +260,6 @@ class StudyPulseState(TypedDict, total=False):
     retry_count: int
     max_retries: int
     error_message: str
+    guardrail_blocked: bool
     final_response: str
     metadata: Dict[str, Any]

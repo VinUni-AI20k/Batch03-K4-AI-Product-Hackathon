@@ -155,6 +155,8 @@ def ingestion_node(state: StudyPulseState) -> StudyPulseState:
         "extracted_items": state.get("extracted_items", []),
         "dashboard_timeline": state.get("dashboard_timeline", []),
         "evidence_log": state.get("evidence_log", []),
+        "chat_history": state.get("chat_history", []),
+        "user_profile": state.get("user_profile", {}),
         "confidence_score": 0.0,
         "requires_hitl": False,
         "hitl_items": [],
@@ -279,35 +281,38 @@ def ai_extraction_node(state: StudyPulseState) -> StudyPulseState:
     current_year = datetime.utcnow().year
 
     # ── PRODUCTION LLM CALL ──
-    # from langchain_core.messages import HumanMessage, SystemMessage
-    # from langchain_google_genai import ChatGoogleGenerativeAI
-    #
-    # llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
-    # structured_llm = llm.with_structured_output(ExtractionResult)
-    #
-    # result: ExtractionResult = structured_llm.invoke([
-    #     SystemMessage(content=get_base_persona()),       # ~120 tokens, CACHED
-    #     HumanMessage(content=get_extraction_prompt(      # Task-specific, fresh
-    #         text=text,
-    #         source_platform=source,
-    #         today=today,
-    #         current_year=current_year,
-    #     )),
-    # ])
-    # extracted_items = [
-    #     ExtractedItem(
-    #         source_platform=SourcePlatform(source),
-    #         source_message_id=raw.get("message_id", str(uuid.uuid4())),
-    #         language_detected=Language(language),
-    #         pii_masked=True,
-    #         raw_snippet=text[:500],
-    #         **item.model_dump(),
-    #     ).model_dump()
-    #     for item in result.items
-    # ]
+    from langchain_core.messages import HumanMessage, SystemMessage
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    import os
 
-    # ── MOCK EXTRACTION for prototype ──
-    extracted_items = _mock_extract(text, source, language)
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
+    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0)
+    structured_llm = llm.with_structured_output(ExtractionResult)
+
+    result: ExtractionResult = structured_llm.invoke([
+        SystemMessage(content=get_base_persona()),       # ~120 tokens, CACHED
+        HumanMessage(content=get_extraction_prompt(      # Task-specific, fresh
+            text=text,
+            source_platform=source,
+            today=today,
+            current_year=current_year,
+        )),
+    ])
+    extracted_items = [
+        ExtractedItem(
+            source_platform=(
+                SourcePlatform(source)
+                if source in [e.value for e in SourcePlatform]
+                else SourcePlatform.DIRECT_INPUT
+            ),
+            source_message_id=raw.get("message_id", str(uuid.uuid4())),
+            language_detected=Language(language),
+            pii_masked=True,
+            raw_snippet=text[:500],
+            **item.model_dump(),
+        ).model_dump()
+        for item in result.items
+    ]
 
     # Aggregate confidence
     avg_conf = (
@@ -404,18 +409,39 @@ def validation_guardrail_node(state: StudyPulseState) -> StudyPulseState:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# NODE 6: DASHBOARD SYNC NODE (Pure Python — 0 tokens)
+# NODE 6: DASHBOARD SYNC NODE (Pure Python — 0 tokens + SQLite Persistence)
 # ═══════════════════════════════════════════════════════════════════════════
 
 def dashboard_sync_node(state: StudyPulseState) -> StudyPulseState:
-    """Append-only merge to timeline. Pure Python."""
+    """Append-only merge to timeline. Pure Python + SQLite persistence."""
     confirmed = state.get("extracted_items", [])
     existing = state.get("dashboard_timeline", [])
     updated = existing + confirmed
     updated.sort(key=lambda x: x.get("due_date") or "9999-12-31")
 
+    # Persist new items to SQLite physical storage
+    if confirmed:
+        try:
+            from .storage import get_db
+            db = get_db()
+            saved_count = db.save_timeline_items(confirmed)
+            print(f"  [SQLite] Persisted {saved_count}/{len(confirmed)} timeline items to disk.")
+        except Exception as e:
+            print(f"  [SQLite] Warning: Failed to persist timeline items: {e}")
+
+    # Index new items into FAISS vector store for RAG retrieval
+    if confirmed:
+        try:
+            from .vector_store import get_vector_store
+            vs = get_vector_store()
+            indexed = vs.index_timeline_items(confirmed)
+            print(f"  [FAISS] Indexed {indexed} items into vector store.")
+        except Exception as e:
+            print(f"  [FAISS] Warning: Failed to index items: {e}")
+
     metadata = _trace(state, "dashboard_sync_node")
     metadata["dashboard_total"] = len(updated)
+    metadata["sqlite_persisted"] = len(confirmed)
 
     return {**state, "dashboard_timeline": updated, "metadata": metadata}
 
@@ -426,52 +452,102 @@ def dashboard_sync_node(state: StudyPulseState) -> StudyPulseState:
 
 def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
     """
-    RAG chatbot using:
-    - SystemMessage: BASE_PERSONA (cached)
-    - HumanMessage: RAG_CHATBOT_PROMPT with retrieved context
-    - .with_structured_output(ChatResponse) for typed output
+    RAG chatbot with:
+    - Dynamic FAISS Vector Retrieval (replaces hardcoded docs)
+    - Token Usage Tracking (monitors LLM cost)
+    - Short-Term Memory: Prepend previous chat history to LLM messages.
+    - Long-Term Memory: Prepend user profile context to RAG chatbot prompt.
     """
     query = state.get("user_query", "")
     language = state.get("language", "vi")
     intent = state.get("intent", "general")
     timeline = state.get("dashboard_timeline", [])
+    user_profile = dict(state.get("user_profile", {}))
+    chat_history = list(state.get("chat_history", []))
 
-    # ── PRODUCTION LLM CALL ──
-    # structured_llm = llm.with_structured_output(ChatResponse)
-    # result = structured_llm.invoke([
-    #     SystemMessage(content=get_base_persona()),    # CACHED
-    #     HumanMessage(content=get_rag_prompt(
-    #         query=query, language=language,
-    #         rag_context=retrieved_docs, timeline_data=json.dumps(timeline[:10]),
-    #     )),
-    # ])
+    # 1. Long-Term Memory (Python preprocessing: Extract profile name/id from query)
+    name_match = re.search(r"(?:tôi là|tên tôi là|mình tên là|tên mình là)\s*([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝĐ][a-zàáâãèéêìíòóôõùúýđ]*(?:\s+[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝĐ][a-zàáâãèéêìíòóôõùúýđ]*)*)", query, re.IGNORECASE)
+    if name_match:
+        user_profile["user_name"] = name_match.group(1).strip()
+    
+    id_match = re.search(r"(?:mã học viên|mã số học viên|ms hv|mshv)[:\s]*([A-Za-z0-9\-]+)", query, re.IGNORECASE)
+    if id_match:
+        user_profile["student_id"] = id_match.group(1).strip()
 
-    # ── MOCK RESPONSE ──
-    if intent == "query_deadline":
-        upcoming = [i for i in timeline if i.get("category") in ("deadline", "assignment", "exam")]
-        if upcoming:
-            items_text = "\n".join(
-                f"- {i['title']} | {_format_date(i.get('due_date'), language)} | {i.get('source_platform', '')}"
-                for i in upcoming[:5]
-            )
-            response_text = f"Các deadline sắp tới:\n{items_text}" if language == "vi" else f"Upcoming deadlines:\n{items_text}"
-        else:
-            response_text = "Không tìm thấy deadline nào." if language == "vi" else "No deadlines found."
-    elif intent == "query_timeline":
+    # ── DYNAMIC RAG RETRIEVAL (FAISS Vector Store) ──
+    try:
+        from .vector_store import get_vector_store
+        vs = get_vector_store()
+        # Index current timeline items if not already indexed
         if timeline:
-            items_text = "\n".join(
-                f"- [{i.get('category', '')}] {i['title']} | {_format_date(i.get('due_date'), language)}"
-                for i in timeline[:10]
-            )
-            response_text = f"Timeline hiện tại:\n{items_text}" if language == "vi" else f"Current timeline:\n{items_text}"
+            vs.index_timeline_items(timeline)
+        retrieved_docs = vs.similarity_search(query, k=3)
+        print(f"  [FAISS] Dynamic RAG: Retrieved {len(retrieved_docs.split('[Doc'))-1} relevant documents.")
+    except Exception as e:
+        retrieved_docs = "VinAI Academy Mini Hackathon Day 1 Foundation & Day 2 Specs. [T01-001] Introduction to AI Hackathon."
+        print(f"  [FAISS] Fallback to static docs: {e}")
+
+    # ── PRODUCTION LLM CALL WITH TOKEN TRACKING ──
+    from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    import os
+
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
+    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.2)
+    
+    # 2. Short-Term Memory: Parse previous chat history to LangChain message formats
+    messages = [SystemMessage(content=get_base_persona())]
+    for msg in chat_history:
+        if msg.get("role") == "user":
+            messages.append(HumanMessage(content=msg.get("content", "")))
         else:
-            response_text = "Timeline trống." if language == "vi" else "Timeline is empty."
-    else:
-        response_text = (
-            "Tôi có thể giúp bạn tra cứu deadline, lịch học, và tài liệu bài giảng. Hãy hỏi cụ thể hơn!"
-            if language == "vi"
-            else "I can help you look up deadlines, schedules, and lecture materials. Please ask a specific question!"
+            messages.append(AIMessage(content=msg.get("content", "")))
+
+    # Inject Long-Term user profile context into RAG prompt
+    profile_context = f"USER PROFILE (LONG-TERM MEMORY): {json.dumps(user_profile)}\n" if user_profile else ""
+    prompt_text = profile_context + get_rag_prompt(
+        query=query,
+        language=language,
+        rag_context=retrieved_docs,
+        timeline_data=json.dumps(timeline[:10]),
+    )
+    messages.append(HumanMessage(content=prompt_text))
+
+    structured_llm = llm.with_structured_output(ChatResponse)
+    result: ChatResponse = structured_llm.invoke(messages)
+    response_text = result.response_text
+
+    # ── TOKEN USAGE TRACKING ──
+    token_usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+    try:
+        # Estimate token usage from message lengths (approximate)
+        input_text = " ".join(m.content for m in messages)
+        est_input = len(input_text) // 4  # ~4 chars per token estimate
+        est_output = len(response_text) // 4
+        token_usage = {
+            "input_tokens": est_input,
+            "output_tokens": est_output,
+            "total_tokens": est_input + est_output,
+        }
+        print(f"  [Tokens] Estimated usage: input={est_input}, output={est_output}, total={est_input + est_output}")
+
+        # Persist to SQLite
+        from .storage import get_db
+        db = get_db()
+        db.log_token_usage(
+            node_name="rag_chatbot_node",
+            input_tokens=est_input,
+            output_tokens=est_output,
+            model_name=model_name,
         )
+    except Exception as e:
+        print(f"  [Tokens] Warning: Failed to track token usage: {e}")
+
+    # Update state history with the current turn
+    current_turn = [
+        {"role": "user", "content": query},
+        {"role": "assistant", "content": response_text}
+    ]
 
     chat_resp = ChatResponse(
         language=Language(language),
@@ -481,9 +557,18 @@ def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
     ).model_dump()
 
     metadata = _trace(state, "rag_chatbot_node")
-    metadata["prompt_architecture"] = "base_persona(cached) + rag_subprompt"
+    metadata["prompt_architecture"] = "base_persona(cached) + short_term_history + long_term_profile + dynamic_faiss_rag"
+    metadata["token_usage"] = token_usage
+    metadata["rag_source"] = "faiss_dynamic"
 
-    return {**state, "chat_response": chat_resp, "final_response": response_text, "metadata": metadata}
+    return {
+        **state,
+        "chat_response": chat_resp,
+        "final_response": response_text,
+        "chat_history": chat_history + current_turn,
+        "user_profile": user_profile,
+        "metadata": metadata,
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -526,16 +611,26 @@ def user_evidence_log_node(state: StudyPulseState) -> StudyPulseState:
 
     evidence_log = state.get("evidence_log", []) + [entry]
 
+    # Persist evidence entry to SQLite physical storage
+    try:
+        from .storage import get_db
+        db = get_db()
+        if db.save_evidence_entry(entry):
+            print(f"  [SQLite] Persisted evidence entry {entry['id'][:8]}... to disk.")
+    except Exception as e:
+        print(f"  [SQLite] Warning: Failed to persist evidence entry: {e}")
+
     # Static confirmation (no LLM needed for this)
     confirmation = (
-        f"✅ Đã ghi nhận phản hồi nguyên văn (ID: {entry['id'][:8]}...). Cảm ơn bạn!"
+        f"Đã ghi nhận phản hồi của (ID: {entry['id'][:8]}...). BTC sẽ xem xét và phản hồi sớm nhất có thể ạ!"
         if language == "vi"
-        else f"✅ Verbatim feedback recorded (ID: {entry['id'][:8]}...). Thank you!"
+        else f"Verbatim feedback recorded (ID: {entry['id'][:8]}...). Thank you!"
     )
 
     metadata = _trace(state, "user_evidence_log_node")
     metadata["evidence_entries_total"] = len(evidence_log)
     metadata["pii_masked_in"] = "python_node"
+    metadata["sqlite_persisted"] = True
 
     return {**state, "evidence_log": evidence_log, "final_response": confirmation, "metadata": metadata}
 
@@ -567,14 +662,14 @@ def hitl_escalation_node(state: StudyPulseState) -> StudyPulseState:
 
     if language == "vi":
         response = (
-            f"⚠️ **Cần xác nhận từ TA/giảng viên**\n\n"
-            f"Các mục sau có độ tin cậy thấp hoặc cần kiểm tra thủ công:\n\n"
+            f"**Cần xác nhận từ TA/giảng viên**\n\n"
+            f"Các mục sau có thông tin hơn mơ hồ:\n\n"
             f"{details_text}\n\n"
             f"Vui lòng xác nhận hoặc chỉnh sửa trước khi thêm vào timeline."
         )
     else:
         response = (
-            f"⚠️ **TA/Instructor Review Required**\n\n"
+            f"**TA/Instructor Review Required**\n\n"
             f"The following items have low confidence or need manual verification:\n\n"
             f"{details_text}\n\n"
             f"Please confirm or edit before adding to the timeline."
@@ -603,15 +698,15 @@ def response_formatter_node(state: StudyPulseState) -> StudyPulseState:
             hitl = state.get("hitl_items", [])
             if language == "vi":
                 final = (
-                    f"📋 Đã trích xuất {len(items)} mục từ nguồn.\n"
-                    f"✅ Đã thêm vào timeline: {len(items)}\n"
-                    f"⚠️ Cần xác nhận: {len(hitl)}"
+                    f"Đã trích xuất {len(items)} mục từ nguồn.\n"
+                    f"Đã thêm vào timeline: {len(items)}\n"
+                    f"Cần xác nhận: {len(hitl)}"
                 )
             else:
                 final = (
-                    f"📋 Extracted {len(items)} items from source.\n"
-                    f"✅ Added to timeline: {len(items)}\n"
-                    f"⚠️ Needs confirmation: {len(hitl)}"
+                    f"Extracted {len(items)} items from source.\n"
+                    f"Added to timeline: {len(items)}\n"
+                    f"Needs confirmation: {len(hitl)}"
                 )
         else:
             final = (
@@ -637,14 +732,14 @@ def spam_rescue_node(state: StudyPulseState) -> StudyPulseState:
 
     if language == "vi":
         response = (
-            f"🔍 Đã quét thư mục Spam/Junk.\n"
-            f"📬 Phát hiện {rescued_count} email học tập quan trọng.\n"
+            f"Đã quét thư mục Spam/Junk.\n"
+            f"Phát hiện {rescued_count} email học tập quan trọng.\n"
             f"Các email đã được di chuyển về hộp thư chính."
         )
     else:
         response = (
-            f"🔍 Scanned Spam/Junk folder.\n"
-            f"📬 Found {rescued_count} important academic emails.\n"
+            f"Scanned Spam/Junk folder.\n"
+            f"Found {rescued_count} important academic emails.\n"
             f"Emails have been moved to your main inbox."
         )
 
@@ -668,31 +763,31 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
     if language == "vi":
         if tomorrow_items:
             items_text = "\n".join(
-                f"  {'🔴' if i.get('priority') == 'critical' else '🟡'} "
+                f"  {'[QUAN TRỌNG]' if i.get('priority') == 'critical' else '[LỊCH TRÌNH]'} "
                 f"{i['title']} — {i.get('due_time') or 'chưa rõ giờ'}"
                 for i in tomorrow_items
             )
             msg = (
-                f"⏰ **Nhắc nhở deadline ngày mai ({_format_date(tomorrow, 'vi')})**\n\n"
+                f"**Nhắc nhở deadline ngày mai ({_format_date(tomorrow, 'vi')})**\n\n"
                 f"Bạn có {len(tomorrow_items)} mục cần hoàn thành "
                 f"({len(critical)} quan trọng):\n\n{items_text}"
             )
         else:
-            msg = f"✅ Không có deadline nào vào ngày mai ({_format_date(tomorrow, 'vi')}). Nghỉ ngơi nhé!"
+            msg = f"Không có deadline nào vào ngày mai ({_format_date(tomorrow, 'vi')}). Nghỉ ngơi nhé!"
     else:
         if tomorrow_items:
             items_text = "\n".join(
-                f"  {'🔴' if i.get('priority') == 'critical' else '🟡'} "
+                f"  {'[CRITICAL]' if i.get('priority') == 'critical' else '[SCHEDULE]'} "
                 f"{i['title']} — {i.get('due_time') or 'time TBD'}"
                 for i in tomorrow_items
             )
             msg = (
-                f"⏰ **Tomorrow's Deadline Reminder ({_format_date(tomorrow, 'en')})**\n\n"
+                f"**Tomorrow's Deadline Reminder ({_format_date(tomorrow, 'en')})**\n\n"
                 f"You have {len(tomorrow_items)} items due "
                 f"({len(critical)} critical):\n\n{items_text}"
             )
         else:
-            msg = f"✅ No deadlines tomorrow ({_format_date(tomorrow, 'en')}). Rest well!"
+            msg = f"No deadlines tomorrow ({_format_date(tomorrow, 'en')}). Rest well!"
 
     reminder = DailyReminder(
         target_date=tomorrow,

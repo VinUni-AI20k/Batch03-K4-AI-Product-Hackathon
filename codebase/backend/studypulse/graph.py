@@ -31,6 +31,7 @@ from .nodes import (
     spam_rescue_node,
     daily_reminder_node,
 )
+from .guardrail import guardrail_node
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -115,6 +116,7 @@ def build_studypulse_graph() -> StateGraph:
 
     # ── REGISTER ALL NODES ──
     graph.add_node("ingestion", ingestion_node)
+    graph.add_node("guardrail", guardrail_node)
     graph.add_node("language_detect", language_detect_node)
     graph.add_node("intent_router", intent_router_node)
     graph.add_node("ai_extraction", ai_extraction_node)
@@ -127,9 +129,25 @@ def build_studypulse_graph() -> StateGraph:
     graph.add_node("spam_rescue", spam_rescue_node)
     graph.add_node("daily_reminder", daily_reminder_node)
 
-    # ── STATIC PIPELINE: Ingestion → LangDetect → IntentRouter ──
+    # ── STATIC PIPELINE: Ingestion → Guardrail → Conditional Gate ──
     graph.set_entry_point("ingestion")
-    graph.add_edge("ingestion", "language_detect")
+    graph.add_edge("ingestion", "guardrail")
+
+    # ── SECURITY GATE: Guardrail → Safe/Blocked routing ──
+    def route_by_guardrail(state: StudyPulseState) -> str:
+        if state.get("guardrail_blocked", False):
+            return "response_formatter"
+        return "language_detect"
+
+    graph.add_conditional_edges(
+        "guardrail",
+        route_by_guardrail,
+        {
+            "language_detect": "language_detect",
+            "response_formatter": "response_formatter",
+        },
+    )
+
     graph.add_edge("language_detect", "intent_router")
 
     # ── DECISION GATE 1: IntentRouter → Conditional Branch ──
@@ -218,15 +236,18 @@ def compile_graph(
 
 GRAPH_METADATA = {
     "name": "StudyPulse AI — EduCentral Agent",
-    "version": "1.1.0",
-    "nodes": 12,
-    "decision_gates": 3,
+    "version": "2.0.0",
+    "nodes": 13,
+    "decision_gates": 4,
     "safeguards": {
         "max_retries": 3,
         "confidence_threshold": 0.85,
         "hitl_terminal": True,
         "interrupt_before": ["hitl_escalation"],
         "checkpointer": "SqliteSaver / MemorySaver",
+        "guardrail": "dual_layer_regex_llm",
+        "vector_store": "faiss_dynamic",
+        "physical_storage": "sqlite_persistent",
     },
     "flow_types": ["ingestion", "chat", "survey_log", "spam_rescue", "daily_reminder"],
     "supported_platforms": ["gmail", "outlook", "discord", "direct_input"],
