@@ -22,6 +22,11 @@ class QuizBackendTests(unittest.TestCase):
         payload = {"status":"OK", "questions":[question] * 15}
         self.assertEqual(api_server.validate_quiz(payload, {"T03-030"})["status"], "OK")
 
+    def test_validate_short_reinforcement_quiz(self):
+        question = {"question":"Q?", "options":["A","B","C","D"], "correct":1, "explanation":"E", "source_ids":["T03-030"]}
+        payload = {"status":"OK", "questions":[question] * 5}
+        self.assertEqual(api_server.validate_quiz(payload, {"T03-030"}, question_count=5)["status"], "OK")
+
     def test_reject_untraceable_question(self):
         question = {"question":"Q?", "options":["A","B","C","D"], "correct":1, "explanation":"E", "source_ids":["T99-999"]}
         with self.assertRaises(ValueError):

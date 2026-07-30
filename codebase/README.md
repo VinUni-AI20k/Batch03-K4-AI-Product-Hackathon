@@ -21,8 +21,10 @@ OPENAI_MODEL=gpt-5.6-luna
 ## Hai flow trong demo
 
 1. **Hỏi bài học:** chọn Day03/04/05 ở panel VLearn Tutor, nhập câu hỏi hoặc chọn câu gợi ý.
-2. **Quiz củng cố:** bấm “Bắt đầu quiz củng cố”, làm 15 câu và nhận practice credit mock nếu đạt
-   từ 12/15.
+2. **Quiz cuối bài đã phát hành:** mở từ mục dưới PDF Day03 ở sidebar để làm bộ 15 câu cố định. Bản demo thể hiện quy trình AI hỗ trợ
+   soạn nháp, sau đó giảng viên duyệt mới release; không tạo lại bằng AI khi học viên mở quiz.
+3. **Phân tích & củng cố:** sau khi nộp quiz, xem phần trăm nắm vững theo đề cương Day03. Người
+   học có thể tạo quiz củng cố 5 câu bằng LangGraph từ các đoạn transcript thuộc phần còn yếu.
 
 ## LangGraph agent
 

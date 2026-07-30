@@ -56,14 +56,14 @@ def load_chunks(source_ids: list[str]) -> list[dict[str, str]]:
     return chunks
 
 
-def validate_quiz(payload: dict, allowed_ids: set[str]) -> dict:
+def validate_quiz(payload: dict, allowed_ids: set[str], question_count: int = 15) -> dict:
     if payload.get("status") not in {"OK", "INSUFFICIENT_EVIDENCE"}:
         raise ValueError("status không hợp lệ")
     if payload["status"] == "INSUFFICIENT_EVIDENCE":
         return {"status": payload["status"], "questions": [], "message": payload.get("message", "Chưa đủ học liệu để tạo quiz tin cậy.")}
     questions = payload.get("questions")
-    if not isinstance(questions, list) or len(questions) != 15:
-        raise ValueError("Quiz phải có đúng 15 câu")
+    if not isinstance(questions, list) or len(questions) != question_count:
+        raise ValueError(f"Quiz phải có đúng {question_count} câu")
     for index, item in enumerate(questions, 1):
         if not isinstance(item.get("question"), str) or not item["question"].strip():
             raise ValueError(f"Câu {index} thiếu nội dung")
@@ -83,17 +83,27 @@ def call_openai(
     lesson_title: str,
     chunks: list[dict[str, str]],
     validation_feedback: str = "",
+    question_count: int = 15,
+    focus_topics: list[str] | None = None,
+    focus_source_ids: list[str] | None = None,
 ) -> tuple[dict, dict]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("Thiếu OPENAI_API_KEY trong .env")
     model = os.getenv("OPENAI_MODEL", "gpt-5.6-luna")
+    focus_instruction = ""
+    if focus_topics:
+        focus_instruction = f"""
+Đây là QUIZ CỦNG CỐ cá nhân hoá. Chỉ kiểm tra các nội dung cần củng cố: {", ".join(focus_topics)}.
+Ưu tiên source_ids: {", ".join(focus_source_ids or [])}. Nếu nguồn ưu tiên không đủ để tạo câu công bằng, trả INSUFFICIENT_EVIDENCE.
+"""
     prompt = f"""Bạn là người thiết kế quiz củng cố cuối buổi cho học viên.
-Chỉ dùng SOURCE_CHUNKS bên dưới. Tạo đúng 15 câu MCQ, mỗi câu 4 lựa chọn, một đáp án đúng.
+Chỉ dùng SOURCE_CHUNKS bên dưới. Tạo đúng {question_count} câu MCQ, mỗi câu 4 lựa chọn, một đáp án đúng.
 Không hỏi trivia, không đánh đố, không đưa kiến thức ngoài nguồn.
 Mỗi câu phải có explanation ngắn và source_ids hỗ trợ trực tiếp cả câu hỏi lẫn đáp án.
-Nếu học liệu không đủ để tạo 15 câu công bằng, trả status INSUFFICIENT_EVIDENCE và questions rỗng.
+Nếu học liệu không đủ để tạo {question_count} câu công bằng, trả status INSUFFICIENT_EVIDENCE và questions rỗng.
 {f"Lần trước output bị từ chối vì: {validation_feedback}. Hãy sửa đúng lỗi này." if validation_feedback else ""}
+{focus_instruction}
 Trả về JSON thuần, không markdown, theo schema:
 {{"status":"OK|INSUFFICIENT_EVIDENCE","message":"...","questions":[{{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","source_ids":["Txx-NNN"]}}]}}
 
@@ -154,15 +164,37 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond({"status": "OUT_OF_SCOPE", "message": "Quiz và practice credits chỉ dùng cho ôn tập, không dùng trong đánh giá chính thức.", "ai_generated": False})
                 return
             source_ids = request_data.get("source_ids") or DEFAULT_SOURCE_IDS
+            question_count = int(request_data.get("question_count", 15))
+            if question_count < 3 or question_count > 15:
+                raise ValueError("question_count phải trong khoảng 3–15")
+            focus_topics = request_data.get("focus_topics") or []
+            focus_source_ids = request_data.get("focus_source_ids") or []
+
+            def generate(title: str, chunks: list[dict[str, str]], feedback: str):
+                return call_openai(
+                    title,
+                    chunks,
+                    feedback,
+                    question_count=question_count,
+                    focus_topics=focus_topics,
+                    focus_source_ids=focus_source_ids,
+                )
+
             quiz, trace = run_quiz_agent(
                 lesson_title=request_data.get("lesson_title", "Day03 — Agentic AI"),
                 source_ids=source_ids,
                 load_chunks=load_chunks,
-                generate=call_openai,
-                validate=validate_quiz,
+                generate=generate,
+                validate=lambda payload, ids: validate_quiz(payload, ids, question_count),
             )
             trace_id = save_trace(trace)
-            self.respond({**quiz, "trace_id": trace_id, "ai_generated": True, "agent": "langgraph_transcript_quiz"})
+            self.respond({
+                **quiz,
+                "trace_id": trace_id,
+                "ai_generated": True,
+                "agent": "langgraph_transcript_quiz",
+                "quiz_kind": "reinforcement" if focus_topics else "teacher_release_draft",
+            })
         except Exception as exc:
             self.respond({"status": "ERROR", "message": str(exc), "ai_generated": False}, HTTPStatus.BAD_REQUEST)
 

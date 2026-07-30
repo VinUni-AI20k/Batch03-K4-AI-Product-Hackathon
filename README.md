@@ -15,6 +15,7 @@ cần ôn lại. Các artifact dùng cho CP1 và prototype:
 - `quiz/survey.md` — form khảo sát 10 câu.
 - `quiz/google-form-quiz.gs` — script tự tạo Google Form.
 - `quiz/prototype-plan.md` — scope, AI call thật và kịch bản demo.
+- `GUILDLINE.md` — hướng dẫn team cài môi trường, chạy demo và kiểm thử.
 
 ## Bắt đầu từ đâu?
 
