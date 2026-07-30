@@ -39,9 +39,9 @@ async function renderPage(num) {
   try {
     const page = await pdfDoc.getPage(num);
 
-    // Calculate scale to fit within container width
-    const containerWidth = slideFrame.clientWidth;
-    const containerHeight = slideFrame.clientHeight;
+    // Calculate scale to fit within container width/height
+    const containerWidth = slideFrame.clientWidth || 800;
+    const containerHeight = slideFrame.clientHeight || 600;
     const unscaledViewport = page.getViewport({ scale: 1 });
 
     // Fit to container while respecting zoom
@@ -67,26 +67,32 @@ async function renderPage(num) {
     };
     await page.render(renderContext).promise;
 
-    // --- Text Layer (for selection / bôi đen) ---
-    textLayerDiv.innerHTML = '';
-    textLayerDiv.style.width = viewport.width + 'px';
-    textLayerDiv.style.height = viewport.height + 'px';
-
-    const textContent = await page.getTextContent();
-    
-    // Store raw text for AI Tutor context
-    currentPageTextContent = textContent.items.map(item => item.str).join(' ');
-
-    // Render text layer using PDF.js TextLayer API
-    const textLayer = new pdfjsLib.TextLayer({
-      textContentSource: textContent,
-      container: textLayerDiv,
-      viewport: viewport,
-    });
-    await textLayer.render();
-
+    // --- Hide loading spinner IMMEDIATELY after canvas is ready ---
     pageRendering = false;
     showLoading(false);
+
+    // --- Render Text Layer asynchronously in background ---
+    setTimeout(async () => {
+      try {
+        textLayerDiv.innerHTML = '';
+        textLayerDiv.style.width = viewport.width + 'px';
+        textLayerDiv.style.height = viewport.height + 'px';
+
+        const textContent = await page.getTextContent();
+        currentPageTextContent = textContent.items.map(item => item.str).join(' ');
+
+        if (pdfjsLib.TextLayer) {
+          const textLayer = new pdfjsLib.TextLayer({
+            textContentSource: textContent,
+            container: textLayerDiv,
+            viewport: viewport,
+          });
+          await textLayer.render();
+        }
+      } catch (tErr) {
+        // Non-blocking text layer error
+      }
+    }, 20);
 
     // If another page was requested while rendering, render it now
     if (pageNumPending !== null) {
@@ -118,12 +124,20 @@ function queueRenderPage(num) {
 async function loadPdfDocument(pdfPath) {
   showLoading(true);
   try {
-    const loadingTask = pdfjsLib.getDocument(pdfPath);
+    const loadingTask = pdfjsLib.getDocument({
+      url: pdfPath,
+      rangeChunkSize: 65536,
+      disableAutoFetch: false,
+      disableStream: false,
+    });
     pdfDoc = await loadingTask.promise;
     totalPages = pdfDoc.numPages;
 
     // Update total pages in all UI elements
     document.querySelectorAll('.total-pages-count').forEach(el => el.textContent = totalPages);
+
+    // Render thumbnail filmstrip track
+    renderThumbnailsTrack(totalPages);
 
     // Render the first (or current) page
     queueRenderPage(currentPage);
@@ -140,7 +154,7 @@ function showLoading(show) {
 }
 
 // ============================================
-// Page Navigation
+// Page Navigation & Thumbnails Logic
 // ============================================
 
 function prevSlidePage() {
@@ -159,6 +173,14 @@ function nextSlidePage() {
   }
 }
 
+function goToSlidePage(num) {
+  if (num >= 1 && num <= totalPages && num !== currentPage) {
+    currentPage = num;
+    updatePageUI();
+    queueRenderPage(currentPage);
+  }
+}
+
 function updatePageUI() {
   const curPgEl = document.getElementById('current-page-num');
   if (curPgEl) curPgEl.textContent = currentPage;
@@ -168,6 +190,295 @@ function updatePageUI() {
 
   const tutorSlideEl = document.getElementById('tutor-slide-num');
   if (tutorSlideEl) tutorSlideEl.textContent = currentPage;
+
+  const notesIndEl = document.getElementById('page-notes-indicator');
+  if (notesIndEl) {
+    const strokeCount = (pageDrawStrokes[currentPage] && pageDrawStrokes[currentPage].length > 0) ? pageDrawStrokes[currentPage].length : 0;
+    notesIndEl.textContent = `Trang ${currentPage} · ${strokeCount} note`;
+  }
+
+  updateActiveThumbnail(currentPage);
+  resizeDrawCanvas();
+}
+
+// ============================================
+// Slide Tools (Đọc, Bút, Highlight, Tẩy & Đổi màu) & Freehand Drawing Engine
+// ============================================
+
+let currentSlideTool = 'read';
+let currentPenColor = '#ef4444';
+const pageDrawStrokes = {}; // Saves array of strokes per page
+let isDrawing = false;
+let currentStroke = null;
+
+function setPenColor(color) {
+  currentPenColor = color;
+  document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+  
+  const dots = document.querySelectorAll('.color-dot');
+  dots.forEach(dot => {
+    if (dot.getAttribute('onclick') && dot.getAttribute('onclick').includes(color)) {
+      dot.classList.add('active');
+    }
+  });
+
+  if (currentSlideTool === 'read' || currentSlideTool === 'eraser') {
+    setSlideTool('pen');
+  }
+}
+
+function getDrawCanvas() {
+  const dc = document.getElementById('draw-canvas');
+  if (dc && dc.dataset.bound !== 'true') {
+    dc.dataset.bound = 'true';
+    dc.addEventListener('mousedown', startDrawing);
+    dc.addEventListener('mousemove', drawMove);
+    dc.addEventListener('mouseup', stopDrawing);
+    dc.addEventListener('mouseleave', stopDrawing);
+
+    dc.addEventListener('touchstart', startDrawing, { passive: false });
+    dc.addEventListener('touchmove', drawMove, { passive: false });
+    dc.addEventListener('touchend', stopDrawing);
+  }
+  return dc;
+}
+
+function setSlideTool(tool) {
+  currentSlideTool = tool;
+  
+  // Toggle toolbar button active states
+  document.querySelectorAll('.canvas-toolbar .tool-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`btn-tool-${tool}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Toggle tool class on slide frame
+  if (slideFrame) {
+    slideFrame.classList.remove('tool-read', 'tool-pen', 'tool-highlight', 'tool-eraser');
+    slideFrame.classList.add(`tool-${tool}`);
+  }
+  
+  resizeDrawCanvas();
+}
+
+function resizeDrawCanvas() {
+  const drawCanvas = getDrawCanvas();
+  if (!drawCanvas || !canvas) return;
+  drawCanvas.width = canvas.width;
+  drawCanvas.height = canvas.height;
+  drawCanvas.style.width = canvas.style.width;
+  drawCanvas.style.height = canvas.style.height;
+  redrawPageStrokes(currentPage);
+}
+
+function eraseStrokesAt(x, y) {
+  const strokes = pageDrawStrokes[currentPage];
+  if (!strokes || strokes.length === 0) return;
+
+  const eraserRadius = 30;
+  const initialCount = strokes.length;
+  
+  pageDrawStrokes[currentPage] = strokes.filter(stroke => {
+    return !stroke.points.some(p => {
+      const dx = p.x - x;
+      const dy = p.y - y;
+      return (dx * dx + dy * dy) < (eraserRadius * eraserRadius);
+    });
+  });
+
+  if (pageDrawStrokes[currentPage].length !== initialCount) {
+    const notesIndEl = document.getElementById('page-notes-indicator');
+    if (notesIndEl) {
+      notesIndEl.textContent = `Trang ${currentPage} · ${pageDrawStrokes[currentPage].length} note`;
+    }
+    redrawPageStrokes(currentPage);
+  }
+}
+
+function startDrawing(e) {
+  if (currentSlideTool === 'read') return;
+  const drawCanvas = getDrawCanvas();
+  if (!drawCanvas) return;
+  const drawCtx = drawCanvas.getContext('2d');
+  if (!drawCtx) return;
+
+  const rect = drawCanvas.getBoundingClientRect();
+  const scaleX = drawCanvas.width / rect.width;
+  const scaleY = drawCanvas.height / rect.height;
+  
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
+
+  if (currentSlideTool === 'eraser') {
+    isDrawing = true;
+    eraseStrokesAt(x, y);
+    return;
+  }
+
+  isDrawing = true;
+  currentStroke = {
+    tool: currentSlideTool,
+    color: currentSlideTool === 'pen' ? currentPenColor : (currentPenColor + '66'),
+    lineWidth: currentSlideTool === 'pen' ? 4 : 18,
+    points: [{ x, y }]
+  };
+  
+  if (!pageDrawStrokes[currentPage]) {
+    pageDrawStrokes[currentPage] = [];
+  }
+  pageDrawStrokes[currentPage].push(currentStroke);
+  
+  const notesIndEl = document.getElementById('page-notes-indicator');
+  if (notesIndEl) {
+    notesIndEl.textContent = `Trang ${currentPage} · ${pageDrawStrokes[currentPage].length} note`;
+  }
+
+  drawCtx.beginPath();
+  drawCtx.moveTo(x, y);
+}
+
+function drawMove(e) {
+  if (!isDrawing) return;
+  const drawCanvas = getDrawCanvas();
+  if (!drawCanvas) return;
+  
+  e.preventDefault();
+  
+  const rect = drawCanvas.getBoundingClientRect();
+  const scaleX = drawCanvas.width / rect.width;
+  const scaleY = drawCanvas.height / rect.height;
+  
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
+
+  if (currentSlideTool === 'eraser') {
+    eraseStrokesAt(x, y);
+    return;
+  }
+  
+  if (currentStroke) {
+    currentStroke.points.push({ x, y });
+    redrawPageStrokes(currentPage);
+  }
+}
+
+function stopDrawing() {
+  isDrawing = false;
+  currentStroke = null;
+}
+
+function redrawPageStrokes(pageNum) {
+  const drawCanvas = getDrawCanvas();
+  if (!drawCanvas) return;
+  const drawCtx = drawCanvas.getContext('2d');
+  if (!drawCtx) return;
+
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  
+  const strokes = pageDrawStrokes[pageNum] || [];
+  strokes.forEach(stroke => {
+    if (!stroke.points || stroke.points.length === 0) return;
+    
+    drawCtx.save();
+    drawCtx.strokeStyle = stroke.color;
+    drawCtx.lineWidth = stroke.lineWidth;
+    drawCtx.lineCap = 'round';
+    drawCtx.lineJoin = 'round';
+    
+    drawCtx.beginPath();
+    drawCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+    for (let i = 1; i < stroke.points.length; i++) {
+      drawCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+    }
+    drawCtx.stroke();
+    drawCtx.restore();
+  });
+}
+
+function renderThumbnailsTrack(total) {
+  const thumbTrack = document.getElementById('thumb-track');
+  if (!thumbTrack) return;
+  thumbTrack.innerHTML = '';
+
+  for (let i = 1; i <= total; i++) {
+    const card = document.createElement('div');
+    card.className = `thumb-card ${i === currentPage ? 'active' : ''}`;
+    card.id = `thumb-card-${i}`;
+    card.setAttribute('onclick', `goToSlidePage(${i})`);
+    card.innerHTML = `
+      <canvas id="thumb-canvas-${i}" class="thumb-canvas"></canvas>
+      <span class="thumb-badge">${i}</span>
+    `;
+    thumbTrack.appendChild(card);
+  }
+
+  // Asynchronously render real visual slide thumbnails on canvas
+  setTimeout(() => {
+    renderThumbnailPreviews();
+  }, 100);
+}
+
+let renderingThumbs = false;
+async function renderThumbnailPreviews() {
+  if (!pdfDoc || renderingThumbs) return;
+  renderingThumbs = true;
+
+  try {
+    const total = pdfDoc.numPages;
+    for (let i = 1; i <= total; i++) {
+      const c = document.getElementById(`thumb-canvas-${i}`);
+      if (!c || c.dataset.rendered === 'true') continue;
+
+      try {
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: 0.25 });
+        
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        c.width = viewport.width * dpr;
+        c.height = viewport.height * dpr;
+        
+        const ctx2d = c.getContext('2d');
+        ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        await page.render({
+          canvasContext: ctx2d,
+          viewport: viewport,
+        }).promise;
+
+        c.dataset.rendered = 'true';
+      } catch (pErr) {
+        // Individual page render catch
+      }
+    }
+  } catch (err) {
+    // Non-blocking thumbnail preview error
+  } finally {
+    renderingThumbs = false;
+  }
+}
+
+function updateActiveThumbnail(pageNum) {
+  document.querySelectorAll('.thumb-card').forEach(el => el.classList.remove('active'));
+  const currentCard = document.getElementById(`thumb-card-${pageNum}`);
+  const currentNumBadge = document.getElementById('thumb-current-num');
+  if (currentNumBadge) currentNumBadge.textContent = pageNum;
+
+  if (currentCard) {
+    currentCard.classList.add('active');
+    currentCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+}
+
+function toggleThumbnailsBar() {
+  const thumbBar = document.getElementById('slide-thumbnails-bar');
+  if (thumbBar) {
+    thumbBar.classList.toggle('collapsed');
+  }
 }
 
 // ============================================
@@ -415,6 +726,10 @@ window.downloadPdf = downloadPdf;
 window.loadPdf = loadPdf;
 window.sendTutorMsg = sendTutorMsg;
 window.askTutorAboutCurrentSlide = askTutorAboutCurrentSlide;
+window.toggleThumbnailsBar = toggleThumbnailsBar;
+window.goToSlidePage = goToSlidePage;
+window.setSlideTool = setSlideTool;
+window.setPenColor = setPenColor;
 
 // ============================================
 // Initial Load

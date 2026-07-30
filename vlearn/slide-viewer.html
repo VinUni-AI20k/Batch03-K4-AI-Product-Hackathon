@@ -176,28 +176,43 @@
       <!-- Floating Toolbar -->
       <div class="canvas-toolbar-wrap">
         <div class="canvas-toolbar">
-          <button class="tool-btn active">
+          <button class="tool-btn active" id="btn-tool-read" onclick="setSlideTool('read')" title="Chế độ Đọc & Bôi đen văn bản">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
             Đọc
           </button>
-          <button class="tool-btn">
+          <button class="tool-btn" id="btn-tool-pen" onclick="setSlideTool('pen')" title="Vẽ tự do bằng Bút">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Bút
           </button>
-          <button class="tool-btn">
+          <button class="tool-btn" id="btn-tool-highlight" onclick="setSlideTool('highlight')" title="Tô dạ quang Highlight">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h3l6-6"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
             Highlight
           </button>
 
+          <button class="tool-btn" id="btn-tool-eraser" onclick="setSlideTool('eraser')" title="Tẩy nét vẽ trên trang">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l12-12a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.4L10 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+            Tẩy
+          </button>
+
+          <!-- Color Swatches Palette -->
+          <div class="color-palette" id="color-palette">
+            <button class="color-dot active" id="dot-color-red" style="background:#ef4444;" onclick="setPenColor('#ef4444')" title="Màu Đỏ"></button>
+            <button class="color-dot" id="dot-color-blue" style="background:#3b82f6;" onclick="setPenColor('#3b82f6')" title="Màu Xanh dương"></button>
+            <button class="color-dot" id="dot-color-green" style="background:#10b981;" onclick="setPenColor('#10b981')" title="Màu Xanh lá"></button>
+            <button class="color-dot" id="dot-color-yellow" style="background:#facc15;" onclick="setPenColor('#facc15')" title="Màu Vàng"></button>
+            <button class="color-dot" id="dot-color-purple" style="background:#8b5cf6;" onclick="setPenColor('#8b5cf6')" title="Màu Tím"></button>
+            <button class="color-dot" id="dot-color-black" style="background:#0f172a;" onclick="setPenColor('#0f172a')" title="Màu Đen"></button>
+          </div>
+
           <div class="tool-divider"></div>
 
-          <span class="zoom-label" style="font-size:0.7rem;color:#64748b;">Trang 1 · 1 note</span>
+          <span class="zoom-label" id="page-notes-indicator" style="font-size:0.7rem;color:#64748b;">Trang 1 · 0 note</span>
 
           <div class="tool-divider"></div>
 
-          <button class="tool-btn" onclick="zoomSlide(-10)">-</button>
+          <button class="tool-btn" title="Thu nhỏ slide (-10%)" onclick="zoomSlide(-10)">-</button>
           <span class="zoom-label" id="zoom-value">100%</span>
-          <button class="tool-btn" onclick="zoomSlide(10)">+</button>
+          <button class="tool-btn" title="Phóng to slide (+10%)" onclick="zoomSlide(10)">+</button>
 
           <div class="tool-divider"></div>
 
@@ -220,6 +235,7 @@
           <div class="slide-aspect-frame" id="slide-aspect-frame">
             <!-- PDF.js renders here -->
             <canvas id="pdf-canvas"></canvas>
+            <canvas id="draw-canvas"></canvas>
             <div id="text-layer" class="textLayer"></div>
             <!-- Loading spinner -->
             <div class="pdf-loading" id="pdf-loading">
@@ -229,7 +245,6 @@
           </div>
 
           <div class="slide-page-footer">
-            <span>Ghi chú trang: Bấm các nút trang bên dưới để chuyển trang slide.</span>
             <button onclick="askTutorAboutCurrentSlide()">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 17h.01"/></svg>
               Hỏi VLearn Tutor về trang này
@@ -239,16 +254,18 @@
 
       </div>
 
-      <!-- Bottom Page Navigator -->
-      <div class="bottom-page-nav-wrap">
-        <div class="bottom-page-nav">
-          <button class="page-step-btn" onclick="prevSlidePage()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          </button>
-          <span>Trang <strong id="current-page-num" style="color:var(--navy);">1</strong> / <span class="total-pages-count">83</span></span>
-          <button class="page-step-btn" onclick="nextSlidePage()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
+      <!-- COLLAPSIBLE SLIDE THUMBNAIL FILMSTRIP BAR -->
+      <div class="slide-thumbnails-bar" id="slide-thumbnails-bar">
+        <button class="thumb-toggle-btn" id="thumb-toggle-btn" onclick="toggleThumbnailsBar()" title="Thu gọn / Mở danh sách slide">
+          <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+          <span class="toggle-text">Slide thu nhỏ</span>
+          <span class="thumb-count-badge"><span id="thumb-current-num">1</span>/<span class="total-pages-count">83</span></span>
+        </button>
+        
+        <div class="thumb-track-container" id="thumb-track-container">
+          <div class="thumb-track" id="thumb-track">
+            <!-- Rendered by JS -->
+          </div>
         </div>
       </div>
 
