@@ -1,5 +1,45 @@
 # Mini Hackathon AI — Batch 03
+# VLearn Context-Aware AI Tutor — Dự án Hackathon Batch 03
 
+> **Nhóm:** My3Mien · **Zone:** A  
+> **Sản phẩm:** Trợ lý AI Tutor hỗ trợ học tập theo bối cảnh Slide trên VLearn
+
+---
+
+## 👥 Thành viên nhóm & Phân công công việc
+
+| Mã học viên | Họ và tên | Vai trò chính | Phân công chi tiết từng phần (Artifacts) |
+| :---: | :--- | :--- | :--- |
+| **2A202601066** | **Đào Chí Hiển** | Team Leader & Product Spec | • Chịu trách nhiệm chính file `spec.md` (§1 - §9)<br>• Thiết kế kiến trúc tổng quan & Lát cắt trải nghiệm (§4) |
+| **2A202601144** | **Nguyễn Việt Anh** | Evidence & User Research | • Thu thập & mining dữ liệu khảo sát Học viên Khóa 3 & 4<br>• Phụ trách `validation/` (Feedback log & User testing) |
+| **2A202601208** | **Nguyễn Bùi Anh Tuấn** | Prompt Engineer & Evals | • Xây dựng bộ Golden Set 20 cases trong `eval/`<br>• Thiết kế Prompt AI Tutor & chạy đo lường Quality Bar (§7) |
+| **2A202602024** | **Nguyễn Ngọc Chi** | Frontend Developer | • Lập trình UI Prototype trên React/Tailwind trong `codebase/`<br>• Tích hợp luồng chat & nối Gemini API thật |
+| **2A202601174** | **Trần Thanh Bình** | Interaction & Demo Lead | • Xử lý sự kiện Text Selection (Bôi đen), nút bấm nổi & Slide Jump<br>• Chuẩn bị `demo-slides.pdf` & kịch bản Demo Live |
+
+---
+
+## 📂 Cấu trúc Repository
+
+* **`spec.md`**: Bản AI Spec chi tiết theo khung `03-template-ai-spec.md` (chốt Quality Bar 80% trước 23:59 N1).
+* **`codebase/`**: Source code ứng dụng Web Prototype (React, Tailwind CSS, Gemini API).
+* **`eval/`**: File `golden-set.json` (20 test cases) và bảng ghi nhận kết quả đo lường qua các lượt chạy.
+* **`validation/`**: Log ghi nhận ý kiến phản hồi thực tế từ học viên Khóa 3 & 4.
+* **`demo-slides.pdf`**: Slide thuyết trình 6 trang chuẩn bị cho CP6 Demo.
+* **`reflection/`**: File đúc kết bài học cá nhân của từng thành viên trong nhóm.
+
+---
+
+## 🚀 Hướng dẫn chạy Prototype (`codebase/`)
+
+```bash
+# Truy cập vào thư mục codebase
+cd codebase
+
+# Cài đặt thư viện
+npm install
+
+# Chạy ứng dụng ở môi trường Local
+npm run dev
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
