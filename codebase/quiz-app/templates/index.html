@@ -72,7 +72,7 @@
     </div>
 
     <div class="field">
-      <label class="field-label">3. Độ khó câu hỏi</label>
+      <label class="field-label">3. Độ bám sát tài liệu</label>
       <div class="diff-cards" id="mode-group">
         <button type="button" class="diff-card mode-standard active" data-value="standard">
           <div class="dc-icon">🎯</div>
@@ -85,6 +85,17 @@
           <div class="dc-desc">AI liên hệ thêm ví dụ thực ngoài slide, vui hơn nhưng có thể lệch 1 chút — câu chưa xác minh được nguồn sẽ gắn nhãn rõ.</div>
         </button>
       </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">4. Mức độ khó</label>
+      <div class="btn-group" id="difficulty-group">
+        <button type="button" class="pill-btn" data-value="easy">Dễ</button>
+        <button type="button" class="pill-btn" data-value="medium">Trung bình</button>
+        <button type="button" class="pill-btn" data-value="hard">Khó</button>
+        <button type="button" class="pill-btn active" data-value="mixed">Dễ → Khó</button>
+      </div>
+      <div class="field-hint" style="margin-top:8px; margin-bottom:0;">"Dễ → Khó" trộn cả 3 mức trong 1 bộ, sắp theo thứ tự tăng dần (mặc định). Chọn 1 mức riêng nếu muốn cả bộ cùng độ khó.</div>
     </div>
 
     <button id="generate-btn" class="primary-btn" disabled>✨ Tạo Quiz ngay</button>

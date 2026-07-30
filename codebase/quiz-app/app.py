@@ -1,7 +1,7 @@
 """
 AI Quiz Generator — VLearn prototype (Hackathon Batch 03, Hướng A)
 
-Upload PDF bài giảng -> trích text -> gọi Gemini API thật -> sinh quiz
+Upload PDF bài giảng -> trích text -> gọi OpenAI API thật -> sinh quiz
 trắc nghiệm dạng ỨNG DỤNG THỰC TẾ, sắp xếp dễ -> khó.
 
 Có 2 chế độ:
@@ -9,6 +9,14 @@ Có 2 chế độ:
   - "stress"    : CỐ Ý nới lỏng ràng buộc + tăng temperature để MINH HOẠ rủi ro
                   hallucination (dùng cho demo/kiểm thử lớp ① trong spec, KHÔNG
                   dùng để phát quiz thật cho học viên).
+
+LƯU Ý ĐỔI PROVIDER (ghi chú cho nhóm):
+  - Yêu cầu ban đầu là "chat gpt 4.0", nhưng GPT-4 đã lỗi thời/bị deprecate ở
+    thời điểm này (2026) — OpenAI hiện khuyến nghị dòng GPT-5.6 (Sol/Terra/Luna).
+    Đã dùng "gpt-5.6-terra" (cân bằng chất lượng/chi phí) làm mặc định, đổi qua
+    .env (OPENAI_MODEL) nếu muốn dùng Sol (mạnh hơn, đắt hơn) hoặc Luna (rẻ hơn).
+  - Code gọi Gemini cũ được GIỮ NGUYÊN dạng ghi chú (comment) phía dưới để dễ
+    chuyển đổi lại nếu cần — không xoá hẳn.
 
 Chạy: xem README.md trong thư mục này.
 """
@@ -25,9 +33,18 @@ import requests
 
 load_dotenv()
 
-API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+# ============================================================================
+# GHI CHÚ — cấu hình Gemini cũ (KHÔNG còn dùng, giữ lại tham khảo):
+#
+# API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+# MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
+# GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+# ============================================================================
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-terra").strip()
+OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+MODEL = OPENAI_MODEL  # dùng chung cho hiển thị UI + response JSON
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30MB, khớp copy trên UI
@@ -95,6 +112,22 @@ QUIZ_SCHEMA = {
 }
 
 
+def to_openai_strict_schema(schema):
+    """OpenAI Structured Outputs (strict mode) bắt buộc mọi object phải có
+    additionalProperties: false và required = TẤT CẢ property (không cho phép field tuỳ chọn).
+    QUIZ_SCHEMA gốc viết theo kiểu Gemini (không cần additionalProperties) nên chuyển đổi
+    đệ quy ở đây thay vì viết trùng 2 bản schema."""
+    if isinstance(schema, dict):
+        new = {k: to_openai_strict_schema(v) for k, v in schema.items()}
+        if new.get("type") == "object" and "properties" in new:
+            new["additionalProperties"] = False
+            new["required"] = list(new["properties"].keys())
+        return new
+    if isinstance(schema, list):
+        return [to_openai_strict_schema(v) for v in schema]
+    return schema
+
+
 def normalize_text(s: str) -> str:
     """Chuẩn hoá để so khớp chuỗi con: hạ chữ thường, gộp khoảng trắng."""
     return re.sub(r"\s+", " ", (s or "")).strip().lower()
@@ -123,7 +156,24 @@ def extract_pdf_text(file_stream) -> list[dict]:
     return pages
 
 
-def build_prompt(pages: list[dict], num_questions: int, mode: str) -> str:
+DIFFICULTY_PROMPT_LABEL = {"easy": "dễ", "medium": "trung bình", "hard": "khó"}
+
+
+def build_difficulty_instruction(num_questions: int, difficulty_level: str) -> str:
+    if difficulty_level in ("easy", "medium", "hard"):
+        label = DIFFICULTY_PROMPT_LABEL[difficulty_level]
+        return (
+            f'Toàn bộ {num_questions} câu đều phải ở mức độ khó "{label}" ({difficulty_level}) — '
+            f'set trường difficulty = "{difficulty_level}" cho MỌI câu, không trộn mức khác.'
+        )
+    # mixed (mặc định): trộn cả 3 mức, tăng dần dễ -> khó
+    return (
+        f"Gán độ khó easy/medium/hard cho từng câu — đảm bảo có đủ cả 3 mức nếu số câu ≥ 3. "
+        f"Không cần tự sắp xếp thứ tự, hệ thống sẽ tự sắp theo độ khó."
+    )
+
+
+def build_prompt(pages: list[dict], num_questions: int, mode: str, difficulty_level: str = "mixed") -> str:
     doc_text = "\n\n".join(f"[Trang {p['page']}]\n{p['text']}" for p in pages)
 
     base_task = f"""Bạn là trợ lý tạo quiz cho một khoá học AI thực chiến. Dưới đây là nội dung trích từ slide bài giảng, có đánh số trang:
@@ -134,7 +184,7 @@ def build_prompt(pages: list[dict], num_questions: int, mode: str) -> str:
 
 Nhiệm vụ: tạo đúng {num_questions} câu hỏi trắc nghiệm 4 đáp án, kiểm tra khả năng ỨNG DỤNG kiến thức trong bài vào tình huống thực tế — KHÔNG hỏi định nghĩa/ghi nhớ thuần tuý ("X là gì?"). Mỗi câu bắt đầu bằng một tình huống thực tế ngắn (2-4 câu, ví dụ: một tình huống công việc, một bài toán cụ thể), sau đó hỏi học viên áp dụng khái niệm trong bài để giải quyết/phân tích tình huống đó.
 
-Gán độ khó easy/medium/hard cho từng câu — đảm bảo có đủ cả 3 mức nếu số câu ≥ 3. Không cần tự sắp xếp thứ tự, hệ thống sẽ tự sắp theo độ khó."""
+{build_difficulty_instruction(num_questions, difficulty_level)}"""
 
     if mode == "stress":
         constraint = """
@@ -153,59 +203,126 @@ RÀNG BUỘC NGUỒN (QUAN TRỌNG — chế độ chuẩn):
     return base_task + "\n" + constraint
 
 
-def call_gemini(prompt: str, mode: str) -> dict:
-    if not API_KEY:
+# ============================================================================
+# GHI CHÚ — hàm gọi Gemini cũ (KHÔNG còn dùng, giữ lại để dễ đổi ngược lại):
+#
+# def call_gemini(prompt: str, mode: str) -> dict:
+#     if not API_KEY:
+#         raise RuntimeError(
+#             "Chưa cấu hình GEMINI_API_KEY. Mở file .env trong thư mục quiz-app/ và dán API key vào "
+#             "(xem README.md để lấy key miễn phí tại aistudio.google.com/apikey)."
+#         )
+#
+#     temperature = 1.4 if mode == "stress" else 0.25
+#
+#     # Gemini REST API cho generateContent có 2 cách khai báo JSON schema tuỳ phiên bản/model:
+#     #   (A) "cổ điển": generationConfig.responseMimeType + responseSchema (phẳng)
+#     #   (B) mới hơn:   generationConfig.responseFormat.text.{mimeType, schema} (lồng nhau)
+#     # Thực tế đã gặp key/model trả lỗi 400 "Invalid value ... response_format.text.mime_type"
+#     # với dạng (B) dù docs mô tả dạng này -> thử (A) trước (ổn định, lâu đời hơn), lỗi thì mới thử (B).
+#     def build_payload(style: str) -> dict:
+#         cfg = {"temperature": temperature}
+#         if style == "flat":
+#             cfg["responseMimeType"] = "application/json"
+#             cfg["responseSchema"] = QUIZ_SCHEMA
+#         else:
+#             cfg["responseFormat"] = {"text": {"mimeType": "application/json", "schema": QUIZ_SCHEMA}}
+#         return {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg}
+#
+#     def do_post(payload: dict):
+#         try:
+#             return requests.post(
+#                 GEMINI_URL,
+#                 headers={"x-goog-api-key": API_KEY, "Content-Type": "application/json"},
+#                 json=payload,
+#                 timeout=90,
+#             )
+#         except requests.exceptions.RequestException as e:
+#             raise RuntimeError(
+#                 f"Không kết nối được tới Gemini API (kiểm tra internet/firewall/proxy). Chi tiết: {e}"
+#             )
+#
+#     resp = do_post(build_payload("flat"))
+#
+#     if resp.status_code == 400 and "response" in resp.text.lower() and "schema" in resp.text.lower():
+#         resp2 = do_post(build_payload("nested"))
+#         if resp2.status_code == 200:
+#             resp = resp2
+#
+#     RETRY_STATUSES = (503, 429)
+#     max_retries = 3
+#     attempt = 0
+#     while resp.status_code in RETRY_STATUSES and attempt < max_retries:
+#         attempt += 1
+#         time.sleep(attempt * 2)
+#         resp = do_post(build_payload("flat"))
+#
+#     if resp.status_code != 200:
+#         try:
+#             err = resp.json().get("error", {}).get("message", resp.text)
+#         except Exception:
+#             err = resp.text
+#         raise RuntimeError(f"Gemini API lỗi ({resp.status_code}): {err}")
+#
+#     data = resp.json()
+#     text = data["candidates"][0]["content"]["parts"][0]["text"]
+#     return json.loads(text)
+# ============================================================================
+
+
+def call_openai(prompt: str, mode: str) -> dict:
+    if not OPENAI_API_KEY:
         raise RuntimeError(
-            "Chưa cấu hình GEMINI_API_KEY. Mở file .env trong thư mục quiz-app/ và dán API key vào "
-            "(xem README.md để lấy key miễn phí tại aistudio.google.com/apikey)."
+            "Chưa cấu hình OPENAI_API_KEY. Mở file .env trong thư mục quiz-app/ và dán API key vào "
+            "(lấy tại platform.openai.com/api-keys)."
         )
 
     temperature = 1.4 if mode == "stress" else 0.25
 
-    # Gemini REST API cho generateContent có 2 cách khai báo JSON schema tuỳ phiên bản/model:
-    #   (A) "cổ điển": generationConfig.responseMimeType + responseSchema (phẳng)
-    #   (B) mới hơn:   generationConfig.responseFormat.text.{mimeType, schema} (lồng nhau)
-    # Thực tế đã gặp key/model trả lỗi 400 "Invalid value ... response_format.text.mime_type"
-    # với dạng (B) dù docs mô tả dạng này -> thử (A) trước (ổn định, lâu đời hơn), lỗi thì mới thử (B).
-    def build_payload(style: str) -> dict:
-        cfg = {"temperature": temperature}
-        if style == "flat":
-            cfg["responseMimeType"] = "application/json"
-            cfg["responseSchema"] = QUIZ_SCHEMA
-        else:
-            cfg["responseFormat"] = {"text": {"mimeType": "application/json", "schema": QUIZ_SCHEMA}}
-        return {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg}
+    payload = {
+        "model": OPENAI_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "quiz_schema",
+                "schema": to_openai_strict_schema(QUIZ_SCHEMA),
+                "strict": True,
+            },
+        },
+    }
 
-    def do_post(payload: dict):
+    def do_post(body: dict):
         try:
             return requests.post(
-                GEMINI_URL,
-                headers={"x-goog-api-key": API_KEY, "Content-Type": "application/json"},
-                json=payload,
+                OPENAI_URL,
+                headers={"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"},
+                json=body,
                 timeout=90,
             )
         except requests.exceptions.RequestException as e:
             raise RuntimeError(
-                f"Không kết nối được tới Gemini API (kiểm tra internet/firewall/proxy). Chi tiết: {e}"
+                f"Không kết nối được tới OpenAI API (kiểm tra internet/firewall/proxy). Chi tiết: {e}"
             )
 
-    resp = do_post(build_payload("flat"))
+    resp = do_post(payload)
 
-    if resp.status_code == 400 and "response" in resp.text.lower() and "schema" in resp.text.lower():
-        # dạng "flat" bị model/version này từ chối -> thử dạng "nested"
-        resp2 = do_post(build_payload("nested"))
-        if resp2.status_code == 200:
-            resp = resp2
+    # Một số model reasoning (dòng gpt-5.x) không nhận tham số temperature tuỳ chỉnh
+    # -> nếu bị từ chối vì lý do này, bỏ temperature và gọi lại thay vì lỗi luôn.
+    if resp.status_code == 400 and "temperature" in resp.text.lower():
+        payload.pop("temperature", None)
+        resp = do_post(payload)
 
-    # 503 (model quá tải) / 429 (rate limit) là lỗi TẠM THỜI phía Google, không phải lỗi
-    # cấu hình -> tự thử lại vài lần với backoff thay vì bắt người dùng tự bấm lại.
-    RETRY_STATUSES = (503, 429)
+    # 429 (rate limit) / 5xx (lỗi tạm thời phía OpenAI) -> tự thử lại thay vì bắt người
+    # dùng tự bấm lại, giống cơ chế đã làm cho Gemini trước đây.
+    RETRY_STATUSES = (429, 500, 502, 503, 504)
     max_retries = 3
     attempt = 0
     while resp.status_code in RETRY_STATUSES and attempt < max_retries:
         attempt += 1
         time.sleep(attempt * 2)  # 2s, 4s, 6s
-        resp = do_post(build_payload("flat"))
+        resp = do_post(payload)
 
     if resp.status_code != 200:
         try:
@@ -214,22 +331,22 @@ def call_gemini(prompt: str, mode: str) -> dict:
             err = resp.text
         if resp.status_code in RETRY_STATUSES:
             raise RuntimeError(
-                f"Gemini đang quá tải (lỗi {resp.status_code}) — đã tự thử lại {max_retries} lần nhưng vẫn bận. "
-                f"Đây là lỗi tạm thời phía Google, không phải lỗi cấu hình. Đợi 1-2 phút rồi bấm Tạo Quiz lại. "
-                f"Chi tiết: {err}"
+                f"OpenAI đang quá tải/giới hạn tần suất (lỗi {resp.status_code}) — đã tự thử lại {max_retries} lần "
+                f"nhưng vẫn chưa được. Đây là lỗi tạm thời phía OpenAI, không phải lỗi cấu hình. "
+                f"Đợi 1-2 phút rồi bấm Tạo Quiz lại. Chi tiết: {err}"
             )
-        raise RuntimeError(f"Gemini API lỗi ({resp.status_code}): {err}")
+        raise RuntimeError(f"OpenAI API lỗi ({resp.status_code}): {err}")
 
     data = resp.json()
     try:
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
+        text = data["choices"][0]["message"]["content"]
     except (KeyError, IndexError):
-        raise RuntimeError(f"Phản hồi Gemini không đúng định dạng mong đợi: {data}")
+        raise RuntimeError(f"Phản hồi OpenAI không đúng định dạng mong đợi: {data}")
 
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError:
-        raise RuntimeError("Gemini trả về JSON không hợp lệ, thử lại (có thể do model bị cắt output).")
+        raise RuntimeError("OpenAI trả về JSON không hợp lệ, thử lại (có thể do model bị cắt output).")
 
     return parsed
 
@@ -255,6 +372,10 @@ def generate_quiz():
     if mode not in ("standard", "stress"):
         mode = "standard"
 
+    difficulty_level = request.form.get("difficulty_level", "mixed")
+    if difficulty_level not in ("easy", "medium", "hard", "mixed"):
+        difficulty_level = "mixed"
+
     try:
         pages = extract_pdf_text(io.BytesIO(pdf_file.read()))
     except Exception as e:
@@ -273,11 +394,11 @@ def generate_quiz():
             "khá ít, quiz sinh ra có thể nông hoặc AI phải suy diễn nhiều hơn bình thường."
         )
 
-    prompt = build_prompt(pages, num_questions, mode)
+    prompt = build_prompt(pages, num_questions, mode, difficulty_level)
 
     t0 = time.time()
     try:
-        result = call_gemini(prompt, mode)
+        result = call_openai(prompt, mode)
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 502
     except Exception as e:  # lưới an toàn cuối - không để lộ traceback thô ra frontend
@@ -304,16 +425,24 @@ def generate_quiz():
         drop_note = f"Đã tự động loại {dropped} câu vì source_snippet không trace được về nội dung PDF gốc (chống bịa, chế độ chuẩn)."
         warning = f"{warning} {drop_note}" if warning else drop_note
 
+    # Ép cứng độ khó phía server khi người dùng chọn 1 mức cố định (easy/medium/hard):
+    # không phụ thuộc AI có tuân đúng lệnh trong prompt hay không — đảm bảo tính năng
+    # luôn đúng như UI hứa hẹn, giống cách đã làm với verify_source() ở trên.
+    if difficulty_level in ("easy", "medium", "hard"):
+        for q in questions:
+            q["difficulty"] = difficulty_level
+
     questions.sort(key=lambda q: DIFFICULTY_RANK.get(q.get("difficulty", "medium"), 1))
 
     if not questions:
         return jsonify({
-            "error": "Gemini không sinh được câu nào bám sát tài liệu (tất cả bị loại ở bước chống bịa). "
+            "error": "OpenAI không sinh được câu nào bám sát tài liệu (tất cả bị loại ở bước chống bịa). "
                      "Thử lại, hoặc dùng chế độ Thử nghiệm để xem AI đã suy diễn ra gì."
         }), 502
 
     return jsonify({
         "mode": mode,
+        "difficulty_level": difficulty_level,
         "model": MODEL,
         "elapsed_seconds": elapsed,
         "pages_used": len(pages),
@@ -326,7 +455,7 @@ def generate_quiz():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    print(f"GEMINI_API_KEY {'đã cấu hình' if API_KEY else 'CHƯA cấu hình — sửa file .env trước khi tạo quiz'}")
+    print(f"OPENAI_API_KEY {'đã cấu hình' if OPENAI_API_KEY else 'CHƯA cấu hình — sửa file .env trước khi tạo quiz'}")
     print(f"Model: {MODEL}")
     print(f"Mở trình duyệt: http://localhost:{port}")
     app.run(host="0.0.0.0", port=port, debug=True)

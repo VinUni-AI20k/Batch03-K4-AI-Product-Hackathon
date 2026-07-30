@@ -8,6 +8,7 @@ const errorBox = document.getElementById('error-box');
 
 const numGroup = document.getElementById('num-questions-group');
 const modeGroup = document.getElementById('mode-group');
+const difficultyGroup = document.getElementById('difficulty-group');
 
 const formPanel = document.getElementById('form-panel');
 const loadingPanel = document.getElementById('loading-panel');
@@ -25,8 +26,10 @@ const MAX_FILE_BYTES = 30 * 1024 * 1024; // 30MB, khớp copy trên dropzone
 let selectedFile = null;
 let numQuestions = 10;
 let mode = 'standard';
+let difficultyLevel = 'mixed'; // easy | medium | hard | mixed (dễ -> khó, mặc định)
 
 const DIFF_LABEL = { easy: 'Dễ', medium: 'Trung bình', hard: 'Khó' };
+const DIFFICULTY_GROUP_LABEL = { easy: 'Dễ', medium: 'Trung bình', hard: 'Khó', mixed: 'Dễ → Khó (trộn)' };
 
 // ---------- Stepper ----------
 function setStep(name) {
@@ -81,6 +84,7 @@ function wireGroup(group, btnClass, onSelect) {
 }
 wireGroup(numGroup, 'pill-btn', v => { numQuestions = parseInt(v, 10); });
 wireGroup(modeGroup, 'diff-card', v => { mode = v; });
+wireGroup(difficultyGroup, 'pill-btn', v => { difficultyLevel = v; });
 
 // ---------- Generate ----------
 generateBtn.addEventListener('click', async () => {
@@ -93,13 +97,14 @@ generateBtn.addEventListener('click', async () => {
   loadingPanel.classList.remove('hidden');
   setStep('generate');
   loadingText.textContent = mode === 'stress'
-    ? 'Đang gọi Gemini (chế độ sáng tạo — temperature cao)…'
-    : 'Đang gọi Gemini để sinh quiz…';
+    ? 'Đang gọi OpenAI (chế độ sáng tạo — temperature cao)…'
+    : 'Đang gọi OpenAI để sinh quiz…';
 
   const fd = new FormData();
   fd.append('pdf', selectedFile);
   fd.append('num_questions', numQuestions);
   fd.append('mode', mode);
+  fd.append('difficulty_level', difficultyLevel);
 
   try {
     const res = await fetch('/api/generate-quiz', { method: 'POST', body: fd });
@@ -187,7 +192,8 @@ function renderResults(data) {
     warningBanner.classList.add('hidden');
   }
 
-  metaLine.textContent = `Model: ${data.model} · ${data.pages_used} trang có text (${data.total_chars} ký tự) · ${data.questions.length} câu · thời gian gọi API: ${data.elapsed_seconds}s`;
+  const diffLabel = DIFFICULTY_GROUP_LABEL[data.difficulty_level] || data.difficulty_level;
+  metaLine.textContent = `Model: ${data.model} · Mức độ khó: ${diffLabel} · ${data.pages_used} trang có text (${data.total_chars} ký tự) · ${data.questions.length} câu · thời gian gọi API: ${data.elapsed_seconds}s`;
 
   quizList.innerHTML = '';
   data.questions.forEach((q, idx) => {
