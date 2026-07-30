@@ -37,8 +37,12 @@ class TelegramGateway:
         self.index = index
         self.home = home
         self.allowed = allowed_users("TELEGRAM_ALLOWED_USERS")
+        if not self.allowed and not getattr(cfg, "allow_all_users", False):
+            raise RuntimeError(
+                "TELEGRAM_ALLOWED_USERS trống. Đặt danh sách user id được phép, "
+                "hoặc set VLEARN_ALLOW_ALL=1 để mở cho mọi người (chỉ nên dùng cá nhân/dev).")
         if not self.allowed:
-            print("⚠️ TELEGRAM_ALLOWED_USERS trống — bot đang MỞ CHO MỌI NGƯỜI (chỉ nên dùng khi dev).")
+            print("⚠️ TELEGRAM_ALLOWED_USERS trống — bot MỞ CHO MỌI NGƯỜI (VLEARN_ALLOW_ALL=1).")
         self.audit = Audit(cfg.root / "data" / "audit.log")
         self.rate = RateLimiter(int(cfg.get("security", "user_rate_per_minute", default=10)))
         self.pending = PendingUploads()

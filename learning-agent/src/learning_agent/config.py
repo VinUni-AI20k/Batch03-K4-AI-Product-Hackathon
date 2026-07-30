@@ -52,6 +52,11 @@ class Config:
     voyage_api_key: str = field(init=False, default="")
     maton_api_key: str = field(init=False, default="")
 
+    # cờ bảo mật (mặc định an toàn — bật thủ công qua env khi cần)
+    dashboard_token: str = field(init=False, default="")   # VLEARN_UI_TOKEN: khoá dashboard khi mở ngoài localhost
+    allow_all_users: bool = field(init=False, default=False)  # VLEARN_ALLOW_ALL: cho chạy khi allowlist trống
+    allow_self_edit: bool = field(init=False, default=False)  # VLEARN_ALLOW_SELF_EDIT: cho phép tự ghi SOUL.md/MEMORY.md
+
     llm_provider: str = field(init=False, default="")
 
     def __post_init__(self) -> None:
@@ -74,6 +79,10 @@ class Config:
         self.telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
         self.voyage_api_key = os.environ.get("VOYAGE_API_KEY", "")
         self.maton_api_key = os.environ.get("MATON_API_KEY", "")
+        _yes = ("1", "true", "yes", "on")
+        self.dashboard_token = os.environ.get("VLEARN_UI_TOKEN", "").strip()
+        self.allow_all_users = os.environ.get("VLEARN_ALLOW_ALL", "").strip().lower() in _yes
+        self.allow_self_edit = os.environ.get("VLEARN_ALLOW_SELF_EDIT", "").strip().lower() in _yes
 
 
 def load_config(root: str | Path | None = None) -> Config:

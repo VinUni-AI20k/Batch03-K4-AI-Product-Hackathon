@@ -106,15 +106,21 @@ async def _run_gateway(cfg, vault, index) -> None:
             print(f"⚠️ Kênh {name} dừng: {type(e).__name__}: {e}")
 
     if cfg.discord_token:
-        from .gateway.discord_bot import TutorBot
-        bot = TutorBot(cfg, agent, vault, index, home)
-        scheduler.register("discord", bot.notify_home, bot.send_to)
-        tasks.append(guarded("Discord", bot.start(cfg.discord_token)))
+        try:
+            from .gateway.discord_bot import TutorBot
+            bot = TutorBot(cfg, agent, vault, index, home)
+            scheduler.register("discord", bot.notify_home, bot.send_to)
+            tasks.append(guarded("Discord", bot.start(cfg.discord_token)))
+        except Exception as e:
+            print(f"⚠️ Không bật Discord: {e}")
     if cfg.telegram_token:
-        from .gateway.telegram_bot import TelegramGateway
-        tg = TelegramGateway(cfg, agent, vault, index, home)
-        scheduler.register("telegram", tg.notify_home, tg.send_to)
-        tasks.append(guarded("Telegram", tg.run()))
+        try:
+            from .gateway.telegram_bot import TelegramGateway
+            tg = TelegramGateway(cfg, agent, vault, index, home)
+            scheduler.register("telegram", tg.notify_home, tg.send_to)
+            tasks.append(guarded("Telegram", tg.run()))
+        except Exception as e:
+            print(f"⚠️ Không bật Telegram: {e}")
     tasks.append(guarded("Scheduler", scheduler.run()))
     await asyncio.gather(*tasks)
 

@@ -16,6 +16,10 @@ from pathlib import Path
 
 import frontmatter
 
+# Token hành động bị cấm khi agent gọi use_cli (chỉ cho đọc/tra cứu, chặn ghi/gửi/xoá).
+CLI_DENY = {"send", "rm", "remove", "delete", "del", "trash", "share",
+            "revoke", "forward", "destroy", "purge", "empty", "upload"}
+
 CATALOG = [
     {"key": "telegram", "name": "Telegram", "category": "Chat channels",
      "type": "channel", "env": "TELEGRAM_BOT_TOKEN", "url": "https://core.telegram.org/bots"},
@@ -146,9 +150,17 @@ class Integrations:
         if shutil.which(item["binary"]) is None:
             return f"⚠️ '{item['binary']}' chưa cài trên máy. Cài: {item.get('install')}"
         try:
-            argv = [item["binary"], *shlex.split(args)]
+            parts = shlex.split(args)
         except ValueError as e:
             return f"⚠️ Args không hợp lệ: {e}"
+        # Chặn hành động ghi/gửi/xoá: use_cli chỉ để đọc/tra cứu. Ngăn prompt-injection
+        # (tài liệu/kết quả web) lái model đi gửi mail hay xoá dữ liệu trên tài khoản đã kết nối.
+        bad = next((t for t in parts if t.lower().lstrip("-") in CLI_DENY), None)
+        if bad:
+            return (f"⚠️ Từ chối: '{bad}' là hành động nhạy cảm. use_cli chỉ cho phép thao tác "
+                    "đọc/tra cứu (list, get, ls, download...), không gửi/xoá/chia sẻ. "
+                    "Nếu thật sự cần, admin chạy trực tiếp trên terminal.")
+        argv = [item["binary"], *parts]
         try:
             r = subprocess.run(argv, capture_output=True, text=True, timeout=30)
         except subprocess.TimeoutExpired:

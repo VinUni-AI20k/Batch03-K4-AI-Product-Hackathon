@@ -349,6 +349,9 @@ class TutorAgent:
             if name == "search_sessions":
                 return self.sessions.search(args.get("query", ""), user_id)
             if name == "update_memory":
+                if not getattr(self.cfg, "allow_self_edit", False):
+                    return ("⚠️ Tự sửa MEMORY.md đang TẮT (chống prompt-injection từ tài liệu/web). "
+                            "Admin bật bằng VLEARN_ALLOW_SELF_EDIT=1 nếu muốn agent tự ghi nhớ chung.")
                 content = (args.get("content") or "").strip()
                 if len(content) < 20:
                     return "⚠️ Nội dung quá ngắn."
@@ -366,6 +369,9 @@ class TutorAgent:
                 return (self.soul_path.read_text(encoding="utf-8")
                         if self.soul_path.exists() else "(Chưa có SOUL.md — tính cách đang là mặc định.)")
             if name == "update_soul":
+                if not getattr(self.cfg, "allow_self_edit", False):
+                    return ("⚠️ Tự sửa SOUL.md (tính cách) đang TẮT (chống prompt-injection). "
+                            "Admin bật bằng VLEARN_ALLOW_SELF_EDIT=1.")
                 content = (args.get("content") or "").strip()
                 if len(content) < 80:
                     return "⚠️ Nội dung quá ngắn để làm SOUL.md — hãy đưa bản hoàn chỉnh."

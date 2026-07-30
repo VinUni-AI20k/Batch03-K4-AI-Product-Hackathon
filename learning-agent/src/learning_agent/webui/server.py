@@ -8,8 +8,8 @@ import json
 import time
 from pathlib import Path
 
-from fastapi import BackgroundTasks, FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 
 from .. import __version__
@@ -46,6 +46,24 @@ class TaskBody(BaseModel):
 
 def create_app(cfg) -> FastAPI:
     app = FastAPI(title="learning-agent admin")
+
+    # Nếu đặt VLEARN_UI_TOKEN: mọi request phải kèm token (cookie / ?token= / Bearer).
+    # Dashboard có route xoá dữ liệu, bật CLI, chạy agent — bắt buộc khoá khi mở ngoài localhost.
+    token = getattr(cfg, "dashboard_token", "")
+    if token:
+        @app.middleware("http")
+        async def _auth(request: Request, call_next):
+            supplied = (request.cookies.get("vl_token")
+                        or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+                        or request.query_params.get("token", ""))
+            if supplied != token:
+                return PlainTextResponse(
+                    "401 — cần token. Mở dashboard: /?token=<VLEARN_UI_TOKEN>", status_code=401)
+            resp = await call_next(request)
+            if request.query_params.get("token") == token:   # ghi cookie để lần sau khỏi nhập lại
+                resp.set_cookie("vl_token", token, httponly=True, samesite="strict")
+            return resp
+
     vault = Vault(cfg.path("vault", "path"), False)
     index = LessonIndex(
         cfg.path("index", "chroma_path"),
@@ -254,6 +272,12 @@ def create_app(cfg) -> FastAPI:
 def run_ui(cfg, port: int = 8321, host: str = "127.0.0.1") -> None:
     import uvicorn
 
-    where = "máy này" if host == "127.0.0.1" else f"{host} (mở qua Docker/mạng — nhớ giới hạn ở host)"
+    if host not in ("127.0.0.1", "localhost") and not getattr(cfg, "dashboard_token", ""):
+        raise SystemExit(
+            f"❌ Bind ngoài localhost ({host}) mà chưa đặt VLEARN_UI_TOKEN — dashboard sẽ mở toang "
+            "(có route xoá dữ liệu, bật CLI). Đặt VLEARN_UI_TOKEN trong .env rồi chạy lại.")
+    where = "máy này" if host in ("127.0.0.1", "localhost") else f"{host} (đã khoá bằng token)"
     print(f"Web UI: http://{host}:{port}  (truy cập từ {where})")
+    if getattr(cfg, "dashboard_token", ""):
+        print("🔒 Dashboard yêu cầu token — mở bằng: http://%s:%s/?token=<VLEARN_UI_TOKEN>" % (host, port))
     uvicorn.run(create_app(cfg), host=host, port=port, log_level="warning")
