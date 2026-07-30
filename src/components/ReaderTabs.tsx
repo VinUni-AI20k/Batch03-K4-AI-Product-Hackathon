@@ -33,15 +33,17 @@ export function ReaderTabs({
 }: ReaderTabsProps) {
   const [activeTab, setActiveTab] = useState<"mindmap" | "flashcards" | "notes" | "tutor">(initialTab);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{
     sender: "ai" | "user";
     text: string;
     badge?: string;
     citation?: string;
+    meta?: string;
   }>>([
     {
       sender: "ai",
-      text: `Xin chào bạn! Mình là AI Tutor VLearn. Bạn đang xem tài liệu "${materialTitle}" (Trang ${currentPage}/${totalPages}). Bạn có thắc mắc gì cần giải đáp không?`
+      text: `Xin chào NGUYỄN HÙNG MẠNH! Mình là AI Tutor VLearn. Bạn đang xem tài liệu "${materialTitle}" (Trang ${currentPage}/${totalPages}). Bạn có thắc mắc gì cần giải đáp không?`
     }
   ]);
   const [notes, setNotes] = useState([
@@ -49,50 +51,82 @@ export function ReaderTabs({
   ]);
   const [newNoteText, setNewNoteText] = useState("");
 
-  const handleSendAiMessage = (textToSend?: string) => {
+  /**
+   * Gọi /api/tutor — quyết định trung tâm của lát cắt nằm ở đó (spec.md §4):
+   * AI tự quyết có căn cứ ở phạm vi nào (trang đang mở / cả bộ) và đủ chưa.
+   * Không còn so khớp từ khoá ở client.
+   */
+  const handleSendAiMessage = async (textToSend?: string) => {
     const query = textToSend || aiPrompt;
-    if (!query.trim()) return;
+    if (!query.trim() || isThinking) return;
 
     setChatMessages(prev => [...prev, { sender: "user", text: query }]);
     if (!textToSend) setAiPrompt("");
+    setIsThinking(true);
 
-    const qLower = query.toLowerCase();
+    try {
+      const res = await fetch("/api/tutor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: query, currentPage }),
+      });
+      const d = await res.json();
 
-    // Determine context scope & response
-    setTimeout(() => {
-      if (qLower.includes("cả bộ") || qLower.includes("toàn bộ") || qLower.includes("tổng quan bài")) {
-        setChatMessages(prev => [
-          ...prev,
-          {
-            sender: "ai",
-            badge: `📚 NGỮ CẢNH: CẢ BỘ SLIDE DAY 01 (${totalPages} TRANG)`,
-            text: `Tổng hợp toàn bộ ${totalPages} trang slide thuộc học liệu "${materialTitle}":\n\n1. Trang 1–5: Khái niệm cơ bản Generative AI & Generative vs Discriminative.\n2. Trang 6–14: Kiến trúc Transformer, Self-Attention & Multi-Head Attention.\n3. Trang 15–23: Các giai đoạn huấn luyện (Pre-training, SFT, RLHF) & Đánh giá mô hình.`,
-            citation: `[Trang 1, 6, 12, 18, 23 - ${materialTitle}]`
-          }
-        ]);
-      } else if (qLower.includes("đáp án") || qLower.includes("bài tập về nhà") || qLower.includes("thiếu")) {
-        setChatMessages(prev => [
-          ...prev,
-          {
-            sender: "ai",
-            badge: `⚠️ NGỮ CẢNH: NGOÀI PHẠM VI HỌC LIỆU`,
-            text: `Rất tiếc, câu hỏi của bạn không nằm trong căn cứ của bộ slide "${materialTitle}" (${totalPages} trang). AI Tutor từ chối đoán mò để tránh gây hiểu sai kiến thức.\n\n👉 Bạn vui lòng kiểm tra phần Bài tập trên hệ thống VLearn hoặc hỏi trực tiếp TA trên channel Discord khoá học!`,
-            citation: `[Không tìm thấy trích dẫn hợp lệ]`
-          }
-        ]);
-      } else {
-        // Default: Trang đang mở (Current Page Context)
-        setChatMessages(prev => [
-          ...prev,
-          {
-            sender: "ai",
-            badge: `📌 NGỮ CẢNH: TRANG ${currentPage} / ${totalPages}`,
-            text: `Dựa trên nội dung Trang ${currentPage} của bài học "${materialTitle}":\n\n• Slide trang ${currentPage} tập trung vào kiến thức trọng tâm về LLMs và cấu trúc bài học Day 01.\n• Cụ thể: Phân tích cơ chế hoạt động của mô hình ngôn ngữ và cách áp dụng vào sản phẩm AI.`,
-            citation: `[Trang ${currentPage} - ${materialTitle}]`
-          }
-        ]);
+      if (!res.ok) {
+        setChatMessages(prev => [...prev, {
+          sender: "ai",
+          badge: "🔌 LỖI GỌI AI",
+          text: `${d.error ?? "Không gọi được model."}${
+            d.attempts?.length
+              ? `\n\nĐã thử: ${d.attempts.map((a: { provider: string; error: string }) => `${a.provider} (${a.error})`).join(" → ")}`
+              : ""
+          }`,
+        }]);
+        return;
       }
-    }, 600);
+
+      // Badge = quyết định phạm vi của AI, hiện TRƯỚC nội dung (HAX G2)
+      const badge =
+        d.scope === "out_of_scope"
+          ? "⚠️ NGỮ CẢNH: NGOÀI PHẠM VI HỌC LIỆU"
+          : !d.sufficient
+            ? `⚠️ CHƯA ĐỦ CĂN CỨ${d.scope === "page" ? ` Ở TRANG ${currentPage}` : ""}`
+            : d.scope === "deck"
+              ? `📚 NGỮ CẢNH: CẢ BỘ SLIDE (${d._meta?.totalPages ?? totalPages} TRANG)`
+              : `📌 NGỮ CẢNH: TRANG ${currentPage} / ${totalPages}`;
+
+      const citation = d.citations?.length
+        ? `[Trang ${d.citations.join(", ")} - ${materialTitle}]`
+        : "[Không tìm thấy trích dẫn hợp lệ]";
+
+      // Hiện dấu vết lời gọi thật: provider nào trả lời, có phải fallback, và
+      // lớp chặn cứng ở server có kích hoạt hay không.
+      const guard = [
+        d._guardrail?.dropped?.length ? `bỏ ${d._guardrail.dropped.length} trích dẫn không hợp lệ` : null,
+        d._guardrail2 ? "chặn câu đòi học viên tự cung cấp nội dung" : null,
+      ].filter(Boolean);
+
+      setChatMessages(prev => [...prev, {
+        sender: "ai",
+        badge,
+        text: d.sufficient ? d.answer : d.missing || d.answer,
+        citation,
+        meta: [
+          `${d._meta?.provider}/${d._meta?.model}`,
+          `${d._meta?.latencyMs}ms`,
+          d._meta?.fellBackFrom?.length ? `fallback từ ${d._meta.fellBackFrom.join(",")}` : null,
+          guard.length ? `guardrail: ${guard.join(" · ")}` : null,
+        ].filter(Boolean).join(" · "),
+      }]);
+    } catch (e) {
+      setChatMessages(prev => [...prev, {
+        sender: "ai",
+        badge: "🔌 LỖI MẠNG",
+        text: (e as Error).message,
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   const handleAddNote = () => {
@@ -228,10 +262,26 @@ export function ReaderTabs({
                           {msg.citation}
                         </div>
                       )}
+                      {msg.meta && (
+                        <div className="mt-1 font-mono text-[9px] text-slate-400 dark:text-slate-500">
+                          {msg.meta}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
+
+              {isThinking && (
+                <div className="flex gap-2.5 justify-start">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#124f8c] text-white">
+                    <Bot className="h-4 w-4 animate-pulse" />
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
+                    Đang tra học liệu để kiểm có đủ căn cứ…
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Quick suggested prompts */}
@@ -267,6 +317,7 @@ export function ReaderTabs({
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendAiMessage()}
+                disabled={isThinking}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-10 text-xs text-slate-900 placeholder-slate-400 focus:border-[#124f8c] focus:bg-white focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
               <button

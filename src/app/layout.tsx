@@ -11,9 +11,11 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 export const metadata: Metadata = {
   title: "VLearn - Nền tảng học thích ứng VinUni",
-  description: "Nền tảng học thích ứng giúp sinh viên nhận ra đúng phần kiến thức còn yếu và luyện tập có định hướng.",
+  description:
+    "Nền tảng học thích ứng giúp sinh viên nhận ra đúng phần kiến thức còn yếu và luyện tập có định hướng.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/brand/vinuni-mark.svg",
+    apple: "/brand/vinuni-mark.svg",
   },
 };
 
@@ -23,10 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="vi"
-      className={`${beVietnamPro.variable} h-full antialiased`}
-    >
+    <html lang="vi" className={`${beVietnamPro.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-50 font-sans text-slate-900 selection:bg-[#24679f]/20 selection:text-[#0b355f] dark:bg-slate-950 dark:text-slate-100">
         {children}
       </body>

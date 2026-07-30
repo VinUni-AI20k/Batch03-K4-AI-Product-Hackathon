@@ -65,7 +65,7 @@ Mở `http://localhost:3000`. Bản CP2 dùng dữ liệu mock và không cần 
 |---|---|---|
 | `cp1/` | Canvas CP1 · bảng impact · kịch bản khảo sát · script đếm | ✅ CP1 |
 | `codebase/` | Prototype mock — flow chính bấm đi hết được | ✅ CP2 |
-| `eval/` | Golden set ≥20 case + bảng kết quả các lượt chạy | ⬜ CP3 |
+| `eval/` | Golden set ≥20 case + bảng kết quả các lượt chạy | ✅ CP3 |
 | `spec.md` | AI Spec theo `03-template-ai-spec.md` | ⬜ **hạn cứng 23:59 N1** |
 | `validation/` | Feedback log ≥5 mẩu từ ≥5 người ngoài nhóm | ⬜ CP5 |
 | `demo-slides.pdf` | Slide 6 trang theo `02-guide.md` §5.1 | ⬜ CP6 |
