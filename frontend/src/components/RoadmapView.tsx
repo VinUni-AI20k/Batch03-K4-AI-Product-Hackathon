@@ -42,24 +42,26 @@ export default function RoadmapView({ content, onFinish }: Props) {
         <div className="mini-card-label">Real-world Example</div>
         <p>{active.example}</p>
       </div>
-      <div className="mini-card">
-        <div className="mini-card-label">Mini Practice Question</div>
-        <p>{active.practice.question}</p>
-        <div className="practice-options">
-          {active.practice.options.map((option) => {
-            let cls = "practice-option";
-            if (practicePick) {
-              if (option === active.practice.answer) cls += " correct";
-              else if (option === practicePick) cls += " wrong";
-            }
-            return (
-              <button key={option} className={cls} onClick={() => setPracticePick(option)}>
-                {option}
-              </button>
-            );
-          })}
+      {active.practice && (
+        <div className="mini-card">
+          <div className="mini-card-label">Mini Practice Question</div>
+          <p>{active.practice.question}</p>
+          <div className="practice-options">
+            {active.practice.options.map((option) => {
+              let cls = "practice-option";
+              if (practicePick) {
+                if (option === active.practice!.answer) cls += " correct";
+                else if (option === practicePick) cls += " wrong";
+              }
+              return (
+                <button key={option} className={cls} onClick={() => setPracticePick(option)}>
+                  {option}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <button className="primary-button roadmap-finish" onClick={onFinish}>
         Tôi đã học xong — Kiểm tra lại

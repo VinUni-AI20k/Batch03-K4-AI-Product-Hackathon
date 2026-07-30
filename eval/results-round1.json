@@ -1,0 +1,1157 @@
+[
+  {
+    "id": "N-S1",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Kỹ năng nào được coi là quan trọng nhất khi xác định bài toán từ yêu cầu mơ hồ?",
+        "options": [
+          "Khả năng xác định bài toán",
+          "Khả năng lập trình",
+          "Khả năng quản lý dự án",
+          "Khả năng giao tiếp"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-001",
+        "explanation": "Khả năng xác định ra một bài toán từ yêu cầu rất mơ hồ là kỹ năng quan trọng nhất."
+      },
+      {
+        "question": "Theo quan sát, điều gì thường thiếu trong các công ty khi áp dụng AI?",
+        "options": [
+          "Người đặt ra đề bài cụ thể",
+          "Công nghệ tiên tiến",
+          "Nhân lực có kinh nghiệm",
+          "Tài chính đầu tư"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-002",
+        "explanation": "Nhiều công ty không có ai chỉ ra được đề bài cụ thể cho các AI engineer."
+      },
+      {
+        "question": "Khi đối diện với yêu cầu mơ hồ từ sếp, cách nào là một phương pháp tốt để làm rõ yêu cầu?",
+        "options": [
+          "Hỏi lại và bóc tách ra các option",
+          "Làm theo ý mình",
+          "Chờ sếp làm rõ",
+          "Bỏ qua yêu cầu"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-006",
+        "explanation": "Hỏi lại và bóc tách ra các option là cách để biến yêu cầu mơ hồ thành cụ thể."
+      }
+    ]
+  },
+  {
+    "id": "N-S2",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Sự khác biệt chính giữa product manager và project manager là gì?",
+        "options": [
+          "Product manager tự tìm bài toán và giải pháp, trong khi project manager chỉ quản lý tiến độ dự án.",
+          "Project manager có trách nhiệm tìm kiếm thị trường cho sản phẩm.",
+          "Product manager chỉ làm việc với khách hàng, còn project manager làm việc với team.",
+          "Project manager thường làm việc trong môi trường sản xuất sản phẩm."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-011",
+        "explanation": "Product manager phải tự đi tìm bài toán và giải pháp, trong khi project manager chỉ đảm bảo dự án hoàn thành đúng tiến độ."
+      },
+      {
+        "question": "Theo bài giảng, điều gì khiến văn hóa làm product ở Việt Nam chưa phát triển tốt?",
+        "options": [
+          "Thiếu người có mindset về khách hàng và user.",
+          "Nhu cầu thị trường không đủ lớn.",
+          "Người Việt Nam không có khả năng làm sản phẩm.",
+          "Thiếu các công ty công nghệ lớn."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-012",
+        "explanation": "Văn hóa làm product chưa hình thành do nhiều người có tiềm năng nhưng không được tận dụng, thiếu mindset về khách hàng và user."
+      },
+      {
+        "question": "Tư duy chậm là gì theo bài giảng?",
+        "options": [
+          "Là tư duy phản xạ, không tốn nhiều năng lượng.",
+          "Là tư duy cần thời gian và năng lượng để phát triển.",
+          "Là tư duy chỉ áp dụng trong các tình huống khẩn cấp.",
+          "Là tư duy mà mọi người thường sử dụng hàng ngày."
+        ],
+        "correct_index": 1,
+        "section_id": "S2",
+        "segment_id": "T01-016",
+        "explanation": "Tư duy chậm là thứ tư duy tốn năng lượng và giúp chúng ta hình thành kỹ năng mới, cần thời gian để phát triển."
+      }
+    ]
+  },
+  {
+    "id": "N-S3",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Phát triển sản phẩm AI có gì khác so với phát triển sản phẩm truyền thống?",
+        "options": [
+          "Cần hiểu cách sử dụng AI và quy trình phát triển sản phẩm đang thay đổi.",
+          "Chỉ cần nắm vững các nguyên lý phát triển sản phẩm truyền thống.",
+          "Không cần quan tâm đến trải nghiệm người dùng.",
+          "Có thể sử dụng cùng một quy trình như sản phẩm truyền thống."
+        ],
+        "correct_index": 0,
+        "section_id": "S3",
+        "segment_id": "T01-018",
+        "explanation": "Phát triển sản phẩm AI khó hơn nhiều lần vì cần hiểu cách sử dụng AI và quy trình phát triển sản phẩm đang thay đổi."
+      },
+      {
+        "question": "Tại sao kỳ vọng của người dùng đối với sản phẩm AI đã thay đổi?",
+        "options": [
+          "Vì sự xuất hiện của các sản phẩm AI như ChatGPT.",
+          "Vì người dùng không còn quan tâm đến chất lượng sản phẩm.",
+          "Vì sản phẩm AI luôn hoàn hảo và không bao giờ sai.",
+          "Vì người dùng không có nhiều lựa chọn sản phẩm khác."
+        ],
+        "correct_index": 0,
+        "section_id": "S3",
+        "segment_id": "T01-020",
+        "explanation": "Kỳ vọng của người dùng đã thay đổi do sự xuất hiện của các sản phẩm AI như ChatGPT, khiến họ mong đợi chất lượng cao hơn."
+      },
+      {
+        "question": "Chi phí chuyển đổi giữa các sản phẩm hiện nay như thế nào?",
+        "options": [
+          "Rẻ hơn rất nhiều so với trước đây.",
+          "Vẫn cao như trước đây.",
+          "Không có chi phí chuyển đổi.",
+          "Chỉ cao với sản phẩm AI."
+        ],
+        "correct_index": 0,
+        "section_id": "S3",
+        "segment_id": "T01-021",
+        "explanation": "Chi phí chuyển đổi giữa các sản phẩm hiện nay rẻ hơn rất nhiều, người dùng có thể dễ dàng chuyển đổi mà không gặp khó khăn."
+      }
+    ]
+  },
+  {
+    "id": "N-S4",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Khi nhận một đề bài mơ hồ về việc xây dựng AI chatbot, điều gì là quan trọng nhất mà bạn cần làm?",
+        "options": [
+          "Xác định mục tiêu và pain point thực sự",
+          "Lập tức bắt tay vào xây dựng chatbot",
+          "Hỏi ý kiến của tất cả các lãnh đạo",
+          "Tìm kiếm công cụ low-code no-code"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-030",
+        "explanation": "Cần xác định được cái mục tiêu, cái pain point thực sự ở phía sau đề bài."
+      },
+      {
+        "question": "Theo giảng viên, điều gì có thể xảy ra khi lãnh đạo ngay lập tức đưa ra giải pháp cho một vấn đề?",
+        "options": [
+          "Giải pháp có thể không phải là tốt nhất",
+          "Giải pháp sẽ luôn hiệu quả",
+          "Giải pháp sẽ được mọi người đồng tình",
+          "Giải pháp sẽ không cần điều chỉnh"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-032",
+        "explanation": "Lời giải đấy hoàn toàn có thể không phải là lời giải tốt nhất để giải bài toán cuối cùng."
+      },
+      {
+        "question": "Khi nào bạn nên cân nhắc việc sử dụng AI để giải quyết một bài toán?",
+        "options": [
+          "Khi vấn đề đủ đau và có nhiều lời giải khác",
+          "Khi bạn có đủ nguồn lực để xây dựng đội ngũ tinh nhuệ",
+          "Khi bạn không có thời gian để tìm hiểu",
+          "Khi lãnh đạo yêu cầu xây dựng ngay lập tức"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-033",
+        "explanation": "Cần xác định xem vấn đề đấy có thực sự đau không, nó đủ đau hay không, rồi mới quyết định."
+      }
+    ]
+  },
+  {
+    "id": "N-S5",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Đề bài mà giảng viên đưa ra cho lớp 1000 học viên là gì?",
+        "options": [
+          "Sử dụng AI để giải quyết vấn đề thiếu trợ giảng",
+          "Tự động chấm bài cho học viên",
+          "Xây dựng một công cụ quản lý lớp học",
+          "Tổng hợp báo cáo lớp học"
+        ],
+        "correct_index": 0,
+        "section_id": "S5",
+        "segment_id": "T01-034",
+        "explanation": "Đề bài là dùng AI để giải quyết việc thiếu trợ giảng cho lớp đông học viên."
+      },
+      {
+        "question": "Theo giảng viên, điều gì là cần thiết trước khi áp dụng AI vào lớp học?",
+        "options": [
+          "Phân tích khâu nào đang tốn nhiều nhân lực nhất",
+          "Tạo ra một ứng dụng mới",
+          "Tìm kiếm thêm trợ giảng",
+          "Tăng cường số lượng học viên"
+        ],
+        "correct_index": 0,
+        "section_id": "S5",
+        "segment_id": "T01-038",
+        "explanation": "Cần phân tích khâu nào đang tốn nhiều nhân lực nhất trước khi áp dụng AI."
+      },
+      {
+        "question": "Dogfooding là gì theo giảng viên?",
+        "options": [
+          "Xây dựng sản phẩm mà bạn là người dùng và tự sử dụng",
+          "Tạo ra một sản phẩm hoàn toàn mới",
+          "Sử dụng AI để tự động hóa quy trình",
+          "Phỏng vấn người dùng để thu thập ý kiến"
+        ],
+        "correct_index": 0,
+        "section_id": "S5",
+        "segment_id": "T01-042",
+        "explanation": "Dogfooding là xây dựng sản phẩm mà bạn là user và bạn dùng chính sản phẩm của bạn."
+      }
+    ]
+  },
+  {
+    "id": "N-S6",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Theo Don Norman, điều gì là quan trọng khi giải quyết vấn đề?",
+        "options": [
+          "Giải quyết vấn đề theo yêu cầu của người khác.",
+          "Tìm ra vấn đề thực sự phía sau.",
+          "Tin tưởng vào vấn đề được đưa ra.",
+          "Giải quyết vấn đề một cách nhanh chóng."
+        ],
+        "correct_index": 1,
+        "section_id": "S6",
+        "segment_id": "T01-045",
+        "explanation": "Don Norman nhấn mạnh rằng cần phải tìm ra điểm đau thực sự ở phía sau vấn đề được đưa ra."
+      },
+      {
+        "question": "Điều gì là khó khăn nhất trong việc học theo giảng viên?",
+        "options": [
+          "Học cách sử dụng AI.",
+          "Xây dựng tư duy và rèn luyện cách tư duy.",
+          "Giải quyết vấn đề ngay lập tức.",
+          "Thực hành nhiều lần."
+        ],
+        "correct_index": 1,
+        "section_id": "S6",
+        "segment_id": "T01-046",
+        "explanation": "Giảng viên cho rằng khó khăn nhất là việc học được cách tư duy và rèn luyện cách tư duy."
+      },
+      {
+        "question": "Sự khác biệt giữa chuyên gia và người mới là gì?",
+        "options": [
+          "Chuyên gia có thể giải quyết vấn đề nhanh hơn.",
+          "Chuyên gia có tri thức ẩn và kinh nghiệm.",
+          "Người mới không biết sử dụng AI.",
+          "Chuyên gia luôn đưa ra quyết định sai."
+        ],
+        "correct_index": 1,
+        "section_id": "S6",
+        "segment_id": "T01-048",
+        "explanation": "Sự khác biệt nằm ở tri thức ẩn của chuyên gia, giúp họ đưa ra quyết định nhanh chóng mà không cần lý giải."
+      }
+    ]
+  },
+  {
+    "id": "N-S7",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Mô hình Double Diamond giúp chúng ta làm gì?",
+        "options": [
+          "Tìm ra đúng vấn đề và giải pháp",
+          "Tăng tốc độ sản xuất",
+          "Giảm chi phí sản phẩm",
+          "Cải thiện kỹ năng làm việc nhóm"
+        ],
+        "correct_index": 0,
+        "section_id": "S7",
+        "segment_id": "T01-049",
+        "explanation": "Mô hình Double Diamond giúp tìm ra đúng vấn đề và đúng giải pháp cho vấn đề đó."
+      },
+      {
+        "question": "Theo quan điểm của giảng viên, điều gì là nguy hiểm hơn?",
+        "options": [
+          "Làm đúng cái sai",
+          "Làm sai cái đúng",
+          "Không làm gì cả",
+          "Chỉ xác định vấn đề"
+        ],
+        "correct_index": 0,
+        "section_id": "S7",
+        "segment_id": "T01-060",
+        "explanation": "Giảng viên cho rằng làm đúng cái sai nguy hiểm hơn vì nó giới hạn không gian giải pháp cho một cái đã sai."
+      },
+      {
+        "question": "Chi phí chìm (sunk cost) là gì theo giảng viên?",
+        "options": [
+          "Chi phí đã bỏ ra khiến khó từ bỏ",
+          "Chi phí cho việc xác định vấn đề",
+          "Chi phí cho giải pháp",
+          "Chi phí cho sản phẩm mới"
+        ],
+        "correct_index": 0,
+        "section_id": "S7",
+        "segment_id": "T01-060",
+        "explanation": "Chi phí chìm là chi phí đã bỏ ra quá nhiều khiến bạn khó từ bỏ cái mà bạn đang làm."
+      }
+    ]
+  },
+  {
+    "id": "N-S8",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "First Principle Thinking là gì?",
+        "options": [
+          "Tư duy từ nguyên bản",
+          "Sao chép cách làm của người khác",
+          "Tư duy theo kinh nghiệm",
+          "Tư duy ngẫu hứng"
+        ],
+        "correct_index": 0,
+        "section_id": "S8",
+        "segment_id": "T01-062",
+        "explanation": "First principle thinking là tư duy từ nguyên bản: không đi sao chép cách làm của người khác, mà cố gắng bóc tách vấn đề về những nguyên lý nguyên bản nhất."
+      },
+      {
+        "question": "Elon Musk đã sử dụng First Principle Thinking để giải quyết vấn đề gì?",
+        "options": [
+          "Chi phí sản xuất tên lửa",
+          "Thiết kế sản phẩm mới",
+          "Quảng cáo trực tuyến",
+          "Phát triển ứng dụng di động"
+        ],
+        "correct_index": 0,
+        "section_id": "S8",
+        "segment_id": "T01-062",
+        "explanation": "Ông ấy giải bài SpaceX như thế: vấn đề ngày xưa là chi phí sản xuất tên lửa quá đắt đỏ."
+      },
+      {
+        "question": "Theo bài giảng, để giải quyết vấn đề hiệu quả, bạn cần làm gì đầu tiên?",
+        "options": [
+          "Xác định được vấn đề đủ tốt",
+          "Tìm kiếm giải pháp ngay lập tức",
+          "Tham khảo ý kiến chuyên gia",
+          "Sao chép cách làm của người khác"
+        ],
+        "correct_index": 0,
+        "section_id": "S8",
+        "segment_id": "T01-064",
+        "explanation": "Thứ nhất, bạn cần xác định được vấn đề đủ tốt để làm."
+      }
+    ]
+  },
+  {
+    "id": "N-S9",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Tại sao cần có hai pha mở rộng và hội tụ trong thiết kế giải pháp của design thinking?",
+        "options": [
+          "Để tìm ra nhiều ứng cử viên và tăng xác suất tìm ra cái đúng.",
+          "Để giảm thiểu thời gian phát triển sản phẩm.",
+          "Để tránh việc đưa ra quyết định quá sớm.",
+          "Để đảm bảo mọi người đều tham gia vào quá trình."
+        ],
+        "correct_index": 0,
+        "section_id": "S9",
+        "segment_id": "T01-069",
+        "explanation": "Cần có hai pha mở rộng và hội tụ để có nhiều ứng cử viên, từ đó tăng xác suất tìm ra cái đúng."
+      },
+      {
+        "question": "AI có thể hỗ trợ trong quá trình nào theo bài giảng?",
+        "options": [
+          "Khám phá vấn đề và đưa ra giải pháp.",
+          "Tạo ra sản phẩm mới mà không cần nghiên cứu.",
+          "Giảm thiểu thời gian làm việc của nhóm.",
+          "Phân tích số liệu mà không cần người dùng."
+        ],
+        "correct_index": 0,
+        "section_id": "S9",
+        "segment_id": "T01-070",
+        "explanation": "AI có thể giúp mở rộng vấn đề và đưa ra giải pháp, như được nêu trong bài giảng."
+      },
+      {
+        "question": "Kỹ thuật nào được đề cập để khám phá và mở góc nhìn trong quá trình tìm đúng vấn đề?",
+        "options": [
+          "Đi quan sát, phỏng vấn, khảo sát.",
+          "Tạo ra nhiều bản mẫu sản phẩm.",
+          "Sử dụng công nghệ AI để phân tích dữ liệu.",
+          "Chỉ dựa vào phản hồi từ người dùng."
+        ],
+        "correct_index": 0,
+        "section_id": "S9",
+        "segment_id": "T01-071",
+        "explanation": "Các kỹ thuật như đi quan sát, phỏng vấn, khảo sát là những phương pháp để khám phá và mở góc nhìn."
+      }
+    ]
+  },
+  {
+    "id": "N-S10",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Ma trận tác động – nỗ lực giúp bạn xác định điều gì?",
+        "options": [
+          "Tác động và nỗ lực của các vấn đề",
+          "Chi phí sản xuất",
+          "Thời gian làm việc",
+          "Số lượng nhân viên"
+        ],
+        "correct_index": 0,
+        "section_id": "S10",
+        "segment_id": "T01-074",
+        "explanation": "Ma trận tác động và nỗ lực giúp bạn xác định cái tác động — cái impact đạt được nếu bạn giải nó — là bao nhiêu, và bạn mất bao nhiêu công để làm việc đấy."
+      },
+      {
+        "question": "Kỹ thuật nào được đề cập để đào sâu hơn vào vấn đề?",
+        "options": [
+          "Phỏng vấn người dùng",
+          "Five Whys",
+          "Phân tích dữ liệu",
+          "Nhật ký hành vi"
+        ],
+        "correct_index": 1,
+        "section_id": "S10",
+        "segment_id": "T01-077",
+        "explanation": "Một trong những kỹ thuật để đào sâu hơn là sử dụng Five Whys để tìm hiểu lý do sâu hơn."
+      },
+      {
+        "question": "Nhật ký hành vi được coi là gì trong quá trình nghiên cứu người dùng?",
+        "options": [
+          "Một kỹ thuật phỏng vấn",
+          "Một kết quả đầu ra",
+          "Một phương pháp phân tích dữ liệu",
+          "Một loại ma trận"
+        ],
+        "correct_index": 1,
+        "section_id": "S10",
+        "segment_id": "T01-076",
+        "explanation": "Nhật ký hành vi có thể gọi là một output — kết quả đầu ra; còn quan sát là động từ, là một quá trình."
+      }
+    ]
+  },
+  {
+    "id": "N-S11",
+    "n_questions_requested": 3,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Vòng lặp HCD là gì?",
+        "options": [
+          "Quy trình thiết kế lấy con người làm trung tâm",
+          "Một kỹ thuật để xây dựng sản phẩm",
+          "Phương pháp kiểm thử sản phẩm",
+          "Quy trình đánh giá ý tưởng"
+        ],
+        "correct_index": 0,
+        "section_id": "S11",
+        "segment_id": "T01-081",
+        "explanation": "Vòng lặp HCD là quy trình thiết kế lấy con người làm trung tâm."
+      },
+      {
+        "question": "Trong quy trình HCD, bước đầu tiên là gì?",
+        "options": [
+          "Đồng cảm và xác định vấn đề",
+          "Xây dựng prototype",
+          "Kiểm thử sản phẩm",
+          "Tạo ra ý tưởng"
+        ],
+        "correct_index": 0,
+        "section_id": "S11",
+        "segment_id": "T01-083",
+        "explanation": "Bước đầu tiên trong quy trình HCD là đồng cảm và xác định vấn đề."
+      },
+      {
+        "question": "Khi nào bạn nên quay trở lại bước đầu tiên trong quy trình HCD?",
+        "options": [
+          "Khi người dùng nói rằng họ không cần sản phẩm",
+          "Khi bạn hoàn thành prototype",
+          "Khi bạn đã kiểm thử sản phẩm",
+          "Khi bạn đã có một ý tưởng tốt"
+        ],
+        "correct_index": 0,
+        "section_id": "S11",
+        "segment_id": "T01-083",
+        "explanation": "Bạn nên quay trở lại bước đầu tiên khi người dùng nói rằng họ không cần sản phẩm."
+      }
+    ]
+  },
+  {
+    "id": "C1-empty-input",
+    "n_questions_requested": 5,
+    "error": "no_sections_provided",
+    "raw_count": 0,
+    "valid_count": 0,
+    "drop_reasons": [],
+    "valid_questions": []
+  },
+  {
+    "id": "C2-single-thin-segment",
+    "n_questions_requested": 5,
+    "error": null,
+    "raw_count": 1,
+    "valid_count": 0,
+    "drop_reasons": [
+      "hallucinated_section(S1): AI là gì?"
+    ],
+    "valid_questions": []
+  },
+  {
+    "id": "C3-thin-section-overask",
+    "n_questions_requested": 15,
+    "error": null,
+    "raw_count": 10,
+    "valid_count": 10,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Khi nhận một đề bài mơ hồ, điều đầu tiên bạn nên làm là gì?",
+        "options": [
+          "Xác định mục tiêu và pain point thực sự",
+          "Lập tức đưa ra giải pháp",
+          "Bỏ qua đề bài và làm theo cách cũ",
+          "Chỉ hỏi ý kiến của sếp"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-030",
+        "explanation": "Bạn nên xác định mục tiêu và pain point thực sự ở phía sau đề bài mơ hồ."
+      },
+      {
+        "question": "Framework nào được đề xuất để khai thác vấn đề thực sự từ đề bài?",
+        "options": [
+          "Five Whys",
+          "SWOT Analysis",
+          "Brainstorming",
+          "Fishbone Diagram"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-030",
+        "explanation": "Five Whys là framework giúp bạn đào sâu vào vấn đề thực sự phía sau đề bài."
+      },
+      {
+        "question": "Tại sao nhiều lãnh đạo thường nhảy ngay vào giải pháp?",
+        "options": [
+          "Họ không hiểu rõ năng lực của AI",
+          "Họ muốn tiết kiệm thời gian",
+          "Họ không có đủ thông tin",
+          "Họ muốn gây ấn tượng với nhân viên"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-032",
+        "explanation": "Nhiều lãnh đạo không thực sự hiểu được hết năng lực AI có thể làm được gì và đến đâu."
+      },
+      {
+        "question": "Theo giảng viên, điều gì quan trọng khi nhận một đề bài?",
+        "options": [
+          "Khai thác vấn đề thực sự ở phía sau",
+          "Lập tức xây dựng giải pháp",
+          "Tìm kiếm thông tin từ internet",
+          "Phân tích thị trường"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-032",
+        "explanation": "Khai thác vấn đề thực sự ở phía sau là một kỹ năng quan trọng khi nhận đề bài."
+      },
+      {
+        "question": "Khi nào bạn nên xem xét việc sử dụng AI trong giải pháp?",
+        "options": [
+          "Khi vấn đề thực sự đau và cần giải quyết",
+          "Khi có đủ nguồn lực",
+          "Khi không có giải pháp nào khác",
+          "Khi sếp yêu cầu"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-033",
+        "explanation": "Bạn nên xem xét sử dụng AI khi vấn đề thực sự đau và cần giải quyết."
+      },
+      {
+        "question": "Giải pháp nào có thể thay thế việc xây dựng một AI chatbot?",
+        "options": [
+          "Viết một cái skill tự động",
+          "Sử dụng dịch vụ bên ngoài",
+          "Tăng cường nhân lực",
+          "Tổ chức đào tạo cho nhân viên"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-033",
+        "explanation": "Viết một cái skill tự động là một giải pháp thay thế cho việc xây dựng một AI chatbot."
+      },
+      {
+        "question": "Việc nào được xem là đáng làm hơn khi có nhiều bài toán khác nhau?",
+        "options": [
+          "Giải quyết vấn đề diễn ra hàng ngày mất 2 tiếng",
+          "Xây dựng một AI chatbot phức tạp",
+          "Tổ chức các cuộc họp để thảo luận",
+          "Phân tích dữ liệu từ các nguồn khác nhau"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-033",
+        "explanation": "Giải quyết vấn đề diễn ra hàng ngày mất 2 tiếng là việc đáng làm hơn khi có nhiều bài toán khác."
+      },
+      {
+        "question": "Khi bạn có một đề bài, bạn nên làm gì trước khi đưa ra giải pháp?",
+        "options": [
+          "Hỏi rõ về mục đích và vấn đề thực sự",
+          "Lập tức xây dựng giải pháp",
+          "Tìm kiếm ý kiến từ đồng nghiệp",
+          "Đưa ra nhiều lựa chọn khác nhau"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-031",
+        "explanation": "Bạn nên hỏi rõ về mục đích và vấn đề thực sự trước khi đưa ra giải pháp."
+      },
+      {
+        "question": "Tại sao việc phản biện đề bài là cần thiết?",
+        "options": [
+          "Để tìm ra vấn đề thực sự phía sau",
+          "Để tiết kiệm thời gian",
+          "Để gây ấn tượng với sếp",
+          "Để tránh làm việc không cần thiết"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-030",
+        "explanation": "Phản biện đề bài giúp bạn tìm ra vấn đề thực sự phía sau nó."
+      },
+      {
+        "question": "Khi xây dựng giải pháp, bạn nên làm gì trước tiên?",
+        "options": [
+          "Xác định vấn đề thực sự",
+          "Tìm kiếm công nghệ mới",
+          "Tham khảo ý kiến của chuyên gia",
+          "Lập kế hoạch chi tiết"
+        ],
+        "correct_index": 0,
+        "section_id": "S4",
+        "segment_id": "T01-033",
+        "explanation": "Xác định vấn đề thực sự là bước đầu tiên quan trọng khi xây dựng giải pháp."
+      }
+    ]
+  },
+  {
+    "id": "C4-section-no-segments",
+    "n_questions_requested": 5,
+    "error": null,
+    "raw_count": 0,
+    "valid_count": 0,
+    "drop_reasons": [],
+    "valid_questions": []
+  },
+  {
+    "id": "C5-offtopic-content",
+    "n_questions_requested": 5,
+    "error": null,
+    "raw_count": 3,
+    "valid_count": 3,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Để nấu phở bò ngon, cần ninh xương bò trong thời gian bao lâu?",
+        "options": [
+          "6-8 tiếng",
+          "4-5 tiếng",
+          "8-10 tiếng",
+          "2-3 tiếng"
+        ],
+        "correct_index": 0,
+        "section_id": "SYN3",
+        "segment_id": "SYN3-001",
+        "explanation": "Cần ninh xương bò từ 6-8 tiếng để nấu phở bò ngon."
+      },
+      {
+        "question": "Gia vị nào không được nhắc đến trong công thức nấu phở bò?",
+        "options": [
+          "Quế",
+          "Hồi",
+          "Gừng nướng",
+          "Tiêu đen"
+        ],
+        "correct_index": 3,
+        "section_id": "SYN3",
+        "segment_id": "SYN3-001",
+        "explanation": "Công thức chỉ nêu quế, hồi, gừng nướng, và thảo quả, không có tiêu đen."
+      },
+      {
+        "question": "Trong công thức nấu phở bò, thảo quả được sử dụng để làm gì?",
+        "options": [
+          "Ninh xương",
+          "Nêm gia vị",
+          "Làm nước dùng",
+          "Trang trí"
+        ],
+        "correct_index": 1,
+        "section_id": "SYN3",
+        "segment_id": "SYN3-001",
+        "explanation": "Thảo quả được nêm gia vị trong công thức nấu phở bò."
+      }
+    ]
+  },
+  {
+    "id": "C6-overask-forces-outside-knowledge",
+    "n_questions_requested": 50,
+    "error": null,
+    "raw_count": 6,
+    "valid_count": 6,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Kỹ năng nào được coi là quan trọng nhất khi xác định bài toán từ yêu cầu mơ hồ?",
+        "options": [
+          "Khả năng xác định bài toán",
+          "Khả năng lập trình",
+          "Khả năng quản lý dự án",
+          "Khả năng giao tiếp"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-001",
+        "explanation": "Khả năng xác định ra một bài toán từ yêu cầu rất mơ hồ là kỹ năng quan trọng nhất."
+      },
+      {
+        "question": "Theo quan sát, điều gì đang thiếu trong các công ty khi đưa AI vào ứng dụng?",
+        "options": [
+          "Người đặt ra đề bài",
+          "AI engineer",
+          "Công nghệ",
+          "Dữ liệu"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-002",
+        "explanation": "Không có ai chỉ ra được là trong 7749 cái việc tôi phải làm mỗi ngày, cái gì tôi nên đưa vào làm trước."
+      },
+      {
+        "question": "Theo nghiên cứu, tỷ lệ thành công của việc đưa AI vào ứng dụng đến từ yếu tố nào?",
+        "options": [
+          "Công nghệ",
+          "Con người và vận hành",
+          "Dữ liệu lớn",
+          "Quá trình phát triển"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-003",
+        "explanation": "70% của việc đưa AI vào ứng dụng đến từ con người và vận hành chứ không phải đến từ công nghệ."
+      },
+      {
+        "question": "Theo giảng viên, bước đầu tiên trong việc giải quyết vấn đề là gì?",
+        "options": [
+          "Xác định vấn đề",
+          "Tìm kiếm giải pháp",
+          "Phân tích dữ liệu",
+          "Tuyển dụng nhân sự"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-004",
+        "explanation": "Đầu tiên mình phải biết vấn đề là gì, sau đấy công nghệ mới là công cụ để giải nó."
+      },
+      {
+        "question": "Giảng viên nhấn mạnh điều gì khi đối diện với yêu cầu mơ hồ từ sếp?",
+        "options": [
+          "Cần phải đưa ra giải pháp ngay lập tức",
+          "Cần phải giữ tư duy phản biện",
+          "Cần phải chờ đợi thêm thông tin",
+          "Cần phải từ bỏ yêu cầu"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-005",
+        "explanation": "Bạn hãy luôn giữ cho mình tư duy phản biện và luyện một kỹ năng là bóc tách từ cái mơ hồ ra cái cụ thể."
+      },
+      {
+        "question": "Một trong những cách để làm rõ yêu cầu mơ hồ là gì?",
+        "options": [
+          "Hỏi lại và bóc tách ra vài option",
+          "Đưa ra giải pháp ngay lập tức",
+          "Chờ đợi thêm thông tin từ sếp",
+          "Bỏ qua yêu cầu"
+        ],
+        "correct_index": 0,
+        "section_id": "S1",
+        "segment_id": "T01-006",
+        "explanation": "Một cách mình hay làm là mình hỏi lại, hoặc mình thử từ cái đề bài đấy bóc tách ra vài option."
+      }
+    ]
+  },
+  {
+    "id": "C7-factual-statistic",
+    "n_questions_requested": 6,
+    "error": null,
+    "raw_count": 5,
+    "valid_count": 5,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Kỹ năng nào được coi là quan trọng nhất khi xác định bài toán từ yêu cầu mơ hồ?",
+        "options": [
+          "Khả năng lập trình",
+          "Khả năng xác định bài toán",
+          "Khả năng quản lý dự án",
+          "Khả năng giao tiếp"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-001",
+        "explanation": "Khả năng xác định ra một bài toán từ một yêu cầu rất mơ hồ là kỹ năng quan trọng nhất."
+      },
+      {
+        "question": "Theo quan sát, tại sao nhiều công ty không hiệu quả khi áp dụng AI?",
+        "options": [
+          "Không có đủ nhân lực",
+          "Không có người đặt ra đề bài cụ thể",
+          "Thiếu công nghệ hiện đại",
+          "Thiếu ngân sách"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-002",
+        "explanation": "Vấn đề là không có ai chỉ ra được đề bài cụ thể cho các AI engineer."
+      },
+      {
+        "question": "Theo nghiên cứu, phần lớn thành công khi đưa AI vào ứng dụng đến từ đâu?",
+        "options": [
+          "Công nghệ",
+          "Con người và vận hành",
+          "Đào tạo nhân viên",
+          "Chiến lược marketing"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-003",
+        "explanation": "70% thành công đến từ con người và vận hành chứ không phải từ công nghệ."
+      },
+      {
+        "question": "Điều gì là bước đầu tiên khi giải quyết một vấn đề bằng công nghệ?",
+        "options": [
+          "Tìm kiếm công nghệ mới",
+          "Xác định đúng vấn đề",
+          "Phân tích dữ liệu",
+          "Lập kế hoạch triển khai"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-004",
+        "explanation": "Bước đầu tiên là xác định được đúng vấn đề trước khi sử dụng công nghệ."
+      },
+      {
+        "question": "Khi nhận được yêu cầu mơ hồ từ sếp, cách nào là hợp lý để làm rõ yêu cầu?",
+        "options": [
+          "Chờ sếp giải thích thêm",
+          "Đưa ra các option cụ thể để xác nhận",
+          "Tự quyết định cách làm",
+          "Bỏ qua yêu cầu"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-006",
+        "explanation": "Một cách hay là hỏi lại và bóc tách ra vài option để xác nhận với sếp."
+      }
+    ]
+  },
+  {
+    "id": "C8-named-framework",
+    "n_questions_requested": 6,
+    "error": null,
+    "raw_count": 4,
+    "valid_count": 4,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Mô hình Double Diamond giúp chúng ta làm gì?",
+        "options": [
+          "Tìm ra đúng vấn đề và đúng giải pháp",
+          "Tối ưu hóa chi phí",
+          "Phân tích dữ liệu người dùng",
+          "Xác định thị trường mục tiêu"
+        ],
+        "correct_index": 0,
+        "section_id": "S7",
+        "segment_id": "T01-049",
+        "explanation": "Mô hình Double Diamond giúp tìm ra đúng vấn đề và đúng giải pháp cho vấn đề đó."
+      },
+      {
+        "question": "Theo quan điểm của giảng viên, điều gì là nguy hiểm hơn?",
+        "options": [
+          "Làm sai cái đúng",
+          "Làm đúng cái sai",
+          "Không làm gì cả",
+          "Làm đúng mọi thứ"
+        ],
+        "correct_index": 1,
+        "section_id": "S7",
+        "segment_id": "T01-060",
+        "explanation": "Giảng viên cho rằng làm đúng cái sai nguy hiểm hơn vì nó tự giới hạn không gian giải pháp."
+      },
+      {
+        "question": "Ma trận tác động – nỗ lực giúp chúng ta làm gì?",
+        "options": [
+          "Đánh giá tác động và nỗ lực của các vấn đề",
+          "Xác định người dùng mục tiêu",
+          "Phân tích dữ liệu",
+          "Tối ưu hóa quy trình làm việc"
+        ],
+        "correct_index": 0,
+        "section_id": "S10",
+        "segment_id": "T01-074",
+        "explanation": "Ma trận tác động – nỗ lực giúp đánh giá tác động và nỗ lực của các vấn đề để xác định cái gì đáng làm nhất."
+      },
+      {
+        "question": "Kỹ thuật nào được đề cập để đào sâu hơn vào vấn đề?",
+        "options": [
+          "Phỏng vấn người dùng",
+          "Five Whys",
+          "Phân tích dữ liệu",
+          "Ghi nhật ký hành vi"
+        ],
+        "correct_index": 1,
+        "section_id": "S10",
+        "segment_id": "T01-075",
+        "explanation": "Five Whys là một kỹ thuật được đề cập để đào sâu hơn vào vấn đề."
+      }
+    ]
+  },
+  {
+    "id": "R1-multi-section-combined",
+    "n_questions_requested": 6,
+    "error": null,
+    "raw_count": 4,
+    "valid_count": 4,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Kỹ năng nào được coi là quan trọng nhất khi xác định bài toán từ yêu cầu mơ hồ?",
+        "options": [
+          "Khả năng giao tiếp với team development",
+          "Khả năng xác định bài toán từ yêu cầu mơ hồ",
+          "Khả năng lập kế hoạch dự án",
+          "Khả năng sử dụng công nghệ mới"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-001",
+        "explanation": "Kỹ năng xác định ra một bài toán từ một yêu cầu rất mơ hồ là rất quan trọng, đặc biệt ở các công ty muốn đưa AI vào ứng dụng."
+      },
+      {
+        "question": "Theo quan sát, điều gì là nguyên nhân chính khiến nhiều công ty không hiệu quả trong việc áp dụng AI?",
+        "options": [
+          "Thiếu nhân lực AI",
+          "Không có người đặt ra đề bài cụ thể",
+          "Thiếu công nghệ hiện đại",
+          "Thiếu ngân sách cho dự án"
+        ],
+        "correct_index": 1,
+        "section_id": "S1",
+        "segment_id": "T01-002",
+        "explanation": "Nguyên nhân chính là không có ai chỉ ra được bài toán nào nên làm trước, dẫn đến sự không hiệu quả."
+      },
+      {
+        "question": "Sự khác biệt giữa product manager và project manager là gì?",
+        "options": [
+          "Product manager tìm kiếm cơ hội, project manager đảm bảo tiến độ",
+          "Project manager tìm kiếm cơ hội, product manager đảm bảo tiến độ",
+          "Cả hai đều tìm kiếm cơ hội",
+          "Cả hai đều đảm bảo tiến độ"
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-011",
+        "explanation": "Product manager là người tìm kiếm cơ hội, trong khi project manager đảm bảo dự án hoàn thành đúng tiến độ."
+      },
+      {
+        "question": "Theo đoạn văn, điều gì có thể gây ra nợ kỹ thuật trong các dự án?",
+        "options": [
+          "Thiếu nhân lực",
+          "Không có kế hoạch dự phòng",
+          "Chỉ làm theo yêu cầu mà không nghĩ xa hơn",
+          "Thiếu công nghệ"
+        ],
+        "correct_index": 2,
+        "section_id": "S2",
+        "segment_id": "T01-013",
+        "explanation": "Nợ kỹ thuật xảy ra khi team chỉ làm theo yêu cầu mà không nghĩ đến những thứ rộng hơn để có thể mở rộng."
+      }
+    ]
+  },
+  {
+    "id": "R2-student-speech-excluded",
+    "n_questions_requested": 6,
+    "error": null,
+    "raw_count": 6,
+    "valid_count": 6,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Sự khác biệt chính giữa product manager và project manager là gì?",
+        "options": [
+          "Product manager tìm kiếm bài toán và giải pháp, trong khi project manager chỉ đảm bảo tiến độ.",
+          "Project manager tìm kiếm bài toán và giải pháp, trong khi product manager chỉ đảm bảo tiến độ.",
+          "Cả hai đều có nhiệm vụ giống nhau trong một team.",
+          "Product manager chỉ làm việc với khách hàng, còn project manager chỉ làm việc với team."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-011",
+        "explanation": "Product manager phải tự tìm bài toán và giải pháp, trong khi project manager chỉ đảm bảo dự án hoàn thành đúng tiến độ."
+      },
+      {
+        "question": "Theo giảng viên, điều gì khiến nhiều người có tiềm năng không được tận dụng trong môi trường làm việc?",
+        "options": [
+          "Văn hóa công ty chưa hình thành tư duy làm product.",
+          "Thiếu kỹ năng quản lý dự án.",
+          "Không có đủ thời gian để học hỏi.",
+          "Thiếu sự hỗ trợ từ cấp trên."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-013",
+        "explanation": "Văn hóa công ty chưa có nét văn hóa làm product thực sự khiến nhiều người có tiềm năng không được tận dụng."
+      },
+      {
+        "question": "Theo giảng viên, tại sao văn hóa làm product ở Sài Gòn được cho là tốt hơn ở Hà Nội?",
+        "options": [
+          "Người miền Nam thường mở hơn và có nhiều công ty trẻ.",
+          "Hà Nội có nhiều công ty công nghệ lớn.",
+          "Sài Gòn có nhiều người nước ngoài về làm việc.",
+          "Người miền Bắc thường có tư duy bảo thủ."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-014",
+        "explanation": "Người miền Nam thường mở hơn, và các công ty trẻ ở Sài Gòn tạo ra nét văn hóa làm product tốt hơn."
+      },
+      {
+        "question": "Theo nghiên cứu về não bộ, tư duy nào được mô tả là nhanh và ít tốn năng lượng?",
+        "options": [
+          "Tư duy nhanh.",
+          "Tư duy chậm.",
+          "Tư duy phản xạ.",
+          "Tư duy phân tích."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-016",
+        "explanation": "Tư duy nhanh là phản ứng ngay lập tức với vấn đề mà không tốn nhiều nơ-ron thần kinh."
+      },
+      {
+        "question": "Theo giảng viên, điều gì là cần thiết để thay đổi tư duy?",
+        "options": [
+          "Chấp nhận việc phải cố gắng và đặt câu hỏi.",
+          "Chỉ cần học hỏi từ người khác.",
+          "Tránh những tình huống khó khăn.",
+          "Tập trung vào việc hoàn thành công việc."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-016",
+        "explanation": "Để thay đổi tư duy, cần chấp nhận việc phải cố gắng đặt câu hỏi và suy nghĩ."
+      },
+      {
+        "question": "Giảng viên cho rằng để xây dựng mindset làm product, cần phải làm gì?",
+        "options": [
+          "Luôn quan sát và đặt câu hỏi.",
+          "Chỉ cần hoàn thành công việc được giao.",
+          "Tập trung vào việc quản lý dự án.",
+          "Học hỏi từ các sản phẩm khác mà không cần thực hành."
+        ],
+        "correct_index": 0,
+        "section_id": "S2",
+        "segment_id": "T01-015",
+        "explanation": "Để xây dựng mindset làm product, cần luôn quan sát và đặt câu hỏi trong mọi việc làm."
+      }
+    ]
+  },
+  {
+    "id": "R3-min-boundary-n1",
+    "n_questions_requested": 1,
+    "error": null,
+    "raw_count": 1,
+    "valid_count": 1,
+    "drop_reasons": [],
+    "valid_questions": [
+      {
+        "question": "Theo Don Norman, điều gì là quan trọng hơn việc giải quyết vấn đề được giao?",
+        "options": [
+          "Tìm ra vấn đề thực sự phía sau",
+          "Giải quyết vấn đề ngay lập tức",
+          "Tin tưởng vào vấn đề được đưa ra",
+          "Không cần đặt câu hỏi"
+        ],
+        "correct_index": 0,
+        "section_id": "S6",
+        "segment_id": "T01-045",
+        "explanation": "Don Norman nhấn mạnh rằng cần phải tìm ra vấn đề thực sự phía sau thay vì chỉ giải quyết vấn đề được giao."
+      }
+    ]
+  }
+]
