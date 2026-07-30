@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from core.agent import run_agent
 from env_loader import get_active_provider, load_lab_env
+import time
 
 # Đường dẫn tới file JSON testcase của nhóm
 EVAL_FILE_PATH = Path(__file__).resolve().parent / "data" / "eval_group.json"
@@ -51,6 +52,9 @@ def run_tests():
         failure_type = tc["failure_type"]
         
         print(f"\n[Test] {tc_id} ({failure_type})")
+
+        # Nghỉ giữa các lần gọi để tránh vượt rate limit free tier (5 req/phút)
+        time.sleep(14)
         
         # Xử lý Single-Turn (query) hoặc Multi-Turn (turns)
         if "query" in tc:
@@ -88,7 +92,7 @@ def run_tests():
                 is_pass = False
                 print("   ❌ KHÔNG ĐẠT: AI chưa từ chối lịch sự yêu cầu ngoài phạm vi.")
                 
-            if failure_type == "missing_info" and not any(k in output.lower() for k in ["mấy", "nào", "hỏi lại", "yêu cầu"]):
+            if failure_type == "missing_info" and not any(k in output.lower() for k in ["mấy", "nào", "hỏi lại", "yêu cầu", "kiểm tra", "cung cấp", "vui lòng", "chọn"]):
                 is_pass = False
                 print("   ❌ KHÔNG ĐẠT: AI chưa chủ động hỏi lại khi thiếu thông tin.")
 

@@ -1,0 +1,39 @@
+[
+  {
+    "name": "load_slide_content",
+    "description": "Đọc nội dung của một trang slide từ tài liệu Day 1 hoặc Day 2.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "day_code": {
+          "type": "string",
+          "description": "Chỉ nhận giá trị 'd1' hoặc 'd2'"
+        },
+        "page_num": {
+          "type": "integer",
+          "description": "Số trang cần đọc"
+        }
+      },
+      "required": [
+        "day_code",
+        "page_num"
+      ]
+    }
+  },
+  {
+    "name": "get_glossary_term",
+    "description": "Tra cứu định nghĩa chuẩn mực của các thuật ngữ chuyên môn trong khóa học.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "term": {
+          "type": "string",
+          "description": "Tên thuật ngữ chuyên môn"
+        }
+      },
+      "required": [
+        "term"
+      ]
+    }
+  }
+]

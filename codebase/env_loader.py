@@ -21,4 +21,6 @@ def get_active_provider():
         return "deepseek"
     elif os.getenv("OPENAI_API_KEY"):
         return "openai"
+    elif os.getenv("ANTHROPIC_API_KEY"):
+        return "claude"
     return None

@@ -21,7 +21,7 @@ def run_agent(user_message: str) -> str:
             temperature=0.0
         )
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=user_message,
             config=config
         )
@@ -115,5 +115,82 @@ def run_agent(user_message: str) -> str:
                 temperature=0.0
             )
             return second_response.choices[0].message.content
-            
+
         return response_message.content
+
+    elif provider == "claude":
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        model_name = "claude-opus-5"
+
+        # Tool schemas theo format Anthropic (input_schema, không có wrapper type:function)
+        claude_tools = [
+            {
+                "name": "load_slide_content",
+                "description": "Đọc nội dung của một trang slide từ tài liệu Day 1 hoặc Day 2.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "day_code": {"type": "string", "description": "Chỉ nhận giá trị 'd1' hoặc 'd2'"},
+                        "page_num": {"type": "integer", "description": "Số trang cần đọc"}
+                    },
+                    "required": ["day_code", "page_num"]
+                }
+            },
+            {
+                "name": "get_glossary_term",
+                "description": "Tra cứu định nghĩa chuẩn mực của các thuật ngữ chuyên môn trong khóa học.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "term": {"type": "string", "description": "Tên thuật ngữ chuyên môn"}
+                    },
+                    "required": ["term"]
+                }
+            }
+        ]
+
+        messages = [{"role": "user", "content": user_message}]
+
+        # Lượt gọi thứ nhất
+        response = client.messages.create(
+            model=model_name,
+            system=BASE_SYSTEM_INSTRUCTION,
+            messages=messages,
+            tools=claude_tools,
+            temperature=0.0,
+            max_tokens=4096,
+        )
+
+        # Vòng lặp tool use: Claude có thể yêu cầu nhiều tool tuần tự
+        while response.stop_reason == "tool_use":
+            messages.append({"role": "assistant", "content": response.content})
+
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    function_name = block.name
+                    function_args = block.input
+                    function_to_call = TOOL_REGISTRY[function_name]
+                    tool_output = function_to_call(**function_args)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": tool_output,
+                    })
+
+            messages.append({"role": "user", "content": tool_results})
+            response = client.messages.create(
+                model=model_name,
+                system=BASE_SYSTEM_INSTRUCTION,
+                messages=messages,
+                tools=claude_tools,
+                temperature=0.0,
+                max_tokens=4096,
+            )
+
+        # Ghép tất cả text blocks trong content cuối cùng
+        return "".join(
+            block.text for block in response.content if hasattr(block, "text")
+        )
