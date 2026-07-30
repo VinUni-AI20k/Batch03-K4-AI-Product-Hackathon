@@ -16,7 +16,7 @@
     2. `misconceptions = []` ở **100% lượt chat (0 / 1.261)**: Field phát hiện hiểu lầm trong DB chưa từng được triển khai.
   - **Kết quả Khảo sát thực tế (Đường A — Đạt chuẩn $\ge 36$ mẫu)** — từ file khảo sát `Câu trả lời biểu mẫu 1.html` mới nhất ($N = 36$ học viên trong lớp):
     1. **88.88% (32/36 học viên)** xác nhận *sẵn sàng làm một bài Quiz ngắn ngay sau bài học* để hệ thống kiểm tra lại mức độ hiểu bài (17 bạn hoàn toàn sẵn sàng, 15 bạn sẵn sàng nếu Quiz ngắn).
-    2. **77.77% (28/36 học viên)** đồng ý *chia sẻ lịch sử lỗi sai của mình với AI* để hệ thống phát hiện lỗ hổng kiến thức & gợi ý chủ đề ôn tập (điểm 3-5/5).
+    2. **91.66% (33/36 học viên)** đồng ý *chia sẻ lịch sử lỗi sai của mình với AI* để hệ thống phát hiện lỗ hổng kiến thức & gợi ý chủ đề ôn tập (điểm 3-5/5).
     3. **88.88% (32/36 học viên)** đồng ý *chuyển câu hỏi/vùng slide chưa hiểu cho Giảng viên/TA* khi làm Quiz không đạt (trong đó 38.9% yêu cầu nút "Đồng ý gửi" trước khi gửi).
 
 ---
