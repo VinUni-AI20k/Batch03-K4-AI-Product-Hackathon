@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLearn</title>
+  <meta name="description" content="Nền tảng học thích ứng giúp sinh viên nhận ra đúng phần kiến thức còn yếu và luyện tập có định hướng." />
+  <meta name="application-name" content="VLearn" />
+  <link rel="icon" href="brand/vinuni-mark.svg" />
+  <link rel="apple-touch-icon" href="brand/vinuni-mark.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <!-- Skip Link -->
+    <a class="skip-link" href="#main-content">Bỏ qua phần điều hướng</a>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header" id="header">
+      <div class="container">
+        <a class="header-logo" href="index.html" aria-label="VLearn — Trang chủ">
+          <img src="brand/vinuni-mark.svg" alt="VinUni AI Thực Chiến" width="38" height="38" />
+          <span class="wordmark"><span class="v-letter">V</span>Learn</span>
+        </a>
+
+        <nav class="nav" aria-label="Điều hướng chính">
+          <a href="#vision">Tầm nhìn</a>
+          <a href="#daily-loop">Cách học</a>
+          <a href="#features">Tính năng</a>
+          <a href="#for-instructors">Giảng viên</a>
+        </nav>
+
+        <!-- Mobile menu button -->
+        <button class="mobile-menu-btn" aria-label="Mở menu" id="mobile-menu-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+
+        <div class="header-actions">
+          <a class="btn-secondary" href="login.html">Đăng nhập</a>
+          <a class="btn-primary" href="#daily-loop">Khám phá VLearn</a>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn" aria-label="Switch to English" title="Switch to English" id="lang-toggle">VI</button>
+            <button type="button" class="toggle-btn" aria-label="Chuyển giao diện tối" title="Chuyển giao diện tối" id="theme-toggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-moon" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sun" aria-hidden="true" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Nav Overlay -->
+    <div class="mobile-nav" id="mobile-nav">
+      <div class="mobile-nav-panel">
+        <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Đóng menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        <a href="#vision" class="mobile-nav-link">Tầm nhìn</a>
+        <a href="#daily-loop" class="mobile-nav-link">Cách học</a>
+        <a href="#features" class="mobile-nav-link">Tính năng</a>
+        <a href="#for-instructors" class="mobile-nav-link">Giảng viên</a>
+        <a href="login.html" class="mobile-nav-link" style="margin-top:12px;color:var(--red);font-weight:800;">Đăng nhập</a>
+      </div>
+    </div>
+
+    <!-- ===== HERO ===== -->
+    <section id="main-content" class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">NỀN TẢNG HỌC THÍCH ỨNG · VINUNI AI THỰC CHIẾN</span>
+          <h1>Chỗ nào em yếu,<br /><span>VLearn biết đúng chỗ đó.</span></h1>
+          <p>Học theo từng ngày, hỏi tutor ngay trên tài liệu và luyện đúng knowledge component còn thiếu — thay vì nhận một đáp án nhanh rồi bỏ qua cách suy luận.</p>
+          <div class="hero-actions">
+            <a class="btn-red" href="login.html">
+              Bắt đầu học
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a class="btn-light" href="#daily-loop">Xem cách hoạt động</a>
+          </div>
+          <div class="trust-line">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Đăng nhập bằng tài khoản VinUni AI Thực Chiến được cấp
+          </div>
+        </div>
+
+        <!-- Tutor Preview Card -->
+        <div class="hero-visual">
+          <div class="red-diamond" aria-hidden="true"></div>
+          <div class="tutor-preview" aria-label="Minh họa VLearn Tutor">
+            <div class="preview-top-line"></div>
+            <div class="preview-header">
+              <span>VLEARN TUTOR</span>
+              <span class="adaptive-status">
+                <span class="dot"></span> Thích ứng
+              </span>
+            </div>
+            <div class="preview-body">
+              <div class="user-bubble">Em chưa hiểu vì sao learning rate quá lớn lại làm mô hình khó hội tụ.</div>
+              <div class="tutor-row">
+                <div class="tutor-avatar" aria-hidden="true">V</div>
+                <div class="tutor-bubble">Nếu mỗi bước cập nhật vượt qua điểm tối ưu, em nghĩ loss sẽ thay đổi như thế nào?</div>
+              </div>
+              <div class="user-bubble">Loss có thể dao động thay vì giảm dần?</div>
+              <div class="tutor-row">
+                <div class="tutor-avatar" aria-hidden="true">V</div>
+                <div class="tutor-bubble">Đúng rồi. Hãy thử liên hệ điều đó với độ dài của vector gradient nhé.</div>
+              </div>
+            </div>
+            <div class="preview-input">
+              <span>Tiếp tục hỏi…</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VISION ===== -->
+    <section id="vision" class="vision-section section-padding">
+      <div class="container vision-grid">
+        <div>
+          <span class="kicker">TẦM NHÌN SẢN PHẨM</span>
+          <h2>Không chỉ trả lời. <span>VLearn giúp bạn học.</span></h2>
+        </div>
+        <div class="vision-copy">
+          <p>Một công cụ học tốt không làm thay phần suy nghĩ. Nó giúp người học thấy mình đang hiểu đến đâu, vì sao còn vướng và bước tiếp theo nên là gì.</p>
+          <p>Placement Assessment đầu khóa là tùy chọn; quiz hằng ngày là bài đánh giá sau buổi học. Không có gate cứng ngăn sinh viên đi tiếp.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DAILY LOOP ===== -->
+    <section id="daily-loop" class="loop-section section-padding">
+      <div class="container">
+        <div class="section-heading">
+          <span class="kicker">MỘT VÒNG HỌC CÓ ĐỊNH HƯỚNG</span>
+          <h2>Đo vừa đủ. Dạy đúng lúc. <span>Luyện đúng chỗ.</span></h2>
+          <p>VLearn bám theo nhịp học thật của sinh viên: trong buổi học, sau buổi học và khi cần ôn lại.</p>
+        </div>
+        <div class="loop-grid">
+          <!-- Card 01 -->
+          <article class="loop-card">
+            <div class="step-number">01</div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V7"/><path d="m16 12 2 2 4-4"/><path d="M22 6V4a1 1 0 0 0-1-1h-5a4 4 0 0 0-4 4 4 4 0 0 0-4-4H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h6a3 3 0 0 1 3 3 3 3 0 0 1 3-3h6a1 1 0 0 0 1-1v-1.3"/></svg>
+            <h3>Học theo ngày</h3>
+            <p>Slide, ghi chú giảng viên và tài liệu bổ sung nằm trong cùng một không gian học tập.</p>
+          </article>
+          <!-- Card 02 -->
+          <article class="loop-card">
+            <div class="step-number">02</div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            <h3>Tutor thích ứng</h3>
+            <p>Giải thích, gợi mở hoặc kiểm tra lại tùy mức độ hiểu và trạng thái của người học.</p>
+          </article>
+          <!-- Card 03 -->
+          <article class="loop-card">
+            <div class="step-number">03</div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+            <h3>Đánh giá sau buổi</h3>
+            <p>Một bài quiz ngắn giúp xác định knowledge component nào đã vững hoặc cần luyện thêm.</p>
+          </article>
+          <!-- Card 04 -->
+          <article class="loop-card">
+            <div class="step-number">04</div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/></svg>
+            <h3>Mastery rõ ràng</h3>
+            <p>Tiến độ được cập nhật theo từng đơn vị kiến thức, có lý do và có đường luyện tiếp theo.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section id="features" class="feature-section section-padding">
+      <div class="container">
+        <div class="section-heading">
+          <span class="kicker">TÍNH NĂNG CỐT LÕI</span>
+          <h2>Thiết kế cho tiến bộ thật, <span>không phô diễn AI.</span></h2>
+        </div>
+        <div class="feature-grid">
+          <!-- Feature 1 -->
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
+            </div>
+            <h3>Biết đúng chỗ còn yếu</h3>
+            <p>VLearn neo câu hỏi, bài luyện và tiến độ vào knowledge component thay vì đưa ra một điểm số chung chung.</p>
+          </article>
+          <!-- Feature 2 -->
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+            </div>
+            <h3>Hướng dẫn vừa đủ</h3>
+            <p>Người mới được giải thích rõ; người đang tiến bộ được gợi mở; khi bế tắc, tutor chuyển sang hỗ trợ trực tiếp.</p>
+          </article>
+          <!-- Feature 3 -->
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3>Dữ liệu học tập có trách nhiệm</h3>
+            <p>Tín hiệu học tập được dùng có giới hạn, có consent và không biến một hành vi đơn lẻ thành kết luận về sinh viên.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FOR INSTRUCTORS ===== -->
+    <section id="for-instructors" class="instructor-section section-padding">
+      <div class="container instructor-grid">
+        <div>
+          <span class="kicker">DÀNH CHO GIẢNG VIÊN</span>
+          <h2>Một màn hình để biết lớp đang cần gì hôm nay.</h2>
+          <p>Theo dõi ai đã vào học, knowledge component nào đang là điểm nghẽn, câu hỏi nào cần trả lời và sinh viên nào cần được hỗ trợ thêm — với diễn giải thay vì nhãn kết luận.</p>
+          <a class="btn-secondary" href="login.html">
+            Vào cổng giảng viên
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Insight Panel -->
+        <div class="insight-panel" aria-label="Minh họa dashboard giảng viên">
+          <div class="insight-header">
+            <span>Hôm nay · Day 10</span>
+            <span class="live-pill">Dữ liệu minh họa</span>
+          </div>
+          <div class="insight-metric">
+            <div>
+              <strong>Gradient descent</strong>
+              <span>KC cần giảng lại</span>
+            </div>
+            <b>68%</b>
+          </div>
+          <div class="progress-track">
+            <span></span>
+          </div>
+          <div class="insight-rows">
+            <span>12 sinh viên cần chú ý</span>
+            <span>8 câu hỏi đang chờ</span>
+            <span>3 KC dưới ngưỡng</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-logo-group">
+          <img src="brand/vinuni-mark.svg" alt="VinUni AI Thực Chiến" width="48" height="48" />
+          <span class="cta-wordmark"><span class="v-letter">V</span>Learn</span>
+        </div>
+        <h2>Bắt đầu một phiên học có định hướng.</h2>
+        <p>Đăng nhập bằng tài khoản VinUni AI Thực Chiến để tiếp tục ngày học của bạn.</p>
+        <a class="btn-red" href="login.html">
+          Đăng nhập VLearn
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-logo">
+            <img src="brand/vinuni-mark.svg" alt="VinUni AI Thực Chiến" width="30" height="30" />
+            <span class="footer-wordmark"><span class="v-letter">V</span>Learn</span>
+          </div>
+          <p>Nền tảng học thích ứng dành cho cộng đồng VinUni AI Thực Chiến.</p>
+        </div>
+        <div>
+          <strong>Sản phẩm</strong>
+          <a href="#daily-loop">Cách học</a>
+          <a href="#features">Tính năng</a>
+        </div>
+        <div>
+          <strong>Truy cập</strong>
+          <a href="login.html">Đăng nhập</a>
+          <a href="mailto:support@vlearn.dev">Hỗ trợ</a>
+        </div>
+      </div>
+      <div class="container copyright">
+        © 2026 VLearn · VinUni AI Thực Chiến. All rights reserved.
+      </div>
+    </footer>
+  </main>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
