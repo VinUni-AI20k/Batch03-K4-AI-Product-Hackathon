@@ -150,4 +150,4 @@ Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
 
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
-| [dd/mm] | Tạo spec lần đầu | — |
+| [30/07] | Tạo spec lần đầu | — |
