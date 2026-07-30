@@ -45,3 +45,17 @@ def post_generate_quiz(transcript_file: str = "transcript-01-clean.md", n_questi
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.routes_reteach import router as reteach_router
+
+app = FastAPI(title="IllumiMATE API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(reteach_router)

@@ -75,6 +75,8 @@ A1[AI Classify Transcript<br/>Teaching Content / Noise]
 
 A2[AI Extract Outline<br/>section_id + key_points]
 
+A1, A2 should be triggered right after slide and transcript was uploaded, not synchronize with mong muốn ôn bài của học viên.
+
 A3[AI Generate Initial Quiz<br/>20 Questions]
 
 KP[(Knowledge Package)]
@@ -115,28 +117,16 @@ end
 
 subgraph P3["Phase 3 - Adaptive Re-teaching"]
 
-AL[AI Align Weak Sections<br/>with Transcript]
+    CONFIG[User Config: Level, Style, Time, Active Mode]
+    AL[Align Weak Sections with Transcript & Slides]
+    PROMPT[Construct Single Context-Aware Prompt]
+    STREAM[AI Stream Dynamic Markdown Lecture]
+    FINISH[User Finishes Learning]
 
-RM[AI Generate Learning Roadmap]
-
-CARD1[Summary Card]
-
-CARD2[Real-world Example]
-
-CARD3[Mini Practice Question]
-
-FINISH[User Finishes Learning]
-
-STYLE --> AL
-AL --> RM
-
-RM --> CARD1
-RM --> CARD2
-RM --> CARD3
-
-CARD1 --> FINISH
-CARD2 --> FINISH
-CARD3 --> FINISH
+    CONFIG --> PROMPT
+    AL --> PROMPT
+    PROMPT --> STREAM
+    STREAM --> FINISH
 
 end
 

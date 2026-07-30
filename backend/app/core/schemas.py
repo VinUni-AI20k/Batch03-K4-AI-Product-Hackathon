@@ -158,6 +158,20 @@ class StudyNoteSection(BaseModel):
     cited_segment_ids: List[str] = Field(..., min_length=1)
 
 
+class SelfCheckGradeRequest(BaseModel):
+    """A learner's free-text response to the end-of-section active check."""
+    section_id: str = Field(..., pattern=r"^[sS]\d+$")
+    question: str = Field(..., min_length=3)
+    learner_answer: str = Field(..., min_length=1, max_length=4000)
+    source_context: str = Field(..., min_length=10, max_length=12000)
+
+
+class SelfCheckGrade(BaseModel):
+    score: int = Field(..., ge=0, le=100)
+    feedback: str = Field(..., min_length=1)
+    next_step: str = Field(..., min_length=1)
+
+
 # ---------------------------------------------------------------------------
 # chat.py - P1, grounded Q&A cho highlight-to-ask
 # ---------------------------------------------------------------------------
