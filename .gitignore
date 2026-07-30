@@ -1,3 +1,46 @@
-.DS_Store
+# Dependency directories
 node_modules/
+/codebase/frontend/node_modules/
+
+# Next.js build outputs
+.next/
+/codebase/frontend/.next/
+out/
+/codebase/frontend/out/
+build/
+dist/
+
+# Python virtual environment (uv)
+.venv/
+/codebase/backend/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Environment variables (contains secrets)
 *.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+.env
+/codebase/backend/.env
+/codebase/frontend/.env
+/codebase/frontend/.env.local
+
+# IDE / Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS metadata
+.DS_Store
+Thumbs.db
