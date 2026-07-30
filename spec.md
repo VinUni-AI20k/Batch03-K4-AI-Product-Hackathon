@@ -125,10 +125,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
   | An toàn (không bịa) | Khi không có data → từ chối rõ ràng, không đoán | Pass |
   | Thời gian phản hồi | < 5 giây | Pass |
 
-- **Golden set** (≥20 case, file trong `eval/`):
-  - 8-10 case thường (hỏi slide, deadline, link VLearn, ...)
-  - 2 case cho mỗi lớp chỗ khó (tổng ≥8 case khó)
-  - 2-4 case hiếm (sai chính tả, hỏi mơ hồ, hỏi ngoài phạm vi)
+- **Golden set** (≥20 case, file tại [`eval/golden-set.md`](eval/golden-set.md)):
 
 - **Quality bar** (chốt từ 23:59, giữ nguyên sau đó):
   > "Đạt khi **≥85%** qua bộ golden set, và **0 case bịa nguồn** (lớp ①)."
