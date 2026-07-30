@@ -15,10 +15,8 @@
   </button>
 
   <a class="brand" href="#" id="brand">
-    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M4 5h7l5 14 5-14h7L20 28h-8z"/>
-    </svg>
-    <span class="brand-text">VLearn</span>
+    <img class="brand-mark" src="../logo/vinuni-mark.png" alt="VLearn Logo">
+    <span class="brand-text"><span class="brand-v">V</span>Learn</span>
   </a>
 
   <span class="vsep"></span>
@@ -231,6 +229,22 @@
   </button>
 </div>
 
+<!-- popup hỏi AI: cho sửa query trước khi gửi -->
+<div class="ask-popup" id="askPopup" hidden>
+  <div class="ask-head">
+    <div class="ask-info">
+      <span class="ask-label">HỎI AI · <b id="askPageLabel">TRANG 1</b></span>
+    </div>
+    <button class="icon-btn sm" id="askClose"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="ask-body">
+    <input id="askInput" type="text" placeholder="Nhập câu hỏi...">
+    <button class="ask-send" id="askSend">
+      <svg viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg>
+    </button>
+  </div>
+</div>
+
 <!-- menu "..." -->
 <div class="menu" id="moreMenu" hidden>
   <button data-act="fit">Vừa khung màn hình</button>
@@ -257,6 +271,8 @@
 
 <div class="toasts" id="toasts"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

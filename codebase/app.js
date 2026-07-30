@@ -126,80 +126,165 @@ function renderChapters() {
   $$('#chapters .docitem').forEach(b => b.onclick = () => {
     const name = b.dataset.doc;
     if (name === DOC.file) { goPage(1); toast('ok', 'Đang xem ' + name); }
-    else toast('warn', 'Tài liệu "' + name + '" chưa mở trong prototype này');
+    else loadDocument(name);
   });
 }
 
 /* =============================================================
-   SLIDES
+   PDF RENDERING
    ============================================================= */
-function slideHTML(p) {
-  const foot = `<div class="s-foot"><span>${p.foot || ''}</span><span>DAY 02 · ${String(p.n).padStart(2, '0')} / ${DOC.totalPages}</span></div>`;
-  const head = `<h2>${p.title || ''}</h2>` + (p.sub ? `<p class="lead">${p.sub}</p>` : '');
+let pdfDoc = null;
+const renderedPDFPages = new Set();
+let pdfObserver = null;
 
-  switch (p.kind) {
-    case 'title':
-      return `<div class="s-eyebrow">${p.eyebrow}</div>
-        <h1 class="s-title">${p.title}</h1>
-        <p class="s-sub">${p.sub}</p>
-        <div class="s-foot"><span>${p.foot}</span><span></span></div>`;
-
-    case 'divider':
-      return `<div class="s-eyebrow">${p.eyebrow}</div>
-        <h1 class="s-title">${p.title}</h1>
-        <p class="s-sub">${p.sub}</p>${foot}`;
-
-    case 'quote':
-      return `<div class="s-quote">“${p.quote}”</div><div class="s-by">${p.by}</div>${foot}`;
-
-    case 'numbered':
-      return head + p.items.map((x, i) =>
-        `<div class="s-num"><i>${String(i + 1).padStart(2, '0')}</i><span>${x}</span></div>`).join('') + foot;
-
-    case 'bullets':
-      return head + `<ul class="s-list">${p.items.map(x => `<li>${x}</li>`).join('')}</ul>` + foot;
-
-    case 'compare':
-      return head + `<div class="s-cols">${p.cols.map(c =>
-        `<div class="s-col ${c.tone}"><h4>${c.head}</h4><ul>${c.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div>` + foot;
-
-    case 'stats':
-      return head + `<div class="s-stats">${p.stats.map(s =>
-        `<div class="s-stat"><b>${s.big}</b><span>${s.small}</span></div>`).join('')}</div>` + foot;
-
-    case 'framework':
-      return head + `<div class="s-fw">
-        <div><h5>${p.groupA.label}</h5>${p.groupA.items.map(i => `<div class="s-kv"><b>${i.k}</b><span>${i.v}</span></div>`).join('')}</div>
-        <div><h5>${p.groupB.label}</h5>${p.groupB.items.map(i => `<div class="s-kv"><b>${i.k}</b><span>${i.v}</span></div>`).join('')}</div>
-      </div>` + foot;
-
-    case 'template':
-      return head + `<div class="s-tpl">${p.lines.join('<br>')}</div>` + foot;
-
-    case 'profile':
-      return `<h2>${p.title}</h2><div class="s-profile">
-        <div class="s-avatar">${p.name.split(' ').map(w => w[0]).slice(0, 2).join('')}</div>
-        <div><div class="nm">${p.name}</div><div class="rl">${p.role}</div>
-        <ul class="s-list">${p.bullets.map(b => `<li>${b}</li>`).join('')}</ul></div>
-      </div>` + foot;
+async function loadDocument(docName) {
+  // Tìm info của document
+  let docInfo = null;
+  for (const ch of CHAPTERS) {
+    const d = ch.docs.find(d => d.name === docName);
+    if (d) { docInfo = d; break; }
   }
-  return head + foot;
+  if (!docInfo || !docInfo.path) { toast('warn', 'Không tìm thấy tài liệu'); return; }
+
+  toast('ok', 'Đang tải ' + docName + '...');
+  try {
+    const loadingTask = pdfjsLib.getDocument(docInfo.path);
+    pdfDoc = await loadingTask.promise;
+    DOC.file = docInfo.name;
+    DOC.totalPages = pdfDoc.numPages;
+    docInfo.pages = pdfDoc.numPages;
+
+    // Cập nhật active state
+    CHAPTERS.forEach(ch => ch.docs.forEach(d => { d.active = (d.name === docName); }));
+    // Cập nhật studying badge
+    CHAPTERS.forEach(ch => { ch.studying = ch.docs.some(d => d.active); });
+
+    // Reset state cho document mới
+    S.notes = [];
+    S.undo = [];
+    S.page = 1;
+    renderedPDFPages.clear();
+    if (pdfObserver) pdfObserver.disconnect();
+
+    // Re-render UI
+    renderChapters();
+    renderPages();
+    syncChrome();
+    $('#docName').textContent = DOC.file;
+    $('#docSub').textContent = DOC.course + ' · ' + DOC.code;
+    $('#scroller').scrollTop = 0;
+
+    toast('ok', 'Đã mở ' + docName + ' (' + pdfDoc.numPages + ' trang)');
+  } catch (err) {
+    console.error('PDF load error:', err);
+    toast('err', 'Không tải được PDF. Hãy chạy local server (xem console).');
+  }
 }
 
 function renderPages() {
-  const wm = 'DEMO · CP2';
-  $('#pages').innerHTML = PAGES.map(p => {
-    const green = ['title', 'divider', 'quote'].includes(p.kind);
-    return `<section class="page" id="pg${p.n}" data-page="${p.n}">
-      <div class="page-head"><span>${t('page')} ${p.n} / ${DOC.totalPages}</span><span class="r">${DOC.file}</span></div>
-      <div class="slide${green ? ' green' : ''}" data-wm="${wm}">
-        ${slideHTML(p)}
+  const container = $('#pages');
+  container.innerHTML = '';
+
+  for (let i = 1; i <= DOC.totalPages; i++) {
+    const section = document.createElement('section');
+    section.className = 'page';
+    section.id = 'pg' + i;
+    section.dataset.page = i;
+    section.innerHTML = `
+      <div class="page-head"><span>${t('page')} ${i} / ${DOC.totalPages}</span><span class="r">${DOC.file}</span></div>
+      <div class="slide pdf-loading">
+        <canvas class="pdf-canvas"></canvas>
+        <div class="pdf-text-layer"></div>
         <svg class="ink" viewBox="0 0 1000 562" preserveAspectRatio="none"></svg>
-      </div>
-    </section>`;
-  }).join('');
+      </div>`;
+    container.appendChild(section);
+  }
+
   $('#pagerTotal').textContent = DOC.totalPages;
   observePages();
+  setupPDFLazyRender();
+}
+
+function setupPDFLazyRender() {
+  if (!pdfDoc) return;
+  if (pdfObserver) pdfObserver.disconnect();
+
+  pdfObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const num = +entry.target.dataset.page;
+        if (!renderedPDFPages.has(num)) {
+          renderedPDFPages.add(num);
+          renderPDFPage(num);
+        }
+      }
+    });
+  }, { root: $('#scroller'), rootMargin: '400px 0px' });
+
+  $$('.page').forEach(el => pdfObserver.observe(el));
+}
+
+async function renderPDFPage(num) {
+  if (!pdfDoc) return;
+  try {
+    const page = await pdfDoc.getPage(num);
+    const slideEl = $(`#pg${num} .slide`);
+    const canvas = $(`#pg${num} .pdf-canvas`);
+    const textLayerDiv = $(`#pg${num} .pdf-text-layer`);
+    if (!canvas || !slideEl) return;
+
+    // Tính viewport
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = 2; // 2x cho retina
+    const viewport = page.getViewport({ scale });
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    // Cập nhật aspect-ratio slide theo PDF page thật
+    slideEl.style.aspectRatio = `${baseViewport.width} / ${baseViewport.height}`;
+
+    // Cập nhật SVG ink viewBox
+    const svg = $(`#pg${num} .ink`);
+    if (svg) svg.setAttribute('viewBox', `0 0 ${Math.round(baseViewport.width)} ${Math.round(baseViewport.height)}`);
+
+    // Render canvas
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    // Text layer cho chọn text
+    textLayerDiv.innerHTML = '';
+    const textContent = await page.getTextContent();
+    const textItems = textContent.items;
+    for (const item of textItems) {
+      if (!item.str) continue;
+      const tx = pdfjsLib.Util.transform(
+        pdfjsLib.Util.transform(baseViewport.transform, item.transform), [1, 0, 0, -1, 0, 0]);
+      const span = document.createElement('span');
+      span.textContent = item.str;
+      const fontHeight = Math.sqrt(tx[2] * tx[2] + tx[3] * tx[3]);
+      span.style.fontSize = fontHeight + 'px';
+      span.style.fontFamily = item.fontName || 'sans-serif';
+      // Vị trí: tính theo % để tỉ lệ đúng với container
+      span.style.left = (tx[4] / baseViewport.width * 100) + '%';
+      span.style.top = (tx[5] / baseViewport.height * 100 - fontHeight / baseViewport.height * 100) + '%';
+      // Scale theo chiều ngang
+      if (item.width) {
+        const naturalWidth = item.str.length * fontHeight * 0.5; // ước lượng
+        const targetWidth = item.width * baseViewport.scale;
+        if (naturalWidth > 0) {
+          span.style.transform = `scaleX(${targetWidth / naturalWidth})`;
+        }
+      }
+      textLayerDiv.appendChild(span);
+    }
+
+    slideEl.classList.remove('pdf-loading');
+  } catch (err) {
+    console.error('Error rendering page ' + num, err);
+    const slideEl = $(`#pg${num} .slide`);
+    if (slideEl) slideEl.classList.remove('pdf-loading');
+  }
 }
 
 /* ---- scroll-spy: tính thẳng từ scrollTop, KHÔNG dùng IntersectionObserver ----
@@ -370,10 +455,14 @@ document.addEventListener('pointerup', () => {
   syncChrome();
 });
 
-/* toạ độ con trỏ quy về hệ 1000×562 của lớp mực */
+/* toạ độ con trỏ quy về hệ toạ độ SVG viewBox của lớp mực */
 function slidePt(slide, e) {
   const r = slide.getBoundingClientRect();
-  return { x: ((e.clientX - r.left) / r.width) * 1000, y: ((e.clientY - r.top) / r.height) * 562 };
+  const svg = slide.querySelector('.ink');
+  const vb = svg ? svg.viewBox.baseVal : null;
+  const vw = (vb && vb.width) || 1000;
+  const vh = (vb && vb.height) || 562;
+  return { x: ((e.clientX - r.left) / r.width) * vw, y: ((e.clientY - r.top) / r.height) * vh };
 }
 function addPoint(e) {
   const p = slidePt(draw.slide, e);
@@ -640,10 +729,10 @@ function pageUnderSnip() {
 $('#snipAsk').onclick = () => {
   const p = pageUnderSnip();
   S.snap = { page: p, w: Math.round(snip.w), h: Math.round(snip.h) };
+  const r = snipBar.getBoundingClientRect();
   closeSnip();
-  openTutor(true);
-  renderAttach();
-  send(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, { page: p, region: true });
+  openAskPopup(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, { page: p, region: true },
+    r.left + r.width / 2, r.top);
 };
 $('#snipNote').onclick = () => {
   const p = pageUnderSnip();
@@ -693,13 +782,14 @@ document.addEventListener('mouseup', e => {
 document.addEventListener('mousedown', e => {
   if (!e.target.closest('.sel-popup')) selPopup.hidden = true;
   if (!e.target.closest('#moreMenu') && !e.target.closest('#btnDocMenu')) $('#moreMenu').hidden = true;
+  if (!e.target.closest('.ask-popup') && !e.target.closest('.sel-popup') && !e.target.closest('.snip-bar')) closeAskPopup();
 });
 
 $('#spAsk').onclick = () => {
+  const rect = selPopup.getBoundingClientRect();
   selPopup.hidden = true;
-  openTutor(true);
-  const q = S.selQuote.length > 90 ? S.selQuote.slice(0, 90) + '…' : S.selQuote;
-  send(`Giải thích giúp mình đoạn: “${q}”`, { page: S.selPos.page, quote: S.selQuote });
+  openAskPopup(`Giải thích đoạn bôi đen ở Trang ${S.selPos.page}...`, { page: S.selPos.page, quote: S.selQuote },
+    rect.left + rect.width / 2, rect.top);
   window.getSelection().removeAllRanges();
 };
 $('#spConfused').onclick = () => {
@@ -713,6 +803,38 @@ $('#spNote').onclick = () => {
   openNoteEditor({ page: S.selPos.page, quote: S.selQuote, x: S.selPos.x, y: S.selPos.y });
   window.getSelection().removeAllRanges();
 };
+
+/* =============================================================
+   ASK POPUP — cho sửa query trước khi gửi
+   ============================================================= */
+const askPopup = $('#askPopup');
+let askOpts = {};
+
+function openAskPopup(defaultQuery, opts, cx, cy) {
+  askOpts = opts;
+  $('#askPageLabel').textContent = `TRANG ${opts.page || S.page}`;
+  $('#askInput').value = defaultQuery;
+  askPopup.hidden = false;
+  // vị trí popup: canh giữa ngang, trên vùng bấm
+  const pw = askPopup.offsetWidth, ph = askPopup.offsetHeight;
+  askPopup.style.left = clamp(cx - pw / 2, 10, innerWidth - pw - 10) + 'px';
+  askPopup.style.top = (cy - ph - 12 > 84 ? cy - ph - 12 : cy + 12) + 'px';
+  setTimeout(() => $('#askInput').focus(), 30);
+}
+function closeAskPopup() {
+  askPopup.hidden = true;
+}
+function submitAskPopup() {
+  const q = $('#askInput').value.trim();
+  if (!q) return;
+  closeAskPopup();
+  openTutor(true);
+  if (S.snap) renderAttach();
+  send(q, askOpts);
+}
+$('#askSend').onclick = submitAskPopup;
+$('#askClose').onclick = closeAskPopup;
+$('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitAskPopup(); });
 
 /* =============================================================
    TUTOR CHAT
@@ -1039,7 +1161,7 @@ $('#ask').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnSend'
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal();
+    closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal(); closeAskPopup();
     S.moreOpen = false; updateSubbar();
   }
   if (e.target.matches('input,textarea') || e.target.isContentEditable) return;
@@ -1053,7 +1175,6 @@ document.addEventListener('keydown', e => {
 
 /* ---------------- boot ---------------- */
 renderChapters();
-renderPages();
 renderSwatches();
 setPenSize(S.penSize, true);
 S.chat = SEED_CHAT.map(m => m.role === 'user'
@@ -1062,4 +1183,17 @@ S.chat = SEED_CHAT.map(m => m.role === 'user'
 renderChat();
 applyLang();
 applyZoom();
-setTimeout(() => toast('ok', 'Prototype CP2 · dữ liệu và câu trả lời AI đều là mock'), 600);
+
+// Tìm document active và load PDF
+(async () => {
+  let activeDoc = null;
+  for (const ch of CHAPTERS) {
+    const d = ch.docs.find(d => d.active);
+    if (d) { activeDoc = d; break; }
+  }
+  if (activeDoc) {
+    await loadDocument(activeDoc.name);
+  } else {
+    renderPages(); // fallback nếu không có active doc
+  }
+})();

@@ -5,9 +5,9 @@
    ============================================================= */
 
 const DOC = {
-  file: 'material_95eb786b4d9e.pdf',
-  course: 'COMP2010',
-  code: 'Lecture_material_ms203vsq_ob7vqp',
+  file: 'd2-slide-hackathon.pdf',
+  course: 'AI & LLM Foundation',
+  code: 'AI_IN_ACTION_Day02',
   totalPages: 76,
   instructor: 'Mai Anh Nguyen (Blue)',
 };
@@ -16,38 +16,12 @@ const DOC = {
 const CHAPTERS = [
   {
     id: 'day01', title: 'Day01', status: 'PUBLISHED', docs: [
-      { name: 'material_2c81f0a7be.pdf', pages: 54, done: true },
-      { name: 'worksheet_day01.pdf', pages: 8, done: true },
+      { name: 'd1-slide-hackathon.pdf', path: '../data/vlearn-pack/slides/d1-slide-hackathon.pdf', pages: 54, done: true },
     ]
   },
   {
     id: 'day02', title: 'Day02', status: 'PUBLISHED', studying: true, open: true, docs: [
-      { name: DOC.file, pages: 76, done: true, active: true },
-    ]
-  },
-  {
-    id: 'day03', title: 'Day03', status: 'PUBLISHED', docs: [
-      { name: 'material_7fa3c19d02.pdf', pages: 61, done: false },
-      { name: 'checklist_hax_pair.pdf', pages: 4, done: false },
-    ]
-  },
-  {
-    id: 'day04', title: 'Day04', status: 'PUBLISHED', docs: [
-      { name: 'material_be40d7c115.pdf', pages: 48, done: false },
-      { name: 'golden_set_template.pdf', pages: 6, done: false },
-      { name: 'eval_playbook.pdf', pages: 12, done: false },
-    ]
-  },
-  {
-    id: 'day05', title: 'Day05', status: 'PUBLISHED', docs: [
-      { name: 'material_09cc5e2a41.pdf', pages: 39, done: false },
-      { name: 'user_test_script.pdf', pages: 5, done: false },
-      { name: 'demo_rubric.pdf', pages: 3, done: false },
-    ]
-  },
-  {
-    id: 'day06', title: 'Day06', status: 'PUBLISHED', docs: [
-      { name: 'material_a1d8b3f720.pdf', pages: 27, done: false },
+      { name: DOC.file, path: '../data/vlearn-pack/slides/d2-slide-hackathon.pdf', pages: 76, done: true, active: true },
     ]
   },
 ];
