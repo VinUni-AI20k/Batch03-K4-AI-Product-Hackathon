@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLearn AI Tutor — Flashcard Ôn Luyện Bài Giảng Khoá AI Thực Chiến</title>
+  <meta name="description"
+    content="Nền tảng tự động tạo và ôn luyện Flashcard bám sát transcript bài giảng khoá học AI Thực Chiến bằng AI Tutor.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dark-theme">
+
+  <!-- Top Navigation Bar -->
+  <header class="vlearn-header">
+    <div class="header-left">
+      <div class="logo-badge">
+        <i class="fa-solid fa-brain logo-icon"></i>
+        <span class="logo-text">VLearn <span class="accent-text">AI Tutor</span></span>
+        <span class="version-tag">CP2 Prototype</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="lesson-selector-wrapper">
+        <i class="fa-solid fa-book-bookmark selector-icon"></i>
+        <select id="lessonSelect" class="lesson-select" aria-label="Chọn bài học">
+          <option value="all">Tất cả bài học (8 Thẻ mẫu)</option>
+          <option value="day-1" selected>Day 1: AI & LLM Foundation</option>
+          <option value="day-2">Day 2: Xác Định Bài Toán AI & Lát Cắt</option>
+        </select>
+      </div>
+
+      <div class="lesson-selector-wrapper" style="margin-left: 0.8rem;">
+        <i class="fa-solid fa-filter selector-icon"></i>
+        <select id="statusFilterSelect" class="lesson-select" aria-label="Lọc theo trạng thái thuộc bài">
+          <option value="all" selected>Tất cả thẻ bài học</option>
+          <option value="hard">🔴 Chưa thuộc (Xem thẻ khó)</option>
+          <option value="review">🟡 Tạm ổn (Cần ôn lại)</option>
+          <option value="master">🟢 Đã thuộc</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="user-avatar" title="Học viên K4 AI Thực Chiến">
+        <span>HV</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App Layout -->
+  <div class="app-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="vlearn-sidebar">
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="reviewTab" id="tabBtnReview">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Ôn Luyện Thẻ 3D</span>
+        </button>
+        <button class="nav-item" data-tab="generateTab" id="tabBtnGenerate">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Sinh Flashcard AI</span>
+        </button>
+      </nav>
+
+      <!-- Mastery Stats Widget -->
+      <div class="sidebar-card mastery-card">
+        <div class="card-header-sm">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Tiến độ thuộc bài</span>
+        </div>
+        <div class="stat-number"><span id="masteredCount">0</span> / <span id="totalCardsCount">0</span></div>
+        <div class="progress-bar-container">
+          <div id="masteryProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="stat-breakdown">
+          <span id="filterMasterTag" class="tag-stat master filter-tag-btn" title="Click để xem các thẻ Đã thuộc"><i class="fa-solid fa-circle"></i> Đã thuộc: <b id="statGreen">0</b></span>
+          <span id="filterReviewTag" class="tag-stat review filter-tag-btn" title="Click để xem các thẻ Tạm ổn"><i class="fa-solid fa-circle"></i> Tạm ổn: <b id="statYellow">0</b></span>
+          <span id="filterHardTag" class="tag-stat hard filter-tag-btn" title="Click để xem các thẻ CHƯA THUỘC"><i class="fa-solid fa-circle"></i> Chưa thuộc: <b id="statRed">0</b></span>
+        </div>
+      </div>
+
+      <!-- HAX Principles Info Box -->
+      <div class="sidebar-card hax-card">
+        <div class="card-header-sm">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Cam kết AI Grounding</span>
+        </div>
+        <p class="hax-desc">100% thẻ Flashcard được trích xuất bám sát Transcript bài giảng với mã đối chiếu
+          <code>[Txx-NNN]</code> (HAX G2).</p>
+      </div>
+    </aside>
+
+    <!-- Main Content View Area -->
+    <main class="vlearn-main">
+
+      <!-- TAB 1: REVIEW FLASHCARDS (3D FLIP CARD) -->
+      <section id="reviewTab" class="tab-content active">
+        <div class="tab-header">
+          <div>
+            <h1 class="tab-title">Ôn Luyện Flashcard Bám Sát Bài Giảng</h1>
+            <p class="tab-subtitle">Bấm vào thẻ (hoặc bấm Space) để lật xem đáp án và trích dẫn bài giảng.</p>
+          </div>
+          <div class="controls-right">
+            <button id="autoGenHeaderBtn" class="btn btn-primary-gradient btn-sm"
+              title="Yêu cầu AI Tutor sinh bộ Flashcards mới">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI Sinh Thẻ Mới
+            </button>
+            <span class="card-counter">Thẻ <b id="currentCardIndex">0</b> / <b id="totalCardCountDisplay">0</b></span>
+            <button id="shuffleBtn" class="btn btn-ghost" title="Xáo trộn thẻ"><i class="fa-solid fa-shuffle"></i> Xáo
+              trộn</button>
+          </div>
+        </div>
+
+        <!-- 3D Flashcard Container -->
+        <div class="flashcard-stage">
+          <!-- Empty State Stage when user has no cards -->
+          <div id="reviewEmptyState" class="empty-state-stage hidden">
+            <i class="fa-solid fa-layer-group empty-icon-lg"></i>
+            <h2>Chưa có thẻ Flashcard nào cho bài học này</h2>
+            <p>Dữ liệu trống cho người dùng mới. Bạn có thể sử dụng AI để sinh bộ thẻ theo số lượng mong muốn hoặc nạp
+              bộ thẻ mẫu để ôn tập ngay.</p>
+            <div class="empty-actions">
+              <button id="emptyGenBtn" class="btn btn-primary-gradient">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Sinh Flashcards Bằng AI
+              </button>
+              <button id="emptyLoadCanonicalBtn" class="btn btn-outline">
+                <i class="fa-solid fa-download"></i> Nạp Bộ Thẻ Mẫu (8 thẻ)
+              </button>
+            </div>
+          </div>
+
+          <button id="prevCardBtn" class="nav-arrow nav-prev" aria-label="Thẻ trước"><i
+              class="fa-solid fa-chevron-left"></i></button>
+
+          <div id="flashcard3D" class="flashcard-3d" tabindex="0">
+            <!-- FRONT OF CARD -->
+            <div class="card-face card-front">
+              <div class="card-top-bar">
+                <span id="cardTopicTag" class="badge badge-topic">Chủ đề</span>
+                <span id="cardDifficultyTag" class="badge badge-difficulty">Độ khó</span>
+              </div>
+
+              <div class="card-body">
+                <i class="fa-regular fa-circle-question question-watermark"></i>
+                <h2 id="cardQuestionText" class="card-question">Đang kết nối AI Tutor để sinh câu hỏi...</h2>
+              </div>
+
+              <div id="hintContainer" class="hint-box hidden">
+                <i class="fa-solid fa-lightbulb hint-icon"></i>
+                <span id="hintText">Gợi ý từ AI Tutor...</span>
+              </div>
+
+              <div class="card-footer-bar">
+                <button id="toggleHintBtn" class="btn btn-ghost-accent btn-sm">
+                  <i class="fa-solid fa-lightbulb"></i> Gợi ý
+                </button>
+                <div class="flip-prompt">
+                  <span>Lật thẻ để xem đáp án</span>
+                  <i class="fa-solid fa-rotate-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- BACK OF CARD -->
+            <div class="card-face card-back">
+              <div class="card-top-bar">
+                <span class="badge badge-answer-title"><i class="fa-solid fa-circle-check"></i> Đáp án chuẩn bài
+                  giảng</span>
+                <button id="cardCitationBadge" class="badge badge-citation" title="Bấm để xem trích dẫn transcript">
+                  <i class="fa-solid fa-quote-left"></i> <span id="cardCitationText">[Nguồn]</span>
+                </button>
+              </div>
+
+              <div class="card-body">
+                <p id="cardAnswerText" class="card-answer">Đang khởi tạo đáp án từ AI Tutor...</p>
+
+                <div id="transcriptBox" class="transcript-snippet-box">
+                  <div class="snippet-header">
+                    <i class="fa-solid fa-file-lines"></i> Trích dẫn Transcript gốc:
+                  </div>
+                  <p id="cardTranscriptSnippet" class="snippet-text">"Đang nạp trích dẫn..."</p>
+                </div>
+              </div>
+
+              <div class="card-footer-bar">
+                <button id="askTutorBtn" class="btn btn-primary-gradient btn-sm">
+                  <i class="fa-solid fa-robot"></i> Hỏi AI Tutor giải thích
+                </button>
+                <div class="flip-prompt">
+                  <span>Lật lại câu hỏi</span>
+                  <i class="fa-solid fa-rotate-left"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button id="nextCardBtn" class="nav-arrow nav-next" aria-label="Thẻ sau"><i
+              class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Rating Controls & Keyboard Guide -->
+        <div class="rating-section">
+          <p class="rating-label">Đánh giá mức độ thuộc thẻ này:</p>
+          <div class="rating-buttons">
+            <button class="btn btn-rate hard" data-rating="hard" id="rateHardBtn">
+              <i class="fa-solid fa-xmark"></i> Chưa thuộc (Cần học lại)
+            </button>
+            <button class="btn btn-rate review" data-rating="review" id="rateReviewBtn">
+              <i class="fa-solid fa-triangle-exclamation"></i> Tạm ổn (Cần ôn)
+            </button>
+            <button class="btn btn-rate master" data-rating="master" id="rateMasterBtn">
+              <i class="fa-solid fa-check"></i> Đã thuộc (Nắm chắc)
+            </button>
+          </div>
+          <div class="keyboard-shortcuts-hint">
+            <span><kbd>Space</kbd> Lật thẻ</span>
+            <span><kbd>←</kbd> Thẻ trước</span>
+            <span><kbd>→</kbd> Thẻ tiếp</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI FLASHCARD GENERATOR -->
+      <section id="generateTab" class="tab-content">
+        <div class="tab-header">
+          <div>
+            <h1 class="tab-title">Sinh Flashcard Tự Động Bằng AI</h1>
+            <p class="tab-subtitle">Trích xuất kiến thức trọng tâm từ Transcript/Slide bài giảng để tạo câu hỏi mới.</p>
+          </div>
+        </div>
+
+        <div class="generator-grid">
+          <!-- Options Panel -->
+          <div class="panel form-panel">
+            <h2 class="panel-title"><i class="fa-solid fa-sliders"></i> Cấu hình sinh Flashcard</h2>
+
+            <div class="form-group">
+              <label for="genLessonSelect">Chọn bài học gốc (Data Pack):</label>
+              <select id="genLessonSelect" class="form-control">
+                <option value="day-1">Day 1: AI & LLM Foundation (Trích 290 đoạn transcript)</option>
+                <option value="day-2">Day 2: Xác Định Bài Toán AI & Lát Cắt (Trích 310 đoạn transcript)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="genTopicSelect">Chủ đề bài giảng:</label>
+              <select id="genTopicSelect" class="form-control">
+                <option value="all">Tất cả khái niệm chính trong buổi</option>
+                <option value="hallucination">Hallucination & RAG Retrieval</option>
+                <option value="augment-automate">Phân biệt Augment vs Automate & Cost-of-Error</option>
+                <option value="jtbd">Jobs-To-Be-Done & One-Sentence Slice</option>
+                <option value="hax">Nguyên tắc HAX/PAIR & 4 Lớp Chỗ Khó</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="genDifficulty">Độ khó mong muốn:</label>
+              <select id="genDifficulty" class="form-control">
+                <option value="Cơ bản">Cơ bản (Định nghĩa khái niệm)</option>
+                <option value="Trọng tâm" selected>Trọng tâm (So sánh & Nguyên lý)</option>
+                <option value="Nâng cao">Nâng cao (Case Study Thực tế & Rủi ro)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="genCountSelect">Số lượng Flashcards sinh cùng lúc:</label>
+              <select id="genCountSelect" class="form-control">
+                <option value="5">5 Flashcards (Ôn nhanh 5 phút)</option>
+                <option value="10" selected>10 Flashcards (Bộ chuẩn)</option>
+                <option value="15">15 Flashcards (Chuyên sâu)</option>
+                <option value="20">20 Flashcards (Bộ hoàn chỉnh)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="genCustomPrompt">Yêu cầu bổ sung cho AI Tutor (Tuỳ chọn):</label>
+              <textarea id="genCustomPrompt" class="form-control" rows="3"
+                placeholder="Ví dụ: Tạo câu hỏi tập trung vào cách phân biệt giữa Augment và Automate khi làm product..."></textarea>
+            </div>
+
+            <button id="generateCardsBtn" class="btn btn-primary-gradient btn-block btn-lg">
+              <i class="fa-solid fa-bolt"></i> Sinh Flashcards Bằng Gemini AI
+            </button>
+          </div>
+
+          <!-- Preview & AI Results Panel -->
+          <div class="panel results-panel">
+            <h2 class="panel-title">
+              <i class="fa-solid fa-list-check"></i> Danh sách Flashcard mới sinh
+              <span id="genStatusBadge" class="badge badge-success hidden">Đã sinh 5 thẻ</span>
+            </h2>
+
+            <div id="genLoadingState" class="loading-state hidden">
+              <div class="spinner"></div>
+              <p class="loading-text">AI Tutor đang đọc Transcript bài giảng và sinh bộ câu hỏi bám sát kiến thức...</p>
+            </div>
+
+            <div id="generatedCardsList" class="cards-list">
+              <div class="empty-state">
+                <i class="fa-solid fa-wand-magic-sparkles empty-icon"></i>
+                <p>Nhấn nút <b>"Sinh 5 Flashcards Bằng Gemini AI"</b> để bắt đầu trích xuất câu hỏi từ transcript bài
+                  giảng.</p>
+              </div>
+            </div>
+
+            <div id="applyGeneratedBtnWrapper" class="hidden" style="margin-top: 1.5rem;">
+              <button id="applyGeneratedCardsBtn" class="btn btn-success-gradient btn-block">
+                <i class="fa-solid fa-play"></i> Thêm vào Bộ Thẻ Ôn Luyện Ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- RIGHT SIDE DRAWER: AI TUTOR EXPLANATION -->
+  <div id="tutorDrawerOverlay" class="drawer-overlay hidden"></div>
+  <aside id="tutorDrawer" class="tutor-drawer">
+    <div class="drawer-header">
+      <div class="tutor-info">
+        <div class="tutor-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <h3 class="tutor-name">VLearn AI Tutor</h3>
+          <span class="tutor-status"><i class="fa-solid fa-circle online-dot"></i> Đang hỗ trợ theo bài giảng</span>
+        </div>
+      </div>
+      <button id="closeDrawerBtn" class="btn-close-drawer" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Card Context Banner -->
+      <div class="card-context-banner">
+        <i class="fa-solid fa-circle-info"></i>
+        <div class="context-content">
+          <div id="drawerCardQuestion" class="context-question">Đang chọn câu hỏi...</div>
+          <span id="drawerCitation" class="badge badge-citation-sm">[T01-015]</span>
+        </div>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="chatMessages" class="chat-messages">
+        <!-- Initial Tutor Message -->
+        <div class="chat-message tutor">
+          <div class="msg-bubble">
+            Xin chào! Mình là AI Tutor. Bạn đang thắc mắc gì về đáp án hoặc kiến thức ở thẻ Flashcard này? Mình có thể
+            giải thích chi tiết dựa trên transcript bài giảng của khoá học.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <form id="tutorChatForm" class="chat-input-wrapper">
+        <input type="text" id="tutorInput" class="chat-input" placeholder="Hỏi AI Tutor giải thích thêm..."
+          autocomplete="off">
+        <button type="submit" class="btn btn-send" aria-label="Gửi"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main JavaScript App -->
+  <script src="app.js"></script>
+</body>
+
+</html>
