@@ -46,9 +46,9 @@ security:
 # Knowledge packs — bộ bài học cài từ GitHub qua chat (agent chỉ được cài các repo
 # khai báo ở đây, không clone URL tuỳ ý). Thay repo bằng repo bài học thật của bạn.
 knowledge_packs:
-  - name: aaa-lessons
-    repo: https://github.com/CHANGE-ME/aaa-lessons   # <- đổi thành repo bài học của đội
-    description: Bộ bài học AI20K của đội AAA (markdown/slide)
+  - name: vlearn-pack
+    repo: https://github.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304.git
+    description: Bộ bài học K4 hackathon (slides + 6 transcript bài giảng + nội dung Discord)
 
 # Cron kiểu Hermes: tick 60s, mỗi job chạy phiên agent mới với skill chỉ định,
 # kết quả gửi về home chat (đặt bằng /sethome trong Discord/Telegram)
