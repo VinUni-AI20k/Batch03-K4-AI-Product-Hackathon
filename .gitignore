@@ -1,6 +1,8 @@
 .DS_Store
 node_modules/
 *.env
+gmail_secret.json
+docs/
 example
 */.venv
 __pycache__/
