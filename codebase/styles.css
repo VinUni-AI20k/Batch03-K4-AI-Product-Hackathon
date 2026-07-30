@@ -327,6 +327,10 @@ input{font:inherit}
 
 /* highlight + mực bút */
 .slide mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px;box-decoration-break:clone}
+/* lớp phủ highlight: nằm trên canvas, dưới text layer để vẫn bôi đen chữ được */
+.hl-layer{position:absolute;inset:0;z-index:1;pointer-events:none}
+.hl-mark{position:absolute;background:var(--hl);border-radius:2px;mix-blend-mode:multiply;opacity:.75}
+[data-theme="dark"] .hl-mark{mix-blend-mode:screen;opacity:.35}
 /* width/height phải ghi đè quy tắc svg{width:20px;height:20px} dùng cho icon,
    nếu không lớp mực bị co thành ô 20×20px ở góc và nét vẽ biến mất */
 .ink{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
@@ -442,6 +446,11 @@ input{font:inherit}
 .sources.open .src-body{display:block}
 .src-card{border-left:3px solid var(--accent);background:var(--sheet);border-radius:0 10px 10px 0;padding:10px 12px;margin-top:8px;cursor:pointer;transition:.15s}
 .src-card:hover{background:var(--accent-soft)}
+/* nguồn chưa đối chiếu được với text thật của trang — phải nhìn ra ngay */
+.src-card.unverified{border-left-color:var(--warn);background:var(--warn-soft)}
+.src-card.unverified:hover{background:var(--warn-soft);filter:brightness(.97)}
+.src-card.unverified .src-pg b{color:var(--warn)}
+.src-warn{font-size:11px;font-weight:800;color:var(--warn);background:var(--warn-soft);padding:3px 7px;border-radius:6px}
 .src-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .src-n{width:20px;height:20px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:11px;font-weight:800}
 .src-pg{font-size:11.5px;font-weight:700;color:var(--ink-3);display:inline-flex;align-items:center;gap:5px}

@@ -73,12 +73,22 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   1. *Accuracy & Citation:* Đạt khi câu trả lời đúng kiến thức bài học và bắt buộc có trích dẫn `[trang N]` hoặc `[Txx-NNN]`.
   2. *Scope & Fallback:* Đạt khi AI nhận diện được câu hỏi ngoài lề/mơ hồ và từ chối/hỏi lại theo đúng kịch bản, không đoán bừa.
   3. *Conciseness & Format:* Đạt khi định dạng tóm tắt dưới 5 gạch đầu dòng, ngôn ngữ dễ hiểu.
-- **Golden set:** **20 case** gồm 8 thường, 8 case khó (2 case cho mỗi lớp) và 4 hiếm; 15 case ghi rõ nguồn/adaptation từ chatlog. Bốn fixture ảnh là pixel render từ PDF thật. File: `eval/golden_set.json`.
+- **Golden set:** **24 case** gồm 8 thường, 12 case khó và 4 hiếm; toàn bộ ghi rõ nguồn/adaptation. Bốn fixture ảnh là pixel render từ PDF thật. File: `eval/golden_set.json`.
+  * GS-21..24 bổ sung sau khi đo được rằng bộ phân loại cũ chỉ bắt đúng câu đã chuẩn bị: ba câu logistics diễn đạt khác (0/4 nhận diện đúng trước khi sửa) và một câu prompt injection để nghiệm thu guardrail mới.
+- **Ai ra quyết định — khai báo rõ để không thổi phồng năng lực AI:**
+  * **Rule (có chủ đích):** nhóm logistics (deadline, link nộp, lịch/giờ thi, điểm số) và trang không tồn tại. Chọn rule vì cost-of-error ở nhóm này cao nhất — trả lời sai deadline gây hậu quả trực tiếp cho học viên, không để model ứng biến.
+  * **AI:** mọi trường hợp còn lại, gồm cả *ngoài phạm vi không thuộc logistics* (nhờ viết code hộ, hỏi chuyện ngoài môn). Trước đây nhóm này do regex quyết định và regex đã bị overfit vào chính golden set (chứa `flappy|pygame` khớp đúng một case).
+  * Bảng kết quả tách hai cột nên đọc được riêng điểm của model.
 - **Quality Bar (Chốt trước 23:59 N1):** **Đạt khi >= 85% số cases trong Golden Set qua bộ lọc kiểm thử thành công.**
 - **Kết quả các lượt chạy (Bảng cập nhật):**
   * *Lượt chạy 1:* **Không hợp lệ** — 18/20 output ghi `[MOCK]` nhưng báo cáo cũ tự nhận Gemini và 12/20. Giữ tại `eval/evaluation_run_1.md` để audit.
   * *Lượt chạy 2 (AI thật - 2026-07-30):* **pre-score 16/20 (80%)** $\rightarrow$ Chưa đạt Quality Bar. Cả 4 case fail là image/vision do chưa cấu hình vision credential. Trace 16 case còn lại có model/request ID/token usage tại `eval/agent_traces_run_2.jsonl`. Cần người thứ hai chấm độc lập 5 case khó trước khi chốt % cuối.
-  * *Lượt chạy 12 (AI thật, text + Gemma 4 vision - 2026-07-30):* **pre-score khái niệm 19/20 (95%)**, exact-label 18/20 (90%) $\rightarrow$ **đạt bar máy 85%**. Đủ 20 output/20 trace, không có API error, 4 case gọi VLM có model `google/gemma-4-31b-it` và request ID. Case fail duy nhất trả lời đúng nội dung nhưng dùng citation `[tr.23]`, trong khi runner chỉ nhận `[trang 23]`; vẫn giữ FAIL để tránh nới rubric sau khi xem output. Kết quả CP3 cuối vẫn cần hai người chấm độc lập.
+  * *Lượt chạy 12 (AI thật, text + Gemma 4 vision - 2026-07-30):* **pre-score khái niệm 19/20 (95%)**, exact-label 18/20 (90%) $\rightarrow$ **đạt bar máy 85%**. Đủ 20 output/20 trace, không có API error, 4 case gọi VLM có model `google/gemma-4-31b-it` và request ID. Case fail duy nhất trả lời đúng nội dung nhưng dùng citation `[tr.23]`, trong khi runner chỉ nhận `[trang 23]`; vẫn giữ FAIL để tránh nới rubric sau khi xem output.
+  * ⚠️ *Đính chính về Run 12:* con số 95% gộp cả 5 case do **rule** quyết định (GS-09/11/12/13/14 — trace có `model: null`, không hề gọi AI). Tách ra thì điểm thật của model chỉ là **14/15 = 93%**. Ngoài ra **23/55 = 42%** trích dẫn hiển thị cho học viên khi đó là đoạn mở đầu trang do nhánh dự phòng thay vào, không liên quan tới ý đang nói.
+  * *Lượt chạy 13 (sau khi sửa citation, chuyển refuse ngoài-logistics sang AI, thêm BM25 + transcript, 24 case):* **21/24 = 88% tổng · AI-only 15/18 = 83%** $\rightarrow$ **AI-only chưa đạt bar 85%**. Citation đối chiếu được với text thật của trang: **39/40 = 98%** (trước là 58%). Fail: GS-07, GS-18 (thiếu khái niệm bắt buộc), GS-14 (trả `clarify` thay vì `refuse`).
+  * *Lượt chạy 14 (hạ `temperature` 0.1 → 0 vì Run 13 cho thấy cùng một câu lúc `refuse` lúc `clarify`; đổi vì tính tái lập, không phải để tăng điểm):* **20/24 = 83% · AI-only 14/18 = 78%** $\rightarrow$ **kém hơn Run 13, ghi nhận nguyên trạng, không quay lại 0.1 để lấy số đẹp**. Xuất hiện thêm một case `error` do model dựng bảng markdown làm vỡ JSON.
+  * *Lượt chạy 15 (sau khi sửa lỗi vỡ JSON — cấm dấu ngoặc kép trong chuỗi + 2 lần tự sửa):* **23/24 = 96% tổng · AI-only 17/18 = 94%** $\rightarrow$ **cả hai đều đạt bar 85%**. Citation đối chiếu được **44/52 = 85%**. Case fail duy nhất là **GS-14**: model trả **đúng** `refuse`, nhưng trượt `required_terms: ["ngoài phạm vi"]` — từ khoá này viết theo đúng chuỗi cứng của rule cũ, không phải tiêu chí chất lượng. **Cố ý giữ FAIL**; sửa golden set sau khi đã nhìn output là nới rubric, việc này để người review quyết định.
+  * Kết quả CP3 cuối vẫn cần hai người chấm độc lập.
 
 ---
 

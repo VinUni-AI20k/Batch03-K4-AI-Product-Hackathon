@@ -37,6 +37,35 @@ Ngày audit: 2026-07-30
 - Viết script audit evidence tái lập và sửa spec/README theo trạng thái thật.
 - Kiểm thử browser: PDF 29 trang, summary end-to-end thành công, crop 200×120 được đính kèm và failure vision hiển thị đúng.
 
+---
+
+# Vòng rà soát thứ hai (2026-07-31)
+
+## Lỗi tìm được khi kiểm chứng lại Run 12
+
+| # | Lỗi | Bằng chứng đo được | Trạng thái |
+|---|---|---|---|
+| 1 | **Quyết định trung tâm phần lớn là regex, không phải AI.** 5/20 case không gọi model; đó lại đúng là các lớp chỗ khó ②③ | 5 trace có `model: null`; regex `OUT_OF_SCOPE` chứa `flappy\|pygame\|viết code game` — ba nhánh khớp đúng **một** case GS-14 | Đã sửa |
+| 2 | **Bộ phân loại chỉ bắt đúng câu đã chuẩn bị.** Gõ câu diễn đạt khác thì trượt | 4 câu logistics viết lại (đúng dấu tiếng Việt) → **0/4** ra `refuse` | Đã sửa · nay 5/5 |
+| 3 | **42% trích dẫn là dự phòng, không liên quan tới ý đang nói.** So khớp chuỗi con chính xác luôn trượt vì model diễn đạt lại | 23/55 source trong Run 12 trùng đoạn mở đầu trang | Đã sửa · nay 85-98% đối chiếu được |
+| 4 | Điểm 95% gộp cả case do rule quyết định | Rule pass theo thiết kế; AI-only thật là 14/15 = 93% | Đã sửa · bảng tách 2 cột |
+| 5 | Model dựng bảng markdown làm vỡ JSON, hỏng cả lượt hỏi | GS-19 `error` ở Run 14 | Đã sửa |
+| 6 | 550 dòng code chết trong `app.js` (362 dòng comment trong thân `mockAnswer` + khối `if (false)`) | `node --check` sạch sau khi gỡ | Đã dọn |
+
+## Nâng cấp kỹ thuật kèm theo
+
+- **Retrieval:** thay đếm từ chung bằng **BM25** (đếm từ chung không có IDF nên trang dài và từ phổ biến thắng oan).
+- **Nguồn:** nạp **486 đoạn transcript** (`[Txx-NNN]`) của đúng buổi học vào evidence — trước đó 6 transcript trong data pack hoàn toàn không được dùng.
+- **Guardrail:** bọc evidence trong `<evidence>` và tuyên bố rõ đó là dữ liệu chứ không phải mệnh lệnh (chống prompt injection); thêm GS-24 để nghiệm thu, dùng `forbidden_terms` kiểm chữ **không được** xuất hiện.
+- **Độ tin cậy:** không lấy nguyên `conf` model tự khai nữa mà kéo về theo tỉ lệ claim có citation và tỉ lệ citation đối chiếu được; số model tự khai vẫn lưu trong `grounding.conf_reported_by_model`.
+- **Luồng ảnh:** dùng `slide_text` mà frontend đã gửi sẵn nhưng backend bỏ quên — cấp chuỗi nhãn chính xác từ text layer để model khỏi đoán chữ số trong biểu đồ; vision lỗi thì suy giảm mềm sang trả lời bằng text kèm cảnh báo thay vì hỏng cả lượt.
+- **Vận hành:** cache theo nội dung câu hỏi, khoá ghi trace (`ThreadingHTTPServer` chạy đa luồng), retry mạng có backoff cho 429/5xx, ước tính chi phí mỗi lượt trong trace.
+
+## Chưa verify được
+
+- **Render PDF trên trình duyệt.** Trong môi trường headless dùng để kiểm thử, `pdfjsLib.getDocument()` không resolve cũng không reject (PDF fetch về đủ 2.435.727 bytes, `pdfjsLib` nạp thành công) — nhiều khả năng là deadlock giữa pdf.js và virtual-time của headless chứ không phải lỗi ứng dụng, nhưng **chưa chứng minh được**. Cần mở bằng trình duyệt thật để xác nhận.
+- **Rủi ro đi kèm:** `pdf.js` và worker của nó tải từ **CDN cloudflare**. Mất mạng hoặc mạng hội trường chặn là viewer trắng trang. Nên tải về đặt trong repo trước buổi demo.
+
 ## Phần cần con người tương tác trực tiếp
 
 1. **Thu hồi key đã lộ ngay:** revoke DeepSeek key cũ trên trang quản trị nhà cung cấp, tạo key mới và chỉ đặt trong `.env`. Xem key là đã lộ vì nó còn trong Git history.
