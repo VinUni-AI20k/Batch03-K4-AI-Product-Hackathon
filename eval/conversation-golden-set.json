@@ -1,8 +1,8 @@
 {
-  "dataset_id": "detai_plus_golden_v1",
-  "dataset_role": "golden",
+  "dataset_id": "detai_plus_conversation_eval_v1",
+  "dataset_role": "extension",
   "product": "ĐềTài+",
-  "description": "Bộ eval cho agent hỗ trợ học viên lựa chọn đề tài dựa trên hồ sơ, sở thích, kỹ năng, quy mô nhóm và mức thử thách.",
+  "description": "Bộ 40 case hội thoại mở rộng cho agent hỗ trợ học viên lựa chọn đề tài. Bộ này bổ sung kiểm thử hành vi và không thay thế golden set chính thức đã chốt trong spec.md.",
   "source_files": [
     "codebase/README.md",
     "codebase/app.js",

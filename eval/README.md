@@ -1,15 +1,17 @@
-# ĐềTài+ — Golden set
+# ĐềTài+ — Eval suites
 
-Thư mục này chứa bộ eval cho lát cắt sản phẩm: **giúp học viên chọn đề tài phù hợp từ hồ sơ, sở thích, kỹ năng, quy mô nhóm và mức thử thách**.
+Thư mục này chứa các bộ eval cho lát cắt sản phẩm: **giúp học viên chọn đề tài phù hợp từ hồ sơ, sở thích, kỹ năng, quy mô nhóm và mức thử thách**.
 
 ## File
 
-- `golden-set.json`: đúng 40 eval case và oracle mong đợi.
-- `validate.js`: kiểm tra schema tối thiểu, số lượng, độ phủ, ID trùng và mã đề tài tham chiếu.
+- `golden-set.json`: bộ 20 case chính thức đã chốt trong `spec.md`, dùng với API `/recommend` và `run_golden_set.py`.
+- `conversation-golden-set.json`: đúng 40 case hội thoại mở rộng và oracle mong đợi.
+- `run-01.md`: kết quả lượt chạy thật của bộ chính thức; không được sửa số liệu để khớp quality bar.
+- `validate.js`: kiểm tra schema, số lượng, độ phủ, ID trùng và mã đề tài của bộ 40 case mở rộng.
 
-Không có kết quả chạy được điền sẵn. Kết quả phải được ghi từ lượt chạy thật, kể cả case fail.
+Bộ mở rộng chưa được điền kết quả. Khi chạy phải lưu nguyên output, kể cả case fail. Hai bộ có mục đích khác nhau và không được cộng gộp tỷ lệ pass nếu chưa định nghĩa lại quality bar trong `spec.md`.
 
-## Cơ cấu 40 case
+## Cơ cấu bộ 40 case mở rộng
 
 | Nhóm | Số case | Mục đích |
 |---|---:|---|

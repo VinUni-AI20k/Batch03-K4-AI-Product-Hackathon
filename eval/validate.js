@@ -1,11 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
-const evalDir = fs.existsSync(path.join(process.cwd(), "eval", "golden-set.json"))
+const evalDir = fs.existsSync(path.join(process.cwd(), "eval", "conversation-golden-set.json"))
   ? path.join(process.cwd(), "eval")
   : __dirname;
 const root = path.resolve(evalDir, "..");
-const datasetPath = path.join(evalDir, "golden-set.json");
+const datasetPath = path.join(evalDir, "conversation-golden-set.json");
 const catalogPath = path.join(root, "mock-data.json");
 
 const dataset = JSON.parse(fs.readFileSync(datasetPath, "utf8"));
@@ -110,12 +110,12 @@ if (adaptedRealCount < 10) {
 }
 
 if (errors.length) {
-  console.error("Golden set INVALID:");
+  console.error("Conversation eval INVALID:");
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
 
-console.log("Golden set VALID");
+console.log("Conversation eval VALID");
 console.log(`- cases: ${cases.length}`);
 console.log(`- adapted real chatlog cases: ${adaptedRealCount}`);
 console.log(`- groups: ${JSON.stringify(groupCounts)}`);
