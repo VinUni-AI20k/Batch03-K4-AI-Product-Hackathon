@@ -141,6 +141,7 @@ class VLearnApp {
     this.currentIndex = 0;
     this.isFlipped = false;
     this.apiKey = localStorage.getItem('vlearn_gemini_key') || '';
+    this.model = localStorage.getItem('vlearn_gemini_model') || 'gemini-3.6-flash';
     this.generatedCardsTemp = [];
 
     this.initElements();
@@ -163,13 +164,19 @@ class VLearnApp {
         const res = await fetch(path);
         if (res.ok) {
           const text = await res.text();
-          const match = text.match(/GEMINI_API_KEY\s*=\s*([^\s#]+)/);
-          if (match && match[1] && !match[1].includes('YOUR_GEMINI_API_KEY_HERE')) {
-            this.apiKey = match[1].trim();
+          const keyMatch = text.match(/GEMINI_API_KEY\s*=\s*([^\s#]+)/);
+          if (keyMatch && keyMatch[1] && !keyMatch[1].includes('YOUR_GEMINI_API_KEY_HERE')) {
+            this.apiKey = keyMatch[1].trim();
             localStorage.setItem('vlearn_gemini_key', this.apiKey);
             console.log(`[VLearn] Loaded Gemini API Key from ${path}`);
-            break;
           }
+          const modelMatch = text.match(/GEMINI_MODEL\s*=\s*([^\s#]+)/);
+          if (modelMatch && modelMatch[1]) {
+            this.model = modelMatch[1].trim();
+            localStorage.setItem('vlearn_gemini_model', this.model);
+            console.log(`[VLearn] Loaded Gemini Model (${this.model}) from ${path}`);
+          }
+          if (this.apiKey) break;
         }
       } catch (e) {
         // Fallback silently
@@ -538,7 +545,8 @@ class VLearnApp {
 
     if (this.apiKey) {
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+        const model = this.model || 'gemini-3.6-flash';
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
