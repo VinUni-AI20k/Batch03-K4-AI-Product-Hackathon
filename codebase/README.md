@@ -1,10 +1,20 @@
-# ĐềTài+ — UI prototype
+# ĐềTài+ — prototype
 
-Prototype tĩnh cho luồng **“Agent hỗ trợ học viên lựa chọn đề tài dựa trên sở thích và kỹ năng”**.
+Prototype cho luồng **“Agent hỗ trợ học viên lựa chọn đề tài dựa trên sở thích và kỹ năng”**. Từ CP3, quyết định xếp hạng + lý do phù hợp được gọi thật qua model AI (`codebase/server/`) — không còn hardcode.
 
 ## Chạy demo
 
-Từ thư mục gốc của repository:
+**1. Backend AI** (bắt buộc để có kết quả AI thật; không chạy thì UI tự rơi về fallback rule-based có ghi rõ):
+
+```bash
+cd codebase/server
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # điền OPENROUTER_API_KEY, KHÔNG commit .env
+uvicorn main:app --port 8001
+```
+
+**2. Frontend** — từ thư mục gốc của repository:
 
 ```bash
 python3 -m http.server 8000
@@ -33,10 +43,12 @@ http://localhost:8000/codebase/
 - Tùy chọn giảm chuyển động hỗ trợ người dùng nhạy cảm với hiệu ứng.
 - Các lựa chọn chỉ được lưu trong `localStorage` của trình duyệt, không gửi ra ngoài.
 
-## Phần được mô phỏng
+## Phần AI thật vs. phần mô phỏng
 
-- Không có tệp nào được upload hoặc phân tích thật.
-- Không gọi chatbot/LLM hay API bên ngoài.
-- Điểm phù hợp dùng quy tắc cố định trong `app.js`.
-- Form đề xuất chỉ tồn tại trong bộ nhớ của phiên trình duyệt.
-- Nếu không tải được `mock-data.json`, giao diện dùng bốn đề tài fallback để flow vẫn bấm được đến cuối.
+- **AI thật**: quyết định trung tâm — xếp hạng 3 đề tài + sinh lý do/cảnh báo rủi ro — gọi model qua `codebase/server/main.py` (`POST /recommend`), log đầy đủ request/response/latency vào `codebase/server/logs/recommend_calls.jsonl` (không commit, xem `.gitignore`).
+- **Mô phỏng còn lại**:
+  - Upload CV/hồ sơ (`populateProfileFromSimulatedFile`) vẫn hardcode kết quả, chưa đọc file thật.
+  - Điểm số `%` trong Kho đề tài (catalog search) vẫn dùng quy tắc cố định (`scoreCatalogProject`) — chỉ luồng advisor 3 bước gọi AI.
+  - Nếu backend AI không phản hồi (lỗi mạng, thiếu key), UI tự rơi về xếp hạng quy tắc cố định và **nói rõ trong chat** đây là fallback, không giả vờ là kết quả AI.
+  - Form đề xuất đề tài chỉ tồn tại trong bộ nhớ phiên trình duyệt.
+  - Nếu không tải được `mock-data.json`, giao diện dùng bốn đề tài fallback để flow vẫn bấm được đến cuối.

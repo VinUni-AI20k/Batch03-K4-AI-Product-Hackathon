@@ -1230,6 +1230,13 @@ svg {
   font-size: 8px;
 }
 
+.match-score-ai {
+  border: 5px solid #dcece5;
+  color: var(--coral-dark);
+  font-size: 10px;
+  letter-spacing: 0.4px;
+}
+
 .recommendation-main {
   min-width: 0;
 }
@@ -2963,6 +2970,11 @@ svg {
   font-weight: 700;
 }
 
+.drawer-score-ai {
+  font-size: 18px;
+  letter-spacing: 0.6px;
+}
+
 .drawer-score-row strong,
 .drawer-score-row span {
   display: block;
@@ -2995,6 +3007,17 @@ svg {
   color: #536661;
   font-size: 11px;
   line-height: 1.7;
+}
+
+.drawer-section-risk {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #f3d9c4;
+  background: #fef6ee;
+}
+
+.drawer-section-risk h3 {
+  color: var(--coral-dark);
 }
 
 .reason-list,
