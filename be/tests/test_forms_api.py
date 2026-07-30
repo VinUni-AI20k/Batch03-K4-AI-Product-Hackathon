@@ -12,9 +12,14 @@ from app.main import create_app
 TEST_DATABASE_URL = "postgresql+asyncpg://test:test@localhost:5432/test"
 
 _DEV_FALLBACK_FONTS = (
+    Path("/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf"),
+    Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"),
     Path("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"),
     Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
     Path("/Library/Fonts/Arial Unicode.ttf"),
+    Path("C:/Windows/Fonts/times.ttf"),
+    Path("C:/Windows/Fonts/arial.ttf"),
+    Path("C:/Windows/Fonts/segoeui.ttf"),
 )
 
 

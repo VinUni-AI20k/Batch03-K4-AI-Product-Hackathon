@@ -1,5 +1,7 @@
 from pathlib import Path
+import io
 
+import pdfplumber
 import pytest
 from pypdf import PdfReader
 
@@ -9,9 +11,9 @@ from app.procedure_settings import load_procedure_settings
 SETTINGS = load_procedure_settings()
 BIRTH_FORM = SETTINGS.form_candidates["BIRTH_REGISTRATION_FORM"]
 WRAP_CASES = (
-    ("BIRTH_REGISTRATION_FORM", "child_full_name", "Nguyễn Thị Minh Anh Phương Mai An Nhiên Hoàng Bảo Ngọc Khánh Linh"),
-    ("PERMANENT_RESIDENCE_CT01_FORM", "residence_request", "Đăng ký thường trú tại căn hộ số 1208, tòa nhà A, phường Minh Khai, quận Bắc Từ Liêm, thành phố Hà Nội"),
-    ("CONSTRUCTION_PERMIT_REQUEST_FORM", "construction_address", "Thửa đất số 123, tờ bản đồ số 45, đường Nguyễn Văn Linh, phường Tân Phong, quận 7, Thành phố Hồ Chí Minh"),
+    ("BIRTH_REGISTRATION_FORM", "applicant_residence", "Căn hộ số 1208, tòa nhà A, phường Minh Khai, quận Bắc Từ Liêm, thành phố Hà Nội"),
+    ("BIRTH_REGISTRATION_FORM", "child_birth_place", "Bệnh viện Đa khoa Trung ương, phường Minh Khai, quận Bắc Từ Liêm, thành phố Hà Nội"),
+    ("BIRTH_REGISTRATION_FORM", "mother_residence", "Căn hộ số 1208, tòa nhà A, phường Minh Khai, quận Bắc Từ Liêm, thành phố Hà Nội"),
 )
 
 # A Vietnamese-diacritic-capable TTF is not vendored in the repo (licensing) — the
@@ -19,9 +21,12 @@ WRAP_CASES = (
 # local test runs, fall back to whatever Unicode-complete font the dev machine or CI
 # image happens to provide, skipping the render tests entirely if none is found.
 _DEV_FALLBACK_FONTS = (
+    Path("/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf"),
+    Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"),
     Path("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf"),
     Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
     Path("/Library/Fonts/Arial Unicode.ttf"),
+    Path("C:/Windows/Fonts/times.ttf"),
 )
 
 
@@ -55,8 +60,23 @@ def test_render_export_produces_valid_pdf_with_vietnamese_text(monkeypatch) -> N
         "mother_full_name": "Trần Thị Bích",
     }
     pdf_bytes = form_export.render_export(BIRTH_FORM, values)
-    reader = PdfReader(__import__("io").BytesIO(pdf_bytes))
+    reader = PdfReader(io.BytesIO(pdf_bytes))
     assert len(reader.pages) == 2
+
+    child_name_field = BIRTH_FORM.field_by_code("child_full_name")
+    assert child_name_field and child_name_field.export
+    expected_baseline = child_name_field.export.y + BIRTH_FORM.export_style.baseline_offset
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        overlay_chars = [
+            char for char in pdf.pages[0].chars
+            if abs(char["matrix"][5] - expected_baseline) <= 0.1
+        ]
+    assert overlay_chars
+    first_char = overlay_chars[0]
+    assert first_char["size"] == pytest.approx(BIRTH_FORM.export_style.font_size)
+    assert first_char["matrix"][5] == pytest.approx(expected_baseline, abs=0.1)
+    normalized_font_name = first_char["fontname"].lower().replace(" ", "")
+    assert any(name in normalized_font_name for name in ("liberationserif", "timesnewroman", "notoserif"))
 
 
 def test_overflowing_value_raises_export_error_not_corrupted_pdf(monkeypatch) -> None:
@@ -81,9 +101,10 @@ def test_long_text_wraps_within_the_configured_pdf_region(monkeypatch, form_code
     assert field and field.export and field.export.overflow_policy == "wrap"
 
     form_export._ensure_font_registered()
-    lines, font_size = form_export._fit_lines(value, field)
+    preferred_font_size = field.export.font_size if field.data_type == "table" else candidate.export_style.font_size
+    lines, font_size = form_export._fit_lines(value, field, preferred_font_size)
     assert 1 < len(lines) <= field.export.max_lines
-    assert field.export.min_font_size <= font_size <= field.export.font_size
+    assert field.export.min_font_size <= font_size <= preferred_font_size
 
     pdf_bytes = form_export.render_export(candidate, {field_code: value})
     assert len(PdfReader(__import__("io").BytesIO(pdf_bytes)).pages) > 0

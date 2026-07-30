@@ -18,8 +18,10 @@ function downloadBlob(blob: Blob, filename: string) {
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 function exportErrorMessage(error: unknown, fallback: string): string {
@@ -29,7 +31,7 @@ function exportErrorMessage(error: unknown, fallback: string): string {
     return `${fallback} Trường ${fieldCode} quá dài cho vùng trên PDF.`;
   }
   if (reason === "vietnamese_font_missing") {
-    return `${fallback} Container chưa có font Noto Sans tiếng Việt.`;
+    return `${fallback} Máy chủ chưa có font serif hỗ trợ tiếng Việt.`;
   }
   return `${fallback} (${error.detail})`;
 }
