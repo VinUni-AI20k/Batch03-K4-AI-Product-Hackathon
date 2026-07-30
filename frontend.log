@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 dev
+> vite --host 127.0.0.1 --port 5173
+
+Port 5173 is in use, trying another one...
+
+  VITE v8.1.5  ready in 214 ms
+
+  ➜  Local:   http://127.0.0.1:5174/
+19:55:10 [vite] .env changed, restarting server...
+19:55:10 [vite] (client) Re-optimizing dependencies because vite config has changed
+19:55:10 [vite] server restarted.
+Terminate batch job (Y/N)? 

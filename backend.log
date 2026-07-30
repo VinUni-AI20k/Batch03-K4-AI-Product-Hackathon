@@ -1,0 +1,38 @@
+[LLM] Using OpenAI: gpt-4o-mini
+🚀 Khởi động AI Agent QA - Khóa học Cộng đồng AI Thực Chiến Vingroup - VinUni...
+🌐 Truy cập Frontend & Backend tại cùng Port 8000: http://localhost:8000
+[LLM] Using OpenAI: gpt-4o-mini
+[LLM] Using OpenAI: gpt-4o-mini
+ [LLM] Using OpenAI: gpt-4o-mini
+[LLM] Using OpenAI: gpt-4o-mini
+  [LLM] Using OpenAI: gpt-4o-mini
+[LLM] Using OpenAI: gpt-4o-mini
+[LLM] Using OpenAI: gpt-4o-mini
+ [Search] Khởi tạo mô hình Semantic Embedding...
+  [Search] Khoi tao mo hinh Semantic Embedding...
+[Search] Semantic Embedding san sang.
+[Search] Khoi tao he thong BM25...
+[Search] BM25 san sang.
+[LLM] Using OpenAI: gpt-4o-mini
+[Search] Khoi tao mo hinh Semantic Embedding...
+[Search] Semantic Embedding san sang.
+[Search] Khoi tao he thong BM25...
+[Search] BM25 san sang.
+[LLM] Using OpenAI: gpt-4o-mini
+[Warning] LLM generation failed (openai): Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************xucA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}. Using local RAG fallback.
+INFO:     127.0.0.1:57204 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55129 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55129 - "GET /assets/index-DEgGNesV.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54636 - "GET /assets/index-DdV3S-Ys.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55129 - "GET /api/kb/stats HTTP/1.1" 200 OK
+[Warning] LLM generation failed (openai): Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************xucA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}. Using local RAG fallback.
+INFO:     127.0.0.1:57856 - "POST /api/chat HTTP/1.1" 200 OK
+[Warning] LLM generation failed (openai): Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************xucA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}. Using local RAG fallback.
+INFO:     127.0.0.1:53464 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60007 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62924 - "GET /assets/index-DdV3S-Ys.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60007 - "GET /assets/index-DEgGNesV.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:60007 - "GET /api/kb/stats HTTP/1.1" 200 OK
+[Warning] LLM generation failed (openai): Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************xucA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}. Using local RAG fallback.
+INFO:     127.0.0.1:60740 - "POST /api/chat HTTP/1.1" 200 OK
+ 

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent QA — Cộng đồng AI Thực Chiến Vingroup - VinUni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient glowing background spheres -->
+    <div class="bg-glow glow-cyan"></div>
+    <div class="bg-glow glow-violet"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="glass-header">
+            <div class="brand">
+                <div class="logo-badge">
+                    <span class="logo-icon">⚡</span>
+                </div>
+                <div class="brand-text">
+                    <h1>AI AGENT QA</h1>
+                    <p>Cộng đồng AI Thực Chiến Vingroup — VinUni</p>
+                </div>
+            </div>
+            
+            <div class="status-pill" id="kb-status-pill">
+                <span class="pulse-dot"></span>
+                <span id="kb-status-text">Đang kết nối Facebook Scraper KB...</span>
+            </div>
+
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="chat-tab">
+                    <span class="tab-icon">💬</span> Trợ lý AI QA
+                </button>
+                <button class="nav-tab" data-tab="kb-tab">
+                    <span class="tab-icon">📊</span> Dữ liệu FB Scraper
+                </button>
+                <button class="nav-tab" data-tab="guardrail-tab">
+                    <span class="tab-icon">🛡️</span> 4 Lớp Chỗ Khó (Demo)
+                </button>
+            </nav>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TAB 1: AI QA CHAT INTERFACE -->
+            <section id="chat-tab" class="tab-panel active">
+                <div class="chat-layout">
+                    <!-- Chat Messages Area -->
+                    <div class="chat-main-card glass-panel">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Welcome Message -->
+                            <div class="message agent-message">
+                                <div class="avatar agent-avatar">⚡</div>
+                                <div class="msg-content">
+                                    <div class="msg-sender">AI Agent QA — VinUni AI Thực Chiến</div>
+                                    <div class="msg-bubble">
+                                        <p>👋 <strong>Xin chào học viên khóa AI Thực Chiến!</strong></p>
+                                        <p>Mình là <strong>AI Agent QA</strong> được tích hợp trực tiếp nguồn tri thức thực chiến cào từ <a href="#" class="inline-tag">#Facebook-Group-Cộng-Đồng</a> (các bài hỏi & bình luận giải đáp từ TA/Mentor) cùng tài liệu <strong>VLearn Pack</strong> (Slide & Transcript).</p>
+                                        <p>Bạn có thắc mắc gì về <strong>lý thuyết AI Spec, cài đặt kỹ thuật, lỗi code, hay quy chế Rubric 100 điểm</strong> không? Hãy nhập câu hỏi bên dưới hoặc thử bấm câu hỏi nhanh nhé!</p>
+                                    </div>
+                                    <div class="msg-meta">
+                                        <span class="badge badge-success">✓ Đã đồng bộ FB Group Scraper v2.0</span>
+                                        <span class="badge badge-info">🛡️ Kích hoạt 4 Lớp Guardrails</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div class="typing-indicator hidden" id="typing-indicator">
+                            <div class="avatar agent-avatar">⚡</div>
+                            <div class="typing-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <span class="typing-text">AI Agent đang tra cứu FB Knowledge Base & suy luận...</span>
+                        </div>
+
+                        <!-- Input Bar -->
+                        <div class="chat-input-wrapper">
+                            <div class="chat-input-box">
+                                <textarea id="user-input" placeholder="Hỏi thắc mắc của bạn về khóa AI Thực Chiến (ví dụ: Lỗi pip install, hạn nộp spec.md, HAX và PAIR là gì?)..." rows="2"></textarea>
+                                <button id="send-btn" class="send-button" title="Gửi câu hỏi">
+                                    <span>Gửi</span>
+                                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="input-hints">
+                                <span>💡 Gợi ý hỏi:</span>
+                                <button class="hint-chip" data-query="Mọi người cho em hỏi lỗi pip install -r requirements.txt trên Windows fix thế nào ạ?">Lỗi pip install Windows</button>
+                                <button class="hint-chip" data-query="Hạn nộp bài spec.md cho Mini Hackathon Batch 03 chính xác là mấy giờ?">Hạn nộp spec.md Batch 03</button>
+                                <button class="hint-chip" data-query="Nguyên tắc HAX và PAIR trong mục §4b của AI Spec áp dụng thế nào?">HAX & PAIR là gì?</button>
+                                <button class="hint-chip" data-query="Vibe-coding rule trong Hackathon quy định như thế nào?">Luật Vibe-coding</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Panel: Live Citations & Guardrail Monitor -->
+                    <aside class="chat-sidebar glass-panel">
+                        <div class="sidebar-section">
+                            <h3>🔍 Trích dẫn Nguồn kiểm chứng</h3>
+                            <p class="sidebar-desc">Các nguồn từ Facebook Group & Slide/Transcript được AI tra cứu:</p>
+                            <div id="citations-container" class="citations-list">
+                                <div class="empty-state">
+                                    <span>📑</span>
+                                    <p>Chưa có trích dẫn. Hãy đặt câu hỏi để xem nguồn FB Group được tham chiếu!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3>🛡️ Trạng thái 4 Lớp Chỗ Khó</h3>
+                            <div class="guardrail-pills" id="guardrail-status-pills">
+                                <div class="g-pill" id="gp-1" title="Nguồn sự thật — Phân biệt deadline/thông báo Batch 03 với batch cũ">
+                                    <span class="g-num">①</span>
+                                    <div class="g-text">
+                                        <strong>Nguồn sự thật</strong>
+                                        <small>Ground Truth Guard</small>
+                                    </div>
+                                    <span class="g-status status-idle">Sẵn sàng</span>
+                                </div>
+                                <div class="g-pill" id="gp-2" title="Mơ hồ/Thiếu thông tin — Hỏi làm rõ khi câu hỏi cộc lốc">
+                                    <span class="g-num">②</span>
+                                    <div class="g-text">
+                                        <strong>Mơ hồ / Thiếu TT</strong>
+                                        <small>Ambiguity Guard</small>
+                                    </div>
+                                    <span class="g-status status-idle">Sẵn sàng</span>
+                                </div>
+                                <div class="g-pill" id="gp-3" title="Ngoài thẩm quyền — Từ chối giải hộ trọn gói bài Checkpoint">
+                                    <span class="g-num">③</span>
+                                    <div class="g-text">
+                                        <strong>Ngoài thẩm quyền</strong>
+                                        <small>Authority Guard</small>
+                                    </div>
+                                    <span class="g-status status-idle">Sẵn sàng</span>
+                                </div>
+                                <div class="g-pill" id="gp-4" title="Đặc thù domain — Chuẩn hóa thuật ngữ VinUni AI Thực Chiến">
+                                    <span class="g-num">④</span>
+                                    <div class="g-text">
+                                        <strong>Đặc thù domain</strong>
+                                        <small>Domain Terminology</small>
+                                    </div>
+                                    <span class="g-status status-idle">Sẵn sàng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- TAB 2: FACEBOOK SCRAPER KNOWLEDGE BASE EXPLORER -->
+            <section id="kb-tab" class="tab-panel">
+                <div class="kb-container glass-panel">
+                    <div class="kb-header">
+                        <div>
+                            <h2>📊 Cơ sở tri thức Facebook Group Scraper (Evidence Base)</h2>
+                            <p>Dữ liệu cào từ FB Group <strong>"Cộng đồng AI Thực Chiến Vingroup — VinUni"</strong> (ID: 363757814515154) bằng công cụ <code>fb/facebook_post_comment_scraper</code>.</p>
+                        </div>
+                        <div class="kb-search-bar">
+                            <input type="text" id="kb-search-input" placeholder="Tìm kiếm trong các bài post hỏi-đáp cào được...">
+                            <button id="kb-search-btn" class="secondary-btn">Tìm kiếm</button>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Số bài FB Q&A đã cào</span>
+                            <span class="stat-value" id="stat-posts">8</span>
+                            <span class="stat-meta">Bài đăng có thắc mắc của học viên</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Lời giải chuẩn TA/Mentor</span>
+                            <span class="stat-value" id="stat-verified">8</span>
+                            <span class="stat-meta">Được kiểm chứng 100%</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Tổng lượt Likes & Hữu ích</span>
+                            <span class="stat-value" id="stat-likes">285</span>
+                            <span class="stat-meta">Đánh giá cao từ cộng đồng</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">VLearn Pack Snippets</span>
+                            <span class="stat-value" id="stat-vlearn">3</span>
+                            <span class="stat-meta">Transcript & Slide đồng bộ</span>
+                        </div>
+                    </div>
+
+                    <!-- FB Q&A List -->
+                    <div class="kb-list-section">
+                        <h3>📑 Danh sách câu hỏi & lời giải từ Facebook Group</h3>
+                        <div id="kb-items-container" class="kb-items-grid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: 4 DIFFICULTY LAYERS (HACKATHON RUBRIC R3 DEMO) -->
+            <section id="guardrail-tab" class="tab-panel">
+                <div class="guardrail-demo-container glass-panel">
+                    <div class="demo-intro">
+                        <h2>🛡️ Kịch bản kiểm thử 4 Lớp Chỗ Khó (Hackathon Rubric R3 — 11 Điểm)</h2>
+                        <p>Theo tiêu chuẩn <strong>Taxonomy Hackathon Batch 03</strong>, AI Agent không chỉ trả lời câu hỏi mà còn phải biết xử lý những kịch bản khó. Bấm vào từng nút bên dưới để xem AI Agent phản ứng trong thời gian thực!</p>
+                    </div>
+
+                    <div class="demo-cards-grid">
+                        <!-- Card ① -->
+                        <div class="demo-card">
+                            <div class="demo-card-header">
+                                <span class="layer-badge l1">Lớp ①</span>
+                                <h3>Nguồn sự thật (Ground Truth)</h3>
+                            </div>
+                            <p class="demo-desc">Học viên hỏi thông tin lịch trình / hạn nộp của các <strong>Batch cũ (Batch 01/02)</strong> hoặc thông tin chưa được công bố.</p>
+                            <div class="demo-query">
+                                <code>"Hạn nộp bài spec.md của khóa 1 Batch 01 là ngày mấy vậy anh chị?"</code>
+                            </div>
+                            <button class="try-btn" data-preset="Hạn nộp bài spec.md của khóa 1 Batch 01 là ngày mấy vậy anh chị?">
+                                ▶ Thử kịch bản Lớp ①
+                            </button>
+                        </div>
+
+                        <!-- Card ② -->
+                        <div class="demo-card">
+                            <div class="demo-card-header">
+                                <span class="layer-badge l2">Lớp ②</span>
+                                <h3>Mơ hồ / Thiếu thông tin (Ambiguity)</h3>
+                            </div>
+                            <p class="demo-desc">Học viên hỏi cộc lốc, không cung cấp đủ hệ điều hành hay mã lỗi cụ thể.</p>
+                            <div class="demo-query">
+                                <code>"Lỗi pip cài không được"</code>
+                            </div>
+                            <button class="try-btn" data-preset="Lỗi pip cài không được">
+                                ▶ Thử kịch bản Lớp ②
+                            </button>
+                        </div>
+
+                        <!-- Card ③ -->
+                        <div class="demo-card">
+                            <div class="demo-card-header">
+                                <span class="layer-badge l3">Lớp ③</span>
+                                <h3>Ngoài thẩm quyền (Authority)</h3>
+                            </div>
+                            <p class="demo-desc">Học viên yêu cầu AI viết hộ nguyên văn toàn bộ code bài thi Checkpoint (vi phạm Vibe-coding rule).</p>
+                            <div class="demo-query">
+                                <code>"Anh ơi viết hộ mình toàn bộ code cho bài nộp Checkpoint 3 với ạ"</code>
+                            </div>
+                            <button class="try-btn" data-preset="Anh ơi viết hộ mình toàn bộ code cho bài nộp Checkpoint 3 với ạ">
+                                ▶ Thử kịch bản Lớp ③
+                            </button>
+                        </div>
+
+                        <!-- Card ④ -->
+                        <div class="demo-card">
+                            <div class="demo-card-header">
+                                <span class="layer-badge l4">Lớp ④</span>
+                                <h3>Đặc thù Domain (VinUni AI Thực Chiến)</h3>
+                            </div>
+                            <p class="demo-desc">Học viên hỏi khái niệm đặc thù của khóa học (HAX/PAIR, JTBD, Cost of Error, Rubric 100 điểm).</p>
+                            <div class="demo-query">
+                                <code>"4 lớp chỗ khó trong quy định của Hackathon gồm những gì và vì sao bắt buộc có trong Spec §5?"</code>
+                            </div>
+                            <button class="try-btn" data-preset="4 lớp chỗ khó trong quy định của Hackathon gồm những gì và vì sao bắt buộc có trong Spec §5?">
+                                ▶ Thử kịch bản Lớp ④
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Citation Detail Modal -->
+        <div id="citation-modal" class="modal-overlay hidden">
+            <div class="modal-card glass-panel">
+                <div class="modal-header">
+                    <h3 id="modal-title">📄 Chi tiết trích dẫn Nguồn</h3>
+                    <button id="close-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-content">
+                    <!-- Dynamic citation content -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

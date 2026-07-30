@@ -1,0 +1,74 @@
+[
+  {
+    "id": "transcript_d1_foundation_llm",
+    "source_id": "T04-001",
+    "title": "Day 1 Foundation — Cách LLM hoạt động & kiến trúc Transformer",
+    "category": "lecture_transcript",
+    "content": "LLM (Large Language Model) hoạt động dựa trên kiến trúc Transformer và cơ chế Attention. Điểm khác biệt quan trọng: LLM sinh ra xác suất — không phải 100 lần trả lời 100 cái đúng như nhau (khác sản phẩm truyền thống). Hệ quả cho thiết kế sản phẩm AI: (1) Phải kiểm soát kỳ vọng người dùng; (2) Xử lý lỗi khác với phần mềm truyền thống; (3) Thiết kế trải nghiệm phù hợp với bản chất xác suất. Trong khóa AI Thực Chiến, học viên học tích hợp LLM API vào sản phẩm thực tế thông qua RAG (Retrieval-Augmented Generation) — kết hợp knowledge base với khả năng sinh ngôn ngữ của LLM.",
+    "source_url": "data/vlearn-pack/transcript/transcript-04-clean.md"
+  },
+  {
+    "id": "transcript_d2_problem_definition",
+    "source_id": "T01-001",
+    "title": "Day 2 (sáng) — Xác định bài toán kinh doanh cho AI [T01-001 đến T01-033]",
+    "category": "lecture_transcript",
+    "content": "Kỹ năng quan trọng nhất khi đưa AI vào doanh nghiệp: xác định bài toán từ yêu cầu mơ hồ. 70% thành công đến từ con người và vận hành, không phải công nghệ (T01-003). Tránh nhảy thẳng vào solution — dùng Five Whys để đào sâu vấn đề thực sự (T01-030). Ví dụ: sếp nói 'xây chatbot support' nhưng vấn đề thực là 'sale đang quá tải' → có thể có giải pháp khác không cần AI. Product Manager (tìm bài toán, user-centered, xây dựng product roadmap) khác Project Manager (đảm bảo tiến độ, spec rõ ràng từ khách hàng). Lát cắt: từ mục tiêu mơ hồ biến thành thứ cụ thể có thể triển khai trong thời gian ngắn và ra được kết quả (T01-005).",
+    "source_url": "data/vlearn-pack/transcript/transcript-01-clean.md"
+  },
+  {
+    "id": "transcript_d2_success_metrics",
+    "source_id": "T02-001",
+    "title": "Day 2 — Chỉ số thành công & mức tự động hoá AI",
+    "category": "lecture_transcript",
+    "content": "Xác định chỉ số thành công (success metrics) trước khi build. Mức tự động hoá AI không phải lúc nào cũng 100% — chọn mức phù hợp với bài toán và rủi ro. Cost of Error (chi phí sai lầm) là yếu tố then chốt: bài toán có hậu quả nghiêm trọng khi AI sai cần giữ human-in-the-loop. PAIR Guidebook của Google (People + AI Research) cung cấp framework chi tiết: define success, mental model, expectation management, trust, error handling. HAX (Human-AI eXperience) của Microsoft bổ sung 18 nguyên tắc thiết kế trải nghiệm AI.",
+    "source_url": "data/vlearn-pack/transcript/transcript-02-clean.md"
+  },
+  {
+    "id": "transcript_d2_afternoon_review",
+    "source_id": "T03-001",
+    "title": "Day 2 (chiều) — Review bài toán các nhóm & ràng buộc tự động hoá",
+    "category": "lecture_transcript",
+    "content": "Lỗi thường gặp khi xác định bài toán: (1) Nhảy thẳng vào solution chưa validate pain point; (2) Bài toán quá rộng, thiếu lát cắt cụ thể; (3) Chưa xác định đúng người dùng mục tiêu. Ràng buộc tự động hoá: một số bài toán có ràng buộc pháp lý hoặc đạo đức không cho phép AI tự động 100%. Phải ghi rõ trong Spec §5 (4 lớp chỗ khó) những kịch bản AI không được làm. Lát cắt tốt = một câu: 'Một [người dùng cụ thể] đang [làm việc cụ thể], với [quyết định AI cụ thể], mang lại [kết quả cụ thể]'.",
+    "source_url": "data/vlearn-pack/transcript/transcript-03-clean.md"
+  },
+  {
+    "id": "slide_hax_pair_principles",
+    "source_id": "Slide-D1-HAX-PAIR",
+    "title": "Day 1 Slide — HAX (Microsoft) & PAIR (Google) — Nguyên tắc thiết kế AI",
+    "category": "lecture_slide",
+    "content": "HAX (Human-AI eXperience) của Microsoft và PAIR (People + AI Research) của Google là hai bộ nguyên tắc thiết kế trải nghiệm AI bắt buộc trong AI Spec §4b. Nhóm phải chọn ≥4 nguyên tắc và chỉ rõ áp dụng vào đâu trong prototype. Ví dụ: HAX G1 (Make clear what the system can do) → hiển thị rõ AI QA trả lời dựa trên data FB/VLearn và có giới hạn; HAX G11 (Make clear why the system did what it did) → luôn kèm badge trích dẫn nguồn; PAIR 'Design for error' → xử lý 4 lớp chỗ khó khi AI thiếu căn cứ.",
+    "source_url": "data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  },
+  {
+    "id": "slide_4_layers_taxonomy",
+    "source_id": "Slide-D2-4Layers",
+    "title": "Day 2 Slide — 4 Lớp Chỗ Khó (Taxonomy) & Spec §5",
+    "category": "lecture_slide",
+    "content": "4 lớp chỗ khó là tiêu chuẩn đánh giá khả năng xử lý rủi ro AI (Rubric R3 — 11 điểm): ① Nguồn sự thật (Ground Truth): AI dễ bịa hoặc thiếu nguồn xịn — cần RAG hoặc từ chối khi không có căn cứ; ② Mơ hồ/Thiếu thông tin: input cộc lốc/chưa rõ — AI hỏi lại để làm rõ; ③ Ngoài phạm vi/Thẩm quyền: user đòi thứ không được làm — từ chối khéo léo với giải thích; ④ Đặc thù domain: sai một cái là mất niềm tin/hậu quả nghiêm trọng. Trong Spec §5 phải nêu ≥8 kịch bản bao phủ đủ 4 lớp này.",
+    "source_url": "data/vlearn-pack/slides/d2-slide-hackathon.pdf"
+  },
+  {
+    "id": "transcript_d1_01",
+    "source_id": "T01-012",
+    "title": "Day 1 Foundation — Lát cắt & AI Spec",
+    "category": "lecture_transcript",
+    "content": "Lát cắt (scope) là một câu duy nhất định nghĩa chính xác sản phẩm AI: 'Một người dùng cụ thể, đang làm một công việc cụ thể, với một quyết định AI cụ thể, mang lại một kết quả cụ thể.' Không phải danh sách tính năng dài dòng. AI Spec 8 phần: §1 Bối cảnh & Pain Point; §2 Người dùng & JTBD; §3 Lát cắt & Giải pháp; §4 Thiết kế trải nghiệm HAX/PAIR; §5 4 Lớp chỗ khó ≥8 kịch bản; §6 Data & Evaluation; §7 Kiến trúc kỹ thuật; §8 Kế hoạch phát triển.",
+    "source_url": "data/vlearn-pack/transcript/transcript-04-clean.md"
+  },
+  {
+    "id": "transcript_d2_01",
+    "source_id": "T02-045",
+    "title": "Day 2 — Xác định bài toán & 4 Lớp chỗ khó",
+    "category": "lecture_transcript",
+    "content": "Rủi ro lớn nhất khi build AI: AI đưa ra quyết định sai mà người dùng vẫn tin theo. Vì vậy phải thiết kế 4 lớp chỗ khó: ① Nguồn sự thật, ② Mơ hồ/Thiếu thông tin, ③ Ngoài thẩm quyền, ④ Đặc thù domain. Quy trình xác định bài toán: (1) Thu thập pain point từ người dùng thực (≥20 người hoặc data mining); (2) Phân tích dữ liệu tìm pattern; (3) Xác định lát cắt cụ thể; (4) Viết AI Spec 8 phần. Hard Deadline spec.md: 23:59 Ngày 1.",
+    "source_url": "data/vlearn-pack/transcript/transcript-01-clean.md"
+  },
+  {
+    "id": "slide_d1_15",
+    "source_id": "Slide-D1-P15",
+    "title": "AI Spec — Khung tiêu chuẩn 8 phần & Rubric 100 điểm",
+    "category": "lecture_slide",
+    "content": "AI Spec là tài liệu trung tâm, được chấm theo Rubric 100 điểm: R1 Bằng chứng (15đ) — khảo sát ≥20 người hoặc data mining với ≥5 quote; R2 Lát cắt (20đ) — một câu rõ ràng, có thể triển khai; R3 4 Lớp chỗ khó (11đ) — ≥8 kịch bản; R4 HAX/PAIR (4đ) — ≥4 nguyên tắc áp dụng cụ thể; R5 Prototype (8đ) — có ≥1 lời gọi AI thật; R6-R8 Demo & giải thích (42đ). Vibe-coding rule: dùng AI build thoải mái nhưng phải giải thích được code của mình tại CP5.",
+    "source_url": "data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  }
+]

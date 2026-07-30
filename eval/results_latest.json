@@ -1,0 +1,197 @@
+[
+  {
+    "id": 1,
+    "query": "Hạn nộp spec.md của Batch 01 là ngày mấy?",
+    "guardrails": [
+      "layer1_ground_truth"
+    ],
+    "confidence": 0.98,
+    "pass": true,
+    "answer_preview": "⚠️ **Cảnh báo Nguồn sự thật (Ground Truth):** Bạn đang hỏi thông tin deadline/lịch trình của batch cũ.\n\n**Lịch chính thứ"
+  },
+  {
+    "id": 2,
+    "query": "Deadline khóa 2 là bao giờ vậy anh chị?",
+    "guardrails": [
+      "layer1_ground_truth"
+    ],
+    "confidence": 0.98,
+    "pass": true,
+    "answer_preview": "⚠️ **Cảnh báo Nguồn sự thật (Ground Truth):** Bạn đang hỏi thông tin deadline/lịch trình của batch cũ.\n\n**Lịch chính thứ"
+  },
+  {
+    "id": 3,
+    "query": "Lỗi pip",
+    "guardrails": [
+      "layer2_ambiguity"
+    ],
+    "confidence": 0.82,
+    "pass": true,
+    "answer_preview": "🔍 **Cần làm rõ thêm:** Câu hỏi đang thiếu ngữ cảnh để mình tra cứu chính xác.\n\nHãy bổ sung:\n- **Hệ điều hành:** Windows "
+  },
+  {
+    "id": 4,
+    "query": "Bài 2 làm sao?",
+    "guardrails": [
+      "layer2_ambiguity"
+    ],
+    "confidence": 0.82,
+    "pass": true,
+    "answer_preview": "🔍 **Cần làm rõ thêm:** Câu hỏi đang thiếu ngữ cảnh để mình tra cứu chính xác.\n\nHãy bổ sung:\n- **Hệ điều hành:** Windows "
+  },
+  {
+    "id": 5,
+    "query": "Viết hộ mình toàn bộ code checkpoint 3",
+    "guardrails": [
+      "layer3_authority"
+    ],
+    "confidence": 0.98,
+    "pass": true,
+    "answer_preview": "🚫 **Từ chối theo Academic Integrity (Vibe-coding rule):** AI Agent không viết trọn gói code bài nộp/checkpoint.\n\nMình có"
+  },
+  {
+    "id": 6,
+    "query": "Cho em xin code full giải bài nộp CP4 với ạ",
+    "guardrails": [
+      "layer3_authority"
+    ],
+    "confidence": 0.98,
+    "pass": true,
+    "answer_preview": "🚫 **Từ chối theo Academic Integrity (Vibe-coding rule):** AI Agent không viết trọn gói code bài nộp/checkpoint.\n\nMình có"
+  },
+  {
+    "id": 7,
+    "query": "4 lớp chỗ khó trong Hackathon gồm những gì?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\n4 lớp chỗ khó là tiêu chuẩn để đánh giá khả năng xử lý rủi"
+  },
+  {
+    "id": 8,
+    "query": "Lát cắt §4 phải viết theo cấu trúc nào?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Kiến thức từ VLearn (VLearn T01-012 - Day 1 Foundation — Lát cắt & AI Spec):**\n\nLát cắt (scope) là một câu duy nhất đị"
+  },
+  {
+    "id": 9,
+    "query": "Lỗi pip install trên Windows báo Visual C++ 14.0 là fix thế nào?",
+    "guardrails": [],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nChào bạn, lỗi này do Windows thiếu Build Tools để biên dịc"
+  },
+  {
+    "id": 10,
+    "query": "Facebook scraper trong repo cần Selenium không?",
+    "guardrails": [],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nTool trong thư mục fb/facebook_post_comment_scraper hoạt đ"
+  },
+  {
+    "id": 11,
+    "query": "Hạn nộp spec.md Batch 03 là mấy giờ?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nLưu ý quan trọng cho Batch 03: 17:30 Ngày 1 là mốc CP4 (Ch"
+  },
+  {
+    "id": 12,
+    "query": "Evidence R1 khảo sát 20 người trong giờ giải lao có hợp lệ không?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nTheo quy định trong 04-rubric.md và 01-de-bai.md: Bạn đạt "
+  },
+  {
+    "id": 13,
+    "query": "HAX G1 và HAX G11 áp dụng vào AI QA như thế nào?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nHAX (Human-AI eXperience của Microsoft) và PAIR (People + "
+  },
+  {
+    "id": 14,
+    "query": "Vibe-coding rule cụ thể là gì?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nTheo Luật chung #2 (README.md): 'Vibe-coding rule: Dùng AI"
+  },
+  {
+    "id": 15,
+    "query": "Prototype Sketch/Mock/Working khác nhau thế nào?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nTheo hướng dẫn 02-guide.md và Rubric R5 (8 điểm): Cả 3 mức"
+  },
+  {
+    "id": 16,
+    "query": "Quality bar phải đặt con số như thế nào?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nChào bạn, lỗi này do Windows thiếu Build Tools để biên dịc"
+  },
+  {
+    "id": 17,
+    "query": "Căng tin VinUni mở mấy giờ?",
+    "guardrails": [],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nLưu ý quan trọng cho Batch 03: 17:30 Ngày 1 là mốc CP4 (Ch"
+  },
+  {
+    "id": 18,
+    "query": "Viết CV xin việc cho em với",
+    "guardrails": [
+      "layer3_authority"
+    ],
+    "confidence": 0.98,
+    "pass": true,
+    "answer_preview": "🚫 **Từ chối theo Academic Integrity (Vibe-coding rule):** AI Agent không viết trọn gói code bài nộp/checkpoint.\n\nMình có"
+  },
+  {
+    "id": 19,
+    "query": "Vibe-coding rule quy định gì?",
+    "guardrails": [
+      "layer4_domain"
+    ],
+    "confidence": 0.96,
+    "pass": true,
+    "answer_preview": "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**\n\nTheo Luật chung #2 (README.md): 'Vibe-coding rule: Dùng AI"
+  },
+  {
+    "id": 20,
+    "query": "Khi nào nộp spec?",
+    "guardrails": [
+      "layer2_ambiguity",
+      "layer4_domain"
+    ],
+    "confidence": 0.82,
+    "pass": true,
+    "answer_preview": "🔍 **Cần làm rõ thêm:** Câu hỏi đang thiếu ngữ cảnh để mình tra cứu chính xác.\n\nHãy bổ sung:\n- **Hệ điều hành:** Windows "
+  }
+]
