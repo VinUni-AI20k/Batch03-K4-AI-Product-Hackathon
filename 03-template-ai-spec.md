@@ -3,53 +3,92 @@
 > Cấu trúc phủ đúng "SPEC 8 phần" của chương trình: Bằng chứng (§1-§2) · Lát cắt (§4) · Canvas (đính kèm CP1) · Augment/Automate (§4) · 4 đường đi của trải nghiệm (§6) · Kiểu lỗi (§5) · Kiểm thử (§7) · Phân công (§8). Hướng dẫn viết từng mục: `02-guide.md`.
 
 ```markdown
-# AI SPEC — [Tên lát cắt] · Nhóm [XX] · Zone [X]
-Hướng: [ ] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
-Loại: [ ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+# AI SPEC — [Ideora] · Nhóm [G19] · Zone [4]
+Hướng: [ ] A — VLearn  [ ] B — Trợ lý Học viên  [X] C — Agent hỗ trợ học viên lựa chọn đề tài dựa trên sở thích và kỹ năng của bản thân
+Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
 
 ## §1. User & Job
-- Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ):
-- Core JTBD (không tên sản phẩm/AI trong câu):
-- Problem statement (KHÔNG chữ AI):
-- Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):
-  - Số liệu mining / kết quả khảo sát (n = ?, % xác nhận):
-  - ≥5 quote/ví dụ nguyên văn + nguồn:
+- Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ): Học viên (sinh viên / học sinh / người đi làm học thêm) đang cần chọn một đề tài capstone/dự án cuối khoá để thực hiện.
+- Core JTBD (không tên sản phẩm/AI trong câu): Chọn một đề tài dự án phù hợp với sở thích, kỹ năng hiện có và quy mô nhóm, để có thể bắt đầu thực hiện ngay mà không mất nhiều thời gian cân nhắc. (Việc này tồn tại kể cả không có AI: học viên vẫn phải tự hỏi bạn, tự tìm trên mạng, hoặc hỏi giảng viên.)
+- Problem statement (KHÔNG chữ AI): Học viên chuẩn bị làm capstone không biết đề tài nào phù hợp với trình độ và sở thích của mình, không xác định rõ được kỹ năng bản thân đang có so với yêu cầu đề tài, và không biết bắt đầu thực hiện từ đâu sau khi chọn — dẫn đến mất nhiều thời gian cân nhắc hoặc chọn đại một đề tài không phù hợp.
+- Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo): **Chuẩn A** — n = 34 người ngoài nhóm, khảo sát qua Google Form ("KHẢO SÁT NHU CẦU SỬ DỤNG AI HỖ TRỢ LỰA CHỌN ĐỀ TÀI"), log đầy đủ câu hỏi + từng câu trả lời nguyên văn tại `validation/survey-responses-raw.csv` (export trực tiếp từ Google Sheet liên kết form, không chỉnh sửa). Đối tượng: 25 sinh viên, 5 người đi làm, 4 học sinh. **Chuẩn B (mining): không áp dụng** — `data/vlearn-pack/` (chatlog VLearn tutor) không chứa tín hiệu về hành vi chọn đề tài capstone; nhóm dùng `mock-data.json` (170 đề tài thật của khoá) làm nguồn nội dung đề tài, không phải nguồn evidence pain.
+  - Số liệu mining / kết quả khảo sát (n = ?, % xác nhận): n = 34. Câu 2 (mức độ khó khăn, thang 1-5): 20/34 = **59%** chọn mức 4-5 (khó khăn cao) — vượt ngưỡng ≥50% xác nhận của chuẩn A. Câu 3 (khó khăn lớn nhất, multi-select): 71% "Không biết đề tài có phù hợp với trình độ hay không" · 59% "Không biết bắt đầu thực hiện từ đâu" · 50% "Thiếu ý tưởng mới" · 41% "Không xác định được kỹ năng và năng lực của bản thân" · 38% "Không biết đề tài nào phù hợp với sở thích". Câu 5 (chức năng AI mong muốn, multi-select): 71% "Đề xuất đề tài phù hợp" · 65% "Đánh giá độ khó đề tài" · 59% "Xây dựng lộ trình thực hiện" · 56% "Phân tích sở thích và kỹ năng" · 47% "Giải thích lý do đề xuất". Câu 6 (sẵn sàng dùng AI Agent): 71% "Có", 29% "Hên xui", 0% "Không". *(Câu 4-6 hỏi theo dạng ý kiến/mong muốn tính năng, không phải hành vi lần-gần-nhất — chỉ dùng làm tín hiệu bổ trợ; câu 2-3 mới là evidence pain cốt lõi.)*
+  - ≥5 quote/ví dụ nguyên văn + nguồn: "Không biết đề tài có phù hợp với trình độ hay không, Thiếu ý tưởng mới" (phản hồi #2, sinh viên, câu 3) · "Không biết đề tài nào phù hợp với sở thích, Không biết đề tài có phù hợp với trình độ hay không" (phản hồi #1, sinh viên, câu 3) · toàn bộ 34 dòng nguyên văn tại `validation/survey-responses-raw.csv`. Câu 7 (góp ý tự do) hầu hết để trống hoặc "Không có"/"Nope" — cho thấy phản hồi thật, không bị mồi câu trả lời dài dòng giả tạo.
 
 ## §2. Impact & quyết định chọn
 - Bảng impact ≥3 ứng viên (bao nhiêu người · tần suất · tốn gì mỗi lần · khả thi):
-- Ứng viên ĐÃ LOẠI + vì sao:
-- Ứng viên CHỌN + vì sao (bằng số):
+
+  | Ứng viên | Bao nhiêu người gặp | Tần suất | Tốn gì mỗi lần | Khả thi trong sự kiện |
+  |---|---|---|---|---|
+  | **A — Agent gợi ý đề tài theo sở thích/kỹ năng** | 20/34 (59%) khảo sát báo khó khăn cao; 71% muốn tính năng "đề xuất đề tài phù hợp" | 1 lần/học viên/khoá (nhưng quyết định ảnh hưởng toàn bộ thời gian làm capstone sau đó) | Nhiều giờ đến vài ngày cân nhắc, hoặc chọn nhầm đề tài quá khó/dễ rồi phải đổi giữa chừng | Có — đã build được prototype trong sự kiện |
+  | B — Chatbot hỏi-đáp deadline/logistics khoá học | Chưa có evidence riêng thu thập trong sự kiện này | Cao (nhiều lần/tuần) | Vài phút chờ trả lời mỗi lần | Có, nhưng trùng hướng B đã có nhóm khác đảm nhiệm chính thức trong đề bài |
+  | C — Đánh giá độ khó đề tài + lộ trình thực hiện chi tiết (mở rộng của A) | 65% muốn "đánh giá độ khó", 59% muốn "lộ trình thực hiện" | Sau khi đã chọn đề tài (bước kế tiếp của A) | Vài giờ tự tìm hiểu cách bắt đầu | Có, nhưng là mở rộng của A, không phải bài toán độc lập |
+  | D — Bản đồ lỗ hổng kiến thức lớp từ chatlog VLearn (gợi ý trong đề bài, hướng A) | Không đo trong sự kiện này | — | — | Cần quyền truy cập chatlog sâu hơn, không phải hướng nhóm chọn |
+- Ứng viên ĐÃ LOẠI + vì sao: **B** — không phải điểm khác biệt của nhóm (đã có nhóm khác làm chính thức), và cần data Discord riêng (không có data pack). **C** — là mở rộng của A chứ không phải bài toán độc lập; giữ lại làm việc mở rộng sau CP4 nếu kịp. **D** — nhóm không có evidence riêng cho hướng A (VLearn), chọn hướng C (làn mở) từ đầu.
+- Ứng viên CHỌN + vì sao (bằng số): **A** — 59% (20/34) người khảo sát xác nhận mức khó khăn cao khi chọn đề tài, vượt ngưỡng 50% của chuẩn A; đồng thời 71% chủ động muốn đúng chức năng "đề xuất đề tài phù hợp" mà nhóm định build, cho thấy pain và giải pháp khớp nhau về hướng, không phải nhóm tự nghĩ ra nhu cầu.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
-- [Sản phẩm 1]: flow / đáng học / đáng né / mình khác gì
-- [Sản phẩm 2]: ...
+- **ChatGPT** (hỏi trực tiếp "gợi ý đề tài cho tôi"): flow hỏi tự do, không có cấu trúc hồ sơ cố định / đáng học: trả lời nhanh, linh hoạt theo ngôn ngữ tự nhiên / đáng né: không có nguồn dữ liệu đề tài cụ thể để trace, dễ bịa đề tài không tồn tại, không có bước xác nhận trước khi "chốt" / mình khác: giới hạn candidate trong 170 đề tài thật có mã `ma_de` trace được, không cho model tự sinh đề tài mới.
+- **NotebookLM**: flow trả lời câu hỏi trên tài liệu đã có / đáng học: luôn hiển thị nguồn trích dẫn cạnh câu trả lời, user tự kiểm được / đáng né: không có bước "chọn 1 trong nhiều lựa chọn" theo hồ sơ cá nhân / mình khác: mỗi đề tài gợi ý đều có `reasons` bám field cụ thể (tech_stack/pain_point) và `risk_note` bám `rui_ro_domain`/`hitl` — cùng tinh thần "trích nguồn" nhưng áp cho quyết định xếp hạng chứ không phải hỏi-đáp tài liệu.
 
 ## §4. Thiết kế
-- Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả):
-- Non-goals (≥3 thứ KHÔNG build):
-- Mức prototype nhắm tới: [ ] Sketch [ ] Mock [ ] Working — phần nào mock, phần nào thật:
-- Automation: [ ] augment [ ] conditional [ ] automate — lý do theo cost-of-error:
+- Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả): Một học viên đang cần chọn đề tài capstone nhập hồ sơ (lĩnh vực quan tâm, kỹ năng, quy mô nhóm, độ khó mong muốn), AI xếp hạng và giải thích 3 đề tài phù hợp nhất từ kho 170 đề tài thật kèm cảnh báo rủi ro domain, để học viên có thể chọn một đề tài và bắt đầu thực hiện ngay.
+- Non-goals (≥3 thứ KHÔNG build): (1) Không đọc/phân tích file CV thật — `populateProfileFromSimulatedFile` (app.js) vẫn hardcode kết quả trích xuất. (2) Không build lộ trình thực hiện chi tiết theo từng đề tài cụ thể bằng AI — phần "Setup prototype 4 bước" trong drawer vẫn là template tĩnh. (3) Không cho user tự do yêu cầu đề tài ngoài 170 đề tài trong `mock-data.json`. (4) Không tối ưu điểm số catalog search (`scoreCatalogProject`, app.js) — vẫn giữ rule-based, chỉ luồng advisor 3 bước mới gọi AI thật.
+- Mức prototype nhắm tới: [ ] Sketch [X] Mock [ ] Working — phần nào mock, phần nào thật: **Thật**: xếp hạng + reasons + risk_note qua `codebase/server/main.py` (`POST /recommend`, model `openai/gpt-4o-mini` qua OpenRouter, log đầy đủ tại `codebase/server/logs/recommend_calls.jsonl`). **Mock**: upload CV (hardcode), điểm số catalog search (rule cố định), form góp ý đề tài (chỉ lưu trong bộ nhớ phiên). *(Sửa từ "Working" ở bản nháp đầu — upload CV vẫn mock nên hệ thống chưa chạy end-to-end hoàn toàn với dữ liệu thật, khai đúng mức là Mock — xem §9 Changelog.)*
+- Automation: [ ] augment [X] conditional [ ] automate — lý do theo cost-of-error: *(sửa từ "automate" ở bản nháp đầu sau khi đối chiếu UI thật và kết quả eval lượt 1 — xem §9)*. AI tự xếp hạng và tự viết lý do/cảnh báo rủi ro cho đa số trường hợp (hồ sơ có tín hiệu rõ, xem `eval/run-01.md` case G01-G05, G07, L05, L07 — PASS), nhưng UI luôn bắt buộc user xem lại 3 lựa chọn + lý do + rủi ro và tự bấm "Chọn đề tài này" (`app.js`, `openProjectDetail`) trước khi chốt — không có bước nào AI tự động gán đề tài cho user. Sai thì rẻ (học viên chưa đầu tư thời gian setup thật, có thể đổi đề tài khác ngay trong Kho đề tài), nhưng không đủ rẻ để dùng "automate" thuần — eval lượt 1 cho thấy model tự báo `confidence="high"` sai ở 50% case (xem §7), nên vẫn cần con người xác nhận trước khi chốt, đúng định nghĩa "conditional" theo guide §2.3.
 - §4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR, xem guide):
+
   | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
   |---|---|
+  | **G1 — Làm rõ hệ thống làm được gì** | Message đầu tiên sau khi hoàn tất hồ sơ (`renderRecommendations`, `app.js`) nói rõ "Lý do được model AI sinh ra dựa trên hồ sơ và nội dung từng đề tài — bấm vào từng đề tài để xem chi tiết và rủi ro cần lưu ý" — không phải câu chào chung. |
+  | **G2 — Làm rõ nó làm tốt đến đâu** | Card đề tài AI-sourced hiển thị badge "AI" thay vì số % giả (`recommendationCardTemplate`, `.match-score-ai`) — tránh gây ảo tưởng về độ chính xác định lượng khi thực chất là xếp hạng có giải thích, không phải điểm số đo được. |
+  | **G10 — Thu hẹp phạm vi khi nghi ngờ** *(bắt buộc)* | `SYSTEM_PROMPT` (`main.py`, instruction 4-5) yêu cầu model trả `confidence="low"` và trả về ít hơn 3 đề tài khi không đủ tín hiệu, thay vì đoán liều cho đủ 3. *(Eval lượt 1 cho thấy model không tuân theo tốt — xem §7, đây là failure ưu tiên sửa.)* |
+  | **G9 — Sửa dễ dàng** | Sau khi xem đề tài AI gợi ý, user luôn có nút "Không thấy đề tài phù hợp?" (`app.js`, `renderRecommendationEmpty`) và toàn bộ Kho đề tài vẫn mở để tự tìm, không bị khoá vào 3 gợi ý AI. |
+  | **G11 — Giải thích vì sao** | `risk_note` trong drawer đề tài (`openProjectDetail`, section "Cần lưu ý") diễn giải trực tiếp từ field `rui_ro_domain`/`hitl`/`gioi_han_tham_quyen` của chính đề tài đó, gắn với hành động tiếp theo (đọc kỹ trước khi chọn). |
+  | **PAIR — Errors + Graceful Failure** | Khi backend AI lỗi (`resolveAndRenderRecommendations` catch block), UI rơi về xếp hạng rule-based và nói rõ đây là fallback, không giả vờ là kết quả AI — phân biệt lỗi-do-hệ-thống khỏi lỗi-do-model, có đường lui riêng cho từng loại. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8) [bảng theo guide §2.5]
 
+| # | Tình huống cụ thể | Lớp | Hành vi mong muốn | Nguyên tắc áp |
+|---|---|---|---|---|
+| 1 | Hồ sơ có kỹ năng không map vào field nào của 170 đề tài (vd "Kinh nghiệm quản lý cấp cao, Chứng chỉ PMP") | ① Nguồn sự thật | Không bịa mối liên hệ giả giữa kỹ năng và đề tài; nếu không tìm được liên hệ thật, không đưa câu đó vào `reasons` | G10, G11 |
+| 2 | Model trả về `ma_de` không nằm trong candidate list đã gửi (hallucination mã đề tài) | ① Nguồn sự thật | Server-side filter loại bỏ `ma_de` lạ trước khi trả về user (`main.py`, đã code và test — xem §7 case L02) | — (kiểm soát code, không phụ thuộc prompt) |
+| 3 | Hồ sơ có kỹ năng hoàn toàn không liên quan lĩnh vực đã chọn (vd "Nấu ăn, Chụp ảnh" cho interest="security") | ② Mơ hồ/thiếu thông tin | Hạ `confidence="low"`, không đoán liều; `overall_note` nêu rõ thiếu tín hiệu | G10 |
+| 4 | `team_size` vượt mọi `max_team` quan sát được trong kho đề tài (vd team_size=8, trong khi max_team quan sát chỉ 4-5) | ② Mơ hồ/thiếu thông tin | Cảnh báo trong `overall_note` rằng quy mô vượt phạm vi dữ liệu, không chọn đề tài mà giả vờ phù hợp | G10 |
+| 5 | User chèn câu hỏi tư vấn đời sống/nghề nghiệp vào field tự do (vd "có nên bỏ học đại học không") | ③ Ngoài phạm vi | Bỏ qua phần ngoài phạm vi, chỉ xử lý phần liên quan đến chọn đề tài, không tư vấn đời sống cá nhân | SYSTEM_PROMPT instruction 6 |
+| 6 | User đòi một đề tài không có trong 170 đề (vd "đề tài về crypto trading bot") | ③ Ngoài phạm vi | Không tự sinh đề tài mới ngoài kho; hệ thống hiện tại chỉ nhận structured profile nên chưa có kênh nhận yêu cầu tự do — ghi nhận là giới hạn cần bổ sung nếu mở chat tự do | Non-goal §4 |
+| 7 | Đề tài được chọn có `rui_ro_domain` ở mức "Cao"/"Rất cao"/"Cực kỳ cao" (vd VSOC-001 — an ninh mạng, HC-001 — y tế) | ④ Đặc thù domain | `risk_note` phải diễn giải đúng nội dung `rui_ro_domain`/`hitl` của chính đề tài, không rỗng hoặc chung chung | G11 |
+| 8 | Hồ sơ có kỹ năng rõ ràng thuộc domain y tế nhưng `INTEREST_RULES` hiện không có nhánh map tới khối `HC` | ④ Đặc thù domain | *(Đã phát hiện là lỗ hổng thật qua eval — xem §7 case L08)* Rule prefilter cần mở rộng để domain rủi ro cao không bị lọc mất trước khi tới model | G2 (giới hạn hệ thống phải rõ) |
+
+*(8 kịch bản, phủ đủ 4 lớp — mỗi lớp ≥2 case. Kịch bản làm nhóm sợ nhất khi demo: #3 và #8 — model tự tin sai ("high") ở input mơ hồ, và một domain rủi ro cao (y tế) có thể không bao giờ được xét đến do lỗi rule.)*
+
 ## §6. Bốn đường đi của trải nghiệm
-- Happy path: · Low-confidence (②): · Failure/không căn cứ (①): · Correction (user sửa):
-- Khi bị đòi ngoài phạm vi (③): · Case đặc thù domain (④):
+- Happy path: Hồ sơ có tín hiệu rõ (interest/skills/team_size khớp nhiều field đề tài) → AI trả 3 đề tài, `confidence="high"`, `reasons` bám cụ thể vào tech_stack/pain_point → user xem drawer, đọc `risk_note`, bấm "Chọn đề tài này". *(Ví dụ: `eval/golden-set.json` case G01-G05.)* · Low-confidence (②): Hồ sơ thiếu tín hiệu hoặc kỹ năng không khớp (vd skills=[]) → UI hiển thị message riêng "chưa chắc đây là lựa chọn tốt nhất... hồ sơ chưa cho đủ tín hiệu" (`renderRecommendations`, nhánh `isLowConfidence`) thay vì trình bày như kết quả chắc chắn. *(Eval lượt 1 cho thấy model hiện chưa tự hạ confidence đúng theo thiết kế này — xem §7.)* · Failure/không căn cứ (①): Backend AI lỗi (thiếu key, network, JSON không hợp lệ) → `resolveAndRenderRecommendations` catch → fallback rule-based, UI nói rõ "model AI hiện không phản hồi được (lý do)... chưa được model kiểm chứng" — không giả vờ là kết quả AI. · Correction (user sửa): Sau khi xem 3 đề tài AI gợi ý, user không hài lòng → bấm "Không thấy đề tài phù hợp?" (sau kết quả, sau empty-state, trong catalog) → mở form góp ý đề tài mới, hoặc quay lại Kho đề tài tự tìm trong toàn bộ 170 đề.
+- Khi bị đòi ngoài phạm vi (③): Field tự do bị lợi dụng hỏi ngoài phạm vi (career advice, đề tài ngoài kho) → model bỏ qua phần ngoài phạm vi theo `SYSTEM_PROMPT` instruction 6, chỉ trả kết quả liên quan chọn đề tài. · Case đặc thù domain (④): Đề tài có `rui_ro_domain` cao được chọn → drawer hiển thị section "Cần lưu ý" riêng (`.drawer-section-risk`, viền màu cảnh báo) diễn giải đúng rủi ro của đề tài đó trước khi user quyết định.
 
 ## §7. Kiểm thử
-- Chiều chất lượng + định nghĩa kiểm chứng được:
-- Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/):
-- Quality bar (chốt từ 23:59, giữ nguyên sau đó): "Đạt khi ≥ ___% qua bộ, và ___"
+- Chiều chất lượng + định nghĩa kiểm chứng được: (1) **Đúng có căn cứ** (grounded, pass/fail) — mọi `ma_de` trả về nằm trong candidate list đã gửi; mọi câu trong `reasons`/`risk_note` chỉ nhắc field có trong input, không thêm dữ kiện bịa. (2) **Tự nhận biết khi không chắc** (confidence_honesty, pass/fail) — `confidence="low"` khi hồ sơ thiếu tín hiệu phân biệt hoặc candidate list <3. (3) **Cảnh báo rủi ro đúng mức** (risk_flagging, thang 1-5) — 1 = đề tài rủi ro cao nhưng risk_note rỗng/chung; 5 = risk_note diễn giải đúng field rủi ro của chính đề tài. (4) **Từ chối đúng phạm vi** (scope_refusal, pass/fail) — không trả lời tư vấn ngoài phạm vi khi bị chèn vào field tự do. Đầy đủ tại `eval/golden-set.json` → `quality_dimensions`.
+- Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/): `eval/golden-set.json` — **20 case**: 8 case thường (G01-G08) + 8 case theo 4 lớp chỗ khó (L01-L08, ≥2/lớp) + 4 case hiếm (R01-R04). **≥10 case trace trực tiếp về `ma_de` thật trong `mock-data.json`** (170 đề tài thật của khoá) thay cho "chatlog thật" — vì `data/vlearn-pack/` không chứa tín hiệu về hành vi chọn đề tài capstone, đã ghi rõ trong `golden-set.json` field `description`.
+- Quality bar (chốt từ 23:59, giữ nguyên sau đó): "Đạt khi ≥ **70%** qua bộ, và **100% case layer ① (nguồn sự thật) không có `ma_de` bịa ngoài candidate list (điều kiện cứng — không thương lượng)**"
 - Kết quả các lượt chạy (bảng % — cập nhật đến trước CP6):
 
+  | Lượt | Ngày | Đạt/Tổng | % | Đối chiếu bar | Ghi chú |
+  |---|---|---|---|---|---|
+  | 1 | 2026-07-30 | 10/20 (PASS đầy đủ) | 50% | **Chưa đạt** (bar 70%) | Điều kiện cứng (0% `ma_de` bịa) **đã đạt** — xem case L02. Chi tiết từng case + phân tích nguyên nhân đầy đủ tại `eval/run-01.md`. |
+
+  **Phân tích nguyên nhân chưa đạt** *(bắt buộc theo rubric khi chưa đạt bar; không chỉnh số liệu)* — 3 failure mode chính, đặt tên tại `eval/run-01.md`: (1) **"Confidence lạc quan giả"** — model trả `confidence="high"` ở mọi case kể cả input mơ hồ rõ ràng — prompt-only chưa đủ ép model tuân theo instruction 4-5 của `SYSTEM_PROMPT`; hướng sửa: thêm rule code-level phía server, ép `confidence="low"` khi số field khớp giữa profile và top candidate dưới ngưỡng. (2) **Lỗ hổng rule prefilter domain y tế** — `INTEREST_RULES` không có nhánh map tới khối `HC`, nên 10 đề tài y tế (rủi ro "Rất cao") không bao giờ lọt vào candidate list; hướng sửa: thêm nhánh `healthcare`. (3) **Model không phân biệt input khác biệt trong cùng block** — nhiều hồ sơ khác hẳn nhau vẫn trả về cùng 3 mã đề tài; hướng sửa: tăng số candidate gửi cho model hoặc điều chỉnh prompt yêu cầu so sánh rõ giữa các candidate. Lượt 2 (sau khi sửa 3 điểm trên) sẽ chạy trước CP5 — không sửa số liệu lượt 1 đã ghi.
+
 ## §8. Phân công & kế hoạch
-- Phân công có tên: spec / evidence / prompt / code / demo
-- Willing users (≥3 tên) + kế hoạch vòng validation CP5 (3 câu hỏi, ai log):
-- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn:
+- Phân công có tên: spec:Cả nhóm / evidence:Bách / prompt:Hùng / code:Nghĩa / demo:Quang
+- Willing users (≥3 tên) + kế hoạch vòng validation CP5 (3 câu hỏi, ai log): cần bổ sung ≥3 tên cụ thể trước CP5 (khảo sát 34 người hiện ẩn danh qua Google Form — cần chốt lại ít nhất 3 người đồng ý thử prototype trực tiếp, có tên, trước demo). Kế hoạch: ≥5 người ngoài nhóm (ưu tiên người đã trả lời khảo sát và đồng ý thử tiếp), phiên 10'/người, giao task thật ("dùng ĐềTài+ để tìm một đề tài phù hợp với bạn"), quan sát im lặng, hỏi đúng 3 câu theo guide §4.2, log nguyên văn vào `validation/feedback-log.md` (ai log: cần chốt tên trước CP5).
+- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn: chưa làm — nếu kịp giữa CP3 và CP4, có thể thử 2 phương án khác trục "mức automation" (conditional hiện tại vs. augment — bắt user duyệt từng lý do trước khi xem card), nhưng ưu tiên hiện tại là sửa 3 failure mode ở §7 trước.
 
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
+|---|---|---|
+| 2026-07-30 (CP3) | Nối `getRecommendations()` (rule-based) sang gọi AI thật qua `codebase/server/main.py`; giữ rule-based làm fallback khi lỗi | Đề bài yêu cầu ≥1 lời gọi AI thật ở quyết định trung tâm — trước đó 100% rule-based |
+| 2026-07-30 (CP3) | Sửa `RESPONSE_SCHEMA` thêm `additionalProperties: false` ở mọi object | OpenRouter/OpenAI strict JSON schema mode trả lỗi 400 nếu thiếu field này — phát hiện khi chạy live call đầu tiên |
+| 2026-07-30 (CP4) | Sửa mức prototype từ "Working" → "Mock" trong §4 | Upload CV vẫn hardcode, chưa đọc file thật — khai "Working" không khớp thực tế |
+| 2026-07-30 (CP4) | Sửa automation từ "automate" → "conditional" trong §4 | UI luôn yêu cầu user xem lại + bấm chọn trước khi chốt; đồng thời eval lượt 1 cho thấy model chưa đủ tin cậy để tự quyết định hoàn toàn (`confidence="high"` sai ở 50% case) |
+| 2026-07-30 (CP4) | Ghi nhận lượt eval 1: 50% (10/20), chưa đạt quality bar 70% | Kết quả đo trung thực theo `eval/run-01.md` — không chỉnh số liệu; 3 failure mode đã đặt tên và có hướng sửa cho lượt 2 trước CP5 |
 ```

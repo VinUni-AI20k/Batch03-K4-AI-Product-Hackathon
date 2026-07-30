@@ -2,5 +2,5 @@
 node_modules/
 *.env
 codebase/server/.venv/
-codebase/server/__pycache__/
 codebase/server/logs/
+__pycache__/
