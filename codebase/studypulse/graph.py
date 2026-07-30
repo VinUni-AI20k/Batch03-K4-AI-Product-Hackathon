@@ -1,14 +1,19 @@
 """
 =============================================================================
-STUDYPULSE AI — LANGGRAPH GRAPH DEFINITION
+STUDYPULSE AI — LANGGRAPH GRAPH DEFINITION (REFACTORED WITH CHECKPOINTER & HITL INTERRUPT)
 =============================================================================
 Compiles the full StateGraph with conditional routing, decision gates,
-loop guards, and fallback edges.
+loop guards, persistent checkpointer factory, and HITL interrupt_before points.
 =============================================================================
 """
 
 from __future__ import annotations
 
+import os
+from typing import Any, List, Optional
+
+from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 
 from .state import StudyPulseState
@@ -29,19 +34,39 @@ from .nodes import (
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# CHECKPOINTER FACTORY (Production Persistence)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def get_checkpointer(db_path: Optional[str] = None) -> BaseCheckpointSaver:
+    """
+    Checkpointer Factory for Production State Persistence.
+    
+    Why this is needed:
+    - MemorySaver only keeps state in RAM. If server crashes or restarts,
+      all pending HITL approvals and session states disappear.
+    - SqliteSaver (or persistent file saver) stores thread state on disk/DB,
+      allowing HITL review hours/days later across server restarts.
+    """
+    if db_path is None:
+        db_path = os.getenv("GSD_CHECKPOINT_DB", "checkpoints.sqlite")
+
+    try:
+        from langgraph.checkpoint.sqlite import SqliteSaver
+        import sqlite3
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        return SqliteSaver(conn)
+    except Exception:
+        # Fallback to MemorySaver for lightweight or dev testing
+        return MemorySaver()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # CONDITIONAL EDGE FUNCTIONS (Decision Gates)
 # ═══════════════════════════════════════════════════════════════════════════
 
 def route_by_flow_type(state: StudyPulseState) -> str:
     """
     DECISION GATE 1: Route based on classified flow_type.
-    
-    Branches:
-    - 'ingestion'      → AIExtractionNode
-    - 'chat'           → RAGChatbotNode
-    - 'survey_log'     → UserEvidenceLogNode
-    - 'spam_rescue'    → SpamRescueNode
-    - 'daily_reminder' → DailyReminderNode
     """
     flow = state.get("flow_type", "chat")
     route_map = {
@@ -57,11 +82,6 @@ def route_by_flow_type(state: StudyPulseState) -> str:
 def route_by_confidence(state: StudyPulseState) -> str:
     """
     DECISION GATE 2: Route based on extraction confidence & HITL flag.
-    
-    Branches:
-    - requires_hitl=True OR confidence < 0.85 → HITLEscalationNode
-    - All items valid (confidence ≥ 0.85)     → DashboardSyncNode
-    - Max retries exceeded                    → HITLEscalationNode (forced)
     """
     if state.get("retry_count", 0) >= state.get("max_retries", 3):
         return "hitl_escalation"
@@ -79,9 +99,6 @@ def route_by_confidence(state: StudyPulseState) -> str:
 def route_after_hitl(state: StudyPulseState) -> str:
     """
     DECISION GATE 3: After HITL, route to formatter (no retry loop).
-    
-    This prevents infinite loops — HITL is a terminal escalation.
-    The human reviewer will handle items externally.
     """
     return "response_formatter"
 
@@ -92,55 +109,8 @@ def route_after_hitl(state: StudyPulseState) -> str:
 
 def build_studypulse_graph() -> StateGraph:
     """
-    Build and compile the StudyPulse AI LangGraph.
-    
-    Architecture:
-    
-    ┌─────────────┐    ┌──────────────┐    ┌────────────────┐
-    │  Ingestion   │───▶│ LangDetect   │───▶│ IntentRouter   │
-    └─────────────┘    └──────────────┘    └───────┬────────┘
-                                                   │
-                              ┌─────────────────────┤ (DECISION GATE 1)
-                              │                     │ route_by_flow_type
-                              ▼                     ▼
-                    ┌─────────────────┐   ┌──────────────────┐
-                    │  AIExtraction   │   │  RAGChatbot      │──▶ Formatter ──▶ END
-                    └────────┬────────┘   ├──────────────────┤
-                             │            │ UserEvidenceLog  │──▶ Formatter ──▶ END
-                             │            ├──────────────────┤
-                             ▼            │ SpamRescue       │──▶ Formatter ──▶ END
-                    ┌─────────────────┐   ├──────────────────┤
-                    │ Validation      │   │ DailyReminder    │──▶ Formatter ──▶ END
-                    │ Guardrail       │   └──────────────────┘
-                    └────────┬────────┘
-                             │
-                    (DECISION GATE 2)
-                    route_by_confidence
-                             │
-                  ┌──────────┴──────────┐
-                  ▼                     ▼
-         ┌──────────────┐    ┌─────────────────┐
-         │ DashboardSync│    │ HITL Escalation  │
-         └──────┬───────┘    └────────┬────────┘
-                │                     │
-                │            (DECISION GATE 3)
-                │            route_after_hitl
-                │                     │
-                ▼                     ▼
-         ┌───────────────────────────────────┐
-         │        ResponseFormatter          │
-         └──────────────┬────────────────────┘
-                        │
-                        ▼
-                       END
-    
-    Safeguards:
-    - max_retries = 3 ceiling enforced in ValidationGuardrailNode
-    - No retry loops in graph — HITL is terminal escalation
-    - All paths converge to ResponseFormatter → END
+    Build the StudyPulse AI StateGraph.
     """
-
-    # Initialize StateGraph
     graph = StateGraph(StudyPulseState)
 
     # ── REGISTER ALL NODES ──
@@ -212,26 +182,51 @@ def build_studypulse_graph() -> StateGraph:
     return graph
 
 
-def compile_graph():
-    """Compile the graph for execution."""
+def compile_graph(
+    checkpointer: Optional[BaseCheckpointSaver] = None,
+    interrupt_before: Optional[List[str]] = None,
+):
+    """
+    Compile the graph with Checkpointer and HITL interrupt points.
+    
+    Parameters:
+    -----------
+    checkpointer : BaseCheckpointSaver, optional
+        Persistent Checkpointer instance (defaults to get_checkpointer()).
+    interrupt_before : List[str], optional
+        List of node names to pause execution BEFORE entering.
+        Defaults to ["hitl_escalation"] to enable Human Approval for HITL items.
+    """
     graph = build_studypulse_graph()
-    return graph.compile()
+
+    if checkpointer is None:
+        checkpointer = get_checkpointer()
+
+    if interrupt_before is None:
+        # Automatically pause BEFORE hitl_escalation node so TA/human can review & approve
+        interrupt_before = ["hitl_escalation"]
+
+    return graph.compile(
+        checkpointer=checkpointer,
+        interrupt_before=interrupt_before,
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# GRAPH METADATA (for documentation)
+# GRAPH METADATA
 # ═══════════════════════════════════════════════════════════════════════════
 
 GRAPH_METADATA = {
     "name": "StudyPulse AI — EduCentral Agent",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "nodes": 12,
     "decision_gates": 3,
     "safeguards": {
         "max_retries": 3,
         "confidence_threshold": 0.85,
         "hitl_terminal": True,
-        "infinite_loop_prevention": "No retry edges in graph; HITL is terminal",
+        "interrupt_before": ["hitl_escalation"],
+        "checkpointer": "SqliteSaver / MemorySaver",
     },
     "flow_types": ["ingestion", "chat", "survey_log", "spam_rescue", "daily_reminder"],
     "supported_platforms": ["gmail", "outlook", "discord", "direct_input"],

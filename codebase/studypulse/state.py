@@ -1,8 +1,10 @@
 """
 =============================================================================
-STUDYPULSE AI — STATE SCHEMA & TYPE DEFINITIONS
+STUDYPULSE AI — STATE SCHEMA & TYPE DEFINITIONS (REFACTORED WITH CUSTOM REDUCER)
 =============================================================================
 LangGraph State TypedDict + Pydantic models for extraction, chat, evidence.
+Includes Custom Deduplicating & Action-based Reducers to prevent duplication
+during retries or multi-loop executions.
 =============================================================================
 """
 
@@ -11,10 +13,82 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Annotated, Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CUSTOM REDUCER FUNCTIONS (Deduplication & Action-based)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def dedupe_list_reducer(
+    existing: List[Dict[str, Any]],
+    update: Union[List[Dict[str, Any]], Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """
+    Custom Reducer for List State Fields in LangGraph.
+    
+    Replaces simple operator.add (list_a + list_b) to solve:
+    1. Deduplication: Removes duplicate items based on 'id' or ('title' + 'due_date').
+    2. Action-based updates:
+       - {"action": "overwrite", "items": [...]}: Fully resets/replaces existing list.
+       - {"action": "delete", "ids": [...]}: Removes specified items by ID.
+       - List of items or {"action": "append", "items": [...]}: Merges & deduplicates.
+    """
+    if existing is None:
+        existing = []
+
+    # Handle action-based dictionary update
+    if isinstance(update, dict):
+        action = update.get("action", "append")
+        if action == "overwrite":
+            items = update.get("items", [])
+            # Deduplicate overwrite items
+            seen = set()
+            res = []
+            for item in items:
+                item_key = item.get("id") or f"{item.get('title')}_{item.get('due_date')}"
+                if item_key not in seen:
+                    seen.add(item_key)
+                    res.append(item)
+            return res
+
+        elif action == "delete":
+            ids_to_remove = set(update.get("ids", []))
+            return [item for item in existing if item.get("id") not in ids_to_remove]
+
+        elif action == "append":
+            new_items = update.get("items", [])
+        else:
+            new_items = [update]
+    else:
+        new_items = update if isinstance(update, list) else [update]
+
+    # Deduplicate & merge new_items into existing list
+    result = list(existing)
+    existing_keys = {
+        item.get("id") or f"{item.get('title')}_{item.get('due_date')}"
+        for item in existing
+    }
+
+    for item in new_items:
+        if not isinstance(item, dict):
+            continue
+        item_key = item.get("id") or f"{item.get('title')}_{item.get('due_date')}"
+        if item_key not in existing_keys:
+            existing_keys.add(item_key)
+            result.append(item)
+        else:
+            # Update existing item in-place if new metadata is provided
+            for idx, ex_item in enumerate(result):
+                ex_key = ex_item.get("id") or f"{ex_item.get('title')}_{ex_item.get('due_date')}"
+                if ex_key == item_key:
+                    result[idx] = {**ex_item, **item}
+                    break
+
+    return result
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -86,7 +160,7 @@ class ExtractedItem(BaseModel):
     confidence_score: float = Field(..., ge=0.0, le=1.0)
     requires_clarification: bool = False
     conflict_detected: bool = False
-    conflicting_sources: list[str] = Field(default_factory=list)
+    conflicting_sources: List[str] = Field(default_factory=list)
     extracted_by: str = "studypulse_ai_v1"
     language_detected: Language = Language.VI
     pii_masked: bool = False
@@ -100,11 +174,11 @@ class ChatResponse(BaseModel):
     language: Language
     intent: IntentType
     response_text: str
-    sources_cited: list[dict[str, str]] = Field(default_factory=list)
-    timeline_items_referenced: list[str] = Field(default_factory=list)
+    sources_cited: List[Dict[str, str]] = Field(default_factory=list)
+    timeline_items_referenced: List[str] = Field(default_factory=list)
     confidence: float = Field(..., ge=0.0, le=1.0)
     requires_clarification: bool = False
-    suggested_actions: list[str] = Field(default_factory=list)
+    suggested_actions: List[str] = Field(default_factory=list)
 
 
 class EvidenceEntry(BaseModel):
@@ -116,7 +190,7 @@ class EvidenceEntry(BaseModel):
     verbatim_text: str  # IMMUTABLE — exact user response
     language_detected: Language
     source: str = "direct_input"
-    pii_masked_fields: list[str] = Field(default_factory=list)
+    pii_masked_fields: List[str] = Field(default_factory=list)
 
 
 class DailyReminder(BaseModel):
@@ -126,79 +200,40 @@ class DailyReminder(BaseModel):
     target_date: str  # YYYY-MM-DD
     scheduled_send_time: str = "22:00"
     language: Language = Language.VI
-    items: list[ExtractedItem] = Field(default_factory=list)
+    items: List[ExtractedItem] = Field(default_factory=list)
     total_items: int = 0
     critical_count: int = 0
     message_text: str = ""
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# LANGGRAPH STATE SCHEMA
+# LANGGRAPH STATE SCHEMA WITH ANNOTATED CUSTOM REDUCERS
 # ═══════════════════════════════════════════════════════════════════════════
 
 class StudyPulseState(TypedDict, total=False):
     """
     Central state object passed through all LangGraph nodes.
-    
-    Fields:
-    -------
-    raw_payload : dict
-        Raw incoming message/webhook payload from any source channel.
-    user_query : str
-        Direct user text input (for chat or survey flows).
-    user_id : str
-        Masked student identifier.
-    language : str
-        Detected language code ('vi' or 'en').
-    flow_type : str
-        Routing discriminator: 'ingestion' | 'chat' | 'survey_log' |
-        'spam_rescue' | 'daily_reminder'.
-    intent : str
-        Sub-intent within chat flow: 'query_timeline' | 'query_material' |
-        'query_deadline' | 'general'.
-    extracted_items : list[dict]
-        List of ExtractedItem dicts produced by AIExtractionNode.
-    dashboard_timeline : list[dict]
-        Confirmed items synced to the unified dashboard.
-    evidence_log : list[dict]
-        Verbatim evidence entries from UserEvidenceLogNode.
-    chat_response : dict
-        Structured chat response from RAGChatbotNode.
-    daily_reminder : dict
-        Compiled reminder object from ReminderNode.
-    confidence_score : float
-        Aggregate confidence for the current extraction batch.
-    requires_hitl : bool
-        True if any item needs human-in-the-loop escalation.
-    hitl_items : list[dict]
-        Items flagged for HITL review.
-    retry_count : int
-        Current retry counter for failed operations.
-    max_retries : int
-        Ceiling for retry attempts (default: 3).
-    error_message : str
-        Error description if a node fails.
-    final_response : str
-        Formatted final response string to return to user.
-    metadata : dict
-        Auxiliary metadata (timestamps, node trace, etc.).
+    Uses Custom dedupe_list_reducer for list attributes to prevent duplicates.
     """
-    raw_payload: dict[str, Any]
+    raw_payload: Dict[str, Any]
     user_query: str
     user_id: str
     language: str
     flow_type: str
     intent: str
-    extracted_items: list[dict[str, Any]]
-    dashboard_timeline: list[dict[str, Any]]
-    evidence_log: list[dict[str, Any]]
-    chat_response: dict[str, Any]
-    daily_reminder: dict[str, Any]
+    
+    # Annotated list fields using dedupe_list_reducer
+    extracted_items: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
+    dashboard_timeline: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
+    evidence_log: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
+    hitl_items: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
+
+    chat_response: Dict[str, Any]
+    daily_reminder: Dict[str, Any]
     confidence_score: float
     requires_hitl: bool
-    hitl_items: list[dict[str, Any]]
     retry_count: int
     max_retries: int
     error_message: str
     final_response: str
-    metadata: dict[str, Any]
+    metadata: Dict[str, Any]
