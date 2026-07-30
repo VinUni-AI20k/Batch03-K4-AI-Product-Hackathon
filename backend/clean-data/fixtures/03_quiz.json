@@ -1,0 +1,64 @@
+{
+  "mcq": [
+    {
+      "q_id": "q1",
+      "question": "Primary Key dÃ¹ng Ä‘á»ƒ lÃ m gÃ¬?",
+      "options": ["Äá»‹nh danh duy nháº¥t má»—i dÃ²ng trong báº£ng", "LÆ°u trá»¯ dá»¯ liá»‡u dáº¡ng vÄƒn báº£n dÃ i", "TÄƒng tá»‘c Ä‘á»™ máº¡ng", "MÃ£ hoÃ¡ dá»¯ liá»‡u nháº¡y cáº£m"],
+      "correct_index": 0,
+      "section_id": "s1"
+    },
+    {
+      "q_id": "q2",
+      "question": "Foreign Key cÃ³ vai trÃ² gÃ¬?",
+      "options": ["XoÃ¡ dá»¯ liá»‡u tá»± Ä‘á»™ng", "Trá» tá»›i Primary Key cá»§a báº£ng khÃ¡c Ä‘á»ƒ thá»ƒ hiá»‡n quan há»‡", "Sáº¯p xáº¿p báº£ng theo alphabet", "KhÃ´ng cÃ³ vai trÃ² gÃ¬ Ä‘áº·c biá»‡t"],
+      "correct_index": 1,
+      "section_id": "s1"
+    },
+    {
+      "q_id": "q3",
+      "question": "INNER JOIN tráº£ vá» nhá»¯ng dÃ²ng nÃ o?",
+      "options": ["Táº¥t cáº£ dÃ²ng á»Ÿ báº£ng trÃ¡i", "Táº¥t cáº£ dÃ²ng á»Ÿ cáº£ hai báº£ng dÃ¹ khá»›p hay khÃ´ng", "Chá»‰ nhá»¯ng dÃ²ng khá»›p á»Ÿ Cáº¢ HAI báº£ng", "Chá»‰ nhá»¯ng dÃ²ng KHÃ”NG khá»›p"],
+      "correct_index": 2,
+      "section_id": "s2"
+    },
+    {
+      "q_id": "q4",
+      "question": "CÃº phÃ¡p nÃ o Ä‘Ãºng cho INNER JOIN?",
+      "options": ["SELECT * FROM a LEFT b", "SELECT * FROM a INNER JOIN b ON a.id = b.id", "SELECT * FROM a, b WHERE a != b", "JOIN INNER a b"],
+      "correct_index": 1,
+      "section_id": "s2"
+    },
+    {
+      "q_id": "q5",
+      "question": "LEFT JOIN khÃ¡c INNER JOIN á»Ÿ Ä‘iá»ƒm nÃ o?",
+      "options": ["LEFT JOIN giá»¯ toÃ n bá»™ báº£ng bÃªn trÃ¡i ká»ƒ cáº£ khÃ´ng khá»›p", "LEFT JOIN chá»‰ giá»¯ dÃ²ng khá»›p cáº£ 2 báº£ng giá»‘ng INNER JOIN", "LEFT JOIN khÃ´ng cho phÃ©p NULL", "LEFT JOIN nhanh hÆ¡n vÃ¬ bá» qua báº£ng pháº£i"],
+      "correct_index": 0,
+      "section_id": "s3"
+    },
+    {
+      "q_id": "q6",
+      "question": "Khi dÃ¹ng LEFT JOIN, náº¿u báº£ng pháº£i khÃ´ng cÃ³ dÃ²ng khá»›p thÃ¬ cá»™t cá»§a báº£ng pháº£i sáº½ lÃ  gÃ¬?",
+      "options": ["Bá»‹ lá»—i", "0", "NULL", "Bá»‹ bá» qua dÃ²ng Ä‘Ã³ luÃ´n"],
+      "correct_index": 2,
+      "section_id": "s3"
+    },
+    {
+      "q_id": "q7",
+      "question": "Khi nÃ o nÃªn dÃ¹ng LEFT JOIN thay vÃ¬ INNER JOIN?",
+      "options": ["Khi chá»‰ cáº§n dá»¯ liá»‡u khá»›p á»Ÿ cáº£ 2 báº£ng", "Khi muá»‘n giá»¯ toÃ n bá»™ báº£ng chÃ­nh dÃ¹ cÃ³ khá»›p hay khÃ´ng", "Khi báº£ng chÃ­nh khÃ´ng cÃ³ Primary Key", "KhÃ´ng bao giá» nÃªn dÃ¹ng LEFT JOIN"],
+      "correct_index": 1,
+      "section_id": "s4"
+    },
+    {
+      "q_id": "q8",
+      "question": "VÃ­ dá»¥ nÃ o phÃ¹ há»£p Ä‘á»ƒ dÃ¹ng LEFT JOIN?",
+      "options": ["BÃ¡o cÃ¡o táº¥t cáº£ user ká»ƒ cáº£ user chÆ°a tá»«ng mua gÃ¬", "Chá»‰ láº¥y user Ä‘Ã£ tá»«ng mua hÃ ng", "XoÃ¡ user khÃ´ng hoáº¡t Ä‘á»™ng", "Äáº¿m sá»‘ báº£ng trong database"],
+      "correct_index": 0,
+      "section_id": "s4"
+    }
+  ],
+  "open_question": {
+    "q_id": "q9",
+    "question": "Pháº§n nÃ o báº¡n tháº¥y khÃ³ nháº¥t trong buá»•i há»c nÃ y?"
+  }
+}

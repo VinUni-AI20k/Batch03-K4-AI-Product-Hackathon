@@ -1,0 +1,4 @@
+[
+  { "section_id": "s3", "related_segment_ids": ["T-010", "T-011", "T-012"] },
+  { "section_id": "s4", "related_segment_ids": ["T-013"] }
+]
