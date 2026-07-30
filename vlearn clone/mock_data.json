@@ -1,0 +1,66 @@
+[
+    {
+      "id": "mock_01",
+      "topic": "Xác định bài toán kinh doanh cho AI",
+      "source": "Slide khóa học AI - Day 2 (Sáng)",
+      "raw_text": "Để xác định một bài toán kinh doanh phù hợp cho AI, không phải bắt đầu từ việc chọn thuật toán hay mô hình, mà phải bắt đầu từ Job-To-Be-Done (JTBD) của người dùng cuối. Ai là người trực tiếp thực hiện công việc? Họ đang cố hoàn thành việc gì và gặp thất bại ở đâu khi dùng công cụ hiện tại? Đặc biệt, cần phải có bằng chứng định lượng (số lượng người gặp, tần suất, thời gian tốn kém) để chứng minh 'nỗi đau' là có thật trước khi đưa AI vào giải quyết. Không có bằng chứng, mọi dự án AI chỉ là đi tìm búa để đập đinh.",
+      "expected_keywords": ["bài toán kinh doanh", "Job-To-Be-Done", "JTBD", "bằng chứng định lượng", "nỗi đau"],
+      "golden_output_bullet": "- Điểm bắt đầu: Tập trung vào JTBD của người dùng (Ai, làm gì, đang gặp khó ở đâu).\n- Điều kiện tiên quyết: Phải có bằng chứng định lượng (tần suất, thời gian mất) chứng minh vấn đề là có thật.\n- Cạm bẫy cần tránh: Đưa giải pháp AI ra trước khi hiểu rõ bài toán thực tế."
+    },
+    {
+      "id": "mock_02",
+      "topic": "Chỉ số thành công & mức tự động hoá",
+      "source": "Slide khóa học AI - Day 2 (Chiều)",
+      "raw_text": "Đánh giá mức độ tự động hóa của một hệ thống AI thường chia làm nhiều cấp: từ hỗ trợ một phần (Human-in-the-loop) đến tự động hoàn toàn (Full Automation). Việc chọn cấp độ phụ thuộc vào rủi ro nghiệp vụ. Chỉ số thành công (Success Metrics) không chỉ là độ chính xác (Accuracy, F1-Score) của mô hình. Trong thực tế, các chỉ số kinh doanh như giảm thời gian xử lý (Processing Time), tăng tỷ lệ chuyển đổi (Conversion Rate), hay mức độ hài lòng của người dùng cuối mới là tiêu chí nghiệm thu quyết định dự án có được đưa vào thực tế hay không.",
+      "expected_keywords": ["mức tự động hóa", "Human-in-the-loop", "Full Automation", "Chỉ số thành công", "Success Metrics", "tiêu chí nghiệm thu"],
+      "golden_output_bullet": "- Cấp độ tự động hóa: Lựa chọn từ Human-in-the-loop đến Full Automation tùy theo mức độ rủi ro nghiệp vụ.\n- Đo lường thành công: Không chỉ phụ thuộc vào F1-Score hay Accuracy của mô hình AI.\n- Tiêu chí nghiệm thu cốt lõi: Phải tạo ra giá trị kinh doanh thực tế (giảm thời gian, tăng tỷ lệ chuyển đổi, tối ưu UX)."
+    },
+    {
+      "id": "mock_03",
+      "topic": "Loss Functions trong Học máy",
+      "source": "Tài liệu học phần Machine Learning",
+      "raw_text": "Hàm mất mát (Loss function) dùng để đánh giá độ sai lệch giữa dự đoán của mô hình và giá trị thực tế. Trong bài toán hồi quy (Regression), người ta thường dùng Mean Squared Error (MSE). Trong khi đó, với bài toán phân lớp (Classification), hàm Cross-Entropy Loss là phổ biến nhất. Mục tiêu của quá trình huấn luyện (training) sử dụng các thuật toán như Gradient Descent là tìm ra bộ trọng số (weights) sao cho giá trị của Loss function đạt mức tối thiểu (global minimum).",
+      "expected_keywords": ["Loss function", "Mean Squared Error", "MSE", "Cross-Entropy", "Gradient Descent", "weights"],
+      "golden_output_bullet": "- Vai trò: Đo lường mức độ sai lệch của mô hình dự đoán so với thực tế.\n- Ứng dụng phổ biến: Bài toán hồi quy dùng MSE, bài toán phân lớp dùng Cross-Entropy.\n- Mục tiêu huấn luyện: Tối thiểu hóa hàm mất mát bằng các thuật toán như Gradient Descent."
+    },
+    {
+      "id": "mock_04",
+      "topic": "Quy trình thiết kế Compiler (Trình biên dịch)",
+      "source": "Slide môn Phân tích thiết kế hệ thống / Trình biên dịch",
+      "raw_text": "Một trình biên dịch truyền thống bao gồm nhiều giai đoạn (phases). Bắt đầu từ Phân tích từ vựng (Lexical Analysis) để tạo ra các token, sau đó chuyển sang Phân tích cú pháp (Syntax Analysis) để xây dựng cây cú pháp trừu tượng (Abstract Syntax Tree - AST). Tiếp theo là Phân tích ngữ nghĩa (Semantic Analysis) để kiểm tra kiểu dữ liệu và phạm vi biến. Nếu phát hiện lỗi ở bất kỳ khâu nào, quá trình sẽ dừng lại. Cuối cùng mới là sinh mã trung gian và sinh mã máy đích (Code Generation).",
+      "expected_keywords": ["Lexical Analysis", "token", "Syntax Analysis", "AST", "Semantic Analysis", "Code Generation"],
+      "golden_output_bullet": "- Phân tích từ vựng (Lexical): Cắt mã nguồn thành các token.\n- Phân tích cú pháp (Syntax): Dựng cây cú pháp trừu tượng (AST).\n- Phân tích ngữ nghĩa (Semantic): Kiểm tra tính hợp lệ về kiểu và phạm vi biến.\n- Đích đến: Sinh mã trung gian và mã máy (Code generation)."
+    },
+    {
+      "id": "mock_05",
+      "topic": "Truyền nhận dữ liệu qua Socket",
+      "source": "Giáo trình Lập trình Mạng (LTM)",
+      "raw_text": "Khi lập trình ứng dụng chat Client-Server bằng C++, giao thức TCP (Transmission Control Protocol) đảm bảo độ tin cậy thông qua cơ chế kết nối hướng luồng. Server phải duy trì trạng thái online/offline của client và quản lý việc file transfer (truyền file). Nếu một client ngắt kết nối đột ngột, server socket cần xử lý ngoại lệ để không bị crash toàn bộ hệ thống. Các hàm cốt lõi để trao đổi dữ liệu thường dùng là send() và recv().",
+      "expected_keywords": ["Client-Server", "C++", "TCP", "file transfer", "online/offline", "send()", "recv()"],
+      "golden_output_bullet": "- Giao thức: TCP đảm bảo kết nối tin cậy, hướng luồng cho mô hình Client-Server.\n- Quản lý trạng thái: Server chịu trách nhiệm theo dõi online/offline và điều phối truyền file.\n- Xử lý lỗi: Cần cơ chế bắt ngoại lệ khi mất kết nối đột ngột để tránh crash server."
+    },
+    {
+      "id": "mock_06",
+      "topic": "Mô hình định giá động (Dynamic Pricing) cho nền tảng OTA",
+      "source": "Tài liệu Nghiệp vụ Hệ thống Đặt phòng/Vé",
+      "raw_text": "Các nền tảng Online Travel Agency (OTA) thường áp dụng chiến lược giá động dựa trên thời gian thực. Giá vé không cố định mà biến thiên theo công thức tính toán dựa trên mức độ cận ngày khởi hành, lịch sử đặt vé của thiết bị truy cập, và tỷ lệ lấp đầy ghế. Khi khoảng thời gian (booking window) càng ngắn và ghế trống càng ít, hệ thống sẽ tự động đẩy giá lên cao (price discrimination) để tối đa hóa biên lợi nhuận.",
+      "expected_keywords": ["OTA", "chiến lược giá động", "booking window", "tỷ lệ lấp đầy", "price discrimination"],
+      "golden_output_bullet": "- Cơ chế: Định giá tự động, liên tục thay đổi theo thời gian thực (Dynamic Pricing).\n- Biến số ảnh hưởng: Độ cận ngày khởi hành, tỷ lệ ghế trống, lịch sử thiết bị truy cập.\n- Mục tiêu: Thực hiện phân biệt giá (price discrimination) trong giai đoạn chót để tối ưu lợi nhuận."
+    },
+    {
+      "id": "mock_07",
+      "topic": "Vòng đời của Android Activity",
+      "source": "Slide Lập trình Ứng dụng Di động (Kotlin)",
+      "raw_text": "Activity trong hệ điều hành Android có một vòng đời (lifecycle) chặt chẽ được quản lý bởi hệ thống. Khi một Activity mới được tạo, nó gọi hàm onCreate() để thiết lập giao diện UI (ví dụ từ file XML) và khởi tạo biến. Sau đó chuyển sang onStart() và onResume() để hiển thị và tương tác với người dùng. Khi người dùng ẩn app hoặc có thông báo đè lên, onPause() và onStop() sẽ được kích hoạt để lưu trạng thái và giải phóng tài nguyên. Tránh thực hiện các tác vụ nặng (như truy vấn SQLite cục bộ) trực tiếp trên Main Thread trong các hàm này.",
+      "expected_keywords": ["Activity lifecycle", "onCreate()", "onResume()", "onPause()", "SQLite", "Main Thread"],
+      "golden_output_bullet": "- Khởi tạo: onCreate() dùng để thiết lập UI và biến.\n- Hiển thị/Tương tác: Hệ thống chuyển qua onStart() và onResume().\n- Ẩn/Chạy nền: onPause() và onStop() được gọi, cần lưu trạng thái và giải phóng tài nguyên.\n- Quy tắc: Không gọi tác vụ nặng (database, network) trên Main Thread."
+    },
+    {
+      "id": "mock_08",
+      "topic": "Google Cloud Data Lifecycle",
+      "source": "Tài liệu Data Engineering on Google Cloud",
+      "raw_text": "Vòng đời dữ liệu đám mây trên Google Cloud Platform (GCP) bao gồm 4 giai đoạn chính: Ingest, Store, Process, và Analyze. Việc lựa chọn công cụ lưu trữ phụ thuộc vào loại dữ liệu. Đối với dữ liệu có cấu trúc (relational) lớn dùng cho Data Warehouse, BigQuery là lựa chọn tối ưu nhờ khả năng tính toán phi máy chủ (serverless). Trong khi đó, Cloud Storage phù hợp để chứa dữ liệu thô (unstructured) dạng object hoặc data lake trước khi đưa vào các luồng xử lý ETL.",
+      "expected_keywords": ["Google Cloud Platform", "Ingest, Store, Process, Analyze", "BigQuery", "serverless", "Cloud Storage", "ETL"],
+      "golden_output_bullet": "- 4 giai đoạn cốt lõi: Ingest (Thu thập), Store (Lưu trữ), Process (Xử lý), Analyze (Phân tích).\n- Dữ liệu có cấu trúc: Sử dụng BigQuery như một Data Warehouse phi máy chủ.\n- Dữ liệu phi cấu trúc (thô): Sử dụng Cloud Storage làm kho chứa object trước quá trình xử lý ETL."
+    }
+  ]

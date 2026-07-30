@@ -1,0 +1,444 @@
+/* ============================================
+   VLearn - Course Detail Page Styles
+   ============================================ */
+
+/* --- Course Header Card --- */
+.course-header-card {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 60px rgba(15, 42, 67, 0.08);
+  padding: 32px 36px;
+  margin-bottom: 32px;
+}
+
+.course-header-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--navy), var(--blue-light), var(--red));
+}
+
+.course-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.course-title-block {
+  flex: 1;
+  min-width: 280px;
+}
+
+.course-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.course-title-large {
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.course-students-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.course-students-meta svg {
+  width: 16px;
+  height: 16px;
+  color: var(--blue-light);
+}
+
+/* Progress & Start Reading Action */
+.course-action-block {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(241, 245, 249, 0.7);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+}
+
+.reading-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reading-progress-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  display: grid;
+  place-items: center;
+}
+
+.reading-progress-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.reading-progress-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.reading-progress-bar {
+  width: 100px;
+  height: 6px;
+  border-radius: 99px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.reading-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--emerald), var(--cyan));
+  width: 0%;
+  transition: width 1s ease;
+}
+
+.btn-start-reading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--navy), var(--blue-light));
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(18, 79, 140, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-start-reading:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(18, 79, 140, 0.35);
+}
+
+.btn-start-reading svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Days Accordion List --- */
+.days-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.day-accordion-card {
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.day-accordion-card:hover {
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 12px 32px rgba(15, 42, 67, 0.1);
+}
+
+.day-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  cursor: pointer;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.2s ease;
+}
+
+.day-accordion-card.open .day-accordion-header {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.day-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.day-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.day-accordion-card.open .day-badge {
+  background: linear-gradient(135deg, var(--navy), var(--blue-light));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(18, 79, 140, 0.25);
+}
+
+.day-badge-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.day-accordion-card.open .day-badge-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.day-badge-num {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.day-accordion-card.open .day-badge-num {
+  color: #ffffff;
+}
+
+.day-title-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.day-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.day-status-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.day-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.day-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accordion-chevron {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  transition: transform 0.3s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.day-accordion-card.open .accordion-chevron {
+  transform: rotate(180deg);
+  color: var(--navy);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Accordion Content Body */
+.day-accordion-body {
+  display: none;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.5);
+  animation: slideDown 0.3s ease;
+}
+
+.day-accordion-card.open .day-accordion-body {
+  display: block;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slides Grid inside Day */
+.slides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.slide-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.slide-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue-light);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+}
+
+.slide-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(18, 79, 140, 0.08), rgba(59, 130, 246, 0.15));
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.slide-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.slide-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.slide-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-meta {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.slide-action-icon {
+  color: #cbd5e1;
+  transition: color 0.2s ease;
+}
+
+.slide-card:hover .slide-action-icon {
+  color: var(--blue-light);
+}
+
+/* Day Quick Tools Footer */
+.day-tools-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.day-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  transition: all 0.15s ease;
+}
+
+.day-tool-btn:hover {
+  border-color: var(--navy);
+  background: var(--ice);
+}
+
+.day-tool-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 768px) {
+  .course-header-top {
+    flex-direction: column;
+  }
+  
+  .course-action-block {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .day-accordion-header {
+    padding: 16px 20px;
+  }
+  
+  .day-accordion-body {
+    padding: 20px;
+  }
+}
