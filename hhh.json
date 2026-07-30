@@ -1,0 +1,3269 @@
+[
+{
+"id": "AIP-01",
+"block": "AIP",
+"pain_point": {
+"situation": "Kỹ sư vận hành ML phải đọc log từ nhiều dịch vụ để xác định nguyên nhân một lần triển khai mô hình thất bại.",
+"measurable_consequence": "Mỗi sự cố mất 45–90 phút phân loại; việc khôi phục chậm làm tăng thời gian gián đoạn API và số ticket chuyển sai nhóm."
+},
+"title": "Agent phân loại sự cố triển khai mô hình",
+"job_executor": "ML Platform Engineer trực vận hành",
+"existing_job_without_ai": "Thu thập log, đối chiếu runbook, xác định nhóm lỗi, tạo ticket và chuyển cho người phụ trách.",
+"central_ai_decision": "Quyết định sự cố thuộc nhóm cấu hình, dữ liệu, tài nguyên, dependency hay model artifact và đề xuất bước kiểm tra tiếp theo dựa trên bằng chứng.",
+"source_of_truth": [
+"Log CI/CD và model serving",
+"Trạng thái Kubernetes hoặc dịch vụ triển khai",
+"Runbook đã được phê duyệt",
+"Lịch sử incident và ticket đã đóng"
+],
+"missing_information_handling": "Liệt kê dữ liệu còn thiếu và yêu cầu đúng loại log hoặc trạng thái cần bổ sung. Nếu bằng chứng không đủ, trả trạng thái chưa xác định và không suy đoán nguyên nhân.",
+"authority_limit": [
+"Không tự rollback hoặc redeploy",
+"Không thay đổi cấu hình production",
+"Không tự đóng incident"
+],
+"human_in_the_loop": {
+"risky_action": "Rollback, redeploy hoặc thay đổi tài nguyên production",
+"reviewer": "ML Platform Engineer hoặc Incident Commander",
+"confirmation": "Người phụ trách phải xem bằng chứng, chọn hành động và xác nhận trước khi công cụ thực thi."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"OpenTelemetry hoặc API log hiện có",
+"LLM hỗ trợ structured output",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Nhóm lỗi dự đoán",
+"Các đoạn log làm bằng chứng",
+"Checklist điều tra tiếp theo",
+"Bản nháp ticket"
+],
+"advanced": [
+"Timeline sự cố tự động",
+"So khớp incident tương tự",
+"Đề xuất runbook cần cập nhật"
+]
+},
+"metrics": [
+"Giảm median time-to-triage ít nhất 40%",
+"Độ chính xác phân loại nhóm lỗi đạt ít nhất 85% trên golden set",
+"Tỷ lệ ticket chuyển sai nhóm dưới 10%",
+"100% kết luận có trích dẫn log"
+]
+},
+{
+"id": "AIP-02",
+"block": "AIP",
+"pain_point": {
+"situation": "Data Scientist thường chỉ phát hiện dữ liệu lỗi sau khi job huấn luyện đã chạy trong nhiều giờ.",
+"measurable_consequence": "Mỗi lần huấn luyện hỏng gây lãng phí GPU, kéo dài lịch thử nghiệm và tạo kết quả benchmark không đáng tin cậy."
+},
+"title": "Cổng kiểm tra chất lượng dữ liệu trước huấn luyện",
+"job_executor": "Data Scientist chuẩn bị dataset cho thí nghiệm",
+"existing_job_without_ai": "Chạy script thống kê, kiểm tra schema, xem mẫu dữ liệu và quyết định dataset có đủ điều kiện huấn luyện hay không.",
+"central_ai_decision": "Quyết định dataset nên được chấp nhận, cảnh báo hay chặn để người phụ trách xem xét dựa trên schema, phân phối, nhãn và các quy tắc chất lượng.",
+"source_of_truth": [
+"Data contract và schema chính thức",
+"Ngưỡng chất lượng do nhóm phê duyệt",
+"Dataset version hiện tại",
+"Baseline thống kê của phiên bản đã được duyệt"
+],
+"missing_information_handling": "Không kết luận pass khi thiếu schema hoặc baseline. Hệ thống trả trạng thái cần bổ sung và chỉ chạy những kiểm tra không phụ thuộc dữ liệu còn thiếu.",
+"authority_limit": [
+"Không tự xóa hoặc sửa dữ liệu gốc",
+"Không tự phê duyệt dataset cho production",
+"Không tự thay đổi ngưỡng chất lượng"
+],
+"human_in_the_loop": {
+"risky_action": "Cho phép sử dụng dataset có drift lớn, thiếu nhãn hoặc chứa dữ liệu nhạy cảm",
+"reviewer": "Data Owner hoặc ML Lead",
+"confirmation": "Reviewer xem báo cáo lỗi và phê duyệt ngoại lệ trước khi dataset được mở khóa."
+},
+"tech_stack": [
+"Python",
+"Pandas hoặc Polars",
+"Great Expectations",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Báo cáo schema và dữ liệu thiếu",
+"Phát hiện outlier và mất cân bằng nhãn",
+"Kết quả pass, warn hoặc review",
+"Danh sách bản ghi mẫu cần kiểm tra"
+],
+"advanced": [
+"Phát hiện drift giữa các phiên bản",
+"Gợi ý quy tắc kiểm tra mới",
+"Theo dõi chi phí GPU tránh được"
+]
+},
+"metrics": [
+"Phát hiện ít nhất 90% lỗi dữ liệu đã biết trong golden set",
+"Giảm số training run hỏng do dữ liệu ít nhất 50%",
+"False-block rate dưới 5%",
+"Thời gian kiểm tra dưới 10% thời gian huấn luyện trung bình"
+]
+},
+{
+"id": "AIP-03",
+"block": "AIP",
+"pain_point": {
+"situation": "Nhóm sản phẩm sửa prompt nhưng không biết thay đổi đó làm hỏng trường hợp nào cho đến khi người dùng báo lỗi.",
+"measurable_consequence": "Mỗi đợt phát hành phải kiểm tra thủ công hàng chục case; regression lọt vào production làm tăng phản hồi sai và thời gian rollback."
+},
+"title": "Nền tảng phát hiện regression của prompt",
+"job_executor": "AI Engineer phụ trách prompt và evaluation",
+"existing_job_without_ai": "Chạy bộ test, so sánh output cũ và mới, đọc từng khác biệt rồi quyết định có phát hành prompt hay không.",
+"central_ai_decision": "Quyết định một thay đổi output là cải thiện, tương đương hay regression dựa trên rubric và bằng chứng của từng test case.",
+"source_of_truth": [
+"Golden set có expected behavior",
+"Rubric đánh giá đã được version hóa",
+"Output baseline và output candidate",
+"Kết quả validator deterministic"
+],
+"missing_information_handling": "Case không có expected behavior hoặc rubric rõ ràng được đánh dấu cần người gán nhãn và không được tính vào quyết định release tự động.",
+"authority_limit": [
+"Không tự phát hành prompt",
+"Không tự sửa golden label",
+"Không sử dụng điểm LLM judge làm nguồn duy nhất"
+],
+"human_in_the_loop": {
+"risky_action": "Phê duyệt prompt mới khi còn regression ở case quan trọng",
+"reviewer": "AI Engineer hoặc Product Owner",
+"confirmation": "Reviewer xem output diff, bằng chứng và các case thất bại trước khi phê duyệt release."
+},
+"tech_stack": [
+"Python",
+"Pytest",
+"FastAPI",
+"LLM judge theo structured rubric",
+"SQLite hoặc PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Bảng so sánh baseline và candidate",
+"Danh sách regression theo mức độ",
+"Pass rate theo nhóm test",
+"Khuyến nghị phát hành hoặc chưa phát hành"
+],
+"advanced": [
+"Phân cụm các kiểu lỗi",
+"Xác định vùng prompt có khả năng gây regression",
+"Tạo test case bổ sung từ lỗi đã được duyệt"
+]
+},
+"metrics": [
+"Recall phát hiện regression nghiêm trọng đạt ít nhất 95%",
+"Mức đồng thuận với human reviewer đạt ít nhất 85%",
+"Giảm thời gian review mỗi release ít nhất 50%",
+"Không có release tự động khi còn case critical chưa được duyệt"
+]
+},
+{
+"id": "AIP-04",
+"block": "AIP",
+"pain_point": {
+"situation": "Các job huấn luyện tranh chấp GPU trong khi job quan trọng phải chờ và job ít ưu tiên giữ tài nguyên quá lâu.",
+"measurable_consequence": "GPU utilization thấp nhưng queue time cao; deadline thí nghiệm bị trễ và chi phí cloud vượt ngân sách."
+},
+"title": "Bộ điều phối GPU theo ưu tiên và ngân sách",
+"job_executor": "ML Infrastructure Engineer quản lý hàng đợi huấn luyện",
+"existing_job_without_ai": "Xem hàng đợi, mức ưu tiên, quota và lịch sử sử dụng để phân bổ, trì hoãn hoặc tạm dừng job.",
+"central_ai_decision": "Quyết định thứ tự chạy và cấu hình tài nguyên đề xuất cho từng job nhằm cân bằng deadline, quota và chi phí.",
+"source_of_truth": [
+"Thông tin job và deadline",
+"Quota tài nguyên theo nhóm",
+"Giá GPU và ngân sách được duyệt",
+"Telemetry sử dụng GPU",
+"Chính sách ưu tiên hiện hành"
+],
+"missing_information_handling": "Job thiếu deadline, owner hoặc giới hạn chi phí được giữ ở hàng chờ và yêu cầu bổ sung. Hệ thống không tự gán mức ưu tiên cao.",
+"authority_limit": [
+"Không tự tăng ngân sách",
+"Không tự hủy job",
+"Không vượt quota cứng",
+"Không thay đổi chính sách ưu tiên"
+],
+"human_in_the_loop": {
+"risky_action": "Preempt job đang chạy hoặc cấp thêm GPU làm phát sinh chi phí",
+"reviewer": "ML Infrastructure Engineer",
+"confirmation": "Hệ thống chỉ tạo kế hoạch; người vận hành xác nhận việc preempt hoặc cấp tài nguyên vượt mức thông thường."
+},
+"tech_stack": [
+"Python",
+"Kubernetes Jobs",
+"Prometheus",
+"OR-Tools",
+"FastAPI"
+],
+"outputs": {
+"basic": [
+"Hàng đợi đã xếp thứ tự ưu tiên",
+"GPU và thời lượng đề xuất",
+"Cảnh báo vượt quota",
+"Ước lượng thời điểm hoàn thành"
+],
+"advanced": [
+"Mô phỏng nhiều kịch bản chi phí",
+"Dự báo thời lượng job",
+"Giải thích nguyên nhân job bị trì hoãn"
+]
+},
+"metrics": [
+"Giảm median queue time của job ưu tiên ít nhất 30%",
+"Tăng GPU utilization ít nhất 15%",
+"Chi phí vượt ngân sách dưới 2%",
+"Tỷ lệ hoàn thành job trước deadline đạt ít nhất 90%"
+]
+},
+{
+"id": "AIP-05",
+"block": "AIP",
+"pain_point": {
+"situation": "Dữ liệu huấn luyện và log prompt có thể chứa email, số điện thoại, token hoặc thông tin bí mật mà người chuẩn bị dữ liệu bỏ sót.",
+"measurable_consequence": "Một bản ghi nhạy cảm lọt vào dataset có thể làm chậm phát hành, tạo incident bảo mật và buộc nhóm phải xóa dữ liệu hoặc huấn luyện lại model."
+},
+"title": "Bộ kiểm tra dữ liệu nhạy cảm trước khi sử dụng cho AI",
+"job_executor": "Data Steward kiểm duyệt dữ liệu AI",
+"existing_job_without_ai": "Dùng regex, sampling và checklist để tìm thông tin cá nhân, secret và nội dung không được phép lưu.",
+"central_ai_decision": "Quyết định đoạn dữ liệu nào có khả năng chứa loại thông tin nhạy cảm nào và nên che, loại bỏ hay chuyển cho người kiểm tra.",
+"source_of_truth": [
+"Chính sách phân loại dữ liệu nội bộ",
+"Danh sách pattern secret",
+"Từ điển thực thể nhạy cảm",
+"Nhãn do Data Steward xác nhận"
+],
+"missing_information_handling": "Khi ngữ cảnh không đủ để phân biệt dữ liệu thật và dữ liệu giả, hệ thống gắn nhãn uncertain và chuyển review thay vì tự xóa.",
+"authority_limit": [
+"Không tự xóa dữ liệu nguồn",
+"Không tự công bố dataset là an toàn",
+"Không gửi dữ liệu đến dịch vụ ngoài danh sách được phép"
+],
+"human_in_the_loop": {
+"risky_action": "Phê duyệt dataset hoặc thực hiện redaction hàng loạt",
+"reviewer": "Data Steward hoặc Security Reviewer",
+"confirmation": "Reviewer xem mẫu trước và sau khi che, sau đó mới phê duyệt batch action."
+},
+"tech_stack": [
+"Python",
+"Microsoft Presidio",
+"Regex và entropy scanner",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Danh sách bản ghi nghi ngờ",
+"Loại thực thể và confidence",
+"Bản preview đã che",
+"Báo cáo theo mức độ rủi ro"
+],
+"advanced": [
+"Active learning từ nhãn reviewer",
+"Phát hiện secret mới theo pattern",
+"Audit trail theo dataset version"
+]
+},
+"metrics": [
+"Recall đối với PII và secret critical đạt ít nhất 95%",
+"False-positive rate dưới 10%",
+"100% batch redaction có audit log",
+"Giảm thời gian review thủ công ít nhất 40%"
+]
+},
+{
+"id": "AIP-06",
+"block": "AIP",
+"pain_point": {
+"situation": "Nhóm phát triển mất nhiều ngày thử nhiều mô hình nhưng vẫn có thể chọn model không phù hợp với latency, chi phí hoặc ngôn ngữ của sản phẩm.",
+"measurable_consequence": "Benchmark lặp lại làm tốn ngân sách, lịch tích hợp bị trễ và model được chọn có thể vượt SLA hoặc giảm chất lượng trên dữ liệu thật."
+},
+"title": "Trợ lý lựa chọn mô hình theo ràng buộc sản phẩm",
+"job_executor": "AI Solution Architect thiết kế giải pháp",
+"existing_job_without_ai": "Thu thập yêu cầu, lập shortlist, chạy benchmark và so sánh chất lượng, latency, chi phí và privacy.",
+"central_ai_decision": "Quyết định model nào nên được đưa vào shortlist và thí nghiệm nào cần chạy tiếp dựa trên ràng buộc thực tế của use case.",
+"source_of_truth": [
+"Yêu cầu SLA và ngân sách",
+"Model card và tài liệu chính thức",
+"Kết quả benchmark nội bộ",
+"Dataset đại diện của use case"
+],
+"missing_information_handling": "Nếu thiếu traffic, ngôn ngữ, giới hạn dữ liệu hoặc ngân sách, agent hỏi đúng trường còn thiếu. Khi chưa đủ dữ liệu, hệ thống chỉ đưa shortlist có điều kiện.",
+"authority_limit": [
+"Không tự mua dịch vụ hoặc tạo API key",
+"Không tự chốt model production",
+"Không dùng benchmark công khai thay cho benchmark nội bộ"
+],
+"human_in_the_loop": {
+"risky_action": "Chọn model production hoặc gửi dữ liệu thật sang provider bên ngoài",
+"reviewer": "AI Solution Architect và Security Owner",
+"confirmation": "Con người duyệt shortlist, bộ benchmark và quyền xử lý dữ liệu trước khi thử nghiệm."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"MLflow",
+"LLM hỗ trợ tool calling"
+],
+"outputs": {
+"basic": [
+"Shortlist từ 3 đến 5 model",
+"Ma trận trade-off",
+"Kế hoạch benchmark",
+"Danh sách giả định và thông tin còn thiếu"
+],
+"advanced": [
+"Tự chạy benchmark trong sandbox",
+"Pareto frontier chất lượng, chi phí và latency",
+"Khuyến nghị fallback model"
+]
+},
+"metrics": [
+"Giảm thời gian lập shortlist ít nhất 50%",
+"100% khuyến nghị gắn với ràng buộc và nguồn dữ liệu",
+"Sai số ước lượng chi phí dưới 15%",
+"Model được chọn đạt SLA trên ít nhất 95% request benchmark"
+]
+},
+{
+"id": "AIP-07",
+"block": "AIP",
+"pain_point": {
+"situation": "Knowledge base dùng cho RAG có tài liệu trùng, mâu thuẫn hoặc hết hiệu lực nhưng vẫn được hệ thống truy xuất.",
+"measurable_consequence": "Người dùng nhận câu trả lời khác nhau cho cùng một câu hỏi; đội hỗ trợ mất thời gian sửa và niềm tin vào hệ thống giảm."
+},
+"title": "Nền tảng kiểm toán độ nhất quán của kho RAG",
+"job_executor": "Knowledge Manager quản trị tài liệu nội bộ",
+"existing_job_without_ai": "Rà soát phiên bản, tìm tài liệu trùng, đối chiếu chính sách và đánh dấu nội dung hết hiệu lực.",
+"central_ai_decision": "Quyết định hai đoạn tài liệu là bổ sung, trùng lặp hay mâu thuẫn và đoạn nào cần người sở hữu xác nhận.",
+"source_of_truth": [
+"Kho tài liệu đã được version hóa",
+"Metadata về owner và ngày hiệu lực",
+"Danh sách tài liệu canonical",
+"Quy tắc ưu tiên nguồn"
+],
+"missing_information_handling": "Nếu thiếu owner, ngày hiệu lực hoặc nguồn canonical, hệ thống không tự chọn tài liệu đúng mà tạo task yêu cầu xác minh.",
+"authority_limit": [
+"Không tự xóa tài liệu",
+"Không tự thay đổi tài liệu canonical",
+"Không tự công bố chính sách mới"
+],
+"human_in_the_loop": {
+"risky_action": "Ẩn tài liệu khỏi retrieval hoặc thay đổi nguồn canonical",
+"reviewer": "Knowledge Manager hoặc Document Owner",
+"confirmation": "Reviewer xem cặp đoạn mâu thuẫn và chọn phiên bản có hiệu lực trước khi index được cập nhật."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL với pgvector",
+"Embedding model",
+"LLM so sánh có citation"
+],
+"outputs": {
+"basic": [
+"Danh sách tài liệu trùng hoặc mâu thuẫn",
+"Đoạn văn làm bằng chứng",
+"Mức độ ưu tiên xử lý",
+"Task gửi Document Owner"
+],
+"advanced": [
+"Bản đồ phụ thuộc tài liệu",
+"Cảnh báo tài liệu sắp hết hiệu lực",
+"Đánh giá retrieval trước và sau khi sửa"
+]
+},
+"metrics": [
+"Precision phát hiện mâu thuẫn đạt ít nhất 85%",
+"100% cảnh báo có trích dẫn hai nguồn",
+"Giảm tỷ lệ câu trả lời RAG sử dụng nguồn lỗi thời ít nhất 60%",
+"Giảm thời gian audit tài liệu ít nhất 40%"
+]
+},
+{
+"id": "AIP-08",
+"block": "AIP",
+"pain_point": {
+"situation": "Khi một workflow AI nhiều bước trả kết quả sai, kỹ sư phải đọc trace dài để xác định lỗi nằm ở prompt, tool, retrieval hay dữ liệu.",
+"measurable_consequence": "Một lỗi mất 30–60 phút tái hiện; cùng loại lỗi có thể lặp lại vì nguyên nhân gốc không được gắn nhãn nhất quán."
+},
+"title": "Agent phân tích nguyên nhân lỗi từ trace AI",
+"job_executor": "AI Reliability Engineer điều tra lỗi",
+"existing_job_without_ai": "Tái hiện request, đọc trace từng bước, so sánh với expected behavior và ghi nhận nguyên nhân gốc.",
+"central_ai_decision": "Quyết định bước nào là điểm lỗi đầu tiên và phân loại nguyên nhân thành prompt, retrieval, tool, data, policy hoặc orchestration.",
+"source_of_truth": [
+"Trace đầy đủ theo request",
+"Expected behavior hoặc test oracle",
+"Tool input và output schema",
+"Version của prompt, model và retrieval index"
+],
+"missing_information_handling": "Trace thiếu bước hoặc thiếu expected behavior được đánh dấu không đủ bằng chứng. Agent đề nghị capture bổ sung thay vì kết luận chắc chắn.",
+"authority_limit": [
+"Không tự sửa prompt production",
+"Không tự thay đổi tool hoặc policy",
+"Không tự đóng bug"
+],
+"human_in_the_loop": {
+"risky_action": "Áp dụng bản sửa vào production hoặc thay đổi guardrail",
+"reviewer": "AI Reliability Engineer hoặc Tech Lead",
+"confirmation": "Reviewer xác nhận root cause và pull request trước khi merge hoặc deploy."
+},
+"tech_stack": [
+"Python",
+"OpenTelemetry",
+"FastAPI",
+"LLM hỗ trợ structured output",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Bước lỗi đầu tiên",
+"Loại nguyên nhân gốc",
+"Bằng chứng từ trace",
+"Đề xuất kiểm tra hoặc test tái hiện"
+],
+"advanced": [
+"Phân cụm lỗi lặp lại",
+"Sinh regression test",
+"Dashboard lỗi theo phiên bản"
+]
+},
+"metrics": [
+"Mức đồng thuận về root cause với kỹ sư đạt ít nhất 85%",
+"Giảm median debugging time ít nhất 40%",
+"Tỷ lệ nhận diện đúng case không đủ bằng chứng đạt ít nhất 95%",
+"100% kết luận có trace span tham chiếu"
+]
+},
+{
+"id": "AIP-09",
+"block": "AIP",
+"pain_point": {
+"situation": "Nhóm AI nhận hàng nghìn phản hồi tự do nhưng khó xác định lỗi nào phổ biến và đáng ưu tiên sửa trước.",
+"measurable_consequence": "Product Manager mất nhiều giờ đọc và gắn nhãn; lỗi nghiêm trọng có thể bị chìm trong các phản hồi trùng lặp hoặc mơ hồ."
+},
+"title": "Hệ thống gom nhóm và ưu tiên phản hồi về AI",
+"job_executor": "AI Product Manager lập backlog cải tiến",
+"existing_job_without_ai": "Đọc phản hồi, gắn nhãn chủ đề, gom phản hồi trùng, ước lượng mức ảnh hưởng và tạo ticket.",
+"central_ai_decision": "Quyết định phản hồi thuộc cụm lỗi nào, có phải phản hồi trùng hay sự cố mới và đề xuất mức ưu tiên dựa trên tần suất cùng mức ảnh hưởng.",
+"source_of_truth": [
+"Phản hồi người dùng đã được ẩn danh",
+"Telemetry của request liên quan",
+"Taxonomy lỗi đã được duyệt",
+"Backlog và incident hiện có"
+],
+"missing_information_handling": "Phản hồi thiếu request ID hoặc mô tả cụ thể được gắn nhãn cần bổ sung. Hệ thống không tự suy đoán nguyên nhân kỹ thuật.",
+"authority_limit": [
+"Không tự xóa phản hồi",
+"Không tự quyết định mức ưu tiên cuối cùng cho backlog",
+"Không suy luận thuộc tính nhạy cảm của người dùng"
+],
+"human_in_the_loop": {
+"risky_action": "Gắn mức ưu tiên critical, công bố incident hoặc đóng một cụm phản hồi",
+"reviewer": "AI Product Manager hoặc Support Lead",
+"confirmation": "Reviewer xem mẫu đại diện và telemetry trước khi xác nhận priority hoặc tạo incident."
+},
+"tech_stack": [
+"Python",
+"Sentence Transformers",
+"HDBSCAN",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Các cụm phản hồi",
+"Tên chủ đề và mẫu đại diện",
+"Số lượng và xu hướng",
+"Danh sách phản hồi chưa đủ thông tin"
+],
+"advanced": [
+"Phát hiện cụm mới theo thời gian",
+"Liên kết cụm với model hoặc prompt version",
+"Đề xuất backlog kèm bằng chứng"
+]
+},
+"metrics": [
+"NMI hoặc ARI so với nhãn chuẩn đạt ngưỡng do nhóm đặt",
+"Giảm thời gian triage phản hồi ít nhất 50%",
+"Recall đối với lỗi critical đạt ít nhất 95%",
+"Tỷ lệ cụm được Product Manager chấp nhận đạt ít nhất 80%"
+]
+},
+{
+"id": "AIP-10",
+"block": "AIP",
+"pain_point": {
+"situation": "Bộ test cho agent thường chỉ có happy path nên lỗi thiếu thông tin, gọi sai tool và vượt thẩm quyền không được phát hiện trước demo.",
+"measurable_consequence": "Nhóm phải sửa lỗi sát deadline; coverage hành vi thấp khiến kết quả đánh giá không phản ánh đúng rủi ro của hệ thống."
+},
+"title": "Agent sinh và quản lý test case hành vi cho AI agent",
+"job_executor": "QA Engineer kiểm thử hệ thống AI",
+"existing_job_without_ai": "Đọc requirement, viết test case, tạo input giả, xác định expected behavior và chạy regression.",
+"central_ai_decision": "Quyết định khoảng trống coverage nào cần thêm test và sinh candidate case phù hợp với requirement, failure taxonomy và boundary.",
+"source_of_truth": [
+"Requirement và policy đã được version hóa",
+"Tool schema",
+"Failure taxonomy",
+"Test suite và lịch sử bug",
+"Expected behavior do QA phê duyệt"
+],
+"missing_information_handling": "Nếu requirement không nêu rõ expected behavior, hệ thống tạo câu hỏi cho Product Owner và không tự gán test oracle.",
+"authority_limit": [
+"Không tự sửa expected result",
+"Không tự đưa test mới vào release gate",
+"Không sử dụng dữ liệu người thật chưa được cho phép"
+],
+"human_in_the_loop": {
+"risky_action": "Đưa test case vào golden set hoặc thay đổi release gate",
+"reviewer": "QA Engineer và Product Owner",
+"confirmation": "QA duyệt input, expected behavior và mức độ rủi ro trước khi merge test."
+},
+"tech_stack": [
+"Python",
+"Pytest",
+"FastAPI",
+"LLM hỗ trợ structured output",
+"GitHub Actions"
+],
+"outputs": {
+"basic": [
+"Candidate test case theo failure taxonomy",
+"Input và expected behavior nháp",
+"Ma trận coverage",
+"Danh sách requirement còn mơ hồ"
+],
+"advanced": [
+"Mutation testing cho tool và prompt",
+"Tự chạy test trong sandbox và lưu trace",
+"Ưu tiên test theo rủi ro và lịch sử bug"
+]
+},
+"metrics": [
+"Tăng coverage failure taxonomy lên ít nhất 90%",
+"Tỷ lệ test candidate được QA chấp nhận đạt ít nhất 75%",
+"Giảm thời gian viết test ít nhất 40%",
+"Không có golden test được thêm khi chưa có human approval"
+]
+}
+]
+
+
+[
+{
+"id": "PTNT-01",
+"block": "PTNT",
+"pain_point": {
+"situation": "Khi một nhóm thay đổi API, các nhóm đang tích hợp thường không biết hệ thống nào sẽ bị ảnh hưởng cho đến khi ứng dụng phát sinh lỗi.",
+"measurable_consequence": "Mỗi thay đổi không tương thích có thể làm gián đoạn nhiều dịch vụ, mất 2–8 giờ điều tra và tăng số lỗi tích hợp sau phát hành."
+},
+"title": "Agent đánh giá tác động khi thay đổi API",
+"job_executor": "Integration Engineer phụ trách API giữa các hệ thống",
+"existing_job_without_ai": "So sánh phiên bản API, tìm các consumer liên quan, đánh giá mức độ tương thích và thông báo cho từng nhóm sử dụng.",
+"central_ai_decision": "Quyết định thay đổi API thuộc loại tương thích, có rủi ro hoặc breaking change và xác định các consumer cần kiểm tra trước khi phát hành.",
+"source_of_truth": [
+"OpenAPI specification đã được version hóa",
+"API Gateway access log",
+"Service catalog",
+"Repository của các consumer",
+"Chính sách versioning API"
+],
+"missing_information_handling": "Nếu không xác định được consumer hoặc không có specification phiên bản cũ, hệ thống trả trạng thái chưa đủ bằng chứng và yêu cầu bổ sung repository, traffic log hoặc owner của API.",
+"authority_limit": [
+"Không tự phát hành API",
+"Không tự thay đổi hợp đồng API",
+"Không tự bỏ qua breaking change",
+"Không tự sửa mã nguồn consumer"
+],
+"human_in_the_loop": {
+"risky_action": "Phê duyệt phát hành một API có breaking change hoặc loại bỏ endpoint đang được sử dụng",
+"reviewer": "API Owner hoặc Solution Architect",
+"confirmation": "Reviewer xem danh sách consumer bị ảnh hưởng, kế hoạch migration và kết quả integration test trước khi cho phép phát hành."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"OpenAPI Parser",
+"PostgreSQL",
+"GitHub hoặc GitLab API"
+],
+"outputs": {
+"basic": [
+"Danh sách thay đổi giữa hai phiên bản API",
+"Phân loại breaking và non-breaking change",
+"Danh sách consumer có khả năng bị ảnh hưởng",
+"Checklist kiểm tra trước phát hành"
+],
+"advanced": [
+"Sinh candidate integration test",
+"Đề xuất kế hoạch migration theo từng consumer",
+"Theo dõi trạng thái nâng cấp của các nhóm"
+]
+},
+"metrics": [
+"Recall phát hiện breaking change đạt ít nhất 95%",
+"Giảm số incident do thay đổi API ít nhất 50%",
+"Giảm thời gian impact analysis ít nhất 60%",
+"100% kết luận có tham chiếu specification hoặc traffic log"
+]
+},
+{
+"id": "PTNT-02",
+"block": "PTNT",
+"pain_point": {
+"situation": "Doanh nghiệp cần kết nối ứng dụng mới với hệ thống legacy nhưng tài liệu tích hợp cũ thiếu, sai hoặc không còn người hiểu rõ.",
+"measurable_consequence": "Kỹ sư có thể mất nhiều ngày đọc code, database và log; mapping sai làm dữ liệu không đồng nhất hoặc gây lỗi cho hệ thống hiện tại."
+},
+"title": "Agent khám phá điểm tích hợp của hệ thống legacy",
+"job_executor": "Solution Architect phụ trách tích hợp hệ thống cũ",
+"existing_job_without_ai": "Đọc source code, schema database, file cấu hình và log để xác định interface, luồng dữ liệu và dependency của hệ thống legacy.",
+"central_ai_decision": "Quyết định điểm tích hợp nào phù hợp nhất cho use case mới dựa trên mức độ ổn định, dữ liệu cung cấp, dependency và rủi ro thay đổi.",
+"source_of_truth": [
+"Source code của hệ thống legacy",
+"Database schema",
+"File cấu hình triển khai",
+"Network và application log",
+"Tài liệu kiến trúc hiện có"
+],
+"missing_information_handling": "Các kết luận không có bằng chứng được gắn confidence thấp. Agent liệt kê thành phần cần kiểm tra thực tế và không tự suy luận giao thức hoặc business rule chưa quan sát được.",
+"authority_limit": [
+"Không tự thay đổi hệ thống legacy",
+"Không tự mở network port",
+"Không tự tạo tài khoản database",
+"Không xem dữ liệu production vượt quyền được cấp"
+],
+"human_in_the_loop": {
+"risky_action": "Chọn phương án can thiệp trực tiếp vào database hoặc sửa mã hệ thống legacy",
+"reviewer": "Solution Architect và System Owner",
+"confirmation": "Con người xác nhận sơ đồ dependency, business rule và phương án rollback trước khi triển khai tích hợp."
+},
+"tech_stack": [
+"Python",
+"Static Analysis Parser",
+"Graphviz",
+"PostgreSQL",
+"LLM hỗ trợ structured extraction"
+],
+"outputs": {
+"basic": [
+"Danh sách interface và dependency phát hiện được",
+"Sơ đồ luồng dữ liệu hiện tại",
+"Các phương án tích hợp khả thi",
+"Danh sách giả định cần xác minh"
+],
+"advanced": [
+"Đánh giá rủi ro của từng phương án",
+"Sinh tài liệu kiến trúc hiện trạng",
+"Đề xuất anti-corruption layer cho hệ thống mới"
+]
+},
+"metrics": [
+"Giảm thời gian khảo sát hệ thống ít nhất 40%",
+"Ít nhất 90% dependency quan trọng được kiến trúc sư xác nhận",
+"100% giả định chưa kiểm chứng được đánh dấu rõ",
+"Giảm số lỗi mapping trong giai đoạn tích hợp ít nhất 30%"
+]
+},
+{
+"id": "PTNT-03",
+"block": "PTNT",
+"pain_point": {
+"situation": "Thông tin khách hàng được đồng bộ giữa CRM, hệ thống bán hàng và chăm sóc khách hàng nhưng các hệ thống có thể cùng sửa một bản ghi theo cách khác nhau.",
+"measurable_consequence": "Xung đột dữ liệu tạo hồ sơ trùng, sai địa chỉ hoặc sai trạng thái khách hàng; nhân viên mất 10–20 phút xử lý mỗi trường hợp."
+},
+"title": "Agent hỗ trợ xử lý xung đột đồng bộ dữ liệu",
+"job_executor": "Data Integration Specialist quản lý dữ liệu liên hệ",
+"existing_job_without_ai": "So sánh các phiên bản bản ghi, kiểm tra thời điểm cập nhật và business rule để chọn giá trị cần giữ.",
+"central_ai_decision": "Quyết định xung đột nào có thể giải quyết theo quy tắc, xung đột nào cần con người xem xét và đề xuất phiên bản dữ liệu đáng tin cậy nhất.",
+"source_of_truth": [
+"Master data policy",
+"Audit log của từng hệ thống",
+"Timestamps và source system",
+"Quy tắc ưu tiên trường dữ liệu",
+"Lịch sử xử lý xung đột đã được xác nhận"
+],
+"missing_information_handling": "Nếu thiếu audit log, không xác định được source ưu tiên hoặc các giá trị có độ tin cậy tương đương, agent chuyển trường hợp sang hàng đợi review.",
+"authority_limit": [
+"Không tự ghi đè dữ liệu master với trường hợp confidence thấp",
+"Không tự gộp hai khách hàng khi chưa xác minh danh tính",
+"Không tự xóa bản ghi",
+"Không thay đổi master data policy"
+],
+"human_in_the_loop": {
+"risky_action": "Gộp hồ sơ khách hàng hoặc ghi đè trường dữ liệu quan trọng",
+"reviewer": "Data Steward hoặc Customer Operations Lead",
+"confirmation": "Reviewer xem các phiên bản, nguồn cập nhật và đề xuất của agent trước khi xác nhận thay đổi."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Apache Kafka",
+"Rule Engine"
+],
+"outputs": {
+"basic": [
+"Danh sách bản ghi đang xung đột",
+"Giá trị được đề xuất cho từng trường",
+"Nguồn và thời điểm của từng phiên bản",
+"Trạng thái tự xử lý hoặc cần review"
+],
+"advanced": [
+"Phát hiện hồ sơ có khả năng trùng",
+"Học quy tắc ưu tiên từ quyết định đã duyệt",
+"Dashboard nguyên nhân gây xung đột"
+]
+},
+"metrics": [
+"Độ chính xác đề xuất xử lý đạt ít nhất 90% trên tập đã gán nhãn",
+"Giảm thời gian xử lý xung đột ít nhất 50%",
+"Tỷ lệ gộp nhầm hồ sơ dưới 1%",
+"100% thay đổi có audit trail"
+]
+},
+{
+"id": "PTNT-04",
+"block": "PTNT",
+"pain_point": {
+"situation": "Một quy trình nghiệp vụ đi qua nhiều ứng dụng thường bị dừng khi một dịch vụ hoặc connector trả lỗi, nhưng nhân viên không biết nên thử lại, bỏ qua hay chuyển xử lý thủ công.",
+"measurable_consequence": "Các workflow bị treo làm chậm xử lý đơn hàng hoặc hồ sơ; đội vận hành mất 20–60 phút xác định trạng thái và khôi phục từng trường hợp."
+},
+"title": "Agent điều phối phục hồi workflow tích hợp",
+"job_executor": "Application Operations Engineer giám sát workflow liên hệ thống",
+"existing_job_without_ai": "Đọc trạng thái từng bước, kiểm tra lỗi connector, quyết định retry, chạy bù hoặc chuyển hồ sơ cho bộ phận nghiệp vụ.",
+"central_ai_decision": "Quyết định lỗi workflow có thể retry an toàn, cần compensation, cần bỏ qua bước hay phải chuyển con người xử lý.",
+"source_of_truth": [
+"Workflow definition",
+"Execution log",
+"Retry và idempotency policy",
+"Trạng thái của các hệ thống đích",
+"Runbook xử lý sự cố"
+],
+"missing_information_handling": "Nếu không xác định được một bước có idempotent hay không, agent không đề xuất retry tự động và yêu cầu owner xác nhận.",
+"authority_limit": [
+"Không tự retry thao tác thanh toán",
+"Không tự hủy giao dịch nghiệp vụ",
+"Không tự bỏ qua bước bắt buộc",
+"Không thay đổi workflow definition"
+],
+"human_in_the_loop": {
+"risky_action": "Chạy lại giao dịch có thể tạo dữ liệu trùng, hoàn tiền hoặc thay đổi trạng thái đơn hàng",
+"reviewer": "Operations Engineer hoặc Business Process Owner",
+"confirmation": "Reviewer xem trace của workflow, trạng thái hệ thống đích và tác động dự kiến trước khi xác nhận hành động."
+},
+"tech_stack": [
+"Python",
+"Temporal hoặc Camunda",
+"FastAPI",
+"OpenTelemetry",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Bước workflow bị lỗi",
+"Nguyên nhân có khả năng cao",
+"Đề xuất retry, compensation hoặc manual review",
+"Checklist phục hồi"
+],
+"advanced": [
+"Tự tạo bản nháp compensation plan",
+"Phân cụm lỗi workflow lặp lại",
+"Đề xuất cải tiến retry policy"
+]
+},
+"metrics": [
+"Giảm median time-to-recovery ít nhất 40%",
+"Độ chính xác phân loại hành động phục hồi đạt ít nhất 90%",
+"Không phát sinh giao dịch trùng từ hành động chưa được duyệt",
+"Giảm số workflow phải điều tra thủ công ít nhất 35%"
+]
+},
+{
+"id": "PTNT-05",
+"block": "PTNT",
+"pain_point": {
+"situation": "Khi tích hợp đăng nhập một lần, quyền của người dùng trong hệ thống nguồn thường không khớp với vai trò của ứng dụng đích.",
+"measurable_consequence": "Mapping sai có thể khiến người dùng không làm được việc hoặc được cấp quyền quá mức; mỗi lần rà soát quyền mất nhiều giờ và tạo rủi ro bảo mật."
+},
+"title": "Agent đề xuất mapping vai trò giữa các ứng dụng",
+"job_executor": "Identity and Access Management Engineer",
+"existing_job_without_ai": "Đối chiếu group, role, permission và mô tả công việc để xây dựng bảng mapping quyền giữa Identity Provider và ứng dụng.",
+"central_ai_decision": "Quyết định role đích phù hợp nhất cho từng group nguồn và nhận diện trường hợp có nguy cơ vi phạm nguyên tắc least privilege hoặc separation of duties.",
+"source_of_truth": [
+"Danh sách group từ Identity Provider",
+"Role và permission của ứng dụng",
+"Access control policy",
+"Job role matrix đã được phê duyệt",
+"Audit log truy cập"
+],
+"missing_information_handling": "Nếu group không có owner, mô tả hoặc không khớp với job role matrix, agent không tự cấp quyền và tạo yêu cầu xác minh.",
+"authority_limit": [
+"Không tự cấp hoặc thu hồi quyền production",
+"Không tự tạo administrator role",
+"Không tự thay đổi access policy",
+"Không phê duyệt ngoại lệ separation of duties"
+],
+"human_in_the_loop": {
+"risky_action": "Cấp quyền truy cập dữ liệu nhạy cảm, quyền quản trị hoặc quyền có xung đột trách nhiệm",
+"reviewer": "IAM Owner và Application Owner",
+"confirmation": "Hai bên xem permission chi tiết và xác nhận mapping trước khi cấu hình được áp dụng."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"Keycloak hoặc Microsoft Entra ID API",
+"PostgreSQL",
+"Policy Rule Engine"
+],
+"outputs": {
+"basic": [
+"Bảng mapping group sang role",
+"Các permission được cấp theo mapping",
+"Cảnh báo quyền quá mức",
+"Danh sách group thiếu thông tin"
+],
+"advanced": [
+"Mô phỏng quyền hiệu dụng",
+"Phát hiện xung đột separation of duties",
+"So sánh quyền thực tế với quyền được phê duyệt"
+]
+},
+"metrics": [
+"Precision phát hiện quyền quá mức đạt ít nhất 90%",
+"Giảm thời gian xây dựng role mapping ít nhất 50%",
+"100% quyền quản trị cần phê duyệt thủ công",
+"Giảm số ticket truy cập sai quyền ít nhất 30%"
+]
+},
+{
+"id": "PTNT-06",
+"block": "PTNT",
+"pain_point": {
+"situation": "Các hệ thống tích hợp cùng một khái niệm nghiệp vụ nhưng sử dụng tên trường, kiểu dữ liệu và quy ước giá trị khác nhau.",
+"measurable_consequence": "Mapping dữ liệu sai làm mất trường, sai đơn vị hoặc sai trạng thái; kỹ sư mất nhiều giờ kiểm tra mỗi interface và phải sửa lại pipeline."
+},
+"title": "Agent đề xuất và kiểm tra mapping dữ liệu liên hệ thống",
+"job_executor": "Data Integration Engineer xây dựng transformation pipeline",
+"existing_job_without_ai": "Đọc schema nguồn và đích, đối chiếu ý nghĩa nghiệp vụ, viết mapping và kiểm tra dữ liệu sau chuyển đổi.",
+"central_ai_decision": "Quyết định trường nguồn nào tương ứng với trường đích, transformation nào cần áp dụng và mapping nào có mức độ không chắc chắn cao.",
+"source_of_truth": [
+"Schema nguồn và schema đích",
+"Data dictionary",
+"Business glossary",
+"Dữ liệu mẫu đã ẩn thông tin nhạy cảm",
+"Mapping đã được phê duyệt trước đó"
+],
+"missing_information_handling": "Mapping thiếu định nghĩa nghiệp vụ hoặc có nhiều trường đích tương đương được đánh dấu ambiguous và yêu cầu Data Owner xác nhận.",
+"authority_limit": [
+"Không tự triển khai mapping lên production",
+"Không tự bỏ qua trường bắt buộc",
+"Không tự thay đổi schema nguồn hoặc đích",
+"Không suy luận dữ liệu nhạy cảm từ tên trường"
+],
+"human_in_the_loop": {
+"risky_action": "Áp dụng transformation có thể làm mất dữ liệu, thay đổi đơn vị hoặc ghi đè trường bắt buộc",
+"reviewer": "Data Integration Engineer và Data Owner",
+"confirmation": "Reviewer duyệt mapping, transformation rule và kết quả chạy thử trên dữ liệu mẫu."
+},
+"tech_stack": [
+"Python",
+"Pydantic",
+"FastAPI",
+"PostgreSQL",
+"dbt Core"
+],
+"outputs": {
+"basic": [
+"Bảng mapping trường nguồn và đích",
+"Transformation rule đề xuất",
+"Điểm confidence cho từng mapping",
+"Danh sách trường chưa thể xác định"
+],
+"advanced": [
+"Sinh test kiểm tra transformation",
+"Phát hiện sai đơn vị và kiểu dữ liệu",
+"So sánh dữ liệu trước và sau chuyển đổi"
+]
+},
+"metrics": [
+"Độ chính xác mapping đạt ít nhất 90% trên bộ schema chuẩn",
+"Giảm thời gian thiết kế mapping ít nhất 50%",
+"Tỷ lệ trường bắt buộc bị bỏ sót dưới 2%",
+"100% mapping confidence thấp được review thủ công"
+]
+},
+{
+"id": "PTNT-07",
+"block": "PTNT",
+"pain_point": {
+"situation": "Một integration flow có thể chạy đúng trong happy path nhưng thất bại khi gặp timeout, dữ liệu thiếu, response bất thường hoặc dịch vụ phụ thuộc không sẵn sàng.",
+"measurable_consequence": "Lỗi chỉ xuất hiện sau khi triển khai, làm tăng số incident và kéo dài thời gian regression test của đội QA."
+},
+"title": "Agent thiết kế test case cho luồng tích hợp ứng dụng",
+"job_executor": "Integration QA Engineer",
+"existing_job_without_ai": "Đọc API contract và workflow, viết test case, chuẩn bị mock service, chạy kiểm thử và đối chiếu kết quả.",
+"central_ai_decision": "Quyết định các khoảng trống coverage quan trọng và sinh candidate test case cho failure mode, boundary condition và dependency failure.",
+"source_of_truth": [
+"API specification",
+"Sequence diagram",
+"Business rule",
+"Lịch sử incident",
+"Test suite hiện có"
+],
+"missing_information_handling": "Nếu requirement không quy định expected behavior, agent tạo câu hỏi cần Product Owner xác nhận thay vì tự đặt kết quả mong đợi.",
+"authority_limit": [
+"Không tự thay đổi expected result đã được duyệt",
+"Không tự thêm test vào release gate",
+"Không gọi hệ thống production trong quá trình tạo test",
+"Không sử dụng dữ liệu khách hàng thật"
+],
+"human_in_the_loop": {
+"risky_action": "Đưa test mới vào release gate hoặc thay đổi tiêu chí pass và fail",
+"reviewer": "QA Lead và Product Owner",
+"confirmation": "Reviewer duyệt input, expected behavior và mức độ ưu tiên trước khi test được merge."
+},
+"tech_stack": [
+"Python",
+"Pytest",
+"WireMock",
+"FastAPI",
+"GitHub Actions"
+],
+"outputs": {
+"basic": [
+"Candidate integration test case",
+"Mock response và failure scenario",
+"Ma trận coverage",
+"Danh sách requirement còn mơ hồ"
+],
+"advanced": [
+"Sinh contract test",
+"Mutation testing cho connector",
+"Tự chạy test trong môi trường sandbox"
+]
+},
+"metrics": [
+"Tăng coverage failure scenario lên ít nhất 85%",
+"Tỷ lệ candidate test được QA chấp nhận đạt ít nhất 75%",
+"Giảm thời gian viết test ít nhất 40%",
+"Giảm lỗi tích hợp lọt vào staging hoặc production ít nhất 30%"
+]
+},
+{
+"id": "PTNT-08",
+"block": "PTNT",
+"pain_point": {
+"situation": "Khi một giao dịch đi qua nhiều service, log bị phân tán và mỗi hệ thống sử dụng mã lỗi khác nhau nên kỹ sư khó xác định điểm lỗi đầu tiên.",
+"measurable_consequence": "Một incident tích hợp mất 30–90 phút điều tra; ticket thường bị chuyển qua nhiều nhóm trước khi tìm đúng owner."
+},
+"title": "Agent tương quan log và xác định lỗi tích hợp",
+"job_executor": "Site Reliability Engineer trực hệ thống ứng dụng",
+"existing_job_without_ai": "Tìm correlation ID, ghép timeline log, đối chiếu mã lỗi và xác định service gây lỗi gốc.",
+"central_ai_decision": "Quyết định service hoặc connector nào là điểm lỗi đầu tiên và phân biệt lỗi gốc với lỗi dây chuyền ở các service phía sau.",
+"source_of_truth": [
+"Distributed trace",
+"Application log",
+"Service dependency map",
+"Error catalog",
+"Deployment history"
+],
+"missing_information_handling": "Nếu thiếu trace span hoặc correlation ID bị đứt, agent trình bày các giả thuyết theo confidence và yêu cầu bổ sung log thay vì kết luận chắc chắn.",
+"authority_limit": [
+"Không tự restart service production",
+"Không tự rollback deployment",
+"Không tự đóng incident",
+"Không thay đổi log retention policy"
+],
+"human_in_the_loop": {
+"risky_action": "Restart, rollback hoặc cô lập một service đang phục vụ người dùng",
+"reviewer": "SRE hoặc Incident Commander",
+"confirmation": "Người phụ trách kiểm tra timeline, blast radius và phương án khôi phục trước khi thực hiện."
+},
+"tech_stack": [
+"Python",
+"OpenTelemetry",
+"Grafana Loki",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Timeline của giao dịch lỗi",
+"Điểm lỗi đầu tiên được đề xuất",
+"Các log span làm bằng chứng",
+"Nhóm sở hữu service liên quan"
+],
+"advanced": [
+"Phân cụm incident tương tự",
+"Đề xuất runbook phù hợp",
+"Phát hiện lỗi xuất hiện sau deployment"
+]
+},
+"metrics": [
+"Giảm median time-to-root-cause ít nhất 40%",
+"Độ chính xác xác định service lỗi đạt ít nhất 85%",
+"Giảm số lần chuyển sai nhóm xử lý ít nhất 50%",
+"100% kết luận có tham chiếu trace hoặc log"
+]
+},
+{
+"id": "PTNT-09",
+"block": "PTNT",
+"pain_point": {
+"situation": "Các event được nhiều ứng dụng sử dụng nhưng producer có thể thay đổi schema mà không biết consumer nào phụ thuộc vào trường bị sửa.",
+"measurable_consequence": "Consumer có thể dừng xử lý hoặc âm thầm bỏ dữ liệu; lỗi thường chỉ được phát hiện sau khi backlog message tăng cao."
+},
+"title": "Agent quản trị tương thích schema sự kiện",
+"job_executor": "Event Platform Engineer quản lý nền tảng messaging",
+"existing_job_without_ai": "So sánh schema event, kiểm tra compatibility rule, xác định consumer và phối hợp kế hoạch nâng cấp.",
+"central_ai_decision": "Quyết định thay đổi schema có tương thích với consumer hiện tại hay không và consumer nào phải được nâng cấp trước khi producer phát hành.",
+"source_of_truth": [
+"Schema Registry",
+"Consumer subscription",
+"Message sample",
+"Compatibility policy",
+"Repository của producer và consumer"
+],
+"missing_information_handling": "Nếu consumer không khai báo schema version hoặc không có owner, agent chặn khuyến nghị phát hành và tạo danh sách cần xác minh.",
+"authority_limit": [
+"Không tự thay đổi schema registry",
+"Không tự xóa topic",
+"Không tự phát hành producer",
+"Không tự bỏ compatibility check"
+],
+"human_in_the_loop": {
+"risky_action": "Cho phép phát hành event schema không tương thích hoặc xóa một trường đang được consumer sử dụng",
+"reviewer": "Event Platform Owner và Producer Owner",
+"confirmation": "Reviewer xác nhận consumer impact, migration plan và kết quả contract test trước khi phát hành."
+},
+"tech_stack": [
+"Python",
+"Apache Kafka",
+"Schema Registry",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Schema diff",
+"Kết quả compatibility check",
+"Danh sách consumer bị ảnh hưởng",
+"Kế hoạch nâng cấp đề xuất"
+],
+"advanced": [
+"Sinh consumer contract test",
+"Phát hiện consumer không còn hoạt động",
+"Theo dõi tiến độ migration schema"
+]
+},
+"metrics": [
+"Recall phát hiện consumer bị ảnh hưởng đạt ít nhất 95%",
+"Giảm incident do schema event ít nhất 60%",
+"Giảm thời gian impact analysis ít nhất 50%",
+"Không có incompatible schema được tự động phê duyệt"
+]
+},
+{
+"id": "PTNT-10",
+"block": "PTNT",
+"pain_point": {
+"situation": "Một thư viện hoặc framework tích hợp đã cũ có thể chứa lỗ hổng hoặc không còn được hỗ trợ, nhưng nâng cấp có nguy cơ làm hỏng nhiều module liên quan.",
+"measurable_consequence": "Đội phát triển trì hoãn nâng cấp trong nhiều tháng; khi buộc phải cập nhật, thời gian sửa lỗi tăng và hệ thống có thể phải dừng phát hành."
+},
+"title": "Agent lập kế hoạch nâng cấp dependency ứng dụng",
+"job_executor": "Application Architect phụ trách hiện đại hóa hệ thống",
+"existing_job_without_ai": "Kiểm tra dependency tree, đọc release note, xác định breaking change, đánh giá module bị ảnh hưởng và lập kế hoạch nâng cấp.",
+"central_ai_decision": "Quyết định dependency nào nên được nâng cấp trước, phạm vi ảnh hưởng và chiến lược nâng cấp trực tiếp, theo từng bước hoặc giữ phiên bản tạm thời.",
+"source_of_truth": [
+"Dependency manifest và lock file",
+"Source code của ứng dụng",
+"Release note chính thức",
+"Security advisory",
+"Kết quả automated test"
+],
+"missing_information_handling": "Nếu thiếu test coverage, không tìm thấy release note hoặc dependency là thành phần nội bộ, agent đánh dấu rủi ro chưa xác định và không khuyến nghị nâng cấp trực tiếp.",
+"authority_limit": [
+"Không tự merge pull request",
+"Không tự triển khai production",
+"Không tự bỏ qua security policy",
+"Không tự sửa business logic để phù hợp dependency mới"
+],
+"human_in_the_loop": {
+"risky_action": "Nâng cấp dependency nền tảng, thay đổi major version hoặc chấp nhận tạm thời một lỗ hổng",
+"reviewer": "Application Architect và Security Engineer",
+"confirmation": "Reviewer xem dependency impact, test result và rollback plan trước khi merge hoặc triển khai."
+},
+"tech_stack": [
+"Python",
+"Dependency Scanner",
+"GitHub hoặc GitLab API",
+"FastAPI",
+"PostgreSQL"
+],
+"outputs": {
+"basic": [
+"Danh sách dependency cần nâng cấp",
+"Mức độ ưu tiên theo rủi ro",
+"Các breaking change liên quan",
+"Module và test có khả năng bị ảnh hưởng"
+],
+"advanced": [
+"Sinh bản nháp migration checklist",
+"Tạo candidate pull request trong branch riêng",
+"Mô phỏng lộ trình nâng cấp theo nhiều giai đoạn"
+]
+},
+"metrics": [
+"Recall dependency bị ảnh hưởng đạt ít nhất 90%",
+"Giảm thời gian lập kế hoạch nâng cấp ít nhất 50%",
+"Tỷ lệ pull request đề xuất vượt qua test ban đầu đạt ít nhất 75%",
+"100% nâng cấp major version cần human approval"
+]
+}
+]
+
+[
+{
+"id": "VFO-01",
+"block": "VFO",
+"pain_point": {
+"situation": "Khách hàng để lại thông tin trên website, mạng xã hội hoặc landing page nhưng lead thường được chuyển chậm hoặc chuyển đến chi nhánh không phù hợp.",
+"measurable_consequence": "Nhân viên có thể mất hơn 30 phút để phân loại một nhóm lead; thời gian phản hồi kéo dài làm giảm tỷ lệ đặt lịch và tăng tỷ lệ lead không được xử lý."
+},
+"title": "Agent phân loại và điều phối lead online đến điểm bán",
+"job_executor": "Sales Operations Coordinator phụ trách phân phối lead",
+"existing_job_without_ai": "Đọc thông tin khách hàng, xác định nhu cầu, khu vực, mức độ ưu tiên và chuyển lead đến nhân viên hoặc chi nhánh phù hợp.",
+"central_ai_decision": "Quyết định lead nên được chuyển đến điểm bán và nhân viên nào, với mức ưu tiên nào, dựa trên nhu cầu, vị trí, khả năng phục vụ và tải công việc hiện tại.",
+"source_of_truth": [
+"CRM và lịch sử tương tác với khách hàng",
+"Danh sách chi nhánh và khu vực phục vụ",
+"Lịch làm việc và năng lực xử lý của nhân viên",
+"Danh mục sản phẩm hoặc dịch vụ",
+"Quy tắc phân phối lead đã được phê duyệt"
+],
+"missing_information_handling": "Nếu thiếu vị trí, nhu cầu hoặc thông tin liên hệ, agent yêu cầu bổ sung đúng trường còn thiếu. Lead chưa đủ dữ liệu được đưa vào hàng đợi xác minh và không tự gán mức ưu tiên cao.",
+"authority_limit": [
+"Không tự cam kết giá hoặc ưu đãi",
+"Không tự liên hệ khách hàng khi chưa được phép",
+"Không tự xóa hoặc đóng lead",
+"Không thay đổi quy tắc phân vùng bán hàng"
+],
+"human_in_the_loop": {
+"risky_action": "Chuyển lead giá trị cao, lead khiếu nại hoặc lead thuộc nhiều khu vực kinh doanh",
+"reviewer": "Sales Operations Lead",
+"confirmation": "Người phụ trách xem thông tin lead, lý do điều phối và xung đột quyền sở hữu trước khi xác nhận."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"CRM API",
+"Rule Engine"
+],
+"outputs": {
+"basic": [
+"Phân loại nhu cầu của lead",
+"Chi nhánh và nhân viên được đề xuất",
+"Mức độ ưu tiên",
+"Danh sách thông tin còn thiếu"
+],
+"advanced": [
+"Dự đoán khả năng đặt lịch",
+"Cân bằng tải giữa các nhân viên",
+"Phát hiện lead trùng từ nhiều kênh"
+]
+},
+"metrics": [
+"Giảm median lead assignment time ít nhất 60%",
+"Tỷ lệ chuyển đúng chi nhánh đạt ít nhất 90%",
+"Giảm tỷ lệ lead chưa được xử lý ít nhất 40%",
+"Tăng tỷ lệ phản hồi trong SLA ít nhất 30%"
+]
+},
+{
+"id": "VFO-02",
+"block": "VFO",
+"pain_point": {
+"situation": "Khách hàng đặt lịch tư vấn hoặc trải nghiệm trực tuyến nhưng nhiều người không đến, trong khi một số khung giờ tại điểm bán lại quá tải.",
+"measurable_consequence": "Tỷ lệ không đến làm lãng phí thời gian nhân viên, giảm công suất phục vụ và kéo dài thời gian chờ của khách hàng khác."
+},
+"title": "Agent tối ưu lịch hẹn online tại điểm bán",
+"job_executor": "Branch Appointment Coordinator quản lý lịch hẹn",
+"existing_job_without_ai": "Kiểm tra lịch nhân viên, năng lực phục vụ, loại yêu cầu và xác nhận hoặc điều chỉnh khung giờ với khách hàng.",
+"central_ai_decision": "Quyết định khung giờ và điểm bán phù hợp nhất cho từng yêu cầu, đồng thời xác định lịch hẹn nào có nguy cơ không đến để ưu tiên xác nhận.",
+"source_of_truth": [
+"Lịch hẹn hiện tại",
+"Lịch làm việc của nhân viên",
+"Năng lực phục vụ của từng điểm bán",
+"Loại dịch vụ và thời lượng tiêu chuẩn",
+"Lịch sử xác nhận và không đến"
+],
+"missing_information_handling": "Nếu thiếu loại dịch vụ, thời lượng hoặc thông tin liên hệ, hệ thống giữ trạng thái tạm thời và yêu cầu bổ sung trước khi xác nhận lịch.",
+"authority_limit": [
+"Không tự hủy lịch đã xác nhận",
+"Không tự đặt vượt công suất cứng",
+"Không tự thu phí giữ chỗ",
+"Không tự thay đổi giờ làm việc của nhân viên"
+],
+"human_in_the_loop": {
+"risky_action": "Hủy, dời lịch hàng loạt hoặc overbooking trong giờ cao điểm",
+"reviewer": "Branch Manager hoặc Appointment Coordinator",
+"confirmation": "Người quản lý xem số khách bị ảnh hưởng, công suất và phương án thay thế trước khi phê duyệt."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Google Calendar hoặc Microsoft Graph API",
+"Optimization Solver"
+],
+"outputs": {
+"basic": [
+"Khung giờ và điểm bán đề xuất",
+"Cảnh báo trùng hoặc quá tải",
+"Danh sách lịch cần xác nhận lại",
+"Ước lượng thời gian chờ"
+],
+"advanced": [
+"Dự đoán khả năng không đến",
+"Đề xuất danh sách chờ",
+"Tối ưu phân bổ lịch giữa nhiều chi nhánh"
+]
+},
+"metrics": [
+"Giảm tỷ lệ no-show ít nhất 20%",
+"Giảm thời gian chờ trung bình ít nhất 25%",
+"Tỷ lệ lịch đặt đúng năng lực phục vụ đạt ít nhất 98%",
+"Tăng mức sử dụng khung giờ thấp điểm ít nhất 15%"
+]
+},
+{
+"id": "VFO-03",
+"block": "VFO",
+"pain_point": {
+"situation": "Sản phẩm được khách đặt online có thể hết tại cửa hàng được chọn, trong khi một chi nhánh gần đó vẫn còn hàng.",
+"measurable_consequence": "Đơn bị hủy hoặc giao chậm làm giảm tỷ lệ hoàn thành đơn; nhân viên mất 10–30 phút gọi nhiều chi nhánh để tìm hàng thay thế."
+},
+"title": "Agent điều phối tồn kho cho đơn hàng O2O",
+"job_executor": "Omnichannel Fulfillment Coordinator",
+"existing_job_without_ai": "Kiểm tra tồn kho tại các điểm bán, xác định nguồn hàng phù hợp và quyết định giữ hàng, chuyển kho hoặc đổi điểm nhận.",
+"central_ai_decision": "Quyết định điểm bán nào nên giữ hoặc cung cấp hàng cho đơn dựa trên tồn khả dụng, khoảng cách, thời gian xử lý và mức tồn an toàn.",
+"source_of_truth": [
+"Tồn kho theo thời gian thực",
+"Đơn hàng và trạng thái giữ hàng",
+"Khoảng cách giữa khách hàng và điểm bán",
+"Năng lực xử lý của từng cửa hàng",
+"Quy tắc tồn kho an toàn"
+],
+"missing_information_handling": "Nếu tồn kho không được cập nhật gần đây, agent không cam kết có hàng mà yêu cầu cửa hàng xác nhận vật lý hoặc chuyển đơn sang trạng thái chờ xác minh.",
+"authority_limit": [
+"Không tự điều chuyển hàng giá trị cao",
+"Không tự bán dưới mức tồn an toàn",
+"Không tự hủy đơn",
+"Không thay đổi số liệu tồn kho nguồn"
+],
+"human_in_the_loop": {
+"risky_action": "Điều chuyển liên vùng, tách đơn hoặc sử dụng hàng trưng bày",
+"reviewer": "Fulfillment Lead hoặc Store Manager",
+"confirmation": "Reviewer kiểm tra chi phí, tình trạng sản phẩm và ảnh hưởng tồn kho trước khi xác nhận."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Inventory Management API",
+"OR-Tools"
+],
+"outputs": {
+"basic": [
+"Điểm xuất hàng đề xuất",
+"Thời gian hoàn thành dự kiến",
+"Cảnh báo tồn kho không đáng tin cậy",
+"Phương án thay thế khi hết hàng"
+],
+"advanced": [
+"Tối ưu nhiều đơn cùng lúc",
+"Dự báo nguy cơ thiếu hàng theo điểm bán",
+"Đề xuất cân bằng tồn kho giữa các chi nhánh"
+]
+},
+"metrics": [
+"Tăng tỷ lệ hoàn thành đơn O2O ít nhất 15%",
+"Giảm đơn hủy do hết hàng ít nhất 35%",
+"Giảm thời gian tìm nguồn hàng ít nhất 60%",
+"Tỷ lệ cam kết sai tồn kho dưới 3%"
+]
+},
+{
+"id": "VFO-04",
+"block": "VFO",
+"pain_point": {
+"situation": "Nhân viên kinh doanh doanh nghiệp phải tự sắp xếp nhiều cuộc gặp tại hiện trường nhưng thường chọn lộ trình chưa tối ưu hoặc bỏ sót khách hàng cần chăm sóc.",
+"measurable_consequence": "Thời gian di chuyển chiếm tỷ trọng lớn trong ngày; số cuộc gặp hoàn thành thấp và chi phí công tác tăng."
+},
+"title": "Agent lập kế hoạch thăm khách hàng doanh nghiệp",
+"job_executor": "Field Sales Representative",
+"existing_job_without_ai": "Chọn khách hàng cần gặp, sắp xếp lịch, xây dựng tuyến đường và chuẩn bị nội dung làm việc cho từng cuộc hẹn.",
+"central_ai_decision": "Quyết định danh sách khách hàng nên được thăm trong ngày và thứ tự di chuyển dựa trên mức ưu tiên, lịch hẹn, vị trí và thời gian làm việc.",
+"source_of_truth": [
+"CRM và lịch sử chăm sóc khách hàng",
+"Lịch hẹn đã xác nhận",
+"Địa điểm khách hàng",
+"SLA chăm sóc theo phân hạng khách hàng",
+"Thời gian di chuyển ước tính"
+],
+"missing_information_handling": "Nếu thiếu địa chỉ, người liên hệ hoặc thời gian có thể gặp, agent không đưa khách hàng vào lịch chính thức và tạo yêu cầu bổ sung dữ liệu.",
+"authority_limit": [
+"Không tự xác nhận lịch với khách hàng",
+"Không tự thay đổi phân hạng khách hàng",
+"Không tự cam kết điều khoản thương mại",
+"Không theo dõi vị trí nhân viên ngoài giờ làm việc"
+],
+"human_in_the_loop": {
+"risky_action": "Hủy cuộc hẹn, thay đổi lịch khách hàng chiến lược hoặc lên lịch ngoài khung giờ quy định",
+"reviewer": "Field Sales Representative hoặc Sales Manager",
+"confirmation": "Nhân viên xem tuyến đường, mức ưu tiên và lịch khách hàng trước khi xác nhận kế hoạch."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Map API",
+"OR-Tools"
+],
+"outputs": {
+"basic": [
+"Lịch thăm khách hàng trong ngày",
+"Tuyến đường đề xuất",
+"Mức ưu tiên của từng cuộc gặp",
+"Danh sách thông tin cần bổ sung"
+],
+"advanced": [
+"Điều chỉnh lịch khi có hủy hẹn",
+"Dự báo thời lượng cuộc gặp",
+"Cân bằng địa bàn giữa nhiều nhân viên"
+]
+},
+"metrics": [
+"Giảm tổng thời gian di chuyển ít nhất 20%",
+"Tăng số cuộc gặp hoàn thành mỗi ngày ít nhất 15%",
+"Tỷ lệ tuân thủ SLA chăm sóc đạt ít nhất 90%",
+"Giảm chi phí di chuyển trên mỗi cuộc gặp ít nhất 10%"
+]
+},
+{
+"id": "VFO-05",
+"block": "VFO",
+"pain_point": {
+"situation": "Khách mua online đến cửa hàng nhận sản phẩm nhưng đơn có thể chưa được chuẩn bị, thiếu phụ kiện hoặc không xác định được vị trí hàng.",
+"measurable_consequence": "Khách phải chờ lâu hoặc rời cửa hàng mà chưa nhận được hàng; nhân viên mất thời gian tìm kiếm và xử lý khiếu nại."
+},
+"title": "Agent giám sát chuẩn bị đơn nhận tại cửa hàng",
+"job_executor": "Store Fulfillment Associate",
+"existing_job_without_ai": "Theo dõi đơn sắp đến hạn, lấy hàng, kiểm tra sản phẩm, chuẩn bị chứng từ và đánh dấu đơn sẵn sàng nhận.",
+"central_ai_decision": "Quyết định đơn nào cần được chuẩn bị trước, đơn nào có nguy cơ trễ và bước xử lý tiếp theo dựa trên giờ khách dự kiến đến và trạng thái thực tế.",
+"source_of_truth": [
+"Đơn click-and-collect",
+"Trạng thái picking và packing",
+"Tồn kho tại cửa hàng",
+"Giờ khách dự kiến đến",
+"SLA chuẩn bị đơn"
+],
+"missing_information_handling": "Nếu không có giờ nhận dự kiến hoặc trạng thái hàng chưa được quét, agent đánh dấu cần xác minh và không thông báo đơn đã sẵn sàng.",
+"authority_limit": [
+"Không tự xác nhận đã giao hàng",
+"Không tự thay thế sản phẩm",
+"Không tự hủy đơn",
+"Không gửi thông báo sẵn sàng khi chưa có xác nhận vật lý"
+],
+"human_in_the_loop": {
+"risky_action": "Thay thế sản phẩm, giao thiếu phụ kiện hoặc xác nhận đơn thất lạc",
+"reviewer": "Store Fulfillment Supervisor",
+"confirmation": "Supervisor kiểm tra hàng thực tế và thông tin đơn trước khi xác nhận phương án xử lý."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Order Management API",
+"Barcode Scanner Integration"
+],
+"outputs": {
+"basic": [
+"Danh sách đơn cần chuẩn bị theo ưu tiên",
+"Cảnh báo đơn có nguy cơ trễ",
+"Checklist sản phẩm và phụ kiện",
+"Trạng thái chờ xác minh"
+],
+"advanced": [
+"Dự đoán thời điểm khách đến",
+"Phân công picking theo khu vực cửa hàng",
+"Phân tích nguyên nhân đơn chuẩn bị trễ"
+]
+},
+"metrics": [
+"Giảm thời gian chờ khi nhận hàng ít nhất 30%",
+"Tỷ lệ đơn sẵn sàng đúng SLA đạt ít nhất 95%",
+"Giảm đơn thiếu sản phẩm hoặc phụ kiện ít nhất 40%",
+"Giảm thời gian chuẩn bị trung bình ít nhất 20%"
+]
+},
+{
+"id": "VFO-06",
+"block": "VFO",
+"pain_point": {
+"situation": "Khách yêu cầu đổi hoặc trả sản phẩm mua online tại cửa hàng nhưng chính sách áp dụng có thể khác nhau theo sản phẩm, thời gian và tình trạng hàng.",
+"measurable_consequence": "Nhân viên mất nhiều thời gian tra cứu; quyết định không nhất quán làm tăng khiếu nại và nguy cơ hoàn tiền sai."
+},
+"title": "Agent hỗ trợ phân luồng đổi trả O2O",
+"job_executor": "Customer Service Supervisor tại điểm bán",
+"existing_job_without_ai": "Kiểm tra đơn hàng, thời hạn, tình trạng sản phẩm và chính sách để quyết định trường hợp đủ điều kiện đổi, trả hoặc cần kiểm tra thêm.",
+"central_ai_decision": "Quyết định yêu cầu thuộc nhóm đủ điều kiện theo quy tắc, cần kiểm tra vật lý, cần phê duyệt ngoại lệ hay không đủ điều kiện.",
+"source_of_truth": [
+"Đơn hàng và phương thức thanh toán",
+"Chính sách đổi trả hiện hành",
+"Danh mục loại trừ",
+"Kết quả kiểm tra tình trạng sản phẩm",
+"Lịch sử đổi trả của giao dịch"
+],
+"missing_information_handling": "Nếu thiếu hóa đơn, serial hoặc kết quả kiểm tra sản phẩm, agent không kết luận đủ điều kiện và tạo checklist thông tin cần bổ sung.",
+"authority_limit": [
+"Không tự phê duyệt hoàn tiền",
+"Không tự chấp nhận ngoại lệ chính sách",
+"Không tự kết luận gian lận",
+"Không thay đổi trạng thái hàng khi chưa kiểm tra vật lý"
+],
+"human_in_the_loop": {
+"risky_action": "Hoàn tiền, chấp nhận hàng ngoài chính sách hoặc từ chối trường hợp có tranh chấp",
+"reviewer": "Customer Service Supervisor hoặc Store Manager",
+"confirmation": "Reviewer xem bằng chứng giao dịch, tình trạng sản phẩm và điều khoản chính sách trước khi quyết định."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Order Management API",
+"Rule Engine"
+],
+"outputs": {
+"basic": [
+"Phân loại yêu cầu đổi trả",
+"Điều khoản chính sách liên quan",
+"Checklist kiểm tra sản phẩm",
+"Đề xuất bước xử lý tiếp theo"
+],
+"advanced": [
+"Phát hiện mẫu đổi trả bất thường",
+"Đề xuất điểm tiếp nhận phù hợp",
+"Phân tích nguyên nhân đổi trả theo sản phẩm"
+]
+},
+"metrics": [
+"Giảm thời gian xử lý ban đầu ít nhất 50%",
+"Mức đồng thuận với supervisor đạt ít nhất 90%",
+"Tỷ lệ hoàn tiền sai dưới 1%",
+"Giảm khiếu nại do áp dụng sai chính sách ít nhất 30%"
+]
+},
+{
+"id": "VFO-07",
+"block": "VFO",
+"pain_point": {
+"situation": "Khuyến mãi được quảng bá online nhưng việc áp dụng tại điểm bán có thể không thống nhất hoặc bị lợi dụng qua nhiều tài khoản và giao dịch.",
+"measurable_consequence": "Doanh nghiệp phát sinh chi phí khuyến mãi ngoài kế hoạch, còn khách hợp lệ có thể bị từ chối sai và khiếu nại."
+},
+"title": "Agent kiểm tra điều kiện áp dụng khuyến mãi O2O",
+"job_executor": "Promotion Operations Specialist",
+"existing_job_without_ai": "Đối chiếu giao dịch với điều kiện chương trình, kiểm tra lịch sử sử dụng và chuyển các trường hợp bất thường cho quản lý.",
+"central_ai_decision": "Quyết định giao dịch đáp ứng điều kiện rõ ràng, vi phạm quy tắc, có dấu hiệu bất thường hoặc cần người kiểm tra thêm.",
+"source_of_truth": [
+"Thể lệ chương trình khuyến mãi",
+"Giỏ hàng và giao dịch",
+"Lịch sử sử dụng voucher",
+"Thông tin khách hàng đã được phép sử dụng",
+"Danh sách cửa hàng và sản phẩm áp dụng"
+],
+"missing_information_handling": "Nếu thiếu thông tin định danh giao dịch hoặc trạng thái voucher chưa đồng bộ, agent giữ giao dịch ở trạng thái chờ và không tự từ chối quyền lợi.",
+"authority_limit": [
+"Không tự khóa tài khoản khách hàng",
+"Không tự kết luận gian lận",
+"Không tự thay đổi giá bán",
+"Không tự phê duyệt ngoại lệ khuyến mãi"
+],
+"human_in_the_loop": {
+"risky_action": "Từ chối ưu đãi, khóa voucher hoặc chuyển vụ việc sang điều tra gian lận",
+"reviewer": "Promotion Operations Lead hoặc Store Manager",
+"confirmation": "Reviewer xem điều kiện chương trình và bằng chứng giao dịch trước khi xác nhận."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Rule Engine",
+"Point-of-Sale API"
+],
+"outputs": {
+"basic": [
+"Kết quả kiểm tra điều kiện",
+"Điều khoản được áp dụng",
+"Cảnh báo dữ liệu chưa đồng bộ",
+"Danh sách trường hợp cần review"
+],
+"advanced": [
+"Phát hiện mẫu sử dụng voucher bất thường",
+"Phân tích chi phí theo chương trình",
+"Cảnh báo điều kiện dễ gây hiểu nhầm"
+]
+},
+"metrics": [
+"Độ chính xác kiểm tra điều kiện đạt ít nhất 95%",
+"Giảm thời gian xử lý tại quầy ít nhất 40%",
+"Tỷ lệ từ chối sai dưới 2%",
+"Giảm thất thoát khuyến mãi đã xác minh ít nhất 20%"
+]
+},
+{
+"id": "VFO-08",
+"block": "VFO",
+"pain_point": {
+"situation": "Khách hàng gửi yêu cầu lắp đặt hoặc bảo trì online nhưng đội hiện trường thường nhận lịch chưa phù hợp về kỹ năng, khu vực hoặc phụ tùng.",
+"measurable_consequence": "Kỹ thuật viên phải quay lại nhiều lần, tỷ lệ xử lý ngay lần đầu thấp và chi phí di chuyển tăng."
+},
+"title": "Agent điều phối kỹ thuật viên cho dịch vụ tại hiện trường",
+"job_executor": "Field Service Dispatcher",
+"existing_job_without_ai": "Đọc yêu cầu, xác định kỹ năng và phụ tùng cần thiết, chọn kỹ thuật viên và sắp xếp lịch đến địa điểm khách hàng.",
+"central_ai_decision": "Quyết định kỹ thuật viên, khung giờ và bộ phụ tùng phù hợp nhất dựa trên lỗi mô tả, chứng chỉ, vị trí và lịch làm việc.",
+"source_of_truth": [
+"Phiếu yêu cầu dịch vụ",
+"Hồ sơ kỹ năng và chứng chỉ kỹ thuật viên",
+"Lịch làm việc",
+"Tồn kho phụ tùng",
+"Lịch sử xử lý các lỗi tương tự"
+],
+"missing_information_handling": "Nếu mô tả lỗi chưa đủ hoặc không xác định được thiết bị, agent yêu cầu ảnh, mã sản phẩm hoặc bước kiểm tra sơ bộ trước khi điều phối.",
+"authority_limit": [
+"Không tự cam kết chi phí sửa chữa",
+"Không tự giao việc yêu cầu chứng chỉ còn thiếu",
+"Không tự điều động ngoài giờ",
+"Không tự đặt mua phụ tùng"
+],
+"human_in_the_loop": {
+"risky_action": "Điều phối công việc có rủi ro an toàn, yêu cầu ngắt hệ thống hoặc phát sinh chi phí lớn",
+"reviewer": "Field Service Manager",
+"confirmation": "Manager xem mức độ rủi ro, kỹ năng yêu cầu và phương án an toàn trước khi phê duyệt."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"Field Service Management API",
+"Optimization Solver"
+],
+"outputs": {
+"basic": [
+"Kỹ thuật viên và khung giờ đề xuất",
+"Danh sách kỹ năng cần có",
+"Phụ tùng cần chuẩn bị",
+"Thông tin còn thiếu từ khách hàng"
+],
+"advanced": [
+"Tối ưu tuyến đường nhiều kỹ thuật viên",
+"Dự đoán thời lượng xử lý",
+"Đề xuất gom nhiều công việc cùng khu vực"
+]
+},
+"metrics": [
+"Tăng first-time fix rate ít nhất 15%",
+"Giảm số lần điều phối lại ít nhất 30%",
+"Giảm thời gian di chuyển trên mỗi phiếu ít nhất 15%",
+"Tỷ lệ giao việc đúng kỹ năng đạt ít nhất 98%"
+]
+},
+{
+"id": "VFO-09",
+"block": "VFO",
+"pain_point": {
+"situation": "Doanh nghiệp tổ chức hội thảo và sự kiện trực tiếp nhưng dữ liệu đăng ký online, check-in và trao đổi tại sự kiện không được hợp nhất kịp thời.",
+"measurable_consequence": "Nhân viên bán hàng liên hệ chậm hoặc sai nhu cầu; nhiều cơ hội tiềm năng bị bỏ sót và khó đánh giá hiệu quả sự kiện."
+},
+"title": "Agent phân loại và bàn giao lead sau sự kiện doanh nghiệp",
+"job_executor": "Event Sales Coordinator",
+"existing_job_without_ai": "Tổng hợp danh sách đăng ký, check-in, ghi chú trao đổi, đánh giá mức quan tâm và chuyển lead cho đội bán hàng.",
+"central_ai_decision": "Quyết định lead thuộc nhóm cần liên hệ ngay, cần nuôi dưỡng, chưa đủ thông tin hoặc không phù hợp dựa trên hành vi và ghi chú đã thu thập.",
+"source_of_truth": [
+"Dữ liệu đăng ký sự kiện",
+"Check-in tại địa điểm",
+"Phiếu khảo sát và nội dung đồng ý liên hệ",
+"Ghi chú của nhân viên tại sự kiện",
+"CRM và lịch sử khách hàng"
+],
+"missing_information_handling": "Nếu thiếu sự đồng ý liên hệ hoặc thông tin doanh nghiệp, agent không chuyển sang quy trình outreach mà yêu cầu xác minh.",
+"authority_limit": [
+"Không tự gửi email bán hàng",
+"Không tự thay đổi trạng thái cơ hội",
+"Không suy luận thông tin nhạy cảm",
+"Không chia sẻ dữ liệu ngoài phạm vi đồng ý của người tham dự"
+],
+"human_in_the_loop": {
+"risky_action": "Liên hệ lead chưa đồng ý, gán lead chiến lược hoặc hợp nhất hồ sơ khách hàng",
+"reviewer": "Event Sales Lead hoặc Data Steward",
+"confirmation": "Reviewer xác nhận quyền liên hệ, độ trùng hồ sơ và owner trước khi bàn giao."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"CRM API",
+"QR Check-in Integration"
+],
+"outputs": {
+"basic": [
+"Phân nhóm lead sau sự kiện",
+"Điểm ưu tiên kèm lý do",
+"Danh sách lead thiếu quyền liên hệ",
+"Bản nháp nội dung bàn giao cho sales"
+],
+"advanced": [
+"Hợp nhất lead trùng đa sự kiện",
+"Liên kết chủ đề quan tâm với sản phẩm",
+"Phân tích đóng góp của sự kiện vào pipeline"
+]
+},
+"metrics": [
+"Giảm thời gian bàn giao lead ít nhất 60%",
+"Tỷ lệ lead được phân loại đúng đạt ít nhất 85%",
+"Tăng tỷ lệ liên hệ trong 24 giờ ít nhất 30%",
+"100% lead được kiểm tra quyền liên hệ"
+]
+},
+{
+"id": "VFO-10",
+"block": "VFO",
+"pain_point": {
+"situation": "Các chi nhánh nhận yêu cầu từ kênh online nhưng chất lượng phản hồi, thời gian xử lý và dữ liệu cập nhật về hệ thống trung tâm không đồng đều.",
+"measurable_consequence": "Khách hàng nhận trải nghiệm khác nhau giữa các điểm bán; SLA bị vi phạm nhưng đội trung tâm chỉ phát hiện khi có khiếu nại."
+},
+"title": "Agent giám sát SLA xử lý yêu cầu online tại chi nhánh",
+"job_executor": "Omnichannel Operations Manager",
+"existing_job_without_ai": "Theo dõi các yêu cầu đang mở, kiểm tra thời gian phản hồi, nhắc chi nhánh và điều tra nguyên nhân các trường hợp quá hạn.",
+"central_ai_decision": "Quyết định yêu cầu nào có nguy cơ vi phạm SLA, cần nhắc nhở, cần hỗ trợ từ trung tâm hoặc cần chuyển cấp quản lý.",
+"source_of_truth": [
+"CRM hoặc ticket system",
+"SLA theo loại yêu cầu",
+"Trạng thái xử lý tại chi nhánh",
+"Lịch làm việc và ngày nghỉ",
+"Lịch sử quá hạn"
+],
+"missing_information_handling": "Nếu trạng thái không được cập nhật hoặc chưa xác định owner, agent gắn cờ dữ liệu không đầy đủ và yêu cầu chi nhánh xác nhận trước khi đánh giá trách nhiệm.",
+"authority_limit": [
+"Không tự kỷ luật nhân viên",
+"Không tự đóng ticket",
+"Không tự chuyển quyền sở hữu khách hàng",
+"Không tự thay đổi SLA"
+],
+"human_in_the_loop": {
+"risky_action": "Escalate lên lãnh đạo, chuyển khách hàng sang chi nhánh khác hoặc xác định vi phạm vận hành",
+"reviewer": "Omnichannel Operations Manager",
+"confirmation": "Manager xem timeline, dữ liệu thiếu và phản hồi của chi nhánh trước khi xác nhận escalation."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"CRM hoặc Ticketing API",
+"Scheduled Worker"
+],
+"outputs": {
+"basic": [
+"Danh sách yêu cầu có nguy cơ quá hạn",
+"SLA còn lại",
+"Owner và chi nhánh phụ trách",
+"Đề xuất nhắc nhở hoặc escalation"
+],
+"advanced": [
+"Dự báo khối lượng quá hạn theo chi nhánh",
+"Phân tích nguyên nhân gốc của vi phạm SLA",
+"Đề xuất cân bằng tải giữa các điểm bán"
+]
+},
+"metrics": [
+"Giảm tỷ lệ vi phạm SLA ít nhất 30%",
+"Recall phát hiện yêu cầu có nguy cơ quá hạn đạt ít nhất 90%",
+"Giảm thời gian phát hiện quá hạn ít nhất 50%",
+"Giảm số khiếu nại do phản hồi chậm ít nhất 20%"
+]
+}
+]
+
+
+[
+{
+"id": "SC-01",
+"block": "SC",
+"pain_point": {
+"situation": "Đơn vị cấp nước thường chỉ biết đường ống bị rò rỉ sau khi người dân phản ánh, mặt đường sụt lún hoặc lượng nước thất thoát tăng bất thường.",
+"measurable_consequence": "Một điểm rò rỉ không được phát hiện sớm có thể làm thất thoát hàng chục mét khối nước mỗi ngày, tăng chi phí sửa chữa và kéo dài thời gian gián đoạn cấp nước."
+},
+"title": "Agent ưu tiên kiểm tra rò rỉ mạng lưới cấp nước",
+"job_executor": "Kỹ sư vận hành mạng lưới cấp nước đô thị",
+"existing_job_without_ai": "Theo dõi lưu lượng, áp suất, phản ánh của người dân và lịch sử sửa chữa để xác định khu vực cần kiểm tra hiện trường.",
+"central_ai_decision": "Quyết định khu vực nào có khả năng xảy ra rò rỉ và nên được điều động kiểm tra trước dựa trên biến động lưu lượng, áp suất, thời gian và lịch sử sự cố.",
+"source_of_truth": [
+"Dữ liệu đồng hồ lưu lượng và cảm biến áp suất",
+"Sơ đồ mạng lưới đường ống",
+"Lịch sử sửa chữa và vỡ ống",
+"Phản ánh của người dân",
+"Lịch bảo trì đã được phê duyệt"
+],
+"missing_information_handling": "Nếu cảm biến mất dữ liệu hoặc dữ liệu giữa các điểm đo mâu thuẫn, agent giảm confidence, đánh dấu khu vực cần xác minh và không kết luận chính xác vị trí rò rỉ.",
+"authority_limit": [
+"Không tự khóa van cấp nước",
+"Không tự điều động đội sửa chữa ngoài kế hoạch",
+"Không tự thông báo ngừng cấp nước",
+"Không thay đổi dữ liệu đo gốc"
+],
+"human_in_the_loop": {
+"risky_action": "Khóa van, cô lập khu vực hoặc đào đường để kiểm tra",
+"reviewer": "Trưởng ca vận hành hoặc Kỹ sư trưởng mạng lưới",
+"confirmation": "Người phụ trách xem dữ liệu cảm biến, phạm vi khách hàng bị ảnh hưởng và phương án cấp nước thay thế trước khi phê duyệt."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"MQTT",
+"Time-series anomaly detection"
+],
+"outputs": {
+"basic": [
+"Danh sách khu vực nghi ngờ rò rỉ",
+"Mức độ ưu tiên kiểm tra",
+"Biểu đồ lưu lượng và áp suất bất thường",
+"Danh sách cảm biến thiếu dữ liệu"
+],
+"advanced": [
+"Ước lượng lượng nước thất thoát",
+"Khoanh vùng đoạn ống có khả năng lỗi",
+"Đề xuất tuyến kiểm tra hiện trường"
+]
+},
+"metrics": [
+"Recall phát hiện sự cố rò rỉ đã xác minh đạt ít nhất 90%",
+"Giảm thời gian phát hiện trung bình ít nhất 40%",
+"Giảm lượng nước thất thoát trước sửa chữa ít nhất 20%",
+"Tỷ lệ cảnh báo giả dưới 10%"
+]
+},
+{
+"id": "SC-02",
+"block": "SC",
+"pain_point": {
+"situation": "Đèn đường hỏng hoặc hoạt động sai lịch thường chỉ được phát hiện sau khi người dân phản ánh hoặc nhân viên đi kiểm tra thủ công.",
+"measurable_consequence": "Khu vực thiếu sáng làm tăng nguy cơ tai nạn và mất an toàn; kiểm tra thủ công toàn tuyến làm tốn nhiều giờ công và chi phí di chuyển."
+},
+"title": "Agent phân loại và ưu tiên sự cố chiếu sáng công cộng",
+"job_executor": "Nhân viên điều hành hệ thống chiếu sáng đô thị",
+"existing_job_without_ai": "Kiểm tra trạng thái tủ điện, phản ánh hiện trường, mức tiêu thụ điện và lịch vận hành để tạo phiếu bảo trì.",
+"central_ai_decision": "Quyết định sự cố thuộc loại hỏng bóng, mất nguồn, lỗi tủ điều khiển, sai lịch bật tắt hay lỗi cảm biến và xác định mức ưu tiên xử lý.",
+"source_of_truth": [
+"Trạng thái bộ điều khiển đèn đường",
+"Dữ liệu tiêu thụ điện",
+"Lịch bật tắt đã cấu hình",
+"Phiếu phản ánh của người dân",
+"Lịch sử bảo trì thiết bị"
+],
+"missing_information_handling": "Nếu thiết bị mất kết nối, agent phân biệt mất telemetry với mất điện dựa trên các điểm lân cận. Khi không đủ bằng chứng, tạo phiếu kiểm tra thay vì kết luận thiết bị hỏng.",
+"authority_limit": [
+"Không tự đóng cắt tủ điện",
+"Không tự thay đổi lịch chiếu sáng toàn khu vực",
+"Không tự đóng phiếu bảo trì",
+"Không tự điều chỉnh công suất vượt ngưỡng kỹ thuật"
+],
+"human_in_the_loop": {
+"risky_action": "Cắt điện một tuyến, thay đổi lịch chiếu sáng diện rộng hoặc thao tác tủ điện",
+"reviewer": "Kỹ sư điện trực ca",
+"confirmation": "Kỹ sư xem trạng thái thiết bị, ảnh hưởng giao thông và yêu cầu an toàn trước khi thực hiện."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"MQTT",
+"PostgreSQL",
+"IoT device management platform"
+],
+"outputs": {
+"basic": [
+"Danh sách đèn hoặc tủ điện có sự cố",
+"Phân loại nguyên nhân dự kiến",
+"Mức ưu tiên bảo trì",
+"Bản nháp phiếu sửa chữa"
+],
+"advanced": [
+"Dự báo thiết bị có nguy cơ hỏng",
+"Phân tích tiêu thụ điện bất thường",
+"Tối ưu tuyến đi kiểm tra của đội bảo trì"
+]
+},
+"metrics": [
+"Giảm thời gian phát hiện sự cố ít nhất 50%",
+"Độ chính xác phân loại lỗi đạt ít nhất 85%",
+"Giảm số chuyến kiểm tra không cần thiết ít nhất 30%",
+"Tỷ lệ thiết bị được xử lý trong SLA đạt ít nhất 95%"
+]
+},
+{
+"id": "SC-03",
+"block": "SC",
+"pain_point": {
+"situation": "Xe thu gom rác thường chạy theo lịch cố định dù một số thùng còn trống, trong khi các điểm đông người có thể đầy và tràn trước giờ thu gom.",
+"measurable_consequence": "Tuyến xe không tối ưu làm tăng nhiên liệu và thời gian làm việc; thùng rác tràn gây mùi, mất vệ sinh và tăng số phản ánh của người dân."
+},
+"title": "Agent lập kế hoạch thu gom rác theo mức đầy thực tế",
+"job_executor": "Điều phối viên đội xe vệ sinh môi trường",
+"existing_job_without_ai": "Theo dõi lịch thu gom, phản ánh hiện trường, tải trọng xe và tự sắp xếp tuyến cho từng ca.",
+"central_ai_decision": "Quyết định thùng rác nào cần được thu gom trong ca và thứ tự tuyến xe dựa trên mức đầy, tốc độ phát sinh rác, khoảng cách và tải trọng xe.",
+"source_of_truth": [
+"Cảm biến mức đầy của thùng rác",
+"Lịch sử thu gom",
+"Vị trí các điểm tập kết",
+"Tải trọng và trạng thái xe",
+"Phản ánh vệ sinh môi trường"
+],
+"missing_information_handling": "Nếu cảm biến không cập nhật, agent dùng lịch sử và phản ánh gần nhất để ước lượng nhưng gắn nhãn độ tin cậy thấp. Điểm có nguy cơ cao được yêu cầu kiểm tra thủ công.",
+"authority_limit": [
+"Không tự điều động tài xế ngoài ca",
+"Không tự bỏ qua điểm thu gom bắt buộc",
+"Không thay đổi tải trọng cho phép",
+"Không tự thay đổi lịch khu vực nhạy cảm"
+],
+"human_in_the_loop": {
+"risky_action": "Bỏ một điểm khỏi tuyến, điều xe sang khu vực khác hoặc yêu cầu làm thêm giờ",
+"reviewer": "Trưởng ca vệ sinh môi trường",
+"confirmation": "Trưởng ca xem mức đầy, năng lực xe và các điểm bắt buộc trước khi duyệt tuyến."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL",
+"MQTT",
+"OR-Tools"
+],
+"outputs": {
+"basic": [
+"Danh sách điểm cần thu gom",
+"Tuyến xe đề xuất",
+"Ước lượng tải trọng từng xe",
+"Cảnh báo cảm biến mất kết nối"
+],
+"advanced": [
+"Dự báo thời điểm thùng sẽ đầy",
+"Điều chỉnh tuyến trong ca",
+"Phân tích điểm phát sinh rác bất thường"
+]
+},
+"metrics": [
+"Giảm quãng đường xe chạy ít nhất 15%",
+"Giảm số trường hợp thùng rác tràn ít nhất 40%",
+"Giảm nhiên liệu trên mỗi tấn rác ít nhất 10%",
+"Tỷ lệ hoàn thành điểm ưu tiên trong ca đạt ít nhất 95%"
+]
+},
+{
+"id": "SC-04",
+"block": "SC",
+"pain_point": {
+"situation": "Khi mưa lớn, cống thoát nước có thể quá tải hoặc bị tắc nhưng lực lượng vận hành khó biết điểm nào sẽ ngập trước để xử lý.",
+"measurable_consequence": "Phát hiện chậm làm tăng độ sâu và thời gian ngập, gây ùn tắc giao thông, hư hỏng tài sản và tăng số cuộc gọi cứu hộ."
+},
+"title": "Agent cảnh báo và ưu tiên ứng phó ngập đô thị",
+"job_executor": "Điều phối viên trung tâm thoát nước đô thị",
+"existing_job_without_ai": "Theo dõi mưa, mực nước, camera và phản ánh hiện trường để điều động đội thông cống, bơm nước hoặc đặt rào chắn.",
+"central_ai_decision": "Quyết định điểm nào có nguy cơ ngập trong thời gian gần và hành động nào nên được ưu tiên: kiểm tra cống, vận hành bơm, cảnh báo giao thông hay theo dõi thêm.",
+"source_of_truth": [
+"Cảm biến lượng mưa và mực nước",
+"Bản đồ cao độ và mạng lưới thoát nước",
+"Trạng thái trạm bơm",
+"Camera giao thông",
+"Lịch sử ngập và phản ánh hiện trường"
+],
+"missing_information_handling": "Nếu một cảm biến không hoạt động, agent dùng dữ liệu lân cận và mô hình địa hình nhưng giảm confidence. Nếu không đủ thông tin để đánh giá, chỉ phát cảnh báo theo dõi.",
+"authority_limit": [
+"Không tự đóng đường",
+"Không tự vận hành bơm vượt quy trình",
+"Không tự phát cảnh báo khẩn cấp cho người dân",
+"Không tự điều động lực lượng cứu hộ"
+],
+"human_in_the_loop": {
+"risky_action": "Đóng đường, vận hành thiết bị công suất lớn hoặc phát cảnh báo diện rộng",
+"reviewer": "Chỉ huy trực trung tâm hoặc Cơ quan điều hành giao thông",
+"confirmation": "Người phụ trách kiểm tra camera, mực nước và phạm vi ảnh hưởng trước khi phê duyệt."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL với PostGIS",
+"MQTT",
+"Time-series forecasting"
+],
+"outputs": {
+"basic": [
+"Bản đồ điểm có nguy cơ ngập",
+"Thời gian dự kiến vượt ngưỡng",
+"Mức độ ưu tiên ứng phó",
+"Danh sách cảm biến không đáng tin cậy"
+],
+"advanced": [
+"Ước lượng phạm vi ngập",
+"Đề xuất vị trí đặt rào chắn",
+"Mô phỏng tác động khi vận hành từng trạm bơm"
+]
+},
+"metrics": [
+"Recall đối với điểm ngập đã xác minh đạt ít nhất 90%",
+"Thời gian cảnh báo sớm trung bình đạt ít nhất 20 phút",
+"Tỷ lệ cảnh báo giả dưới 15%",
+"Giảm thời gian điều động lực lượng ít nhất 30%"
+]
+},
+{
+"id": "SC-05",
+"block": "SC",
+"pain_point": {
+"situation": "Phụ huynh và học sinh có thể ở trong phòng học có chất lượng không khí kém nhưng nhà trường chỉ phát hiện khi có mùi, người học khó chịu hoặc kiểm tra định kỳ.",
+"measurable_consequence": "Nồng độ CO2, bụi mịn hoặc nhiệt độ vượt ngưỡng kéo dài làm giảm sự tập trung, tăng phản ánh sức khỏe và gây lãng phí điện nếu thông gió không hợp lý."
+},
+"title": "Agent giám sát chất lượng không khí trong trường học",
+"job_executor": "Nhân viên quản trị cơ sở vật chất trường học",
+"existing_job_without_ai": "Theo dõi cảm biến, kiểm tra phòng học, điều chỉnh thông gió và thông báo giáo viên khi điều kiện không phù hợp.",
+"central_ai_decision": "Quyết định phòng nào cần thông gió, kiểm tra thiết bị hoặc chuyển lớp tạm thời dựa trên CO2, bụi mịn, nhiệt độ, độ ẩm và số người trong phòng.",
+"source_of_truth": [
+"Cảm biến CO2, PM2.5, nhiệt độ và độ ẩm",
+"Lịch sử sử dụng phòng",
+"Số lượng người dự kiến",
+"Trạng thái hệ thống thông gió",
+"Ngưỡng chất lượng không khí được phê duyệt"
+],
+"missing_information_handling": "Nếu cảm biến cho giá trị bất thường hoặc không cập nhật, agent yêu cầu đo lại bằng thiết bị cầm tay và không tự kết luận phòng không an toàn.",
+"authority_limit": [
+"Không tự đóng cửa phòng học",
+"Không tự thay đổi lịch học",
+"Không tự điều khiển HVAC vượt giới hạn cài đặt",
+"Không đưa ra chẩn đoán y tế"
+],
+"human_in_the_loop": {
+"risky_action": "Di chuyển lớp học, đóng phòng hoặc dừng hệ thống thông gió",
+"reviewer": "Quản lý cơ sở vật chất hoặc Ban giám hiệu",
+"confirmation": "Người phụ trách xác nhận số đo, điều kiện thực tế và phương án phòng thay thế trước khi hành động."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"MQTT",
+"PostgreSQL",
+"Rule-based anomaly detection"
+],
+"outputs": {
+"basic": [
+"Danh sách phòng vượt ngưỡng",
+"Nguyên nhân có khả năng cao",
+"Đề xuất thông gió hoặc kiểm tra thiết bị",
+"Cảnh báo cảm biến lỗi"
+],
+"advanced": [
+"Dự báo chất lượng không khí theo lịch học",
+"Tối ưu thời điểm thông gió",
+"Phân tích phòng có vấn đề lặp lại"
+]
+},
+"metrics": [
+"Giảm tổng thời gian CO2 vượt ngưỡng ít nhất 30%",
+"Recall phát hiện sự kiện chất lượng không khí xấu đạt ít nhất 95%",
+"Giảm số phản ánh liên quan đến phòng học ngột ngạt ít nhất 25%",
+"Tỷ lệ cảnh báo cảm biến lỗi được xác nhận đúng đạt ít nhất 85%"
+]
+},
+{
+"id": "SC-06",
+"block": "SC",
+"pain_point": {
+"situation": "Người cao tuổi sống một mình có thể bị ngã hoặc không sinh hoạt như thường lệ nhưng người thân chỉ biết khi không liên lạc được trong thời gian dài.",
+"measurable_consequence": "Phát hiện chậm làm tăng thời gian người bị nạn không được hỗ trợ; cảnh báo sai quá nhiều khiến gia đình bỏ qua cảnh báo thật."
+},
+"title": "Agent phát hiện bất thường sinh hoạt của người cao tuổi tại nhà",
+"job_executor": "Điều phối viên dịch vụ chăm sóc người cao tuổi từ xa",
+"existing_job_without_ai": "Theo dõi cuộc gọi kiểm tra, tín hiệu thiết bị an toàn và lịch sinh hoạt để quyết định có cần liên hệ hoặc cử người đến hỗ trợ.",
+"central_ai_decision": "Quyết định một thay đổi trong hoạt động tại nhà là bình thường, cần gọi xác minh hay có nguy cơ khẩn cấp dựa trên mô hình sinh hoạt cá nhân và nhiều cảm biến.",
+"source_of_truth": [
+"Cảm biến chuyển động không dùng camera",
+"Cảm biến cửa và thiết bị gia dụng được đồng ý theo dõi",
+"Nút khẩn cấp",
+"Lịch sinh hoạt do người dùng hoặc gia đình thiết lập",
+"Lịch sử cảnh báo đã được xác minh"
+],
+"missing_information_handling": "Nếu nhiều cảm biến đồng thời mất kết nối, agent phân loại là lỗi thiết bị và yêu cầu gọi kiểm tra. Không suy luận tình trạng sức khỏe chỉ từ một tín hiệu thiếu.",
+"authority_limit": [
+"Không đưa ra chẩn đoán y tế",
+"Không tự mở khóa cửa",
+"Không tự gọi lực lượng cấp cứu khi chưa đạt quy trình khẩn cấp",
+"Không thu thập âm thanh hoặc hình ảnh ngoài phạm vi đồng ý"
+],
+"human_in_the_loop": {
+"risky_action": "Liên hệ cấp cứu, mở cửa từ xa hoặc cử nhân viên vào nhà",
+"reviewer": "Điều phối viên chăm sóc hoặc Người liên hệ khẩn cấp",
+"confirmation": "Hệ thống ưu tiên gọi xác minh; hành động tiếp theo phải theo quy trình và được người có trách nhiệm xác nhận, trừ tín hiệu khẩn cấp đã được cấu hình trước."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"MQTT",
+"PostgreSQL",
+"Time-series anomaly detection"
+],
+"outputs": {
+"basic": [
+"Cảnh báo thay đổi sinh hoạt",
+"Mức độ khẩn cấp đề xuất",
+"Các tín hiệu làm bằng chứng",
+"Checklist gọi xác minh"
+],
+"advanced": [
+"Cá nhân hóa baseline sinh hoạt",
+"Phân biệt lỗi thiết bị với bất thường thật",
+"Báo cáo xu hướng để gia đình xem xét"
+]
+},
+"metrics": [
+"Recall đối với sự kiện khẩn cấp đã xác minh đạt ít nhất 95%",
+"Tỷ lệ cảnh báo giả dưới 10%",
+"Giảm thời gian từ bất thường đến liên hệ xác minh ít nhất 50%",
+"100% truy cập dữ liệu có audit log"
+]
+},
+{
+"id": "SC-07",
+"block": "SC",
+"pain_point": {
+"situation": "Tòa nhà văn phòng thường tiêu thụ điện cao ngoài giờ hoặc làm lạnh khu vực không có người vì lịch vận hành không phản ánh đúng nhu cầu thực tế.",
+"measurable_consequence": "Điện năng lãng phí làm tăng chi phí vận hành; điều chỉnh quá mức có thể làm nhân viên khó chịu và phát sinh khiếu nại."
+},
+"title": "Agent đề xuất vận hành năng lượng cho tòa nhà",
+"job_executor": "Kỹ sư quản lý năng lượng tòa nhà",
+"existing_job_without_ai": "Theo dõi công suất điện, lịch sử dụng phòng, thời tiết và trạng thái HVAC để điều chỉnh lịch vận hành.",
+"central_ai_decision": "Quyết định khu vực nào có thể giảm công suất, trì hoãn khởi động hoặc cần giữ điều kiện hiện tại dựa trên mức sử dụng, thời tiết và yêu cầu tiện nghi.",
+"source_of_truth": [
+"Dữ liệu công tơ điện",
+"Trạng thái HVAC và hệ thống chiếu sáng",
+"Lịch đặt phòng",
+"Cảm biến hiện diện",
+"Ngưỡng tiện nghi và chính sách vận hành"
+],
+"missing_information_handling": "Nếu cảm biến hiện diện hoặc lịch phòng không đáng tin cậy, agent không đề xuất tắt thiết bị mà giữ cấu hình an toàn và yêu cầu xác minh.",
+"authority_limit": [
+"Không tự tắt thiết bị phục vụ khu vực quan trọng",
+"Không vượt giới hạn nhiệt độ được phê duyệt",
+"Không tự điều khiển thiết bị có cảnh báo bảo trì",
+"Không thay đổi chính sách tiện nghi"
+],
+"human_in_the_loop": {
+"risky_action": "Giảm công suất khu vực đông người, thay đổi lịch HVAC diện rộng hoặc tắt tải quan trọng",
+"reviewer": "Kỹ sư trưởng tòa nhà",
+"confirmation": "Kỹ sư xem dự báo người sử dụng, mức tiết kiệm và rủi ro tiện nghi trước khi áp dụng."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"BACnet gateway",
+"PostgreSQL",
+"Time-series forecasting"
+],
+"outputs": {
+"basic": [
+"Danh sách khu vực tiêu thụ bất thường",
+"Lịch vận hành đề xuất",
+"Ước lượng điện năng có thể tiết kiệm",
+"Cảnh báo dữ liệu cảm biến không đầy đủ"
+],
+"advanced": [
+"Dự báo phụ tải theo giờ",
+"Phát hiện thiết bị hoạt động kém hiệu quả",
+"Mô phỏng tác động của nhiều kịch bản vận hành"
+]
+},
+"metrics": [
+"Giảm tiêu thụ điện ngoài giờ ít nhất 20%",
+"Giảm tổng điện năng HVAC ít nhất 10%",
+"Tỷ lệ khiếu nại tiện nghi không tăng quá 2%",
+"Sai số dự báo phụ tải dưới 15%"
+]
+},
+{
+"id": "SC-08",
+"block": "SC",
+"pain_point": {
+"situation": "Người lái xe mất nhiều thời gian tìm chỗ đỗ trong khu vực đông đúc, trong khi dữ liệu cảm biến và thanh toán có thể không phản ánh đúng trạng thái thực tế.",
+"measurable_consequence": "Việc chạy vòng tìm chỗ gây ùn tắc, tăng nhiên liệu tiêu thụ và làm nhân viên quản lý mất thời gian xử lý các vị trí báo sai."
+},
+"title": "Agent giám sát và dự báo chỗ đỗ xe đô thị",
+"job_executor": "Điều phối viên vận hành bãi đỗ xe thông minh",
+"existing_job_without_ai": "Theo dõi trạng thái chỗ đỗ, kiểm tra cảm biến lỗi, cập nhật biển báo và điều phối nhân viên đến khu vực có vấn đề.",
+"central_ai_decision": "Quyết định trạng thái chỗ đỗ nào đáng tin cậy, khu vực nào sắp đầy và cảm biến nào cần được kiểm tra trước.",
+"source_of_truth": [
+"Cảm biến chỗ đỗ",
+"Dữ liệu camera đã được xử lý tại biên",
+"Giao dịch vào ra hoặc thanh toán",
+"Lịch sự kiện trong khu vực",
+"Lịch sử trạng thái từng vị trí"
+],
+"missing_information_handling": "Khi các nguồn dữ liệu mâu thuẫn, agent gắn trạng thái chưa xác nhận và không hiển thị chỗ trống chắc chắn cho người dùng cho đến khi có bằng chứng bổ sung.",
+"authority_limit": [
+"Không tự xử phạt phương tiện",
+"Không tự khóa lối vào bãi",
+"Không tự thay đổi mức phí",
+"Không lưu nhận dạng biển số lâu hơn chính sách cho phép"
+],
+"human_in_the_loop": {
+"risky_action": "Đóng khu vực đỗ, thay đổi biển chỉ dẫn diện rộng hoặc xử lý vi phạm",
+"reviewer": "Quản lý bãi đỗ hoặc Cán bộ vận hành giao thông",
+"confirmation": "Người phụ trách xem dữ liệu cảm biến, hình ảnh xác minh và ảnh hưởng luồng xe trước khi quyết định."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"PostgreSQL với PostGIS",
+"MQTT",
+"Edge computer vision"
+],
+"outputs": {
+"basic": [
+"Bản đồ chỗ đỗ theo độ tin cậy",
+"Dự báo khu vực sắp đầy",
+"Danh sách cảm biến có khả năng lỗi",
+"Đề xuất vị trí kiểm tra hiện trường"
+],
+"advanced": [
+"Dự báo nhu cầu theo sự kiện",
+"Điều chỉnh biển hướng dẫn theo lưu lượng",
+"Phân tích thời gian tìm chỗ trung bình"
+]
+},
+"metrics": [
+"Độ chính xác trạng thái chỗ đỗ đạt ít nhất 95%",
+"Giảm thời gian tìm chỗ trung bình ít nhất 20%",
+"Giảm thời gian phát hiện cảm biến lỗi ít nhất 50%",
+"Tỷ lệ hiển thị chỗ trống sai dưới 5%"
+]
+},
+{
+"id": "SC-09",
+"block": "SC",
+"pain_point": {
+"situation": "Thang máy tại chung cư hoặc tòa nhà có thể xuất hiện dấu hiệu bất thường nhiều ngày trước khi dừng hoạt động nhưng đội bảo trì chỉ xử lý sau khi có lỗi rõ ràng.",
+"measurable_consequence": "Sự cố đột ngột gây gián đoạn di chuyển, tăng số cuộc gọi cứu hộ và có thể làm chi phí sửa chữa cao hơn bảo trì phòng ngừa."
+},
+"title": "Agent ưu tiên bảo trì thang máy theo dấu hiệu bất thường",
+"job_executor": "Kỹ sư bảo trì thang máy",
+"existing_job_without_ai": "Kiểm tra nhật ký lỗi, số chu kỳ vận hành, rung động, tiếng ồn và lịch bảo trì để quyết định thiết bị cần kiểm tra.",
+"central_ai_decision": "Quyết định thang máy nào có nguy cơ hỏng sớm, thành phần nào cần kiểm tra và mức độ ưu tiên bảo trì.",
+"source_of_truth": [
+"Nhật ký bộ điều khiển thang máy",
+"Dữ liệu rung động, nhiệt độ và dòng điện",
+"Số chu kỳ vận hành",
+"Lịch sử lỗi và thay thế linh kiện",
+"Lịch bảo trì bắt buộc"
+],
+"missing_information_handling": "Nếu cảm biến thiếu dữ liệu hoặc firmware thay đổi làm sai baseline, agent không đưa ra dự báo chắc chắn và yêu cầu kiểm tra kỹ thuật tại chỗ.",
+"authority_limit": [
+"Không tự vô hiệu hóa thang máy",
+"Không tự bỏ qua lịch kiểm định bắt buộc",
+"Không tự reset lỗi an toàn",
+"Không tự quyết định tiếp tục vận hành thiết bị có cảnh báo nghiêm trọng"
+],
+"human_in_the_loop": {
+"risky_action": "Dừng thang máy, cho phép tiếp tục vận hành hoặc trì hoãn bảo trì an toàn",
+"reviewer": "Kỹ sư trưởng bảo trì hoặc Quản lý tòa nhà",
+"confirmation": "Người phụ trách xem mã lỗi, dữ liệu cảm biến và quy định an toàn trước khi xác nhận."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"MQTT",
+"PostgreSQL",
+"Predictive maintenance model"
+],
+"outputs": {
+"basic": [
+"Danh sách thang máy cần kiểm tra",
+"Linh kiện nghi ngờ",
+"Mức độ ưu tiên bảo trì",
+"Các tín hiệu làm bằng chứng"
+],
+"advanced": [
+"Ước lượng thời gian còn lại trước lỗi",
+"Đề xuất phụ tùng cần chuẩn bị",
+"Phân tích nguyên nhân sự cố lặp lại"
+]
+},
+"metrics": [
+"Recall phát hiện lỗi nghiêm trọng trước sự cố đạt ít nhất 90%",
+"Giảm thời gian dừng ngoài kế hoạch ít nhất 25%",
+"Giảm số lần cứu hộ do lỗi thiết bị ít nhất 20%",
+"Tỷ lệ cảnh báo giả dưới 10%"
+]
+},
+{
+"id": "SC-10",
+"block": "SC",
+"pain_point": {
+"situation": "Thiết bị điện trong nhà có thể hoạt động bất thường hoặc bị bỏ quên khi không có người, nhưng chủ nhà chỉ phát hiện qua hóa đơn điện hoặc khi xảy ra sự cố.",
+"measurable_consequence": "Thiết bị chạy không cần thiết làm tăng điện năng tiêu thụ; các tải như bếp, bàn là hoặc máy nước nóng có thể tạo nguy cơ mất an toàn."
+},
+"title": "Agent phát hiện thiết bị gia dụng hoạt động bất thường",
+"job_executor": "Chủ hộ hoặc Nhân viên quản lý căn hộ dịch vụ",
+"existing_job_without_ai": "Kiểm tra thiết bị, công tơ điện và lịch sử sử dụng để xác định tải nào đang hoạt động bất thường và quyết định có cần tắt hoặc kiểm tra.",
+"central_ai_decision": "Quyết định mức tiêu thụ hiện tại là hành vi bình thường, lãng phí điện, lỗi thiết bị hay có nguy cơ an toàn dựa trên công suất, thời lượng và trạng thái có người trong nhà.",
+"source_of_truth": [
+"Công tơ điện thông minh",
+"Ổ cắm hoặc công tắc IoT",
+"Trạng thái hiện diện được người dùng cho phép",
+"Lịch sử sử dụng thiết bị",
+"Ngưỡng an toàn của từng loại tải"
+],
+"missing_information_handling": "Nếu không xác định được thiết bị hoặc trạng thái hiện diện, agent chỉ cảnh báo mức tiêu thụ bất thường và yêu cầu người dùng xác minh, không tự tắt tải.",
+"authority_limit": [
+"Không tự ngắt thiết bị y tế hoặc thiết bị quan trọng",
+"Không tự tắt điện toàn nhà",
+"Không suy luận lịch sinh hoạt ngoài mục đích đã đồng ý",
+"Không thay đổi ngưỡng an toàn do nhà sản xuất quy định"
+],
+"human_in_the_loop": {
+"risky_action": "Ngắt nguồn một thiết bị có thể ảnh hưởng an toàn, thực phẩm, sức khỏe hoặc tài sản",
+"reviewer": "Chủ hộ hoặc Nhân viên trực vận hành căn hộ",
+"confirmation": "Hệ thống gửi cảnh báo kèm thiết bị nghi ngờ; người có trách nhiệm xác nhận trước khi ngắt nguồn, trừ cơ chế bảo vệ điện độc lập đã được lắp đặt."
+},
+"tech_stack": [
+"Python",
+"FastAPI",
+"MQTT",
+"PostgreSQL",
+"Time-series anomaly detection"
+],
+"outputs": {
+"basic": [
+"Thiết bị hoặc nhóm tải nghi ngờ",
+"Loại bất thường",
+"Ước lượng điện năng lãng phí",
+"Đề xuất kiểm tra hoặc tắt thủ công"
+],
+"advanced": [
+"Nhận diện mẫu tiêu thụ theo thiết bị",
+"Cảnh báo thiết bị xuống cấp",
+"Lập lịch sử dụng để giảm điện giờ cao điểm"
+]
+},
+"metrics": [
+"Độ chính xác phát hiện tải bất thường đạt ít nhất 85%",
+"Giảm điện năng ngoài nhu cầu ít nhất 10%",
+"Tỷ lệ cảnh báo giả dưới 15%",
+"100% thao tác ngắt tải quan trọng yêu cầu xác nhận"
+]
+}
+]
+
+
+[
+{
+"id": "FIN-01",
+"block": "FIN",
+"title": "Kiểm tra hồ sơ hoàn ứng trước khi chuyển cho kế toán",
+"pain": {
+"current_situation": "Nhân viên thường nộp hồ sơ hoàn ứng thiếu hóa đơn, sai thông tin thuế, vượt định mức hoặc không khớp với mục đích đã đăng ký.",
+"measurable_consequences": [
+"Kế toán mất trung bình 10-20 phút để kiểm tra một bộ hồ sơ.",
+"Hồ sơ bị trả lại nhiều lần làm thời gian hoàn ứng kéo dài từ 3 đến 7 ngày.",
+"Tăng nguy cơ ghi nhận chi phí sai kỳ hoặc sai tài khoản."
+]
+},
+"job_executor": "Kế toán thanh toán",
+"existing_job_without_ai": "Đối chiếu đơn hoàn ứng, hóa đơn, chính sách chi tiêu, phê duyệt công tác và chứng từ thanh toán trước khi hạch toán.",
+"central_ai_decision": "Phân loại hồ sơ thành đủ điều kiện kiểm tra tiếp, thiếu thông tin, có dấu hiệu vi phạm chính sách hoặc cần kiểm tra thủ công.",
+"source_of_truth": [
+"Quy chế chi tiêu nội bộ đã được phê duyệt",
+"Đơn công tác hoặc đề nghị tạm ứng",
+"Hóa đơn và chứng từ gốc",
+"Danh mục định mức chi phí",
+"Dữ liệu nhân sự và đơn vị công tác"
+],
+"missing_information_handling": {
+"behavior": "Không kết luận hồ sơ hợp lệ khi thiếu dữ liệu bắt buộc.",
+"actions": [
+"Liệt kê chính xác trường hoặc chứng từ còn thiếu.",
+"Yêu cầu người nộp bổ sung bằng biểu mẫu chuẩn.",
+"Gắn trạng thái chưa đủ dữ liệu và dừng đề xuất hạch toán."
+]
+},
+"authority_limits": [
+"Không tự phê duyệt hoàn ứng.",
+"Không tự sửa số tiền hoặc nội dung hóa đơn.",
+"Không kết luận hành vi gian lận.",
+"Không tạo lệnh thanh toán."
+],
+"human_in_the_loop": {
+"required_for": [
+"Khoản chi vượt định mức",
+"Chứng từ có dấu hiệu chỉnh sửa",
+"Chi phí không có trong chính sách",
+"Hồ sơ có nguy cơ trùng thanh toán"
+],
+"reviewer": "Kế toán trưởng hoặc người có thẩm quyền phê duyệt chi phí"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"document_processing": "OCR cho hóa đơn và thư viện kiểm tra dữ liệu có cấu trúc",
+"ai_components": "LLM hỗ trợ trích xuất và giải thích lỗi; rule engine thực thi chính sách",
+"frontend": "Giao diện web đơn giản bằng React hoặc Streamlit"
+},
+"outputs": {
+"basic": [
+"Danh sách chứng từ đã nhận",
+"Các trường còn thiếu",
+"Kết quả đối chiếu định mức",
+"Trạng thái hồ sơ"
+],
+"advanced": [
+"Báo cáo nguyên nhân hồ sơ thường bị trả lại",
+"Phát hiện mẫu chi phí bất thường",
+"Gợi ý chuẩn hóa quy trình nộp hồ sơ"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ phát hiện hồ sơ thiếu thông tin",
+"target": "Từ 95% trở lên"
+},
+{
+"metric": "Thời gian kiểm tra trung bình mỗi hồ sơ",
+"target": "Giảm ít nhất 50%"
+},
+{
+"metric": "Tỷ lệ cảnh báo sai",
+"target": "Dưới 10%"
+},
+{
+"metric": "Tỷ lệ hồ sơ bị trả lại sau bước kiểm tra",
+"target": "Giảm ít nhất 30%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Xử lý tài liệu",
+"Tài chính doanh nghiệp",
+"Tự động hóa quy trình"
+],
+"recommended_skills": [
+"Python cơ bản",
+"SQL",
+"OCR",
+"Thiết kế rule engine"
+],
+"difficulty": "Trung bình"
+}
+},
+{
+"id": "FIN-02",
+"block": "FIN",
+"title": "Đối chiếu hóa đơn nhà cung cấp với đơn mua hàng và biên bản nhận hàng",
+"pain": {
+"current_situation": "Kế toán công nợ phải kiểm tra thủ công hóa đơn, đơn mua hàng và biên bản nhận hàng; sai khác về số lượng, đơn giá hoặc thuế dễ bị bỏ sót.",
+"measurable_consequences": [
+"Một nhân viên chỉ xử lý được khoảng 40-80 hóa đơn mỗi ngày.",
+"Sai lệch không được phát hiện có thể dẫn đến thanh toán thừa.",
+"Hóa đơn bị treo làm chậm thanh toán và ảnh hưởng quan hệ với nhà cung cấp."
+]
+},
+"job_executor": "Kế toán công nợ phải trả",
+"existing_job_without_ai": "Thực hiện đối chiếu ba bên giữa hóa đơn, đơn mua hàng và biên bản giao nhận trước khi lập đề nghị thanh toán.",
+"central_ai_decision": "Xác định hóa đơn khớp hoàn toàn, khớp trong ngưỡng dung sai, có sai lệch cần xử lý hoặc không đủ dữ liệu để đối chiếu.",
+"source_of_truth": [
+"Hóa đơn điện tử",
+"Đơn mua hàng đã được phê duyệt",
+"Biên bản giao nhận hoặc phiếu nhập kho",
+"Hợp đồng và phụ lục giá",
+"Ngưỡng dung sai do doanh nghiệp quy định"
+],
+"missing_information_handling": {
+"behavior": "Không suy đoán số lượng, đơn giá hoặc điều khoản hợp đồng bị thiếu.",
+"actions": [
+"Xác định tài liệu chưa tồn tại trong hệ thống.",
+"Chuyển hồ sơ sang trạng thái chờ bổ sung.",
+"Gửi yêu cầu đến bộ phận mua hàng hoặc kho.",
+"Ghi lại dữ liệu nào chưa thể đối chiếu."
+]
+},
+"authority_limits": [
+"Không tự xác nhận hóa đơn đủ điều kiện thanh toán.",
+"Không thay đổi dữ liệu đơn mua hàng.",
+"Không điều chỉnh công nợ nhà cung cấp.",
+"Không tự chấp nhận sai lệch vượt ngưỡng."
+],
+"human_in_the_loop": {
+"required_for": [
+"Sai lệch vượt ngưỡng dung sai",
+"Hóa đơn không có đơn mua hàng",
+"Đơn giá khác hợp đồng",
+"Hàng hóa chưa được xác nhận đã nhận"
+],
+"reviewer": "Kế toán công nợ phối hợp với nhân viên mua hàng và quản lý phê duyệt"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"document_processing": "OCR hoặc API hóa đơn điện tử",
+"ai_components": "Mô hình trích xuất trường dữ liệu và thuật toán matching; rule engine cho ngưỡng dung sai",
+"integration": "API kết nối ERP hoặc hệ thống mua hàng"
+},
+"outputs": {
+"basic": [
+"Bảng đối chiếu từng dòng hàng",
+"Danh sách sai lệch về số lượng, đơn giá và thuế",
+"Trạng thái khớp hoặc chưa khớp",
+"Tài liệu còn thiếu"
+],
+"advanced": [
+"Xếp hạng hóa đơn theo mức độ rủi ro",
+"Phân tích nhà cung cấp thường xuyên phát sinh sai lệch",
+"Ước tính số tiền có nguy cơ thanh toán thừa"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Độ chính xác đối chiếu dòng hàng",
+"target": "Từ 97% trở lên"
+},
+{
+"metric": "Tỷ lệ phát hiện sai lệch vượt ngưỡng",
+"target": "Từ 95% trở lên"
+},
+{
+"metric": "Thời gian xử lý một hóa đơn",
+"target": "Giảm ít nhất 60%"
+},
+{
+"metric": "Giá trị thanh toán thừa được ngăn chặn",
+"target": "Đo bằng VND theo từng tháng"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Đối soát dữ liệu",
+"Kế toán công nợ",
+"Tích hợp hệ thống"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Xử lý dữ liệu bảng",
+"API"
+],
+"difficulty": "Trung bình"
+}
+},
+{
+"id": "FIN-03",
+"block": "FIN",
+"title": "Điều tra nguyên nhân chênh lệch giữa ngân sách và chi phí thực tế",
+"pain": {
+"current_situation": "Chuyên viên kiểm soát ngân sách phải tổng hợp dữ liệu từ nhiều phòng ban và mất nhiều thời gian tìm nguyên nhân khi chi phí thực tế vượt kế hoạch.",
+"measurable_consequences": [
+"Báo cáo chênh lệch thường hoàn thành chậm từ 3 đến 5 ngày.",
+"Các khoản vượt ngân sách nhỏ nhưng lặp lại nhiều tháng không được chú ý.",
+"Quản lý thiếu thông tin để điều chỉnh ngân sách hoặc cắt giảm chi phí."
+]
+},
+"job_executor": "Chuyên viên kiểm soát ngân sách",
+"existing_job_without_ai": "So sánh ngân sách với số thực tế, xác định tài khoản và bộ phận phát sinh chênh lệch, sau đó yêu cầu đơn vị liên quan giải trình.",
+"central_ai_decision": "Xác định chênh lệch nào cần ưu tiên điều tra dựa trên giá trị, tỷ lệ vượt, tính lặp lại, xu hướng và mức độ bất thường.",
+"source_of_truth": [
+"Ngân sách đã được phê duyệt",
+"Sổ cái và dữ liệu chi phí thực tế",
+"Cơ cấu trung tâm chi phí",
+"Kế hoạch hoạt động của từng phòng ban",
+"Giải trình đã được xác nhận từ các kỳ trước"
+],
+"missing_information_handling": {
+"behavior": "Tách rõ dữ liệu thực tế, dữ liệu ước tính và dữ liệu chưa được cung cấp.",
+"actions": [
+"Không tự tạo nguyên nhân khi chưa có bằng chứng.",
+"Đưa ra danh sách câu hỏi giải trình theo từng khoản chênh lệch.",
+"Giảm mức độ tin cậy của đề xuất khi dữ liệu chưa hoàn chỉnh.",
+"Chuyển các trường hợp không xác định được sang chuyên viên phụ trách."
+]
+},
+"authority_limits": [
+"Không tự điều chỉnh ngân sách.",
+"Không tự cắt hoặc khóa khoản chi.",
+"Không kết luận phòng ban sử dụng ngân sách sai mục đích.",
+"Không thay thế giải trình chính thức của đơn vị."
+],
+"human_in_the_loop": {
+"required_for": [
+"Chênh lệch vượt ngưỡng trọng yếu",
+"Đề xuất điều chuyển ngân sách",
+"Đề xuất tạm dừng chi tiêu",
+"Nguyên nhân liên quan đến sai sót kế toán"
+],
+"reviewer": "Trưởng bộ phận tài chính và chủ ngân sách của phòng ban"
+},
+"tech_stack": {
+"backend": "Python",
+"database": "PostgreSQL hoặc dữ liệu xuất từ ERP",
+"analytics": "Pandas và các mô hình phát hiện bất thường đơn giản",
+"ai_components": "LLM tổng hợp giải trình có dẫn chứng; rule engine tính trọng yếu",
+"frontend": "Dashboard bằng Streamlit hoặc Power BI kết hợp API"
+},
+"outputs": {
+"basic": [
+"Bảng chênh lệch ngân sách theo phòng ban và tài khoản",
+"Danh sách khoản vượt ngưỡng",
+"Câu hỏi yêu cầu giải trình",
+"Mức độ ưu tiên xử lý"
+],
+"advanced": [
+"Nhóm các khoản chênh lệch theo nguyên nhân",
+"Phát hiện chênh lệch lặp lại nhiều kỳ",
+"Mô phỏng tác động đến ngân sách cuối năm"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ chênh lệch trọng yếu được phát hiện",
+"target": "Từ 95% trở lên"
+},
+{
+"metric": "Thời gian lập báo cáo variance",
+"target": "Giảm ít nhất 50%"
+},
+{
+"metric": "Tỷ lệ nguyên nhân được chuyên viên xác nhận",
+"target": "Từ 80% trở lên"
+},
+{
+"metric": "Số khoản vượt ngân sách lặp lại được phát hiện sớm",
+"target": "Theo dõi theo tháng"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Phân tích dữ liệu tài chính",
+"Dashboard",
+"Lập ngân sách"
+],
+"recommended_skills": [
+"Python",
+"Pandas",
+"SQL",
+"Trực quan hóa dữ liệu"
+],
+"difficulty": "Trung bình"
+}
+},
+{
+"id": "FIN-04",
+"block": "FIN",
+"title": "Cảnh báo thiếu hụt dòng tiền trước ngày đến hạn thanh toán",
+"pain": {
+"current_situation": "Nhân viên ngân quỹ phải tổng hợp số dư ngân hàng, khoản phải thu và lịch thanh toán từ nhiều nguồn nên khó nhận biết sớm thời điểm thiếu tiền.",
+"measurable_consequences": [
+"Doanh nghiệp có thể thanh toán chậm cho nhà cung cấp hoặc người lao động.",
+"Phải vay ngắn hạn gấp với chi phí vốn cao.",
+"Tiền nhàn rỗi tại một số tài khoản không được điều chuyển kịp thời."
+]
+},
+"job_executor": "Chuyên viên quản lý ngân quỹ",
+"existing_job_without_ai": "Lập bảng dự báo thu chi, kiểm tra số dư tài khoản và đề xuất kế hoạch điều chuyển hoặc huy động tiền.",
+"central_ai_decision": "Xác định khoảng thời gian có nguy cơ thiếu hụt dòng tiền và khoản thu, khoản chi nào ảnh hưởng lớn nhất đến kết quả dự báo.",
+"source_of_truth": [
+"Số dư tài khoản ngân hàng",
+"Lịch thanh toán đã được phê duyệt",
+"Công nợ phải thu và phải trả",
+"Hợp đồng có lịch thu hoặc trả tiền",
+"Dữ liệu dòng tiền thực tế các kỳ trước"
+],
+"missing_information_handling": {
+"behavior": "Không coi khoản thu chưa xác nhận là tiền chắc chắn sẽ nhận.",
+"actions": [
+"Gán xác suất hoặc kịch bản cho khoản thu chưa chắc chắn.",
+"Hiển thị khoảng dự báo thay vì một giá trị duy nhất.",
+"Cảnh báo dữ liệu ngân hàng hoặc công nợ chưa được cập nhật.",
+"Yêu cầu chuyên viên xác nhận các khoản thu chi lớn."
+]
+},
+"authority_limits": [
+"Không tự thực hiện giao dịch ngân hàng.",
+"Không tự vay vốn hoặc điều chuyển tiền.",
+"Không tự thay đổi ngày thanh toán đã cam kết.",
+"Không tự liên hệ khách hàng để thu nợ."
+],
+"human_in_the_loop": {
+"required_for": [
+"Đề xuất vay ngắn hạn",
+"Điều chuyển tiền giữa các tài khoản",
+"Trì hoãn thanh toán",
+"Ưu tiên thanh toán giữa nhiều nghĩa vụ"
+],
+"reviewer": "Trưởng phòng tài chính hoặc người được ủy quyền quản lý ngân quỹ"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"analytics": "Pandas và mô hình dự báo chuỗi thời gian mức cơ bản",
+"ai_components": "Mô hình phân loại độ chắc chắn của dòng tiền và LLM giải thích kịch bản",
+"integration": "API ngân hàng hoặc file sao kê; dữ liệu ERP"
+},
+"outputs": {
+"basic": [
+"Dự báo số dư tiền theo ngày hoặc tuần",
+"Danh sách ngày có nguy cơ âm tiền",
+"Khoản thu chi ảnh hưởng lớn",
+"Mức độ đầy đủ của dữ liệu"
+],
+"advanced": [
+"Kịch bản cơ sở, tốt và xấu",
+"Mô phỏng tác động khi khách hàng trả chậm",
+"Gợi ý phương án để chuyên viên xem xét"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Sai số dự báo dòng tiền 7 ngày",
+"target": "MAPE dưới 15% khi dữ liệu đầy đủ"
+},
+{
+"metric": "Tỷ lệ phát hiện trước ngày thiếu hụt",
+"target": "Từ 90% trở lên"
+},
+{
+"metric": "Số ngày cảnh báo trước",
+"target": "Ít nhất 5 ngày làm việc"
+},
+{
+"metric": "Số trường hợp thanh toán chậm do thiếu tiền",
+"target": "Giảm ít nhất 30%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Dự báo",
+"Tài chính doanh nghiệp",
+"Phân tích chuỗi thời gian"
+],
+"recommended_skills": [
+"Python",
+"Pandas",
+"Thống kê cơ bản",
+"SQL"
+],
+"difficulty": "Khá"
+}
+},
+{
+"id": "FIN-05",
+"block": "FIN",
+"title": "Phát hiện hóa đơn và yêu cầu thanh toán có nguy cơ bị trùng",
+"pain": {
+"current_situation": "Cùng một hóa đơn có thể được gửi lại dưới tên file khác, nhập sai số hóa đơn hoặc được nhiều bộ phận cùng đề nghị thanh toán.",
+"measurable_consequences": [
+"Doanh nghiệp có nguy cơ thanh toán cùng một khoản nhiều lần.",
+"Kế toán mất thời gian tìm kiếm và so sánh chứng từ cũ.",
+"Việc thu hồi tiền thanh toán thừa có thể kéo dài nhiều tuần."
+]
+},
+"job_executor": "Kế toán công nợ phải trả",
+"existing_job_without_ai": "Tìm kiếm lịch sử hóa đơn và đối chiếu các trường thông tin trước khi đưa khoản chi vào danh sách thanh toán.",
+"central_ai_decision": "Ước lượng hai hồ sơ có phải cùng một nghĩa vụ thanh toán hay không dựa trên số hóa đơn, nhà cung cấp, ngày, số tiền, nội dung và mức độ giống nhau của chứng từ.",
+"source_of_truth": [
+"Kho lưu trữ hóa đơn đã tiếp nhận",
+"Sổ công nợ nhà cung cấp",
+"Lịch sử thanh toán ngân hàng",
+"Mã số thuế và thông tin nhà cung cấp",
+"Đơn mua hàng hoặc hợp đồng liên quan"
+],
+"missing_information_handling": {
+"behavior": "Không tự đánh dấu trùng chắc chắn chỉ dựa trên một trường dữ liệu.",
+"actions": [
+"Tính điểm nghi ngờ theo các trường đang có.",
+"Nêu rõ trường nào thiếu hoặc không khớp.",
+"Yêu cầu kiểm tra thủ công khi độ tin cậy nằm trong vùng không chắc chắn.",
+"Không chặn hồ sơ nếu chưa có đủ bằng chứng theo quy định."
+]
+},
+"authority_limits": [
+"Không tự xóa hóa đơn.",
+"Không tự khóa nhà cung cấp.",
+"Không tự hủy đề nghị thanh toán.",
+"Không kết luận có hành vi gian lận."
+],
+"human_in_the_loop": {
+"required_for": [
+"Điểm nghi ngờ trùng vượt ngưỡng",
+"Hóa đơn đã được thanh toán nhưng tiếp tục xuất hiện",
+"Hai chứng từ giống nhau nhưng có đơn mua hàng khác nhau",
+"Nhà cung cấp phản đối kết quả đối chiếu"
+],
+"reviewer": "Kế toán công nợ hoặc kiểm soát viên tài chính"
+},
+"tech_stack": {
+"backend": "Python",
+"database": "PostgreSQL",
+"document_processing": "OCR và chuẩn hóa trường hóa đơn",
+"ai_components": "Fuzzy matching, vector similarity cho nội dung chứng từ và rule engine",
+"frontend": "Trang web kiểm tra cặp hồ sơ nghi trùng"
+},
+"outputs": {
+"basic": [
+"Danh sách cặp hồ sơ nghi trùng",
+"Điểm tương đồng",
+"Các trường khớp và không khớp",
+"Lịch sử thanh toán liên quan"
+],
+"advanced": [
+"Phân tích nguyên nhân phát sinh hồ sơ trùng",
+"Nhóm nhà cung cấp hoặc đơn vị có tỷ lệ trùng cao",
+"Ước tính giá trị thanh toán trùng đã ngăn chặn"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Recall phát hiện hồ sơ thanh toán trùng",
+"target": "Từ 95% trở lên"
+},
+{
+"metric": "Precision cảnh báo trùng",
+"target": "Từ 85% trở lên"
+},
+{
+"metric": "Giá trị thanh toán trùng được ngăn chặn",
+"target": "Đo bằng VND theo tháng"
+},
+{
+"metric": "Thời gian kiểm tra lịch sử mỗi hồ sơ",
+"target": "Giảm ít nhất 60%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Phát hiện bất thường",
+"Xử lý văn bản",
+"Kiểm soát nội bộ"
+],
+"recommended_skills": [
+"Python",
+"String matching",
+"OCR",
+"SQL"
+],
+"difficulty": "Trung bình"
+}
+},
+{
+"id": "FIN-06",
+"block": "FIN",
+"title": "Ưu tiên kiểm tra các nhà cung cấp có rủi ro tài chính và tuân thủ",
+"pain": {
+"current_situation": "Nhân viên mua hàng và kiểm soát nội bộ phải rà soát nhiều nhà cung cấp nhưng không đủ thời gian kiểm tra sâu toàn bộ hồ sơ.",
+"measurable_consequences": [
+"Nhà cung cấp có thông tin pháp lý hết hạn vẫn có thể tiếp tục giao dịch.",
+"Doanh nghiệp có nguy cơ mua hàng từ đơn vị không đáp ứng điều kiện.",
+"Thời gian rà soát định kỳ kéo dài nhiều tuần."
+]
+},
+"job_executor": "Chuyên viên kiểm soát nhà cung cấp",
+"existing_job_without_ai": "Kiểm tra hồ sơ pháp lý, thông tin thanh toán, lịch sử giao dịch, vi phạm hợp đồng và kết quả đánh giá nhà cung cấp.",
+"central_ai_decision": "Xếp hạng nhà cung cấp cần được con người kiểm tra trước dựa trên mức độ thiếu hồ sơ, thay đổi thông tin bất thường, lịch sử tranh chấp và sai lệch thanh toán.",
+"source_of_truth": [
+"Hồ sơ nhà cung cấp trong hệ thống",
+"Hợp đồng và phụ lục",
+"Lịch sử mua hàng và thanh toán",
+"Biên bản đánh giá chất lượng",
+"Danh sách hạn chế hoặc cảnh báo được doanh nghiệp phê duyệt"
+],
+"missing_information_handling": {
+"behavior": "Thiếu hồ sơ được xem là một yếu tố cần kiểm tra, không tự động được xem là vi phạm.",
+"actions": [
+"Liệt kê tài liệu hết hạn hoặc chưa có.",
+"Giảm độ tin cậy của điểm đánh giá.",
+"Yêu cầu nhà cung cấp hoặc bộ phận mua hàng bổ sung.",
+"Không đưa ra kết luận cuối cùng về tư cách nhà cung cấp."
+]
+},
+"authority_limits": [
+"Không tự khóa hoặc loại bỏ nhà cung cấp.",
+"Không tự chấm dứt hợp đồng.",
+"Không kết luận nhà cung cấp gian lận.",
+"Không sử dụng dữ liệu ngoài danh mục được doanh nghiệp cho phép."
+],
+"human_in_the_loop": {
+"required_for": [
+"Đề xuất tạm ngừng giao dịch",
+"Thay đổi mức rủi ro chính thức",
+"Phát hiện thay đổi tài khoản ngân hàng",
+"Hồ sơ liên quan đến tranh chấp hoặc vi phạm hợp đồng"
+],
+"reviewer": "Trưởng bộ phận mua hàng, pháp chế hoặc kiểm soát nội bộ"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"document_processing": "Trích xuất dữ liệu từ hồ sơ PDF",
+"ai_components": "Rule engine, mô hình xếp hạng rủi ro và LLM tóm tắt bằng chứng",
+"frontend": "Dashboard quản lý danh sách cần rà soát"
+},
+"outputs": {
+"basic": [
+"Danh sách hồ sơ thiếu hoặc hết hạn",
+"Điểm ưu tiên kiểm tra",
+"Các yếu tố làm tăng mức rủi ro",
+"Lịch sử thay đổi thông tin"
+],
+"advanced": [
+"Mạng liên kết giữa nhà cung cấp, tài khoản ngân hàng và giao dịch",
+"Phát hiện thay đổi thông tin bất thường",
+"Báo cáo xu hướng rủi ro theo nhóm nhà cung cấp"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ hồ sơ hết hạn được phát hiện",
+"target": "Từ 98% trở lên"
+},
+{
+"metric": "Tỷ lệ trường hợp rủi ro cao được chuyên viên xác nhận",
+"target": "Từ 75% trở lên"
+},
+{
+"metric": "Thời gian rà soát danh sách nhà cung cấp",
+"target": "Giảm ít nhất 40%"
+},
+{
+"metric": "Tỷ lệ cảnh báo không có bằng chứng",
+"target": "Dưới 5%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Quản trị rủi ro",
+"Phân tích hồ sơ",
+"Kiểm soát nội bộ"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Xử lý tài liệu",
+"Thiết kế hệ thống chấm điểm"
+],
+"difficulty": "Khá"
+}
+},
+{
+"id": "FIN-07",
+"block": "FIN",
+"title": "Theo dõi công việc khóa sổ và phát hiện bút toán bất thường cuối kỳ",
+"pain": {
+"current_situation": "Trong giai đoạn khóa sổ, kế toán phải xử lý nhiều đầu việc trong thời gian ngắn; bút toán nhập muộn, thiếu mô tả hoặc có giá trị bất thường dễ bị bỏ qua.",
+"measurable_consequences": [
+"Báo cáo tài chính nội bộ bị trễ từ 1 đến 3 ngày.",
+"Sai sót cuối kỳ phải điều chỉnh lại sau khi đã phát hành báo cáo.",
+"Kế toán trưởng khó biết đầu việc nào đang gây tắc nghẽn."
+]
+},
+"job_executor": "Kế toán tổng hợp",
+"existing_job_without_ai": "Theo dõi checklist khóa sổ, kiểm tra bút toán cuối kỳ, đối chiếu tài khoản và tổng hợp vấn đề cần xử lý.",
+"central_ai_decision": "Xác định đầu việc khóa sổ hoặc bút toán nào cần được ưu tiên kiểm tra dựa trên hạn hoàn thành, mức độ trọng yếu và sự khác biệt so với lịch sử.",
+"source_of_truth": [
+"Checklist khóa sổ đã được phê duyệt",
+"Sổ cái và nhật ký bút toán",
+"Phân quyền người lập và người duyệt",
+"Lịch sử bút toán các kỳ trước",
+"Ngưỡng trọng yếu kế toán"
+],
+"missing_information_handling": {
+"behavior": "Không đánh giá hoàn thành nếu chưa có bằng chứng đối chiếu hoặc phê duyệt.",
+"actions": [
+"Đánh dấu đầu việc chưa có tài liệu chứng minh.",
+"Không suy đoán mục đích của bút toán thiếu diễn giải.",
+"Yêu cầu người lập bổ sung chứng từ hoặc mô tả.",
+"Chuyển bút toán không đủ dữ liệu sang kiểm tra thủ công."
+]
+},
+"authority_limits": [
+"Không tự ghi, sửa hoặc đảo bút toán.",
+"Không tự xác nhận hoàn thành khóa sổ.",
+"Không tự thay đổi thời hạn báo cáo.",
+"Không kết luận bút toán là gian lận."
+],
+"human_in_the_loop": {
+"required_for": [
+"Bút toán thủ công có giá trị trọng yếu",
+"Bút toán được ghi ngoài giờ hoặc sát thời điểm khóa sổ",
+"Điều chỉnh doanh thu, lợi nhuận hoặc dự phòng",
+"Bút toán thiếu chứng từ hỗ trợ"
+],
+"reviewer": "Kế toán trưởng hoặc kiểm soát viên được phân công"
+},
+"tech_stack": {
+"backend": "Python",
+"database": "PostgreSQL hoặc dữ liệu ERP",
+"analytics": "Pandas và mô hình phát hiện bất thường",
+"ai_components": "Rule engine cho checklist; LLM tóm tắt trạng thái và bằng chứng",
+"frontend": "Dashboard theo dõi tiến độ khóa sổ"
+},
+"outputs": {
+"basic": [
+"Tiến độ từng đầu việc khóa sổ",
+"Danh sách công việc quá hạn",
+"Danh sách bút toán cần kiểm tra",
+"Lý do cảnh báo và dữ liệu liên quan"
+],
+"advanced": [
+"Dự báo nguy cơ trễ khóa sổ",
+"Phân tích điểm nghẽn theo bộ phận",
+"So sánh mẫu bút toán cuối kỳ giữa các tháng"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ đầu việc quá hạn được cảnh báo đúng",
+"target": "Từ 95% trở lên"
+},
+{
+"metric": "Tỷ lệ bút toán trọng yếu bất thường được phát hiện",
+"target": "Từ 90% trở lên"
+},
+{
+"metric": "Thời gian hoàn thành khóa sổ",
+"target": "Giảm ít nhất 20%"
+},
+{
+"metric": "Số điều chỉnh phát sinh sau khóa sổ",
+"target": "Giảm ít nhất 25%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Kế toán tổng hợp",
+"Phát hiện bất thường",
+"Quản lý quy trình"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Phân tích dữ liệu",
+"Kiến thức kế toán cơ bản"
+],
+"difficulty": "Khá"
+}
+},
+{
+"id": "FIN-08",
+"block": "FIN",
+"title": "Kiểm tra mức độ đầy đủ của hồ sơ kê khai thuế trước khi nộp",
+"pain": {
+"current_situation": "Nhân viên thuế phải rà soát nhiều hóa đơn và phụ lục; thiếu chứng từ hoặc sai mã thuế thường chỉ được phát hiện sát hạn nộp.",
+"measurable_consequences": [
+"Hồ sơ phải chỉnh sửa nhiều lần trước hạn kê khai.",
+"Doanh nghiệp có nguy cơ kê khai sai hoặc bỏ sót hóa đơn.",
+"Nhân viên phải làm thêm giờ vào cuối kỳ thuế."
+]
+},
+"job_executor": "Chuyên viên kế toán thuế",
+"existing_job_without_ai": "Đối chiếu hóa đơn đầu vào, đầu ra, sổ kế toán và danh sách phụ lục trước khi lập hồ sơ kê khai.",
+"central_ai_decision": "Xác định hồ sơ nào thiếu chứng từ, có dữ liệu không nhất quán hoặc cần chuyên viên thuế xem xét trước khi đưa vào bản kê khai.",
+"source_of_truth": [
+"Hóa đơn điện tử",
+"Sổ kế toán thuế",
+"Danh mục mã thuế nội bộ",
+"Tờ khai và phụ lục do chuyên viên lập",
+"Quy định và hướng dẫn thuế đã được bộ phận pháp chế hoặc thuế phê duyệt"
+],
+"missing_information_handling": {
+"behavior": "Không tự áp dụng quy định khi không xác định được phiên bản hiệu lực hoặc loại giao dịch.",
+"actions": [
+"Đánh dấu giao dịch thiếu căn cứ.",
+"Yêu cầu người phụ trách bổ sung chứng từ.",
+"Hiển thị quy định được sử dụng và ngày hiệu lực.",
+"Chuyển trường hợp không rõ cách xử lý cho chuyên viên thuế."
+]
+},
+"authority_limits": [
+"Không tự nộp tờ khai.",
+"Không tự sửa dữ liệu kế toán.",
+"Không tự quyết định khoản thuế được khấu trừ.",
+"Không thay thế tư vấn thuế hoặc pháp lý chính thức."
+],
+"human_in_the_loop": {
+"required_for": [
+"Giao dịch có giá trị trọng yếu",
+"Hóa đơn có dấu hiệu không hợp lệ",
+"Giao dịch đặc thù chưa có quy tắc rõ ràng",
+"Thay đổi số thuế phải nộp"
+],
+"reviewer": "Chuyên viên thuế cấp cao hoặc kế toán trưởng"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"document_processing": "API hóa đơn điện tử hoặc OCR",
+"ai_components": "Rule engine kiểm tra dữ liệu; LLM chỉ giải thích kết quả dựa trên nguồn quy định được duyệt",
+"frontend": "Giao diện kiểm tra hồ sơ và xuất báo cáo lỗi"
+},
+"outputs": {
+"basic": [
+"Danh sách hóa đơn thiếu hoặc sai trường",
+"Các chênh lệch giữa hóa đơn và sổ kế toán",
+"Danh sách giao dịch cần chuyên viên xem xét",
+"Báo cáo mức độ hoàn thiện hồ sơ"
+],
+"advanced": [
+"Theo dõi lỗi thường gặp theo kỳ",
+"Phân loại nguyên nhân kê khai sai",
+"Ước tính ảnh hưởng của các giao dịch chưa được xử lý"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ phát hiện trường dữ liệu thuế bị thiếu",
+"target": "Từ 98% trở lên"
+},
+{
+"metric": "Tỷ lệ cảnh báo được chuyên viên xác nhận",
+"target": "Từ 85% trở lên"
+},
+{
+"metric": "Thời gian rà soát hồ sơ trước kê khai",
+"target": "Giảm ít nhất 40%"
+},
+{
+"metric": "Số lỗi phát hiện sau khi nộp",
+"target": "Giảm ít nhất 30%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Kế toán thuế",
+"Kiểm tra dữ liệu",
+"Xử lý hóa đơn"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Rule engine",
+"Kiến thức thuế cơ bản"
+],
+"difficulty": "Khá"
+}
+},
+{
+"id": "FIN-09",
+"block": "FIN",
+"title": "Phát hiện doanh thu bị bỏ sót giữa hợp đồng, sử dụng dịch vụ và hóa đơn",
+"pain": {
+"current_situation": "Dữ liệu hợp đồng, nghiệm thu, sử dụng dịch vụ và xuất hóa đơn nằm ở nhiều hệ thống nên có trường hợp đã cung cấp dịch vụ nhưng chưa ghi nhận hoặc chưa xuất hóa đơn.",
+"measurable_consequences": [
+"Doanh thu bị ghi nhận chậm hoặc bỏ sót.",
+"Dòng tiền thu về thấp hơn kế hoạch.",
+"Nhân viên phải đối soát thủ công hàng nghìn giao dịch."
+]
+},
+"job_executor": "Chuyên viên kiểm soát doanh thu",
+"existing_job_without_ai": "Đối chiếu điều khoản hợp đồng, dữ liệu cung cấp dịch vụ, biên bản nghiệm thu và hóa đơn đã phát hành.",
+"central_ai_decision": "Xác định giao dịch có đủ bằng chứng về nghĩa vụ lập hóa đơn hoặc ghi nhận doanh thu nhưng chưa xuất hiện trong hệ thống kế toán.",
+"source_of_truth": [
+"Hợp đồng và phụ lục giá",
+"Biên bản nghiệm thu",
+"Dữ liệu sử dụng hoặc giao dịch dịch vụ",
+"Danh sách hóa đơn đã phát hành",
+"Sổ doanh thu và công nợ khách hàng"
+],
+"missing_information_handling": {
+"behavior": "Không đề xuất ghi nhận doanh thu khi thiếu bằng chứng về việc hoàn thành nghĩa vụ.",
+"actions": [
+"Phân biệt chưa xuất hóa đơn với chưa đủ điều kiện xuất hóa đơn.",
+"Yêu cầu bổ sung biên bản nghiệm thu hoặc xác nhận sử dụng.",
+"Đánh dấu điều khoản hợp đồng chưa được trích xuất chắc chắn.",
+"Chuyển hợp đồng phức tạp cho kế toán doanh thu."
+]
+},
+"authority_limits": [
+"Không tự phát hành hóa đơn.",
+"Không tự ghi nhận hoặc điều chỉnh doanh thu.",
+"Không tự thay đổi điều khoản hợp đồng.",
+"Không tự gửi yêu cầu thanh toán cho khách hàng."
+],
+"human_in_the_loop": {
+"required_for": [
+"Đề xuất phát hành hóa đơn",
+"Điều chỉnh doanh thu kỳ trước",
+"Hợp đồng có nhiều nghĩa vụ thực hiện",
+"Giao dịch có tranh chấp với khách hàng"
+],
+"reviewer": "Kế toán doanh thu và người phụ trách hợp đồng"
+},
+"tech_stack": {
+"backend": "Python và FastAPI",
+"database": "PostgreSQL",
+"document_processing": "Trích xuất điều khoản từ hợp đồng PDF",
+"ai_components": "Matching giao dịch, rule engine xác định điều kiện và LLM tóm tắt bằng chứng",
+"integration": "API CRM, hệ thống dịch vụ và phần mềm kế toán"
+},
+"outputs": {
+"basic": [
+"Danh sách giao dịch có nguy cơ chưa xuất hóa đơn",
+"Hợp đồng và bằng chứng liên quan",
+"Giá trị doanh thu ước tính bị bỏ sót",
+"Lý do cần kiểm tra"
+],
+"advanced": [
+"Phân tích nguyên nhân rò rỉ doanh thu",
+"Dự báo doanh thu có thể thu hồi",
+"Xác định sản phẩm hoặc bộ phận có tỷ lệ bỏ sót cao"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Precision của cảnh báo doanh thu bỏ sót",
+"target": "Từ 85% trở lên"
+},
+{
+"metric": "Recall giao dịch chưa xuất hóa đơn",
+"target": "Từ 90% trở lên"
+},
+{
+"metric": "Giá trị doanh thu được phát hiện",
+"target": "Đo bằng VND theo tháng"
+},
+{
+"metric": "Thời gian đối soát doanh thu",
+"target": "Giảm ít nhất 50%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Phân tích hợp đồng",
+"Kế toán doanh thu",
+"Đối soát nhiều nguồn dữ liệu"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Xử lý tài liệu",
+"Data matching"
+],
+"difficulty": "Khá"
+}
+},
+{
+"id": "FIN-10",
+"block": "FIN",
+"title": "Ưu tiên kiểm tra các khoản công nợ có nguy cơ quá hạn và khó thu hồi",
+"pain": {
+"current_situation": "Nhân viên thu hồi công nợ quản lý nhiều khách hàng nhưng thường chỉ xử lý khi hóa đơn đã quá hạn lâu, trong khi dữ liệu về tranh chấp và lịch sử thanh toán nằm rải rác.",
+"measurable_consequences": [
+"Số ngày thu tiền bình quân tăng.",
+"Nhân viên dành thời gian cho khoản nợ ít rủi ro trong khi bỏ qua khoản cần can thiệp sớm.",
+"Doanh nghiệp phải trích lập dự phòng cho các khoản khó thu."
+]
+},
+"job_executor": "Chuyên viên quản lý công nợ phải thu",
+"existing_job_without_ai": "Theo dõi tuổi nợ, liên hệ khách hàng, kiểm tra tranh chấp và báo cáo các khoản có nguy cơ chậm thanh toán.",
+"central_ai_decision": "Xếp hạng hóa đơn cần được chuyên viên ưu tiên xử lý dựa trên tuổi nợ, lịch sử thanh toán, tranh chấp, cam kết thanh toán và giá trị công nợ.",
+"source_of_truth": [
+"Sổ công nợ phải thu",
+"Lịch sử thanh toán của khách hàng",
+"Hợp đồng và điều khoản thanh toán",
+"Cam kết thanh toán đã được ghi nhận",
+"Phiếu hỗ trợ hoặc hồ sơ tranh chấp"
+],
+"missing_information_handling": {
+"behavior": "Không mặc định khách hàng có rủi ro cao chỉ vì chưa có đủ dữ liệu.",
+"actions": [
+"Hiển thị mức độ đầy đủ của hồ sơ.",
+"Không sử dụng đặc điểm cá nhân không liên quan đến nghĩa vụ thanh toán.",
+"Yêu cầu nhân viên xác nhận tranh chấp hoặc cam kết mới nhất.",
+"Chuyển trường hợp thiếu căn cứ sang danh sách cần thu thập thêm thông tin."
+]
+},
+"authority_limits": [
+"Không tự gửi thư đòi nợ.",
+"Không tự khóa tài khoản khách hàng.",
+"Không tự chuyển hồ sơ sang pháp lý.",
+"Không tự thay đổi hạn mức tín dụng hoặc thời hạn thanh toán."
+],
+"human_in_the_loop": {
+"required_for": [
+"Liên hệ khách hàng",
+"Dừng cung cấp dịch vụ",
+"Thay đổi hạn mức tín dụng",
+"Chuyển hồ sơ cho pháp chế hoặc đơn vị thu hồi nợ"
+],
+"reviewer": "Chuyên viên công nợ và quản lý tín dụng khách hàng"
+},
+"tech_stack": {
+"backend": "Python",
+"database": "PostgreSQL",
+"analytics": "Pandas và mô hình xếp hạng rủi ro có thể giải thích",
+"ai_components": "LLM tóm tắt lịch sử trao đổi; rule engine kiểm soát hành động",
+"integration": "API CRM và phần mềm kế toán"
+},
+"outputs": {
+"basic": [
+"Danh sách công nợ được xếp theo mức ưu tiên",
+"Tuổi nợ và giá trị còn phải thu",
+"Các yếu tố ảnh hưởng đến mức ưu tiên",
+"Thông tin còn thiếu cần xác minh"
+],
+"advanced": [
+"Dự báo xác suất thanh toán trong 7, 30 và 60 ngày",
+"Phân nhóm nguyên nhân chậm trả",
+"Mô phỏng ảnh hưởng đến dòng tiền và dự phòng"
+]
+},
+"evaluation_metrics": [
+{
+"metric": "Tỷ lệ khoản nợ quá hạn cao được xếp đúng nhóm ưu tiên",
+"target": "Từ 85% trở lên"
+},
+{
+"metric": "Tỷ lệ giải thích được kết quả xếp hạng",
+"target": "100% cảnh báo có lý do và nguồn dữ liệu"
+},
+{
+"metric": "Số ngày thu tiền bình quân",
+"target": "Giảm ít nhất 10%"
+},
+{
+"metric": "Tỷ lệ nợ chuyển sang nhóm khó thu",
+"target": "Giảm ít nhất 15%"
+}
+],
+"learner_fit": {
+"suitable_interests": [
+"Quản lý công nợ",
+"Mô hình xếp hạng",
+"Phân tích hành vi thanh toán"
+],
+"recommended_skills": [
+"Python",
+"SQL",
+"Machine learning cơ bản",
+"Trực quan hóa dữ liệu"
+],
+"difficulty": "Khá"
+}
+}
+]
