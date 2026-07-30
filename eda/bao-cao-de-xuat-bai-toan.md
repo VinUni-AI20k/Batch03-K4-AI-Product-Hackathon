@@ -1,276 +1,222 @@
-# BÁO CÁO ĐỀ XUẤT BÀI TOÁN — VLEARN AI TUTOR
+# BÁO CÁO ĐỀ XUẤT BÀI TOÁN — QUIZ CỦNG CỐ CUỐI BUỔI
 
-**Hướng:** A — Tối ưu AI Tutor hiện có  
-**Nguồn dữ liệu:** `chat_history_anonymized_for_hackathon.csv`  
-**Phạm vi dữ liệu:** 22–29/07/2026  
-**Đơn vị phân tích:** một `turn_id` gồm đúng một câu hỏi của học viên và một câu
-trả lời của Tutor.
-
-> Trạng thái: bằng chứng mining đã đạt cấu trúc yêu cầu B và đã xác nhận ba willing
-> users ngoài nhóm. Nhóm vẫn phải điền tên thành viên/phân công và nên khảo sát
-> thêm để lượng hóa hậu quả theo phút/mức độ mất niềm tin trước CP1/CP4.
+**Nhóm:** Team Rau Má
+**Hướng:** A — VLearn, tính năng mới
+**Trạng thái:** Đề xuất pain đang chờ bằng chứng khảo sát
+**Cập nhật:** 07/08/2026
 
 ## 1. Tóm tắt quyết định
 
-### Pain được đề xuất
+### Bài toán đề xuất
 
-Khi **học viên đang đọc tài liệu trên VLearn và hỏi Tutor để hiểu một khái niệm**,
-nhiều câu trả lời **không cho biết căn cứ nằm ở trang nào**, khiến học viên khó
-kiểm tra lại nội dung và không biết nên tin câu trả lời đến mức nào.
+Sau mỗi buổi học, học viên cần biết phần nào mình chưa nắm để ôn lại đúng trọng
+tâm. Hiện giả thuyết của nhóm là họ chưa có một phản hồi ngắn, đáng tin và đủ sát
+với bài vừa học để tự kiểm tra điều đó.
 
-Problem statement trên không dùng AI như một giải pháp; “Tutor” chỉ mô tả công cụ
-hiện tại trong workflow của người dùng.
+### Problem statement
 
-### Bằng chứng chính
-
-- Dataset có **1.261 lượt hỏi–đáp**, từ **369 học viên** và **585 hội thoại**.
-- Xác định được **740/1.261 lượt có intent học thuật** bằng một quy tắc từ khóa có
-  thể chạy lại.
-- Trong đó, **258/740 lượt học thuật không có citation — 34,9%**.
-- Pain này xuất hiện ở **170 học viên** và **201 hội thoại**.
-- Trong nhóm câu hỏi học thuật có rating:
-  - Không citation: **16/21 lượt bị downvote — 76,2%**.
-  - Có citation: **4/19 lượt bị downvote — 21,1%**.
-
-Rating chỉ bao phủ một phần rất nhỏ dữ liệu và do học viên tự chọn có đánh giá hay
-không. Vì vậy, chênh lệch trên là **tín hiệu về niềm tin**, không được diễn giải
-thành quan hệ nhân quả.
+> Học viên vừa hoàn thành một buổi học nhưng không có phản hồi nhanh, đáng tin về
+> mức hiểu của mình, nên khó ưu tiên nội dung cần ôn lại và dễ mang lỗ hổng kiến
+> thức sang bài sau.
 
 ### Lát cắt prototype — một câu
 
-> Một học viên đang đọc tài liệu và hỏi về một khái niệm được Tutor quyết định chỉ
-> trả lời khi tìm được đoạn nguồn phù hợp, đồng thời đặt citation cạnh từng ý chính,
-> để học viên kiểm tra lại câu trả lời ngay trong tài liệu.
+> Một học viên vừa học xong một bài được hệ thống tạo quiz 3 câu có căn cứ theo
+> đúng bài vừa học, chấm đáp án và chỉ ra một nội dung cần ôn lại, để học viên
+> quyết định bước học tiếp theo.
 
-### Mức automation đề xuất
+### Điều chưa được phép khẳng định
 
-**Conditional:** Tutor tự trả lời khi tìm được căn cứ đủ mạnh; nếu không có căn cứ
-thì nói rõ giới hạn và yêu cầu học viên chọn lại đoạn hoặc chuyển sang câu hỏi cụ
-thể hơn.
+Hiện **chưa có bằng chứng mining hoặc khảo sát** chứng minh pain trên xảy ra ở bao
+nhiêu học viên, tần suất và hậu quả mỗi lần. Nhóm cần thu thập bằng chứng trực tiếp
+cho pain Quiz trước khi chốt bài toán.
 
-Lý do theo cost-of-error: kiến thức sai hoặc citation không hỗ trợ nội dung có thể
-làm học viên học sai và mất niềm tin. Chi phí yêu cầu thêm ngữ cảnh thấp hơn chi
-phí trả lời chắc chắn nhưng không có căn cứ.
+## 2. User & Job
 
-## 2. Phương pháp mining có thể kiểm tra lại
+| Thành phần | Nội dung |
+|---|---|
+| Job executor | Học viên vừa kết thúc buổi học trên VLearn. |
+| Bối cảnh | Họ chuẩn bị chuyển sang bài tiếp theo, làm bài tập hoặc ôn thi nhưng chưa chắc mình hiểu đúng phần trọng tâm của bài vừa học. |
+| Core JTBD | Sau khi học xong một buổi, kiểm tra ý chính mình chưa nắm để biết cần ôn lại phần nào trước khi quên hoặc bước sang bài tiếp theo. |
+| Job story | Khi vừa kết thúc một buổi học có nhiều khái niệm mới, tôi muốn làm một kiểm tra ngắn dựa trên đúng nội dung vừa học để biết phần nào cần xem lại thay vì chỉ cảm thấy rằng mình “có vẻ hiểu”. |
+| Alternatives | Tự xem lại slide; làm bài tập dài; hỏi Tutor; hỏi bạn/TA; dùng AI khác; hoặc không ôn lại. |
 
-### 2.1 Làm sạch và ghép dữ liệu
+## 3. Kế hoạch tìm bằng chứng
 
-1. Đọc CSV bằng `pandas`.
-2. Kiểm tra không trùng `message_id`, không thiếu `content`.
-3. Nhóm theo `turn_id` và xác minh mỗi turn có đúng:
-   - một dòng `role = student`;
-   - một dòng `role = tutor`.
-4. Ghép hai dòng thành một bản ghi để tránh đếm một turn hai lần.
+### 3.1 Đường bằng chứng được chọn: khảo sát A
 
-Kết quả: **1.261/1.261 turn** đều ghép được một-một.
+Nhóm dùng form `quiz/survey.md` để hỏi về **buổi học gần nhất**, không hỏi dẫn
+dắt kiểu “bạn có cần quiz AI không?”. Form bắt buộc người trả lời chọn một
+`primary_pain`, sau đó ghi tần suất, thời gian mất và hậu quả.
 
-### 2.2 Quy tắc xác định câu hỏi học thuật
-
-Một turn được xếp vào nhóm `academic_intent` khi câu hỏi học viên chứa ít nhất một
-trong các cụm, không phân biệt hoa thường:
-
-```text
-giải thích | tóm tắt | tóm gọn | nội dung | là gì | tại sao | vì sao |
-ý nghĩa | phân tích | ví dụ | kiến thức | nắm vững | khái niệm |
-so sánh | phân biệt
-```
-
-Quy tắc trên tìm được **740 turn**. Đây là heuristic có chủ đích minh bạch, không
-phải bộ phân loại intent hoàn hảo. Trước khi đưa vào `spec.md`, nhóm nên đọc tay
-20 turn được gắn nhãn và 10 turn không được gắn nhãn để ước lượng false
-positive/false negative.
-
-### 2.3 Quy tắc xác định thiếu citation
-
-Một câu trả lời được tính là không citation khi trường cấu trúc `citations` của
-message Tutor bằng danh sách rỗng `[]`. Không suy luận citation chỉ từ việc câu trả
-lời có hoặc không chứa chữ “trang”.
-
-Mẫu số chính là toàn bộ **740 turn học thuật**, không phải toàn bộ message:
-
-```text
-258 turn học thuật không citation / 740 turn học thuật = 34,9%
-```
-
-Notebook tái lập toàn bộ phép đếm:
-`eda/vlearn_ai_tutor_eda.ipynb`.
-
-## 3. Ví dụ nguyên văn từ dữ liệu
-
-Chỉ trích đoạn ngắn, giữ ID ẩn danh và không ghi danh tính người dùng.
-
-| Turn | Câu hỏi của học viên | Phản hồi Tutor liên quan đến pain |
+| Điều kiện thể lệ | Cách thực hiện | Trạng thái |
 |---|---|---|
-| `T0649` | “tóm tắt nội dung chính trong slide này” | “tôi không tìm thấy nội dung cụ thể cho slide 37…” |
-| `T0905` | “tóm gọn những nội dung quan trọng nhất trong day 04 này” | “không tìm thấy tài liệu tổng hợp đầy đủ…” |
-| `T0154` | “tại sao có lưu ý như trang 25” | “không thấy trang 25 đề cập đến lưu ý nào như bạn mô tả…” |
-| `T0811` | “Designt Pattern ReAct là gì có lưu ý gì về nó?” | “không tìm thấy định nghĩa chi tiết về ‘ReAct’ trong các slide…” |
-| `T0122` | “tóm tắt hết slice trong vài câu đi” | “hệ thống chưa trả về kết quả cụ thể để mình có thể tóm tắt…” |
-| `T0769` | “giải thích nghĩa chi tiết của trang 4” | “hệ thống tìm kiếm không tìm thấy nội dung cụ thể cho trang 4…” |
+| ≥20 người ngoài nhóm | Gửi form cho học viên ngoài Team Rau Má | Chưa thực hiện |
+| ≥50% xác nhận pain | Tính trên phản hồi hợp lệ theo định nghĩa bên dưới | Chưa thực hiện |
+| Log toàn bộ câu hỏi và từng phản hồi | Export Google Forms sang CSV, lưu trong `validation/` hoặc thư mục evidence không công khai | Chưa thực hiện |
+| ≥5 ví dụ nguyên văn | Lấy trích đoạn ngắn từ Câu 4, có sự đồng ý phù hợp | Chưa thực hiện |
 
-Các ví dụ này chứng minh có failure về truy xuất/grounding trong nhóm intent học
-thuật. Chúng **không tự chứng minh** mọi câu không citation đều sai. Muốn đánh giá
-faithfulness, nhóm phải đối chiếu câu trả lời với slide/transcript nguồn.
+### 3.2 Định nghĩa phản hồi hợp lệ
 
-## 4. So sánh ba pain candidate
+Một phản hồi hợp lệ khi:
 
-Các số dưới đây dùng cùng đơn vị `turn_id`. “Tổn thất mỗi lần” hiện được biểu diễn
-bằng proxy quan sát được; cần khảo sát người dùng để bổ sung số phút hoặc mức độ
-mất niềm tin.
+1. Người trả lời là người thật ngoài Team Rau Má.
+2. Có trả lời về một buổi học gần đây.
+3. Câu 5 của form chọn một pain khác “Không gặp khó khăn”.
+4. Câu 8 chọn ít nhất một hậu quả khác “Không hậu quả”.
 
-| Ứng viên | Quy mô quan sát | Tần suất | Proxy hậu quả/lần | Khả thi trong hackathon | Quyết định |
-|---|---:|---:|---|---|---|
-| Câu hỏi học thuật không citation | 258 turn, 170 user, 201 hội thoại | 1,52 turn/user bị ảnh hưởng | 16/21 lượt có rating bị downvote | Cao: sửa retrieval threshold, output và fallback | **Chọn** |
-| Tutor báo không tìm thấy/không đủ nguồn | 291/1.261 turn theo heuristic ban đầu; 170 user | 1,71 turn/user bị ảnh hưởng | User không hoàn thành job và phải hỏi lại/tự tìm | Trung bình: cần phân biệt lỗi retrieval với câu ngoài phạm vi | Giữ làm failure mode của pain chính |
-| Câu trả lời quá dài so với câu hỏi | 316/1.261 turn theo ngưỡng notebook; 150 user | 2,11 turn/user bị ảnh hưởng | Tăng công đọc; chưa có số phút trực tiếp | Cao nhưng “quá dài” phụ thuộc intent và sở thích | Loại ở vòng này |
+`primary_pain` là lựa chọn ở Câu 5, ví dụ: không biết ôn phần nào; không biết mình
+hiểu đúng chưa; không có bài ngắn để tự kiểm tra; quiz quá dài; thiếu thời gian.
 
-### Vì sao chọn ứng viên 1
+### 3.3 Bảng bằng chứng cần điền sau khảo sát
 
-1. Khớp chức năng cốt lõi hiện tại của VLearn: trả lời dựa trên tài liệu và kèm
-   citation.
-2. Có field cấu trúc `citations`, nên phép đếm rõ ràng và dễ tái lập hơn đánh giá
-   “dài” hoặc “đúng giọng”.
-3. Có tín hiệu rating nhất quán với hậu quả về niềm tin, dù cỡ mẫu nhỏ.
-4. Lát cắt đủ nhỏ để build và demo trong 5 phút: một câu hỏi chuẩn và một trường
-   hợp không đủ căn cứ.
+| Primary pain | Số người xác nhận | Tỷ lệ trên mẫu hợp lệ | Tần suất | Thời gian mất/lần | Hậu quả phổ biến | 5 quote/ID |
+|---|---:|---:|---|---|---|---|
+| Không biết ôn phần nào | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Không biết mình hiểu đúng chưa | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Không có bài ngắn để tự kiểm tra | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Quiz hiện có quá dài | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Thiếu thời gian | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
 
-### Vì sao chưa chọn ứng viên 2 và 3
+**Quy tắc:** chốt định nghĩa và mẫu số trước khi xem kết quả; không xóa phản hồi
+không hợp ý; ghi rõ mọi quy tắc loại trùng hoặc loại phản hồi test.
 
-- “Không tìm thấy nguồn” đang được phát hiện bằng regex, có thể bắt nhầm các câu
-  Tutor giải thích giới hạn hợp lệ hoặc câu hỏi ngoài phạm vi. Nhóm giữ nó làm
-  failure mode cho thiết kế conditional.
-- “Quá dài” phụ thuộc loại câu hỏi. Chưa có khảo sát chứng minh học viên coi đây là
-  pain và chưa đo được thời gian đọc dư thừa.
+## 4. Impact & quyết định chọn
 
-## 5. Thiết kế lát cắt đủ nhỏ
+Hiện có ba ứng viên. Bảng này chưa có dữ liệu thật nên chỉ là khung quyết định,
+không phải kết luận.
 
-### Flow prototype
+| Ứng viên | Người gặp | Tần suất | Tốn gì/lần | Khả thi build | Quyết định hiện tại |
+|---|---:|---:|---:|---|---|
+| Không biết mình hiểu đúng chưa sau buổi | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: quiz + feedback ngắn | Ứng viên chính |
+| Không biết cần ôn phần nào | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: chỉ ra một nội dung cần ôn | Ứng viên gần |
+| Không có bài tự kiểm tra ngắn | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: quiz 3 câu | Ứng viên gần |
+| Quiz/bài hiện có quá dài | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Trung bình: cần hiểu quiz hiện có | Có thể loại |
 
-1. Học viên chọn một đoạn/trang và đặt câu hỏi học thuật.
-2. Hệ thống truy xuất các đoạn liên quan và tính mức đủ căn cứ.
-3. Nếu đủ căn cứ:
-   - trả lời ngắn theo từng ý;
-   - mỗi ý có citation về trang/đoạn nguồn;
-   - học viên có thể mở nguồn để kiểm tra.
-4. Nếu không đủ căn cứ:
-   - không tự bổ sung kiến thức ngoài nguồn;
-   - nói rõ chưa tìm được căn cứ;
-   - hỏi lại một câu cụ thể hoặc đề nghị học viên chọn đoạn khác.
-5. Học viên có thể báo “citation không hỗ trợ ý này” và hỏi lại.
+### Quy tắc chốt
+
+Chọn pain có: (1) tỷ lệ xác nhận cao, (2) tần suất/hậu quả rõ, (3) ít nhất năm
+quote cụ thể, và (4) giải được bằng một lát cắt 5 phút. Nếu ba pain đầu sát nhau,
+chọn pain có evidence mạnh nhất; quiz vẫn có thể là giải pháp nhưng problem
+statement phải bám pain được chọn.
+
+## 5. Giải pháp đề xuất
+
+### Flow
+
+1. Học viên chọn bài vừa học hoặc hệ thống nhận biết bài vừa hoàn thành.
+2. Hệ thống lấy các đoạn nguồn đã duyệt của bài.
+3. AI quyết định có đủ nguồn để sinh quiz hay không.
+4. Nếu đủ: sinh 3 câu, mỗi câu/đáp án có mã nguồn học liệu.
+5. Học viên trả lời; hệ thống chấm và chỉ ra một nội dung cần ôn lại.
+6. Nếu thiếu nguồn: không sinh quiz, nói rõ lý do và cho chọn đoạn/chủ đề khác.
+7. User có thể báo câu hỏi hoặc đáp án sai nguồn.
+
+### Automation: Conditional / augment
+
+AI chỉ soạn quiz khi nguồn hỗ trợ câu hỏi và đáp án. Với nguồn mơ hồ, hệ thống
+không tự đoán; nó yêu cầu thêm nội dung hoặc chuyển sang checklist tự đánh giá.
+
+Lý do: câu quiz sai có thể khiến học viên học sai hoặc đánh giá sai mức hiểu của
+mình. Chi phí không sinh được một quiz thấp hơn chi phí sinh quiz có đáp án sai.
 
 ### Non-goals
 
-- Không xây lại toàn bộ Tutor hoặc VLearn.
-- Không hỗ trợ câu hỏi logistics của Discord.
-- Không tự động chấm điểm học viên.
-- Không đảm bảo trả lời mọi kiến thức ngoài tài liệu khóa học.
-- Không làm hệ thống phát hiện toàn bộ misconception trong hackathon.
+- Không thay điểm học phần hoặc điểm kiểm tra chính thức.
+- Không dùng AI hoặc credit trong bài thi/kiểm tra chính thức VinUni.
+- Không tạo ngân hàng quiz toàn bộ khóa.
+- Không tự động kết luận năng lực dài hạn của học viên.
+- Không cấp phần thưởng thật nếu chính sách chưa được phê duyệt.
 
-### Bốn đường đi cần demo
+## 6. Reward, giới hạn AI và chính sách
 
-| Đường đi | Hành vi mong muốn |
+| Hạng mục | Thiết kế prototype | Điều kiện triển khai thật |
+|---|---|---|
+| Reward | Đạt ngưỡng demo, ví dụ 2/3, nhận 1 practice-question credit | Giảng viên/ban vận hành phê duyệt |
+| Cap | Hiển thị cap 20 credits | Xác định theo học phần/chu kỳ rõ ràng |
+| Lợi ích credit | Mở lượt hỏi trong **chế độ ôn tập VLearn** | Không ảnh hưởng đặc quyền học vụ/đánh giá |
+| Thi chính thức | Không có flow nào cho phép dùng credit | Phải tuân thủ quy định assessment của VinUni |
+| Chống spam | Một quiz thưởng một lần, random hóa, log lượt làm | Rà soát fairness và gian lận |
+
+Nếu mong muốn ban đầu là dùng credit trong “bài kiểm tra cuối kỳ”, nhóm cần có xác
+nhận bằng văn bản của đơn vị phụ trách học vụ trước khi coi đó là một feature. Nếu
+không, demo và spec phải gọi nó là **practice mode trước kỳ thi**.
+
+## 7. Bốn lớp chỗ khó và kịch bản
+
+| Lớp | Trigger | Hành vi mong muốn |
+|---|---|---|
+| ① Nguồn sự thật | Câu/đáp án không được tài liệu hỗ trợ | Không render câu; nêu chưa đủ nguồn; giữ source ID để kiểm tra. |
+| ① Nguồn sự thật | User báo mã nguồn học liệu không hỗ trợ câu | Ẩn câu, không tính điểm/click reward, cho tạo lại từ nguồn khác. |
+| ② Mơ hồ | Bài ít tài liệu/mục tiêu học không rõ | Hỏi user chọn đoạn/chủ đề, hoặc chuyển checklist tự đánh giá. |
+| ② Mơ hồ | User làm sai nhưng lý do không rõ | Chỉ nêu đáp án + nguồn, không suy đoán misconception. |
+| ④ Domain | Hai đáp án đều có vẻ đúng | Validator chặn câu; đưa vào golden set failure. |
+| ④ Domain | Câu quá đánh đố/quá khó | User báo feedback; không thưởng tự động cho case bị flag. |
+
+## 8. Kiểm thử và quality bar
+
+### Golden set
+
+Tối thiểu 20 case: 8–10 bài thường; ≥2 case cho mỗi lớp khó; 2–4 case hiếm. Mỗi
+case lưu source IDs, input, output, expected behavior và kết quả pass/fail. Ít
+nhất 10 case phát triển từ transcript/chatlog thật, chỉ trích dẫn tối thiểu theo
+quy định data.
+
+### Quality bar đề xuất
+
+> Đạt khi ≥85% golden set pass, đồng thời 100% câu/đáp án render có mã nguồn học liệu hỗ
+> trợ và 100% case xin dùng credit trong đánh giá chính thức bị từ chối đúng.
+
+Bar chỉ là đề xuất. Nhóm phải chốt một lần trong `spec.md` trước 23:59 ngày 1,
+không hạ bar sau khi thấy kết quả chạy.
+
+| Chiều | Định nghĩa kiểm chứng |
 |---|---|
-| Happy path | Có nguồn phù hợp → trả lời và citation cạnh từng ý |
-| Low confidence | Nguồn gần đúng nhưng chưa đủ → nói rõ giới hạn và hỏi lại |
-| Failure | Không có nguồn → không đoán, đưa bước tiếp theo |
-| Correction | User báo citation sai → cho chọn nguồn/đặt lại câu hỏi và sinh lại |
+| Groundedness | Người chấm mở được nguồn và xác nhận nguồn hỗ trợ câu + đáp án. |
+| Correctness | Đáp án chấm khớp nguồn/rubric. |
+| Relevance | Câu kiểm tra mục tiêu bài, không trivia hoặc kiến thức ngoài nguồn. |
+| Difficulty | User test đánh giá vừa sức, không đánh đố. |
+| Reward safety | Không có đường đi nào dùng credit cho đánh giá chính thức. |
 
-## 6. Điều kiện chấp nhận bài toán
+## 9. Willing users & validation
 
-### Tiêu chí 1 — Pain cụ thể
-
-**Đạt ở mức bản thảo.** Đã xác định:
-
-- Ai: học viên đang đọc tài liệu trên VLearn.
-- Việc: hỏi để hiểu/tóm tắt/so sánh khái niệm học thuật.
-- Vướng: câu trả lời không chỉ ra căn cứ hoặc không tìm được nguồn.
-- Hậu quả: khó kiểm chứng và không biết nên tin câu trả lời đến mức nào.
-
-Nhóm nên khảo sát để bổ sung hậu quả định lượng: mất bao nhiêu phút để tìm lại
-slide, có bỏ cuộc/hỏi công cụ khác không, mức độ tin giảm bao nhiêu.
-
-### Tiêu chí 2 — Bằng chứng
-
-**Đạt đường B về cấu trúc mining**, với điều kiện nhóm thực hiện và ghi lại bước
-đọc tay:
-
-- Có số đếm và mẫu số.
-- Có phương pháp đếm chạy lại được.
-- Có ít nhất 5 ví dụ nguyên văn kèm `turn_id`.
-- Có notebook tái lập.
-
-Để tăng độ chắc, thêm một file review gồm tối thiểu 20 turn flagged và cột
-`manual_valid`, `manual_note`.
-
-### Tiêu chí 3 — Impact
-
-**Đạt phần so sánh ứng viên, còn thiếu số tổn thất trực tiếp.**
-
-- Đã so sánh ba pain bằng số user, số turn, số hội thoại và tần suất.
-- Đã giữ ứng viên bị loại và lý do.
-- Có rating làm proxy cho trust.
-- Cần khảo sát để bổ sung “mỗi lần tốn gì” bằng phút, hành vi hỏi lại hoặc mức tin.
-
-### Tiêu chí 4 — Lát cắt prototype
-
-**Đạt.** Lát cắt có một user, một job, một quyết định trung tâm và một kết quả;
-flow có thể demo bằng một case có nguồn và một case thiếu nguồn trong 5 phút.
-
-### Tiêu chí 5 — Có người sẵn sàng thử
-
-**Đạt yêu cầu CP1:** đã có ba người thật ngoài nhóm đồng ý thử prototype.
-
-| Người thử | Vai trò | Đã đồng ý? | Thời gian dự kiến |
+| Người thử | Vai trò | Đồng ý thử | Thời gian dự kiến |
 |---|---|---|---|
-| Lâm Vũ | Học viên lớp D303 | Có | 14:00 ngày 2 |
-| Lê Văn Tuấn | Học viên lớp D303 | Có | 14:00 ngày 2 |
-| Cao Hương Giang | Học viên lớp D303 | Có | 14:00 ngày 2 |
+| Lâm Vũ | Học viên D303 | Có | 14:00 ngày 2 |
+| Lê Văn Tuấn | Học viên D303 | Có | 14:00 ngày 2 |
+| Cao Hương Giang | Học viên D303 | Có | 14:00 ngày 2 |
 
-Trước CP5 cần validation với ít nhất 5 người ngoài nhóm, trong đó có ít nhất 2
-người thuộc danh sách willing users trên.
+Task validation:
 
-## 7. Khảo sát tối thiểu cần làm tiếp
+> “Hãy dùng prototype sau một bài học, làm quiz và cho biết liệu kết quả có giúp
+> bạn biết cần ôn gì tiếp theo hay không.”
 
-Mining đã đủ cho đường bằng chứng B, nhưng khảo sát sẽ giúp chứng minh hậu quả và
-hoàn thiện impact. Không hỏi “Bạn có muốn tính năng citation không?”. Hỏi về lần
-gần nhất:
+Ghi log ≥5 người ngoài nhóm: tên/vai, task, quan sát, quote nguyên văn, mức nghiêm
+trọng. Hỏi đúng ba câu: điều gì khó hiểu/khó chịu nhất; bạn có tin kết quả không và
+vì sao; bạn có dùng thật không và vì sao.
 
-1. Lần gần nhất Tutor trả lời nhưng bạn không chắc câu trả lời đúng, bạn đã làm gì?
-2. Bạn mất khoảng bao nhiêu phút để kiểm tra lại?
-3. Bạn mở lại slide, hỏi bạn/TA, dùng ChatGPT khác hay bỏ qua?
-4. Citation hiện tại có giúp bạn tìm đúng đoạn nguồn không? Hãy mô tả một lần cụ thể.
-5. Nếu Tutor không tìm được nguồn, phản hồi nào giúp bạn tiếp tục công việc?
+## 10. Kế hoạch theo checkpoint
 
-Nếu dùng đường khảo sát A: cần ít nhất 20 người ngoài nhóm, ít nhất 50% xác nhận
-pain và lưu **toàn bộ câu hỏi cùng từng câu trả lời nguyên văn**.
+| Mốc | Việc cần xong | Artifact |
+|---|---|---|
+| CP1 | Chạy khảo sát, có pain hypothesis, willing users, lát cắt | Canvas + link form |
+| CP2 | Flow bấm được với quiz mẫu, chưa cần AI | Prototype mock + commit |
+| CP3 | AI call thật sinh quiz có mã nguồn học liệu; golden set ≥20; lượt đo đầu | Code + eval kết quả 1 |
+| CP4 | Chốt evidence khảo sát, impact, 4 lớp, quality bar | `spec.md` trước 23:59 ngày 1 |
+| CP5 | Test với ≥5 người, changelog, dry run | `validation/` + slide |
+| CP6 | Demo một happy path và một failure path | Slide + prototype |
 
-## 8. Đề xuất quality metrics cho prototype
+## 11. Kết luận hiện tại
 
-Các ngưỡng dưới đây là đề xuất, nhóm phải chốt trong `spec.md` trước hạn:
+Quiz cuối buổi là một **giải pháp khả thi**, không phải pain đã được chứng minh.
+Nhóm chỉ nên chốt bài toán sau khi khảo sát xác nhận pain chính, quy mô, tần suất
+và hậu quả. Nếu pain được xác nhận, lát cắt 3 câu có căn cứ, feedback một mục cần
+ôn và practice credits có cap 20 là đủ nhỏ để build/demo, đồng thời giữ an toàn học
+thuật bằng cách tách hoàn toàn khỏi đánh giá chính thức.
 
-- **Citation coverage:** 100% câu trả lời có claim học thuật phải có ít nhất một
-  citation.
-- **Citation faithfulness:** citation thực sự hỗ trợ claim, chấm tay theo rubric.
-- **Abstention correctness:** không đủ nguồn thì không đưa claim ngoài nguồn.
-- **Answer relevance:** trả lời đúng câu hỏi, không chỉ lặp lại tài liệu.
-- **Correction success:** user báo citation sai thì có thể sửa/hỏi lại trong flow.
+## Tài liệu liên quan
 
-Golden set cần tối thiểu 20 case và phủ bốn lớp chỗ khó; ít nhất 10 case phát triển
-từ chatlog thật. Không sử dụng chính các case test để chỉnh output thủ công trong
-demo.
-
-## 9. Kết luận
-
-Data mining cho thấy pain “câu hỏi học thuật không có citation đáng kiểm tra” có
-quy mô đủ lớn, xuất hiện trên nhiều người dùng và có tín hiệu liên quan đến
-downvote. Đây là lựa chọn phù hợp cho hướng A vì:
-
-- có bằng chứng tái lập được;
-- bám đúng chức năng cốt lõi của Tutor;
-- có failure mode rõ;
-- có thể tạo golden set;
-- build và demo được trong thời gian cuộc thi.
-
-**Quyết định cuối chỉ nên chốt sau khi** review tay để xác nhận độ chính xác của
-heuristic. Yêu cầu ba willing users thật đã hoàn thành.
+- Canvas: `quiz/product-canvas.md`
+- Form khảo sát: `quiz/survey.md`
+- Script tạo Google Form: `quiz/google-form-quiz.gs`
+- Kế hoạch prototype: `quiz/prototype-plan.md`

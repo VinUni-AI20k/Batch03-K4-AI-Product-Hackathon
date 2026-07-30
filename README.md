@@ -5,20 +5,16 @@
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
 - Nhóm: **4-5 người** · zone tối đa 5 nhóm · thi theo lớp
 
-## EDA cho hướng A — VLearn AI Tutor
+## Dự án hiện tại — Quiz củng cố cuối buổi
 
-Môi trường phân tích đã được khóa bằng `uv`. Để chạy notebook:
+Nhóm đang xây tính năng Quiz 3 câu sau mỗi buổi học để giúp học viên xác định phần
+cần ôn lại. Các artifact dùng cho CP1 và prototype:
 
-```bash
-uv sync
-uv run jupyter lab
-```
-
-Sau đó mở `eda/vlearn_ai_tutor_eda.ipynb`. Hướng dẫn và lưu ý diễn giải nằm trong
-`eda/README.md`.
-
-Product Canvas dùng cho CP1: `product-canvas.md`; bản trình bày dạng bảng:
-`product-canvas-table.md`.
+- `eda/bao-cao-de-xuat-bai-toan.md` — báo cáo đề xuất bài toán.
+- `quiz/product-canvas.md` — Product Canvas.
+- `quiz/survey.md` — form khảo sát 10 câu.
+- `quiz/google-form-quiz.gs` — script tự tạo Google Form.
+- `quiz/prototype-plan.md` — scope, AI call thật và kịch bản demo.
 
 ## Bắt đầu từ đâu?
 
