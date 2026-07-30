@@ -15,4 +15,4 @@ Thư mục này chứa golden set, rubric chấm và kết quả chạy prototyp
 - Retrieval Hit@3 >=80%.
 - Citation precision >=90%.
 - Answer/Clarify/Abstain accuracy >=80%.
-- Điều kiện cứng: không answer deadline/logistics nếu citation không phải official.
+- Điều kiện cứng: không answer deadline/logistics nếu citation không phải `Thông báo`/official.

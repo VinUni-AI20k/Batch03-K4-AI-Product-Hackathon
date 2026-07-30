@@ -1,6 +1,6 @@
 # Evidence
 
-Thư mục này chứa bằng chứng cho pain "học viên khó tìm lại nguồn Discord".
+Thư mục này chứa bằng chứng cho pain "học viên khó tìm lại thread Chia sẻ và link/deadline trong Thông báo trên Discord".
 
 ## Mục Tiêu
 
@@ -16,6 +16,12 @@ Thư mục này chứa bằng chứng cho pain "học viên khó tìm lại ngu�
 3. Mất khoảng bao lâu?
 4. Bạn có tìm được đúng nguồn không?
 5. Nếu không tìm được, bạn đã làm gì tiếp theo?
+
+## File Hiện Có
+
+- `survey_summary.md`: tổng hợp số liệu khảo sát ban đầu n=54 và nhóm câu hỏi bổ sung giả lập để định hướng.
+- `survey_log.csv`: template log từng người nếu nhóm bổ sung khảo sát chi tiết.
+- `mining_log.md`: template mining Discord nếu nhóm có quyền rà post/thread.
 
 ## Lưu Ý Bảo Mật
 

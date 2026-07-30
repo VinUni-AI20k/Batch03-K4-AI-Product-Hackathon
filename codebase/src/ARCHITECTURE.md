@@ -23,7 +23,7 @@ Frontend/CLI
 
 ```json
 {
-  "query": "Cho mình link bài hướng dẫn viết AI spec?",
+  "query": "Deadline nộp AI Spec là khi nào?",
   "mode": "find_resource"
 }
 ```
@@ -35,8 +35,8 @@ Frontend/CLI
   "source_id": "D001",
   "channel": "thong-bao",
   "source_type": "official",
-  "title": "Hướng dẫn viết AI Spec",
-  "content": "Nội dung post...",
+  "title": "Thông báo deadline nộp AI Spec",
+  "content": "Nội dung thông báo...",
   "comments": [],
   "url": "https://discord.com/channels/...",
   "created_at": "2026-07-30T00:00:00+07:00",
@@ -49,7 +49,7 @@ Frontend/CLI
 ```json
 {
   "decision": "answer",
-  "answer": "Bạn cần xem post Hướng dẫn viết AI Spec...",
+  "answer": "Deadline nộp AI Spec là 23:59 ngày 1, theo thông báo D001...",
   "citations": [
     {
       "source_id": "D001",

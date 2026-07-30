@@ -1,13 +1,13 @@
 # Discord Knowledge Finder - Nhóm Gehihi36
 
-Prototype AI hỗ trợ học viên khóa AI Thực Chiến tìm lại thông tin, tài nguyên, hướng dẫn và kinh nghiệm đã được đăng trên Discord trong các nguồn được whitelist.
+Prototype AI hỗ trợ học viên khóa AI Thực Chiến tìm lại thread hữu ích trong mục `Chia sẻ` và link/deadline quan trọng trong mục `Thông báo` trên Discord.
 
 ## Đề Tài
 
 - Track: Hướng B - Trợ lý Học viên Discord.
 - Tên lát cắt: Discord Knowledge Finder.
-- Actor: Học viên trong khóa học đang cần tìm lại một thông tin, tài nguyên, hướng dẫn hoặc kinh nghiệm từng được đăng trên Discord.
-- Problem: Học viên phải đoán keyword, đoán channel và mở nhiều post/thread thủ công; cách diễn đạt trong trí nhớ của học viên thường khác với tiêu đề/nội dung thật trên Discord.
+- Actor: Học viên trong khóa học đang cần tìm lại thread chia sẻ liên quan đến câu hỏi hiện tại, hoặc link/deadline quan trọng từng được đăng trong Thông báo.
+- Problem: Học viên phải đoán keyword, đoán channel và mở nhiều post/thread thủ công; cách diễn đạt trong câu hỏi của học viên thường khác với tiêu đề/nội dung thật trên Discord.
 - AI decision trung tâm: `answer / clarify / abstain`.
 - Mức automation: Conditional - AI trả lời khi đủ căn cứ, hỏi lại khi mơ hồ, từ chối generate khi không đủ nguồn.
 
@@ -32,6 +32,7 @@ repo/
 ├── demo-slides-outline.md
 ├── evidence/
 │   ├── README.md
+│   ├── survey_summary.md
 │   ├── survey_log.csv
 │   └── mining_log.md
 ├── codebase/
@@ -67,8 +68,8 @@ Sẽ cập nhật sau khi hoàn thành `codebase/`.
 
 Dự kiến MVP:
 
-1. Load snapshot JSON các post/thread Discord được phép dùng.
-2. Người dùng nhập câu hỏi tìm tài nguyên/hướng dẫn.
+1. Load snapshot JSON các thread `Chia sẻ` và message/post `Thông báo` được phép dùng.
+2. Người dùng nhập câu hỏi tìm thread liên quan, link hoặc deadline.
 3. Retriever tìm bằng semantic + keyword trong nguồn whitelist.
 4. AI engine quyết định `answer`, `clarify` hoặc `abstain`.
 5. Hệ thống trả lời ngắn kèm citation đến đúng post/thread, hoặc hỏi lại/từ chối khi không đủ căn cứ.
@@ -81,7 +82,7 @@ Dự kiến MVP:
 
 ## Evidence
 
-Phần evidence để trong `evidence/` và sẽ được cập nhật sau khi nhóm có khảo sát/mining Discord. Không đưa nội dung nhạy cảm hoặc Discord private không được phép vào repo public.
+Phần evidence để trong `evidence/`. Hiện đã có `survey_summary.md` với khảo sát ban đầu n=54 và nhóm câu hỏi bổ sung giả lập để định hướng. Không đưa nội dung nhạy cảm hoặc Discord private không được phép vào repo public.
 
 ## Tài Liệu Gốc
 

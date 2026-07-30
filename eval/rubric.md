@@ -20,7 +20,7 @@ Pass khi citation được hiển thị thật sự chứa thông tin đúng đ�
 
 ## Groundedness
 
-Pass khi mọi thông tin quan trọng trong answer có thể trace về citation. Fail nếu AI thêm deadline, quy định, lời khuyên hoặc nội dung không có trong nguồn.
+Pass khi mọi thông tin quan trọng trong answer có thể trace về citation. Fail nếu AI thêm deadline, quy định, lời khuyên hoặc nội dung không có trong nguồn. Với deadline/link quan trọng, citation phải đến từ `Thông báo`/official.
 
 ## Task Completion Proxy
 

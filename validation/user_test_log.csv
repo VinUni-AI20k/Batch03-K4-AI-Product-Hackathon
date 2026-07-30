@@ -1,6 +1,6 @@
 tester_name,role,willing_user_from_cp1,task,completed,time_seconds,needed_to_ask_chat,observations,verbatim_quote,severity,logged_by
-TODO,học viên,TODO,"Tìm lại post hướng dẫn viết AI spec",TODO,TODO,TODO,TODO,TODO,TODO,TODO
-TODO,học viên,TODO,"Tìm lại nội dung về automation/augmentation",TODO,TODO,TODO,TODO,TODO,TODO,TODO
-TODO,học viên,TODO,"Tìm lại bài/chia sẻ về prompt guardrail",TODO,TODO,TODO,TODO,TODO,TODO,TODO
+TODO,học viên,TODO,"Tìm lại deadline nộp AI Spec từ Thông báo",TODO,TODO,TODO,TODO,TODO,TODO,TODO
+TODO,học viên,TODO,"Tìm thread Chia sẻ liên quan đến automation/augmentation",TODO,TODO,TODO,TODO,TODO,TODO,TODO
+TODO,học viên,TODO,"Tìm thread Chia sẻ về prompt guardrail",TODO,TODO,TODO,TODO,TODO,TODO,TODO
 TODO,học viên,TODO,"Hỏi một câu mơ hồ để xem hệ thống clarify",TODO,TODO,TODO,TODO,TODO,TODO,TODO
 TODO,học viên,TODO,"Hỏi một câu không có nguồn để xem hệ thống abstain",TODO,TODO,TODO,TODO,TODO,TODO,TODO

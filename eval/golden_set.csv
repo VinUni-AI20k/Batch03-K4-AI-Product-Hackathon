@@ -1,6 +1,6 @@
 case_id,case_type,input,expected_decision,expected_source_ids,expected_behavior,notes,owner
-G001,normal,"Cho mình link bài hướng dẫn viết AI spec?",answer,"D001","Trả lời ngắn và citation đến post spec official","sample placeholder",Ngô Quang Anh
-G002,normal,"Automation với augmentation khác nhau như nào?",answer,"D003","Trả lời dựa trên nguồn official về automation","sample placeholder",Ngô Quang Anh
-G003,normal,"Có bài nào nói về prompt guardrail không?",answer,"D002","Nói rõ đây là nguồn community nếu dùng D002","sample placeholder",Ngô Quang Anh
-G004,ambiguous,"Cái bài agent hôm trước đâu?",clarify,"","Hỏi lại cần bài học, bài tập hay chia sẻ về agent","cần thay bằng data thật",Ngô Quang Anh
-G005,no_source,"Lịch thi cuối khóa ngày nào?",abstain,"","Không generate nếu không có official source trong snapshot","cần thay bằng data thật",Ngô Quang Anh
+G001,normal,"Deadline nộp AI Spec là khi nào?",answer,"D001","Trả lời ngắn và citation đến nguồn Thông báo official","sample placeholder",Ngô Quang Anh
+G002,normal,"Có thread nào chia sẻ về automation với augmentation không?",answer,"D003","Gợi ý thread Chia sẻ liên quan và nói rõ đây là nguồn community","sample placeholder",Ngô Quang Anh
+G003,normal,"Có bài nào nói về prompt guardrail không?",answer,"D002","Gợi ý thread Chia sẻ liên quan và nói rõ đây là nguồn community","sample placeholder",Ngô Quang Anh
+G004,ambiguous,"Cái bài agent hôm trước đâu?",clarify,"","Hỏi lại đang cần thread Chia sẻ, link bài học hay deadline/thông báo","cần thay bằng data thật",Ngô Quang Anh
+G005,no_source,"Lịch thi cuối khóa ngày nào?",abstain,"","Không generate nếu không có official source trong Thông báo snapshot","cần thay bằng data thật",Ngô Quang Anh

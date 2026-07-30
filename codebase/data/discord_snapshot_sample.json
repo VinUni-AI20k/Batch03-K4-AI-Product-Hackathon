@@ -3,8 +3,8 @@
     "source_id": "D001",
     "channel": "thong-bao",
     "source_type": "official",
-    "title": "Hướng dẫn nộp AI Spec hackathon",
-    "content": "Spec cần có user job, evidence, lát cắt một câu, automation, risk scenarios, golden set và quality bar. Quality bar phải chốt trước hạn nộp spec.",
+    "title": "Thông báo deadline nộp AI Spec hackathon",
+    "content": "Deadline nộp AI Spec là 23:59 ngày 1. Spec cần có user job, evidence, lát cắt một câu, automation, risk scenarios, golden set và quality bar.",
     "comments": [],
     "url": "https://discord.com/channels/example/D001",
     "created_at": "2026-07-30T09:00:00+07:00",
@@ -14,7 +14,7 @@
     "source_id": "D002",
     "channel": "chia-se",
     "source_type": "community",
-    "title": "Kinh nghiệm viết prompt có guardrail",
+    "title": "Thread chia sẻ: kinh nghiệm viết prompt có guardrail",
     "content": "Một prompt tốt nên nói rõ phạm vi, tiêu chí từ chối, cách citation và cách hỏi lại khi input mơ hồ.",
     "comments": [
       {
@@ -28,9 +28,9 @@
   },
   {
     "source_id": "D003",
-    "channel": "bai-hoc",
-    "source_type": "official",
-    "title": "Automation và augmentation",
+    "channel": "chia-se",
+    "source_type": "community",
+    "title": "Thread chia sẻ: automation và augmentation trong sản phẩm AI",
     "content": "Nếu sai thì đắt, nên để AI ở mức augment hoặc conditional. Nếu sai rẻ và user tự sửa được, có thể automate.",
     "comments": [],
     "url": "https://discord.com/channels/example/D003",

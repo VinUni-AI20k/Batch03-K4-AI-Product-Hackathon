@@ -7,7 +7,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ### Job Executor + Workflow
 
-Job executor: học viên trong khóa AI Thực Chiến đang cần tìm lại một thông tin, tài nguyên, hướng dẫn hoặc kinh nghiệm từng được đăng trên Discord.
+Job executor: học viên trong khóa AI Thực Chiến đang cần tìm lại thread chia sẻ liên quan đến câu hỏi hiện tại, hoặc cần tìm nhanh link/deadline quan trọng từng được đăng trong Thông báo.
 
 Workflow hiện tại:
 
@@ -15,40 +15,47 @@ Workflow hiện tại:
 2. Đoán channel chứa thông tin.
 3. Tìm bằng một số từ khóa.
 4. Duyệt và mở nhiều kết quả.
-5. Đọc post và comment để tìm đoạn liên quan.
+5. Đọc thread/post và comment để tìm đoạn liên quan hoặc link/deadline đúng.
 6. Đổi từ khóa nếu chưa thấy.
 7. Hỏi lại cộng đồng hoặc bỏ cuộc nếu vẫn không tìm được.
 
 ### Core JTBD
 
-Tìm lại đúng nguồn thông tin đã được chia sẻ trong khóa học khi chỉ nhớ mang máng nội dung cần tìm.
+Tìm lại đúng thread chia sẻ, link hoặc deadline đã được đăng trong khóa học khi chỉ nhớ mang máng nội dung cần tìm.
 
 ### Problem Statement
 
-Khi học viên cần tìm lại nội dung đã được đăng trong các khu vực Thông báo, Bài học hoặc Chia sẻ, họ phải đoán từ khóa, xác định channel và mở nhiều post/thread thủ công. Do cách diễn đạt trong bài viết thường khác với từ khóa mà học viên nhớ, họ mất nhiều thời gian, không tìm được nội dung dù nó đã tồn tại, hoặc phải hỏi lại cộng đồng.
+Khi học viên cần tìm lại thread hữu ích trong mục Chia sẻ hoặc link/deadline quan trọng trong mục Thông báo, họ phải đoán từ khóa, xác định channel và mở nhiều post/thread thủ công. Do cách diễn đạt trong câu hỏi của học viên thường khác với tiêu đề/nội dung thật trên Discord, họ mất nhiều thời gian, không tìm được nội dung dù nó đã tồn tại, hoặc phải hỏi lại cộng đồng.
 
 ### Evidence
 
-Trạng thái: cần bổ sung sau khi nhóm thu thập dữ liệu Discord/khảo sát.
+Khảo sát ban đầu: n = 54 học viên. Log tổng hợp nằm tại `evidence/survey_summary.md`.
 
 Cần đạt ít nhất một trong hai đường:
 
 - Chuẩn A - Khảo sát: >=20 người ngoài nhóm, >=50% xác nhận pain, log đầy đủ câu hỏi và câu trả lời.
 - Chuẩn B - Mining: số đếm kiểm lại được + >=5 ví dụ nguyên văn + phương pháp đếm.
 
-Dự kiến câu hỏi khảo sát:
+Kết quả chính:
 
-1. Lần gần nhất bạn cần tìm lại một tài nguyên/hướng dẫn trên Discord khóa học, bạn đang tìm gì?
-2. Bạn đã tìm bằng cách nào?
-3. Mất khoảng bao lâu?
-4. Bạn có tìm được đúng nguồn không?
-5. Nếu không tìm được, bạn đã làm gì tiếp theo?
+| Câu hỏi | Có | Không | Other | Tỉ lệ xác nhận pain |
+|---|---:|---:|---:|---:|
+| Bạn có gặp khó khăn khi tìm lại các thông báo hay đường link quan trọng trong Discord do có quá nhiều kênh không? | 49 | 5 | 0 | 90,7% |
+| Bạn có từng lỡ mất các thông báo gấp như đổi lịch học/dời deadline vì tin nhắn bị trôi quá nhanh chưa? | 36 | 17 | 1 | 66,7% |
+| Bạn có cảm thấy tốn thời gian khi phải lội ngược dòng tin nhắn hoặc dùng Discord Search nhưng vẫn không tìm thấy thứ mình cần không? | 46 | 8 | 0 | 85,2% |
+| Khi cần tìm tài liệu/link bài giảng của một buổi học cụ thể, bạn có phải đi hỏi lại bạn bè thay vì tự tìm trên Discord không? | 38 | 16 | 0 | 70,4% |
 
-Evidence cần điền:
+Takeaway:
 
-- Số liệu mining/khảo sát: `TODO`, lưu tại `evidence/survey_log.csv` hoặc `evidence/mining_log.md`.
+- Pain về tìm lại link/thông báo/deadline là rõ nhất: 49/54 người xác nhận khó tìm lại thông báo/link quan trọng.
+- Pain về trôi thông báo gấp có cost-of-error cao hơn vì liên quan đổi lịch/deadline: 36/54 người từng gặp.
+- Discord Search/scroll chưa đủ tốt với nhu cầu thực tế: 46/54 người thấy tốn thời gian nhưng vẫn không tìm thấy thứ cần.
+
+Evidence còn cần bổ sung trước CP4:
+
 - >=5 quote/ví dụ nguyên văn + nguồn: `TODO`.
-- Phương pháp đếm: `TODO`.
+- Phương pháp thu thập khảo sát đầy đủ: `TODO`.
+- Nếu có mining Discord: thêm số đếm và ví dụ tại `evidence/mining_log.md`.
 
 ## §2. Impact & Quyết Định Chọn
 
@@ -56,7 +63,7 @@ Evidence cần điền:
 
 | Ứng viên | Ai gặp | Tần suất | Tốn gì mỗi lần | Khả thi trong hackathon | Chọn? |
 |---|---|---|---|---|---|
-| Discord Knowledge Finder | Học viên cần tìm lại post/thread/tài nguyên | TODO sau survey | Thời gian tìm, gián đoạn học, hỏi lặp | Cao nếu dùng snapshot JSON | Chọn |
+| Discord Knowledge Finder | Học viên cần tìm thread chia sẻ/link/deadline | 49/54 gặp khó với thông báo/link; 46/54 tốn thời gian tìm | Thời gian tìm, gián đoạn học, hỏi lặp, có thể lỡ deadline | Cao nếu dùng snapshot JSON | Chọn |
 | Discord daily digest cho TA | TA/mentor cần nắm câu hỏi tồn | TODO | Thời gian đọc chat, bỏ sót câu hỏi | Vừa, cần nhiều log Discord | Loại tạm |
 | VLearn tutor follow-up/check understanding | Học viên đang học trong VLearn | Có signal từ data VLearn | Học xong nhưng chưa chắc đã hiểu | Cao, có data sẵn | Loại tạm |
 
@@ -67,7 +74,7 @@ Evidence cần điền:
 
 ### Ứng Viên Chọn + Vì Sao
 
-Chọn Discord Knowledge Finder vì pain nằm ở khoảng cách giữa cách học viên diễn đạt nhu cầu và cấu trúc/từ khóa thật của Discord. MVP có thể làm gọn bằng snapshot JSON được whitelist, đo được bằng time-to-source, Hit@3 và citation precision.
+Chọn Discord Knowledge Finder vì pain nằm ở khoảng cách giữa cách học viên diễn đạt nhu cầu và cấu trúc/từ khóa thật của Discord. MVP có thể làm gọn bằng snapshot JSON gồm thread trong `Chia sẻ` và post/message trong `Thông báo`, đo được bằng time-to-source, Hit@3 và citation precision.
 
 ## §3. Giải Pháp Tương Tự Đã Nghiên Cứu
 
@@ -83,21 +90,21 @@ Cần bổ sung nhanh, mỗi thành viên nghiên cứu 1 sản phẩm trong 15 
 
 ### Lát Cắt MỘT CÂU
 
-Học viên đang cần tìm lại một tài nguyên/hướng dẫn đã được đăng trên Discord; AI quyết định trả lời, hỏi lại hay từ chối dựa trên nguồn whitelist; kết quả là học viên mở đúng post/thread có citation nhanh hơn Discord Search.
+Học viên đang đặt câu hỏi để tìm thread liên quan trong mục Chia sẻ hoặc tìm link/deadline trong mục Thông báo; AI quyết định trả lời, hỏi lại hay từ chối dựa trên nguồn whitelist; kết quả là học viên mở đúng thread/link/thông báo có citation nhanh hơn Discord Search.
 
 ### Non-Goals
 
 1. Không build bot Discord realtime trong MVP.
 2. Không crawl toàn bộ Discord.
-3. Không trả lời các câu hỏi không có trong nguồn whitelist.
+3. Không tìm trong các channel ngoài `Chia sẻ` và `Thông báo` ở MVP.
 4. Không thay thế TA/mentor trong việc đưa lời khuyên cá nhân hóa.
-5. Không tự động kết luận deadline/logistics nếu nguồn không phải official.
+5. Không tự động kết luận deadline/logistics nếu nguồn không phải `Thông báo`/official.
 
 ### Mức Prototype
 
 Mức nhắm tới: Mock/Working nhẹ.
 
-- Thật: snapshot JSON, retriever, AI call quyết định answer/clarify/abstain, citation, trace, eval.
+- Thật: snapshot JSON từ `Chia sẻ` và `Thông báo`, retriever, AI call quyết định answer/clarify/abstain, citation, trace, eval.
 - Mock: Discord API realtime, permission model, UI bot Discord thật.
 
 ### Automation
@@ -106,7 +113,7 @@ Mức: Conditional.
 
 Lý do theo cost-of-error:
 
-- Nếu AI trả lời sai deadline/hướng dẫn, học viên có thể nộp sai, học sai hoặc mất niềm tin.
+- Nếu AI trả lời sai deadline/link quan trọng, học viên có thể lỡ hạn, vào nhầm tài nguyên hoặc mất niềm tin.
 - Nếu AI chỉ search và citation đúng nguồn, user có thể tự kiểm lại.
 - Vì vậy AI chỉ tự trả lời khi có căn cứ đủ mạnh; nếu mơ hồ thì hỏi lại; nếu không đủ nguồn thì abstain và hiện top nguồn liên quan.
 
@@ -114,7 +121,7 @@ Lý do theo cost-of-error:
 
 | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
 |---|---|
-| HAX G1 - Làm rõ hệ thống làm được gì | Màn hình đầu nói rõ chỉ tìm trong nguồn Discord whitelist |
+| HAX G1 - Làm rõ hệ thống làm được gì | Màn hình đầu nói rõ chỉ tìm thread `Chia sẻ` và link/deadline từ `Thông báo` |
 | HAX G2 - Làm rõ mức độ tin cậy | Mỗi câu trả lời có citation và nhãn `official/community` |
 | HAX G10 - Thu hẹp phạm vi khi nghi ngờ | Câu hỏi mơ hồ thì hỏi lại một câu thay vì đoán |
 | HAX G11 - Giải thích vì sao | Nếu answer, nêu nguồn/câu đoạn đúng; nếu abstain, nói lý do không đủ căn cứ |
@@ -124,9 +131,9 @@ Lý do theo cost-of-error:
 
 | Tình huống | Lớp | Hành vi mong muốn | Nguyên tắc |
 |---|---|---|---|
-| User hỏi "link bài agent hôm trước đâu?" | Mơ hồ/thiếu thông tin | Hỏi lại cần tìm bài học, post chia sẻ hay assignment | G10 |
-| User hỏi deadline nộp bài nhưng snapshot có cả comment cộng đồng và thông báo chính thức | Nguồn sự thật | Ưu tiên official, tách rõ community nếu có | G2/G11 |
-| User hỏi một kinh nghiệm "nên dùng model nào" chỉ có comment cộng đồng | Domain | Trả lời rằng đây là kinh nghiệm cộng đồng, không phải quy định chính thức | G2 |
+| User hỏi "link bài agent hôm trước đâu?" | Mơ hồ/thiếu thông tin | Hỏi lại đang cần thread chia sẻ, link bài học hay deadline/thông báo | G10 |
+| User hỏi deadline nộp bài nhưng snapshot có cả comment cộng đồng và thông báo chính thức | Nguồn sự thật | Chỉ chốt deadline từ `Thông báo`; nếu có community thì tách riêng | G2/G11 |
+| User hỏi một kinh nghiệm "nên dùng model nào" và có thread Chia sẻ phù hợp | Domain | Gợi ý các thread liên quan và nói rõ đây là kinh nghiệm cộng đồng | G2 |
 | User hỏi nội dung không có trong whitelist | Nguồn sự thật | Abstain, hiện top bài gần nhất nếu có | G10/G11 |
 | User hỏi xin tóm tắt toàn bộ private thread không trong snapshot | Ngoài phạm vi | Từ chối, nói hệ thống chỉ dùng nguồn được phép | G1 |
 | Citation top 1 liên quan keyword nhưng không trả lời đúng câu hỏi | Domain | Không answer nếu score/evidence không đủ; hiện nguồn liên quan | G2 |
@@ -135,12 +142,13 @@ Lý do theo cost-of-error:
 
 ## §6. Bốn Đường Đi Của Trải Nghiệm
 
-- Happy path: user hỏi "bài nào hướng dẫn viết AI spec?" -> hệ thống tìm post official, trả lời ngắn + citation.
+- Happy path: user hỏi "có thread nào chia sẻ cách viết prompt guardrail không?" -> hệ thống gợi ý 2-3 thread `Chia sẻ` liên quan + citation.
+- Happy path thông báo: user hỏi "deadline nộp spec là khi nào?" -> hệ thống chỉ trả lời nếu tìm thấy nguồn `Thông báo`/official.
 - Low-confidence: user hỏi "cái bài agent hôm trước" -> hệ thống hỏi lại "bạn cần bài giảng, bài tập hay chia sẻ kinh nghiệm về agent?"
 - Failure/không căn cứ: user hỏi nội dung không có trong snapshot -> hệ thống không generate, hiện top bài gần nhất.
 - Correction: user báo "citation này không đúng" -> hệ thống cho feedback, chạy lại với nguồn bị loại trừ.
 - Ngoài phạm vi: user hỏi thông tin cá nhân/kênh private -> hệ thống từ chối.
-- Domain-specific: deadline/logistics chỉ được trả lời từ official source.
+- Domain-specific: deadline/logistics chỉ được trả lời từ `Thông báo`/official source.
 
 ## §7. Kiểm Thử
 
@@ -175,7 +183,7 @@ Chốt trước 23:59 N1, giữ nguyên sau khi chốt:
 - Retrieval Hit@3 >=80%.
 - Citation precision >=90%.
 - Answer/Clarify/Abstain accuracy >=80%.
-- Điều kiện cứng: không có answer nào về deadline/logistics nếu citation không phải official.
+- Điều kiện cứng: không có answer nào về deadline/logistics nếu citation không phải `Thông báo`/official.
 
 ### Kết Quả Các Lượt Chạy
 

@@ -4,11 +4,11 @@
 
 Cần có:
 
-- Actor: học viên cần tìm lại thông tin/tài nguyên trên Discord.
-- Core JTBD: tìm lại đúng nguồn khi chỉ nhớ mang máng nội dung.
-- Evidence: TODO số liệu khảo sát/mining.
+- Actor: học viên cần tìm thread Chia sẻ liên quan, hoặc link/deadline trong Thông báo.
+- Core JTBD: tìm lại đúng thread/link/deadline khi chỉ nhớ mang máng nội dung.
+- Evidence: n=54; 49/54 gặp khó khi tìm lại thông báo/link quan trọng, 46/54 thấy tốn thời gian khi scroll/Search vẫn không tìm thấy thứ cần.
 
-Thông điệp: Pain không phải "Discord khó dùng", mà là khoảng cách giữa ngôn ngữ người học nhớ và cấu trúc/keyword thật của Discord.
+Thông điệp: Pain không phải "Discord khó dùng", mà là khoảng cách giữa câu hỏi tự nhiên của học viên và cấu trúc thread/thông báo thật trên Discord.
 
 ## Slide 2 - Vì Sao Chọn Tính Năng Này
 
@@ -31,7 +31,8 @@ Cần có:
 
 Case gợi ý:
 
-- Happy: "Cho mình link/bài viết hướng dẫn viết AI spec?"
+- Happy: "Deadline nộp AI Spec là khi nào?"
+- Happy thread: "Có thread nào chia sẻ về prompt guardrail không?"
 - Hard: "Cái bài agent hôm trước đâu?" -> clarify.
 
 ## Slide 4 - Kết Quả Đo

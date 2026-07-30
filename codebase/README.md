@@ -1,6 +1,6 @@
 # Codebase Prototype
 
-MVP: Discord Knowledge Finder chạy trên snapshot JSON của các post/thread được whitelist.
+MVP: Discord Knowledge Finder chạy trên snapshot JSON của thread `Chia sẻ` và post/message `Thông báo` được whitelist.
 
 ## Luồng Chạy Dự Kiến
 
@@ -19,7 +19,7 @@ user query
 
 | Module | Owner | Mô tả |
 |---|---|---|
-| `ingest` | Lê Trọng Việt Dũng | Đọc snapshot, clean text, tạo chunk/citation |
+| `ingest` | Lê Trọng Việt Dũng | Đọc snapshot `Chia sẻ`/`Thông báo`, clean text, tạo chunk/citation |
 | `retriever` | Lê Trọng Việt Dũng | Keyword + semantic search, merge/rerank |
 | `classifier` | Nguyễn Việt Phong + Nguyễn Tuấn Đức | Phân loại intent và độ mơ hồ |
 | `answerer` | Nguyễn Việt Phong + Nguyễn Tuấn Đức | Prompt answer/clarify/abstain |
@@ -28,7 +28,7 @@ user query
 
 ## AI Decision Policy
 
-- `answer`: chỉ khi có nguồn đủ căn cứ và citation rõ.
+- `answer`: chỉ khi có nguồn đủ căn cứ và citation rõ; deadline/link quan trọng phải đến từ `Thông báo`/official.
 - `clarify`: khi query mơ hồ nhưng có thể thu hẹp bằng một câu hỏi.
 - `abstain`: khi không có nguồn, ngoài whitelist, hoặc nguồn không đủ để trả lời.
 
