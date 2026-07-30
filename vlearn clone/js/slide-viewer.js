@@ -97,6 +97,13 @@ function updatePage() {
   if (frame) {
     frame.src = currentPdfPath + '#toolbar=0&navpanes=0&view=FitH&page=' + currentPage;
   }
+  
+  if (typeof pdfDoc !== 'undefined' && pdfDoc) {
+    const canvas = document.getElementById('pdf-canvas');
+    if (canvas) canvas.style.display = 'block';
+    if (frame) frame.style.display = 'none';
+    queueRenderPage(currentPage);
+  }
 }
 
 function scrollToPage(pg) {
