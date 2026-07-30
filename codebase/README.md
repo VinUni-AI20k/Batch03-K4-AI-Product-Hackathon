@@ -25,6 +25,14 @@ http://localhost:8000/codebase/
 5. Bấm bất kỳ đề tài nào để xem lý do phù hợp và hướng dẫn setup bốn bước.
 6. Chọn **Góp ý đề tài** để gửi một đề xuất mới trong phiên demo.
 
+## Cài đặt giao diện
+
+- Nút **Giao diện** ở thanh trên cùng và **Cài đặt giao diện** ở thanh bên mở bảng cá nhân hóa.
+- Có ba chế độ màu: theo thiết bị, sáng và tối.
+- Mặc định dùng **Be Vietnam Pro** để hiển thị dấu tiếng Việt rõ ràng; người dùng vẫn có thể chọn phông hệ thống.
+- Tùy chọn giảm chuyển động hỗ trợ người dùng nhạy cảm với hiệu ứng.
+- Các lựa chọn chỉ được lưu trong `localStorage` của trình duyệt, không gửi ra ngoài.
+
 ## Phần được mô phỏng
 
 - Không có tệp nào được upload hoặc phân tích thật.

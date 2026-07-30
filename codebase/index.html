@@ -7,8 +7,38 @@
       name="description"
       content="ĐềTài+ — prototype mô phỏng trợ lý chọn đề tài theo hồ sơ, sở thích và kỹ năng."
     />
+    <meta id="themeColor" name="theme-color" content="#fbfaf6" />
     <title>ĐềTài+ · Trợ lý chọn đề tài</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (() => {
+        const key = "detai-plus-appearance";
+        const defaults = { theme: "system", font: "vietnamese", reducedMotion: false };
+        try {
+          const saved = JSON.parse(localStorage.getItem(key) || "{}");
+          const settings = { ...defaults, ...saved };
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const resolvedTheme = settings.theme === "system"
+            ? (prefersDark ? "dark" : "light")
+            : settings.theme;
+          document.documentElement.dataset.theme = resolvedTheme;
+          document.documentElement.dataset.themePreference = settings.theme;
+          document.documentElement.dataset.font = settings.font;
+          document.documentElement.dataset.reducedMotion = String(Boolean(settings.reducedMotion));
+        } catch {
+          document.documentElement.dataset.theme = "light";
+          document.documentElement.dataset.themePreference = "system";
+          document.documentElement.dataset.font = "vietnamese";
+          document.documentElement.dataset.reducedMotion = "false";
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -70,6 +100,13 @@
           </svg>
           Bắt đầu lại demo
         </button>
+        <button class="sidebar-action muted" type="button" data-open-settings>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" />
+          </svg>
+          Cài đặt giao diện
+        </button>
       </aside>
 
       <main class="main-panel">
@@ -84,6 +121,12 @@
                 <path d="M4 5h16v14H4zM8 9h8M8 13h5" />
               </svg>
               Khám phá kho đề tài
+            </button>
+            <button class="appearance-shortcut" type="button" data-open-settings aria-label="Mở cài đặt giao diện">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7 7 0 0 1 12 3Z" />
+              </svg>
+              <span>Giao diện</span>
             </button>
             <span class="simulation-label">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -346,12 +389,25 @@
             </svg>
             Không tải tệp thật · Không gọi AI
           </div>
+          <button class="onboarding-settings" type="button" data-open-settings>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7 7 0 0 1 12 3Z" />
+            </svg>
+            Cài đặt giao diện
+          </button>
         </aside>
 
         <div class="onboarding-main">
           <div class="onboarding-mobile-head">
             <strong>ĐềTài<span>+</span></strong>
-            <small id="onboardingMobileStep">Bước 1 / 3</small>
+            <div>
+              <small id="onboardingMobileStep">Bước 1 / 3</small>
+              <button class="icon-button" type="button" data-open-settings aria-label="Mở cài đặt giao diện">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7 7 0 0 1 12 3Z" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <section class="onboarding-step" data-onboarding-step="1">
@@ -485,6 +541,86 @@
               </button>
             </div>
           </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop settings-backdrop is-hidden" id="appearanceModal" role="presentation">
+      <section
+        class="modal appearance-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="appearanceTitle"
+      >
+        <div class="modal-head">
+          <div>
+            <span class="section-kicker">CÁ NHÂN HÓA</span>
+            <h2 id="appearanceTitle">Cài đặt giao diện</h2>
+            <p>Chọn cách hiển thị dễ chịu nhất với bạn.</p>
+          </div>
+          <button class="icon-button" id="closeAppearanceSettings" type="button" aria-label="Đóng cài đặt">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-copy">
+            <strong>Chế độ màu</strong>
+            <span>“Theo thiết bị” sẽ tự đổi theo hệ điều hành.</span>
+          </div>
+          <div class="theme-options" role="group" aria-label="Chọn chế độ màu">
+            <button type="button" data-theme-option="system">
+              <span class="theme-preview system-preview"><i></i><i></i></span>
+              <strong>Theo thiết bị</strong>
+              <small>Tự động</small>
+            </button>
+            <button type="button" data-theme-option="light">
+              <span class="theme-preview light-preview"><i></i></span>
+              <strong>Sáng</strong>
+              <small>Dịu và rõ</small>
+            </button>
+            <button type="button" data-theme-option="dark">
+              <span class="theme-preview dark-preview"><i></i></span>
+              <strong>Tối</strong>
+              <small>Êm mắt hơn</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-copy">
+            <strong>Kiểu chữ</strong>
+            <span>Be Vietnam Pro được tối ưu cho dấu tiếng Việt.</span>
+          </div>
+          <div class="font-options" role="group" aria-label="Chọn kiểu chữ">
+            <button type="button" data-font-option="vietnamese">
+              <span class="font-sample vietnamese-font">Ă â Ê ươ</span>
+              <span><strong>Be Vietnam Pro</strong><small>Thân thiện, hiện đại</small></span>
+            </button>
+            <button type="button" data-font-option="system">
+              <span class="font-sample system-font">Ă â Ê ươ</span>
+              <span><strong>Phông hệ thống</strong><small>Quen thuộc trên thiết bị</small></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-toggle-row">
+          <div>
+            <strong>Giảm chuyển động</strong>
+            <span>Hạn chế hiệu ứng và cuộn mượt trong giao diện.</span>
+          </div>
+          <label class="toggle" for="reducedMotionToggle">
+            <input id="reducedMotionToggle" type="checkbox" />
+            <span aria-hidden="true"></span>
+            <span class="sr-only">Giảm chuyển động</span>
+          </label>
+        </div>
+
+        <div class="settings-footer">
+          <button class="button ghost" id="resetAppearanceSettings" type="button">Khôi phục mặc định</button>
+          <button class="button primary" id="doneAppearanceSettings" type="button">Xong</button>
         </div>
       </section>
     </div>

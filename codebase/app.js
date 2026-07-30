@@ -155,6 +155,16 @@ const interestRules = {
   },
 };
 
+const APPEARANCE_STORAGE_KEY = "detai-plus-appearance";
+const defaultAppearanceSettings = {
+  theme: "system",
+  font: "vietnamese",
+  reducedMotion: false,
+};
+const systemColorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+const appearanceSettings = readAppearanceSettings();
+let appearanceTrigger = null;
+
 const state = {
   stage: "profile",
   activeView: "advisor",
@@ -178,6 +188,7 @@ document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
   cacheElements();
+  applyAppearanceSettings(false);
   bindGlobalEvents();
   renderInitialConversation();
   syncOnboardingSelections();
@@ -221,6 +232,12 @@ function cacheElements() {
     "clearTopicFilters",
     "emptyClearFilters",
     "catalogSuggestTopic",
+    "appearanceModal",
+    "closeAppearanceSettings",
+    "doneAppearanceSettings",
+    "resetAppearanceSettings",
+    "reducedMotionToggle",
+    "themeColor",
     "onboardingModal",
     "onboardingMobileStep",
     "onboardingFileBtn",
@@ -259,6 +276,41 @@ function cacheElements() {
 }
 
 function bindGlobalEvents() {
+  document.querySelectorAll("[data-open-settings]").forEach((button) => {
+    button.addEventListener("click", openAppearanceModal);
+  });
+  refs.closeAppearanceSettings.addEventListener("click", closeAppearanceModal);
+  refs.doneAppearanceSettings.addEventListener("click", closeAppearanceModal);
+  refs.resetAppearanceSettings.addEventListener("click", resetAppearanceSettings);
+  refs.appearanceModal.addEventListener("click", (event) => {
+    if (event.target === refs.appearanceModal) closeAppearanceModal();
+  });
+  document.querySelectorAll("[data-theme-option]").forEach((button) => {
+    button.addEventListener("click", () => {
+      appearanceSettings.theme = button.dataset.themeOption;
+      applyAppearanceSettings();
+    });
+  });
+  document.querySelectorAll("[data-font-option]").forEach((button) => {
+    button.addEventListener("click", () => {
+      appearanceSettings.font = button.dataset.fontOption;
+      applyAppearanceSettings();
+    });
+  });
+  refs.reducedMotionToggle.addEventListener("change", () => {
+    appearanceSettings.reducedMotion = refs.reducedMotionToggle.checked;
+    applyAppearanceSettings();
+  });
+
+  const handleSystemThemeChange = () => {
+    if (appearanceSettings.theme === "system") applyAppearanceSettings(false);
+  };
+  if (typeof systemColorScheme.addEventListener === "function") {
+    systemColorScheme.addEventListener("change", handleSystemThemeChange);
+  } else {
+    systemColorScheme.addListener(handleSystemThemeChange);
+  }
+
   refs.profileFileInput.addEventListener("change", (event) => {
     const [file] = event.target.files;
     if (file) populateProfileFromSimulatedFile(file);
@@ -358,6 +410,10 @@ function bindGlobalEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    if (!refs.appearanceModal.classList.contains("is-hidden")) {
+      closeAppearanceModal();
+      return;
+    }
     closeSuggestModal();
     closeDetail();
     refs.profilePanel.classList.remove("is-open");
@@ -727,8 +783,90 @@ function topicCardTemplate(project) {
   `;
 }
 
+function readAppearanceSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY) || "{}");
+    return {
+      theme: ["system", "light", "dark"].includes(saved.theme)
+        ? saved.theme
+        : defaultAppearanceSettings.theme,
+      font: ["vietnamese", "system"].includes(saved.font)
+        ? saved.font
+        : defaultAppearanceSettings.font,
+      reducedMotion: Boolean(saved.reducedMotion),
+    };
+  } catch {
+    return { ...defaultAppearanceSettings };
+  }
+}
+
+function applyAppearanceSettings(persist = true) {
+  const resolvedTheme = appearanceSettings.theme === "system"
+    ? (systemColorScheme.matches ? "dark" : "light")
+    : appearanceSettings.theme;
+
+  document.documentElement.dataset.theme = resolvedTheme;
+  document.documentElement.dataset.themePreference = appearanceSettings.theme;
+  document.documentElement.dataset.font = appearanceSettings.font;
+  document.documentElement.dataset.reducedMotion = String(appearanceSettings.reducedMotion);
+
+  if (refs.themeColor) {
+    refs.themeColor.content = resolvedTheme === "dark" ? "#0b1211" : "#fbfaf6";
+  }
+
+  if (persist) {
+    try {
+      localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify(appearanceSettings));
+    } catch {
+      // The UI still works when storage is blocked by the browser.
+    }
+  }
+
+  renderAppearanceSettings();
+}
+
+function renderAppearanceSettings() {
+  document.querySelectorAll("[data-theme-option]").forEach((button) => {
+    const selected = button.dataset.themeOption === appearanceSettings.theme;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  document.querySelectorAll("[data-font-option]").forEach((button) => {
+    const selected = button.dataset.fontOption === appearanceSettings.font;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  if (refs.reducedMotionToggle) {
+    refs.reducedMotionToggle.checked = appearanceSettings.reducedMotion;
+  }
+}
+
+function openAppearanceModal(event) {
+  appearanceTrigger = event?.currentTarget || document.activeElement;
+  renderAppearanceSettings();
+  refs.appearanceModal.classList.remove("is-hidden");
+  document.body.style.overflow = "hidden";
+  window.setTimeout(() => refs.closeAppearanceSettings.focus(), 40);
+}
+
+function closeAppearanceModal() {
+  refs.appearanceModal.classList.add("is-hidden");
+  if (!isAnyModalOpen()) document.body.style.overflow = "";
+  if (appearanceTrigger instanceof HTMLElement && appearanceTrigger.isConnected) {
+    appearanceTrigger.focus();
+  }
+}
+
+function resetAppearanceSettings() {
+  appearanceSettings.theme = defaultAppearanceSettings.theme;
+  appearanceSettings.font = defaultAppearanceSettings.font;
+  appearanceSettings.reducedMotion = defaultAppearanceSettings.reducedMotion;
+  applyAppearanceSettings();
+}
+
 function isAnyModalOpen() {
   return (
+    !refs.appearanceModal.classList.contains("is-hidden") ||
     !refs.onboardingModal.classList.contains("is-hidden") ||
     !refs.suggestModal.classList.contains("is-hidden") ||
     !refs.detailDrawer.classList.contains("is-hidden")
