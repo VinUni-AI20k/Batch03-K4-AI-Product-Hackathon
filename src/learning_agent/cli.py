@@ -5,6 +5,7 @@
   reindex   rebuild toàn bộ index từ vault (index là phái sinh)
   ask       hỏi thử agent trong terminal (không cần Discord/Telegram)
   bot       chạy gateway: Discord + Telegram + cron scheduler (kênh nào có token thì bật)
+  update    cập nhật lên bản mới nhất từ GitHub (git pull + cài deps) rồi khởi động lại bot
 """
 from __future__ import annotations
 
@@ -34,6 +35,7 @@ def main() -> None:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("onboard")
+    sub.add_parser("update")
     sub.add_parser("sync")
     sub.add_parser("reindex")
     ask = sub.add_parser("ask")
@@ -45,6 +47,11 @@ def main() -> None:
 
     if args.cmd == "onboard":
         _onboard(cfg)
+        return
+
+    if args.cmd == "update":
+        from .updater.selfupdate import do_update
+        do_update(cfg)
         return
 
     vault, index = _setup(cfg)

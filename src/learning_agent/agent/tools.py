@@ -57,6 +57,10 @@ def build_tools(vault: Vault, index: LessonIndex, cfg=None) -> tuple[list[dict],
         from ..updater.packs import install_pack
         return install_pack(cfg, vault, index, name) if cfg else "Chưa cấu hình knowledge packs."
 
+    def get_version() -> str:
+        from ..updater.selfupdate import check_version
+        return check_version(cfg) if cfg else "Không xác định được phiên bản."
+
     schemas = [
         {
             "type": "function",
@@ -123,6 +127,14 @@ def build_tools(vault: Vault, index: LessonIndex, cfg=None) -> tuple[list[dict],
         {
             "type": "function",
             "function": {
+                "name": "get_version",
+                "description": "Xem phiên bản agent đang chạy và kiểm tra GitHub có bản mới không. Dùng khi học viên hỏi version, 'đã mới nhất chưa', 'có cần cập nhật không'.",
+                "parameters": {"type": "object", "properties": {}},
+            },
+        },
+        {
+            "type": "function",
+            "function": {
                 "name": "install_knowledge_pack",
                 "description": "Cài/cập nhật một knowledge pack từ GitHub vào tài liệu học tập. CHỈ gọi sau khi học viên xác nhận đồng ý cài.",
                 "parameters": {
@@ -140,5 +152,6 @@ def build_tools(vault: Vault, index: LessonIndex, cfg=None) -> tuple[list[dict],
         "save_concept": save_concept,
         "list_knowledge_packs": list_knowledge_packs,
         "install_knowledge_pack": install_knowledge_pack,
+        "get_version": get_version,
     }
     return schemas, impls
