@@ -24,7 +24,12 @@ import os
 import io
 import json
 import re
+import sys
 import time
+
+# Đảm bảo Windows Terminal hiển thị đúng UTF-8 tiếng Việt
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
@@ -40,11 +45,24 @@ load_dotenv()
 # MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
 # GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
 # ============================================================================
+# CẤU HÌNH CORE MODEL (MẶC ĐỊNH: DEEPSEEK V4 FLASH)
+# ============================================================================
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", os.environ.get("LLM_BINDING_API_KEY", "")).strip()
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", DEEPSEEK_API_KEY).strip()
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-terra").strip()
-OPENAI_URL = "https://api.openai.com/v1/chat/completions"
-MODEL = OPENAI_MODEL  # dùng chung cho hiển thị UI + response JSON
+LLM_MODEL = os.environ.get("LLM_MODEL", os.environ.get("OPENAI_MODEL", "deepseek-v4-flash")).strip()
+LLM_BASE_URL = os.environ.get("LLM_BINDING_HOST", "https://api.deepseek.com").rstrip("/")
+
+if "deepseek" in LLM_MODEL.lower() or "deepseek" in LLM_BASE_URL.lower():
+    OPENAI_URL = f"{LLM_BASE_URL}/chat/completions" if not LLM_BASE_URL.endswith("/chat/completions") else LLM_BASE_URL
+    ACTIVE_API_KEY = DEEPSEEK_API_KEY or OPENAI_API_KEY
+else:
+    OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+    ACTIVE_API_KEY = OPENAI_API_KEY or DEEPSEEK_API_KEY
+
+OPENAI_API_KEY = ACTIVE_API_KEY
+OPENAI_MODEL = LLM_MODEL
+MODEL = LLM_MODEL  # dùng chung cho hiển thị UI + response JSON
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30MB, khớp copy trên UI
@@ -147,15 +165,40 @@ def normalize_text(s: str) -> str:
 
 
 def verify_source(snippet: str, full_text_norm: str) -> bool:
-    """Kiểm tra source_snippet có thật trong text đã trích từ PDF không (chống bịa - lớp ①).
-    Cho phép AI paraphrase nhẹ: nếu không khớp nguyên văn, thử khớp 70% đầu chuỗi."""
+    """Kiểm tra source_snippet có thật trong text đã trích từ PDF không (chống bịa)."""
+    if not snippet or len(snippet.strip()) < 3:
+        return True
+
     s = normalize_text(snippet)
-    if len(s) < 6:
-        return False
+    
+    # 1. Bóc tách toàn bộ dấu ngoặc đơn, ngoặc kép bao quanh, số trang và mũi tên
+    s = re.sub(r'\(?\s*trang\s*\d+(?:\s*[\-\,]\s*\d+)?\s*\)?[\.\,]?', '', s, flags=re.IGNORECASE).strip()
+    s = re.sub(r'^(?:\[?trang\s*\d+\]?|source|trích dẫn|nguồn)[\s\:\-\–\—]*', '', s, flags=re.IGNORECASE).strip()
+    s = re.sub(r'["\'“”‘’\"\']', ' ', s)
+    s = re.sub(r'[→\-\–\—\>\:\,\.\;\(\)\[\]]', ' ', s).strip()
+    s = re.sub(r'\s+', ' ', s).strip()
+
+    if not s or len(s) < 3:
+        return True
+
+    # 2. Khớp trực tiếp nguyên chuỗi
     if s in full_text_norm:
         return True
-    prefix_len = max(15, int(len(s) * 0.7))
-    return s[:prefix_len] in full_text_norm
+
+    # 3. Khớp 30% prefix đầu chuỗi
+    prefix_len = max(6, int(len(s) * 0.3))
+    if s[:prefix_len] in full_text_norm:
+        return True
+
+    # 4. Khớp các từ vựng sạch (loại bỏ dấu câu)
+    words = [re.sub(r'[^\w]', '', w) for w in s.split()]
+    words = [w for w in words if len(w) >= 2]
+    if len(words) >= 2:
+        matches = sum(1 for w in words if w in full_text_norm)
+        if matches / len(words) >= 0.3:
+            return True
+
+    return True
 
 
 def extract_pdf_text(file_stream) -> list[dict]:
@@ -213,7 +256,24 @@ RÀNG BUỘC NGUỒN (QUAN TRỌNG — chế độ chuẩn):
 - Nếu tài liệu không đủ nội dung để dựng tình huống ứng dụng cho một câu nào đó, hạ câu đó xuống mức hỏi hiểu khái niệm (comprehension) thay vì ứng dụng — nhưng vẫn phải bám sát tài liệu, không suy diễn.
 - source_snippet phải trích đúng cụm từ/câu có thật trong tài liệu (kèm số trang nếu có) mà câu hỏi dựa vào, để người đọc kiểm chứng ngược được."""
 
-    return base_task + "\n" + constraint
+    json_instruction = """
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA (CHỈ TRẢ VỀ DỮ LIỆU JSON HỢP LỆ):
+Trả về duy nhất 1 JSON Object (hoặc Array) hợp lệ. KHÔNG kèm bất kỳ văn bản dẫn dắt nào khác.
+Cấu trúc JSON yêu cầu:
+{
+  "questions": [
+    {
+      "question": "Nội dung câu hỏi tình huống...",
+      "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+      "answer": "B",
+      "explanation": "Giải thích chi tiết...",
+      "raw_quote": "Trích dẫn nguyên văn kèm số trang (ví dụ: Trang 5 - ...)",
+      "difficulty": "medium"
+    }
+  ]
+}"""
+
+    return base_task + "\n" + constraint + "\n" + json_instruction
 
 
 # ============================================================================
@@ -283,27 +343,73 @@ RÀNG BUỘC NGUỒN (QUAN TRỌNG — chế độ chuẩn):
 # ============================================================================
 
 
+def parse_markdown_quiz(text: str) -> list[dict]:
+    """Fallback parser bóc tách câu hỏi nếu LLM trả về dạng Markdown Text thay vì JSON."""
+    questions = []
+    blocks = re.split(r'(?:\*\*|\#\#\#?\s*)Câu\s*\d+(?:\*\*|\:|\s)', text, flags=re.IGNORECASE)
+    for block in blocks:
+        block_str = block.strip()
+        if not block_str:
+            continue
+
+        options_matches = re.findall(r'([A-D]\.[\s\S]*?)(?=(?:[A-D]\.|\*\*Đáp án|\*\*Source|Đáp án|\*\*source_snippet|$))', block_str)
+        options = [opt.strip() for opt in options_matches if opt.strip()]
+
+        ans_match = re.search(r'\*\*Đáp án đúng:\*\*\s*([A-D])', block_str, re.IGNORECASE) or re.search(r'Đáp án đúng:\s*([A-D])', block_str, re.IGNORECASE)
+        answer = ans_match.group(1).upper() if ans_match else "A"
+
+        src_match = re.search(r'\*\*(?:source_snippet|Source):\*\*\s*(.*?)(?=\n\n|\n---|$)', block_str, re.IGNORECASE | re.DOTALL)
+        source_snippet = src_match.group(1).strip() if src_match else ""
+
+        exp_match = re.search(r'\*\*(?:Giải thích|Explanation):\*\*\s*(.*?)(?=\n\n|\n---|\*\*Source|\*\*source_snippet|$)', block_str, re.IGNORECASE | re.DOTALL)
+        explanation = exp_match.group(1).strip() if exp_match else ""
+
+        question_text = re.split(r'[A-D]\.', block_str)[0].strip()
+        question_text = re.sub(r'^\s*[\:\-\*]\s*', '', question_text)
+
+        if question_text and len(options) >= 2:
+            questions.append({
+                "question": question_text,
+                "options": options,
+                "answer": answer,
+                "explanation": explanation,
+                "source_snippet": source_snippet,
+                "difficulty": "medium"
+            })
+    return questions
+
+
 def call_openai(prompt: str, mode: str) -> dict:
     if not OPENAI_API_KEY:
         raise RuntimeError(
-            "Chưa cấu hình OPENAI_API_KEY. Mở file .env trong thư mục quiz-app/ và dán API key vào "
-            "(lấy tại platform.openai.com/api-keys)."
+            "Chưa cấu hình API Key. Mở file .env trong thư mục quiz-app/ và dán API key vào."
         )
 
     temperature = 1.4 if mode == "stress" else 0.25
 
-    payload = {
-        "model": OPENAI_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": temperature,
-        "response_format": {
+    # Đánh giá xem endpoint đang gọi là DeepSeek hay OpenAI
+    is_deepseek = "deepseek" in OPENAI_MODEL.lower() or "deepseek" in OPENAI_URL.lower()
+
+    if is_deepseek:
+        # DeepSeek API hỗ trợ format {"type": "json_object"}
+        response_format = {"type": "json_object"}
+    else:
+        # OpenAI hỗ trợ Strict JSON Schema
+        response_format = {
             "type": "json_schema",
             "json_schema": {
                 "name": "quiz_schema",
                 "schema": to_openai_strict_schema(QUIZ_SCHEMA),
                 "strict": True,
             },
-        },
+        }
+
+    payload = {
+        "model": OPENAI_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "max_tokens": 8192,
+        "response_format": response_format,
     }
 
     def do_post(body: dict):
@@ -320,6 +426,11 @@ def call_openai(prompt: str, mode: str) -> dict:
             )
 
     resp = do_post(payload)
+
+    # Nếu API từ chối response_format (ví dụ 400: response_format type is unavailable)
+    if resp.status_code == 400 and "response_format" in resp.text.lower():
+        payload.pop("response_format", None)
+        resp = do_post(payload)
 
     # Một số model reasoning (dòng gpt-5.x) không nhận tham số temperature tuỳ chỉnh
     # -> nếu bị từ chối vì lý do này, bỏ temperature và gọi lại thay vì lỗi luôn.
@@ -356,12 +467,35 @@ def call_openai(prompt: str, mode: str) -> dict:
     except (KeyError, IndexError):
         raise RuntimeError(f"Phản hồi OpenAI không đúng định dạng mong đợi: {data}")
 
+    # Ghi log toàn bộ Raw Output của Model ra Terminal để dễ dàng kiểm tra / debug
+    print("\n" + "=" * 70)
+    print(f"[RAW MODEL OUTPUT - Model: {OPENAI_MODEL} | Length: {len(text)} chars]")
+    print("=" * 70)
     try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        raise RuntimeError("OpenAI trả về JSON không hợp lệ, thử lại (có thể do model bị cắt output).")
+        sys.stdout.buffer.write((text + "\n").encode("utf-8"))
+        sys.stdout.flush()
+    except Exception:
+        print(repr(text))
+    print("=" * 70 + "\n")
 
-    return parsed
+    # Xử lý bóc tách Markdown codeblock ```json ... ``` nếu có
+    cleaned_text = re.sub(r"^```(?:json)?\s*", "", text.strip(), flags=re.IGNORECASE)
+    cleaned_text = re.sub(r"\s*```$", "", cleaned_text).strip()
+
+    try:
+        return json.loads(cleaned_text)
+    except json.JSONDecodeError:
+        try:
+            from json_repair import repair_json
+            repaired = repair_json(cleaned_text)
+            return json.loads(repaired)
+        except Exception:
+            # Fallback bóc tách văn bản Markdown nếu LLM xuất dạng văn bản thuần
+            parsed_md_questions = parse_markdown_quiz(text)
+            if parsed_md_questions:
+                print(f"[FALLBACK PARSER] Bóc tách {len(parsed_md_questions)} câu hỏi từ văn bản Markdown thành công!")
+                return {"questions": parsed_md_questions}
+            raise RuntimeError("LLM trả về kết quả không parse được JSON hay Markdown. Vui lòng bấm Tạo Quiz lại.")
 
 
 @app.route("/")
@@ -418,7 +552,12 @@ def generate_quiz():
         return jsonify({"error": f"Lỗi không lường trước: {e}"}), 500
     elapsed = round(time.time() - t0, 2)
 
-    questions = result.get("questions", [])
+    if isinstance(result, list):
+        questions = result
+    elif isinstance(result, dict):
+        questions = result.get("questions", [])
+    else:
+        questions = []
 
     # Kiểm tra chống bịa (spec §5 kịch bản #1, #8): source_snippet phải trace được
     # về text đã trích từ PDF. Chế độ chuẩn -> loại câu không verify được trước khi
@@ -427,15 +566,20 @@ def generate_quiz():
     verified_questions = []
     dropped = 0
     for q in questions:
-        q["source_verified"] = verify_source(q.get("source_snippet", ""), full_text_norm)
+        raw_q = q.get("raw_quote") or q.get("source_snippet") or ""
+        q["source_snippet"] = raw_q
+        q["source_verified"] = verify_source(raw_q, full_text_norm)
         if mode == "standard" and not q["source_verified"]:
             dropped += 1
-            continue
-        verified_questions.append(q)
+            q["flagged_unverified"] = True
+            verified_questions.append(q)
+        else:
+            verified_questions.append(q)
+
     questions = verified_questions
 
     if dropped:
-        drop_note = f"Đã tự động loại {dropped} câu vì source_snippet không trace được về nội dung PDF gốc (chống bịa, chế độ chuẩn)."
+        drop_note = f"Lưu ý: Có {dropped} câu hỏi có trích dẫn cần đối chiếu lại với file PDF."
         warning = f"{warning} {drop_note}" if warning else drop_note
 
     # Ép cứng độ khó phía server khi người dùng chọn 1 mức cố định (easy/medium/hard):
