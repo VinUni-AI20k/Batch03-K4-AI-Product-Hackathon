@@ -1,3 +1,46 @@
+# Operating systems and editors
 .DS_Store
-node_modules/
-*.env
+Thumbs.db
+.idea/
+.vscode/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Python
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / Next.js
+**/node_modules/
+**/.next/
+**/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Generated retrieval data
+data/processed/*
+!data/processed/README.md
+data/indexes/*
+!data/indexes/README.md
+
+# Runtime artifacts (commit only reviewed, anonymized evidence)
+artifacts/conversations/*
+!artifacts/conversations/.gitkeep
+artifacts/evaluation-runs/*
+!artifacts/evaluation-runs/.gitkeep
+artifacts/traces/*
+!artifacts/traces/.gitkeep
+artifacts/exports/*
+!artifacts/exports/.gitkeep
