@@ -206,9 +206,7 @@ function updatePageUI() {
 // Left Sidebar Tabs & Personal Notes Engine
 // ============================================
 
-const pageTextNotes = {
-  1: "Khái niệm nền tảng AI & LLM, mô hình tạo sinh GenAI."
-};
+const pageTextNotes = {};
 
 function switchSidebarTab(tabName) {
   document.querySelectorAll('.sidebar-tab-btn').forEach(btn => btn.classList.remove('active'));
