@@ -1,0 +1,11 @@
+[
+  { "segment_id": "T-003", "text": "TrÆ°á»›c khi vÃ o JOIN, mÃ¬nh nháº¯c láº¡i Primary Key lÃ  cá»™t Ä‘á»‹nh danh duy nháº¥t cho má»—i dÃ²ng trong báº£ng, vÃ­ dá»¥ user_id trong báº£ng users.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-004", "text": "Foreign Key lÃ  cá»™t á»Ÿ báº£ng nÃ y trá» tá»›i Primary Key cá»§a báº£ng khÃ¡c, dÃ¹ng Ä‘á»ƒ thá»ƒ hiá»‡n quan há»‡ giá»¯a hai báº£ng.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-005", "text": "VÃ­ dá»¥ báº£ng orders cÃ³ cá»™t user_id lÃ  Foreign Key trá» tá»›i báº£ng users.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-007", "text": "INNER JOIN tráº£ vá» nhá»¯ng dÃ²ng cÃ³ giÃ¡ trá»‹ khá»›p á»Ÿ Cáº¢ HAI báº£ng. Náº¿u user khÃ´ng cÃ³ order nÃ o thÃ¬ user Ä‘Ã³ sáº½ KHÃ”NG xuáº¥t hiá»‡n trong káº¿t quáº£.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-008", "text": "CÃº phÃ¡p: SELECT * FROM users INNER JOIN orders ON users.user_id = orders.user_id.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-010", "text": "Giá» qua LEFT JOIN. LEFT JOIN tráº£ vá» Táº¤T Cáº¢ dÃ²ng á»Ÿ báº£ng bÃªn trÃ¡i, ká»ƒ cáº£ khi khÃ´ng cÃ³ dÃ²ng khá»›p á»Ÿ báº£ng bÃªn pháº£i, lÃºc Ä‘Ã³ cÃ¡c cá»™t bÃªn pháº£i sáº½ lÃ  NULL.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-011", "text": "VÃ­ dá»¥ dÃ¹ng LEFT JOIN tá»« users sang orders, mÃ¬nh sáº½ tháº¥y Táº¤T Cáº¢ user, ká»ƒ cáº£ user chÆ°a tá»«ng Ä‘áº·t order nÃ o - order_id cá»§a há» sáº½ lÃ  NULL.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-012", "text": "ÄÃ¢y lÃ  Ä‘iá»ƒm khÃ¡c biá»‡t quan trá»ng nháº¥t so vá»›i INNER JOIN, cÃ¡c báº¡n nhá»› ká»¹ chá»— nÃ y.", "label": "TEACHING_CONTENT" },
+  { "segment_id": "T-013", "text": "Váº­y khi nÃ o dÃ¹ng INNER JOIN, khi nÃ o dÃ¹ng LEFT JOIN? DÃ¹ng INNER JOIN khi chá»‰ quan tÃ¢m dá»¯ liá»‡u cÃ³ khá»›p á»Ÿ cáº£ 2 báº£ng. DÃ¹ng LEFT JOIN khi muá»‘n giá»¯ toÃ n bá»™ báº£ng chÃ­nh dÃ¹ cÃ³ khá»›p hay khÃ´ng, vÃ­ dá»¥ bÃ¡o cÃ¡o táº¥t cáº£ user ká»ƒ cáº£ user chÆ°a mua gÃ¬.", "label": "TEACHING_CONTENT" }
+]
