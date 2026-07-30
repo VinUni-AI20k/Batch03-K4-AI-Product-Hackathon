@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import Any
 
 from mcp_bridge.http_mcp_client import call_tool_text
@@ -25,7 +26,13 @@ def calendar_list_events(
             args["query"] = query
         if calendar_id:
             args["calendar_id"] = calendar_id
-        text = asyncio.run(call_tool_text(GOOGLE_CALENDAR_MCP_URL, "list_events", args))
-        return {"tool": "calendar_list_events", "text": text}
+        raw = asyncio.run(call_tool_text(GOOGLE_CALENDAR_MCP_URL, "list_events", args))
+        try:
+            payload = json.loads(raw)
+            text, events = payload["text"], payload.get("events", [])
+        except (json.JSONDecodeError, KeyError, TypeError):
+            # Defensive fallback if the MCP server ever returns plain text.
+            text, events = raw, []
+        return {"tool": "calendar_list_events", "text": text, "events": events}
     except Exception as exc:
         return err("calendar_list_events", exc)

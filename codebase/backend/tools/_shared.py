@@ -3,14 +3,11 @@ from __future__ import annotations
 import os
 from typing import Any
 
-# Registers codebase/mcp/gmail_mcp_client on sys.path before any tool module
-# tries `import gmail_mcp_client`.
-from mcp_bridge import mcp_paths  # noqa: F401
-
 TIMEOUT = 30
 
 DISCORD_MCP_URL = os.environ.get("DISCORD_MCP_URL", "http://localhost:8085/mcp")
 GOOGLE_CALENDAR_MCP_URL = os.environ.get("GOOGLE_CALENDAR_MCP_URL", "http://localhost:8086/mcp")
+GMAIL_MCP_URL = os.environ.get("GMAIL_MCP_URL", "http://localhost:8087/mcp")
 
 
 def _innermost(exc: BaseException) -> BaseException:

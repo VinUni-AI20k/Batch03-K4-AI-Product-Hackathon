@@ -5,24 +5,37 @@ A local MCP server for Google Calendar, built the same way as
 served over streamable-http, calling the Calendar API on demand (no
 long-running sync/watch — just request/response per tool call).
 
-Uses OAuth 2.0 "Desktop app" flow against **your own Google account** — a
-browser tab opens once for you to grant access, then a refresh token is
-cached locally so you don't have to log in again.
+Auth is normally handled once, centrally, by the unified Google connection in
+`codebase/backend/google_connection.py` (the "Quản lý kết nối" > Gmail button
+in the FE) — it requests both Gmail and Calendar scopes in one consent
+screen and writes the token this server reads. See that module's docstring
+and `codebase/mcp/.env.example` (`GOOGLE_CLIENT_SECRETS_FILE` /
+`GOOGLE_CALENDAR_TOKEN_FILE`) for how this server points at those shared
+files. The steps below are for the one-time Google Cloud Console setup, or
+for running this server standalone without the backend.
 
 ## Setup
 
 ### 1) Google Cloud Console (one-time, manual)
 
 1. https://console.cloud.google.com/ → create or select a project.
-2. **APIs & Services → Library** → search "Google Calendar API" → Enable.
+2. **APIs & Services → Library** → search "Google Calendar API" → Enable
+   (also enable "Gmail API" if you want the unified connection to cover
+   Gmail too).
 3. **APIs & Services → OAuth consent screen** → User Type "External" → fill
    in app name/support email → under "Test users" add your own Google
    account email. (Testing mode is fine — you don't need to publish the app,
    this is just for your own account.)
 4. **APIs & Services → Credentials → Create Credentials → OAuth client ID**
-   → Application type **Desktop app** → Create → **Download JSON**.
-5. Save that file as `mcp/google_calendar_mcp/credentials/client_secret.json`
-   (this path is gitignored, safe to leave there).
+   → Application type **Web application** → add
+   `http://localhost:8000/api/v1/connections/google/callback` under
+   Authorized redirect URIs (this is what the backend's OAuth flow uses) →
+   Create → **Download JSON**.
+5. Save that file as `codebase/backend/credentials/client_secret.json`
+   (gitignored). If you're running this server standalone (no backend), you
+   can instead save it at `mcp/google_calendar_mcp/credentials/client_secret.json`
+   and use a **Desktop app** client type — `run_local_server` below handles
+   that flow itself.
 
 ### 2) Python deps + env
 

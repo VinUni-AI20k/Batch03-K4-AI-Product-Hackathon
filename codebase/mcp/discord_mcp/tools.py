@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import discord
@@ -47,6 +48,34 @@ def _format_message(message: discord.Message) -> str:
 # Server info
 # ---------------------------------------------------------------------------
 
+@mcp.tool(
+    name="list_my_guilds",
+    description="List every guild (server) this bot is currently a member of — a bot can be in "
+    "more than one. Connection-management action for the backend's 'Quản lý kết nối' UI — not "
+    "for the chat agent.",
+)
+async def list_my_guilds() -> str:
+    guilds = [
+        {"id": str(guild.id), "name": guild.name, "member_count": guild.member_count}
+        for guild in client.guilds
+    ]
+    return json.dumps(guilds)
+
+
+@mcp.tool(
+    name="list_guilds",
+    description="List every Discord server (guild) this bot has been invited into and can currently see.",
+)
+async def list_guilds() -> str:
+    guilds = client.guilds
+    if not guilds:
+        return "Bot chưa được mời vào server Discord nào."
+    lines = [f"**Bot hiện có mặt trong {len(guilds)} server:**"]
+    for guild in guilds:
+        lines.append(f"- (ID: {guild.id}) **{guild.name}** — {guild.member_count} thành viên")
+    return "\n".join(lines)
+
+
 @mcp.tool(name="get_server_info", description="Get detailed Discord server information")
 async def get_server_info(guild_id: Optional[str] = None) -> str:
     guild = await discord_bot.resolve_guild(guild_id)
@@ -62,6 +91,18 @@ async def get_server_info(guild_id: Optional[str] = None) -> str:
         f"- Boost tier: {guild.premium_tier} ({guild.premium_subscription_count} boosts)\n"
         f"- Created at: {guild.created_at.isoformat()}"
     )
+
+
+@mcp.tool(
+    name="leave_guild",
+    description="Make the bot leave a specific guild. Connection-management action for the "
+    "backend's 'Quản lý kết nối' UI — not for the chat agent to call on its own.",
+)
+async def leave_guild(guild_id: Optional[str] = None) -> str:
+    guild = await discord_bot.resolve_guild(guild_id)
+    name, gid = guild.name, guild.id
+    await guild.leave()
+    return f"Left guild: {name} (ID: {gid})"
 
 
 # ---------------------------------------------------------------------------

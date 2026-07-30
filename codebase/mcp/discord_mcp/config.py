@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN", "").strip()
-DISCORD_GUILD_ID = os.environ.get("DISCORD_GUILD_ID", "").strip() or None
 MCP_HOST = os.environ.get("MCP_HOST", "0.0.0.0")
 MCP_PORT = int(os.environ.get("MCP_PORT", "8085"))
 
