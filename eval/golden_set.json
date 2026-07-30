@@ -1,15 +1,18 @@
 {
   "test_suite": "VLearn Active Recall - Golden Set Day 2",
-  "version": "1.0",
+  "version": "1.1",
   "target_quality_bar": ">= 85% accuracy on misconception diagnosis & exact transcript citation",
+  "changelog": [
+    "v1.1: Đối chiếu lại toàn bộ 'expected_citation' với data/vlearn-pack/transcript/*.md thật. Phát hiện T02-045 và T02-088 KHÔNG TỒN TẠI (transcript-02-clean.md chỉ có T02-001 -> T02-043); T02-012 và T02-030 tồn tại nhưng nội dung không khớp case. Đã sửa TC01/TC02/TC03 sang mã đúng nội dung, và thay TC04 bằng case khác vì khái niệm cũ ('Lát cắt một câu') là framework riêng của 02-guide.md, không có trong bất kỳ transcript nào."
+  ],
   "cases": [
     {
       "id": "TC01",
       "lecture": "Day 2 - Cost of Error",
       "question": "Công ty muốn AI tự động trả lời 100% khiếu nại hoàn tiền. Rủi ro là gì?",
       "student_answer": "Em nghĩ tự động 100% là đúng vì tiết kiệm nhân sự.",
-      "expected_misconception": "Nhầm lẫn giữa Automate và Conditional Automation trong bài toán Cost of Error cao",
-      "expected_citation": "[T02-045]",
+      "expected_misconception": "Bỏ qua nguyên tắc cost-of-error khi chọn mức automation: việc sai gây hậu quả nghiêm trọng nên gần phía augmentation hơn là automate 100%",
+      "expected_citation": "[T02-034]",
       "category": "Domain Specific (④)"
     },
     {
@@ -17,8 +20,8 @@
       "lecture": "Day 2 - Job Statement",
       "question": "Viết một Job statement cho học viên ôn thi.",
       "student_answer": "Dùng AI tutor để giải bài tập nhanh hơn.",
-      "expected_misconception": "Đưa tên sản phẩm/AI vào Job statement",
-      "expected_citation": "[T02-012]",
+      "expected_misconception": "Nhảy thẳng vào giải pháp 'dùng AI' thay vì giữ Job statement ở dạng vấn đề (không tên sản phẩm/giải pháp)",
+      "expected_citation": "[T02-014]",
       "category": "Domain Specific (④)"
     },
     {
@@ -26,17 +29,17 @@
       "lecture": "Day 2 - Range of Authority",
       "question": "AI có nên tự đổi deadline bài tập cho học viên không?",
       "student_answer": "Có, nếu học viên xin nghỉ học có lý do chính đáng.",
-      "expected_misconception": "Vượt quá thẩm quyền của AI tutor",
-      "expected_citation": "[T02-088]",
+      "expected_misconception": "Vượt quá phạm vi (scope) được giao — quyết định thay đổi deadline không thuộc thẩm quyền của AI tutor, cần chuyển cho người có thẩm quyền",
+      "expected_citation": "[T03-095]",
       "category": "Out of Scope (③)"
     },
     {
       "id": "TC04",
-      "lecture": "Day 2 - Ambiguous Input",
-      "question": "Khái niệm Lát cắt một câu là gì?",
-      "student_answer": "Là làm một cái gì đó nhỏ nhỏ.",
-      "expected_misconception": "Câu trả lời quá mơ hồ, thiếu 4 thành tố (1 user, 1 việc, 1 quyết định AI, 1 kết quả)",
-      "expected_citation": "[T02-030]",
+      "lecture": "Day 2 - Problem Statement Elements",
+      "question": "Khi viết phát biểu bài toán (problem statement) cho một ý tưởng AI, cần nêu rõ những yếu tố nào?",
+      "student_answer": "Là mô tả sơ sơ ý tưởng của mình thôi, không cần nhiều chi tiết lắm.",
+      "expected_misconception": "Câu trả lời quá mơ hồ, thiếu 4 yếu tố bắt buộc: đối tượng ảnh hưởng, quy trình hiện tại, nút thắt đang tồn tại, và chỉ số thành công",
+      "expected_citation": "[T02-015]",
       "category": "Ambiguous / Low Info (②)"
     },
     {
