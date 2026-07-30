@@ -1,4 +1,4 @@
-// File: C:\New folder\K4-hackathon-3Tuat-E402\fe\app\my-courses\page.jsx
+// File: C:\Users\ADMIN\OneDrive\Máy tính\New folder (2)\K4-hackathon-3Tuat-E402\fe\app\my-courses\page.jsx
 import * as entry from '../../../../app/my-courses/page.js'
 import type { ResolvingMetadata } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
