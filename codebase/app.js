@@ -165,6 +165,8 @@ const systemColorScheme = window.matchMedia("(prefers-color-scheme: dark)");
 const appearanceSettings = readAppearanceSettings();
 let appearanceTrigger = null;
 
+const API_BASE = window.DETAI_API_BASE || "http://localhost:8001";
+
 const state = {
   stage: "profile",
   activeView: "advisor",
@@ -178,6 +180,7 @@ const state = {
   difficulty: "balanced",
   projects: fallbackProjects,
   recommendations: [],
+  recommendationMeta: null,
   suggestedTopics: [],
   catalogLimit: 12,
 };
@@ -556,7 +559,7 @@ function selectOnboardingOption(selector, selectedButton) {
   });
 }
 
-function finishOnboarding() {
+async function finishOnboarding() {
   state.profileLoaded = true;
   state.profileName = refs.onboardingName.value.trim() || "Trần Minh Anh";
   state.profileMajor = refs.onboardingMajor.value.trim() || "Hệ thống thông tin";
@@ -577,10 +580,67 @@ function finishOnboarding() {
     <p>Chào <strong>${escapeHtml(state.profileName)}</strong>! Hồ sơ đã hoàn tất trong cửa sổ thiết lập.</p>
     <p>Mình đang ưu tiên hướng <strong>${escapeHtml(interestRules[state.interest]?.label || "Dữ liệu & AI")}</strong>, kỹ năng ${escapeHtml(state.skills.join(", "))} và phạm vi nhóm ${state.teamSize} người.</p>
   `);
-  state.recommendations = getRecommendations();
-  renderRecommendations();
+  await resolveAndRenderRecommendations();
   state.catalogLimit = 12;
   renderTopicCatalog();
+}
+
+async function resolveAndRenderRecommendations() {
+  const loadingBlock = renderRecommendationLoading();
+  try {
+    const { recommendations, meta } = await getRecommendationsFromAI();
+    loadingBlock.remove();
+    if (!recommendations.length) {
+      state.recommendations = [];
+      state.recommendationMeta = meta;
+      renderRecommendationEmpty(meta);
+      return;
+    }
+    state.recommendations = recommendations;
+    state.recommendationMeta = meta;
+    renderRecommendations();
+  } catch (error) {
+    loadingBlock.remove();
+    state.recommendations = getRecommendations();
+    state.recommendationMeta = { source: "fallback_rule", error: error.message };
+    renderRecommendations();
+  }
+}
+
+function renderRecommendationLoading() {
+  const block = document.createElement("div");
+  block.className = "interactive-block active-interactive";
+  block.innerHTML = `
+    <section class="analysis-card">
+      <div class="analysis-head">
+        <span class="analysis-spinner"></span>
+        <div>
+          <strong>Đang đối chiếu hồ sơ với kho đề tài...</strong>
+          <span>Gọi model AI xếp hạng và giải thích theo hồ sơ của bạn.</span>
+        </div>
+      </div>
+    </section>
+  `;
+  refs.chatStream.appendChild(block);
+  scrollChat();
+  return block;
+}
+
+function renderRecommendationEmpty(meta) {
+  addAssistantMessage(`
+    <p>Mình chưa tìm được đề tài đủ khớp với hồ sơ hiện tại${meta?.overallNote ? `: ${escapeHtml(meta.overallNote)}` : "."}</p>
+    <p>Bạn có thể chọn lại lĩnh vực quan tâm, bổ sung thêm kỹ năng, hoặc bấm "Không thấy đề tài phù hợp?" để gửi góp ý đề tài mới.</p>
+  `);
+  const block = document.createElement("div");
+  block.className = "interactive-block";
+  block.innerHTML = `
+    <section class="result-actions">
+      <button class="button secondary small" id="suggestAfterEmpty" type="button">Không thấy đề tài phù hợp?</button>
+    </section>
+  `;
+  refs.chatStream.appendChild(block);
+  block.querySelector("#suggestAfterEmpty").addEventListener("click", openSuggestModal);
+  scrollChat();
 }
 
 function switchView(view) {
@@ -1139,6 +1199,50 @@ async function runRecommendationSimulation() {
   renderRecommendations();
 }
 
+async function getRecommendationsFromAI() {
+  const response = await fetch(`${API_BASE}/recommend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      interest: state.interest || "data",
+      skills: state.skills,
+      team_size: state.teamSize,
+      difficulty: state.difficulty,
+      profile_major: state.profileMajor || null,
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`recommend_api_${response.status}: ${detail.slice(0, 200)}`);
+  }
+
+  const payload = await response.json();
+  const byCode = new Map(state.projects.map((project) => [project.ma_de, project]));
+  const recommendations = (payload.selections || [])
+    .map((selection) => {
+      const project = byCode.get(selection.ma_de);
+      if (!project) return null;
+      return {
+        ...project,
+        match: null,
+        reasons: selection.reasons || [],
+        riskNote: selection.risk_note || "",
+      };
+    })
+    .filter(Boolean);
+
+  return {
+    recommendations,
+    meta: {
+      source: "ai",
+      confidence: payload.confidence || "low",
+      overallNote: payload.overall_note || "",
+      traceId: payload.trace_id || null,
+    },
+  };
+}
+
 function getRecommendations() {
   const rule = interestRules[state.interest] || interestRules.data;
   const skillTokens = state.skills.flatMap((skill) => normalize(skill).split(/\s+/)).filter((token) => token.length > 2);
@@ -1213,9 +1317,26 @@ function getRecommendations() {
 
 function renderRecommendations() {
   state.stage = "results";
-  addAssistantMessage(`
-    <p>Mình đã tìm thấy <strong>3 đề tài phù hợp nhất</strong>. Điểm phù hợp được mô phỏng từ lĩnh vực, kỹ năng và quy mô nhóm bạn đã chọn.</p>
-  `);
+  const meta = state.recommendationMeta;
+  const isFallback = meta?.source === "fallback_rule";
+  const isLowConfidence = meta?.source === "ai" && meta?.confidence === "low";
+
+  let introHtml;
+  if (isFallback) {
+    introHtml = `
+      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong> bằng quy tắc cố định — model AI hiện không phản hồi được (${escapeHtml(meta.error || "lỗi không rõ")}), nên phần xếp hạng và lý do này chưa được model kiểm chứng.</p>
+    `;
+  } else if (isLowConfidence) {
+    introHtml = `
+      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong>, nhưng chưa chắc đây là lựa chọn tốt nhất${meta.overallNote ? `: ${escapeHtml(meta.overallNote)}` : " — hồ sơ chưa cho đủ tín hiệu để phân biệt rõ giữa các đề tài."}</p>
+      <p>Bạn nên đọc kỹ lý do từng đề tài trước khi chọn, hoặc bổ sung thêm kỹ năng cụ thể để mình xếp hạng chính xác hơn.</p>
+    `;
+  } else {
+    introHtml = `
+      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài phù hợp nhất</strong>. Lý do được model AI sinh ra dựa trên hồ sơ và nội dung từng đề tài — bấm vào từng đề tài để xem chi tiết và rủi ro cần lưu ý.</p>
+    `;
+  }
+  addAssistantMessage(introHtml);
 
   const block = document.createElement("div");
   block.className = "interactive-block";
@@ -1226,7 +1347,7 @@ function renderRecommendations() {
           <h3>Đề tài dành cho hồ sơ của bạn</h3>
           <p>Bấm vào từng đề tài để xem cách setup và kế hoạch thực hiện.</p>
         </div>
-        <span class="result-count">TOP 3 / ${state.projects.length} ĐỀ TÀI</span>
+        <span class="result-count">TOP ${state.recommendations.length} / ${state.projects.length} ĐỀ TÀI</span>
       </div>
       <div class="recommendation-list">
         ${state.recommendations.map(recommendationCardTemplate).join("")}
@@ -1262,6 +1383,10 @@ function renderRecommendations() {
 
 function recommendationCardTemplate(project) {
   const tags = getProjectTags(project);
+  const scoreHtml =
+    project.match === null || project.match === undefined
+      ? `<div class="match-score match-score-ai" title="Xếp hạng bởi model AI, không quy đổi thành %">AI</div>`
+      : `<div class="match-score">${project.match}<span>%</span></div>`;
   return `
     <article
       class="recommendation-card"
@@ -1270,7 +1395,7 @@ function recommendationCardTemplate(project) {
       role="button"
       aria-label="Xem đề tài ${escapeHtml(project.ten_de_tai)}"
     >
-      <div class="match-score">${project.match}<span>%</span></div>
+      ${scoreHtml}
       <div class="recommendation-main">
         <div class="recommendation-meta">
           <span>${escapeHtml(project.ma_de)}</span>
@@ -1300,15 +1425,27 @@ function openProjectDetail(project, announce = false) {
         "Có thể tận dụng bộ kỹ năng trong hồ sơ.",
         `Phạm vi có thể chia cho nhóm ${state.teamSize} người.`,
       ];
-
-  refs.detailContent.innerHTML = `
+  const isAiSourced = project.match === null || project.match === undefined;
+  const scoreRowHtml = isAiSourced
+    ? `
+    <div class="drawer-score-row">
+      <span class="drawer-score drawer-score-ai">AI</span>
+      <div>
+        <strong>Xếp hạng bởi model AI</strong>
+        <span>Lý do bên dưới do model sinh ra từ hồ sơ và nội dung đề tài — không phải điểm số cố định.</span>
+      </div>
+    </div>`
+    : `
     <div class="drawer-score-row">
       <span class="drawer-score">${project.match || 88}%</span>
       <div>
         <strong>Mức phù hợp mô phỏng</strong>
         <span>Tính bằng quy tắc cố định từ câu trả lời của bạn.</span>
       </div>
-    </div>
+    </div>`;
+
+  refs.detailContent.innerHTML = `
+    ${scoreRowHtml}
 
     <section class="drawer-section">
       <h3>Vấn đề cần giải quyết</h3>
@@ -1321,6 +1458,16 @@ function openProjectDetail(project, announce = false) {
         ${reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}
       </ul>
     </section>
+
+    ${
+      project.riskNote
+        ? `
+    <section class="drawer-section drawer-section-risk">
+      <h3>Cần lưu ý</h3>
+      <p>${escapeHtml(project.riskNote)}</p>
+    </section>`
+        : ""
+    }
 
     <section class="drawer-section">
       <h3>Setup prototype trong 4 bước</h3>
