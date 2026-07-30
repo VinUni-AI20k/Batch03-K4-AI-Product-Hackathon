@@ -10,6 +10,7 @@ phải tồn tại thật trong danh sách ứng viên. Không neo được → 
 from __future__ import annotations
 
 import datetime as dt
+import time
 from typing import Callable, Literal
 
 from pydantic import BaseModel
@@ -102,30 +103,72 @@ def canh_bao_cu(tin: TinNhan, hom_nay: dt.date | None = None, nguong: int = 7) -
 
 GoiLLM = Callable[[str, list[TinNhan]], KetQua]
 
+# Mã lỗi đáng thử lại: 429 hết hạn mức, 500/503 Google quá tải. Mọi mã khác
+# (400 sai request, 403 sai key) chờ bao lâu cũng không tự khỏi -> ném lên ngay.
+_LOI_TAM_THOI = {429, 500, 503}
 
-def _goi_claude(cau_hoi: str, ung_vien: list[TinNhan]) -> KetQua:
+_GOI_GAN_NHAT = 0.0
+
+
+def _cho_het_gian_cach() -> None:
+    """Giãn nhịp cho free tier — hạn của nó là lời gọi/phút, không phải token.
+
+    Chỉ giãn các lời gọi LIỀN NHAU, nên một câu hỏi lẻ trong Discord không bị chậm
+    (lần gọi trước đã quá lâu). Chỗ bị giãn là chay_eval.py bắn 22 case liên tiếp.
+    """
+    global _GOI_GAN_NHAT
+    cho = config.GIAN_CACH_GOI - (time.monotonic() - _GOI_GAN_NHAT)
+    if cho > 0:
+        time.sleep(cho)
+    _GOI_GAN_NHAT = time.monotonic()
+
+
+def _goi_gemini(cau_hoi: str, ung_vien: list[TinNhan]) -> KetQua:
     """1 lời gọi AI thật ở quyết định trung tâm (rubric R5)."""
-    import anthropic  # import trong hàm -> test không cần cài anthropic
+    from google import genai              # import trong hàm -> test không cần cài SDK
+    from google.genai import errors, types
 
-    config.can_anthropic()
-    client = anthropic.Anthropic()
+    client = genai.Client(api_key=config.can_gemini())
     than = "\n\n".join(t.dong_prompt() for t in ung_vien)
-    resp = client.messages.parse(
-        model=config.MODEL,
-        max_tokens=config.MAX_TOKENS,
-        system=[{                                  # prefix ổn định -> cache được
-            "type": "text",
-            "text": SYSTEM,
-            "cache_control": {"type": "ephemeral"},
-        }],
-        messages=[{
-            "role": "user",
-            "content": f"CÂU HỎI: {cau_hoi}\n\nTIN NHẮN ỨNG VIÊN:\n{than}",
-        }],
-        output_format=KetQua,
+    cau_hinh = types.GenerateContentConfig(
+        system_instruction=SYSTEM,
+        response_mime_type="application/json",
+        response_schema=KetQua,            # Gemini tự ép JSON đúng schema
+        temperature=0,                     # chạy lại lượt eval phải ra cùng kết quả
+        max_output_tokens=config.MAX_TOKENS,
+        # KHÔNG truyền thinking_config: đo tay 30/07 cho thấy tắt thinking thì model
+        # trả 2 message_id cho "slide buổi 5" thay vì chọn bản mới nhất — tức là hỏng
+        # luật 5 trong SYSTEM, đúng rủi ro ④. Thêm ~2s nhưng vẫn dưới mốc <5s ở §7.
+        # Ngoài ra gemini-3.6-flash ném 400 nếu bị truyền thinking_budget=0.
     )
-    print(f"[trace] usage={resp.usage} request_id={resp._request_id}")  # log cho R5
-    return resp.parsed_output
+    noi_dung = f"CÂU HỎI: {cau_hoi}\n\nTIN NHẮN ỨNG VIÊN:\n{than}"
+
+    for lan in range(1, config.SO_LAN_THU + 1):
+        _cho_het_gian_cach()
+        try:
+            resp = client.models.generate_content(
+                model=config.MODEL, contents=noi_dung, config=cau_hinh
+            )
+            break
+        except errors.APIError as e:
+            # 429 = hết hạn mức phút/ngày của free tier. Hết hạn mức NGÀY thì chờ
+            # cũng vô ích, nhưng phân biệt được hai loại thì phải đọc chi tiết lỗi —
+            # cứ thử lại vài lần rồi ném lên, đừng nuốt lỗi thành kết quả sai.
+            # 500/503 = quá tải phía Google, không phải lỗi mình. Bắt cả hai loại vì
+            # một cú 503 ở case thứ 9 làm hỏng cả lượt eval 22 case và không ghi ra
+            # được file kết quả nào — đo lại từ đầu tốn 2,5 phút và 9 lời gọi.
+            ma = getattr(e, "code", None)
+            if ma not in _LOI_TAM_THOI or lan == config.SO_LAN_THU:
+                raise
+            cho = config.GIAN_CACH_GOI * 2**lan
+            print(f"[{ma}] lỗi tạm thời, chờ {cho:.0f}s rồi thử lại (lần {lan})")
+            time.sleep(cho)
+
+    print(f"[trace] usage={resp.usage_metadata} id={resp.response_id}")  # log cho R5
+    kq = resp.parsed
+    if not isinstance(kq, KetQua):         # SDK không parse được -> tự parse từ text
+        kq = KetQua.model_validate_json(resp.text)
+    return kq
 
 
 def tra_cuu(
@@ -152,5 +195,5 @@ def tra_cuu(
             ),
             [],
         )
-    kq = (goi_llm or _goi_claude)(cau_hoi, ung_vien)
+    kq = (goi_llm or _goi_gemini)(cau_hoi, ung_vien)
     return neo(kq, ung_vien)
