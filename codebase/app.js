@@ -1,7 +1,4 @@
-/* =============================================================
-   app.js — VLearn prototype (CP2 · mức Mock, bấm đi hết flow)
-   Mọi câu trả lời của tutor đang là MOCK — xem mục AI_CALL bên dưới.
-   ============================================================= */
+/* VLearn prototype CP3 — UI thật + backend AI cùng origin. */
 'use strict';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -733,36 +730,17 @@ $('#snipAsk').onclick = async () => {
   const relX = Math.round(snip.x);
   const relY = Math.round(snip.y);
 
-  // --- Trích xuất nội dung slide từ PAGES[] data (không cần OCR) ---
-  // PAGES là data structure đã có từ data.js, chứa text thật của từng slide
-  const slideData = (typeof PAGES !== 'undefined') ? PAGES.find(pg => pg.n === p) : null;
+  const pageEl = document.getElementById('pg' + p);
+  const textLayer = pageEl && pageEl.querySelector('.pdf-text-layer');
+  const slideTextContent = textLayer ? (textLayer.textContent || '').trim() : '';
+  const imageDataUrl = captureSnipImage(p);
 
-  let slideTextContent = '';
-  if (slideData) {
-    const parts = [];
-    if (slideData.title)   parts.push(`Tiêu đề: ${slideData.title}`);
-    if (slideData.sub)     parts.push(`Phụ đề: ${slideData.sub}`);
-    if (slideData.quote)   parts.push(`Trích dẫn: ${slideData.quote}`);
-    if (slideData.items)   parts.push(`Nội dung:\n${Array.isArray(slideData.items) ? slideData.items.join('\n') : slideData.items}`);
-    if (slideData.bullets) parts.push(`Bullet points:\n${Array.isArray(slideData.bullets) ? slideData.bullets.join('\n') : slideData.bullets}`);
-    if (slideData.cols)    parts.push(`Cột/Bảng:\n${JSON.stringify(slideData.cols)}`);
-    if (slideData.stats)   parts.push(`Số liệu:\n${JSON.stringify(slideData.stats)}`);
-    if (slideData.lines)   parts.push(`Dòng:\n${Array.isArray(slideData.lines) ? slideData.lines.join('\n') : slideData.lines}`);
-    slideTextContent = parts.join('\n');
-  }
-
-  // Fallback: lấy text từ DOM element nếu không có trong PAGES
-  if (!slideTextContent) {
-    const pageEl = document.getElementById('pg' + p);
-    if (pageEl) slideTextContent = (pageEl.innerText || '').slice(0, 800);
-  }
-
-  S.snap = { page: p, w, h };
+  S.snap = { page: p, w, h, imageDataUrl };
   closeSnip();
   openTutor(true);
   renderAttach();
 
-  // Gửi metadata + slide text thật vào opts để Agent dùng
+  // Gửi pixel crop thật + text layer của đúng trang cho backend.
   send(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, {
     page: p,
     region: true,
@@ -770,9 +748,40 @@ $('#snipAsk').onclick = async () => {
     h,
     x: relX,
     y: relY,
-    slideText: slideTextContent.slice(0, 800)
+    slideText: slideTextContent.slice(0, 5000),
+    imageDataUrl,
   });
 };
+
+function captureSnipImage(page) {
+  const layerRect = snipLayer.getBoundingClientRect();
+  const slide = $(`#pg${page} .slide`);
+  const source = slide && slide.querySelector('.pdf-canvas');
+  if (!source || !source.width || !snip) return null;
+  const slideRect = slide.getBoundingClientRect();
+  const selected = {
+    left: layerRect.left + snip.x,
+    top: layerRect.top + snip.y,
+    right: layerRect.left + snip.x + snip.w,
+    bottom: layerRect.top + snip.y + snip.h,
+  };
+  const left = Math.max(selected.left, slideRect.left);
+  const top = Math.max(selected.top, slideRect.top);
+  const right = Math.min(selected.right, slideRect.right);
+  const bottom = Math.min(selected.bottom, slideRect.bottom);
+  if (right <= left || bottom <= top) return null;
+
+  const sx = (left - slideRect.left) * source.width / slideRect.width;
+  const sy = (top - slideRect.top) * source.height / slideRect.height;
+  const sw = (right - left) * source.width / slideRect.width;
+  const sh = (bottom - top) * source.height / slideRect.height;
+  const scale = Math.min(1, 1200 / Math.max(sw, sh));
+  const output = document.createElement('canvas');
+  output.width = Math.max(1, Math.round(sw * scale));
+  output.height = Math.max(1, Math.round(sh * scale));
+  output.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, output.width, output.height);
+  return output.toDataURL('image/jpeg', .86);
+}
 $('#snipNote').onclick = () => {
   const p = pageUnderSnip();
   const box = { ...snip };
@@ -894,7 +903,7 @@ function mockAnswer(q, opts = {}) {
 /* Discarded duplicate implementation from the conflicted commit.
 // AI_CALL: duplicate implementation from the discarded conflict side.
 async function mockAnswer(q, opts = {}) {
-  const apiKey = localStorage.getItem('deepseek_api_key');
+  const apiKey = null; // legacy implementation is permanently disabled
   if (!apiKey) {
     const s = q.toLowerCase();
     if (opts.region) return withPage(ANSWERS.region, opts.page);
@@ -930,6 +939,27 @@ LUỒNG HOẠT ĐỘNG BẮT BUỘC (EXECUTION FLOW):
   "body": ["Đoạn giải thích 1...", "Đoạn giải thích 2..."],
   "sources": [{"page": 12, "text": "Trích dẫn dòng text thực tế trong bài giảng..."}],
   "kind": "answered"
+}
+
+const MOCK_MODE = new URLSearchParams(location.search).get('mock') === '1';
+
+async function callBackendAgent(question, opts = {}) {
+  const response = await fetch('/api/agent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question,
+      document: DOC.file,
+      page: opts.page || S.page,
+      selected_text: opts.quote || '',
+      slide_text: opts.slideText || '',
+      image_data_url: opts.imageDataUrl || null,
+      region: opts.region ? { x: opts.x, y: opts.y, w: opts.w, h: opts.h } : null,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Backend trả lỗi ${response.status}`);
+  return data;
 }
 *(Nếu từ chối, đặt kind = "refuse", nếu cần làm rõ đặt kind = "clarify")*
 `;
@@ -1242,6 +1272,33 @@ function withPage(a, p) {
   };
 }
 
+// Production path: browser talks only to the same-origin backend.
+const MOCK_MODE = new URLSearchParams(location.search).get('mock') === '1';
+
+async function callBackendAgent(question, opts = {}) {
+  const response = await fetch('/api/agent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question,
+      document: DOC.file,
+      page: opts.page || S.page,
+      selected_text: opts.quote || '',
+      slide_text: opts.slideText || '',
+      image_data_url: opts.imageDataUrl || null,
+      region: opts.region ? { x: opts.x, y: opts.y, w: opts.w, h: opts.h } : null,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Backend trả lỗi ${response.status}`);
+  return data;
+}
+
+// UNUSED LEGACY DIRECT-API IMPLEMENTATION.
+// Kept temporarily for diff archaeology; send() never calls this block.
+// The only supported production path is callBackendAgent() above.
+if (false) {
+
 // Định nghĩa 6 tools gửi lên DeepSeek
 const AGENT_TOOLS = [
   {
@@ -1341,8 +1398,8 @@ function runTool(name, args, q, opts, pageNum) {
 }
 
 // Agent chính: gọi DeepSeek với tool use, max 6 vòng
-async function callDeepSeekAgent(q, opts = {}) {
-  const apiKey = localStorage.getItem('deepseek_api_key');
+async function legacyCallDeepSeekAgent(q, opts = {}) {
+  const apiKey = null; // direct browser-to-provider calls are intentionally disabled
   if (!apiKey) return null; // fallback sang mock
 
   const pageNum = opts.page || S.page;
@@ -1427,6 +1484,7 @@ kind có thể là: answered | clarify | refuse`;
   }
   throw new Error('Agent vượt quá 6 vòng lặp tool call.');
 }
+}
 
 async function send(text, opts = {}) {
   if (S.busy || !text.trim()) return;
@@ -1447,16 +1505,12 @@ async function send(text, opts = {}) {
   try {
     if (failing) throw new Error('simulated network error');
 
-    const hasKey = !!localStorage.getItem('deepseek_api_key');
     let a;
-    if (hasKey) {
-      // Gọi DeepSeek Agent thật
-      a = await callDeepSeekAgent(text, { ...opts, page });
-      if (!a) a = mockAnswer(text, { ...opts, page });
-      else a = withPage(a, page);
-    } else {
+    if (MOCK_MODE) {
       await new Promise(r => setTimeout(r, 900 + Math.random() * 500));
       a = mockAnswer(text, { ...opts, page });
+    } else {
+      a = await callBackendAgent(text, { ...opts, page });
     }
 
     // Xóa typing bubble và hiển thị kết quả
@@ -1494,13 +1548,13 @@ function renderChat() {
       const isCors = (m.errMsg || '').toLowerCase().includes('failed to fetch') || (m.errMsg || '').toLowerCase().includes('network');
       const isSimulated = (m.errMsg || '').includes('simulated');
       let hint = '';
-      if (isCors) hint = `<p style="font-size:11px;color:var(--fg2);margin:4px 0 0">⚠️ Lỗi CORS/mạng — Nếu đang mở file trực tiếp (file://), hãy chạy qua server thay vì double-click. Hoặc cài CORS Unblock extension cho Chrome.</p>`;
+      if (isCors) hint = `<p style="font-size:11px;color:var(--fg2);margin:4px 0 0">Hãy chạy ứng dụng bằng <code>python3 codebase/server.py</code>, không mở file HTML trực tiếp.</p>`;
       else if (m.errMsg && !isSimulated) hint = `<p style="font-size:11px;color:var(--fg2);margin:4px 0 0">Chi tiết: ${esc(m.errMsg)}</p>`;
       const label = isSimulated ? 'Mô phỏng lỗi mạng' : isCors ? 'Lỗi kết nối' : 'Lỗi Agent';
       return `<div class="msg-ai">
         <div class="ai-meta"><span class="state err">${label}</span></div>
         <div class="bubble"><p>Không gọi được trợ lý. Câu hỏi của bạn vẫn được giữ nguyên.</p>${hint}
-        <div class="chips"><button class="qchip" data-retry="${i}">${t('retry')}</button><button class="qchip" onclick="openKeyModal()">🔑 Kiểm tra API Key</button></div></div></div>`;
+        <div class="chips"><button class="qchip" data-retry="${i}">${t('retry')}</button><button class="qchip" data-ai-status>Kiểm tra cấu hình AI</button></div></div></div>`;
     }
     const a = m.data;
     const isClarify = a.kind === 'clarify', isRefuse = a.kind === 'refuse', low = a.conf > 0 && a.conf < 60;
@@ -1567,6 +1621,7 @@ function wireChat() {
     b.classList.add('on');
     toast(dir === 'up' ? 'ok' : 'warn', dir === 'up' ? 'Cảm ơn phản hồi!' : 'Đã ghi nhận — câu này sẽ được TA rà lại');
   });
+  $$('#chat [data-ai-status]').forEach(b => b.onclick = showAiStatus);
 }
 
 function renderAttach() {
@@ -1674,7 +1729,7 @@ $$('#moreMenu button').forEach(b => b.onclick = () => {
   else if (a === 'info') openModal('Thông tin tài liệu',
     `<p><b>Tên file:</b> ${DOC.file}<br><b>Môn:</b> ${DOC.course}<br><b>Mã tài liệu:</b> ${DOC.code}<br>
      <b>Số trang:</b> ${DOC.totalPages}<br><b>Giảng viên:</b> ${DOC.instructor}</p>
-     <p><b>Mức prototype:</b> Mock — nội dung slide và câu trả lời tutor đều là dữ liệu giả.</p>`);
+     <p><b>Mức prototype:</b> CP3 — PDF thật, backend AI thật; chỉ dùng mock khi URL có <code>?mock=1</code>.</p>`);
   else if (a === 'report') openModal('Báo lỗi tài liệu',
     `<textarea class="note-input" placeholder="Mô tả lỗi bạn gặp ở trang ${S.page}..."></textarea>`,
     `<button class="btn" data-close>${t('cancel')}</button><button class="btn primary" data-close>Gửi</button>`);
@@ -1725,36 +1780,38 @@ $('#btnClear').onclick = () => {
 $('#tglSidebar').onclick = () => $('#workspace').classList.toggle('side-off');
 $('#tglTutor').onclick = () => openTutor(false);
 
-// Nút cấu hình DeepSeek API Key (ẩn trong header, trigger qua phím tắt K hoặc footer)
-document.addEventListener('keydown', e => {
-  if (e.key === 'k' && !e.ctrlKey && !e.metaKey && !e.target.matches('input,textarea')) openKeyModal();
-});
-
-function updateAiBadge() {
+async function updateAiBadge() {
   const badge = document.getElementById('aiModeBadge');
   if (!badge) return;
-  const hasKey = !!localStorage.getItem('deepseek_api_key');
-  badge.textContent = hasKey ? '🤖 AI thật' : '🔵 Mock';
-  badge.style.background = hasKey ? 'var(--accent)' : 'var(--border)';
-  badge.style.color = hasKey ? '#fff' : 'var(--fg2)';
+  if (MOCK_MODE) {
+    badge.textContent = '🔵 MOCK CÓ CHỦ ĐÍCH';
+    badge.style.background = 'var(--border)';
+    badge.style.color = 'var(--fg2)';
+    return;
+  }
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    const state = await response.json();
+    badge.textContent = state.ai_configured ? '🤖 AI THẬT' : '⚠ CHƯA CÓ KEY';
+    badge.style.background = state.ai_configured ? 'var(--accent)' : 'var(--warn)';
+    badge.style.color = '#fff';
+    badge.dataset.health = JSON.stringify(state);
+  } catch (_) {
+    badge.textContent = '⚠ BACKEND OFFLINE';
+    badge.style.background = 'var(--danger)';
+    badge.style.color = '#fff';
+  }
 }
 
-function openKeyModal() {
-  const cur = localStorage.getItem('deepseek_api_key') || '';
-  openModal('🔑 Cấu hình DeepSeek API Key',
-    `<p style="margin:0 0 10px">API Key được lưu tại localStorage của trình duyệt, <b>không gửi về server</b>.</p>
-     <input type="password" id="dsKeyInput" class="note-input" placeholder="sk-..." value="${cur}" style="width:100%;box-sizing:border-box;font-family:monospace">
-     <p style="margin:8px 0 0;font-size:12px;color:var(--fg2)">Để trống → dùng dữ liệu giả lập (mock). Có key → gọi DeepSeek API thật.</p>`,
-    `<button class="btn" data-close>Huỷ</button><button class="btn primary" id="saveKeyBtn">Lưu Key</button>`
-  );
-  document.getElementById('saveKeyBtn').onclick = () => {
-    const v = document.getElementById('dsKeyInput').value.trim();
-    if (v) { localStorage.setItem('deepseek_api_key', v); toast('ok', '✅ Đã lưu API Key — sẽ gọi DeepSeek AI thật!'); }
-    else { localStorage.removeItem('deepseek_api_key'); toast('warn', '🔵 Đã xóa Key — chuyển sang mock data.'); }
-    updateAiBadge();
-    closeModal();
-  };
+async function showAiStatus() {
+  await updateAiBadge();
+  const badge = $('#aiModeBadge');
+  const state = badge.dataset.health ? JSON.parse(badge.dataset.health) : null;
+  openModal('Trạng thái AI', state
+    ? `<p><b>Text AI:</b> ${state.ai_configured ? 'đã cấu hình' : 'chưa cấu hình'}<br><b>Vision AI:</b> ${state.vision_configured ? 'đã cấu hình' : 'chưa cấu hình'}<br><b>Model:</b> ${esc(state.model)}</p><p>API key chỉ nằm trong biến môi trường phía server.</p>`
+    : '<p>Không kết nối được backend. Chạy <code>python3 codebase/server.py</code>.</p>');
 }
+$('#aiModeBadge').onclick = showAiStatus;
 
 $('#btnTheme').onclick = () => {
   const dark = document.documentElement.dataset.theme === 'dark';
@@ -1781,6 +1838,7 @@ $('#btnSend').onclick = () => {
   i.value = '';
 };
 $('#ask').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnSend').click(); });
+$('#btnSummary').onclick = () => send('Tóm tắt toàn bộ tài liệu này thành 5 gạch đầu dòng, ưu tiên các ý cần nhớ để ôn tập.', { page: S.page });
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
@@ -1800,15 +1858,9 @@ document.addEventListener('keydown', e => {
 renderChapters();
 renderSwatches();
 setPenSize(S.penSize, true);
-S.chat = SEED_CHAT.map(m => m.role === 'user'
-  ? { role: 'user', text: m.text, ctxPage: m.ctxPage }
-  : { role: 'ai', data: ANSWERS[m.key], ctxPage: m.ctxPage });
+S.chat = [];
 renderChat();
 applyLang();
 applyZoom();
 updateAiBadge();
-setTimeout(() => {
-  const hasKey = !!localStorage.getItem('deepseek_api_key');
-  if (hasKey) toast('ok', '🤖 DeepSeek AI Agent đã sẵn sàng! Nhấn K để đổi API Key.');
-  else toast('warn', 'Mock mode — Nhấn phím K để nhập DeepSeek API Key và bật AI thật.');
-}, 600);
+loadDocument(DOC.file);

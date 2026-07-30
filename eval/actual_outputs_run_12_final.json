@@ -1,0 +1,822 @@
+[
+  {
+    "id": "GS-01",
+    "category": "normal",
+    "source_ref": "chatlog:T0905 (adapted to the available Day 01 deck)",
+    "question": "Tóm tắt toàn bộ Day 01 thành 5 ý quan trọng nhất để ôn tập.",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "AI, ML, Deep Learning, GenAI, LLM có quan hệ bao hàm từ rộng đến hẹp; LLM là tầng nền của hầu hết trải nghiệm AI hiện nay [tr. 3].",
+        "Các mốc lịch sử then chốt: Hệ chuyên gia (1980) [tr. 6], ImageNet (2009) [tr. 7], Transformer (2017) [tr. 8], ChatGPT (2022) [tr. 9].",
+        "LLM hoạt động qua token (mảnh chữ), context (bàn làm việc có hạn), attention (cơ chế nhìn sang từ quan trọng), sinh văn bản vòng lặp predict-append-rerun [tr. 11-16].",
+        "Quy trình tạo LLM gồm: Pre-training, SFT, RLHF/DPO, và luyện suy luận (từ 2025) [tr. 18-19].",
+        "Từ LLM đến Agent theo 4 mức độ (Level 0-3); Agent gồm 5 bộ phận: Goal, Reasoning, Tools, Memory, Action [tr. 23-24]. Chọn model theo tầng (Frontier → Rẻ mạnh → Self-host), chú ý chi phí token (input rẻ, output đắt) [tr. 26-27]."
+      ],
+      "sources": [
+        {
+          "page": 3,
+          "text": "AI, ML, Deep Learning, GenAI, LLM — nằm ở đâu trong cùng một hệ?"
+        },
+        {
+          "page": 6,
+          "text": "1980: Hệ chuyên gia (expert system)"
+        },
+        {
+          "page": 7,
+          "text": "2009: Fei-Fei Li và ImageNet"
+        },
+        {
+          "page": 8,
+          "text": "2017: Transformer"
+        },
+        {
+          "page": 9,
+          "text": "2022: ChatGPT"
+        },
+        {
+          "page": 11,
+          "text": "Bên trong Transformer: đầu ra luôn là một phân bố xác suất"
+        },
+        {
+          "page": 12,
+          "text": "Sinh văn bản = đoán → nối vào câu → đoán tiếp"
+        },
+        {
+          "page": 13,
+          "text": "Token: model không đọc \"từ\", model đọc mảnh chữ"
+        }
+      ],
+      "trace": {
+        "request_id": "3ff77e14-87e5-435b-8320-c536558648b1",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-02",
+    "category": "normal",
+    "source_ref": "chatlog:T0649 (summary intent adapted to Day 02)",
+    "question": "Tóm tắt toàn bộ Day 02 cho một product manager, tối đa 5 gạch đầu dòng.",
+    "answer": {
+      "conf": 90,
+      "kind": "answered",
+      "body": [
+        "1. Áp dụng Double Diamond để tìm đúng vấn đề: ‘Discover’ mở rộng khảo sát, ‘Define’ thu hẹp bài toán gốc [trang 3].",
+        "2. Problem Statement hoàn chỉnh gồm 9 trường: Actor, Workflow, Bottleneck, Impact, Success Metric, Boundary và Decision Point, Decision Level, Risk & HITL [trang 27].",
+        "3. Dùng khung PAIR để quyết định: bước 1 – có thực sự cần AI?, bước 2 – Automate hay Augment?, bước 3 – Reward function (đánh đổi precision ↔ recall), tổng hợp → Go / Not Yet / No-Go [trang 13, 28].",
+        "4. Chọn giải pháp theo thứ tự ưu tiên: Rule (if/else), Workflow (quy trình có LLM), Agent (tự động hóa nhiều bước) – giữ đơn giản nhất có thể [trang 18, 21].",
+        "5. Định lượng hóa mọi pain point: baseline (hiện trạng), target (mục tiêu), measurement (chỉ số cụ thể); viết success criteria theo mẫu ‘if [metric] drops below [threshold], we will [action]’ [trang 11, 24]."
+      ],
+      "sources": [
+        {
+          "page": 3,
+          "text": "DIAMOND 1 — TÌM ĐÚNG VẤN ĐỀ Discover: Mở rộng — khảo sát vấn đề căn bản. Define: Thu hẹp — xác định đúng bài toán gốc."
+        },
+        {
+          "page": 27,
+          "text": "6 YẾU TỐ BÀI TOÁN CỐT LÕI Actor đối tượng ảnh hưởng Đối tượng trực tiếp chịu ảnh hưởng bởi vấn đề. Workflow quy trình hiện tại Quy trình vận hành hiện tại gồm các bước cụ thể nào? Bottleneck nút thắt Khâu nào gặp tình tr"
+        },
+        {
+          "page": 13,
+          "text": "BƯỚC ① Giao điểm: nhu cầu × thế mạnh AI Bài toán của bạn có nằm trong nhóm việc AI làm tốt hơn hẳn rule/heuristic không? VD: câu hỏi trùng lặp của 1000 học viên K3 & K4 có nằm trong thế mạnh của AI? → trả lời câu hỏi 1: "
+        },
+        {
+          "page": 18,
+          "text": "CẤP ĐỘ 1 Rule / Script · Đầu vào ổn định, ít thay đổi · Logic viết được thành if/else · Cần kết quả luôn đúng 100% · Quy định pháp lý / tuân thủ chặt Ví dụ: Tính thuế · chặn email spam theo từ khóa · auto-reply theo temp"
+        },
+        {
+          "page": 11,
+          "text": "01 · BASELINE Hiện trạng / where we are Mức hao phí hiện tại là bao nhiêu? Bằng con số cụ thể. 02 · TARGET Mục tiêu / where to go Kỳ vọng cải thiện ở mức độ nào? Ngưỡng cụ thể là gì? 03 · MEASUREMENT Đo lường / how we kn"
+        },
+        {
+          "page": 24,
+          "text": "TEMPLATE CỦA PAIR If {chỉ số cụ thể} for {tính năng AI} {drops below / goes above} {ngưỡng có nghĩa}, we will {hành động cụ thể}. VÍ DỤ ĐIỀN SẴN — CASE TA 1000 HỌC VIÊN Nếu tỷ lệ câu trả lời AI gợi ý bị TA sửa > 30% "
+        }
+      ],
+      "trace": {
+        "request_id": "141e2250-bca1-48c3-9472-1ed0005659a6",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-03",
+    "category": "normal",
+    "source_ref": "chatlog:T0076",
+    "question": "Giải thích đoạn bôi đen này bằng ví dụ tiếng Việt dễ hiểu.",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "Ví dụ: Câu 'Xin chào' trong tiếng Việt có thể bị tokenizer cắt thành 3–4 token, như 'Xin', ' ch', 'ào' (dấu cách và dấu thanh tách riêng). Trong khi 'Hello world' tiếng Anh chỉ gồm 2 token. Điều này cho thấy model không đọc nguyên từ mà đọc các mảnh chữ nhỏ gọi là token."
+      ],
+      "sources": [
+        {
+          "page": 13,
+          "text": "Token: model không đọc \"từ\", model đọc mảnh chữ Model không nhìn từ nguyên vẹn. Nó cắt văn bản thành các mảnh nhỏ gọi là token: có từ là một mảnh, có từ vỡ ba bốn mảnh, cả dấu câu và khoảng trắng cũng là mảnh. Ví dụ: \"He"
+        }
+      ],
+      "trace": {
+        "request_id": "cf7d05cf-cd8e-4fcd-83b2-67fa3569e51f",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-04",
+    "category": "normal",
+    "source_ref": "chatlog:T0290 (solution-level question adapted to current deck)",
+    "question": "Khi nào nên Automate và khi nào nên Augment?",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "Chọn Automate (AI làm thay) khi: việc khó, nhàm chán, nguy hiểm hoặc cần scale; người dùng thiếu kiến thức/khả năng tự làm; có 'đáp án đúng' đồng thuận. Đo bằng hiệu quả tăng, an toàn hơn, giảm việc tẻ nhạt. [trang 17]",
+        "Chọn Augment (AI hỗ trợ con người) khi: người dùng thích tự làm; stakes cao (tiền bạc, pháp lý, sức khỏe); kết quả cần trách nhiệm cá nhân/social capital; sở thích khó diễn đạt. Đo bằng mức độ thích thú, cảm giác kiểm soát, sáng tạo tăng. [trang 17]",
+        "Quyết định theo từng tác vụ (bước ② của PAIR). Dù automate vẫn cần human oversight (preview, edit, undo). [trang 17]",
+        "Automate/Augment (vai trò con người) khác với cấp độ kỹ thuật Rule/Workflow/Agent. [trang 18]"
+      ],
+      "sources": [
+        {
+          "page": 17,
+          "text": "AUTOMATE AI làm thay Chọn khi: · Việc khó, nhàm chán, nguy hiểm hoặc cần scale · Người dùng thiếu kiến thức / khả năng tự làm · Có \"đáp án đúng\" mà mọi người cùng đồng thuận Đo thành công bằng: hiệu quả tăng · an toàn hơ"
+        },
+        {
+          "page": 17,
+          "text": "AUTOMATE AI làm thay Chọn khi: · Việc khó, nhàm chán, nguy hiểm hoặc cần scale · Người dùng thiếu kiến thức / khả năng tự làm · Có \"đáp án đúng\" mà mọi người cùng đồng thuận Đo thành công bằng: hiệu quả tăng · an toàn hơ"
+        },
+        {
+          "page": 18,
+          "text": "CẤP ĐỘ 1 Rule / Script · Đầu vào ổn định, ít thay đổi · Logic viết được thành if/else · Cần kết quả luôn đúng 100% · Quy định pháp lý / tuân thủ chặt Ví dụ: Tính thuế · chặn email spam theo từ khóa · auto-reply theo temp"
+        }
+      ],
+      "trace": {
+        "request_id": "8a28a0f5-6810-45c2-8e4f-b01d2d7eb721",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-05",
+    "category": "normal",
+    "source_ref": "chatlog:T0193 (MoE question adapted from page 37 to the available page 17)",
+    "question": "Giải thích hình so sánh bác sĩ đa năng và bệnh viện đa khoa.",
+    "answer": {
+      "conf": 100,
+      "kind": "answered",
+      "body": [
+        "Hình ảnh so sánh giữa \"bác sĩ đa năng\" và \"bệnh viện đa khoa\" được dùng để minh họa sự khác biệt về kiến trúc xử lý token giữa các model LLM: \n\n- **Bác sĩ đa năng (ví dụ GPT-3 năm 2020 với 175 tỷ tham số):** Đại diện cho kiến trúc dense, trong đó mọi token đều phải đi qua toàn bộ khớp nối [trang 17].\n- **Bệnh viện đa khoa (ví dụ Kimi K3 năm 2026 với 2.800 tỷ tham số):** Đại diện cho kiến trúc MoE, trong đó mỗi token chỉ gọi vài chuyên gia [trang 17].\n\nNhờ kiến trúc MoE, dù \"bệnh viện\" có quy mô lớn gấp 16 lần nhưng chi phí cho mỗi ca khám gần như không thay đổi, cho thấy việc tăng số lượng tham số không gây tốn kém theo tỷ lệ tuyến tính [trang 17]."
+      ],
+      "sources": [
+        {
+          "page": 17,
+          "text": "2020  GPT3 175 tỷ một \"bác sĩ đa năng\" — mọi token đều đi qua toàn bộ khớp nối (dense) 2026  Kimi K3 2.800 tỷ một \"bệnh viện đa khoa\" — mỗi token chỉ gọi vài chuyên gia MoE compute / dữ liệu (thang log) → test loss "
+        }
+      ],
+      "trace": {
+        "request_id": "gen-1785426662-l0lxYlx1GqvzXieaUc2k",
+        "model": "google/gemma-4-31b-it"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [
+        "compute"
+      ],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-06",
+    "category": "normal",
+    "source_ref": "chatlog:T0367",
+    "question": "Sơ đồ cây quyết định này giúp tránh overkill như thế nào?",
+    "answer": {
+      "conf": 100,
+      "kind": "answered",
+      "body": [
+        "Sơ đồ cây quyết định giúp tránh overkill (độ phức tạp không cần thiết) bằng cách vận hành theo cơ chế đi từ trên xuống, trong đó mỗi nhánh \"KHÔNG\" là một lần tránh được độ phức tạp không cần thiết [trang 21]. Cụ thể, sơ đồ này hỗ trợ lựa chọn cấp độ giải pháp phù hợp (Rule, Workflow hay Agent) dựa trên bài toán cốt lõi [trang 21]. Điều này nhất quán với nguyên tắc cốt lõi rằng độ phức tạp kỹ thuật không đồng nghĩa với hiệu quả tối ưu, và Rule, Workflow, Agent là ba cấp độ khác nhau [trang 29]."
+      ],
+      "sources": [
+        {
+          "page": 21,
+          "text": "Cây quyết định: Lựa chọn cấp độ giải pháp — Từ bài toán cốt lõi đến lựa chọn Rule, Workflow hay Agent Đi từ trên xuống — mỗi nhánh \"KHÔNG\" là một lần tránh được độ phức tạp không cần thiết."
+        },
+        {
+          "page": 29,
+          "text": "Phức tạp không đồng nghĩa với hiệu quả. Rule, Workflow và Agent là ba cấp độ khác nhau; độ phức tạp kỹ thuật không đồng nghĩa với hiệu quả tối ưu."
+        }
+      ],
+      "trace": {
+        "request_id": "gen-1785426678-jRZ9RfUYmpPcMNZ4U2r8",
+        "model": "google/gemma-4-31b-it"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-07",
+    "category": "normal",
+    "source_ref": "chatlog:T0990",
+    "question": "Context là gì và vì sao có giới hạn?",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "Context là “bàn làm việc có hạn của model” – lượng chữ tối đa mà model có thể “thấy” trong một lần trả lời [trang 14].",
+        "Context có giới hạn vì: (1) càng dài càng tốn tiền và chậm; (2) thông tin ở giữa dễ bị bỏ sót (hiện tượng “Lost in the Middle”) [trang 14]; (3) đây là giới hạn bẩm sinh của cỗ máy đoán token, không phải lỗi tạm thời [trang 20]. Attention cũng có hạn và có “điểm mù” [trang 16]."
+      ],
+      "sources": [
+        {
+          "page": 14,
+          "text": "Context: bàn làm việc có hạn của model Mỗi lần trả lời, model chỉ nhìn được một lượng chữ có hạn — gọi là context. Hãy hình dung một bàn làm việc: mọi thứ muốn model \"thấy\" phải bày lên bàn. Quy đổi: 128K token ≈ một cuố"
+        },
+        {
+          "page": 14,
+          "text": "Context: bàn làm việc có hạn của model Mỗi lần trả lời, model chỉ nhìn được một lượng chữ có hạn — gọi là context. Hãy hình dung một bàn làm việc: mọi thứ muốn model \"thấy\" phải bày lên bàn. Quy đổi: 128K token ≈ một cuố"
+        },
+        {
+          "page": 20,
+          "text": "Giới hạn bẩm sinh: học giả trong bong bóng Đây không phải lỗi tạm thời — đó là bản chất của cỗ máy đoán token."
+        },
+        {
+          "page": 16,
+          "text": "Attention có hạn và có \"điểm mù\"."
+        }
+      ],
+      "trace": {
+        "request_id": "3853a48f-033e-4b5e-afeb-ffa8f6c2a8bc",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-08",
+    "category": "normal",
+    "source_ref": "chatlog:T0487",
+    "question": "Problem Statement 6+3 gồm những trường nào?",
+    "answer": {
+      "conf": 100,
+      "kind": "answered",
+      "body": [
+        "Problem Statement 6+3 gồm 6 yếu tố bài toán cốt lõi và 3 yếu tố quyết định AI, tổng cộng 9 trường. Cụ thể:\n- 6 yếu tố cốt lõi: Actor (đối tượng ảnh hưởng), Workflow (quy trình hiện tại), Bottleneck (nút thắt), Impact (tác động), Success Metric (chỉ số thành công), Boundary (ranh giới AI).\n- 3 yếu tố quyết định AI: Điểm AI can thiệp (decision entry), Mức chọn (decision level: Rule / Workflow / Agent), Rủi ro & HITL (decision safety).\n[trang 27]"
+      ],
+      "sources": [
+        {
+          "page": 27,
+          "text": "6 YẾU TỐ BÀI TOÁN CỐT LÕI Actor đối tượng ảnh hưởng Đối tượng trực tiếp chịu ảnh hưởng bởi vấn đề. Workflow quy trình hiện tại Quy trình vận hành hiện tại gồm các bước cụ thể nào? Bottleneck nút thắt Khâu nào gặp tình tr"
+        },
+        {
+          "page": 26,
+          "text": "01 · INPUT Problem Statement 9 trường đã hoàn chỉnh — từ Actor, Workflow, Bottleneck đến Boundary & HITL."
+        }
+      ],
+      "trace": {
+        "request_id": "81cc62a6-f721-4ead-9d97-c1f98914f05f",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-09",
+    "category": "hard_source_of_truth",
+    "source_ref": "synthetic boundary derived from the 29-page PDF",
+    "question": "Tóm tắt trang 80 của Day 01.",
+    "answer": {
+      "conf": 100,
+      "kind": "clarify",
+      "body": [
+        "Trang 80 không tồn tại trong d1-slide-hackathon.pdf; tài liệu này có 29 trang."
+      ],
+      "sources": [],
+      "trace": {
+        "request_id": null,
+        "model": null
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-10",
+    "category": "hard_source_of_truth",
+    "source_ref": "synthetic unsupported-topic case",
+    "question": "Trình bày chi tiết quy trình fine-tuning được dạy trong Day 02.",
+    "answer": {
+      "conf": 100,
+      "kind": "clarify",
+      "body": [
+        "Tài liệu được cung cấp không có nội dung về quy trình fine-tuning. Các chủ đề được đề cập trong Day 02 bao gồm xác định bài toán, Problem Statement, khung quyết định Go / Not Yet / No-Go, sáu nguyên tắc cốt lõi, và khoảng cách giữa demo và production. Không có bất kỳ thông tin nào về fine-tuning."
+      ],
+      "sources": [
+        {
+          "page": 1,
+          "text": "AI IN ACTION · DAY 02 Xác định bài toán cho AI. Từ yêu cầu mơ hồ đến Problem Statement rõ ràng."
+        },
+        {
+          "page": 28,
+          "text": "Khung ra quyết định: Go / Not Yet / No-Go — Lập luận dựa trên tính khả thi của Problem Statement"
+        },
+        {
+          "page": 29,
+          "text": "Sáu nguyên tắc cốt lõi sau Day 02 — Kim chỉ nam để thẩm định mọi đề xuất ứng dụng AI"
+        },
+        {
+          "page": 27,
+          "text": "Problem Statement cho hệ thống AI — 6 yếu tố bài toán cốt lõi và 3 yếu tố quyết định AI"
+        },
+        {
+          "page": 25,
+          "text": "Khoảng cách giữa Demo và Production — Phản hồi chính xác trong vài lần thử chưa đủ cơ sở để triển khai hệ thống thực tế"
+        }
+      ],
+      "trace": {
+        "request_id": "61569441-8b2a-41f3-8e22-99768f8e9a5d",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-11",
+    "category": "hard_ambiguity",
+    "source_ref": "chatlog:T0950",
+    "question": "Giải thích sơ đồ này.",
+    "answer": {
+      "conf": 100,
+      "kind": "clarify",
+      "body": [
+        "Mình chưa nhìn thấy vùng cần giải thích, hoặc vùng chọn quá nhỏ. Hãy chụp lại vùng rộng hơn và gồm cả tiêu đề/chú thích."
+      ],
+      "sources": [],
+      "trace": {
+        "request_id": null,
+        "model": null
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-12",
+    "category": "hard_ambiguity",
+    "source_ref": "chatlog:T1254",
+    "question": "Giải thích phần khoanh này.",
+    "answer": {
+      "conf": 100,
+      "kind": "clarify",
+      "body": [
+        "Mình chưa nhìn thấy vùng cần giải thích, hoặc vùng chọn quá nhỏ. Hãy chụp lại vùng rộng hơn và gồm cả tiêu đề/chú thích."
+      ],
+      "sources": [],
+      "trace": {
+        "request_id": null,
+        "model": null
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-13",
+    "category": "hard_out_of_scope",
+    "source_ref": "synthetic logistics boundary",
+    "question": "Link nộp bài hôm nay ở đâu và deadline mấy giờ?",
+    "answer": {
+      "conf": 100,
+      "kind": "refuse",
+      "body": [
+        "Yêu cầu này nằm ngoài phạm vi học liệu. Với deadline hoặc link nộp, hãy kiểm tra LMS/Discord chính thức; mình sẽ không đoán."
+      ],
+      "sources": [],
+      "trace": {
+        "request_id": null,
+        "model": null
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-14",
+    "category": "hard_out_of_scope",
+    "source_ref": "synthetic scope boundary",
+    "question": "Viết hộ tôi code game Flappy Bird bằng pygame.",
+    "answer": {
+      "conf": 100,
+      "kind": "refuse",
+      "body": [
+        "Yêu cầu này nằm ngoài phạm vi học liệu. Với deadline hoặc link nộp, hãy kiểm tra LMS/Discord chính thức; mình sẽ không đoán."
+      ],
+      "sources": [],
+      "trace": {
+        "request_id": null,
+        "model": null
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-15",
+    "category": "hard_domain_specificity",
+    "source_ref": "chatlog:T0984",
+    "question": "Giải thích attention trong hình theo đúng mức khái niệm của slide, không thêm công thức.",
+    "answer": {
+      "conf": 100,
+      "kind": "answered",
+      "body": [
+        "Cơ chế attention cho phép mỗi token thay vì đọc tuần tự từng chữ sẽ thực hiện các hoạt động sau: \n- Chủ động \"quay đầu\" để nhìn lại các token trước đó trong câu [trang 15].\n- Chấm điểm mức độ liên quan của từng token đối với nghĩa của chính nó [trang 15].\n- Khóa nghĩa theo ngữ cảnh (ví dụ: từ \"nó\" sẽ là quyển sách hay cái túi tùy thuộc vào việc nó chú ý vào từ nào) [trang 15].\n\nĐây chính là chữ T trong GPT và là lý do giúp model hiểu ngữ cảnh tốt hơn nhiều so với các thế hệ trước [trang 15]."
+      ],
+      "sources": [
+        {
+          "page": 15,
+          "text": "Attention: mỗi từ được “nhìn sangˮ những từ quan trọng khác Thay vì đọc tuần tự từng chữ, cơ chế attention cho phép mỗi token: Chủ động “quay đầuˮ nhìn lại các token trước đó trong câu Chấm điểm mức độ liên quan của từng token đối với nghĩa của mình Khóa nghĩa theo ngữ cảnh — “nóˮ là quyển sách hay cái túi, tùy theo nó chú ý vào từ nào Đây chính là chữ T trong GPT — và là lý do model hiểu ngữ cảnh tốt hơn hẳn các thế hệ trước"
+        }
+      ],
+      "trace": {
+        "request_id": "gen-1785426702-LZ73n9LgVNa5jhxD7I5S",
+        "model": "google/gemma-4-31b-it"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-16",
+    "category": "hard_domain_specificity",
+    "source_ref": "synthetic domain-risk case grounded in page 23",
+    "question": "Giải thích trade-off precision/recall trong hình và hệ quả với học viên cần giúp.",
+    "answer": {
+      "conf": 100,
+      "kind": "answered",
+      "body": [
+        "Trade-off giữa precision và recall là sự đánh đổi không tránh khỏi đối với cùng một hệ thống AI, khi việc tăng chỉ số này sẽ khiến chất lượng chỉ số kia xấu đi [trang 23].\n\nChi tiết về hai hướng đánh đổi và hệ quả đối với học viên cần giúp như sau:\n\n*   **Khi ưu tiên precision cao (TP / (TP + FP)):**\n    *   Đặc điểm: Hệ thống đưa ra ít gợi ý nhưng các gợi ý này chắc chắn đúng, giúp người dùng tin tưởng vào từng gợi ý nhận được [trang 23].\n    *   Hệ quả: Xảy ra nhiều False Negative, dẫn đến việc bỏ sót những học viên đang thực sự cần giúp đỡ [trang 23].\n\n*   **Khi ưu tiên recall cao (TP / (TP + FN)):**\n    *   Đặc điểm: Hệ thống bao trọn mọi trường hợp cần giúp, đảm bảo không học viên nào bị bỏ lại phía sau [trang 23].\n    *   Hệ quả: Xảy ra nhiều False Positive, khiến hệ thống gợi ý sai nhiều và TA (Teaching Assistant) phải thực hiện lọc lại thủ công [trang 23].\n\nVì không có cấu hình đúng tuyệt đối, điểm cân bằng này cần được test với chính người dùng [trang 23]."
+      ],
+      "sources": [
+        {
+          "page": 23,
+          "text": "PRECISION CAO TP / (TP + FP) Ít gợi ý — nhưng gợi ý nào cũng chắc đúng. Người dùng tin vào từng gợi ý nhận được. HỆ QUẢ Nhiều False Negative — bỏ sót học viên đang thực sự cần giúp. ⇄ ĐÒN BẨY Vặn nút bên này lên, chất lư"
+        }
+      ],
+      "trace": {
+        "request_id": "gen-1785426710-Z9Hrs2FbkloYWnL9DOgP",
+        "model": "google/gemma-4-31b-it"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-17",
+    "category": "rare",
+    "source_ref": "chatlog:T1201 (summary intent with stricter format)",
+    "question": "Tóm tắt toàn bộ Day 01 bằng đúng 3 gạch đầu dòng ngắn.",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "Buổi học giới thiệu các tầng AI (ML, DL, GenAI, LLM) và lịch sử 70 năm, nhấn mạnh Transformer là nền tảng LLM, với các khái niệm token, context và attention [tr.3][tr.8][tr.13-15].",
+        "LLM hoạt động như 'bộ não' đoán token, trải qua 4 bước huấn luyện (pre-training, SFT, RLHF, reasoning training) và có giới hạn bẩm sinh như hallucination, context có hạn và 'quên phần giữa' [tr.18-20].",
+        "Từ LLM đến agent có 4 mức (Level 0-3), hướng dẫn chọn model theo tầng (frontier, rẻ-mạnh, self-host), kiểm soát chi phí token, và cấu trúc prompt 4 lớp cùng núm vặn temperature/top_p [tr.23][tr.26-29]."
+      ],
+      "sources": [
+        {
+          "page": 3,
+          "text": "AI, ML, Deep Learning, GenAI, LLM — nằm ở đâu trong cùng một hệ?"
+        },
+        {
+          "page": 8,
+          "text": "2017: Transformer Transformer là bước ngoặt vì nó cho mô hình hiểu ngôn ngữ theo cách linh hoạt hơn: mỗi từ có thể nhìn sang những từ quan trọng khác trong cả câu, thay vì chỉ đi tuần tự từng bước → trở thành nền móng kỹ"
+        },
+        {
+          "page": 13,
+          "text": "Token: model không đọc \"từ\", model đọc mảnh chữ"
+        },
+        {
+          "page": 14,
+          "text": "Context: bàn làm việc có hạn của model"
+        },
+        {
+          "page": 15,
+          "text": "Attention: mỗi từ được “nhìn sangˮ những từ quan trọng khác Thay vì đọc tuần tự từng chữ, cơ chế attention cho phép mỗi token: Chủ động “quay đầuˮ nhìn lại các token trước đó trong câu Chấm điểm mức độ liên quan của từng"
+        },
+        {
+          "page": 18,
+          "text": "LLM được tạo ra như thế nào? — đọc nhiều, được chỉ, được uốn nắn, luyện đề"
+        },
+        {
+          "page": 19,
+          "text": "RLHF: ba bước uốn cỗ máy đoán token thành trợ lý biết nghe lời"
+        },
+        {
+          "page": 20,
+          "text": "Bong bóng thời gian Model bị \"đóng băng\" tại ngày ngừng đọc. Chuyện sau đó nó không biết — trừ khi bạn cung cấp thêm (knowledge cutoff). Nói chắc như đúng rồi Model tối ưu cho câu nghe hợp lý, không phải tra sự thật — nê"
+        }
+      ],
+      "trace": {
+        "request_id": "198aa923-168a-419f-a386-cca3e0c2e2f0",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": false,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": false,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-18",
+    "category": "rare",
+    "source_ref": "chatlog:T1261 (adapted to an age-specific explanation)",
+    "question": "Giải thích phân bố xác suất cho học sinh lớp 5 bằng một phép so sánh.",
+    "answer": {
+      "conf": 90,
+      "kind": "answered",
+      "body": [
+        "Phân bố xác suất giống như một hộp bút màu, trong đó mỗi màu có một tỉ lệ khác nhau. Ví dụ, khi bạn nhắm mắt rút một cây bút thì màu đỏ có 22% khả năng được rút, màu xanh 9%, cũng giống như model chấm điểm mỗi từ trong từ vựng: “land” 22%, “forest” 9%… rồi chọn theo xác suất đó [trang 11]."
+      ],
+      "sources": [
+        {
+          "page": 11,
+          "text": "Bên trong Transformer: đầu ra luôn là một phân bố xác suất Với mọi ngữ cảnh, model chấm điểm MỌI từ trong từ vựng — “landˮ 22%, “forestˮ 9%… — rồi chọn theo xác suất đó Transformers, the tech behind LLMs - 3Blue1Brown AI"
+        }
+      ],
+      "trace": {
+        "request_id": "3a30ff6f-13e0-4487-be46-8e89d3e772d8",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-19",
+    "category": "rare",
+    "source_ref": "chatlog:T1063",
+    "question": "So sánh Rule, Workflow và Agent trong một bảng ngắn, rồi khuyên chọn mức nào cho FAQ tĩnh.",
+    "answer": {
+      "conf": 95,
+      "kind": "answered",
+      "body": [
+        "### So sánh Rule – Workflow – Agent",
+        "| Tiêu chí | Rule (Cấp 1) | Workflow (Cấp 2) | Agent (Cấp 3) |",
+        "|----------|--------------|------------------|----------------|",
+        "| **Đầu vào** | Ổn định, ít thay đổi [tr 18] | Đa dạng, không viết hết rule được [tr 18] | Nhiều bước, tình huống thay đổi liên tục [tr 18] |",
+        "| **Logic** | if/else, kết quả cố định [tr 18] | Có quy trình rõ, AI hỗ trợ từng bước [tr 19] | Tự ra quyết định giữa các bước, dùng nhiều công cụ [tr 18] |",
+        "| **Ví dụ** | Tính thuế, auto-reply template [tr 18]; Trả lời FAQ tự động [tr 19] | Chatbot FAQ, phân loại ticket hỗ trợ [tr 18]; Duyệt Problem Card [tr 19] | Agent nghiên cứu thị trường, coding agent sửa nhiều file [tr 18]; Đề xuất can thiệp chủ động [tr 19] |",
+        "| **Khi nào dùng** | Logic tường minh, cần kết quả luôn đúng 100% [tr 18] | Đầu ra linh hoạt, có cách đo chất lượng, người kiểm tra trước khi gửi [tr 18] | Cần tự ra quyết định, có kiểm soát rủi ro rõ ràng [tr 18] |",
+        "| **Mức độ phức tạp** | Thấp | Trung bình | Cao"
+      ],
+      "sources": [
+        {
+          "page": 18,
+          "text": "CẤP ĐỘ 1 Rule / Script · Đầu vào ổn định, ít thay đổi · Logic viết được thành if/else · Cần kết quả luôn đúng 100%"
+        },
+        {
+          "page": 18,
+          "text": "CẤP ĐỘ 2 LLM Feature / Workflow · Đầu vào đa dạng, không viết hết rule được · Đầu ra cần linh hoạt"
+        },
+        {
+          "page": 18,
+          "text": "CẤP ĐỘ 3 Agent · Nhiều bước, dùng nhiều công cụ · Tình huống thay đổi liên tục · Cần tự ra quyết định giữa các bước"
+        },
+        {
+          "page": 19,
+          "text": "CẤP ĐỘ 1 — RULE (LUẬT TĨNH) Trả lời tự động · Tự động trả lời FAQ, gửi link thời khóa biểu"
+        },
+        {
+          "page": 19,
+          "text": "Không bắt buộc nâng cấp tuần tự từ Rule lên Agent → dừng ở cấp tối giản nhất nếu đã đáp ứng mục tiêu đề ra"
+        }
+      ],
+      "trace": {
+        "request_id": "8b390096-165c-443c-bb64-809ba3d8f43d",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  },
+  {
+    "id": "GS-20",
+    "category": "rare",
+    "source_ref": "chatlog:T1061 (focused-summary intent adapted to current deck)",
+    "question": "Tóm tắt toàn bộ Day 02 nhưng chỉ tập trung vào cost-of-error, mức automation và tiêu chí Go/Not Yet/No-Go.",
+    "answer": {
+      "conf": 90,
+      "kind": "answered",
+      "body": [
+        "Cost-of-error trong Day 02 nhấn mạnh chi phí của False Positive và False Negative là không đối xứng: 'báo cháy giả ≠ bỏ sót đám cháy' [tr.22]. Thiết kế reward function phải cân bằng giữa precision (TP/(TP+FP)) và recall (TP/(TP+FN)) — vặn nút bên này lên sẽ làm chất lượng bên kia xấu đi [tr.23].",
+        "Về mức automation, PAIR bước ② phân biệt Automate (AI làm thay) khi việc khó, nhàm chán, cần scale, và Augment (AI hỗ trợ) khi stakes cao, người dùng muốn tự làm [tr.17]. Kỹ thuật có ba cấp: Rule (luật tĩnh), Workflow (quy trình), Agent (tác nhân) — ưu tiên giải pháp đơn giản nhất [tr.18][tr.19].",
+        "Tiêu chí Go / Not Yet / No-Go được dùng để ra quyết định dựa trên Problem Statement: Go khi bài toán rõ ràng, chỉ số đo lường khả thi, điểm can thiệp AI phù hợp, kiểm soát được rủi ro; Not Yet khi cần bổ sung dữ liệu, chuẩn hóa quy trình; No-Go khi AI không mang giá trị vượt trội hoặc rủi ro quá cao [tr.28]. Mục tiêu Day 02 là xác định tính khả thi, không phải quyết định triển khai ngay [tr.25]."
+      ],
+      "sources": [
+        {
+          "page": 22,
+          "text": "Chi phí của FP và FN KHÔNG đối xứng — báo cháy giả ≠ bỏ sót đám cháy."
+        },
+        {
+          "page": 23,
+          "text": "PRECISION CAO TP / (TP + FP) Ít gợi ý — nhưng gợi ý nào cũng chắc đúng. Người dùng tin vào từng gợi ý nhận được. HỆ QUẢ Nhiều False Negative — bỏ sót học viên đang thực sự cần giúp. ⇄ ĐÒN BẨY Vặn nút bên này lên, chất lư"
+        },
+        {
+          "page": 17,
+          "text": "AUTOMATE AI làm thay Chọn khi: · Việc khó, nhàm chán, nguy hiểm hoặc cần scale · Người dùng thiếu kiến thức / khả năng tự làm · Có \"đáp án đúng\" mà mọi người cùng đồng thuận Đo thành công bằng: hiệu quả tăng · an toàn hơ"
+        },
+        {
+          "page": 18,
+          "text": "Ba mức giải pháp: Rule / Workflow / Agent"
+        },
+        {
+          "page": 19,
+          "text": "CẤP ĐỘ 1 — RULE (LUẬT TĨNH) Trả lời tự động · Tự động trả lời FAQ, gửi link thời khóa biểu · Gửi tài liệu sửa lỗi cài đặt cơ bản · Nhắc nhở checklist nộp bài Khi nào? Logic tường minh, kết quả cố định. CẤP ĐỘ 2 — WORKFLO"
+        },
+        {
+          "page": 28,
+          "text": "✓ Go thực hiện ĐỦ ĐIỀU KIỆN — Bài toán rõ ràng — Chỉ số đo lường khả thi — Điểm can thiệp AI phù hợp — Kiểm soát được rủi ro ⏸ Not Yet tạm hoãn CÓ TRIỂN VỌNG — Cần bổ sung dữ liệu thực tế — Chuẩn hóa quy trình — Thiết lậ"
+        },
+        {
+          "page": 25,
+          "text": "Mục tiêu Day 02 là xác định tính khả thi để tiếp tục nghiên cứu — chưa phải quyết định triển khai ngay."
+        }
+      ],
+      "trace": {
+        "request_id": "74b82a24-477e-4d89-ad85-e8e15c4a9827",
+        "model": "deepseek-v4-flash"
+      }
+    },
+    "error": null,
+    "grade": {
+      "passed": true,
+      "kind_ok": true,
+      "missing_terms": [],
+      "missing_exact_terms": [],
+      "citation_ok": true,
+      "format_ok": true,
+      "note": "Điểm máy là pre-score; case answered vẫn cần người thứ hai kiểm tra đúng nghĩa/citation."
+    }
+  }
+]

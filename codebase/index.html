@@ -6,17 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VLearn · Học liệu môn học</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Tự động nạp DeepSeek API Key vào localStorage nếu chưa có.
-       Key này được lấy từ file .env. Người dùng có thể đổi bằng phím K. -->
-  <script>
-    (function () {
-      var KEY = 'deepseek_api_key';
-      // Chỉ set nếu chưa có key hoặc key rỗng — tránh ghi đè key user đã sửa
-      if (!localStorage.getItem(KEY)) {
-        localStorage.setItem(KEY, 'sk-668f1d008daa49ed860105076f8e743e');
-      }
-    })();
-  </script>
 </head>
 
 <body>
@@ -62,6 +51,9 @@
         <path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" />
       </svg>
     </button>
+    <button class="icon-btn" id="btnDocMenu" data-tip="Tuỳ chọn tài liệu">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
   </header>
 
   <!-- ================= WORKSPACE ================= -->
@@ -80,6 +72,7 @@
           <div class="side-sub" data-i18n="sideSub">Chương, slide và tài liệu đã upload</div>
         </div>
       </div>
+
       <div class="chapters" id="chapters"><!-- render bằng JS --></div>
     </aside>
 
@@ -180,6 +173,22 @@
         </div>
       </div>
 
+      <div class="subbar" id="subbar" hidden>
+        <div class="tgroup" id="subExtra" hidden>
+          <button class="tool sm" data-tool="circle"><span data-i18n="tCircle">Khoanh</span></button>
+          <button class="tool sm" data-tool="text"><span data-i18n="tText">Text</span></button>
+          <button class="tool sm" id="btnImg"><span data-i18n="tImg">Ảnh</span></button>
+          <button class="tool sm" data-tool="eraser"><span data-i18n="tEraser">Tẩy</span></button>
+        </div>
+        <span class="tsep" id="subSep" hidden></span>
+        <div class="inkopts" id="inkOpts" hidden>
+          <div class="swatches" id="swatches"></div>
+          <span class="net-label" data-i18n="stroke">NÉT</span>
+          <input id="penRange" type="range" min="1" max="12" value="3">
+        </div>
+      </div>
+      <input id="imgPicker" type="file" accept="image/*" hidden>
+
       <!-- scroll area -->
       <div class="pages-scroll" id="scroller">
         <div class="pages" id="pages"><!-- render bằng JS --></div>
@@ -254,9 +263,7 @@
         <button class="icon-btn sm" id="btnNewChat" data-tip="Hội thoại mới"><svg viewBox="0 0 24 24">
             <path d="M12 5v14M5 12h14" />
           </svg></button>
-        <!-- Badge AI mode + nút đổi key (nhấn K) -->
-        <button class="chip sm" id="aiModeBadge" data-tip="Nhấn để cấu hình API Key (phím K)"
-          onclick="openKeyModal()"
+        <button class="chip sm" id="aiModeBadge" data-tip="Trạng thái kết nối AI"
           style="cursor:pointer;font-size:10px;padding:2px 7px;"></button>
         <span class="chip sm" id="ctxChip">Trang slide: <b>1</b></span>
       </div>
@@ -265,6 +272,9 @@
 
       <div class="composer">
         <div class="attach-row" id="attachRow" hidden></div>
+        <div class="chips" style="margin:0 0 8px">
+          <button class="qchip" id="btnSummary">Tóm tắt toàn bộ tài liệu</button>
+        </div>
         <div class="composer-box">
           <input id="ask" type="text" data-i18n-ph="askPh" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu...">
           <button class="send" id="btnSend" data-tip="Gửi">
@@ -276,6 +286,17 @@
         </div>
       </div>
     </aside>
+  </div>
+
+  <div class="ask-popup" id="askPopup" hidden>
+    <div class="ask-head">
+      <div class="ask-label" id="askPageLabel">TRANG 1</div>
+      <button class="icon-btn sm" id="askClose" aria-label="Đóng"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="ask-body">
+      <input id="askInput" type="text" aria-label="Câu hỏi về đoạn đã chọn">
+      <button class="ask-send" id="askSend" aria-label="Gửi câu hỏi"><svg viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></button>
+    </div>
   </div>
 
 
@@ -339,8 +360,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=cp3-audit"></script>
+  <script src="app.js?v=cp3-audit"></script>
 </body>
 
 </html>
