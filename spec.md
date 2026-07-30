@@ -60,22 +60,21 @@ Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
   > *Một học viên gõ câu hỏi tự nhiên (VD: "link slide hackathon", "link lý thuyết buổi 3", "link lab 2") trong Discord → AI tìm trong tin nhắn 5 kênh chỉ định → trả về chính xác link tài liệu kèm tên người gửi và link trỏ đến tin nhắn gốc — nếu không có thì trả lời "Mình không tìm thấy link này."*
 
 - **Phạm vi dữ liệu index** (chỉ 5 kênh):
-  1. Kênh thông báo #Build (khai giảng, deadline, lịch học)
-  2. Kênh tài nguyên #Build (tài liệu, template, link hướng dẫn)
-  3. Kênh thông báo chung (thông báo từ ban tổ chức)
-  4. Kênh lý thuyết — Lớp học Khoá 3 (slide, tài liệu lý thuyết từng buổi)
-  5. Kênh thực hành lab — Lớp học Khoá 3 (link bài lab, hướng dẫn thực hành)
+  1. Kênh #Build/Thông báo #Build (Link zoom, Link ngân hàng đề)
+  2. Kênh Build/Tài nguyên (Link Hướng dẫn onboarding, GitHub Org, Link Tài liệu Workshop)
+  3. Kênh Lớp học Khoá 3/Thông báo chung (Link codelabs, Link slide hackathon, Link repo, Link Checkpoint)
+  4. Kênh lý thuyết — Lớp học Khoá 3 (Link tài liệu tham khảo)
+  5. Kênh thực hành lab — Lớp học Khoá 3 (Link repo, Link chấm điểm, Link checkpoint)
 
 - **Non-goals** (≥3 thứ KHÔNG build):
   1. Không trả lời câu hỏi kiến thức chuyên môn (học thuật) — chỉ trả link tài liệu.
   2. Không tự động gửi tin nhắn chủ động (push) — chỉ phản hồi khi được hỏi.
   3. Không hỗ trợ tiếng Anh hoặc ngôn ngữ khác ngoài tiếng Việt.
-  4. Không index ngoài 5 kênh đã định (kênm chat chung, kênh hỏi bài, v.v.).
+  4. Không index ngoài 5 kênh đã định (kênh chat chung, kênh hỏi bài, v.v.).
 
-- **Mức prototype nhắm tới**: [ ] Sketch [X] Mock [ ] Working
-  - AI thật ở lõi (RAG trên data Discord giả/mẫu từ 5 kênh)
-  - Giao diện chat trong terminal hoặc web đơn giản
-  - Mock phần UI Discord integration (chưa cần deploy bot thật vào server)
+- **Mức prototype nhắm tới**: [ ] Sketch [] Mock [X] Working
+  - AI thật ở lõi (RAG trên data Discord mẫu từ 5 kênh)
+  - Giao diện chat trên discord trong server thật
 
 - **Automation**: [ ] augment [X] conditional [ ] automate
   - **Lý do theo cost-of-error**: Sai link tài liệu gây hậu quả trực tiếp — học viên vào sai tài liệu, học sai nội dung, bỏ lỡ bài lab. Do đó: AI **chỉ trả link khi có căn cứ rõ ràng** trong tin nhắn (≥1 match khớp). Khi không tìm thấy → "Mình không tìm thấy link này trong các kênh." — tuyệt đối không bịa link.
@@ -151,4 +150,4 @@ Loại: [ ] Tối ưu tính năng có sẵn  [X] Tính năng mới
 
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
-| [dd/mm] | Tạo spec lần đầu | — |
+| [30/07] | Tạo spec lần đầu | — |
