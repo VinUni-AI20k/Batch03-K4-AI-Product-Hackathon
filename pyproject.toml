@@ -1,0 +1,27 @@
+[project]
+name = "vlearn-ai-tutor-eda"
+version = "0.1.0"
+description = "Reproducible EDA environment for the VLearn AI Tutor hackathon data"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "ipykernel>=6.29.5",
+    "jupyterlab>=4.2.5",
+    "cryptography>=43.0.0",
+    "langchain>=1.0.0,<2",
+    "langchain-openai>=1.0.0,<2",
+    "langgraph>=1.0.0,<2",
+    "matplotlib>=3.9.2",
+    "numpy>=2.1.1",
+    "pandas>=2.2.3",
+    "pypdf>=6.0.0,<7",
+    "seaborn>=0.13.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6.9",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
