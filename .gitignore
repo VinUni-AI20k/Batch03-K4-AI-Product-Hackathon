@@ -9,3 +9,5 @@ artifacts/ocr/logs/*.jsonl
 artifacts/ocr/reports/*.md
 codebase/server/.venv/
 codebase/server/logs/
+__pycache__/
+.venv
