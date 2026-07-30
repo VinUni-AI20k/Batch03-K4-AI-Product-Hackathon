@@ -10,14 +10,27 @@ Chi tiết bài toán, bằng chứng và bảng impact: **[cp1/canvas.md](cp1/c
 
 Leader: **Nguyễn Hùng Mạnh** — `2A202601256`
 
-| Mã HV | Tên | Phần phụ trách |
-|---|---|---|
-| `2A202601256` | Nguyễn Hùng Mạnh | `spec.md` · prompt ở quyết định trung tâm |
-| `2A202601102` | Nguyễn Văn Trọng | evidence · golden set từ chatlog thật |
-| `2A202601194` | Nguyễn Tuấn Hùng | chạy đo golden set · vòng validation CP5 |
-| `2A202601568` | Trần Trọng Thịnh | code flow · demo |
+Bốn luồng chạy song song theo [02-guide.md](02-guide.md) §3.5.
 
-**Vibe-coding rule:** mỗi người phải giải thích được phần có tên mình — bị hỏi ngẫu nhiên tại CP5.
+| Mã HV | Tên | Luồng | Phần phụ trách | Artifact có tên |
+|---|---|---|---|---|
+| `2A202601256` | Nguyễn Hùng Mạnh | spec + validation | AI Spec 8 mục theo `03-template-ai-spec.md` · hẹn trước willing users, chủ trì vòng validation | `spec.md` · `validation/` |
+| `2A202601102` | Nguyễn Văn Trọng | prompt + golden set | Prompt ở quyết định trung tâm · golden set ≥20 case · vòng lặp `chạy trọn bộ → % → sửa 1 failure → chạy lại` | `eval/` · phần prompt trong `codebase/` |
+| `2A202601194` | Nguyễn Tuấn Hùng | evidence | Vòng hỏi 10 người · giữ `verify.py` và mọi con số mining · **người thứ 2 của build flow sau CP2** | `cp1/` · `spec.md` §1-§2 |
+| `2A202601568` | Trần Trọng Thịnh | build flow | Flow chính bấm đi hết được, không can thiệp tay · lời gọi AI thật · demo CP6 | `codebase/` · `demo-slides.pdf` |
+
+**Vibe-coding rule:** mỗi người phải giải thích được phần có tên mình — TA hỏi ngẫu nhiên **một** người tại CP5, không giải thích được thì phần cá nhân liên quan 0 điểm ([04-rubric.md](04-rubric.md) mục Reflection).
+
+**Giao diện giữa các luồng** — chỗ dễ tắc nhất, chốt trước:
+
+| Từ | Sang | Bàn giao cái gì | Trước mốc |
+|---|---|---|---|
+| Mạnh | Trọng | 4 lớp chỗ khó (①②③④) + ≥8 kịch bản trong `spec.md` §5-§6 → đây là xương của golden set | CP3 |
+| Mạnh | Trọng | Định nghĩa từng chiều chất lượng + quality bar bằng số | 23:59 N1 (chốt, không đổi sau) |
+| Thịnh | Trọng | Điểm cắm prompt trong code + cách chạy 1 case ngoài UI | CP2 |
+| Tuấn Hùng | Trọng | Case lấy từ chatlog: mã turn + trang + `day_code` | CP3 |
+| Tuấn Hùng | Mạnh | 3 dòng tổng hợp vòng hỏi 10 người → ô hậu quả trong `spec.md` §1 | trước 23:59 N1 |
+| Trọng | Mạnh | Bảng kết quả có % để đối chiếu quality bar | CP3 |
 
 ## Bằng chứng — chạy lại được
 

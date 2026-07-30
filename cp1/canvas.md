@@ -54,12 +54,14 @@
 
 ## 7 · Phân công
 
-| Mã HV | Tên | Phần phụ trách |
-|---|---|---|
-| `2A202601256` | Nguyễn Hùng Mạnh *(leader)* | spec.md · prompt ở quyết định trung tâm |
-| `2A202601102` | Nguyễn Văn Trọng | evidence · golden set từ chatlog thật |
-| `2A202601194` | Nguyễn Tuấn Hùng | chạy đo golden set · vòng validation CP5 |
-| `2A202601568` | Trần Trọng Thịnh | code flow · demo |
+Bốn luồng chạy song song theo [02-guide.md](../02-guide.md) §3.5:
+
+| Mã HV | Tên | Luồng | Phần phụ trách |
+|---|---|---|---|
+| `2A202601256` | Nguyễn Hùng Mạnh *(leader)* | spec + validation | `spec.md` (hạn cứng 23:59 N1) · hẹn trước willing users cho CP5 |
+| `2A202601102` | Nguyễn Văn Trọng | prompt + golden set | prompt ở quyết định trung tâm · golden set ≥20 case từ chatlog thật · vòng lặp đo |
+| `2A202601194` | Nguyễn Tuấn Hùng | evidence | vòng hỏi 10 người · giữ `verify.py` và mọi con số mining · **người thứ 2 của build flow sau CP2** |
+| `2A202601568` | Trần Trọng Thịnh | build flow | flow chính bấm đi hết được · lời gọi AI thật · demo CP6 |
 
 ---
 

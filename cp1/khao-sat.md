@@ -6,16 +6,16 @@
 
 **Quy mô:** 10 người ngoài nhóm · ~2 phút/người · giờ nghỉ · hỏi trực tiếp 1-1.
 
-**Chia người — mỗi người hỏi 2-3, điền cột `nguoi_ghi` trong log:**
+**Chia người — điền cột `nguoi_ghi` trong log:**
 
 | Người hỏi | Số thứ tự trong log |
 |---|---|
-| Nguyễn Tuấn Hùng *(chủ trì vòng này)* | 1-3 |
-| Nguyễn Văn Trọng | 4-6 |
-| Trần Trọng Thịnh | 7-8 |
-| Nguyễn Hùng Mạnh | 9-10 |
+| Nguyễn Tuấn Hùng — **chủ trì, đây là luồng evidence của Hùng** | 1-6 |
+| Nguyễn Hùng Mạnh | 7-8 |
+| Trần Trọng Thịnh | 9 |
+| Nguyễn Văn Trọng | 10 |
 
-Hùng gom log, viết 3 dòng tổng hợp, và là người đưa số vào Canvas mục 3.
+Trọng và Thịnh đang gánh build flow + golden set nên chỉ nhận 1 người mỗi người; Hùng gom log, viết 3 dòng tổng hợp, và bàn giao cho Mạnh để đưa vào `spec.md` §1 ô hậu quả trước 23:59 N1.
 
 ---
 
