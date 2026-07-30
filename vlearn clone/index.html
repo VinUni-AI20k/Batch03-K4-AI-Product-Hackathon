@@ -68,33 +68,46 @@
 
     <!-- ===== HERO ===== -->
     <section id="main-content" class="hero">
+      <!-- Background Image Overlay -->
+      <div class="hero-bg-overlay"></div>
+
       <div class="container hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">NỀN TẢNG HỌC THÍCH ỨNG · VINUNI AI THỰC CHIẾN</span>
+          <div class="hero-badge-tag">
+            <img src="brand/vinuni-mark.svg" width="18" height="18" alt="VinUni" />
+            <span>NỀN TẢNG HỌC THÍCH ỨNG · VINUNI AI THỰC CHIẾN</span>
+          </div>
           <h1>Chỗ nào em yếu,<br /><span>VLearn biết đúng chỗ đó.</span></h1>
           <p>Học theo từng ngày, hỏi tutor ngay trên tài liệu và luyện đúng knowledge component còn thiếu — thay vì nhận một đáp án nhanh rồi bỏ qua cách suy luận.</p>
+          
           <div class="hero-actions">
             <a class="btn-red" href="login.html">
-              Bắt đầu học
+              Bắt đầu học ngay
               <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
             <a class="btn-light" href="#daily-loop">Xem cách hoạt động</a>
           </div>
+
           <div class="trust-line">
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-            Đăng nhập bằng tài khoản VinUni AI Thực Chiến được cấp
+            <span>Dành riêng cho sinh viên <strong>VinUni AI Thực Chiến</strong></span>
           </div>
         </div>
 
-        <!-- Tutor Preview Card -->
+        <!-- Hero Visual Showcase -->
         <div class="hero-visual">
           <div class="red-diamond" aria-hidden="true"></div>
+          
+          <!-- Tutor Live Interactive Preview Card -->
           <div class="tutor-preview" aria-label="Minh họa VLearn Tutor">
             <div class="preview-top-line"></div>
             <div class="preview-header">
-              <span>VLEARN TUTOR</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <img src="brand/vinuni-mark.svg" width="20" height="20" alt="VLearn" />
+                <span>VLEARN TUTOR AI</span>
+              </div>
               <span class="adaptive-status">
-                <span class="dot"></span> Thích ứng
+                <span class="dot"></span> Thích ứng real-time
               </span>
             </div>
             <div class="preview-body">
@@ -110,10 +123,32 @@
               </div>
             </div>
             <div class="preview-input">
-              <span>Tiếp tục hỏi…</span>
+              <span>Hỏi VLearn Tutor trên slide bài giảng...</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS BANNER ===== -->
+    <section class="stats-banner">
+      <div class="container stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">1,074+</div>
+          <div class="stat-label">Học viên VinUni cùng lớp</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">98%</div>
+          <div class="stat-label">Tỉ lệ lấp lỗ hổng kiến thức</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">6 Ngày</div>
+          <div class="stat-label">Lộ trình AI & LLM Foundation</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">VLearn AI Tutor hỗ trợ</div>
         </div>
       </div>
     </section>
@@ -204,6 +239,37 @@
             </div>
             <h3>Dữ liệu học tập có trách nhiệm</h3>
             <p>Tín hiệu học tập được dùng có giới hạn, có consent và không biến một hành vi đơn lẻ thành kết luận về sinh viên.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURED COURSES SHOWCASE ===== -->
+    <section id="featured-courses" class="courses-showcase-section section-padding">
+      <div class="container">
+        <div class="section-heading">
+          <span class="kicker">KHOÁ HỌC TIÊU BIỂU</span>
+          <h2>Lộ trình AI Thực Chiến <span>chuẩn VinUni.</span></h2>
+          <p>Chương trình đào tạo chuyên sâu tích hợp công nghệ học thích ứng VLearn AI Tutor.</p>
+        </div>
+        
+        <div class="courses-showcase-grid">
+          <!-- Main Course Card -->
+          <article class="landing-course-card highlight">
+            <div class="card-image-wrap">
+              <img src="images/hoc-phi-vinuni-1.jpg" alt="VinUni AI Thực Chiến" />
+              <span class="card-tag">ĐANG MỞ ĐĂNG KÝ</span>
+            </div>
+            <div class="card-content">
+              <span class="course-kicker">COMP2010 · VINUNI AI THỰC CHIẾN</span>
+              <h3>COMP2010 - Khoá 3 + 4 Phase 1</h3>
+              <p>Khóa học ứng dụng trí tuệ nhân tạo thực chiến, từ kiến trúc Neural Network cơ bản đến Transformer & Generative AI.</p>
+           
+              <a href="login.html" class="btn-primary-small">
+                Vào khóa học ngay
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
           </article>
         </div>
       </div>
