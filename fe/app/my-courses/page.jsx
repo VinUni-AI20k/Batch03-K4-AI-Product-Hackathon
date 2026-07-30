@@ -4,11 +4,12 @@ import DayCard from '../../components/DayCard'
 import CourseHeader from '../../components/CourseHeader'
 import { useEffect, useState } from 'react'
 import { getCourseInfo, getCourseDays, toggleDay } from '../../utils/api'
+import { useApp } from '../../context/AppContext'
 
 export default function MyCoursesPage() {
   const [info, setInfo] = useState(null)
   const [days, setDays] = useState([])
-  const [lang, setLang] = useState('VI')
+  const { lang } = useApp()
 
   useEffect(()=>{
     fetchData()
@@ -29,8 +30,8 @@ export default function MyCoursesPage() {
   }
 
   return (
-    <div>
-      <Header lang={lang} setLang={setLang} info={info} onStart={handleStart} />
+    <div className="min-h-screen bg-[#F1F5F9] dark:bg-[#0F172A] transition-colors duration-200">
+      <Header />
       <CourseHeader info={info} progressPercent={info ? Math.round((info.progress_completed/info.progress_total)*100) : 0} onStart={handleStart} />
       <main className="container-centered p-6">
         <div className="space-y-4">

@@ -1,22 +1,51 @@
-export default function CourseHeader({ info, progressPercent=0, onStart }){
+'use client'
+import { useApp } from '../context/AppContext'
+
+export default function CourseHeader({ info, progressPercent = 0, onStart }) {
+  const { lang } = useApp()
+  const isVi = lang === 'VI'
+
+  const t = {
+    sub: isVi ? 'VLEARN · VINUNI AI THỰC CHIẾN' : 'VLEARN · VINUNI PRACTICAL AI',
+    defaultTitle: isVi ? 'COMP2010 - Khoá 3 + 4 Phase 1' : 'COMP2010 - Cohort 3 + 4 Phase 1',
+    students: isVi ? 'học viên cùng lớp' : 'classmates enrolled',
+    readDays: isVi ? 'Đã đọc' : 'Read',
+    days: isVi ? 'ngày' : 'days',
+    startReading: isVi ? 'Bắt đầu đọc' : 'Start Reading',
+  }
+
   return (
-    <div className="bg-white">
-      <div className="container-centered flex items-center justify-between py-6">
+    <div className="bg-white dark:bg-[#1E293B] border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <div className="container-centered flex flex-col md:flex-row md:items-center justify-between py-6 gap-4">
         <div>
-          <div className="text-xs font-bold text-red-600 tracking-wider">VLEARN · VINUNI AI THỰC CHIẾN</div>
-          <h2 className="text-2xl font-extrabold text-slate-900 mt-2">{info?.title ?? 'COMP2010 - Khoá 3 + 4 Phase 1'}</h2>
-          <div className="text-sm text-muted mt-1">{info?.students ?? 1074} học viên cùng lớp</div>
+          <div className="text-xs font-bold text-red-600 dark:text-red-500 tracking-wider">
+            {t.sub}
+          </div>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
+            {info?.title ?? t.defaultTitle}
+          </h2>
+          <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {info?.students ?? 1074} {t.students}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="bg-slate-50 rounded-lg p-3">
-            <div className="flex items-center gap-2 text-sm text-slate-900"><span className="text-green-600 font-bold">✓</span> Đã đọc {info?.progress_completed ?? 0}/{info?.progress_total ?? 6} ngày</div>
-            <div className="w-40 bg-slate-200 h-2 rounded mt-2 overflow-hidden">
-              <div className="bg-[color:var(--tw-color-primary)] h-2" style={{width: `${progressPercent}%`, backgroundColor:'#0B3B60'}}></div>
+          <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 rounded-xl p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> {t.readDays} {info?.progress_completed ?? 0}/{info?.progress_total ?? 6} {t.days}
             </div>
-            <div className="text-xs text-muted mt-1">{progressPercent}%</div>
+            <div className="w-40 bg-slate-200 dark:bg-slate-700 h-2 rounded mt-2 overflow-hidden">
+              <div className="h-2 rounded transition-all duration-300 bg-[#0B3B60] dark:bg-[#38BDF8]" style={{ width: `${progressPercent}%` }}></div>
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{progressPercent}%</div>
           </div>
-          <button onClick={onStart} className="px-6 py-2.5 bg-[#0B3B60] text-white rounded-full font-semibold hover:opacity-90">Bắt đầu đọc</button>
+
+          <button
+            onClick={onStart}
+            className="px-6 py-2.5 bg-[#0B3B60] dark:bg-[#1E3A8A] hover:bg-[#0a3050] dark:hover:bg-[#1e40af] text-white rounded-full font-semibold transition-all shadow-sm"
+          >
+            {t.startReading}
+          </button>
         </div>
       </div>
     </div>

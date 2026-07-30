@@ -10,14 +10,26 @@ body {
   background-color: #F1F5F9;
   color: #0F172A;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark body {
+  background-color: #0F172A;
+  color: #F8FAFC;
 }
 
 .card {
   background-color: #FFFFFF;
-  border: 1px solid rgba(15,23,42,0.06);
+  border: 1px solid rgba(15,23,42,0.08);
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(2,6,23,0.06);
   padding: 1rem;
+}
+
+.dark .card {
+  background-color: #1E293B;
+  border-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 .container-centered {
@@ -29,4 +41,7 @@ body {
 }
 
 .text-muted { color: #64748B; }
+.dark .text-muted { color: #94A3B8; }
+
 .text-muted2 { color: #94A3B8; }
+.dark .text-muted2 { color: #CBD5E1; }
