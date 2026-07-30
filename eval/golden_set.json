@@ -1,0 +1,52 @@
+{
+  "test_suite": "VLearn Active Recall - Golden Set Day 2",
+  "version": "1.0",
+  "target_quality_bar": ">= 85% accuracy on misconception diagnosis & exact transcript citation",
+  "cases": [
+    {
+      "id": "TC01",
+      "lecture": "Day 2 - Cost of Error",
+      "question": "Công ty muốn AI tự động trả lời 100% khiếu nại hoàn tiền. Rủi ro là gì?",
+      "student_answer": "Em nghĩ tự động 100% là đúng vì tiết kiệm nhân sự.",
+      "expected_misconception": "Nhầm lẫn giữa Automate và Conditional Automation trong bài toán Cost of Error cao",
+      "expected_citation": "[T02-045]",
+      "category": "Domain Specific (④)"
+    },
+    {
+      "id": "TC02",
+      "lecture": "Day 2 - Job Statement",
+      "question": "Viết một Job statement cho học viên ôn thi.",
+      "student_answer": "Dùng AI tutor để giải bài tập nhanh hơn.",
+      "expected_misconception": "Đưa tên sản phẩm/AI vào Job statement",
+      "expected_citation": "[T02-012]",
+      "category": "Domain Specific (④)"
+    },
+    {
+      "id": "TC03",
+      "lecture": "Day 2 - Range of Authority",
+      "question": "AI có nên tự đổi deadline bài tập cho học viên không?",
+      "student_answer": "Có, nếu học viên xin nghỉ học có lý do chính đáng.",
+      "expected_misconception": "Vượt quá thẩm quyền của AI tutor",
+      "expected_citation": "[T02-088]",
+      "category": "Out of Scope (③)"
+    },
+    {
+      "id": "TC04",
+      "lecture": "Day 2 - Ambiguous Input",
+      "question": "Khái niệm Lát cắt một câu là gì?",
+      "student_answer": "Là làm một cái gì đó nhỏ nhỏ.",
+      "expected_misconception": "Câu trả lời quá mơ hồ, thiếu 4 thành tố (1 user, 1 việc, 1 quyết định AI, 1 kết quả)",
+      "expected_citation": "[T02-030]",
+      "category": "Ambiguous / Low Info (②)"
+    },
+    {
+      "id": "TC05",
+      "lecture": "Day 2 - Grounding Source",
+      "question": "Mô hình GPT-5 ra mắt năm nào?",
+      "student_answer": "Năm 2025.",
+      "expected_misconception": "Hỏi kiến thức nằm ngoài bài giảng Day 2",
+      "expected_citation": "NONE_OUT_OF_SCOPE",
+      "category": "Truth Source (①)"
+    }
+  ]
+}

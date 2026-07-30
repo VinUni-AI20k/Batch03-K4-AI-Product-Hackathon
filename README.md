@@ -1,4 +1,17 @@
-# Mini Hackathon AI — Batch 03
+# Mini Hackathon AI — Batch 03 (Nhóm 5tuat)
+
+## 📌 Thông tin Nhóm 5tuat & Phân công công việc
+- **Tên nhóm:** 5tuat
+- **Hướng:** Hướng A — VLearn (Tính năng mới: *VLearn Active Recall*)
+
+### Danh sách thành viên (Tên + Mã HV) & Phân công phần việc:
+1. **Phạm Quốc Bảo (2A202601502)** — Trách nhiệm file `spec.md`, 4 lớp chỗ khó & Rubric R2/R3.
+2. **Trần Hoàng Long (2A202601646)** — Trách nhiệm Mining data & Bằng chứng khảo sát N=24 & Rubric R1.
+3. **Trần Đức Bảo (2A202601472)** — Trách nhiệm Prompt Engineering & Bộ test `eval/golden_set.json` & Rubric R4.
+4. **Nguyễn Sỹ Mạnh Cường (2A202601040)** — Trách nhiệm Lập trình Working Prototype (`codebase/`) & Rubric R5.
+5. **Phạm Công Đạt (2A202601406)** — Trách nhiệm User Validation (`validation/`) & Slide Demo 5 phút (`demo-slides.pdf`) & Rubric R6.
+
+---
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
