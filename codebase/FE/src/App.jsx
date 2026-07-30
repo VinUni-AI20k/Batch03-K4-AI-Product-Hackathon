@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from "react";
+﻿import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { initialEvents, initialMessages, initialPlatforms, quickActions } from "./data.js";
 
 const Icon = ({ children, className = "" }) => (
@@ -42,6 +42,15 @@ function Header({ onOpenConnections }) {
 
 function ChatPanel({ messages, onSend }) {
   const [value, setValue] = useState("");
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    messagesEndRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "end",
+    });
+  }, [messages.length]);
 
   const submit = (event) => {
     event.preventDefault();
@@ -93,6 +102,7 @@ function ChatPanel({ messages, onSend }) {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} aria-hidden="true" />
       </div>
 
       <form onSubmit={submit} className="border-t border-slate-100 bg-white p-4">
@@ -408,3 +418,6 @@ export default function App() {
     </main>
   );
 }
+
+
+
