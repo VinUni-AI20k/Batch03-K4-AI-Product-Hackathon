@@ -1,5 +1,26 @@
-﻿import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { initialEvents, initialMessages, initialPlatforms, quickActions } from "./data.js";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { initialMessages, initialPlatforms, quickActions } from "./data.js";
+import { ApiError } from "./api/client.js";
+import { sendChatMessage } from "./api/chat.js";
+import { TIMELINE_KEY, confirmCalendar, flagTimelineItem, getTimeline, patchTimelineItem } from "./api/timeline.js";
+import { disconnectDiscord, disconnectGoogle, getConnections, getDiscordInviteUrl, getGoogleAuthUrl } from "./api/connections.js";
+
+const REVOCABLE_PLATFORM_IDS = new Set(["gmail"]);
+
+const QUICK_ACTION_QUERIES = {
+  important: "Kiểm tra giúp mình email quan trọng gần đây trên Gmail.",
+  discord: "Có thông báo mới nào từ Discord BTC không?",
+  today: "Hôm nay tôi có những cuộc họp nào?",
+  week: "Tuần này mình còn deadline nào chưa nộp?",
+};
+
+function formatTime() {
+  return new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date());
+}
 
 const Icon = ({ children, className = "" }) => (
   <span className={`material-symbols-rounded select-none ${className}`} aria-hidden="true">
@@ -23,11 +44,11 @@ function Header({ onOpenConnections }) {
         </div>
       </div>
       <div className="flex items-center gap-2 md:gap-4">
-        <button className="relative grid size-10 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100" aria-label="Thông báo">
+        <button className="relative grid size-10 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100" aria-label="Thông báo">
           <Icon>notifications</Icon>
           <span className="absolute right-2 top-2 size-2 rounded-full border-2 border-white bg-red-500" />
         </button>
-        <button onClick={onOpenConnections} className="flex items-center gap-3 rounded-full p-1 pr-2 transition hover:bg-slate-100">
+        <button onClick={onOpenConnections} className="flex items-center gap-3 rounded-full p-1 pr-2 transition-colors hover:bg-slate-100">
           <div className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-sm font-extrabold text-white">M</div>
           <div className="hidden text-left sm:block">
             <p className="text-xs font-bold text-ink">Minh Trương</p>
@@ -40,7 +61,173 @@ function Header({ onOpenConnections }) {
   );
 }
 
-function ChatPanel({ messages, onSend }) {
+const markdownComponents = {
+  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+  ul: ({ children }) => <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
+  ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
+  li: ({ children }) => <li>{children}</li>,
+  a: ({ children, href }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="font-semibold text-blue-700 underline underline-offset-2 hover:text-blue-800"
+    >
+      {children}
+    </a>
+  ),
+  code: ({ children }) => <code className="rounded bg-slate-200/70 px-1 py-0.5 font-mono text-[0.85em]">{children}</code>,
+  pre: ({ children }) => (
+    <pre className="mb-2 overflow-x-auto rounded-xl bg-slate-900 p-3 font-mono text-xs text-slate-100 last:mb-0">{children}</pre>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="mb-2 border-l-2 border-slate-300 pl-3 italic text-slate-500 last:mb-0">{children}</blockquote>
+  ),
+  h1: ({ children }) => <p className="mb-1 text-base font-extrabold">{children}</p>,
+  h2: ({ children }) => <p className="mb-1 text-[15px] font-extrabold">{children}</p>,
+  h3: ({ children }) => <p className="mb-1 text-sm font-extrabold">{children}</p>,
+  hr: () => <hr className="my-2 border-slate-200" />,
+};
+
+function MarkdownText({ text }) {
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      {text}
+    </ReactMarkdown>
+  );
+}
+
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+const eventDateFormat = new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+const eventTimeFormat = new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" });
+
+function formatEventRange(event) {
+  if (!event.start) return "";
+  if (DATE_ONLY_RE.test(event.start)) {
+    return `Cả ngày · ${eventDateFormat.format(new Date(`${event.start}T00:00:00`))}`;
+  }
+  const start = new Date(event.start);
+  const datePart = eventDateFormat.format(start);
+  const startTime = eventTimeFormat.format(start);
+  const endTime = event.end && !DATE_ONLY_RE.test(event.end) ? eventTimeFormat.format(new Date(event.end)) : null;
+  return endTime ? `${datePart} · ${startTime} - ${endTime}` : `${datePart} · ${startTime}`;
+}
+
+function MeetingCard({ event }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm">
+      <div className="flex items-start gap-3 px-4 py-3">
+        <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600">
+          <Icon className="text-lg">event</Icon>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold text-ink">{event.summary || "(Không có tiêu đề)"}</p>
+          <p className="mt-0.5 text-xs text-slate-500">{formatEventRange(event)}</p>
+          {event.location ? <p className="mt-0.5 truncate text-xs text-slate-500">{event.location}</p> : null}
+        </div>
+      </div>
+      {event.meet_link ? (
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-4 py-2.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+            <span className="grid size-7 place-items-center rounded-full bg-white shadow-sm">
+              <Icon className="text-base text-emerald-600">videocam</Icon>
+            </span>
+            Google Meet
+          </div>
+          <a
+            href={event.meet_link}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+          >
+            Tham gia
+          </a>
+        </div>
+      ) : null}
+      {event.attachments?.length || event.html_link ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 px-4 py-2">
+          {event.attachments?.map((attachment) => (
+            <a
+              key={attachment.url}
+              href={attachment.url}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline"
+            >
+              <Icon className="text-sm">description</Icon>
+              {attachment.title || "Tài liệu"}
+            </a>
+          ))}
+          {event.html_link ? (
+            <a href={event.html_link} target="_blank" rel="noreferrer" className="text-[11px] font-semibold text-slate-500 hover:underline">
+              Xem trên Google Calendar
+            </a>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function MessageBubble({ message, onRetry }) {
+  const isUser = message.role === "user";
+  const isClarification = message.needsClarification;
+  const isError = message.isError;
+
+  return (
+    <div className={`message-enter flex gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
+      {!isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
+          <Icon className="text-lg">neurology</Icon>
+        </div>
+      ) : null}
+      <div className={`max-w-[82%] ${isUser ? "text-right" : ""}`}>
+        <div
+          className={`inline-block rounded-2xl px-4 py-3 text-left text-sm leading-6 ${
+            isUser
+              ? "rounded-tr-sm bg-blue-600 text-white"
+              : isError
+                ? "rounded-tl-sm bg-red-50 text-red-700"
+                : isClarification
+                  ? "rounded-tl-sm bg-amber-50 text-amber-800"
+                  : "rounded-tl-sm bg-slate-100 text-slate-700"
+          }`}
+        >
+          {message.loading ? (
+            <span className="flex items-center gap-2">
+              <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500" aria-hidden="true" />
+              StudyPulse đang xử lý…
+            </span>
+          ) : isUser ? (
+            message.text
+          ) : (
+            <MarkdownText text={message.text} />
+          )}
+        </div>
+        {!isUser && message.calendarEvents?.length ? (
+          <div className="mt-2 space-y-2 text-left">
+            {message.calendarEvents.map((event) => (
+              <MeetingCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : null}
+        {message.isError && message.retryText ? (
+          <button
+            onClick={() => onRetry(message.retryText)}
+            className="mt-1.5 rounded-lg px-2 py-1 text-xs font-bold text-red-600 transition-colors hover:bg-red-50"
+          >
+            Thử lại
+          </button>
+        ) : (
+          <p className="mt-1.5 text-[10px] font-medium text-slate-400">{message.time}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ChatPanel({ messages, onSend, isSending }) {
   const [value, setValue] = useState("");
   const messagesEndRef = useRef(null);
 
@@ -55,7 +242,7 @@ function ChatPanel({ messages, onSend }) {
   const submit = (event) => {
     event.preventDefault();
     const text = value.trim();
-    if (!text) return;
+    if (!text || isSending) return;
     onSend(text);
     setValue("");
   };
@@ -84,29 +271,13 @@ function ChatPanel({ messages, onSend }) {
           <p className="text-sm leading-6 text-slate-600">Mình tổng hợp lịch, deadline và link học. Mình không nộp bài hoặc trả lời tin nhắn thay bạn.</p>
         </div>
         {messages.map((message) => (
-          <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
-            {message.role === "assistant" ? (
-              <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
-                <Icon className="text-lg">neurology</Icon>
-              </div>
-            ) : null}
-            <div className={`max-w-[82%] ${message.role === "user" ? "text-right" : ""}`}>
-              <div className={`inline-block rounded-2xl px-4 py-3 text-left text-sm leading-6 ${
-                message.role === "user"
-                  ? "rounded-tr-sm bg-blue-600 text-white"
-                  : "rounded-tl-sm bg-slate-100 text-slate-700"
-              }`}>
-                {message.text}
-              </div>
-              <p className="mt-1.5 text-[10px] font-medium text-slate-400">{message.time}</p>
-            </div>
-          </div>
+          <MessageBubble key={message.id} message={message} onRetry={onSend} />
         ))}
         <div ref={messagesEndRef} aria-hidden="true" />
       </div>
 
       <form onSubmit={submit} className="border-t border-slate-100 bg-white p-4">
-        <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 transition focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50">
+        <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 transition-colors focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50">
           <button type="button" className="grid size-10 shrink-0 place-items-center rounded-xl text-slate-400 hover:bg-white" aria-label="Đính kèm">
             <Icon>attach_file</Icon>
           </button>
@@ -122,8 +293,17 @@ function ChatPanel({ messages, onSend }) {
             placeholder="Hỏi về lịch hoặc deadline..."
             className="max-h-28 min-h-10 flex-1 resize-none bg-transparent py-2 text-sm text-ink outline-none placeholder:text-slate-400"
           />
-          <button type="submit" className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white transition hover:bg-blue-700 disabled:opacity-40" disabled={!value.trim()} aria-label="Gửi">
-            <Icon className="text-xl">arrow_upward</Icon>
+          <button
+            type="submit"
+            className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
+            disabled={!value.trim() || isSending}
+            aria-label="Gửi"
+          >
+            {isSending ? (
+              <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+            ) : (
+              <Icon className="text-xl">arrow_upward</Icon>
+            )}
           </button>
         </div>
         <p className="mt-2 text-center text-[10px] text-slate-400">Kết quả AI có thể chưa chính xác. Hãy kiểm tra nguồn gốc trước khi xác nhận.</p>
@@ -139,7 +319,7 @@ function QuickActions({ active, onSelect }) {
         <button
           key={action.id}
           onClick={() => onSelect(action.id)}
-          className={`flex items-center gap-3 rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
+          className={`flex items-center gap-3 rounded-2xl border bg-white p-3 text-left transition-colors hover:-translate-y-0.5 hover:shadow-md ${
             active === action.id ? "border-blue-300 ring-4 ring-blue-50" : "border-slate-200"
           }`}
         >
@@ -153,12 +333,12 @@ function QuickActions({ active, onSelect }) {
   );
 }
 
-function EventCard({ event, onCalendar, onEdit, onFlag }) {
+function EventCard({ event, onCalendar, onEdit, onFlag, isBusy }) {
   const urgent = event.priority === "Khẩn cấp";
   const review = !event.verified;
 
   return (
-    <article className={`event-card rounded-2xl border bg-white p-4 transition hover:shadow-md ${review ? "border-amber-200" : "border-slate-200"}`}>
+    <article className={`event-card card-enter rounded-2xl border bg-white p-4 transition-shadow hover:shadow-md ${review ? "border-amber-200" : "border-slate-200"}`}>
       <div className="flex gap-3">
         <div className={`grid size-11 shrink-0 place-items-center rounded-2xl ${
           event.type === "deadline" ? "bg-orange-50 text-orange-600" : review ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600"
@@ -168,7 +348,7 @@ function EventCard({ event, onCalendar, onEdit, onFlag }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{event.course}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{event.course || "Chưa rõ môn học"}</p>
               <h3 className="mt-1 text-sm font-extrabold leading-5 text-ink">{event.title}</h3>
             </div>
             <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${
@@ -186,17 +366,18 @@ function EventCard({ event, onCalendar, onEdit, onFlag }) {
           </div>
           <p className="mt-3 text-xs leading-5 text-slate-500">{event.detail}</p>
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
-            <button className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800">
-              <Icon className="text-base">open_in_new</Icon>{event.action}
-            </button>
             <span className="hidden flex-1 sm:block" />
-            <button onClick={() => onEdit(event)} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-500 hover:bg-slate-100">
+            <button onClick={() => onEdit(event)} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-100">
               Chỉnh sửa
             </button>
-            <button onClick={() => onFlag(event.id)} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-500 hover:bg-red-50 hover:text-red-600">
+            <button onClick={() => onFlag(event.id)} disabled={isBusy} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-40">
               Đánh dấu sai
             </button>
-            <button onClick={() => onCalendar(event.id)} className="flex items-center gap-1 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">
+            <button
+              onClick={() => onCalendar(event.id)}
+              disabled={isBusy}
+              className="flex items-center gap-1 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+            >
               <Icon className="text-base">calendar_add_on</Icon>Thêm vào lịch
             </button>
           </div>
@@ -206,7 +387,7 @@ function EventCard({ event, onCalendar, onEdit, onFlag }) {
   );
 }
 
-function Connections({ platforms, onToggle }) {
+function Connections({ platforms, onToggle, onDisconnectGuild }) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-panel">
       <div className="flex items-start justify-between gap-3">
@@ -218,27 +399,55 @@ function Connections({ platforms, onToggle }) {
         <div className="grid size-11 place-items-center rounded-2xl bg-blue-50 text-blue-600"><Icon>hub</Icon></div>
       </div>
       <div className="mt-6 divide-y divide-slate-100">
-        {platforms.map((platform) => (
-          <div key={platform.id} className="flex items-center gap-3 py-4">
-            <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-slate-100 text-slate-600"><Icon>{platform.icon}</Icon></div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-bold text-ink">{platform.name}</p>
-                <span className={`size-2 rounded-full ${platform.connected ? "bg-emerald-500" : "bg-slate-300"}`} />
+        {platforms.map((platform) => {
+          const isDiscord = platform.id === "discord";
+          const buttonLabel = platform.connected ? (isDiscord ? "Kết nối" : REVOCABLE_PLATFORM_IDS.has(platform.id) ? "Hủy kết nối" : "Quản lý") : "Kết nối";
+          const isDanger = platform.connected && !isDiscord && REVOCABLE_PLATFORM_IDS.has(platform.id);
+          return (
+            <div key={platform.id} className="py-4">
+              <div className="flex items-center gap-3">
+                <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-slate-100 text-slate-600"><Icon>{platform.icon}</Icon></div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-ink">{platform.name}</p>
+                    <span className={`size-2 rounded-full ${platform.connected ? "bg-emerald-500" : "bg-slate-300"}`} />
+                  </div>
+                  <p className="truncate text-xs text-slate-500">
+                    {isDiscord && platform.guilds?.length ? platform.guilds.map((g) => g.name).join(", ") : platform.scope}
+                  </p>
+                </div>
+                <button
+                  onClick={() => onToggle(platform.id)}
+                  disabled={platform.id === "zalo"}
+                  className={`rounded-xl px-3 py-2 text-xs font-bold transition-colors ${
+                    isDanger
+                      ? "bg-red-50 text-red-600 hover:bg-red-100"
+                      : platform.connected
+                        ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        : "bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                  }`}
+                >
+                  {buttonLabel}
+                </button>
               </div>
-              <p className="truncate text-xs text-slate-500">{platform.scope}</p>
+              {isDiscord && platform.guilds?.length ? (
+                <ul className="ml-14 mt-2 space-y-1.5">
+                  {platform.guilds.map((guild) => (
+                    <li key={guild.id} className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-1.5">
+                      <span className="truncate text-xs font-semibold text-slate-600">{guild.name}</span>
+                      <button
+                        onClick={() => onDisconnectGuild(guild.id, guild.name)}
+                        className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        Hủy kết nối
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
-            <button
-              onClick={() => onToggle(platform.id)}
-              disabled={platform.id === "zalo"}
-              className={`rounded-xl px-3 py-2 text-xs font-bold transition ${
-                platform.connected ? "bg-slate-100 text-slate-600 hover:bg-slate-200" : "bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-              }`}
-            >
-              {platform.connected ? "Quản lý" : "Kết nối"}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="mt-4 flex items-start gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800">
         <Icon className="text-xl">shield_lock</Icon>
@@ -248,7 +457,55 @@ function Connections({ platforms, onToggle }) {
   );
 }
 
-function Dashboard({ events, platforms, activeAction, onAction, onCalendar, onEdit, onFlag, onTogglePlatform, showConnections, setShowConnections }) {
+function TimelineSkeleton() {
+  return (
+    <div className="mt-4 space-y-3" aria-hidden="true">
+      {[0, 1, 2].map((index) => (
+        <div key={index} className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4">
+          <div className="flex gap-3">
+            <div className="size-11 shrink-0 rounded-2xl bg-slate-100" />
+            <div className="flex-1 space-y-2">
+              <div className="h-2.5 w-24 rounded bg-slate-100" />
+              <div className="h-3.5 w-2/3 rounded bg-slate-100" />
+              <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TimelineError({ onRetry }) {
+  return (
+    <div className="mt-4 rounded-3xl border border-red-200 bg-red-50 p-8 text-center">
+      <Icon className="text-4xl text-red-400">error</Icon>
+      <p className="mt-3 text-sm font-bold text-red-700">Không tải được dòng thời gian từ backend.</p>
+      <p className="mt-1 text-xs text-red-500">Kiểm tra server đang chạy tại VITE_API_BASE_URL rồi thử lại.</p>
+      <button onClick={onRetry} className="mt-3 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-700">
+        Thử lại
+      </button>
+    </div>
+  );
+}
+
+function Dashboard({
+  events,
+  timelineLoading,
+  timelineError,
+  onRetryTimeline,
+  busyItemId,
+  platforms,
+  activeAction,
+  onAction,
+  onCalendar,
+  onEdit,
+  onFlag,
+  onTogglePlatform,
+  onDisconnectGuild,
+  showConnections,
+  setShowConnections,
+}) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const filteredEvents = useMemo(() => {
@@ -268,9 +525,9 @@ function Dashboard({ events, platforms, activeAction, onAction, onCalendar, onEd
           <div>
             <p className="text-sm font-semibold text-slate-500">Thứ Năm, 30 tháng 7</p>
             <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-ink md:text-3xl">Chào buổi chiều, Minh 👋</h2>
-            <p className="mt-2 text-sm text-slate-500">Bạn có <strong className="text-red-600">1 deadline khẩn cấp</strong> cần xử lý hôm nay.</p>
+            <p className="mt-2 text-sm text-slate-500">Hỏi StudyPulse ở khung chat để bắt đầu tổng hợp deadline và lịch học thật.</p>
           </div>
-          <button onClick={() => setShowConnections(!showConnections)} className="flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:border-blue-300">
+          <button onClick={() => setShowConnections(!showConnections)} className="flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-colors hover:border-blue-300">
             <Icon className="text-lg">settings_input_component</Icon>Quản lý kết nối
           </button>
         </div>
@@ -280,31 +537,46 @@ function Dashboard({ events, platforms, activeAction, onAction, onCalendar, onEd
         </div>
 
         {showConnections ? (
-          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} /></div>
+          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} onDisconnectGuild={onDisconnectGuild} /></div>
         ) : (
           <>
             <div className="mt-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-lg font-extrabold text-ink">Dòng thời gian học tập</h2>
-                <p className="mt-1 text-xs text-slate-500">{filteredEvents.length} thông báo được tổng hợp · Cập nhật 2 phút trước</p>
+                <p className="mt-1 text-xs text-slate-500">{filteredEvents.length} thông báo được tổng hợp từ tool thật</p>
               </div>
               <div className="relative">
                 <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-slate-400">search</Icon>
                 <label className="sr-only" htmlFor="event-search">Tìm thông báo</label>
-                <input id="event-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm môn học, nguồn..." className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-xs outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50 sm:w-60" />
+                <input id="event-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm môn học, nguồn..." className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-xs outline-none transition-colors focus:border-blue-400 focus:ring-4 focus:ring-blue-50 sm:w-60" />
               </div>
             </div>
-            <div className="mt-4 space-y-3">
-              {filteredEvents.length > 0 ? filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} onCalendar={onCalendar} onEdit={onEdit} onFlag={onFlag} />
-              )) : (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
-                  <Icon className="text-4xl text-slate-300">search_off</Icon>
-                  <p className="mt-3 text-sm font-bold text-slate-600">Không tìm thấy thông báo phù hợp</p>
-                  <button onClick={() => { setQuery(""); onAction("week"); }} className="mt-3 text-xs font-bold text-blue-600">Xóa bộ lọc</button>
-                </div>
-              )}
-            </div>
+
+            {timelineError ? (
+              <TimelineError onRetry={onRetryTimeline} />
+            ) : timelineLoading ? (
+              <TimelineSkeleton />
+            ) : (
+              <div className="mt-4 space-y-3">
+                {filteredEvents.length > 0 ? (
+                  filteredEvents.map((event) => (
+                    <EventCard key={event.id} event={event} onCalendar={onCalendar} onEdit={onEdit} onFlag={onFlag} isBusy={busyItemId === event.id} />
+                  ))
+                ) : events.length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
+                    <Icon className="text-4xl text-slate-300">chat</Icon>
+                    <p className="mt-3 text-sm font-bold text-slate-600">Chưa có dữ liệu thật nào được tổng hợp</p>
+                    <p className="mt-1 text-xs text-slate-400">Bấm một mục nhanh ở trên, hoặc hỏi StudyPulse ở khung chat bên trái.</p>
+                  </div>
+                ) : (
+                  <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
+                    <Icon className="text-4xl text-slate-300">search_off</Icon>
+                    <p className="mt-3 text-sm font-bold text-slate-600">Không tìm thấy thông báo phù hợp</p>
+                    <button onClick={() => { setQuery(""); onAction("week"); }} className="mt-3 text-xs font-bold text-blue-600">Xóa bộ lọc</button>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -314,10 +586,25 @@ function Dashboard({ events, platforms, activeAction, onAction, onCalendar, onEd
 
 function EditDialog({ event, onClose, onSave }) {
   const [time, setTime] = useState(event?.time ?? "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setTime(event?.time ?? "");
+    setIsSaving(false);
+  }, [event]);
+
   if (!event) return null;
+
+  const submit = async (submitEvent) => {
+    submitEvent.preventDefault();
+    setIsSaving(true);
+    await onSave(event.id, time);
+    setIsSaving(false);
+  };
+
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="edit-title">
-      <form onSubmit={(e) => { e.preventDefault(); onSave(event.id, time); }} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+      <form onSubmit={submit} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider text-blue-600">Human in the loop</p>
@@ -331,7 +618,9 @@ function EditDialog({ event, onClose, onSave }) {
         <p className="mt-2 text-xs leading-5 text-slate-400">Thay đổi của bạn sẽ được ghi nhận để cải thiện lần trích xuất sau.</p>
         <div className="mt-6 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100">Hủy</button>
-          <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700">Lưu thay đổi</button>
+          <button type="submit" disabled={isSaving} className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-60">
+            {isSaving ? "Đang lưu…" : "Lưu thay đổi"}
+          </button>
         </div>
       </form>
     </div>
@@ -347,66 +636,254 @@ function Toast({ text }) {
 }
 
 export default function App() {
+  const [conversationId] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState(initialMessages);
-  const [events, setEvents] = useState(initialEvents);
   const [platforms, setPlatforms] = useState(initialPlatforms);
   const [activeAction, setActiveAction] = useState("week");
   const [showConnections, setShowConnections] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [toast, setToast] = useState("");
   const [mobileView, setMobileView] = useState("dashboard");
+  const [seededActions, setSeededActions] = useState(() => new Set());
+  const [busyItemId, setBusyItemId] = useState(null);
+
+  const {
+    data: events = [],
+    error: timelineError,
+    isLoading: timelineLoading,
+    mutate: mutateTimeline,
+  } = useSWR(TIMELINE_KEY, getTimeline);
+
+  const { trigger: triggerChat, isMutating: isSending } = useSWRMutation("studypulse-chat", (_key, { arg }) => sendChatMessage(arg));
 
   const notify = (text) => {
     setToast(text);
     window.setTimeout(() => setToast(""), 2600);
   };
 
-  const sendMessage = (text) => {
-    const time = new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date());
-    const isOutOfScope = /bài luận|làm bài|viết hộ|giải bài/i.test(text);
-    const reply = isOutOfScope
-      ? "Mình chỉ hỗ trợ quản lý lịch và deadline. Bạn có muốn mình tìm thông báo hoặc tài liệu liên quan trong Gmail/Discord không?"
-      : "Mình tìm thấy 2 thông báo liên quan. Kết quả đã được lọc ở Dashboard; bạn có thể mở nguồn gốc để kiểm chứng.";
+  const refreshConnections = async () => {
+    try {
+      const data = await getConnections();
+      setPlatforms((current) =>
+        current.map((platform) => {
+          if (platform.id === "gmail") return { ...platform, connected: data.google.connected };
+          if (platform.id === "discord") return { ...platform, connected: data.discord.connected, guilds: data.discord.guilds };
+          return platform;
+        }),
+      );
+    } catch {
+      // Backend may be offline; leave platforms as-is (mock state).
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const googleConnected = params.get("google_connected");
+    if (googleConnected !== null) {
+      notify(googleConnected === "1" ? "Đã kết nối Gmail & Google Calendar" : "Kết nối Gmail thất bại, thử lại sau.");
+      params.delete("google_connected");
+      params.delete("reason");
+      const query = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (query ? `?${query}` : ""));
+    }
+    refreshConnections();
+  }, []);
+
+  useEffect(() => {
+    // Re-check whenever the panel is opened — connecting Gmail (full-page
+    // redirect) or Discord (opened in a new tab, no callback to us) both
+    // happen outside this app, so the one-time fetch on initial load goes
+    // stale as soon as either completes.
+    if (showConnections) refreshConnections();
+  }, [showConnections]);
+
+  const sendMessage = async (text) => {
+    const userMessageId = crypto.randomUUID();
+    const loadingMessageId = crypto.randomUUID();
     setMessages((current) => [
       ...current,
-      { id: Date.now(), role: "user", text, time },
-      { id: Date.now() + 1, role: "assistant", text: reply, time },
+      { id: userMessageId, role: "user", text, time: formatTime() },
+      { id: loadingMessageId, role: "assistant", text: "", time: "", loading: true },
     ]);
+
+    try {
+      const data = await triggerChat({ conversationId, userQuery: text });
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === loadingMessageId
+            ? {
+                id: loadingMessageId,
+                role: "assistant",
+                text: data.response_text,
+                time: formatTime(),
+                needsClarification: data.requires_clarification,
+                calendarEvents: data.calendar_events,
+              }
+            : message,
+        ),
+      );
+      if (data.timeline_items_referenced?.length) {
+        mutateTimeline();
+      }
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : "Không thể kết nối tới StudyPulse.";
+      setMessages((current) =>
+        current.map((existing) =>
+          existing.id === loadingMessageId
+            ? {
+                id: loadingMessageId,
+                role: "assistant",
+                text: `${message} Kiểm tra backend đã chạy chưa rồi thử lại.`,
+                time: formatTime(),
+                isError: true,
+                retryText: text,
+              }
+            : existing,
+        ),
+      );
+    }
   };
 
   const handleAction = (id) => {
     setActiveAction(id);
     setShowConnections(false);
+    if (!seededActions.has(id) && QUICK_ACTION_QUERIES[id]) {
+      setSeededActions((current) => new Set(current).add(id));
+      sendMessage(QUICK_ACTION_QUERIES[id]);
+    }
   };
 
-  const togglePlatform = (id) => {
-    setPlatforms((current) => current.map((platform) => platform.id === id ? { ...platform, connected: true } : platform));
+  const togglePlatform = async (id) => {
+    if (id === "gmail") {
+      const gmail = platforms.find((platform) => platform.id === "gmail");
+      if (gmail?.connected) {
+        const confirmed = window.confirm(
+          "Hủy kết nối Gmail & Google Calendar?\n\nStudyPulse sẽ không thể đọc email hoặc lịch của bạn cho đến khi bạn kết nối lại.",
+        );
+        if (!confirmed) return;
+        try {
+          await disconnectGoogle();
+          setPlatforms((current) => current.map((platform) => (platform.id === "gmail" ? { ...platform, connected: false } : platform)));
+          notify("Đã hủy kết nối Gmail & Google Calendar");
+        } catch (err) {
+          notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.");
+        }
+        return;
+      }
+      try {
+        const authUrl = await getGoogleAuthUrl();
+        window.location.href = authUrl;
+      } catch (err) {
+        notify(err instanceof ApiError ? err.message : "Không thể bắt đầu kết nối Gmail, kiểm tra backend.");
+      }
+      return;
+    }
+
+    if (id === "discord") {
+      // Bots can be in several servers at once, so the row's main button
+      // always opens the invite flow (to add another one) — disconnecting a
+      // specific server happens per-row in the guild list below, not here.
+      try {
+        const inviteUrl = await getDiscordInviteUrl();
+        window.open(inviteUrl, "_blank", "noopener,noreferrer");
+        notify("Cần quản trị viên server đồng ý mời bot. Sau khi mời xong, mở lại Quản lý kết nối để kiểm tra.");
+      } catch (err) {
+        notify(err instanceof ApiError ? err.message : "Không thể lấy link mời bot, kiểm tra backend.");
+      }
+      return;
+    }
+
+    setPlatforms((current) => current.map((platform) => (platform.id === id ? { ...platform, connected: true } : platform)));
     notify("Đã kết nối nền tảng thành công");
   };
 
-  const flagEvent = (id) => {
-    setEvents((current) => current.filter((event) => event.id !== id));
-    notify("Đã đánh dấu sai và chuyển cho TA kiểm tra");
+  const disconnectDiscordGuild = async (guildId, guildName) => {
+    const confirmed = window.confirm(
+      `Hủy kết nối server Discord "${guildName}"?\n\nBot sẽ rời khỏi server này và StudyPulse sẽ không thể đọc tin nhắn ở đó nữa cho đến khi được mời lại.`,
+    );
+    if (!confirmed) return;
+    try {
+      await disconnectDiscord(guildId);
+      setPlatforms((current) =>
+        current.map((platform) => {
+          if (platform.id !== "discord") return platform;
+          const guilds = (platform.guilds || []).filter((guild) => guild.id !== guildId);
+          return { ...platform, guilds, connected: guilds.length > 0 };
+        }),
+      );
+      notify(`Đã hủy kết nối server "${guildName}"`);
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.");
+    }
   };
 
-  const saveEvent = (id, time) => {
-    setEvents((current) => current.map((event) => event.id === id ? { ...event, time, confidence: 100, verified: true, priority: "Đã xác nhận" } : event));
-    setEditingEvent(null);
-    notify("Đã lưu thay đổi của bạn");
+  const flagEvent = async (id) => {
+    setBusyItemId(id);
+    try {
+      await flagTimelineItem(id);
+      await mutateTimeline();
+      notify("Đã đánh dấu sai và chuyển cho TA kiểm tra");
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể đánh dấu mục này, thử lại sau.");
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
+  const addToCalendar = async (id) => {
+    setBusyItemId(id);
+    try {
+      const result = await confirmCalendar(id);
+      notify(result.detail ? `Đã thêm vào Google Calendar: ${result.detail}` : "Đã thêm sự kiện vào Google Calendar");
+      await mutateTimeline();
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể thêm vào lịch, thử lại sau.");
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
+  const saveEvent = async (id, time) => {
+    try {
+      await patchTimelineItem(id, { time });
+      await mutateTimeline();
+      setEditingEvent(null);
+      notify("Đã lưu thay đổi của bạn");
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể lưu thay đổi, thử lại sau.");
+    }
+  };
+
+  const dashboardProps = {
+    events,
+    timelineLoading,
+    timelineError,
+    onRetryTimeline: () => mutateTimeline(),
+    busyItemId,
+    platforms,
+    activeAction,
+    onAction: handleAction,
+    onCalendar: addToCalendar,
+    onEdit: setEditingEvent,
+    onFlag: flagEvent,
+    onTogglePlatform: togglePlatform,
+    onDisconnectGuild: disconnectDiscordGuild,
+    showConnections,
+    setShowConnections,
   };
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
       <Header onOpenConnections={() => { setShowConnections(true); setMobileView("dashboard"); }} />
       <div className="hidden min-h-0 flex-1 lg:flex">
-        <ChatPanel messages={messages} onSend={sendMessage} />
-        <Dashboard events={events} platforms={platforms} activeAction={activeAction} onAction={handleAction} onCalendar={() => notify("Đã thêm sự kiện vào Google Calendar")} onEdit={setEditingEvent} onFlag={flagEvent} onTogglePlatform={togglePlatform} showConnections={showConnections} setShowConnections={setShowConnections} />
+        <ChatPanel messages={messages} onSend={sendMessage} isSending={isSending} />
+        <Dashboard {...dashboardProps} />
       </div>
       <div className="min-h-0 flex-1 lg:hidden">
         {mobileView === "chat" ? (
-          <ChatPanel messages={messages} onSend={sendMessage} />
+          <ChatPanel messages={messages} onSend={sendMessage} isSending={isSending} />
         ) : (
-          <Dashboard events={events} platforms={platforms} activeAction={activeAction} onAction={handleAction} onCalendar={() => notify("Đã thêm sự kiện vào Google Calendar")} onEdit={setEditingEvent} onFlag={flagEvent} onTogglePlatform={togglePlatform} showConnections={showConnections} setShowConnections={setShowConnections} />
+          <Dashboard {...dashboardProps} />
         )}
       </div>
       <nav className="grid h-16 shrink-0 grid-cols-2 border-t border-slate-200 bg-white lg:hidden" aria-label="Điều hướng di động">
@@ -418,6 +895,3 @@ export default function App() {
     </main>
   );
 }
-
-
-

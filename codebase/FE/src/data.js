@@ -69,9 +69,9 @@ export const initialEvents = [
 ];
 
 export const initialPlatforms = [
-  { id: "gmail", name: "Gmail", icon: "mail", connected: false, scope: "Mail học tập" },
+  { id: "gmail", name: "Gmail", icon: "mail", connected: false, scope: "Mail, Google Calendar" },
   { id: "outlook", name: "Outlook", icon: "alternate_email", connected: true, scope: "Mail, Calendar" },
-  { id: "discord", name: "Discord", icon: "forum", connected: true, scope: "Server BTC, Class K4" },
+  { id: "discord", name: "Discord", icon: "forum", connected: false, scope: "Server BTC, Class K4", guilds: [] },
   { id: "zalo", name: "Zalo", icon: "chat_bubble", connected: false, scope: "Mock — chưa hỗ trợ API" },
 ];
 

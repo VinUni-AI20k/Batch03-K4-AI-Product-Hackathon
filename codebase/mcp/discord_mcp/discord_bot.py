@@ -46,18 +46,27 @@ def parse_id(raw_id: str, label: str) -> int:
 
 
 async def resolve_guild(guild_id: Optional[str] = None) -> discord.Guild:
-    gid = guild_id or config.DISCORD_GUILD_ID
-    if not gid:
-        raise ValueError("guildId is required (no DISCORD_GUILD_ID default configured)")
-    numeric_id = parse_id(gid, "guildId")
+    if guild_id:
+        numeric_id = parse_id(guild_id, "guildId")
+        guild = client.get_guild(numeric_id)
+        if guild is not None:
+            return guild
+        try:
+            return await client.fetch_guild(numeric_id)
+        except discord.NotFound:
+            raise ValueError(f"Guild not found by guildId: {guild_id}")
 
-    guild = client.get_guild(numeric_id)
-    if guild is not None:
-        return guild
-    try:
-        return await client.fetch_guild(numeric_id)
-    except discord.NotFound:
-        raise ValueError(f"Guild not found by guildId: {gid}")
+    # No guild_id given — resolve dynamically from whatever guilds the bot
+    # is actually in right now (list_guilds) rather than a static config
+    # default, since which servers the bot has been invited into can change
+    # at any time and it can be in more than one at once.
+    guilds = client.guilds
+    if len(guilds) == 1:
+        return guilds[0]
+    if not guilds:
+        raise ValueError("Bot is not currently a member of any Discord server — invite it first.")
+    names = ", ".join(f"{g.name} (guild_id={g.id})" for g in guilds)
+    raise ValueError(f"Bot is in multiple servers ({names}) — specify guild_id to pick one.")
 
 
 async def resolve_channel(channel_id: str) -> discord.abc.GuildChannel | discord.Thread:
