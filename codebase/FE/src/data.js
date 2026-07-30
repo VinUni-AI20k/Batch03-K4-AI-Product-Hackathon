@@ -1,0 +1,91 @@
+export const quickActions = [
+  { id: "important", label: "Mail quan trọng", icon: "mark_email_unread", color: "text-blue-600 bg-blue-50" },
+  { id: "discord", label: "Discord BTC", icon: "forum", color: "text-indigo-600 bg-indigo-50" },
+  { id: "today", label: "Lịch hôm nay", icon: "today", color: "text-emerald-600 bg-emerald-50" },
+  { id: "week", label: "Deadline tuần", icon: "assignment", color: "text-orange-600 bg-orange-50" },
+];
+
+export const initialEvents = [
+  {
+    id: 1,
+    type: "deadline",
+    title: "Nộp AI Spec — bản hoàn chỉnh",
+    course: "AI Product Hackathon",
+    date: "Hôm nay",
+    time: "23:59",
+    source: "Gmail",
+    sourceIcon: "mail",
+    priority: "Khẩn cấp",
+    confidence: 98,
+    detail: "Nộp spec.md theo template, quality bar được chốt sau thời điểm này.",
+    action: "Mở email gốc",
+    verified: true,
+  },
+  {
+    id: 2,
+    type: "class",
+    title: "Checkpoint 5 — Validation & dry run",
+    course: "AI Product Hackathon",
+    date: "Ngày mai",
+    time: "14:00",
+    source: "Discord",
+    sourceIcon: "forum",
+    priority: "Sắp tới",
+    confidence: 96,
+    detail: "Chuẩn bị prototype, validation log và phân công người demo.",
+    action: "Đi tới Discord",
+    verified: true,
+  },
+  {
+    id: 3,
+    type: "review",
+    title: "Lịch học bù sau kỳ nghỉ",
+    course: "Hệ điều hành",
+    date: "Chờ xác nhận",
+    time: "—",
+    source: "Discord",
+    sourceIcon: "forum",
+    priority: "Cần kiểm tra",
+    confidence: 72,
+    detail: "Tin nhắn dùng cụm “tuần sau Tết”, chưa có ngày cụ thể. AI không tự suy diễn.",
+    action: "Kiểm tra nguồn",
+    verified: false,
+  },
+  {
+    id: 4,
+    type: "class",
+    title: "Workshop: Prompt & Evals",
+    course: "AI Thực Chiến",
+    date: "02/08",
+    time: "09:00",
+    source: "Outlook",
+    sourceIcon: "calendar_month",
+    priority: "Bình thường",
+    confidence: 94,
+    detail: "Phòng B204 · Mang theo golden set và kết quả lượt chạy gần nhất.",
+    action: "Mở lịch gốc",
+    verified: true,
+  },
+];
+
+export const initialPlatforms = [
+  { id: "gmail", name: "Gmail", icon: "mail", connected: false, scope: "Mail học tập" },
+  { id: "outlook", name: "Outlook", icon: "alternate_email", connected: true, scope: "Mail, Calendar" },
+  { id: "discord", name: "Discord", icon: "forum", connected: true, scope: "Server BTC, Class K4" },
+  { id: "zalo", name: "Zalo", icon: "chat_bubble", connected: false, scope: "Mock — chưa hỗ trợ API" },
+];
+
+export const initialMessages = [
+  {
+    id: 1,
+    role: "assistant",
+    text: "Chào Minh! Mình là StudyPulse. Mình có thể tổng hợp lịch và deadline từ Gmail, Outlook và Discord của bạn.",
+    time: "08:30",
+  },
+  {
+    id: 2,
+    role: "assistant",
+    text: "Hôm nay bạn có 1 deadline khẩn cấp lúc 23:59. Mình luôn đính kèm nguồn để bạn kiểm tra trước khi xác nhận.",
+    time: "08:30",
+  },
+];
