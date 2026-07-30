@@ -36,6 +36,40 @@ Toàn bộ quy tắc nằm ở đầu `verify.py` dưới dạng regex có chú 
 - **Cột `total_cost_usd` luôn = 0** — không dùng được để phân tích chi phí (data dictionary đã cảnh báo).
 - **"Tốn gì mỗi lần" không có trong data.** Chatlog cho biết học viên bấm 👎, không cho biết họ mất bao nhiêu phút. Ô đó lấy từ vòng hỏi 10 người (`../khao-sat.md`).
 
+## Sử dụng các script
+
+### Main script — Verification Report
+```bash
+python verify.py
+```
+Chạy full report của tất cả metrics. Output in ra terminal với tất cả các con số.
+
+### Thêm các script hỗ trợ
+
+1. **analyze_revised.py** — Phân tích chi tiết hơn
+   - Dùng citations column để phát hiện khi tutor có/không có content
+   - Export kết quả ra `analysis_revised.json`
+   
+2. **analyze_chatlog.py** — Toàn phần phân tích đầy đủ
+   - Phân tích ratings, select patterns, failure rates
+   - Đầu ra chi tiết 15 examples
+   
+3. **inspect_patterns.py** — Inspection thấp cấp
+   - Kiểm tra quote patterns, trang markers
+   - Xem sample messages thực tế
+   - Phân tích citations column
+   
+4. **visualize_report.py** — Tạo HTML report
+   - Output: `analysis_report.html` (mở bằng browser)
+   - Tóm tắt tất cả metrics dạng visual
+
+### Chạy tất cả trong một lần
+```bash
+python verify.py                    # View in terminal
+python analyze_revised.py           # Get JSON export  
+python visualize_report.py          # Generate HTML report
+```
+
 ## Bảo mật
 
 Script đọc data pack tại `data/vlearn-pack/`. Theo README gốc mục "Bảo mật dữ liệu được cung cấp" điều 3: **không commit data pack vào repo nộp bài** — spec chỉ trích mã turn (`T0769`) và con số.

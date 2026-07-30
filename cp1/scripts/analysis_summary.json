@@ -1,0 +1,15 @@
+{
+  "total_pairs": 1261,
+  "with_context_marker": 1252,
+  "selected_pairs": 1,
+  "freeform_pairs": 1251,
+  "total_failures": 133,
+  "selected_failures": 0,
+  "freeform_failures": 132,
+  "summary_requests": 65,
+  "summary_failures": 19,
+  "users_with_failures": 91,
+  "unique_users": 369,
+  "freeform_failure_rate": 10.6,
+  "selected_failure_rate": 0.0
+}

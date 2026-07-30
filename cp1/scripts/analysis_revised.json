@@ -1,0 +1,14 @@
+{
+  "total_pairs": 1261,
+  "without_citations": 582,
+  "with_citations": 679,
+  "total_failures": 159,
+  "failures_without_content": 148,
+  "failures_with_content": 11,
+  "failure_rate_no_content": 25.4,
+  "failure_rate_with_content": 1.6,
+  "summary_requests": 40,
+  "summary_failures": 10,
+  "users_with_failures": 108,
+  "total_unique_users": 369
+}
