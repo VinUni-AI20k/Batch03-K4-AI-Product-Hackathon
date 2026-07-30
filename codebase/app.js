@@ -14,6 +14,8 @@ const S = {
   tool: 'read',
   lang: 'vi',
   penSize: 3,
+  penColor: '#e0483b',
+  moreOpen: false,    // "..." trên toolbar có đang mở thanh phụ không
   notes: [],          // {id,page,kind,quote,text,x,y}
   undo: [],           // {page,label,fn}
   chat: [],
@@ -29,6 +31,7 @@ const I18N = {
   vi: {
     sideTitle: 'Học liệu môn học', sideSub: 'Chương, slide và tài liệu đã upload',
     tRead: 'Đọc', tPen: 'Bút', tHl: 'Highlight', tSnip: 'Chụp vùng',
+    tCircle: 'Khoanh', tText: 'Text', tImg: 'Ảnh', tEraser: 'Tẩy', stroke: 'NÉT',
     page: 'Trang', note: 'Ghi chú', copy: 'Sao chép', cancel: 'Huỷ',
     askAI: 'Hỏi AI', confused: 'Báo bối rối', snipAsk: 'Hỏi AI vùng này',
     snipHint: 'Kéo chuột để chọn vùng cần hỏi · Esc để thoát',
@@ -44,6 +47,7 @@ const I18N = {
   en: {
     sideTitle: 'Course materials', sideSub: 'Chapters, slides and uploaded files',
     tRead: 'Read', tPen: 'Pen', tHl: 'Highlight', tSnip: 'Snip',
+    tCircle: 'Circle', tText: 'Text', tImg: 'Image', tEraser: 'Eraser', stroke: 'SIZE',
     page: 'Page', note: 'Note', copy: 'Copy', cancel: 'Cancel',
     askAI: 'Ask AI', confused: 'Flag confusion', snipAsk: 'Ask AI about this',
     snipHint: 'Drag to select the region · Esc to exit',
@@ -122,80 +126,165 @@ function renderChapters() {
   $$('#chapters .docitem').forEach(b => b.onclick = () => {
     const name = b.dataset.doc;
     if (name === DOC.file) { goPage(1); toast('ok', 'Đang xem ' + name); }
-    else toast('warn', 'Tài liệu "' + name + '" chưa mở trong prototype này');
+    else loadDocument(name);
   });
 }
 
 /* =============================================================
-   SLIDES
+   PDF RENDERING
    ============================================================= */
-function slideHTML(p) {
-  const foot = `<div class="s-foot"><span>${p.foot || ''}</span><span>DAY 02 · ${String(p.n).padStart(2, '0')} / ${DOC.totalPages}</span></div>`;
-  const head = `<h2>${p.title || ''}</h2>` + (p.sub ? `<p class="lead">${p.sub}</p>` : '');
+let pdfDoc = null;
+const renderedPDFPages = new Set();
+let pdfObserver = null;
 
-  switch (p.kind) {
-    case 'title':
-      return `<div class="s-eyebrow">${p.eyebrow}</div>
-        <h1 class="s-title">${p.title}</h1>
-        <p class="s-sub">${p.sub}</p>
-        <div class="s-foot"><span>${p.foot}</span><span></span></div>`;
-
-    case 'divider':
-      return `<div class="s-eyebrow">${p.eyebrow}</div>
-        <h1 class="s-title">${p.title}</h1>
-        <p class="s-sub">${p.sub}</p>${foot}`;
-
-    case 'quote':
-      return `<div class="s-quote">“${p.quote}”</div><div class="s-by">${p.by}</div>${foot}`;
-
-    case 'numbered':
-      return head + p.items.map((x, i) =>
-        `<div class="s-num"><i>${String(i + 1).padStart(2, '0')}</i><span>${x}</span></div>`).join('') + foot;
-
-    case 'bullets':
-      return head + `<ul class="s-list">${p.items.map(x => `<li>${x}</li>`).join('')}</ul>` + foot;
-
-    case 'compare':
-      return head + `<div class="s-cols">${p.cols.map(c =>
-        `<div class="s-col ${c.tone}"><h4>${c.head}</h4><ul>${c.items.map(i => `<li>${i}</li>`).join('')}</ul></div>`).join('')}</div>` + foot;
-
-    case 'stats':
-      return head + `<div class="s-stats">${p.stats.map(s =>
-        `<div class="s-stat"><b>${s.big}</b><span>${s.small}</span></div>`).join('')}</div>` + foot;
-
-    case 'framework':
-      return head + `<div class="s-fw">
-        <div><h5>${p.groupA.label}</h5>${p.groupA.items.map(i => `<div class="s-kv"><b>${i.k}</b><span>${i.v}</span></div>`).join('')}</div>
-        <div><h5>${p.groupB.label}</h5>${p.groupB.items.map(i => `<div class="s-kv"><b>${i.k}</b><span>${i.v}</span></div>`).join('')}</div>
-      </div>` + foot;
-
-    case 'template':
-      return head + `<div class="s-tpl">${p.lines.join('<br>')}</div>` + foot;
-
-    case 'profile':
-      return `<h2>${p.title}</h2><div class="s-profile">
-        <div class="s-avatar">${p.name.split(' ').map(w => w[0]).slice(0, 2).join('')}</div>
-        <div><div class="nm">${p.name}</div><div class="rl">${p.role}</div>
-        <ul class="s-list">${p.bullets.map(b => `<li>${b}</li>`).join('')}</ul></div>
-      </div>` + foot;
+async function loadDocument(docName) {
+  // Tìm info của document
+  let docInfo = null;
+  for (const ch of CHAPTERS) {
+    const d = ch.docs.find(d => d.name === docName);
+    if (d) { docInfo = d; break; }
   }
-  return head + foot;
+  if (!docInfo || !docInfo.path) { toast('warn', 'Không tìm thấy tài liệu'); return; }
+
+  toast('ok', 'Đang tải ' + docName + '...');
+  try {
+    const loadingTask = pdfjsLib.getDocument(docInfo.path);
+    pdfDoc = await loadingTask.promise;
+    DOC.file = docInfo.name;
+    DOC.totalPages = pdfDoc.numPages;
+    docInfo.pages = pdfDoc.numPages;
+
+    // Cập nhật active state
+    CHAPTERS.forEach(ch => ch.docs.forEach(d => { d.active = (d.name === docName); }));
+    // Cập nhật studying badge
+    CHAPTERS.forEach(ch => { ch.studying = ch.docs.some(d => d.active); });
+
+    // Reset state cho document mới
+    S.notes = [];
+    S.undo = [];
+    S.page = 1;
+    renderedPDFPages.clear();
+    if (pdfObserver) pdfObserver.disconnect();
+
+    // Re-render UI
+    renderChapters();
+    renderPages();
+    syncChrome();
+    $('#docName').textContent = DOC.file;
+    $('#docSub').textContent = DOC.course + ' · ' + DOC.code;
+    $('#scroller').scrollTop = 0;
+
+    toast('ok', 'Đã mở ' + docName + ' (' + pdfDoc.numPages + ' trang)');
+  } catch (err) {
+    console.error('PDF load error:', err);
+    toast('err', 'Không tải được PDF. Hãy chạy local server (xem console).');
+  }
 }
 
 function renderPages() {
-  const wm = 'DEMO · CP2';
-  $('#pages').innerHTML = PAGES.map(p => {
-    const green = ['title', 'divider', 'quote'].includes(p.kind);
-    return `<section class="page" id="pg${p.n}" data-page="${p.n}">
-      <div class="page-head"><span>${t('page')} ${p.n} / ${DOC.totalPages}</span><span class="r">${DOC.file}</span></div>
-      <div class="slide${green ? ' green' : ''}" data-wm="${wm}">
-        ${slideHTML(p)}
+  const container = $('#pages');
+  container.innerHTML = '';
+
+  for (let i = 1; i <= DOC.totalPages; i++) {
+    const section = document.createElement('section');
+    section.className = 'page';
+    section.id = 'pg' + i;
+    section.dataset.page = i;
+    section.innerHTML = `
+      <div class="page-head"><span>${t('page')} ${i} / ${DOC.totalPages}</span><span class="r">${DOC.file}</span></div>
+      <div class="slide pdf-loading">
+        <canvas class="pdf-canvas"></canvas>
+        <div class="pdf-text-layer"></div>
         <svg class="ink" viewBox="0 0 1000 562" preserveAspectRatio="none"></svg>
-      </div>
-    </section>`;
-  }).join('');
+      </div>`;
+    container.appendChild(section);
+  }
+
   $('#pagerTotal').textContent = DOC.totalPages;
   observePages();
+  setupPDFLazyRender();
+}
+
+function setupPDFLazyRender() {
+  if (!pdfDoc) return;
+  if (pdfObserver) pdfObserver.disconnect();
+
+  pdfObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const num = +entry.target.dataset.page;
+        if (!renderedPDFPages.has(num)) {
+          renderedPDFPages.add(num);
+          renderPDFPage(num);
+        }
+      }
+    });
+  }, { root: $('#scroller'), rootMargin: '400px 0px' });
+
+  $$('.page').forEach(el => pdfObserver.observe(el));
+}
+
+async function renderPDFPage(num) {
+  if (!pdfDoc) return;
+  try {
+    const page = await pdfDoc.getPage(num);
+    const slideEl = $(`#pg${num} .slide`);
+    const canvas = $(`#pg${num} .pdf-canvas`);
+    const textLayerDiv = $(`#pg${num} .pdf-text-layer`);
+    if (!canvas || !slideEl) return;
+
+    // Tính viewport
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = 2; // 2x cho retina
+    const viewport = page.getViewport({ scale });
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    // Cập nhật aspect-ratio slide theo PDF page thật
+    slideEl.style.aspectRatio = `${baseViewport.width} / ${baseViewport.height}`;
+
+    // Cập nhật SVG ink viewBox
+    const svg = $(`#pg${num} .ink`);
+    if (svg) svg.setAttribute('viewBox', `0 0 ${Math.round(baseViewport.width)} ${Math.round(baseViewport.height)}`);
+
+    // Render canvas
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    // Text layer cho chọn text
+    textLayerDiv.innerHTML = '';
+    const textContent = await page.getTextContent();
+    const textItems = textContent.items;
+    for (const item of textItems) {
+      if (!item.str) continue;
+      const tx = pdfjsLib.Util.transform(
+        pdfjsLib.Util.transform(baseViewport.transform, item.transform), [1, 0, 0, -1, 0, 0]);
+      const span = document.createElement('span');
+      span.textContent = item.str;
+      const fontHeight = Math.sqrt(tx[2] * tx[2] + tx[3] * tx[3]);
+      span.style.fontSize = fontHeight + 'px';
+      span.style.fontFamily = item.fontName || 'sans-serif';
+      // Vị trí: tính theo % để tỉ lệ đúng với container
+      span.style.left = (tx[4] / baseViewport.width * 100) + '%';
+      span.style.top = (tx[5] / baseViewport.height * 100 - fontHeight / baseViewport.height * 100) + '%';
+      // Scale theo chiều ngang
+      if (item.width) {
+        const naturalWidth = item.str.length * fontHeight * 0.5; // ước lượng
+        const targetWidth = item.width * baseViewport.scale;
+        if (naturalWidth > 0) {
+          span.style.transform = `scaleX(${targetWidth / naturalWidth})`;
+        }
+      }
+      textLayerDiv.appendChild(span);
+    }
+
+    slideEl.classList.remove('pdf-loading');
+  } catch (err) {
+    console.error('Error rendering page ' + num, err);
+    const slideEl = $(`#pg${num} .slide`);
+    if (slideEl) slideEl.classList.remove('pdf-loading');
+  }
 }
 
 /* ---- scroll-spy: tính thẳng từ scrollTop, KHÔNG dùng IntersectionObserver ----
@@ -268,54 +357,221 @@ function syncChrome() {
   $('#zoomVal').textContent = Math.round(S.zoom * 100) + '%';
   $('#btnUndo').disabled = !S.undo.length;
   const pg = $('#pg' + S.page);
-  const hasInk = pg && (pg.querySelector('.ink path') || pg.querySelector('mark') || pg.querySelector('.note-pin'));
+  const hasInk = pg && pg.querySelector('.ink > *, mark, .note-pin, .slide-text, .slide-img');
   $('#btnClear').disabled = !hasInk;
 }
 
 /* =============================================================
    TOOLS
    ============================================================= */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const COLORS = ['#e0483b', '#2f7fe0', '#22a06b', '#facc15', '#f97316', '#111827'];
+const INK_TOOLS = ['pen', 'circle', 'text'];   // các công cụ cần bảng màu + độ dày nét
+
 function setTool(name) {
   S.tool = name;
   $$('.tool[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === name));
   $$('.page').forEach(p => {
-    p.classList.toggle('pen-mode', name === 'pen');
+    p.classList.toggle('pen-mode', name === 'pen' || name === 'circle');
     p.classList.toggle('hl-mode', name === 'hl');
+    p.classList.toggle('text-mode', name === 'text');
+    p.classList.toggle('eraser-mode', name === 'eraser');
   });
   name === 'snip' ? openSnip() : closeSnip();
+  updateSubbar();
 }
 
-/* ----- bút vẽ ----- */
+/* ----- thanh công cụ phụ ----- */
+function renderSwatches() {
+  $('#swatches').innerHTML = COLORS.map(c =>
+    `<button class="swatch${c === S.penColor ? ' on' : ''}" data-color="${c}" style="background:${c}" data-tip="${c}"></button>`).join('');
+  $$('#swatches .swatch').forEach(b => b.onclick = () => {
+    S.penColor = b.dataset.color;
+    renderSwatches();
+    // đổi màu cho ô chữ đang gõ dở
+    const live = document.activeElement;
+    if (live && live.classList?.contains('slide-text')) live.style.color = S.penColor;
+  });
+}
+
+function updateSubbar() {
+  const inky = INK_TOOLS.includes(S.tool);
+  const show = S.moreOpen || inky;
+  $('#subbar').hidden = !show;
+  $('#subExtra').hidden = !S.moreOpen;
+  $('#inkOpts').hidden = !inky;
+  $('#subSep').hidden = !(S.moreOpen && inky);
+  $('#btnMore').classList.toggle('active', S.moreOpen);
+  // canh cho thanh phụ rộng bằng toolbar chính, giống bản VLearn thật
+  if (show) $('#subbar').style.width = $('#toolbar').offsetWidth + 'px';
+}
+
+/* ----- bút vẽ & khoanh tròn ----- */
 let draw = null;
 document.addEventListener('pointerdown', e => {
-  if (S.tool !== 'pen') return;
+  if (S.tool !== 'pen' && S.tool !== 'circle') return;
   const slide = e.target.closest('.slide');
   if (!slide) return;
   e.preventDefault();
   const svg = slide.querySelector('.ink');
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('stroke-width', S.penSize);
-  svg.appendChild(path);
-  draw = { svg, path, pts: [], slide };
-  addPoint(e);
-  slide.setPointerCapture?.(e.pointerId);
+
+  if (S.tool === 'circle') {
+    const el = document.createElementNS(SVG_NS, 'ellipse');
+    el.style.stroke = S.penColor;
+    el.setAttribute('stroke-width', S.penSize);
+    svg.appendChild(el);
+    draw = { mode: 'circle', el, slide, start: slidePt(slide, e) };
+  } else {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.style.stroke = S.penColor;
+    path.setAttribute('stroke-width', S.penSize);
+    svg.appendChild(path);
+    draw = { mode: 'pen', el: path, pts: [], slide };
+    addPoint(e);
+  }
+  try { slide.setPointerCapture(e.pointerId); } catch { }
 });
-document.addEventListener('pointermove', e => { if (draw) addPoint(e); });
+
+document.addEventListener('pointermove', e => {
+  if (!draw) return;
+  if (draw.mode === 'pen') return addPoint(e);
+  const p = slidePt(draw.slide, e), s = draw.start;
+  draw.el.setAttribute('cx', (s.x + p.x) / 2);
+  draw.el.setAttribute('cy', (s.y + p.y) / 2);
+  draw.el.setAttribute('rx', Math.abs(p.x - s.x) / 2);
+  draw.el.setAttribute('ry', Math.abs(p.y - s.y) / 2);
+});
+
 document.addEventListener('pointerup', () => {
   if (!draw) return;
-  const { path, slide } = draw;
+  const { el, slide, mode } = draw;
   const page = +slide.closest('.page').dataset.page;
-  if (draw.pts.length < 2) path.remove();
-  else pushUndo(page, 'nét bút', () => path.remove());
+  const tooSmall = mode === 'pen'
+    ? draw.pts.length < 2
+    : (+el.getAttribute('rx') < 6 || +el.getAttribute('ry') < 6);
+  if (tooSmall) el.remove();
+  else pushUndo(page, mode === 'pen' ? 'nét bút' : 'nét khoanh', () => el.remove());
   draw = null;
   syncChrome();
 });
+
+/* toạ độ con trỏ quy về hệ toạ độ SVG viewBox của lớp mực */
+function slidePt(slide, e) {
+  const r = slide.getBoundingClientRect();
+  const svg = slide.querySelector('.ink');
+  const vb = svg ? svg.viewBox.baseVal : null;
+  const vw = (vb && vb.width) || 1000;
+  const vh = (vb && vb.height) || 562;
+  return { x: ((e.clientX - r.left) / r.width) * vw, y: ((e.clientY - r.top) / r.height) * vh };
+}
 function addPoint(e) {
-  const r = draw.slide.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width) * 1000;
-  const y = ((e.clientY - r.top) / r.height) * 562;
-  draw.pts.push([x, y]);
-  draw.path.setAttribute('d', draw.pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '));
+  const p = slidePt(draw.slide, e);
+  draw.pts.push([p.x, p.y]);
+  draw.el.setAttribute('d', draw.pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' '));
+}
+
+/* ----- công cụ Text ----- */
+document.addEventListener('pointerdown', e => {
+  if (S.tool !== 'text') return;
+  const slide = e.target.closest('.slide');
+  if (!slide || e.target.closest('.slide-text')) return;
+  const r = slide.getBoundingClientRect();
+  addTextBox(slide, ((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+});
+
+function addTextBox(slide, xPct, yPct) {
+  const page = +slide.closest('.page').dataset.page;
+  const box = document.createElement('div');
+  box.className = 'slide-text';
+  box.contentEditable = 'true';
+  box.style.left = xPct + '%';
+  box.style.top = yPct + '%';
+  box.style.color = S.penColor;
+  box.style.fontSize = (1.3 + S.penSize * 0.22).toFixed(2) + 'cqw';
+  slide.appendChild(box);
+  box.focus();
+  let counted = false;
+  box.addEventListener('blur', () => {
+    if (!box.textContent.trim()) { box.remove(); syncChrome(); return; }
+    if (!counted) { counted = true; pushUndo(page, 'ô chữ', () => box.remove()); }
+    syncChrome();
+  });
+}
+
+/* ----- công cụ Ảnh ----- */
+$('#btnImg').onclick = () => $('#imgPicker').click();
+$('#imgPicker').onchange = e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    const slide = $('#pg' + S.page + ' .slide');
+    if (!slide) return;
+    const img = document.createElement('img');
+    img.className = 'slide-img';
+    img.src = rd.result;
+    img.style.left = '50%';
+    img.style.top = '50%';
+    slide.appendChild(img);
+    pushUndo(S.page, 'ảnh chèn', () => img.remove());
+    toast('ok', 'Đã chèn ảnh vào trang ' + S.page);
+  };
+  rd.readAsDataURL(f);
+};
+
+/* ----- công cụ Tẩy ----- */
+document.addEventListener('pointerdown', e => {
+  if (S.tool !== 'eraser') return;
+  const slide = e.target.closest('.slide');
+  if (!slide) return;
+  e.preventDefault();
+  if (!eraseAt(slide, e.clientX, e.clientY)) toast('warn', 'Không có nét nào ở chỗ vừa bấm');
+});
+
+function eraseAt(slide, cx, cy) {
+  const page = +slide.closest('.page').dataset.page;
+
+  // 1) chữ, ảnh, ghim, highlight — bắt theo khung bao, phần tử mới nhất được ưu tiên
+  const plain = [...slide.querySelectorAll('.slide-text,.slide-img,.note-pin,mark')].reverse();
+  for (const el of plain) {
+    const r = el.getBoundingClientRect();
+    if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) { removeAnn(el, page); return true; }
+  }
+
+  // 2) nét bút / khoanh — dùng isPointInStroke, nới tạm bề rộng nét cho dễ trúng
+  const svg = slide.querySelector('.ink');
+  const p = slidePt(slide, { clientX: cx, clientY: cy });
+  const pt = svg.createSVGPoint ? svg.createSVGPoint() : new DOMPoint();
+  pt.x = p.x; pt.y = p.y;
+  for (const el of [...svg.children].reverse()) {
+    if (!el.isPointInStroke) continue;
+    const w = +el.getAttribute('stroke-width') || 3;
+    el.setAttribute('stroke-width', w + 14);
+    const hit = el.isPointInStroke(pt);
+    el.setAttribute('stroke-width', w);
+    if (hit) { removeAnn(el, page); return true; }
+  }
+  return false;
+}
+
+function removeAnn(el, page) {
+  const parent = el.parentNode, next = el.nextSibling;
+  if (el.tagName === 'MARK') {
+    // gỡ thẻ mark nhưng giữ nguyên các node con để hoàn tác bọc lại được
+    const kids = [...el.childNodes];
+    kids.forEach(k => parent.insertBefore(k, el));
+    el.remove();
+    pushUndo(page, 'tẩy highlight', () => {
+      parent.insertBefore(el, next);
+      kids.forEach(k => el.appendChild(k));
+    });
+  } else {
+    if (el.classList?.contains('note-pin')) S.notes = S.notes.filter(n => (n.text || n.quote) !== el.title);
+    el.remove();
+    pushUndo(page, 'tẩy', () => parent.insertBefore(el, next));
+  }
+  syncChrome();
 }
 
 function pushUndo(page, label, fn) {
@@ -473,10 +729,10 @@ function pageUnderSnip() {
 $('#snipAsk').onclick = () => {
   const p = pageUnderSnip();
   S.snap = { page: p, w: Math.round(snip.w), h: Math.round(snip.h) };
+  const r = snipBar.getBoundingClientRect();
   closeSnip();
-  openTutor(true);
-  renderAttach();
-  send(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, { page: p, region: true });
+  openAskPopup(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, { page: p, region: true },
+    r.left + r.width / 2, r.top);
 };
 $('#snipNote').onclick = () => {
   const p = pageUnderSnip();
@@ -525,14 +781,15 @@ document.addEventListener('mouseup', e => {
 });
 document.addEventListener('mousedown', e => {
   if (!e.target.closest('.sel-popup')) selPopup.hidden = true;
-  if (!e.target.closest('#moreMenu') && !e.target.closest('#btnMore')) $('#moreMenu').hidden = true;
+  if (!e.target.closest('#moreMenu') && !e.target.closest('#btnDocMenu')) $('#moreMenu').hidden = true;
+  if (!e.target.closest('.ask-popup') && !e.target.closest('.sel-popup') && !e.target.closest('.snip-bar')) closeAskPopup();
 });
 
 $('#spAsk').onclick = () => {
+  const rect = selPopup.getBoundingClientRect();
   selPopup.hidden = true;
-  openTutor(true);
-  const q = S.selQuote.length > 90 ? S.selQuote.slice(0, 90) + '…' : S.selQuote;
-  send(`Giải thích giúp mình đoạn: “${q}”`, { page: S.selPos.page, quote: S.selQuote });
+  openAskPopup(`Giải thích đoạn bôi đen ở Trang ${S.selPos.page}...`, { page: S.selPos.page, quote: S.selQuote },
+    rect.left + rect.width / 2, rect.top);
   window.getSelection().removeAllRanges();
 };
 $('#spConfused').onclick = () => {
@@ -546,6 +803,38 @@ $('#spNote').onclick = () => {
   openNoteEditor({ page: S.selPos.page, quote: S.selQuote, x: S.selPos.x, y: S.selPos.y });
   window.getSelection().removeAllRanges();
 };
+
+/* =============================================================
+   ASK POPUP — cho sửa query trước khi gửi
+   ============================================================= */
+const askPopup = $('#askPopup');
+let askOpts = {};
+
+function openAskPopup(defaultQuery, opts, cx, cy) {
+  askOpts = opts;
+  $('#askPageLabel').textContent = `TRANG ${opts.page || S.page}`;
+  $('#askInput').value = defaultQuery;
+  askPopup.hidden = false;
+  // vị trí popup: canh giữa ngang, trên vùng bấm
+  const pw = askPopup.offsetWidth, ph = askPopup.offsetHeight;
+  askPopup.style.left = clamp(cx - pw / 2, 10, innerWidth - pw - 10) + 'px';
+  askPopup.style.top = (cy - ph - 12 > 84 ? cy - ph - 12 : cy + 12) + 'px';
+  setTimeout(() => $('#askInput').focus(), 30);
+}
+function closeAskPopup() {
+  askPopup.hidden = true;
+}
+function submitAskPopup() {
+  const q = $('#askInput').value.trim();
+  if (!q) return;
+  closeAskPopup();
+  openTutor(true);
+  if (S.snap) renderAttach();
+  send(q, askOpts);
+}
+$('#askSend').onclick = submitAskPopup;
+$('#askClose').onclick = closeAskPopup;
+$('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitAskPopup(); });
 
 /* =============================================================
    TUTOR CHAT
@@ -771,7 +1060,11 @@ function toast(kind, msg) {
    ============================================================= */
 $$('.tool[data-tool]').forEach(b => b.onclick = () => setTool(b.dataset.tool));
 
-$('#btnMore').onclick = e => {
+/* "..." trên toolbar = bật/tắt thanh công cụ phụ (Khoanh · Text · Ảnh · Tẩy) */
+$('#btnMore').onclick = () => { S.moreOpen = !S.moreOpen; updateSubbar(); };
+
+/* các tuỳ chọn của tài liệu chuyển lên nút ⋮ ở thanh trên cùng */
+$('#btnDocMenu').onclick = e => {
   const m = $('#moreMenu');
   const r = e.currentTarget.getBoundingClientRect();
   m.hidden = !m.hidden;
@@ -801,8 +1094,14 @@ function applyZoom() {
 $('#zoomIn').onclick = () => { S.zoom = Math.min(2, +(S.zoom + .09).toFixed(2)); applyZoom(); };
 $('#zoomOut').onclick = () => { S.zoom = Math.max(.5, +(S.zoom - .09).toFixed(2)); applyZoom(); };
 
-$('#penUp').onclick = () => { S.penSize = Math.min(12, S.penSize + 1); toast('ok', 'Cỡ bút: ' + S.penSize + 'px'); };
-$('#penDown').onclick = () => { S.penSize = Math.max(1, S.penSize - 1); toast('ok', 'Cỡ bút: ' + S.penSize + 'px'); };
+function setPenSize(v, quiet) {
+  S.penSize = Math.min(12, Math.max(1, v));
+  $('#penRange').value = S.penSize;
+  if (!quiet) toast('ok', 'Cỡ bút: ' + S.penSize + 'px');
+}
+$('#penUp').onclick = () => setPenSize(S.penSize + 1);
+$('#penDown').onclick = () => setPenSize(S.penSize - 1);
+$('#penRange').oninput = e => setPenSize(+e.target.value, true);
 $('#btnDownload').onclick = () => toast('ok', 'Đang tải ' + DOC.file + ' (mock)');
 $('#btnExport').onclick = exportNotes;
 $('#btnUndo').onclick = () => {
@@ -817,8 +1116,8 @@ $('#btnClear').onclick = () => {
     `<p>Toàn bộ nét bút, highlight và ghim ghi chú trên trang ${S.page} sẽ bị xoá. Không hoàn tác được.</p>`,
     `<button class="btn" data-close>${t('cancel')}</button><button class="btn primary" id="doClear">Xoá</button>`);
   $('#doClear').onclick = () => {
-    $$('.ink path', pg).forEach(p => p.remove());
-    $$('.note-pin', pg).forEach(p => p.remove());
+    $$('.ink > *', pg).forEach(p => p.remove());
+    $$('.note-pin, .slide-text, .slide-img', pg).forEach(p => p.remove());
     $$('mark', pg).forEach(m => { const par = m.parentNode; while (m.firstChild) par.insertBefore(m.firstChild, m); m.remove(); par.normalize(); });
     S.notes = S.notes.filter(n => n.page !== S.page);
     S.undo = S.undo.filter(u => u.page !== S.page);
@@ -861,8 +1160,11 @@ $('#btnSend').onclick = () => {
 $('#ask').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnSend').click(); });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal(); }
-  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'Escape') {
+    closeSnip(); selPopup.hidden = true; $('#moreMenu').hidden = true; closeModal(); closeAskPopup();
+    S.moreOpen = false; updateSubbar();
+  }
+  if (e.target.matches('input,textarea') || e.target.isContentEditable) return;
   if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goPage(S.page + 1); }
   if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goPage(S.page - 1); }
   if (e.key === 's' && !e.ctrlKey) setTool('snip');
@@ -873,11 +1175,25 @@ document.addEventListener('keydown', e => {
 
 /* ---------------- boot ---------------- */
 renderChapters();
-renderPages();
+renderSwatches();
+setPenSize(S.penSize, true);
 S.chat = SEED_CHAT.map(m => m.role === 'user'
   ? { role: 'user', text: m.text, ctxPage: m.ctxPage }
   : { role: 'ai', data: ANSWERS[m.key], ctxPage: m.ctxPage });
 renderChat();
 applyLang();
 applyZoom();
-setTimeout(() => toast('ok', 'Prototype CP2 · dữ liệu và câu trả lời AI đều là mock'), 600);
+
+// Tìm document active và load PDF
+(async () => {
+  let activeDoc = null;
+  for (const ch of CHAPTERS) {
+    const d = ch.docs.find(d => d.active);
+    if (d) { activeDoc = d; break; }
+  }
+  if (activeDoc) {
+    await loadDocument(activeDoc.name);
+  } else {
+    renderPages(); // fallback nếu không có active doc
+  }
+})();

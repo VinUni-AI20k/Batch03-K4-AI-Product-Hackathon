@@ -80,8 +80,9 @@ input{font:inherit}
   background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:60;
 }
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
-.brand-mark{width:30px;height:30px;fill:var(--accent);stroke:none}
+.brand-mark{width:32px;height:32px;object-fit:contain}
 .brand-text{font-size:23px;font-weight:800;letter-spacing:-.4px;color:var(--accent)}
+.brand-v{color:#e03636}
 .vsep{width:1px;height:34px;background:var(--line)}
 .doc-id{display:flex;align-items:center;gap:11px;min-width:0}
 .doc-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--accent)}
@@ -208,6 +209,26 @@ input{font:inherit}
 .zoom{display:flex;align-items:center;gap:2px}
 .zoom-val{font-size:14px;font-weight:700;min-width:52px;text-align:center;color:var(--ink-2)}
 
+/* thanh công cụ phụ (Khoanh · Text · Ảnh · Tẩy · màu · độ dày nét) */
+.subbar{
+  position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:54;
+  display:flex;align-items:center;gap:6px;padding:7px 10px;max-width:calc(100% - 90px);
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);
+}
+.tool.sm{height:34px;padding:0 13px;font-size:13.5px;border:1px solid var(--line);border-radius:11px}
+.tool.sm svg{width:16px;height:16px}
+.tool.sm.active{border-color:transparent}
+.inkopts{display:flex;align-items:center;gap:8px}
+.swatches{display:flex;align-items:center;gap:7px}
+.swatch{
+  width:25px;height:25px;border-radius:50%;border:2px solid transparent;
+  box-shadow:inset 0 0 0 2px var(--surface);transition:.15s;
+}
+.swatch:hover{transform:scale(1.12)}
+.swatch.on{border-color:var(--ink)}
+.net-label{font-size:12px;font-weight:800;letter-spacing:.09em;color:var(--ink-2)}
+#penRange{width:82px;accent-color:var(--accent);cursor:pointer}
+
 /* scroll area */
 .pages-scroll{position:absolute;inset:0;overflow:auto;padding:86px 34px 76px;scroll-behavior:smooth}
 .pages{display:flex;flex-direction:column;align-items:center;gap:26px;margin:0 auto}
@@ -232,6 +253,32 @@ input{font:inherit}
   pointer-events:none;letter-spacing:2px;
 }
 .slide *{position:relative;z-index:1}
+
+/* PDF canvas rendering */
+.pdf-canvas{
+  position:absolute;inset:0;width:100%;height:100%;z-index:0;border-radius:inherit;
+  display:block;object-fit:contain;
+}
+.pdf-text-layer{
+  position:absolute;inset:0;z-index:2;overflow:hidden;line-height:1;
+}
+.pdf-text-layer > span{
+  color:transparent;position:absolute;white-space:pre;cursor:text;
+  transform-origin:0% 0%;
+}
+.pdf-text-layer ::selection{background:rgba(0,50,180,.35)}
+.pdf-text-layer ::-moz-selection{background:rgba(0,50,180,.35)}
+.slide.pdf-loading::before{
+  content:"";position:absolute;inset:0;z-index:5;display:grid;place-items:center;
+  background:var(--slide);border-radius:inherit;
+}
+.slide.pdf-loading::after{
+  content:"";position:absolute;left:50%;top:50%;z-index:6;
+  width:32px;height:32px;margin:-16px 0 0 -16px;
+  border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Lưu ý: container-type là inline-size nên chỉ dùng cqw (cqh không resolve được) */
 .s-eyebrow{font-size:1.55cqw;font-weight:700;letter-spacing:.22em;opacity:.62;margin-bottom:3.4cqw}
@@ -280,11 +327,27 @@ input{font:inherit}
 
 /* highlight + mực bút */
 .slide mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px;box-decoration-break:clone}
-.ink{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible}
-.ink path{fill:none;stroke:#e0483b;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+/* width/height phải ghi đè quy tắc svg{width:20px;height:20px} dùng cho icon,
+   nếu không lớp mực bị co thành ô 20×20px ở góc và nét vẽ biến mất */
+.ink{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
+.ink path,.ink ellipse{fill:none;stroke:#e0483b;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .page.pen-mode .slide{cursor:crosshair}
 .page.pen-mode .slide *{user-select:none}
 .page.hl-mode .slide{cursor:text}
+.page.text-mode .slide{cursor:text}
+.page.eraser-mode .slide{cursor:cell}
+
+/* chữ và ảnh chèn thêm lên slide */
+.slide-text{
+  position:absolute;z-index:4;transform:translate(-2px,-50%);min-width:12px;
+  font-weight:700;line-height:1.25;outline:none;white-space:pre-wrap;max-width:70%;
+}
+.slide-text:focus{box-shadow:0 0 0 2px var(--accent);border-radius:4px;padding:0 3px}
+.slide-text:empty::before{content:"Gõ chữ...";opacity:.45}
+.slide-img{
+  position:absolute;z-index:4;width:30%;transform:translate(-50%,-50%);
+  border-radius:6px;box-shadow:0 4px 14px rgba(16,40,60,.28);
+}
 
 .note-pin{
   position:absolute;z-index:4;width:22px;height:22px;border-radius:50%;background:var(--warn);color:#fff;
@@ -436,6 +499,38 @@ input{font:inherit}
 .sp.primary:hover{filter:brightness(1.1);color:#fff}
 .sp.warn:hover{background:var(--warn-soft);color:var(--warn)}
 .sp-sep{width:1px;height:20px;background:var(--line)}
+
+/* popup hỏi AI (editable query) */
+.ask-popup{
+  position:fixed;z-index:310;width:340px;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);
+  overflow:hidden;animation:pop .18s ease-out;
+}
+.ask-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 6px;
+}
+.ask-label{
+  font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--ink-3);text-transform:uppercase;
+}
+.ask-label b{color:var(--accent);font-weight:800}
+.ask-body{
+  display:flex;align-items:center;gap:8px;padding:6px 14px 14px;
+}
+.ask-body input{
+  flex:1;height:40px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;
+  font:inherit;font-size:14px;color:var(--ink);background:var(--sheet);outline:none;
+  transition:border-color .15s;
+}
+.ask-body input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ask-send{
+  width:38px;height:38px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;transition:.15s;
+}
+.ask-send:hover{filter:brightness(1.12)}
+.ask-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
 
 /* menu */
 .menu{

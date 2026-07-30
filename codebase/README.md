@@ -20,7 +20,8 @@ Mở `index.html` bằng trình duyệt. Không cần cài đặt, không cần 
 | Nhóm | Nút | Hành vi |
 |---|---|---|
 | Chế độ | Đọc · Bút · Highlight · Chụp vùng | Bút vẽ thật lên slide (SVG), Highlight bôi vàng đoạn đã chọn thật |
-| Toolbar | `…` | Vừa khung · toàn màn hình · in · thông tin tài liệu · báo lỗi · **mô phỏng lỗi mạng** |
+| Toolbar | `…` | Mở **thanh công cụ phụ** (xem bảng dưới) |
+| Header | `⋮` | Vừa khung · toàn màn hình · in · thông tin tài liệu · báo lỗi · **mô phỏng lỗi mạng** |
 | Toolbar | `Trang N · X note` | Mở danh sách ghi chú |
 | Toolbar | zoom `−` `%` `+` | Phóng to/thu nhỏ slide thật |
 | Toolbar | `+` `−` | Tăng/giảm cỡ bút |
@@ -30,6 +31,25 @@ Mở `index.html` bằng trình duyệt. Không cần cài đặt, không cần 
 | Tutor | lịch sử · `+` · gửi · 👍👎 | Đều có phản hồi |
 
 Phím tắt: `R` đọc · `B` bút · `H` highlight · `S` chụp vùng · `←`/`→` đổi trang · `Esc` thoát.
+
+## Thanh công cụ phụ
+
+Hiện ra khi đang dùng **Bút / Khoanh / Text**, hoặc khi bấm **`…`** trên toolbar — giống hành vi của VLearn bản thật:
+
+| Đang chọn | Thanh phụ hiện gì |
+|---|---|
+| Bút (chưa bấm `…`) | 6 ô màu + thanh trượt **NÉT** |
+| Bút + đã bấm `…` | Khoanh · Text · Ảnh · Tẩy **+** 6 ô màu + **NÉT** |
+| Highlight + đã bấm `…` | Chỉ Khoanh · Text · Ảnh · Tẩy (highlight không dùng màu bút) |
+
+| Công cụ | Hành vi thật |
+|---|---|
+| **Khoanh** | Kéo chuột để vẽ hình ellipse bao quanh nội dung, theo màu và độ dày đang chọn |
+| **Text** | Bấm lên slide → hiện ô chữ gõ trực tiếp; cỡ chữ theo thanh NÉT, màu theo ô màu; để trống rồi bấm ra ngoài thì tự huỷ |
+| **Ảnh** | Mở hộp chọn file → chèn ảnh thật vào giữa trang đang xem |
+| **Tẩy** | Bấm vào một nét bút, hình khoanh, ô chữ, ảnh hoặc đoạn highlight để xoá đúng phần tử đó — hoàn tác được |
+| **6 ô màu** | Đỏ · xanh dương · xanh lá · vàng · cam · đen, áp cho bút, khoanh và text |
+| **NÉT** | Độ dày nét 1–12px, đồng bộ hai chiều với hai nút `+` `−` trên toolbar chính |
 
 ## Bốn đường đi trải nghiệm đã dựng sẵn (để nối vào spec §6)
 

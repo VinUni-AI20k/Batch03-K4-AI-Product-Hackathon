@@ -15,10 +15,8 @@
   </button>
 
   <a class="brand" href="#" id="brand">
-    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M4 5h7l5 14 5-14h7L20 28h-8z"/>
-    </svg>
-    <span class="brand-text">VLearn</span>
+    <img class="brand-mark" src="../logo/vinuni-mark.png" alt="VLearn Logo">
+    <span class="brand-text"><span class="brand-v">V</span>Learn</span>
   </a>
 
   <span class="vsep"></span>
@@ -35,6 +33,9 @@
 
   <div class="grow"></div>
 
+  <button class="icon-btn" id="btnDocMenu" data-tip="Tuỳ chọn tài liệu">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+  </button>
   <button class="pill-btn" id="btnLang" data-tip="Đổi ngôn ngữ">VI</button>
   <button class="icon-btn" id="btnTheme" data-tip="Chế độ tối">
     <svg class="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8.2 8.2 0 00-.5 2.8A8 8 0 0017.2 15a8.2 8.2 0 002.8-.5z"/></svg>
@@ -116,6 +117,34 @@
         <button class="icon-btn sm danger" id="btnClear" data-tip="Xoá annotation trang này" disabled><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button>
       </div>
     </div>
+
+    <!-- thanh công cụ phụ: hiện khi đang dùng Bút/Khoanh/Text hoặc khi bấm "..." -->
+    <div class="subbar" id="subbar" hidden>
+      <div class="tgroup" id="subExtra">
+        <button class="tool sm" data-tool="circle" data-tip="Kéo để khoanh tròn">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="7"/></svg><span data-i18n="tCircle">Khoanh</span>
+        </button>
+        <button class="tool sm" data-tool="text" data-tip="Bấm lên slide để gõ chữ">
+          <svg viewBox="0 0 24 24"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg><span data-i18n="tText">Text</span>
+        </button>
+        <button class="tool sm" id="btnImg" data-tip="Chèn ảnh vào trang này">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.4"/><path d="M21 16l-5-5-5 5-2-2-6 5"/></svg><span data-i18n="tImg">Ảnh</span>
+        </button>
+        <button class="tool sm" data-tool="eraser" data-tip="Bấm vào nét/chữ/ảnh để xoá">
+          <svg viewBox="0 0 24 24"><path d="M8 20H5l-2-2 11-11 6 6-7 7z"/><path d="M9 12l6 6"/></svg><span data-i18n="tEraser">Tẩy</span>
+        </button>
+      </div>
+
+      <span class="tsep" id="subSep"></span>
+
+      <div class="inkopts" id="inkOpts">
+        <div class="swatches" id="swatches"><!-- render bằng JS --></div>
+        <span class="tsep"></span>
+        <span class="net-label" data-i18n="stroke">NÉT</span>
+        <input type="range" id="penRange" min="1" max="12" step="1" value="3" data-tip="Độ dày nét">
+      </div>
+    </div>
+    <input type="file" id="imgPicker" accept="image/*" hidden>
 
     <!-- scroll area -->
     <div class="pages-scroll" id="scroller">
@@ -200,6 +229,22 @@
   </button>
 </div>
 
+<!-- popup hỏi AI: cho sửa query trước khi gửi -->
+<div class="ask-popup" id="askPopup" hidden>
+  <div class="ask-head">
+    <div class="ask-info">
+      <span class="ask-label">HỎI AI · <b id="askPageLabel">TRANG 1</b></span>
+    </div>
+    <button class="icon-btn sm" id="askClose"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="ask-body">
+    <input id="askInput" type="text" placeholder="Nhập câu hỏi...">
+    <button class="ask-send" id="askSend">
+      <svg viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg>
+    </button>
+  </div>
+</div>
+
 <!-- menu "..." -->
 <div class="menu" id="moreMenu" hidden>
   <button data-act="fit">Vừa khung màn hình</button>
@@ -226,6 +271,8 @@
 
 <div class="toasts" id="toasts"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>
