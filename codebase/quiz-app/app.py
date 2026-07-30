@@ -55,6 +55,19 @@ def file_too_large(_e):
     return jsonify({"error": "File vượt quá giới hạn 30MB."}), 413
 
 
+@app.errorhandler(405)
+def method_not_allowed(_e):
+    # /api/generate-quiz chỉ nhận POST (gọi từ nút "Tạo Quiz ngay" qua fetch()).
+    # Mở thẳng URL này bằng GET trên trình duyệt (gõ địa chỉ, F5 khi đang ở trang
+    # API, hoặc test bằng tay) sẽ luôn ra lỗi 405 — đây không phải bug, là đúng
+    # thiết kế REST (route chỉ khai methods=["POST"]). Trả JSON thay vì trang lỗi
+    # HTML mặc định của Flask để nhất quán với các lỗi khác trong app.
+    return jsonify({
+        "error": "Endpoint /api/generate-quiz chỉ nhận POST kèm file PDF — không hỗ trợ mở trực tiếp bằng GET. "
+                 "Dùng nút \"Tạo Quiz ngay\" trên trang chủ (http://localhost:5000/) thay vì gõ thẳng URL này."
+    }), 405
+
+
 DIFFICULTY_RANK = {"easy": 0, "medium": 1, "hard": 2}
 
 QUIZ_SCHEMA = {

@@ -16,7 +16,7 @@
     <div class="brand-icon">✨</div>
     <h1>VLearn <span class="accent">Quiz AI</span></h1>
   </div>
-  <div class="sub">Biến slide bài giảng thành quiz vui trong 30 giây 🎯 · Model: <code>{{ model }}</code></div>
+  <div class="sub">Biến slide bài giảng thành quiz vui trong 30 giây 🎯</div>
 
   <div class="stepper" id="stepper">
     <div class="step active" data-step="upload">
@@ -46,7 +46,7 @@
     <div class="field">
       <label class="field-label">1. Upload slide bài giảng</label>
       <div class="field-hint">Kéo PDF vào đây — AI sẽ đọc và sinh câu hỏi thực tế, sắp xếp từ dễ đến khó.</div>
-      <div id="dropzone" class="dropzone">
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Chọn file PDF slide bài giảng (kéo thả hoặc bấm/Enter để mở hộp thoại chọn file)">
         <input type="file" id="pdf-input" accept="application/pdf" hidden>
         <div id="dropzone-empty">
           <div class="dz-icon">📄</div>
@@ -77,7 +77,7 @@
         <button type="button" class="diff-card mode-standard active" data-value="standard">
           <div class="dc-icon">🎯</div>
           <div class="dc-title">Chuẩn — bám sát tài liệu</div>
-          <div class="dc-desc">Temperature thấp, chỉ dùng nội dung có thật trong PDF. Phù hợp luyện thi thật.</div>
+          <div class="dc-desc">Chỉ dùng nội dung có thật trong PDF, không tự bịa thêm. Phù hợp luyện thi thật.</div>
         </button>
         <button type="button" class="diff-card mode-stress" data-value="stress">
           <div class="dc-icon">⚡</div>
@@ -107,6 +107,7 @@
   <section id="loading-panel" class="panel hidden">
     <div class="spinner"></div>
     <div id="loading-text">Đang gọi Gemini để sinh quiz…</div>
+    <button type="button" id="cancel-btn" class="cancel-btn">✕ Hủy</button>
   </section>
 
   <!-- ============ RESULTS ============ -->
@@ -121,9 +122,12 @@
   <!-- ============ DEMO PREVIEW (trước khi upload) ============ -->
   <section id="demo-panel">
     <div class="demo-badge">🪄 Demo câu hỏi mẫu</div>
-    <div class="section-title">Xem trước quiz sẽ trông như thế nào</div>
-    <div class="section-sub">Chưa cần upload file gì cả — thử bấm vào 1 đáp án bên dưới.</div>
-    <div id="demo-quiz-list"></div>
+    <button type="button" id="demo-toggle" class="link-btn">👀 Xem thử quiz sẽ trông như thế nào</button>
+    <div id="demo-content" class="hidden">
+      <div class="section-title">Xem trước quiz sẽ trông như thế nào</div>
+      <div class="section-sub">Chưa cần upload file gì cả — thử bấm vào 1 đáp án bên dưới.</div>
+      <div id="demo-quiz-list"></div>
+    </div>
   </section>
 
 </main>

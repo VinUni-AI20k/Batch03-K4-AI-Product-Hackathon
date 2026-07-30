@@ -15,6 +15,9 @@ const loadingPanel = document.getElementById('loading-panel');
 const loadingText = document.getElementById('loading-text');
 const resultsPanel = document.getElementById('results-panel');
 const demoPanel = document.getElementById('demo-panel');
+const demoToggle = document.getElementById('demo-toggle');
+const demoContent = document.getElementById('demo-content');
+const cancelBtn = document.getElementById('cancel-btn');
 const modeBanner = document.getElementById('mode-banner');
 const warningBanner = document.getElementById('warning-banner');
 const metaLine = document.getElementById('meta-line');
@@ -27,6 +30,7 @@ let selectedFile = null;
 let numQuestions = 10;
 let mode = 'standard';
 let difficultyLevel = 'mixed'; // easy | medium | hard | mixed (dễ -> khó, mặc định)
+let currentController = null; // AbortController của request /api/generate-quiz đang chạy (để Hủy)
 
 const DIFF_LABEL = { easy: 'Dễ', medium: 'Trung bình', hard: 'Khó' };
 const DIFFICULTY_GROUP_LABEL = { easy: 'Dễ', medium: 'Trung bình', hard: 'Khó', mixed: 'Dễ → Khó (trộn)' };
@@ -40,6 +44,14 @@ function setStep(name) {
 
 // ---------- Upload ----------
 dropzone.addEventListener('click', () => pdfInput.click());
+// Dropzone là <div>, không phải <button>/<input> nên mặc định không dùng bàn phím được —
+// thêm tabindex+role trong HTML rồi bắt Enter/Space ở đây để tương đương click (a11y: BUG-002).
+dropzone.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    pdfInput.click();
+  }
+});
 ['dragover', 'dragenter'].forEach(ev =>
   dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); })
 );
@@ -88,8 +100,9 @@ wireGroup(difficultyGroup, 'pill-btn', v => { difficultyLevel = v; });
 
 // ---------- Generate ----------
 generateBtn.addEventListener('click', async () => {
-  if (!selectedFile) return;
+  if (!selectedFile || generateBtn.disabled) return; // chặn double-submit (BUG-006): request thật tốn phí OpenAI
   hideError();
+  generateBtn.disabled = true;
 
   formPanel.classList.add('hidden');
   demoPanel.classList.add('hidden');
@@ -106,8 +119,12 @@ generateBtn.addEventListener('click', async () => {
   fd.append('mode', mode);
   fd.append('difficulty_level', difficultyLevel);
 
+  // AbortController để nút Hủy có tác dụng thật (BUG-004): backend có thể mất
+  // tới vài phút (timeout 90s x tối đa 3 lần retry) nếu OpenAI bị rate-limit.
+  currentController = new AbortController();
+
   try {
-    const res = await fetch('/api/generate-quiz', { method: 'POST', body: fd });
+    const res = await fetch('/api/generate-quiz', { method: 'POST', body: fd, signal: currentController.signal });
     const data = await res.json();
 
     if (!res.ok) {
@@ -118,8 +135,25 @@ generateBtn.addEventListener('click', async () => {
     loadingPanel.classList.add('hidden');
     formPanel.classList.remove('hidden');
     setStep('upload');
-    showError(err.message);
+    if (err.name !== 'AbortError') {
+      showError(err.message);
+    }
+    // AbortError (do bấm Hủy) không hiện error-box đỏ — người dùng chủ động hủy, không phải lỗi hệ thống.
+  } finally {
+    currentController = null;
+    generateBtn.disabled = false;
   }
+});
+
+cancelBtn.addEventListener('click', () => {
+  if (currentController) currentController.abort();
+});
+
+// ---------- Demo mẫu: thu gọn mặc định, tránh chiếm màn hình đầu (BUG-005) ----------
+demoToggle.addEventListener('click', () => {
+  const willShow = demoContent.classList.contains('hidden');
+  demoContent.classList.toggle('hidden', !willShow);
+  demoToggle.textContent = willShow ? '🙈 Ẩn demo' : '👀 Xem thử quiz sẽ trông như thế nào';
 });
 
 // ---------- Render 1 thẻ câu hỏi (dùng chung cho demo + kết quả thật) ----------

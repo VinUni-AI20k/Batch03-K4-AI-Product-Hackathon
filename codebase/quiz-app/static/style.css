@@ -1,7 +1,7 @@
 :root{
   --bg:#F7ECD9; --card:#FFFFFF; --card-alt:#FBF3E4;
   --border:#EBDFC7; --border-soft:#F0E5D0;
-  --text:#2E2B40; --muted:#8B8478; --muted2:#A79F8E;
+  --text:#2E2B40; --muted:#6B6458; --muted2:#5F594C;
   --coral:#EA7B5C; --coral-dark:#DD6647; --coral-soft:#FBE3D9;
   --teal:#2FAF93; --teal-soft:#E1F5EF; --teal-border:#9BDCC9;
   --amber:#F0A73E; --amber-soft:#FCEED7;
@@ -65,6 +65,7 @@ main{padding:8px 20px 56px; max-width:640px; margin:0 auto;}
   background:var(--card-alt);
 }
 .dropzone:hover, .dropzone.dragover{border-color:var(--coral); background:var(--coral-soft);}
+.dropzone:focus-visible{outline:2.5px solid var(--coral); outline-offset:2px; border-color:var(--coral);}
 .dz-icon{font-size:26px; margin-bottom:10px;}
 .dz-title{font-size:14px; font-weight:700; color:var(--navy);}
 .dz-sub{font-size:12px; color:var(--muted2); margin-top:5px;}
@@ -118,6 +119,17 @@ main{padding:8px 20px 56px; max-width:640px; margin:0 auto;}
   border-radius:50%; margin:0 auto 16px; animation:spin 0.8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg);}}
+.cancel-btn{
+  margin-top:18px; padding:9px 18px; border-radius:12px; border:1.5px solid var(--border);
+  background:var(--card); color:var(--navy); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;
+}
+.cancel-btn:hover{border-color:var(--red); color:var(--red);}
+
+.link-btn{
+  display:inline-block; background:none; border:none; padding:0; margin-bottom:14px;
+  color:var(--coral); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; text-decoration:underline;
+}
+.link-btn:hover{color:var(--coral-dark);}
 
 .mode-banner{
   padding:12px 16px; border-radius:12px; font-size:13px; margin-bottom:14px;
