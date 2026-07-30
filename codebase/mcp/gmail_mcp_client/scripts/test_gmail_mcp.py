@@ -1,6 +1,6 @@
 """Manual smoke test for the Google Gmail MCP connection.
 
-Run after ``pip install -e .`` from the gmail-mcp-client directory.
+Run after ``pip install -e .`` from the gmail_mcp_client directory.
 This script uses in-memory OAuth storage, so it never writes tokens to disk.
 """
 
@@ -13,7 +13,7 @@ import sys
 from typing import Any
 
 from gmail_mcp_client import GmailMcpClient
-from gmail_mcp_client.config import load_codebase_env
+from gmail_mcp_client.config import load_mcp_env
 
 
 def json_default(value: Any) -> Any:
@@ -52,7 +52,7 @@ def main() -> None:
     actions.add_argument("--thread-id", help="Read one Gmail thread")
     args = parser.parse_args()
 
-    load_codebase_env()
+    load_mcp_env()
     try:
         asyncio.run(run(args))
     except Exception as error:

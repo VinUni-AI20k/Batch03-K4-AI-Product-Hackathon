@@ -5,13 +5,13 @@ Python client để agent kết nối Gmail MCP server chính chủ của Google
 ## Cài đặt
 
 ```bash
-cd codebase
+cd codebase/mcp
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e gmail-mcp-client --no-deps
+pip install -e gmail_mcp_client --no-deps
 cp .env.example .env
-cd gmail-mcp-client
+cd gmail_mcp_client
 ```
 
 Trước khi chạy, theo [tài liệu Google](https://developers.google.com/workspace/gmail/api/guides/configure-mcp-server):
@@ -19,7 +19,7 @@ Trước khi chạy, theo [tài liệu Google](https://developers.google.com/wor
 1. Bật `gmail.googleapis.com` và `gmailmcp.googleapis.com` trong Google Cloud project.
 2. Cấu hình OAuth consent screen, thêm scopes `gmail.readonly` và `gmail.compose`.
 3. Tạo OAuth client loại **Web application**; thêm đúng URI `http://localhost:8765/oauth/callback` (hoặc giá trị `GMAIL_MCP_OAUTH_REDIRECT_URI` bạn chọn) vào Authorized redirect URIs.
-4. Điền Client ID và Client Secret vào `codebase/.env`.
+4. Điền Client ID và Client Secret vào `codebase/mcp/.env`.
 
 Lệnh CLI dùng `InMemoryTokenStorage`, phù hợp để thử kết nối nhưng sẽ yêu cầu đăng nhập lại sau khi tiến trình kết thúc. Với ứng dụng thật, tạo `TokenStorage` dùng database/secret manager và truyền vào `GmailMcpClient` cho từng người dùng.
 
@@ -33,7 +33,7 @@ Với Gmail MCP của Google, hai tool đọc là `search_threads` và `get_thre
 
 ## Smoke test trong terminal
 
-Sau khi đã cài package và điền `codebase/.env`, chạy từ thư mục này:
+Sau khi đã cài package và điền `codebase/mcp/.env`, chạy từ thư mục này:
 
 ```bash
 python scripts/test_gmail_mcp.py
