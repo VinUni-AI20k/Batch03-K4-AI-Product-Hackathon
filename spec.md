@@ -10,14 +10,14 @@
   - Workflow hiện tại: Xem video ➔ Đọc slide ➔ Nghĩ rằng mình đã hiểu bài ➔ Bắt tay làm bài tập lớn/Quiz ➔ Phát hiện bị sai/hổng kiến thức cốt lõi.
 - **Core JTBD** *(không chứa chữ AI)*: Kiểm tra và xác nhận mức độ hiểu bài thực tế của bản thân ngay sau buổi học để tự tin áp dụng kiến thức vào bài tập lớn mà không bị hổng kiến thức cốt lõi.
 - **Problem statement** *(KHÔNG chữ AI)*: Học viên thường rơi vào trạng thái "ảo tưởng đã hiểu bài" (Illusion of Competence) sau khi đọc slide hoặc nghe giảng, nhưng thực chất bị hiểu sai hoặc hổng các khái niệm quan trọng mà không tự biết cho đến khi bị trừ điểm bài tập.
-- **Evidence** *(Đạt cả chuẩn A và B — n = 24 học viên)*:
+- **Evidence** *(Đạt cả chuẩn A và B — n = 36 học viên)*:
   - **Số liệu Mining Data (Đường B)** — từ dataset `chat_history_anonymized_for_hackathon.csv` (2.522 lượt chat):
     1. `asked_check_question = False` ở **2.515 / 2.518 lượt chat (99.88%)**: AI Tutor hiện tại vận hành hoàn toàn thụ động, gần như không bao giờ chủ động đặt câu hỏi kiểm tra bài.
     2. `misconceptions = []` ở **100% lượt chat (0 / 1.261)**: Field phát hiện hiểu lầm trong DB chưa từng được triển khai.
-  - **Kết quả Khảo sát thực tế (Đường A — Đạt chuẩn $\ge 20$ mẫu)** — từ file khảo sát `Câu trả lời biểu mẫu 1.html` mới nhất ($N = 24$ học viên trong lớp):
-    1. **83.33% (20/24 học viên)** xác nhận *sẵn sàng làm một bài Quiz ngắn ngay sau bài học* để hệ thống kiểm tra lại mức độ hiểu bài (9 bạn hoàn toàn sẵn sàng, 11 bạn sẵn sàng nếu Quiz ngắn).
-    2. **91.67% (22/24 học viên)** đồng ý *chia sẻ lịch sử lỗi sai của mình với AI* để hệ thống phát hiện lỗ hổng kiến thức & gợi ý chủ đề ôn tập (điểm 3-5/5).
-    3. **83.33% (20/24 học viên)** đồng ý *chuyển câu hỏi/vùng slide chưa hiểu cho Giảng viên/TA* khi làm Quiz không đạt (trong đó 37.5% yêu cầu nút "Đồng ý gửi" trước khi gửi).
+  - **Kết quả Khảo sát thực tế (Đường A — Đạt chuẩn $\ge 36$ mẫu)** — từ file khảo sát `Câu trả lời biểu mẫu 1.html` mới nhất ($N = 36$ học viên trong lớp):
+    1. **88.88% (32/36 học viên)** xác nhận *sẵn sàng làm một bài Quiz ngắn ngay sau bài học* để hệ thống kiểm tra lại mức độ hiểu bài (17 bạn hoàn toàn sẵn sàng, 15 bạn sẵn sàng nếu Quiz ngắn).
+    2. **77.77% (28/36 học viên)** đồng ý *chia sẻ lịch sử lỗi sai của mình với AI* để hệ thống phát hiện lỗ hổng kiến thức & gợi ý chủ đề ôn tập (điểm 3-5/5).
+    3. **88.88% (32/36 học viên)** đồng ý *chuyển câu hỏi/vùng slide chưa hiểu cho Giảng viên/TA* khi làm Quiz không đạt (trong đó 38.9% yêu cầu nút "Đồng ý gửi" trước khi gửi).
 
 ---
 
