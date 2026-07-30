@@ -17,6 +17,8 @@ uv run jupyter lab
 Sau đó mở `eda/vlearn_ai_tutor_eda.ipynb`. Hướng dẫn và lưu ý diễn giải nằm trong
 `eda/README.md`.
 
+Product Canvas dùng cho CP1: `product-canvas.md`.
+
 ## Bắt đầu từ đâu?
 
 1. Đọc **`01-de-bai.md`** để chọn hướng và hiểu tiêu chí.
