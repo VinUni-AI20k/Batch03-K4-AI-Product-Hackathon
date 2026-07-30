@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Hỏi nhanh qua chat với agent
+    url: https://github.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304/discussions
+    about: Trao đổi, hỏi đáp cộng đồng team VLagent (không phải báo lỗi/feedback chính thức).

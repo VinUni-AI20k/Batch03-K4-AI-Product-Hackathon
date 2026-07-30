@@ -1,4 +1,4 @@
-"""Version & self-update (mô hình `hermes update`):
+"""Version & self-update (git pull + cài deps):
 - check_version: version + commit local, so sánh với origin/main trên GitHub.
 - do_update: git pull --ff-only + pip install -e . (chạy qua CLI `learning-agent update`).
 """

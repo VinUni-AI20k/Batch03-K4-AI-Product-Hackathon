@@ -1,0 +1,34 @@
+# Vlearn Agent — chạy bằng docker compose.
+#   docker compose up -d           # bật cả bot (gateway) + dashboard
+#   docker compose logs -f bot
+#   docker compose down
+# Sửa .env + config.yaml + SOUL.md ở host là container đọc luôn (mount vào).
+# Muốn xử lý PDF/PPTX/video: sửa build.args WITH_INGEST: "1" rồi `docker compose build`.
+
+x-common: &common
+  build:
+    context: .
+    args:
+      WITH_INGEST: "0"      # đổi "1" để cài Docling/Whisper (image nặng)
+  image: vlearn-agent:latest
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - ./vault:/app/vault              # knowledge base (markdown, xem bằng Obsidian)
+    - ./data:/app/data               # index Chroma, manifest, sessions, audit...
+    - ./source_mirror:/app/source_mirror
+    - ./skills:/app/skills
+    - ./addons:/app/addons
+    - ./config.yaml:/app/config.yaml
+    - ./SOUL.md:/app/SOUL.md
+
+services:
+  bot:                                # gateway Telegram + Discord + scheduler
+    <<: *common
+    command: ["learning-agent", "bot"]
+
+  ui:                                 # dashboard quản trị
+    <<: *common
+    command: ["learning-agent", "ui", "--port", "8321", "--host", "0.0.0.0"]
+    ports:
+      - "127.0.0.1:8321:8321"         # chỉ mở ở localhost host; từ xa dùng SSH tunnel

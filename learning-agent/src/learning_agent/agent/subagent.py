@@ -1,4 +1,4 @@
-"""Sub-agent cho việc dài (quiz cả chương, tóm tắt module) — pattern Hermes:
+"""Sub-agent cho việc dài (quiz cả chương, tóm tắt module) — thiết kế Vlearn Agent:
 chạy một agent con với system prompt riêng, context cô lập, trả kết quả về thread."""
 from __future__ import annotations
 

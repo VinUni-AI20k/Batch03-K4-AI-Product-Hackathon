@@ -1,4 +1,4 @@
-"""Cron scheduler — mô hình Hermes: tick, mỗi job chạy một phiên agent MỚI,
+"""Cron scheduler — mô hình Vlearn Agent: tick, mỗi job chạy một phiên agent MỚI,
 kết quả tự giao về chat.
 
 Hai loại job:
@@ -67,6 +67,11 @@ class TaskStore:
             json.dumps(self.tasks, ensure_ascii=False, indent=1), encoding="utf-8"
         )
 
+    def reload(self) -> None:
+        """Đọc lại từ file — để thay đổi từ Web UI/process khác được scheduler nhận."""
+        if self.path.exists():
+            self.tasks = json.loads(self.path.read_text(encoding="utf-8"))
+
     def add(self, prompt: str, when: str, platform: str, chat_id: str) -> str:
         parsed = parse_when(when)
         if parsed is None:
@@ -121,6 +126,7 @@ class Scheduler:
 
     async def run(self) -> None:
         while True:
+            self.store.reload()  # nhận thay đổi từ Web UI
             now = datetime.now()
             for job in self.static_jobs:
                 name = job.get("name", job.get("skill", "job"))
@@ -141,7 +147,7 @@ class Scheduler:
                     asyncio.create_task(self._run_dynamic(task))
             await asyncio.sleep(20)
 
-    # ---------- thực thi (phiên agent mới — mô hình cron Hermes) ----------
+    # ---------- thực thi (phiên agent mới — mô hình cron Vlearn Agent) ----------
     async def _run_static(self, job: dict) -> None:
         prompt = (
             f"Hôm nay là {datetime.now().strftime('%A %d/%m/%Y')}. "

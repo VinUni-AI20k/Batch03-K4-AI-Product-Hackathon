@@ -34,9 +34,17 @@ class Vault:
             yield Note.load(p)
 
     def find(self, name: str) -> Note | None:
-        """Tìm note theo tên file (cách wikilink resolve trong Obsidian)."""
+        """Tìm note theo tên file (cách wikilink resolve trong Obsidian).
+        Không khớp chính xác thì fuzzy: khớp chuỗi con không phân biệt hoa thường
+        (vd 'day03-...-react' ra được 'day03-...-react-v7')."""
         for p in self.path.rglob(f"{name}.md"):
             return Note.load(p)
+        needle = name.lower().strip()
+        candidates = [p for p in self.path.rglob("*.md")
+                      if needle in p.stem.lower() or p.stem.lower() in needle]
+        if candidates:
+            best = min(candidates, key=lambda p: abs(len(p.stem) - len(needle)))
+            return Note.load(best)
         return None
 
     def backlinks(self, name: str) -> list[Note]:

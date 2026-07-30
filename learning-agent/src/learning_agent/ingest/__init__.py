@@ -13,16 +13,20 @@ from .audio import AUDIO_EXTS, VIDEO_EXTS, fmt_ts, transcribe
 from .align import align_transcript, transcript_markdown
 from .slides import extract_slides
 from .video import detect_slides
+from .web import extract_html
 
 DOC_EXTS = {".pdf", ".pptx", ".docx"}
 TEXT_EXTS = {".md", ".txt"}
-SUPPORTED_EXTS = DOC_EXTS | TEXT_EXTS | AUDIO_EXTS | VIDEO_EXTS
+HTML_EXTS = {".html", ".htm"}
+SUPPORTED_EXTS = DOC_EXTS | TEXT_EXTS | HTML_EXTS | AUDIO_EXTS | VIDEO_EXTS
 
 
 def extract(source: Path, asr_model: str, language: str = "vi") -> str:
     ext = source.suffix.lower()
     if ext in TEXT_EXTS:
         return source.read_text(encoding="utf-8", errors="replace")
+    if ext in HTML_EXTS:
+        return extract_html(source)
     if ext in DOC_EXTS:
         return extract_slides(source)
 

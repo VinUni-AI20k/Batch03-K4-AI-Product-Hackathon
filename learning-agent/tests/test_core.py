@@ -152,12 +152,127 @@ def test_audit_log(tmp_path):
     assert "ts" in lines[1]
 
 
-def test_upload_filename_sanitized(tmp_path):
-    from learning_agent.updater.inbox import ingest_upload
+def test_upload_filename_sanitized():
     # tên file chứa ký tự traversal/độc -> bị làm sạch, không thoát được inbox
     import re
     safe = re.sub(r"[^\w.\-() ]", "_", "../../../etc/passwd")
     assert "/" not in safe and "\\" not in safe
+
+
+def test_research_tool_routing(tmp_path):
+    # research tool định tuyến source đúng; source lạ -> báo lỗi (không gọi mạng)
+    from learning_agent.config import load_config
+    from learning_agent.vault import Vault
+    from learning_agent.index import LessonIndex
+    from learning_agent.agent.tools import build_tools
+    cfg = load_config()
+    _, impls = build_tools(Vault(tmp_path / "v", False),
+                           LessonIndex(tmp_path / "c", "test", None), cfg)
+    assert "research" in impls
+    assert "web | reddit | github | x" in impls["research"]("badsource", "x")
+
+
+def test_md_to_telegram_html():
+    from learning_agent.gateway.base import md_to_telegram_html
+    assert md_to_telegram_html("**ReAct** là mẫu") == "<b>ReAct</b> là mẫu"
+    assert md_to_telegram_html("### Định Nghĩa") == "<b>Định Nghĩa</b>"
+    assert "<code>x = 1</code>" in md_to_telegram_html("chạy `x = 1` nhé")
+    assert '<a href="https://a.b">t</a>' in md_to_telegram_html("[t](https://a.b)")
+    # escape < > & để không vỡ HTML
+    out = md_to_telegram_html("so sánh a < b & c")
+    assert "&lt;" in out and "&amp;" in out
+    # code block giữ nguyên
+    assert "<pre>" in md_to_telegram_html("```\nfor i in x:\n```")
+
+
+def test_pending_uploads_interpret():
+    from learning_agent.gateway.base import PendingUploads
+    p = PendingUploads.interpret
+    assert p("nạp") == "commit"
+    assert p("ok lưu đi") == "commit"
+    assert p("cả 2 bản") == "both"
+    assert p("không, chỉ hỏi thôi") == "skip"
+    # câu hỏi về file -> None (không phải yes/no)
+    assert p("file này nói về chủ đề gì và có những phần nào?") is None
+
+
+def test_session_log_search(tmp_path):
+    from learning_agent.agent.sessions import SessionLog
+    s = SessionLog(tmp_path / "sessions.db")
+    s.log("u1", "user", "RAG là gì và chunking hoạt động thế nào?", "telegram")
+    s.log("u1", "assistant", "RAG kết hợp retrieval với generation...", "telegram")
+    s.log("u2", "user", "RAG bí mật của người khác", "telegram")
+    out = s.search("chunking", "u1")
+    assert "chunking" in out.lower()
+    # scope theo user — u1 không thấy hội thoại của u2
+    assert "bí mật" not in s.search("RAG", "u1")
+    assert "GẦN NHẤT" in s.search("kubernetes", "u1")
+
+
+def test_integrations(tmp_path):
+    from learning_agent.config import Config
+    from learning_agent.integrations import Integrations
+
+    cfg = Config(raw={"agent": {"skills_dir": "skills"}}, root=tmp_path)
+    (tmp_path / "skills").mkdir()
+    integ = Integrations(cfg)
+
+    # toggle persist
+    integ.set_enabled("gog", True)
+    assert Integrations(cfg)._state()["gog"] is True
+    # run_cli guards: chưa bật -> từ chối; bật nhưng binary không tồn tại -> báo cài
+    assert "chưa được admin bật" in integ.run_cli("m365", "spo file list")
+    assert "chưa cài" in integ.run_cli("gog", "drive ls") or "sẵn" not in integ.run_cli("gog", "drive ls")
+    assert "không phải CLI" in integ.run_cli("rm", "-rf /")  # binary lạ bị chặn
+
+    # cài skill từ registry local (giả lập repo GitHub)
+    import subprocess
+    repo = tmp_path / "reg"
+    (repo / "hoc-tap" / "quiz-x").mkdir(parents=True)
+    (repo / "hoc-tap" / "quiz-x" / "SKILL.md").write_text(
+        "---\nname: quiz-x\ndescription: Quiz nâng cao.\n---\nQuy trình...", encoding="utf-8")
+    for cmd in (["git", "init", "-q"], ["git", "add", "-A"],
+                ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "x"]):
+        subprocess.run(cmd, cwd=repo, check=True)
+    from learning_agent import integrations as integ_mod
+    integ_mod.CATALOG.append({"key": "test-reg", "name": "T", "category": "E",
+                              "type": "registry", "repo": str(repo), "url": ""})
+    try:
+        skills = integ.registry_skills("test-reg")
+        assert skills and skills[0]["name"] == "quiz-x" and not skills[0]["installed"]
+        assert "✅" in integ.install_skill("test-reg", "quiz-x")
+        assert (tmp_path / "skills" / "quiz-x" / "SKILL.md").exists()
+        assert integ.registry_skills("test-reg")[0]["installed"]
+    finally:
+        integ_mod.CATALOG.pop()
+
+
+def test_addons(tmp_path):
+    from learning_agent.addons import Addons
+    from learning_agent.config import Config
+
+    addons_dir = tmp_path / "addons"
+    addons_dir.mkdir()
+    (addons_dir / "demo.py").write_text(
+        'NAME = "demo"\nDESCRIPTION = "Addon test"\n'
+        'TOOLS = [{"name": "demo_hello", "description": "chào", '
+        '"parameters": {"type": "object", "properties": {}}}]\n'
+        'def handle(tool, args):\n    return "xin chào từ addon"\n',
+        encoding="utf-8",
+    )
+    (addons_dir / "hong.py").write_text("NAME = 'hong'\n", encoding="utf-8")  # thiếu TOOLS
+
+    cfg = Config(raw={}, root=tmp_path)
+    a = Addons(cfg)
+    assert a.owns("demo_hello")
+    # mặc định TẮT -> từ chối
+    assert "chưa được admin bật" in a.dispatch("demo_hello", {})
+    a.set_enabled("demo", True)
+    assert a.dispatch("demo_hello", {}) == "xin chào từ addon"
+    # addon hỏng được báo lỗi, không sập loader
+    status = {s["name"]: s for s in a.status()}
+    assert status["demo"]["enabled"] and status["hong"].get("error")
+    assert len(a.schemas()) == 1
 
 
 def test_ingest_markdown_passthrough(tmp_path):
@@ -166,3 +281,40 @@ def test_ingest_markdown_passthrough(tmp_path):
     f.write_text("# Bài học\nNội dung.", encoding="utf-8")
     assert ingest.extract(f, asr_model="x") == "# Bài học\nNội dung."
     assert ".md" in ingest.SUPPORTED_EXTS and ".mp4" in ingest.SUPPORTED_EXTS
+
+
+def test_discord_action_routing():
+    # agent định tuyến tool discord_* tới origin['discord_actions'] khi chat qua Discord
+    from learning_agent.config import load_config
+    from learning_agent.vault import Vault
+    from learning_agent.index import LessonIndex
+    from learning_agent.agent import TutorAgent
+    import json as _json
+
+    cfg = load_config()
+    cfg.llm_api_key = ""  # không gọi LLM
+    agent = TutorAgent(cfg, Vault(cfg.path("vault", "path"), False),
+                       LessonIndex(cfg.path("index", "chroma_path"), "lessons", None))
+
+    class FakeActions:
+        def handle(self, tool, args):
+            return f"OK:{tool}:{args.get('name','')}"
+    origin = {"platform": "discord", "chat_id": 1, "discord_actions": FakeActions()}
+    out = agent._run_tool("discord_create_event",
+                          _json.dumps({"name": "Họp", "when": "07:00"}),
+                          "u1", "David", origin)
+    assert out == "OK:discord_create_event:Họp"
+    # không có origin discord -> không định tuyến (trả lời tool không tồn tại)
+    out2 = agent._run_tool("discord_create_event", "{}", "u1", "David", None)
+    assert "không tồn tại" in out2.lower()
+
+
+def test_ingest_html(tmp_path):
+    from learning_agent import ingest
+    f = tmp_path / "bai.html"
+    f.write_text("<html><body><h1>Tiêu đề</h1><p>Nội dung bài học.</p>"
+                 "<script>bỏ cái này</script></body></html>", encoding="utf-8")
+    out = ingest.extract(f, asr_model="x")
+    assert "Tiêu đề" in out and "Nội dung bài học" in out
+    assert "bỏ cái này" not in out  # script bị loại
+    assert ".html" in ingest.SUPPORTED_EXTS

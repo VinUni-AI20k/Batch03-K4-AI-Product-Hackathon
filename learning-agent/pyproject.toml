@@ -1,7 +1,7 @@
 [project]
 name = "learning-agent"
 version = "0.1.0"
-description = "Agent học tập cho học viên: Discord gateway + Obsidian-style vault + RAG, tự build (tham khảo kiến trúc Hermes Agent & basic-memory)"
+description = "Vlearn Agent — trợ giảng AI cá nhân: Discord/Telegram gateway + vault markdown (Obsidian-compatible) + RAG, skills, memory 3 tầng. Tự build bởi đội AIECOS/Vlearn."
 requires-python = ">=3.11"
 dependencies = [
     "openai>=1.40",              # client OpenAI-compatible: OpenAI / OpenRouter / Nous Portal / Ollama
@@ -11,6 +11,9 @@ dependencies = [
     "pyyaml>=6.0",
     "chromadb>=0.5",
     "python-dotenv>=1.0",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "ddgs>=6.0",                  # web search cho tool nghiên cứu (Reddit/GitHub dùng stdlib)
 ]
 
 [project.optional-dependencies]
@@ -34,3 +37,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/learning_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["data", ".venv", "vault", "source_mirror"]

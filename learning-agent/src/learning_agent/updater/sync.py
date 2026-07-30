@@ -28,16 +28,19 @@ def sync_once(cfg, vault: Vault, index: LessonIndex, verbose: bool = True) -> di
 
     stats = {"ingested": 0, "removed": 0, "chunks": 0}
 
+    stats["failed"] = []
     for path in changes.added + changes.modified:
         if verbose:
             print(f"→ ingest: {path.name}")
-        raw = ingest.extract(path, asr_model, language)
-        body = structure_lesson(raw, llm, structurer_model)
-        meta = lesson_meta(path, source_dir, file_hash(path))
-        note = vault.write_lesson_note(note_rel_path(path, source_dir), meta, body)
-        stats["chunks"] += index.index_note(note)
-        manifest.record(source_dir, path, str(note.path))
-        stats["ingested"] += 1
+        try:
+            note, chunks = ingest_one_file(cfg, vault, index, path, source_dir, manifest,
+                                           llm, structurer_model, asr_model, language)
+            stats["chunks"] += chunks
+            stats["ingested"] += 1
+        except Exception as e:  # 1 file lỗi (mã hoá, hỏng...) -> bỏ qua, tiếp file khác
+            stats["failed"].append((path.name, str(e)[:120]))
+            if verbose:
+                print(f"  ⚠️ bỏ qua {path.name}: {str(e)[:120]}")
 
     for rel in changes.deleted:
         note_path = manifest.note_for(rel)
@@ -59,6 +62,21 @@ def sync_once(cfg, vault: Vault, index: LessonIndex, verbose: bool = True) -> di
             f"sync: +{stats['ingested']} bài, -{stats['removed']} bài, {stats['chunks']} chunks"
         )
     return stats
+
+
+def ingest_one_file(cfg, vault, index, path: Path, source_dir: Path, manifest,
+                    llm, structurer_model, asr_model, language,
+                    rel_override: str | None = None):
+    """Ingest ĐÚNG 1 file: extract -> structure -> ghi note -> embed -> ghi manifest.
+    rel_override: đổi đường dẫn note (để lưu 'giữ cả 2' thành phiên bản mới)."""
+    raw = ingest.extract(path, asr_model, language)
+    body = structure_lesson(raw, llm, structurer_model)
+    meta = lesson_meta(path, source_dir, file_hash(path))
+    rel = rel_override or note_rel_path(path, source_dir)
+    note = vault.write_lesson_note(rel, meta, body)
+    chunks = index.index_note(note)
+    manifest.record(source_dir, path, str(note.path))
+    return note, chunks
 
 
 def reindex_all(cfg, vault: Vault, index: LessonIndex) -> int:

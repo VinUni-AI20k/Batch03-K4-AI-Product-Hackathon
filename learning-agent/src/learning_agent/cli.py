@@ -6,6 +6,7 @@
   ask       hỏi thử agent trong terminal (không cần Discord/Telegram)
   bot       chạy gateway: Discord + Telegram + cron scheduler (kênh nào có token thì bật)
   update    cập nhật lên bản mới nhất từ GitHub (git pull + cài deps) rồi khởi động lại bot
+  ui        mở dashboard quản trị web (http://127.0.0.1:8321, chỉ local)
 """
 from __future__ import annotations
 
@@ -36,6 +37,9 @@ def main() -> None:
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("onboard")
     sub.add_parser("update")
+    ui = sub.add_parser("ui")
+    ui.add_argument("--port", type=int, default=8321)
+    ui.add_argument("--host", default="127.0.0.1", help="0.0.0.0 khi chạy trong Docker")
     sub.add_parser("sync")
     sub.add_parser("reindex")
     ask = sub.add_parser("ask")
@@ -52,6 +56,11 @@ def main() -> None:
     if args.cmd == "update":
         from .updater.selfupdate import do_update
         do_update(cfg)
+        return
+
+    if args.cmd == "ui":
+        from .webui import run_ui
+        run_ui(cfg, args.port, args.host)
         return
 
     vault, index = _setup(cfg)
@@ -78,7 +87,7 @@ def main() -> None:
 
 
 async def _run_gateway(cfg, vault, index) -> None:
-    """Một process chạy mọi channel + cron scheduler chung 1 event loop (mô hình gateway Hermes)."""
+    """Một process chạy mọi channel + cron scheduler chung 1 event loop (mô hình gateway Vlearn Agent)."""
     from .agent import TutorAgent
     from .gateway.base import HomeStore
     from .scheduler import Scheduler
@@ -89,22 +98,29 @@ async def _run_gateway(cfg, vault, index) -> None:
     agent.attach_task_store(scheduler.store)  # bật tools schedule_task từ chat
     tasks = []
 
+    async def guarded(name: str, coro):
+        """Một kênh lỗi thì chỉ kênh đó dừng, không kéo sập cả gateway."""
+        try:
+            await coro
+        except Exception as e:
+            print(f"⚠️ Kênh {name} dừng: {type(e).__name__}: {e}")
+
     if cfg.discord_token:
         from .gateway.discord_bot import TutorBot
         bot = TutorBot(cfg, agent, vault, index, home)
         scheduler.register("discord", bot.notify_home, bot.send_to)
-        tasks.append(bot.start(cfg.discord_token))
+        tasks.append(guarded("Discord", bot.start(cfg.discord_token)))
     if cfg.telegram_token:
         from .gateway.telegram_bot import TelegramGateway
         tg = TelegramGateway(cfg, agent, vault, index, home)
         scheduler.register("telegram", tg.notify_home, tg.send_to)
-        tasks.append(tg.run())
-    tasks.append(scheduler.run())
+        tasks.append(guarded("Telegram", tg.run()))
+    tasks.append(guarded("Scheduler", scheduler.run()))
     await asyncio.gather(*tasks)
 
 
 def _onboard(cfg) -> None:
-    """Checklist cấu hình lần đầu — kiểu `hermes setup` tối giản."""
+    """Checklist cấu hình lần đầu — lần đầu."""
     env_file = cfg.root / ".env"
     if not env_file.exists():
         example = cfg.root / ".env.example"
@@ -117,7 +133,7 @@ def _onboard(cfg) -> None:
     if not (os.environ.get("TELEGRAM_ALLOWED_USERS") or os.environ.get("DISCORD_ALLOWED_USERS")):
         print("⚠️ Allowlist trống — bot sẽ mở cho MỌI người. Điền *_ALLOWED_USERS trước khi chạy thật.")
     checks = [
-        ("LLM_API_KEY (bắt buộc)", bool(cfg.llm_api_key)),
+        (f"LLM key cho provider '{cfg.llm_provider}' (bắt buộc)", bool(cfg.llm_api_key)),
         ("DISCORD_BOT_TOKEN (kênh Discord)", bool(cfg.discord_token)),
         ("TELEGRAM_BOT_TOKEN (kênh Telegram)", bool(cfg.telegram_token)),
         ("VOYAGE_API_KEY (embedding — thiếu thì dùng local)", bool(cfg.voyage_api_key)),

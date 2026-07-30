@@ -1,6 +1,6 @@
 """Telegram gateway (python-telegram-bot v21+, long polling).
 
-UX theo Hermes: chat riêng = 1 phiên; allowlist TELEGRAM_ALLOWED_USERS;
+UX theo Vlearn Agent: chat riêng = 1 phiên; allowlist TELEGRAM_ALLOWED_USERS;
 gửi file (PDF/audio/video/md) là nạp thẳng vào tài liệu học; /sethome chọn nơi
 nhận báo cáo cron. Giới hạn Bot API: nhận file ≤20MB (nâng 2GB bằng local
 telegram-bot-api server), message ≤4096 ký tự → cắt 4000.
@@ -20,9 +20,9 @@ from ..agent import TutorAgent
 from ..agent.subagent import run_quiz, run_summary
 from ..index import LessonIndex
 from ..security import Audit, RateLimiter
-from ..updater.inbox import ingest_upload
+from ..updater.inbox import commit_upload, receive_upload
 from ..vault import Vault
-from .base import HomeStore, allowed_users, split_message
+from .base import HomeStore, PendingUploads, allowed_users, md_to_telegram_html, split_message
 
 MAX_LEN = 4000
 MAX_DOWNLOAD = 20 * 1024 * 1024  # Bot API chuẩn chỉ cho bot tải file ≤20MB
@@ -41,9 +41,25 @@ class TelegramGateway:
             print("⚠️ TELEGRAM_ALLOWED_USERS trống — bot đang MỞ CHO MỌI NGƯỜI (chỉ nên dùng khi dev).")
         self.audit = Audit(cfg.root / "data" / "audit.log")
         self.rate = RateLimiter(int(cfg.get("security", "user_rate_per_minute", default=10)))
+        self.pending = PendingUploads()
         self.histories: dict[int, deque] = defaultdict(lambda: deque(maxlen=HISTORY_TURNS))
-        self.app = Application.builder().token(os.environ["TELEGRAM_BOT_TOKEN"]).build()
+        # concurrent_updates: tin nhắn xử lý song song — việc dài (cài pack, ingest)
+        # không chặn cả hàng đợi chat
+        self.app = (
+            Application.builder()
+            .token(os.environ["TELEGRAM_BOT_TOKEN"])
+            .concurrent_updates(True)
+            .build()
+        )
         self._register()
+
+    async def _send_formatted(self, sender, text: str) -> None:
+        """sender(text, parse_mode)->coroutine. Cắt + render Markdown->HTML; lỗi parse thì gửi plain."""
+        for chunk in split_message(text, MAX_LEN):
+            try:
+                await sender(md_to_telegram_html(chunk), "HTML")
+            except Exception:
+                await sender(chunk, None)
 
     def _ok(self, update: Update) -> bool:
         uid = str(update.effective_user.id)
@@ -74,7 +90,7 @@ class TelegramGateway:
             await update.message.reply_text(f"Bạn chưa được cấp quyền. User ID của bạn: {update.effective_user.id} — thêm vào TELEGRAM_ALLOWED_USERS.")
             return
         await update.message.reply_text(
-            "📚 Mình là trợ giảng AI của bạn.\n"
+            "📚 Mình là Vlearn Agent — trợ giảng AI của bạn.\n"
             "• Nhắn tin để hỏi về nội dung học (mình luôn trích nguồn, không bịa).\n"
             "• Gửi file slide PDF/PPTX, ghi âm, video, ghi chú .md để nạp bài học mới.\n"
             "• Hỏi \"có bộ kiến thức nào cài được không?\" — mình cài bộ bài học từ GitHub cho bạn.\n"
@@ -107,8 +123,8 @@ class TelegramGateway:
 
         async def worker():
             result = await asyncio.to_thread(fn, self.agent, str(user.id), user.first_name, lesson)
-            for chunk in split_message(result, MAX_LEN):
-                await update.effective_chat.send_message(chunk)
+            await self._send_formatted(
+                lambda t, pm: update.effective_chat.send_message(t, parse_mode=pm), result)
             await status.edit_text(f"✅ Xong {label}: {lesson}")
 
         asyncio.create_task(worker())
@@ -117,17 +133,39 @@ class TelegramGateway:
         if not self._ok(update):
             return
         chat = update.effective_chat
+        uid = str(update.effective_user.id)
+
+        # đang chờ xác nhận nạp file? phân loại câu trả lời
+        up = self.pending.get(uid)
+        if up is not None:
+            action = self.pending.interpret(update.message.text)
+            if action in ("commit", "both"):
+                await chat.send_action("typing")
+                msg = await asyncio.to_thread(commit_upload, self.cfg, self.vault, self.index,
+                                              up, action == "both")
+                self.audit.log("ingest_confirmed", platform="telegram", user=uid,
+                               file=up.name, mode=action)
+                self.pending.clear(uid)
+                await update.message.reply_text(msg)
+                return
+            if action == "skip":
+                self.pending.clear(uid)
+                await update.message.reply_text(
+                    "👌 Ok, mình không nạp vào kiến thức — chỉ dùng để trả lời câu hỏi của bạn về file này thôi.")
+                return
+            # action None -> coi như câu hỏi về file: vẫn trả lời (dưới), giữ pending
+
         session = self.histories[chat.id]
         session.append({"role": "user", "content": update.message.text})
         await chat.send_action("typing")
         answer = await asyncio.to_thread(
             self.agent.reply, str(update.effective_user.id),
             update.effective_user.first_name, list(session),
-            "", {"platform": "telegram", "chat_id": chat.id},
+            self.pending.context(uid), {"platform": "telegram", "chat_id": chat.id},
         )
         session.append({"role": "assistant", "content": answer})
-        for chunk in split_message(answer, MAX_LEN):
-            await update.message.reply_text(chunk)
+        await self._send_formatted(
+            lambda t, pm: update.message.reply_text(t, parse_mode=pm), answer)
 
     async def on_file(self, update: Update, _ctx) -> None:
         if not self._ok(update):
@@ -141,15 +179,29 @@ class TelegramGateway:
                 "Bỏ file vào thư mục nguồn (source_mirror/) giúp mình, hoặc admin bật local Bot API server."
             )
             return
-        await update.message.reply_text(f"📥 Nhận `{name}` — đang xử lý thành tài liệu học…")
+        uid = str(update.effective_user.id)
+        await update.message.reply_text(f"📥 Nhận `{name}` — đang đọc nội dung…")
         f = await att.get_file()
         data = bytes(await f.download_as_bytearray())
-        msg = await asyncio.to_thread(
-            ingest_upload, self.cfg, self.vault, self.index, data, name
-        )
-        self.audit.log("ingest_upload", platform="telegram",
-                       user=str(update.effective_user.id), file=name, ok="✅" in msg)
-        await update.message.reply_text(msg)
+        up = await asyncio.to_thread(receive_upload, self.cfg, data, name)
+        if isinstance(up, str):  # lỗi
+            await update.message.reply_text(up)
+            return
+        self.pending.set(uid, up)
+        self.audit.log("file_received", platform="telegram", user=uid,
+                       file=up.name, chars=len(up.text), is_update=up.is_update)
+        if up.is_update:
+            await update.message.reply_text(
+                f"📄 Đã đọc `{up.name}` — bạn hỏi mình về nội dung này được ngay.\n\n"
+                f"⚠️ Bài này **đã có trong kiến thức** rồi. Bạn muốn:\n"
+                f"• Trả lời **\"nạp\"** → cập nhật thay bản cũ\n"
+                f"• Trả lời **\"cả 2\"** → giữ cả bản cũ lẫn bản mới\n"
+                f"• Trả lời **\"không\"** → chỉ tra cứu lần này, không đụng kiến thức")
+        else:
+            await update.message.reply_text(
+                f"📄 Đã đọc `{up.name}` ({len(up.text)} ký tự) — bạn hỏi mình về nội dung này được ngay.\n\n"
+                f"📚 Có muốn mình **nạp thành kiến thức học tập lâu dài** không? "
+                f"(trả lời **\"nạp\"** để lưu + học được sau này; hoặc cứ hỏi bình thường nếu chỉ cần tra cứu lần này)")
 
     # ---------- lifecycle & notifier ----------
     async def notify_home(self, text: str) -> None:
@@ -158,8 +210,8 @@ class TelegramGateway:
             await self.send_to(chat_id, text)
 
     async def send_to(self, chat_id: str, text: str) -> None:
-        for chunk in split_message(text, MAX_LEN):
-            await self.app.bot.send_message(chat_id=chat_id, text=chunk)
+        await self._send_formatted(
+            lambda t, pm: self.app.bot.send_message(chat_id=chat_id, text=t, parse_mode=pm), text)
 
     async def run(self) -> None:
         """Manual lifecycle để chạy chung event loop với discord.py."""

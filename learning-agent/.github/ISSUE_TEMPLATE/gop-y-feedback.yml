@@ -1,0 +1,45 @@
+name: "💬 Góp ý / Feedback học viên"
+description: Chia sẻ trải nghiệm khi học cùng Vlearn Agent — điều gì hữu ích, điều gì cần cải thiện.
+title: "[Feedback] "
+labels: ["feedback", "cần phân loại"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn bạn đã dùng **Vlearn Agent**! Mọi góp ý đều giúp agent học tốt hơn. Không cần điền hết các mục.
+  - type: dropdown
+    id: kenh
+    attributes:
+      label: Bạn dùng agent qua kênh nào?
+      options: ["Telegram", "Discord", "Dashboard web", "Khác"]
+    validations:
+      required: true
+  - type: dropdown
+    id: loai
+    attributes:
+      label: Loại góp ý
+      options:
+        - "👍 Điều tôi thấy hữu ích"
+        - "😕 Điều gây khó chịu / khó hiểu"
+        - "💡 Ý tưởng cải thiện"
+        - "📚 Về chất lượng trả lời / kiến thức"
+    validations:
+      required: true
+  - type: textarea
+    id: noidung
+    attributes:
+      label: Nội dung góp ý
+      description: Bạn đang làm gì, mong đợi điều gì, và thực tế xảy ra ra sao?
+      placeholder: "Ví dụ: mình hỏi tóm tắt bài day04 nhưng agent trả lời thiếu phần tool-calling..."
+    validations:
+      required: true
+  - type: input
+    id: cauhoi
+    attributes:
+      label: (Tuỳ chọn) Câu hỏi / lệnh cụ thể bạn đã gõ
+      placeholder: "tóm tắt bài day04 giúp mình"
+  - type: dropdown
+    id: muc-do-hai-long
+    attributes:
+      label: Mức độ hài lòng chung
+      options: ["⭐⭐⭐⭐⭐ Rất hài lòng", "⭐⭐⭐⭐ Hài lòng", "⭐⭐⭐ Bình thường", "⭐⭐ Chưa tốt", "⭐ Kém"]

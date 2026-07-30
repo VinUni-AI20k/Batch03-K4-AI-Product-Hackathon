@@ -1,4 +1,4 @@
-"""Skills theo chuẩn agentskills.io (như Hermes): skills/<name>/SKILL.md
+"""Skills theo chuẩn agentskills.io  : skills/<name>/SKILL.md
 với YAML frontmatter (name khớp tên thư mục, description chứa trigger).
 
 Progressive disclosure 3 tầng: catalog (name+description) nạp vào system prompt

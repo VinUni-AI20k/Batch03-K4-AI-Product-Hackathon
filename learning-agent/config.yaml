@@ -12,13 +12,21 @@ index:
   chroma_path: ./data/chroma
   collection: lessons
   embedding_provider: voyage   # voyage | local (fallback: embedding mặc định của Chroma)
-  voyage_model: voyage-4
+  voyage_model: voyage-context-3   # contextualized: embed chunk theo ngữ cảnh toàn bài (hợp slide rời rạc)
   top_k: 6
 
 llm:
-  # base_url + api key đọc từ .env (LLM_BASE_URL, LLM_API_KEY) -> đổi provider không cần sửa code
-  model: gpt-4o-mini
-  structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng
+  # provider: chọn nhà cung cấp (tự set base_url; key đọc từ .env theo từng provider):
+  #   openai      -> OPENAI_API_KEY       · model vd: gpt-4o-mini, gpt-4.1-mini, o4-mini
+  #   openrouter  -> OPENROUTER_API_KEY   · model vd: anthropic/claude-3.7-sonnet, google/gemini-2.0-flash, meta-llama/llama-3.3-70b (CLAUDE dùng qua đây)
+  #   gemini      -> GEMINI_API_KEY       · model vd: gemini-2.0-flash, gemini-1.5-pro
+  #   groq        -> GROQ_API_KEY         · model vd: llama-3.3-70b-versatile (siêu nhanh)
+  #   together    -> TOGETHER_API_KEY     · model vd: meta-llama/Llama-3.3-70B-Instruct-Turbo
+  #   ollama      -> chạy local, không cần key · model vd: llama3.1
+  #   custom      -> tự điền LLM_BASE_URL + LLM_API_KEY trong .env (bất kỳ endpoint OpenAI-compatible)
+  provider: openai
+  model: gpt-4o-mini              # model dùng để CHAT (đổi theo provider ở trên)
+  structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng lúc nạp (có thể giữ rẻ)
   max_tool_rounds: 8
 
 asr:
@@ -27,8 +35,10 @@ asr:
 
 discord:
   # token trong .env (DISCORD_BOT_TOKEN); allowlist: DISCORD_ALLOWED_USERS
-  thread_per_question: true       # câu hỏi trong channel chung -> mở thread trả lời
-  max_events_per_minute: 20       # chống bot-loop (pattern OpenClaw)
+  thread_per_question: false      # false = trả lời thẳng trong channel (tự nhiên); true = mở thread riêng mỗi câu (channel đông)
+  max_events_per_minute: 20       # chống bot-loop
+  message_content_intent: true    # true = đọc MỌI tin trong channel/thread (đã bật Message Content Intent
+                                  # trong Developer Portal). false = chỉ DM + @mention + slash
 
 # telegram: token trong .env (TELEGRAM_BOT_TOKEN); allowlist: TELEGRAM_ALLOWED_USERS
 # Bot API chuẩn chỉ nhận file <=20MB — video lớn bỏ vào source_mirror/ hoặc chạy local bot-api server
@@ -48,9 +58,14 @@ security:
 knowledge_packs:
   - name: vlearn-pack
     repo: https://github.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304.git
-    description: Bộ bài học K4 hackathon (slides + 6 transcript bài giảng + nội dung Discord)
+    description: Bộ bài học K4 hackathon (slides + 6 transcript bài giảng + nội dung Discord + đề bài/rubric)
+    subdirs:                      # chỉ ingest các mục này, tránh nuốt code/file ngoài lề
+      - data/vlearn-pack
+      - 01-de-bai.md
+      - 02-guide.md
+      - 04-rubric.md
 
-# Cron kiểu Hermes: tick 60s, mỗi job chạy phiên agent mới với skill chỉ định,
+# Cron: tick 60s, mỗi job chạy phiên agent mới với skill chỉ định,
 # kết quả gửi về home chat (đặt bằng /sethome trong Discord/Telegram)
 schedules:
   - name: bao-cao-sang

@@ -1,4 +1,4 @@
-"""Memory theo từng học viên — pattern Hermes/Letta nhưng lưu ngay trong vault.
+"""Memory theo từng học viên — thiết kế Vlearn Agent/Letta nhưng lưu ngay trong vault.
 
 vault/students/<discord_user_id>.md : agent đọc vào context mỗi lượt,
 và tự cập nhật qua tool update_student_memory (điểm yếu, đã hỏi gì, tiến độ).
