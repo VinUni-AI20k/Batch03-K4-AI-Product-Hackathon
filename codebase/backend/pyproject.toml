@@ -9,4 +9,7 @@ dependencies = [
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "uvicorn[standard]>=0.52.0",
+    "docling>=2.15.1",
+    "python-multipart>=0.0.9",
+    "markdown>=3.6.0",
 ]
