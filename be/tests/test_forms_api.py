@@ -178,6 +178,54 @@ async def test_full_happy_path_produces_a_pdf(app, monkeypatch) -> None:
     assert response.content[:4] == b"%PDF"
 
 
+@pytest.mark.asyncio
+async def test_simulated_submission_requires_explicit_confirmation(app) -> None:
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": VALID_BIRTH_VALUES})
+            validation = (await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")).json()
+            response = await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate",
+                json={"validation_id": validation["validation_id"], "confirmed": False},
+            )
+    assert response.status_code == 422
+    assert response.json()["detail"] == "explicit_confirmation_required"
+
+
+@pytest.mark.asyncio
+async def test_simulated_submission_returns_clearly_labeled_demo_receipt(app) -> None:
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": VALID_BIRTH_VALUES})
+            validation = (await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")).json()
+            response = await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate",
+                json={"validation_id": validation["validation_id"], "confirmed": True},
+            )
+    assert response.status_code == 200
+    receipt = response.json()
+    assert receipt["status"] == "submitted_simulation"
+    assert receipt["simulation"] is True
+    assert receipt["official_submission"] is False
+    assert receipt["receipt_code"].startswith("SPDVC-DEMO-")
+    assert "Nguyễn" not in json.dumps(receipt, ensure_ascii=False)
+
+
+@pytest.mark.asyncio
+async def test_simulated_submission_rejects_draft_changed_after_validation(app) -> None:
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": VALID_BIRTH_VALUES})
+            validation = (await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")).json()
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": {"child_full_name": "Tên mới"}})
+            response = await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate",
+                json={"validation_id": validation["validation_id"], "confirmed": True},
+            )
+    assert response.status_code == 409
+    assert response.json()["detail"] == "draft_changed_since_validation"
+
+
 class _FakeAiReviewResponse:
     status_code = 200
     headers = {"content-type": "application/json"}

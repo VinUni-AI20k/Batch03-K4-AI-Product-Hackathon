@@ -779,6 +779,24 @@ h1 span {
   padding: 12px 14px;
 }
 
+.simulate-submit-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #0b6b50;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.simulate-submit-button:disabled { cursor: default; opacity: .65; }
+.simulation-disclaimer { margin: 10px 0 0; color: #775b13; font-size: .78rem; line-height: 1.4; }
+.simulation-receipt { margin-top: 12px; padding: 12px; border: 1px solid #8fc9b7; border-radius: 8px; background: #effaf6; display: grid; gap: 4px; }
+.simulation-receipt code { color: #07543f; font-weight: 800; overflow-wrap: anywhere; }
+.simulation-receipt span { color: #587069; font-size: .78rem; }
+
 .export-button,
 .preview-button {
   width: 100%;

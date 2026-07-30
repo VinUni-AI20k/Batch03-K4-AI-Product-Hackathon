@@ -39,7 +39,7 @@ def mock_form_reply(language_code: str, candidate: FormCandidate, known_fields: 
     if missing is None:
         answer = (
             "Tôi đã ghi nhận đủ các thông tin bắt buộc cho biểu mẫu này. Bạn có thể sang tab "
-            "Rà soát & Kiểm tra đơn để xem lại và chỉnh sửa trước khi thẩm định."
+            "Rà soát & Nộp mô phỏng để xem lại, chỉnh sửa và thẩm định trước khi xác nhận."
             if is_vietnamese
             else "All required fields for this form are recorded. Check the review tab to confirm."
         )

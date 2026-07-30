@@ -14,6 +14,7 @@ from app.form_llm import fill_form
 from app.procedure_catalog import normalize_text
 from app.procedure_settings import FormMapping, ProcedureSettings
 from app.schemas import AssistantReply
+from app.safety import refusal_for_unsafe_request
 
 
 def resolve_form_code(active_procedure_code: str | None, message: str, mappings: tuple[FormMapping, ...]) -> str | None:
@@ -37,6 +38,10 @@ async def maybe_fill_form(
 ) -> tuple[AssistantReply, dict[str, Any] | None]:
     """Returns (reply_to_use, form_patch_or_None). form_patch is {"form_code", "fields"}."""
     message = messages[-1]["content"]
+    if refusal_for_unsafe_request(message):
+        # The deterministic pipeline already produced the scoped refusal. Do
+        # not let a form keyword (for example "khai sinh") override it.
+        return result["reply"], None
     active_form_code = state.get("active_scenario_code")
     # An explicit keyword match against a *different* form in the new message always wins over
     # a sticky active form — otherwise, once a form is active, later messages naming a different

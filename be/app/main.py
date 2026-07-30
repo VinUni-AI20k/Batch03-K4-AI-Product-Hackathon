@@ -34,11 +34,18 @@ from app.schemas import (
     FormFieldSchema,
     FormGroupSchema,
     FormSchemaResponse,
+    SimulatedSubmissionRequest,
+    SimulatedSubmissionResponse,
     ValidationResult,
     VoiceStatusResponse,
     VoiceTranscriptResponse,
 )
 from app.session_store import SessionStore
+from app.submission_simulation import (
+    SubmissionSimulationError,
+    create_simulated_submission,
+    is_submission_simulation_request,
+)
 from app.translation import TranslationError, TranslationService, VIETNAMESE
 from voice_ai.speech_to_text import SpeechToTextProcessor
 
@@ -207,6 +214,63 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     chat_request.message, chat_request.language_code,
                 )
                 messages = [*state.get("messages", []), {"role": "user", "content": canonical_message}]
+                if is_submission_simulation_request(canonical_message):
+                    form_code = state.get("active_scenario_code")
+                    if not form_code:
+                        answer = "Bạn chưa có biểu mẫu đang làm. Hãy chọn thủ tục và điền biểu mẫu trước khi nộp mô phỏng."
+                        for word in answer.split(" "):
+                            yield sse("message.delta", {"text": f"{word} "})
+                        yield sse("message.complete", {
+                            "intent": "form_guidance", "quick_replies": ["Chọn biểu mẫu"], "citations": [],
+                            "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
+                            "confidence_reasons": ["Không có biểu mẫu active trong phiên"], "external_search_used": False,
+                            "external_search_consent_required": False, "form_code": None, "translation_used": needs_translation,
+                        })
+                        return
+                    yield sse("tool.call", {"name": "submit_form_simulation", "form_code": form_code})
+                    try:
+                        receipt = create_simulated_submission(
+                            form_code=form_code,
+                            draft=state.get("form_draft", {}).get(form_code, {}),
+                            validation=state.get("last_validation", {}).get(form_code),
+                            confirmed=True,
+                            channel="chat",
+                        )
+                    except SubmissionSimulationError as exc:
+                        guidance = {
+                            "validation_required": "Hãy mở mục Rà soát & Nộp mô phỏng và thẩm định hồ sơ trước.",
+                            "draft_changed_since_validation": "Hồ sơ đã thay đổi. Hãy thẩm định lại trước khi nộp mô phỏng.",
+                            "blocking_errors_remaining": "Hồ sơ còn lỗi bắt buộc. Hãy sửa và thẩm định lại trước khi nộp mô phỏng.",
+                            "validation_not_ready": "Hồ sơ chưa đạt trạng thái sẵn sàng để nộp mô phỏng.",
+                        }.get(exc.reason, "Chưa thể nộp mô phỏng. Hãy kiểm tra lại hồ sơ.")
+                        yield sse("tool.result", {"name": "submit_form_simulation", "ok": False, "reason": exc.reason})
+                        for word in guidance.split(" "):
+                            yield sse("message.delta", {"text": f"{word} "})
+                        yield sse("message.complete", {
+                            "intent": "form_guidance", "quick_replies": ["Mở rà soát hồ sơ"], "citations": [],
+                            "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
+                            "confidence_reasons": [exc.reason], "external_search_used": False,
+                            "external_search_consent_required": False, "form_code": form_code, "translation_used": needs_translation,
+                        })
+                        return
+                    new_state = {
+                        **state,
+                        "messages": [*messages, {"role": "assistant", "content": receipt["message_vi"]}][-12:],
+                        "simulated_submissions": [*state.get("simulated_submissions", []), receipt][-10:],
+                    }
+                    await app.state.store.save(current_session_id, new_state)
+                    yield sse("tool.result", {"name": "submit_form_simulation", "ok": True, "receipt": receipt})
+                    answer = f'{receipt["message_vi"]} Mã biên nhận demo: {receipt["receipt_code"]}.'
+                    for word in answer.split(" "):
+                        yield sse("message.delta", {"text": f"{word} "})
+                    yield sse("message.complete", {
+                        "intent": "form_guidance", "quick_replies": [], "citations": [],
+                        "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
+                        "confidence_reasons": ["Công cụ nộp mô phỏng đã trả biên nhận"], "external_search_used": False,
+                        "external_search_consent_required": False, "form_code": form_code,
+                        "simulated_submission": receipt, "translation_used": needs_translation,
+                    })
+                    return
                 result = await app.state.procedure_pipeline.ainvoke({
                     "messages": messages,
                     "request_id": request_id,
@@ -396,6 +460,41 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
             media_type="application/pdf",
             headers={"Content-Disposition": f'attachment; filename="{form_code.lower()}.pdf"'},
         )
+
+    @app.post("/api/v1/forms/{form_code}/submissions/simulate", response_model=SimulatedSubmissionResponse)
+    async def simulate_form_submission(
+        form_code: str,
+        payload: SimulatedSubmissionRequest,
+        http_response: Response,
+        session_id: str | None = Cookie(default=None, alias=settings.session_cookie_name),
+    ) -> SimulatedSubmissionResponse:
+        _form_candidate_or_404(form_code)
+        current_session_id, state, is_new = await ensure_session(session_id)
+        if is_new:
+            set_session_cookie(http_response, current_session_id)
+        validation = state.get("last_validation", {}).get(form_code)
+        if not validation or validation.get("validation_id") != payload.validation_id:
+            raise HTTPException(status_code=409, detail="validation_required_or_mismatched")
+        try:
+            receipt = create_simulated_submission(
+                form_code=form_code,
+                draft=state.get("form_draft", {}).get(form_code, {}),
+                validation=validation,
+                confirmed=payload.confirmed,
+                channel="review_form",
+            )
+        except SubmissionSimulationError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.reason) from exc
+        new_state = {
+            **state,
+            "simulated_submissions": [*state.get("simulated_submissions", []), receipt][-10:],
+        }
+        await app.state.store.save(current_session_id, new_state)
+        logger.info(
+            "simulated_submission_complete session=%s form_code=%s receipt_code=%s",
+            session_hash(current_session_id), form_code, receipt["receipt_code"],
+        )
+        return SimulatedSubmissionResponse.model_validate(receipt)
 
     return app
 

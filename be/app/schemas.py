@@ -109,3 +109,22 @@ class ValidationResult(BaseModel):
 
 class FormExportRequest(BaseModel):
     validation_id: str
+
+
+class SimulatedSubmissionRequest(BaseModel):
+    validation_id: str
+    confirmed: bool = False
+
+
+class SimulatedSubmissionResponse(BaseModel):
+    submission_id: str
+    receipt_code: str
+    form_code: str
+    validation_id: str
+    input_hash: str
+    status: Literal["submitted_simulation"]
+    channel: Literal["chat", "review_form"]
+    submitted_at: str
+    simulation: Literal[True]
+    official_submission: Literal[False]
+    message_vi: str

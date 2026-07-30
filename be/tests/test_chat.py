@@ -147,3 +147,38 @@ async def test_citations_are_suppressed_when_form_guidance_overrides_the_reply(a
     payload = _complete_payload(response.text)
     assert payload["intent"] == "form_guidance"
     assert payload["citations"] == []
+
+
+@pytest.mark.asyncio
+async def test_chat_can_call_simulated_submission_tool_after_validated_form(app) -> None:
+    valid_values = {
+        "applicant_full_name": "Nguyễn Văn An",
+        "relationship_to_child": "Cha",
+        "child_full_name": "Nguyễn Thị Hồng Ánh",
+        "child_birth_date": "2026-01-01",
+        "child_gender": "Nữ",
+        "child_ethnicity": "Kinh",
+        "child_nationality": "Việt Nam",
+        "child_birth_place": "Bệnh viện Phụ sản Hà Nội",
+        "mother_full_name": "Trần Thị Bích",
+        "copy_request_needed": "Không",
+    }
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": valid_values})
+            validation = await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")
+            assert validation.json()["status"] == "valid"
+            session_id = client.cookies.get("icivi_session")
+            state = await app.state.store.get(session_id)
+            state["active_scenario_code"] = "BIRTH_REGISTRATION_FORM"
+            await app.state.store.save(session_id, state)
+
+            response = await client.post(
+                "/api/v1/chat/stream",
+                json={"message": "Tôi xác nhận nộp hồ sơ mô phỏng", "language_code": "vi"},
+            )
+
+    assert "event: tool.call" in response.text
+    assert "event: tool.result" in response.text
+    assert "SPDVC-DEMO-" in response.text
+    assert '"official_submission": false' in response.text
