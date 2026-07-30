@@ -7,6 +7,7 @@ import { sendChatMessage } from "./api/chat.js";
 import { TIMELINE_KEY, confirmCalendar, flagTimelineItem, getTimeline, patchTimelineItem } from "./api/timeline.js";
 import { disconnectDiscord, disconnectGoogle, getConnections, getDiscordInviteUrl, getGoogleAuthUrl } from "./api/connections.js";
 import { formatTime } from "./utils/formatters.js";
+import { generateUUID } from "./utils/uuid.js";
 import { QUICK_ACTION_QUERIES } from "./constants/chat.js";
 import { Icon } from "./components/common/Icon.jsx";
 import { Toast } from "./components/common/Toast.jsx";
@@ -16,13 +17,13 @@ import { Dashboard } from "./components/dashboard/Dashboard.jsx";
 import { EditDialog } from "./components/dashboard/EditDialog.jsx";
 
 export default function App() {
-  const [conversationId] = useState(() => crypto.randomUUID());
+  const [conversationId] = useState(() => generateUUID());
   const [messages, setMessages] = useState(initialMessages);
   const [platforms, setPlatforms] = useState(initialPlatforms);
   const [activeAction, setActiveAction] = useState("week");
   const [showConnections, setShowConnections] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState(null);
   const [mobileView, setMobileView] = useState("dashboard");
   const [seededActions, setSeededActions] = useState(() => new Set());
   const [busyItemId, setBusyItemId] = useState(null);
@@ -36,9 +37,9 @@ export default function App() {
 
   const { trigger: triggerChat, isMutating: isSending } = useSWRMutation("studypulse-chat", (_key, { arg }) => sendChatMessage(arg));
 
-  const notify = (text) => {
-    setToast(text);
-    window.setTimeout(() => setToast(""), 2600);
+  const notify = (text, type = "success") => {
+    setToast({ text, type });
+    window.setTimeout(() => setToast(null), 2600);
   };
 
   const refreshConnections = async () => {
@@ -60,7 +61,10 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const googleConnected = params.get("google_connected");
     if (googleConnected !== null) {
-      notify(googleConnected === "1" ? "Đã kết nối Gmail & Google Calendar" : "Kết nối Gmail thất bại, thử lại sau.");
+      notify(
+        googleConnected === "1" ? "Đã kết nối Gmail & Google Calendar" : "Kết nối Gmail thất bại, thử lại sau.",
+        googleConnected === "1" ? "success" : "error"
+      );
       params.delete("google_connected");
       params.delete("reason");
       const query = params.toString();
@@ -78,8 +82,8 @@ export default function App() {
   }, [showConnections]);
 
   const sendMessage = async (text) => {
-    const userMessageId = crypto.randomUUID();
-    const loadingMessageId = crypto.randomUUID();
+    const userMessageId = generateUUID();
+    const loadingMessageId = generateUUID();
     setMessages((current) => [
       ...current,
       { id: userMessageId, role: "user", text, time: formatTime() },
@@ -144,9 +148,9 @@ export default function App() {
         try {
           await disconnectGoogle();
           setPlatforms((current) => current.map((platform) => (platform.id === "gmail" ? { ...platform, connected: false } : platform)));
-          notify("Đã hủy kết nối Gmail & Google Calendar");
+          notify("Đã hủy kết nối Gmail & Google Calendar", "info");
         } catch (err) {
-          notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.");
+          notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.", "error");
         }
         return;
       }
@@ -154,7 +158,7 @@ export default function App() {
         const authUrl = await getGoogleAuthUrl();
         window.location.href = authUrl;
       } catch (err) {
-        notify(err instanceof ApiError ? err.message : "Không thể bắt đầu kết nối Gmail, kiểm tra backend.");
+        notify(err instanceof ApiError ? err.message : "Không thể bắt đầu kết nối Gmail, kiểm tra backend.", "error");
       }
       return;
     }
@@ -166,15 +170,15 @@ export default function App() {
       try {
         const inviteUrl = await getDiscordInviteUrl();
         window.open(inviteUrl, "_blank", "noopener,noreferrer");
-        notify("Cần quản trị viên server đồng ý mời bot. Sau khi mời xong, mở lại Quản lý kết nối để kiểm tra.");
+        notify("Cần quản trị viên server đồng ý mời bot. Sau khi mời xong, mở lại Quản lý kết nối để kiểm tra.", "info");
       } catch (err) {
-        notify(err instanceof ApiError ? err.message : "Không thể lấy link mời bot, kiểm tra backend.");
+        notify(err instanceof ApiError ? err.message : "Không thể lấy link mời bot, kiểm tra backend.", "error");
       }
       return;
     }
 
     setPlatforms((current) => current.map((platform) => (platform.id === id ? { ...platform, connected: true } : platform)));
-    notify("Đã kết nối nền tảng thành công");
+    notify("Đã kết nối nền tảng thành công", "success");
   };
 
   const disconnectDiscordGuild = async (guildId, guildName) => {
@@ -191,9 +195,9 @@ export default function App() {
           return { ...platform, guilds, connected: guilds.length > 0 };
         }),
       );
-      notify(`Đã hủy kết nối server "${guildName}"`);
+      notify(`Đã hủy kết nối server "${guildName}"`, "info");
     } catch (err) {
-      notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.");
+      notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.", "error");
     }
   };
 
@@ -202,9 +206,9 @@ export default function App() {
     try {
       await flagTimelineItem(id);
       await mutateTimeline();
-      notify("Đã đánh dấu sai và chuyển cho TA kiểm tra");
+      notify("Đã đánh dấu sai và chuyển cho TA kiểm tra", "success");
     } catch (err) {
-      notify(err instanceof ApiError ? err.message : "Không thể đánh dấu mục này, thử lại sau.");
+      notify(err instanceof ApiError ? err.message : "Không thể đánh dấu mục này, thử lại sau.", "error");
     } finally {
       setBusyItemId(null);
     }
@@ -214,10 +218,10 @@ export default function App() {
     setBusyItemId(id);
     try {
       const result = await confirmCalendar(id);
-      notify(result.detail ? `Đã thêm vào Google Calendar: ${result.detail}` : "Đã thêm sự kiện vào Google Calendar");
+      notify(result.detail ? `Đã thêm vào Google Calendar: ${result.detail}` : "Đã thêm sự kiện vào Google Calendar", "success");
       await mutateTimeline();
     } catch (err) {
-      notify(err instanceof ApiError ? err.message : "Không thể thêm vào lịch, thử lại sau.");
+      notify(err instanceof ApiError ? err.message : "Không thể thêm vào lịch, thử lại sau.", "error");
     } finally {
       setBusyItemId(null);
     }
@@ -228,9 +232,9 @@ export default function App() {
       await patchTimelineItem(id, { time });
       await mutateTimeline();
       setEditingEvent(null);
-      notify("Đã lưu thay đổi của bạn");
+      notify("Đã lưu thay đổi của bạn", "success");
     } catch (err) {
-      notify(err instanceof ApiError ? err.message : "Không thể lưu thay đổi, thử lại sau.");
+      notify(err instanceof ApiError ? err.message : "Không thể lưu thay đổi, thử lại sau.", "error");
     }
   };
 
@@ -271,7 +275,7 @@ export default function App() {
         <button onClick={() => setMobileView("chat")} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${mobileView === "chat" ? "text-blue-600" : "text-slate-400"}`}><Icon>smart_toy</Icon>Trợ lý AI</button>
       </nav>
       <EditDialog event={editingEvent} onClose={() => setEditingEvent(null)} onSave={saveEvent} />
-      {toast ? <Toast text={toast} /> : null}
+      {toast ? <Toast text={toast.text} type={toast.type} /> : null}
     </main>
   );
 }
