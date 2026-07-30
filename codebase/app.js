@@ -299,6 +299,9 @@ function cacheElements() {
     "newTopicProblem",
     "newTopicSkills",
     "resetDemo",
+    "catalogCsvInput",
+    "importCatalogCsv",
+    "restoreDefaultCatalog",
     "detailBackdrop",
     "detailDrawer",
     "detailCode",
@@ -374,6 +377,9 @@ function bindGlobalEvents() {
   refs.suggestForm.addEventListener("submit", submitTopicSuggestion);
 
   refs.resetDemo.addEventListener("click", resetDemo);
+  refs.importCatalogCsv.addEventListener("click", openCsvPicker);
+  refs.catalogCsvInput.addEventListener("change", handleCatalogCsvChange);
+  refs.restoreDefaultCatalog.addEventListener("click", restoreDefaultCatalog);
   refs.closeDetail.addEventListener("click", closeDetail);
   refs.detailBackdrop.addEventListener("click", closeDetail);
   refs.mobileProfileToggle.addEventListener("click", () => {
@@ -1152,6 +1158,93 @@ function openFilePicker() {
   refs.profileFileInput.click();
 }
 
+function openCsvPicker() {
+  refs.catalogCsvInput.value = "";
+  refs.catalogCsvInput.click();
+}
+
+async function handleCatalogCsvChange(event) {
+  const [file] = event.target.files;
+  if (file) await handleCatalogCsvImport(file);
+}
+
+async function handleCatalogCsvImport(file) {
+  try {
+    if (!file.size || !file.name.toLowerCase().endsWith(".csv")) {
+      return showToast({ title: "Tệp không hợp lệ", message: "Vui lòng chọn tệp CSV có dữ liệu." });
+    }
+    let text = await file.text();
+    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // strip BOM
+    const rows = parseCsv(text);
+    if (rows.length < 2) {
+      return showToast({ title: "Tệp CSV không có dữ liệu", message: "Cần ít nhất 1 dòng đề tài ngoài header." });
+    }
+    const header = rows[0].map((h) => h.trim());
+    if (!header.includes("ma_de") || !header.includes("ten_de_tai")) {
+      return showToast({ title: "Thiếu cột bắt buộc", message: "Cần có cột ma_de và ten_de_tai trong header." });
+    }
+    const accepted = [];
+    let skipped = 0;
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      const obj = {};
+      header.forEach((key, i) => { obj[key] = (row[i] ?? "").trim(); });
+      if (!obj.ma_de || !obj.ten_de_tai) { skipped++; continue; }
+      obj.max_team = Number(obj.max_team) || 4;
+      obj.stt = Number(obj.stt) || null;
+      if (obj.learner_fit === "") obj.learner_fit = null;
+      accepted.push(obj);
+    }
+    if (accepted.length === 0) {
+      return showToast({ title: "Không có đề tài hợp lệ", message: "Tất cả các dòng đều thiếu ma_de hoặc ten_de_tai." });
+    }
+    state.projects = accepted;
+    clearTopicFilters();
+    buildCategoryFilter();
+    renderTopicCatalog();
+    showToast({
+      title: "Đã nhập kho đề tài",
+      message: `${accepted.length} đề tài được thêm${skipped ? `, ${skipped} dòng bị bỏ qua` : ""}.`,
+    });
+  } catch (error) {
+    showToast({ title: "Không đọc được tệp CSV", message: "Vui lòng kiểm tra định dạng rồi thử lại." });
+  }
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += ch;
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === ",") {
+      row.push(field); field = "";
+    } else if (ch === "\n" || ch === "\r") {
+      row.push(field); rows.push(row); row = []; field = "";
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+    } else field += ch;
+  }
+  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+  while (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === "") rows.pop();
+  return rows;
+}
+
+async function restoreDefaultCatalog() {
+  await loadProjects();
+  showToast({
+    title: "Đã khôi phục kho đề tài",
+    message: `Kho đề tài mặc định đã được nạp (${state.projects.length} đề tài).`,
+  });
+}
+
 async function simulateProfileUpload(file) {
   if (state.profileLoaded) return;
   state.profileLoaded = true;
@@ -1921,7 +2014,13 @@ function selectWithinSegment(button) {
   });
 }
 
-function showToast() {
+function showToast(options) {
+  const titleEl = refs.toast.querySelector("strong");
+  const messageEl = refs.toast.querySelector("span");
+  if (options && typeof options === "object") {
+    if (options.title) titleEl.textContent = options.title;
+    if (options.message) messageEl.textContent = options.message;
+  }
   refs.toast.classList.remove("is-hidden");
   window.clearTimeout(showToast.timeout);
   showToast.timeout = window.setTimeout(() => refs.toast.classList.add("is-hidden"), 3200);

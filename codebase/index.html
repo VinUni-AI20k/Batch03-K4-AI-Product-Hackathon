@@ -94,6 +94,18 @@
           </svg>
           Đề xuất đề tài mới
         </button>
+        <button class="sidebar-action" id="importCatalogCsv" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4v12M7 11l5 5 5-5M5 20h14" />
+          </svg>
+          Nhập kho đề tài từ CSV
+        </button>
+        <button class="sidebar-action muted" id="restoreDefaultCatalog" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 4v6h6M20 20v-6h-6M6.5 17.5A8 8 0 0 0 19 14M17.5 6.5A8 8 0 0 0 5 10" />
+          </svg>
+          Khôi phục kho đề tài mặc định
+        </button>
         <button class="sidebar-action muted" id="resetDemo" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 4v6h6M20 20v-6h-6M6.5 17.5A8 8 0 0 0 19 14M17.5 6.5A8 8 0 0 0 5 10" />
@@ -349,6 +361,14 @@
       type="file"
       accept=".pdf,.docx,.png,.jpg,.jpeg"
       aria-label="Chọn hồ sơ để đọc"
+    />
+
+    <input
+      class="sr-only"
+      id="catalogCsvInput"
+      type="file"
+      accept=".csv,text/csv"
+      aria-label="Chọn tệp CSV kho đề tài"
     />
 
     <div class="modal-backdrop onboarding-backdrop" id="onboardingModal" role="presentation">
