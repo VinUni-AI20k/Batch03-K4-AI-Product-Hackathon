@@ -3,55 +3,55 @@ import socketserver
 import os
 import sys
 import json
-import urllib.request
-import urllib.error
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env_file_path = os.path.join(parent_dir, '.env')
-if os.path.exists(env_file_path):
-    load_dotenv(env_file_path)
-else:
-    load_dotenv()
-
-PORT = 3000
-DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-def call_openai_chat(messages, api_key=None, model=None, temperature=0.7):
-    """Call real OpenAI API Chat Completions endpoint"""
-    key = api_key or os.getenv('OPENAI_API_KEY')
-    selected_model = model or os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-
-    if not key or key == 'sk-proj-your-openai-api-key-here':
-        raise ValueError("Chưa cấu hình OPENAI_API_KEY hợp lệ trong file .env hoặc trên giao diện!")
-
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {key}"
-    }
-    payload = {
-        "model": selected_model,
-        "messages": messages,
-        "temperature": temperature
-    }
-
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode('utf-8'),
-        headers=headers,
-        method='POST'
-    )
-
-    with urllib.request.urlopen(req) as response:
-        res_data = json.loads(response.read().decode('utf-8'))
-        return res_data['choices'][0]['message']['content']
+# Import custom modular components
+from config import PORT, GIAO_DIEN_DIR, CODEBASE_DIR, BASE_DIR, get_openai_api_key, get_openai_model
+from llm import call_openai_json, get_all_ai_logs, save_ai_log
+from prompt import (
+    MINI_PROJECT_GENERATOR_SYSTEM_PROMPT,
+    LAB_COACH_REVISION_PROMPT,
+    REACT_AGENT_RUNNER_PROMPT
+)
+from tools import convert_pptx_to_markdown, ask_lab_coach, registry
+from reflection import get_team_reflections
 
 
 class VLearnRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
+        # Serve static files from giao_dien directory
+        super().__init__(*args, directory=GIAO_DIEN_DIR, **kwargs)
+
+    def do_GET(self):
+        # API 1: System Status
+        if self.path == '/api/status':
+            key = get_openai_api_key()
+            has_key = bool(key and key != 'sk-proj-your-openai-api-key-here')
+            model = get_openai_model()
+            
+            res_data = {
+                "status": "ok",
+                "has_env_key": has_key,
+                "model": model,
+                "architecture": "Mini Project Architecture + Human-in-the-Loop",
+                "message": "Real OpenAI API & Modular Backend Ready" if has_key else "Missing OPENAI_API_KEY"
+            }
+            self.send_json_response(res_data)
+            return
+
+        # API 2: Get AI Logs
+        if self.path == '/api/logs':
+            logs = get_all_ai_logs()
+            self.send_json_response(logs)
+            return
+
+        # API 3: Get Team Reflections
+        if self.path == '/api/reflections':
+            reflections = get_team_reflections()
+            self.send_json_response({"success": True, "reflections": reflections})
+            return
+
+        # Fallback file serving
+        super().do_GET()
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length', 0))
@@ -62,135 +62,106 @@ class VLearnRequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             data = {}
 
-        # Endpoint 1: Generate Mini Codelab via Real OpenAI API
+        # API 4: Generate Mini Project Codelab via OpenAI JSON Call
         if self.path == '/api/generate_minicodelab':
             self.handle_generate_minicodelab(data)
             return
 
-        # Endpoint 2: Run ReAct Agent via Real OpenAI API
+        # API 5: Human-In-The-Loop Revision (Lab Coach Feedback Loop)
+        if self.path == '/api/revise_minicodelab':
+            self.handle_revise_minicodelab(data)
+            return
+
+        # API 6: Run ReAct Agent Sandbox
         if self.path == '/api/run_agent':
             self.handle_run_agent(data)
             return
 
-        # Fallback 404 for unknown POST API paths
         self.send_error(404, "API Endpoint Not Found")
-
-    def do_GET(self):
-        if self.path == '/api/status':
-            key = os.getenv('OPENAI_API_KEY', '')
-            has_key = bool(key and key != 'sk-proj-your-openai-api-key-here')
-            model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-            
-            res_data = {
-                "status": "ok",
-                "has_env_key": has_key,
-                "model": model,
-                "message": "Real OpenAI API Backend Ready" if has_key else "Missing OPENAI_API_KEY in .env"
-            }
-            self.send_json_response(res_data)
-            return
-
-        super().do_GET()
 
     def handle_generate_minicodelab(self, data):
         morning_slide = data.get('morning_slide', 'Day 4: ReAct Agent Architecture')
         afternoon_repo = data.get('afternoon_repo', 'github.com/vlearn/day4-research-agent-lab')
-        rules = data.get('rules', 'Python < 50 lines, ReAct loop comment')
+        readme_content = data.get('readme_content', '').strip()
+        rules = data.get('rules', 'Mini Project với 3 file Python')
         user_key = data.get('api_key', '').strip()
 
-        system_prompt = (
-            "Bạn là Trợ lý AI thiết kế bài giảng của VLearn (VinUni AI Thực Chiến). "
-            "Nhiệm vụ của bạn là sinh 1 bài Mini Codelab 15 phút (gồm 3 bước) nhằm nối liền "
-            "lý thuyết slide buổi sáng và bài lab 4 tiếng buổi chiều.\n"
-            "Hãy trả về định dạng JSON thuần túy (dạng JSON object) có cấu trúc đúng sau:\n"
-            "{\n"
-            '  "title": "Tên bài Mini Codelab",\n'
-            '  "duration": "15 phút",\n'
-            '  "morningTopic": "Tên chủ đề sáng",\n'
-            '  "morningSlideRef": "Slide trích dẫn cụ thể [Txx-NNN]",\n'
-            '  "afternoonLabTarget": "Tên repo chiều",\n'
-            '  "description": "Mô tả ngắn bài mini lab",\n'
-            '  "steps": [\n'
-            '    {\n'
-            '      "num": 1,\n'
-            '      "title": "Hiểu Lý thuyết & Cầu nối",\n'
-            '      "content": "Đoạn văn HTML giải thích lý thuyết slide và vì sao nó giúp ích bài lab chiều..."\n'
-            '    },\n'
-            '    {\n'
-            '      "num": 2,\n'
-            '      "title": "Thử nghiệm Code & Prompt",\n'
-            '      "starterCode": "Code Python mẫu minh họa luồng ReAct Agent..."\n'
-            '    },\n'
-            '    {\n'
-            '      "num": 3,\n'
-            '      "title": "Kiểm tra & Củng cố (Mini Quiz)",\n'
-            '      "quiz": {\n'
-            '        "question": "Câu hỏi kiểm tra kiến thức HAX/PAIR?",\n'
-            '        "options": ["Đáp án A", "Đáp án B", "Đáp án C"],\n'
-            '        "correct": 1,\n'
-            '        "explanation": "Giải thích vì sao đúng..."\n'
-            '      }\n'
-            '    }\n'
-            '  ]\n'
-            "}"
-        )
+        # 1. Trích xuất text từ Slide PPTX bằng tool pptx_to_md
+        slide_markdown_content = convert_pptx_to_markdown(morning_slide)
+
+        # 2. Giới hạn độ dài README.md để tiết kiệm token tối đa (chỉ lấy phần nội dung chính)
+        if readme_content:
+            trimmed_readme = readme_content[:3000] + ("\n... [Đã cắt ngắn để tiết kiệm token]" if len(readme_content) > 3000 else "")
+        else:
+            trimmed_readme = f"Tên Repo bài lab chiều: {afternoon_repo}. (Chỉ phân tích tên repo và mô tả tổng quan)."
 
         user_message = (
-            f"Slide sáng: {morning_slide}\n"
-            f"Repo lab chiều: {afternoon_repo}\n"
-            f"Ràng buộc & Prompt rules: {rules}\n"
-            f"Hãy sinh 1 bài Mini Codelab thực tế bằng tiếng Việt."
+            f"=== 1. NỘI DUNG SLIDE BÀI GIẢNG SÁNG (Chuyển đổi từ file PPTX) ===\n{slide_markdown_content}\n\n"
+            f"=== 2. NỘI DUNG FILE README.MD BÀI LAB CHIỀU (Chỉ đọc README.md để tối ưu token) ===\n{trimmed_readme}\n\n"
+            f"=== 3. RÀNG BUỘC & PROMPT POLICY ===\n{rules}\n\n"
+            f"Hãy sinh 1 bài Mini Project Codelab hoàn chỉnh (gồm các file code, giải thích và lệnh chạy) bằng tiếng Việt."
         )
 
+
         messages = [
-            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": MINI_PROJECT_GENERATOR_SYSTEM_PROMPT},
             {"role": "user", "content": user_message}
         ]
 
         try:
-            raw_response = call_openai_chat(messages, api_key=user_key if user_key else None)
-            
-            # Clean json output if wrapped in ```json ... ```
-            cleaned = raw_response.strip()
-            if cleaned.startswith('```json'):
-                cleaned = cleaned[7:]
-            if cleaned.startswith('```'):
-                cleaned = cleaned[3:]
-            if cleaned.endswith('```'):
-                cleaned = cleaned[:-3]
-            cleaned = cleaned.strip()
-
-            parsed_lab = json.loads(cleaned)
-            self.send_json_response({"success": True, "lab": parsed_lab, "raw_ai_output": raw_response})
-
+            raw_response = call_openai_json(messages, override_key=user_key if user_key else None, action_name="GENERATE_MINI_PROJECT")
+            parsed_lab = json.loads(raw_response)
+            self.send_json_response({"success": True, "lab": parsed_lab})
         except Exception as e:
             self.send_json_response({
                 "success": False,
                 "error": str(e),
-                "hint": "Vui lòng thêm OPENAI_API_KEY chuẩn vào file .env hoặc ô nhập API Key trên màn hình."
+                "hint": "Vui lòng kiểm tra file .env hoặc API Key."
             }, status=500)
+
+    def handle_revise_minicodelab(self, data):
+        feedback = data.get('feedback', '')
+        current_lab = data.get('current_lab', {})
+        user_key = data.get('api_key', '').strip()
+
+        revision_user_message = LAB_COACH_REVISION_PROMPT.format(
+            feedback=feedback,
+            current_lab_json=json.dumps(current_lab, ensure_ascii=False, indent=2)
+        )
+
+        messages = [
+            {"role": "system", "content": MINI_PROJECT_GENERATOR_SYSTEM_PROMPT},
+            {"role": "user", "content": revision_user_message}
+        ]
+
+        try:
+            raw_response = call_openai_json(messages, override_key=user_key if user_key else None, action_name="HUMAN_IN_LOOP_REVISION")
+            parsed_lab = json.loads(raw_response)
+            parsed_lab["status"] = "Dự thảo đã chỉnh sửa theo phản hồi"
+            self.send_json_response({"success": True, "lab": parsed_lab})
+        except Exception as e:
+            self.send_json_response({"success": False, "error": str(e)}, status=500)
 
     def handle_run_agent(self, data):
         code_input = data.get('code_input', '')
         user_key = data.get('api_key', '').strip()
 
-        system_prompt = (
-            "Bạn là ReAct Agent Runner cho VLearn Sandbox. Hãy phân tích đoạn code/prompt của học viên "
-            "và thực thi giả lập với format log ReAct rõ ràng gồm:\n"
-            "[THOUGHT] Suy nghĩ của Agent\n"
-            "[ACTION] Tên Tool gọi (ví dụ lookup_paper, fetch_doc...)\n"
-            "[OBSERVATION] Kết quả tool trả về\n"
-            "[FINAL ANSWER] Câu trả lời chốt cho học viên."
-        )
-
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Chạy thử đoạn code / prompt này:\n\n{code_input}"}
+            {"role": "system", "content": REACT_AGENT_RUNNER_PROMPT},
+            {"role": "user", "content": f"Chạy thực thi đoạn code dự án này:\n\n{code_input}"}
         ]
 
         try:
-            raw_response = call_openai_chat(messages, api_key=user_key if user_key else None)
-            self.send_json_response({"success": True, "output": raw_response})
+            raw_response = call_openai_json(messages, override_key=user_key if user_key else None, action_name="RUN_SANDBOX_AGENT")
+            parsed_output = json.loads(raw_response)
+            
+            output_str = parsed_output.get('full_log') or (
+                f"[THOUGHT] {parsed_output.get('thought', '')}\n"
+                f"[ACTION] {parsed_output.get('action', '')}\n"
+                f"[OBSERVATION] {parsed_output.get('observation', '')}\n"
+                f"[FINAL ANSWER] {parsed_output.get('final_answer', '')}"
+            )
+            self.send_json_response({"success": True, "output": output_str, "data": parsed_output})
         except Exception as e:
             self.send_json_response({"success": False, "error": str(e)}, status=500)
 
@@ -201,14 +172,29 @@ class VLearnRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
 
 
+class ReusableTCPServer(socketserver.TCPServer):
+    allow_reuse_address = True
+
+
 if __name__ == "__main__":
-    print(f"🚀 Starting VLearn Real OpenAI Server on http://localhost:{PORT}")
-    print(f"🔑 .env Status: OPENAI_API_KEY {'loaded' if os.getenv('OPENAI_API_KEY') else 'not found'}")
-    print(f"📁 Serving files from: {DIRECTORY}")
-    
-    with socketserver.TCPServer(("", PORT), VLearnRequestHandler) as httpd:
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\nShutting down server.")
-            sys.exit(0)
+    print(f"🚀 VLearn Modular Backend Server running on http://localhost:{PORT}")
+    print(f"📁 Serving UI from: {GIAO_DIEN_DIR}")
+    print(f"🔑 API Key Status: {'Ready' if get_openai_api_key() else 'Not Configured'}")
+
+    try:
+        with ReusableTCPServer(("", PORT), VLearnRequestHandler) as httpd:
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\nServer shut down gracefully.")
+                sys.exit(0)
+    except OSError as e:
+        if e.errno == 98:
+            print(f"\n⚠️ Cổng {PORT} hiện đang được sử dụng bởi server đang chạy ngầm!")
+            print(f"👉 Bạn có thể truy cập ứng dụng ngay tại: http://localhost:{PORT}")
+            print(f"👉 Nếu muốn tắt tiến trình cũ để chạy lại, hãy gõ lệnh:")
+            print(f"   fuser -k {PORT}/tcp  (hoặc pkill -f server.py)\n")
+        else:
+            raise e
+
+
