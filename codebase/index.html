@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ĐềTài+ — prototype mô phỏng trợ lý chọn đề tài theo hồ sơ, sở thích và kỹ năng."
+    />
+    <title>ĐềTài+ · Trợ lý chọn đề tài</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Điều hướng quy trình">
+        <a class="brand" href="#" aria-label="ĐềTài+ — về đầu trang">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="img">
+              <path d="M8 8.5h10.5a5.5 5.5 0 0 1 0 11H14l-6 5v-16Z" />
+              <path d="m18.5 9.5 1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8-2.1-1.9 2.8-.3 1.2-2.6Z" />
+            </svg>
+          </span>
+          <span>ĐềTài<span class="brand-plus">+</span></span>
+        </a>
+
+        <div class="demo-badge">
+          <span class="status-dot"></span>
+          Prototype mô phỏng
+        </div>
+
+        <nav class="flow-nav" aria-label="Các bước">
+          <p class="nav-label">Hành trình của bạn</p>
+          <ol>
+            <li class="flow-step is-active" data-nav-step="profile">
+              <span class="step-icon">1</span>
+              <span>
+                <strong>Hồ sơ</strong>
+                <small>Hiểu bạn là ai</small>
+              </span>
+            </li>
+            <li class="flow-step" data-nav-step="questions">
+              <span class="step-icon">2</span>
+              <span>
+                <strong>Sở thích & kỹ năng</strong>
+                <small>3 câu hỏi ngắn</small>
+              </span>
+            </li>
+            <li class="flow-step" data-nav-step="results">
+              <span class="step-icon">3</span>
+              <span>
+                <strong>Đề tài phù hợp</strong>
+                <small>Gợi ý có lý do</small>
+              </span>
+            </li>
+          </ol>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+        <button class="sidebar-action" id="openSuggestFromSidebar" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Đề xuất đề tài mới
+        </button>
+        <button class="sidebar-action muted" id="resetDemo" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 4v6h6M20 20v-6h-6M6.5 17.5A8 8 0 0 0 19 14M17.5 6.5A8 8 0 0 0 5 10" />
+          </svg>
+          Bắt đầu lại demo
+        </button>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">TRỢ LÝ ĐỊNH HƯỚNG ĐỀ TÀI</p>
+            <h1>Chọn đúng đề tài, bắt đầu tự tin hơn.</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="catalog-shortcut" id="openCatalogTop" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 5h16v14H4zM8 9h8M8 13h5" />
+              </svg>
+              Khám phá kho đề tài
+            </button>
+            <span class="simulation-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 4.5 6v5c0 4.7 3.2 8.9 7.5 10 4.3-1.1 7.5-5.3 7.5-10V6L12 3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              Không gửi dữ liệu ra ngoài
+            </span>
+            <button class="icon-button mobile-only" id="mobileProfileToggle" type="button" aria-label="Mở hồ sơ">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5 20c.5-4 3-6 7-6s6.5 2 7 6" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="workspace">
+          <section class="chat-panel" aria-label="Cuộc trò chuyện mô phỏng">
+            <div class="chat-heading">
+              <div class="assistant-identity">
+                <div class="assistant-avatar" aria-hidden="true">
+                  <svg viewBox="0 0 32 32">
+                    <path d="M9 10h14v11H9z" />
+                    <path d="M13 10V7h6v3M6 15h3M23 15h3M13 15h.01M19 15h.01M13 19h6" />
+                  </svg>
+                </div>
+                <div>
+                  <strong>Mai · Trợ lý đề tài</strong>
+                  <span><i></i> Đang sẵn sàng</span>
+                </div>
+              </div>
+              <div class="chat-heading-actions">
+                <div class="view-tabs" role="tablist" aria-label="Chọn không gian làm việc">
+                  <button class="is-active" id="advisorTab" type="button" role="tab" aria-selected="true">
+                    Tư vấn
+                  </button>
+                  <button id="catalogTab" type="button" role="tab" aria-selected="false">
+                    Kho đề tài
+                    <span id="catalogTabCount">170</span>
+                  </button>
+                </div>
+                <button class="text-button" id="openSuggestTop" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Góp ý đề tài
+                </button>
+              </div>
+            </div>
+
+            <div class="chat-stream" id="chatStream" aria-live="polite"></div>
+
+            <div class="composer-wrap" id="composerWrap">
+              <div class="composer">
+                <button class="composer-icon" id="composerAttach" type="button" aria-label="Đính kèm hồ sơ">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m20 11.5-8.2 8.2a6 6 0 0 1-8.5-8.5l9-9a4 4 0 0 1 5.7 5.6l-9.1 9.1a2 2 0 1 1-2.8-2.8l8.4-8.4" />
+                  </svg>
+                </button>
+                <label class="sr-only" for="chatInput">Nhập câu trả lời</label>
+                <textarea
+                  id="chatInput"
+                  rows="1"
+                  placeholder="Nhập câu trả lời hoặc hỏi về cách bắt đầu..."
+                ></textarea>
+                <button class="send-button" id="sendMessage" type="button" aria-label="Gửi tin nhắn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m5 12 14-7-4 14-3-6-7-1Z" />
+                    <path d="m12 13 7-8" />
+                  </svg>
+                </button>
+              </div>
+              <p>Đây là luồng phản hồi dựng sẵn để trình diễn UI, không phải chatbot AI thật.</p>
+            </div>
+
+            <section class="topic-explorer is-hidden" id="topicExplorer" aria-label="Kho đề tài">
+              <div class="catalog-hero">
+                <div>
+                  <span class="section-kicker">KHO Ý TƯỞNG DỰ ÁN</span>
+                  <h2>Tìm đề tài bạn muốn thực hiện</h2>
+                  <p>Khám phá toàn bộ dữ liệu, lọc theo lĩnh vực và mở chi tiết từng đề tài.</p>
+                </div>
+                <button class="button primary" id="catalogSuggestTopic" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Đề xuất đề tài
+                </button>
+              </div>
+
+              <div class="catalog-toolbar">
+                <label class="catalog-search" for="topicSearch">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6" />
+                    <path d="m16 16 4 4" />
+                  </svg>
+                  <input
+                    id="topicSearch"
+                    type="search"
+                    placeholder="Tìm theo tên, mã đề, kỹ năng hoặc bài toán..."
+                  />
+                  <kbd>/</kbd>
+                </label>
+                <div class="catalog-filters">
+                  <label>
+                    <span class="sr-only">Lọc theo lĩnh vực</span>
+                    <select id="topicCategory">
+                      <option value="">Tất cả lĩnh vực</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span class="sr-only">Lọc theo quy mô nhóm</span>
+                    <select id="topicTeamFilter">
+                      <option value="">Mọi quy mô nhóm</option>
+                      <option value="3">Tối đa 3 người</option>
+                      <option value="4">Tối đa 4 người</option>
+                      <option value="5">Tối đa 5 người</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span class="sr-only">Sắp xếp đề tài</span>
+                    <select id="topicSort">
+                      <option value="recommended">Phù hợp nhất</option>
+                      <option value="az">Tên A → Z</option>
+                      <option value="za">Tên Z → A</option>
+                      <option value="code">Theo mã đề</option>
+                      <option value="team">Nhóm nhỏ trước</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="catalog-summary">
+                <p><strong id="topicResultCount">170</strong> đề tài được tìm thấy</p>
+                <button class="clear-filter is-hidden" id="clearTopicFilters" type="button">
+                  Xóa bộ lọc
+                </button>
+              </div>
+
+              <div class="topic-grid" id="topicList"></div>
+              <div class="catalog-empty is-hidden" id="catalogEmpty">
+                <span aria-hidden="true">⌕</span>
+                <h3>Chưa tìm thấy đề tài phù hợp</h3>
+                <p>Thử một từ khóa khác hoặc xóa bớt bộ lọc.</p>
+                <button class="button secondary small" id="emptyClearFilters" type="button">Xóa bộ lọc</button>
+              </div>
+              <div class="catalog-load-more" id="catalogLoadMoreWrap">
+                <button class="button secondary" id="loadMoreTopics" type="button">Xem thêm đề tài</button>
+              </div>
+            </section>
+          </section>
+
+          <aside class="profile-panel" id="profilePanel" aria-label="Hồ sơ học viên">
+            <div class="profile-empty" id="profileEmpty">
+              <div class="empty-illustration" aria-hidden="true">
+                <svg viewBox="0 0 100 100">
+                  <rect x="22" y="14" width="56" height="72" rx="12" />
+                  <circle cx="50" cy="39" r="11" />
+                  <path d="M34 68c2-10 8-15 16-15s14 5 16 15M72 20l8-8M79 25h11" />
+                </svg>
+              </div>
+              <span class="section-kicker">HỒ SƠ CỦA BẠN</span>
+              <h2>Chưa có dữ liệu</h2>
+              <p>Tải hồ sơ mô phỏng để xem thông tin được điền vào đây.</p>
+            </div>
+
+            <div class="profile-content is-hidden" id="profileContent">
+              <div class="profile-card-head">
+                <span class="section-kicker">HỒ SƠ ĐÃ TRÍCH XUẤT</span>
+                <span class="mock-tag">Dữ liệu giả</span>
+              </div>
+              <div class="profile-person">
+                <div class="profile-avatar">MA</div>
+                <div>
+                  <h2 id="profileName">Trần Minh Anh</h2>
+                  <p id="profileHeadline">Sinh viên năm 3 · Hệ thống thông tin</p>
+                </div>
+              </div>
+
+              <div class="profile-section">
+                <div class="profile-section-title">
+                  <span>Kỹ năng nhận diện</span>
+                  <span id="skillCount">3 kỹ năng</span>
+                </div>
+                <div class="tag-list" id="profileSkills"></div>
+              </div>
+
+              <div class="profile-section">
+                <div class="profile-section-title">
+                  <span>Mong muốn</span>
+                </div>
+                <p class="profile-note" id="profileGoal">
+                  Xây một sản phẩm có thể demo, ưu tiên bài toán gần với dữ liệu.
+                </p>
+              </div>
+
+              <div class="fit-summary is-hidden" id="fitSummary">
+                <div class="fit-ring" aria-label="Hồ sơ đã hoàn thiện">
+                  <svg viewBox="0 0 44 44">
+                    <circle cx="22" cy="22" r="18" />
+                    <circle class="ring-progress" cx="22" cy="22" r="18" />
+                  </svg>
+                  <strong>100%</strong>
+                </div>
+                <div>
+                  <strong>Đã đủ để gợi ý</strong>
+                  <span>Sở thích, kỹ năng và quy mô nhóm đã rõ.</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <input
+      class="sr-only"
+      id="profileFileInput"
+      type="file"
+      accept=".pdf,.doc,.docx,.txt"
+      aria-label="Chọn hồ sơ mô phỏng"
+    />
+
+    <div class="modal-backdrop onboarding-backdrop" id="onboardingModal" role="presentation">
+      <section class="onboarding-modal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+        <aside class="onboarding-aside">
+          <a class="onboarding-brand" href="#" aria-label="ĐềTài+">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32">
+                <path d="M8 8.5h10.5a5.5 5.5 0 0 1 0 11H14l-6 5v-16Z" />
+                <path d="m18.5 9.5 1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8-2.1-1.9 2.8-.3 1.2-2.6Z" />
+              </svg>
+            </span>
+            <span>ĐềTài<span class="brand-plus">+</span></span>
+          </a>
+          <div class="onboarding-copy">
+            <span class="onboarding-overline">THIẾT LẬP HỒ SƠ</span>
+            <h2>Để lời gợi ý thực sự dành cho bạn.</h2>
+            <p>Ba bước ngắn, hoàn toàn là dữ liệu mô phỏng và có thể thay đổi bất cứ lúc nào.</p>
+          </div>
+          <ol class="onboarding-progress">
+            <li class="is-active" data-onboarding-progress="1">
+              <span>1</span>
+              <div><strong>Thông tin cơ bản</strong><small>Hồ sơ và chuyên ngành</small></div>
+            </li>
+            <li data-onboarding-progress="2">
+              <span>2</span>
+              <div><strong>Sở thích & kỹ năng</strong><small>Điều bạn muốn làm</small></div>
+            </li>
+            <li data-onboarding-progress="3">
+              <span>3</span>
+              <div><strong>Cách thực hiện</strong><small>Nhóm và độ khó</small></div>
+            </li>
+          </ol>
+          <div class="onboarding-privacy">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3 4.5 6v5c0 4.7 3.2 8.9 7.5 10 4.3-1.1 7.5-5.3 7.5-10V6L12 3Z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            Không tải tệp thật · Không gọi AI
+          </div>
+        </aside>
+
+        <div class="onboarding-main">
+          <div class="onboarding-mobile-head">
+            <strong>ĐềTài<span>+</span></strong>
+            <small id="onboardingMobileStep">Bước 1 / 3</small>
+          </div>
+
+          <section class="onboarding-step" data-onboarding-step="1">
+            <span class="section-kicker">BƯỚC 1 · HỒ SƠ</span>
+            <h1 id="onboardingTitle">Bắt đầu với vài thông tin về bạn</h1>
+            <p class="onboarding-lead">
+              Tải một hồ sơ mô phỏng hoặc tự điền. Tệp chỉ dùng để diễn hoạt giao diện.
+            </p>
+
+            <div class="onboarding-upload" id="onboardingDropzone">
+              <span class="upload-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 16V4M7 9l5-5 5 5M5 14v5h14v-5" />
+                </svg>
+              </span>
+              <div>
+                <strong id="onboardingFileLabel">Tải hồ sơ PDF hoặc DOCX</strong>
+                <span id="onboardingFileMeta">Mô phỏng trích xuất tên, ngành học và kỹ năng</span>
+              </div>
+              <button class="button secondary small" id="onboardingFileBtn" type="button">Chọn tệp</button>
+              <button class="button ghost small" id="onboardingSampleBtn" type="button">Dùng hồ sơ mẫu</button>
+            </div>
+
+            <div class="or-divider"><span>hoặc tự điền</span></div>
+
+            <div class="onboarding-form-grid">
+              <label>
+                Họ và tên
+                <input id="onboardingName" placeholder="Ví dụ: Trần Minh Anh" />
+              </label>
+              <label>
+                Chuyên ngành / định hướng
+                <input id="onboardingMajor" placeholder="Ví dụ: Hệ thống thông tin" />
+              </label>
+            </div>
+
+            <div class="onboarding-actions">
+              <button class="onboarding-skip" id="browseBeforeProfile" type="button">
+                Xem kho đề tài trước
+              </button>
+              <button class="button primary" id="onboardingNext1" type="button">
+                Tiếp tục
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+              </button>
+            </div>
+          </section>
+
+          <section class="onboarding-step is-hidden" data-onboarding-step="2">
+            <span class="section-kicker">BƯỚC 2 · SỞ THÍCH & KỸ NĂNG</span>
+            <h1>Bạn muốn làm gì và đã biết gì?</h1>
+            <p class="onboarding-lead">Chọn một lĩnh vực chính và ít nhất một kỹ năng có thể đóng góp.</p>
+
+            <div class="onboarding-fieldset">
+              <span>Lĩnh vực quan tâm nhất</span>
+              <div class="onboarding-interest-grid" id="onboardingInterests">
+                <button type="button" data-onboard-interest="data"><i>⌁</i>Dữ liệu & AI</button>
+                <button type="button" data-onboard-interest="product"><i>◫</i>Web / Product</button>
+                <button type="button" data-onboard-interest="education"><i>⌂</i>Giáo dục</button>
+                <button type="button" data-onboard-interest="finance"><i>◇</i>Tài chính</button>
+                <button type="button" data-onboard-interest="operations"><i>↗</i>Vận hành</button>
+                <button type="button" data-onboard-interest="security"><i>◈</i>An ninh & hệ thống</button>
+              </div>
+            </div>
+
+            <div class="onboarding-fieldset">
+              <span>Kỹ năng của bạn</span>
+              <div class="onboarding-skill-grid" id="onboardingSkills">
+                <button type="button" data-onboard-skill="Python">Python</button>
+                <button type="button" data-onboard-skill="SQL">SQL</button>
+                <button type="button" data-onboard-skill="React">React</button>
+                <button type="button" data-onboard-skill="Phân tích dữ liệu">Phân tích dữ liệu</button>
+                <button type="button" data-onboard-skill="Machine Learning">Machine Learning</button>
+                <button type="button" data-onboard-skill="Thiết kế UX">Thiết kế UX</button>
+                <button type="button" data-onboard-skill="Thuyết trình">Thuyết trình</button>
+                <button type="button" data-onboard-skill="Quản lý dự án">Quản lý dự án</button>
+              </div>
+            </div>
+
+            <p class="onboarding-error is-hidden" id="onboardingStep2Error">Hãy chọn một lĩnh vực và ít nhất một kỹ năng.</p>
+            <div class="onboarding-actions">
+              <button class="button secondary" data-onboarding-back="1" type="button">Quay lại</button>
+              <button class="button primary" id="onboardingNext2" type="button">
+                Tiếp tục
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+              </button>
+            </div>
+          </section>
+
+          <section class="onboarding-step is-hidden" data-onboarding-step="3">
+            <span class="section-kicker">BƯỚC 3 · CÁCH THỰC HIỆN</span>
+            <h1>Chọn phạm vi phù hợp với nhóm</h1>
+            <p class="onboarding-lead">Thông tin này giúp ưu tiên đề tài có thể hoàn thành trong thời gian hackathon.</p>
+
+            <div class="onboarding-fieldset">
+              <span>Quy mô nhóm</span>
+              <div class="onboarding-large-options" id="onboardingTeam">
+                <button type="button" data-onboard-team="3"><strong>3</strong><span>người</span></button>
+                <button class="is-selected" type="button" data-onboard-team="4"><strong>4</strong><span>người</span></button>
+                <button type="button" data-onboard-team="5"><strong>5</strong><span>người</span></button>
+              </div>
+            </div>
+
+            <div class="onboarding-fieldset">
+              <span>Mức thử thách mong muốn</span>
+              <div class="onboarding-difficulty" id="onboardingDifficulty">
+                <button type="button" data-onboard-difficulty="easy">
+                  <strong>Vừa sức</strong><span>Flow rõ, ít thành phần</span>
+                </button>
+                <button class="is-selected" type="button" data-onboard-difficulty="balanced">
+                  <strong>Cân bằng</strong><span>Đủ khó để học và demo</span>
+                </button>
+                <button type="button" data-onboard-difficulty="hard">
+                  <strong>Thử thách</strong><span>Nhiều dữ liệu và logic hơn</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="onboarding-ready">
+              <span>✓</span>
+              <div>
+                <strong>Đã đủ thông tin để tạo gợi ý</strong>
+                <small>Kết quả được mô phỏng bằng quy tắc cố định từ kho đề tài.</small>
+              </div>
+            </div>
+
+            <div class="onboarding-actions">
+              <button class="button secondary" data-onboarding-back="2" type="button">Quay lại</button>
+              <button class="button primary" id="completeOnboarding" type="button">
+                Xem đề tài dành cho tôi
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop is-hidden" id="suggestModal" role="presentation">
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="suggestTitle">
+        <div class="modal-head">
+          <div>
+            <span class="section-kicker">ĐÓNG GÓP TỪ HỌC VIÊN</span>
+            <h2 id="suggestTitle">Đề xuất một đề tài mới</h2>
+            <p>Ý tưởng sẽ được ghi nhận trong phiên demo này.</p>
+          </div>
+          <button class="icon-button" id="closeSuggest" type="button" aria-label="Đóng">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <form id="suggestForm">
+          <label>
+            Tên đề tài <span>*</span>
+            <input
+              id="newTopicTitle"
+              name="title"
+              required
+              maxlength="120"
+              placeholder="Ví dụ: Trợ lý lập kế hoạch học tập theo tuần"
+            />
+          </label>
+          <div class="form-row">
+            <label>
+              Lĩnh vực
+              <select id="newTopicArea" name="area">
+                <option>Giáo dục</option>
+                <option>Dữ liệu & AI</option>
+                <option>Vận hành</option>
+                <option>Tài chính</option>
+                <option>Khác</option>
+              </select>
+            </label>
+            <label>
+              Quy mô nhóm
+              <select id="newTopicTeam" name="team">
+                <option>3 người</option>
+                <option selected>4 người</option>
+                <option>5 người</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Vấn đề muốn giải quyết <span>*</span>
+            <textarea
+              id="newTopicProblem"
+              name="problem"
+              required
+              rows="4"
+              maxlength="400"
+              placeholder="Ai đang gặp vấn đề gì? Hậu quả có thể đo được là gì?"
+            ></textarea>
+          </label>
+          <label>
+            Kỹ năng phù hợp
+            <input
+              id="newTopicSkills"
+              name="skills"
+              placeholder="Python, UI/UX, phân tích dữ liệu..."
+            />
+          </label>
+          <div class="modal-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3 4.5 6v5c0 4.7 3.2 8.9 7.5 10 4.3-1.1 7.5-5.3 7.5-10V6L12 3Z" />
+              <path d="M12 8v5M12 16h.01" />
+            </svg>
+            Bản prototype chỉ mô phỏng gửi đề xuất, không lưu lên máy chủ.
+          </div>
+          <div class="modal-actions">
+            <button class="button secondary" id="cancelSuggest" type="button">Hủy</button>
+            <button class="button primary" type="submit">
+              Gửi đề xuất
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 12 14-7-4 14-3-6-7-1Z" />
+              </svg>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div class="drawer-backdrop is-hidden" id="detailBackdrop"></div>
+    <aside class="detail-drawer is-hidden" id="detailDrawer" aria-label="Chi tiết đề tài">
+      <div class="drawer-head">
+        <div>
+          <span class="section-kicker" id="detailCode">DATA-001</span>
+          <h2 id="detailTitle">Chi tiết đề tài</h2>
+        </div>
+        <button class="icon-button" id="closeDetail" type="button" aria-label="Đóng chi tiết">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-scroll" id="detailContent"></div>
+    </aside>
+
+    <div class="toast is-hidden" id="toast" role="status">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+      <div>
+        <strong>Đã ghi nhận đề xuất</strong>
+        <span>Ý tưởng đã được thêm vào phiên demo.</span>
+      </div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
