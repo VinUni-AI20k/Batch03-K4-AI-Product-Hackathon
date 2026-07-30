@@ -1,0 +1,2187 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Day 02 Lab Guide — Tìm đúng bài toán cho AI</title>
+  <style>
+    :root {
+      --ink: #172121;
+      --muted: #586565;
+      --paper: #f4f1e8;
+      --surface: #fffdf7;
+      --line: #d9d2c2;
+      --teal: #0d6b63;
+      --teal-dark: #084f49;
+      --amber: #b86717;
+      --red: #a33b2b;
+      --blue: #315d9a;
+      --green: #28734d;
+      --shadow: 0 14px 36px rgba(37, 43, 39, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 6.5rem;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 3%, rgba(13, 107, 99, 0.10), transparent 28rem),
+        linear-gradient(180deg, #faf8f1 0, var(--paper) 32rem);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+
+    button,
+    input { font: inherit; }
+
+    a { color: var(--teal-dark); }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid #f0a94b;
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 0.5rem;
+      left: 0.5rem;
+      transform: translateY(-160%);
+      padding: 0.65rem 0.9rem;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .skip-link:focus { transform: none; }
+
+    .topbar {
+      position: sticky;
+      z-index: 30;
+      top: 0;
+      border-bottom: 1px solid rgba(217, 210, 194, 0.88);
+      background: rgba(250, 248, 241, 0.93);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0.72rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-width: 12rem;
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 2.2rem;
+      height: 2.2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--teal);
+      box-shadow: 0 8px 20px rgba(13, 107, 99, 0.2);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.2rem;
+    }
+
+    .nav-links a {
+      padding: 0.45rem 0.62rem;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--teal-dark);
+      background: #e8f1ed;
+    }
+
+    .progress-chip {
+      min-width: 8rem;
+      padding: 0.45rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: var(--surface);
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding-bottom: 5rem;
+    }
+
+    .hero {
+      padding: 5.2rem 0 2.6rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+      align-items: end;
+      gap: 2.3rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.75rem;
+      color: var(--teal);
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin-top: 0;
+      line-height: 1.18;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 16ch;
+      margin-bottom: 1.15rem;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.8rem, 7vw, 5.8rem);
+      font-weight: 600;
+      letter-spacing: -0.045em;
+    }
+
+    .hero-lead {
+      max-width: 68ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1.02rem, 1.8vw, 1.24rem);
+    }
+
+    .meta-card,
+    .section-card,
+    .audit-item,
+    .role-card,
+    .phase-card,
+    .validation-card,
+    .new-file-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 1.2rem;
+      border-top: 5px solid var(--teal);
+    }
+
+    .meta-grid {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .meta-grid div { min-width: 0; }
+
+    .meta-grid dt {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .meta-grid dd {
+      margin: 0.12rem 0 0;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .control-deck {
+      margin: 1rem 0 3.5rem;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.3fr auto;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #172121;
+      color: #fff;
+      box-shadow: 0 18px 44px rgba(23, 33, 33, 0.17);
+    }
+
+    .control-group {
+      min-width: 0;
+    }
+
+    .control-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: #bac8c6;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .timer-row,
+    .os-row,
+    .deck-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-display {
+      min-width: 6.4rem;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.45rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .button {
+      min-height: 2.45rem;
+      padding: 0.48rem 0.78rem;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    .button:hover { transform: translateY(-1px); }
+
+    .button-primary {
+      color: #10211f;
+      background: #82d5c9;
+    }
+
+    .button-secondary {
+      color: #fff;
+      border-color: #52615f;
+      background: #293635;
+    }
+
+    .button-quiet {
+      color: var(--ink);
+      border-color: var(--line);
+      background: #fff;
+    }
+
+    .os-button[aria-pressed="true"] {
+      color: #10211f;
+      border-color: #82d5c9;
+      background: #82d5c9;
+    }
+
+    .progress-wrap {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .progress-track {
+      height: 0.55rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #3a4847;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #82d5c9;
+      transition: width 180ms ease;
+    }
+
+    .progress-text {
+      color: #e2ecea;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .section {
+      margin: 0 0 4.5rem;
+    }
+
+    .section-heading {
+      margin-bottom: 1.4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.55fr);
+      align-items: end;
+      gap: 2rem;
+    }
+
+    .section-kicker {
+      margin: 0 0 0.5rem;
+      color: var(--amber);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      font-weight: 600;
+      letter-spacing: -0.035em;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .section-card { padding: 1.3rem; }
+
+    .audit-grid,
+    .roles-grid,
+    .validation-grid,
+    .new-files-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .audit-item,
+    .role-card,
+    .validation-card,
+    .new-file-card {
+      padding: 1.2rem;
+      box-shadow: none;
+    }
+
+    .audit-item {
+      border-left: 5px solid var(--amber);
+    }
+
+    .audit-item[data-level="critical"] { border-left-color: var(--red); }
+    .audit-item[data-level="info"] { border-left-color: var(--blue); }
+
+    .audit-item h3,
+    .role-card h3,
+    .validation-card h3,
+    .new-file-card h3 {
+      margin-bottom: 0.45rem;
+      font-size: 1.05rem;
+    }
+
+    .audit-item p,
+    .role-card p,
+    .validation-card p,
+    .new-file-card p {
+      margin: 0.35rem 0;
+      color: var(--muted);
+    }
+
+    .audit-action {
+      padding-top: 0.65rem;
+      color: var(--ink) !important;
+      font-weight: 700;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.7rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: #dceeea;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tag.parallel {
+      color: #254e85;
+      background: #e2ebf8;
+    }
+
+    .tag.sequential {
+      color: #7c450c;
+      background: #fae7cf;
+    }
+
+    .tag.break {
+      color: #5e467e;
+      background: #eee7f7;
+    }
+
+    .path-box {
+      margin: 0.8rem 0;
+      padding: 0.8rem;
+      border: 1px dashed #b9b2a4;
+      border-radius: 12px;
+      background: #f7f4eb;
+    }
+
+    .path-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .path-value {
+      display: block;
+      margin-top: 0.12rem;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 0.84rem;
+      overflow-wrap: anywhere;
+    }
+
+    .command-card {
+      margin: 0.9rem 0;
+      overflow: hidden;
+      border: 1px solid #263535;
+      border-radius: 13px;
+      background: #12201f;
+      color: #ecf5f3;
+    }
+
+    .command-head {
+      padding: 0.58rem 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid #344442;
+      color: #b9cbc8;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .copy-button {
+      padding: 0.3rem 0.55rem;
+      border: 1px solid #56706d;
+      border-radius: 8px;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    pre {
+      margin: 0;
+      padding: 0.9rem;
+      overflow-x: auto;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 0.83rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .expected-output {
+      margin: 0.55rem 0 0;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      color: #315447;
+      background: #e7f2eb;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+    }
+
+    .role-number {
+      width: 2rem;
+      height: 2rem;
+      margin-bottom: 0.7rem;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #fff;
+      background: var(--teal);
+      font-weight: 900;
+    }
+
+    .role-card label {
+      display: block;
+      margin-top: 0.85rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .role-card input {
+      width: 100%;
+      margin-top: 0.3rem;
+      padding: 0.65rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2.2rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 1.5rem;
+      bottom: 1.5rem;
+      left: 0.62rem;
+      width: 2px;
+      background: linear-gradient(var(--teal), #bdc9c4);
+    }
+
+    .phase-card {
+      position: relative;
+      margin-bottom: 1.35rem;
+      padding: 1.35rem;
+      box-shadow: none;
+    }
+
+    .phase-card::before {
+      content: "";
+      position: absolute;
+      top: 1.6rem;
+      left: -2.18rem;
+      width: 1.15rem;
+      height: 1.15rem;
+      border: 4px solid var(--paper);
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 1px var(--teal);
+    }
+
+    .phase-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .phase-index {
+      margin: 0 0 0.3rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .phase-head h3 {
+      margin-bottom: 0.45rem;
+      font-size: clamp(1.35rem, 2vw, 1.75rem);
+    }
+
+    .phase-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+
+    .task-card {
+      margin-top: 1rem;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+
+    .task-card.is-complete { opacity: 0.68; }
+
+    .task-head {
+      padding: 0.95rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--line);
+      background: #f9f7f0;
+    }
+
+    .task-head input {
+      width: 1.2rem;
+      height: 1.2rem;
+      flex: 0 0 auto;
+      accent-color: var(--teal);
+    }
+
+    .task-head h4 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .task-owner {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .task-panels {
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .concept-panel {
+      padding: 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .concept-panel h5 {
+      margin: 0 0 0.6rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .concept-panel ul,
+    .concept-panel ol {
+      margin: 0.45rem 0 0;
+      padding-left: 1.2rem;
+    }
+
+    .concept-panel li + li { margin-top: 0.35rem; }
+
+    .concept-knowledge {
+      border-top: 4px solid var(--blue);
+      background: #f4f7fc;
+    }
+
+    .concept-instructions {
+      border-top: 4px solid var(--teal);
+      background: #f1f8f6;
+    }
+
+    .concept-expected {
+      border-top: 4px solid var(--green);
+      background: #f3f8f4;
+    }
+
+    .concept-deliverables {
+      border-top: 4px solid var(--amber);
+      background: #fcf7ef;
+    }
+
+    .checkpoint {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--teal-dark);
+    }
+
+    .checkpoint strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.77rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .break-note {
+      margin-top: 0.8rem;
+      padding: 0.7rem 0.9rem;
+      border: 1px dashed #b9abd0;
+      border-radius: 11px;
+      color: #553c78;
+      background: #f4effa;
+      font-weight: 800;
+    }
+
+    .checklist {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.6rem;
+      list-style: none;
+    }
+
+    .checklist label {
+      padding: 0.7rem 0.8rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .checklist input {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin-top: 0.2rem;
+      flex: 0 0 auto;
+      accent-color: var(--teal);
+    }
+
+    .source-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem 1.5rem;
+    }
+
+    .source-list code {
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      padding: 2.2rem 0 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .focus-mode .task-card.is-complete { display: none; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 900px) {
+      .topbar-inner {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+
+      .hero,
+      .section-heading {
+        grid-template-columns: 1fr;
+      }
+
+      .control-deck {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      main,
+      .topbar-inner {
+        width: min(100% - 1.1rem, 1180px);
+      }
+
+      .hero { padding-top: 3rem; }
+
+      h1 { font-size: clamp(2.5rem, 13vw, 4.2rem); }
+
+      .control-deck,
+      .audit-grid,
+      .roles-grid,
+      .validation-grid,
+      .new-files-grid,
+      .task-panels,
+      .source-list {
+        grid-template-columns: 1fr;
+      }
+
+      .deck-actions { justify-content: flex-start; }
+
+      .timeline { padding-left: 1.5rem; }
+      .timeline::before { left: 0.3rem; }
+      .phase-card::before { left: -1.72rem; }
+
+      .phase-head { display: block; }
+      .phase-meta { justify-content: flex-start; }
+
+      .task-head { align-items: flex-start; }
+      .task-owner { max-width: 42%; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .topbar,
+      .control-deck,
+      .copy-button,
+      .skip-link { display: none !important; }
+      main { width: 100%; }
+      .hero { padding-top: 0; }
+      .section { break-inside: avoid; }
+      .phase-card,
+      .task-card,
+      .concept-panel { break-inside: avoid; box-shadow: none; }
+      .focus-mode .task-card.is-complete { display: block; }
+      .command-card { color: #000; background: #fff; }
+      .command-head { color: #000; }
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">D2</span>
+        <span>AI Product Lab</span>
+      </a>
+      <nav class="nav-links" aria-label="Điều hướng chính">
+        <a href="#setup">Setup</a>
+        <a href="#steps">Step by step</a>
+        <a href="#roles">Roles</a>
+        <a href="#validation">Validation</a>
+        <a href="#new-files">New files</a>
+      </nav>
+      <div class="progress-chip" id="top-progress" aria-live="polite">0/12 task</div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top">
+      <div>
+        <p class="eyebrow">Learner-facing guide · Day 02</p>
+        <h1>Tìm đúng bài toán cho AI</h1>
+        <p class="hero-lead">
+          Đi từ pain thật đến workflow, metric, boundary và một quyết định
+          Rule / Workflow / Agent có thể bảo vệ bằng bằng chứng — không bắt đầu
+          bằng giải pháp AI.
+        </p>
+      </div>
+      <aside class="meta-card" aria-label="Thông tin lab">
+        <dl class="meta-grid" id="meta-grid"></dl>
+      </aside>
+    </section>
+
+    <section class="control-deck" aria-label="Bộ điều khiển lab">
+      <div class="control-group">
+        <span class="control-label">Đồng hồ 4 giờ</span>
+        <div class="timer-row">
+          <span class="timer-display" id="timer-display" aria-live="polite">04:00:00</span>
+          <button class="button button-primary" id="timer-toggle" type="button">Bắt đầu</button>
+          <button class="button button-secondary" id="timer-reset" type="button">Đặt lại giờ</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">Hệ điều hành</span>
+        <div class="os-row" role="group" aria-label="Chọn hệ điều hành">
+          <button class="button button-secondary os-button" type="button" data-os-choice="windows">Windows</button>
+          <button class="button button-secondary os-button" type="button" data-os-choice="macos">macOS</button>
+          <button class="button button-secondary os-button" type="button" data-os-choice="linux">Linux</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">Tiến độ task</span>
+        <div class="progress-wrap">
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <span class="progress-text" id="progress-text">0/12 hoàn thành · 0%</span>
+        </div>
+      </div>
+
+      <div class="deck-actions">
+        <button class="button button-secondary" id="focus-toggle" type="button" aria-pressed="false">Focus: tắt</button>
+        <button class="button button-secondary" id="print-guide" type="button">In</button>
+        <button class="button button-secondary" id="reset-all" type="button">Reset</button>
+      </div>
+    </section>
+
+    <section class="section" id="audit">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Repository audit</p>
+          <h2>Biết chỗ thiếu trước khi làm</h2>
+        </div>
+        <p>
+          Kết luận dựa trên commit được audit. Test và mã chạy không tồn tại;
+          vì vậy các lệnh bên dưới là kiểm tra contract, không phải automated test.
+        </p>
+      </div>
+      <div class="audit-grid" id="audit-grid"></div>
+    </section>
+
+    <section class="section" id="setup">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Setup</p>
+          <h2>Chuẩn bị repo có thể kiểm chứng</h2>
+        </div>
+        <p>
+          Clone đúng nguồn, kiểm branch/commit, rồi đọc example trước worksheet.
+          Không cần cài package, API key hay dịch vụ bên ngoài.
+        </p>
+      </div>
+      <div class="section-card" id="setup-content"></div>
+    </section>
+
+    <section class="section" id="roles">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Team model</p>
+          <h2>4 vai trò, một file tích hợp</h2>
+        </div>
+        <p>
+          Repo quy định nhóm 3–4 người. Với nhóm 3, gộp vai trò Evidence và
+          Workflow; không để nhiều người cùng sửa <code>group-report.md</code>.
+        </p>
+      </div>
+      <div class="roles-grid" id="roles-grid"></div>
+    </section>
+
+    <section class="section" id="steps">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Step by step</p>
+          <h2>8 phase theo critical path</h2>
+        </div>
+        <p>
+          Phase cá nhân chạy song song; phase hội tụ và tích hợp chạy tuần tự.
+          Mỗi checkpoint phải pass trước khi chuyển phase.
+        </p>
+      </div>
+      <div class="timeline" id="phase-timeline"></div>
+    </section>
+
+    <section class="section" id="new-files">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Artifact contract</p>
+          <h2>File hiện hữu và file mới</h2>
+        </div>
+        <p>
+          Ba report đã tồn tại trong starter repo. Guide không yêu cầu tạo file
+          mới; ảnh/PDF/note chỉ là artifact phụ nếu nhóm thực sự cần.
+        </p>
+      </div>
+      <div class="new-files-grid" id="new-files-grid"></div>
+    </section>
+
+    <section class="section" id="validation">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Validation</p>
+          <h2>Chứng minh bài nộp đủ contract</h2>
+        </div>
+        <p>
+          Không có test runner trong repo. Dùng kiểm tra file, từ khóa, diff và
+          review theo rubric; mọi claim research vẫn phải mở nguồn để xác minh.
+        </p>
+      </div>
+      <div class="validation-grid" id="validation-grid"></div>
+    </section>
+
+    <section class="section" id="definition-of-done">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Definition of Done</p>
+          <h2>Chốt bài trước khi nộp</h2>
+        </div>
+        <p>
+          Checklist này lưu trên trình duyệt của bạn. Nó không sửa repo và
+          không thay thế việc đọc diff cuối cùng.
+        </p>
+      </div>
+      <div class="audit-grid">
+        <div class="section-card">
+          <h3>Chất lượng nội dung</h3>
+          <ul class="checklist" id="dod-list"></ul>
+        </div>
+        <div class="section-card">
+          <h3>Submission &amp; security</h3>
+          <ul class="checklist" id="security-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <h2>Nguồn đã audit</h2>
+      <div class="source-list" id="source-list"></div>
+      <p>
+        Repo:
+        <a href="https://github.com/VinUni-AI20k/K4-Day02-AI-Product-Labs">
+          VinUni-AI20k/K4-Day02-AI-Product-Labs
+        </a>.
+        Audit ngày 31/07/2026 trên branch <code>main</code>, commit
+        <code>13572a929821955ec103abeb8531ce455256502a</code>.
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    // LAB_CONFIG: toàn bộ nội dung riêng của lab nằm trong object này.
+    const LAB_CONFIG = {
+      meta: {
+        title: "Day 02 Lab — Tìm Đúng Bài Toán Cho AI",
+        audience: "Fresher AI engineer, có nền tảng backend cơ bản",
+        repository: "VinUni-AI20k/K4-Day02-AI-Product-Labs",
+        branch: "main",
+        commit: "13572a9",
+        totalMinutes: 240,
+        phaseMinutes: 220,
+        breakMinutes: 20,
+        teamSize: "3–4 người (guide dùng 4 vai trò)",
+        auditDate: "31/07/2026",
+        rootAbsolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs`
+      },
+
+      audit: [
+        {
+          level: "critical",
+          title: "Cỡ nhóm mâu thuẫn",
+          finding: "README, worksheet và example đều nói nhóm 3–4 người; group-report.md lại có 5 dòng thành viên.",
+          action: "Dùng 3–4 người làm chuẩn. Dòng thứ 5 chỉ dùng nếu giảng viên xác nhận ngoại lệ."
+        },
+        {
+          level: "critical",
+          title: "Hai report cá nhân đang rỗng",
+          finding: "individual-report.md và reflection.md có kích thước 0 byte; group-report.md mới có tiêu đề và bảng thành viên.",
+          action: "Đây là EXISTING FILE TO EDIT, không tạo file trùng tên ở chỗ khác."
+        },
+        {
+          level: "warning",
+          title: "Contract README nộp bài chưa rõ",
+          finding: "Tài liệu yêu cầu repo cá nhân có README.md nhưng không quy định README nộp bài phải chứa gì. README hiện tại là hướng dẫn lab.",
+          action: "Không ghi đè README theo suy đoán. Hỏi giảng viên về format repo/fork/push trước khi nộp."
+        },
+        {
+          level: "info",
+          title: "Không có automated test",
+          finding: "Repo chỉ có 6 file Markdown; không có source code, manifest, CI, test runner hay schema máy đọc.",
+          action: "Dùng contract validation và rubric review. Không gọi lệnh mở/đọc Markdown là automated test."
+        },
+        {
+          level: "info",
+          title: "Thời lượng nhất quán",
+          finding: "8 phase chiếm 220 phút và hai break chiếm 20 phút, tổng đúng 240 phút.",
+          action: "Countdown của guide dùng đúng 4 giờ; không cộng thêm thời gian ngoài repo."
+        },
+        {
+          level: "warning",
+          title: "Kênh nộp và remote chưa được mô tả",
+          finding: "Repo nói mỗi học viên nộp repo cá nhân nhưng không nêu fork, GitHub Classroom, LMS hay URL đích.",
+          action: "Guide chỉ kiểm tra local. Không tự đổi remote hoặc push khi chưa có hướng dẫn từ giảng viên."
+        }
+      ],
+
+      setup: {
+        readOrder: [
+          "Mở 02-deliverable-example.md để hiểu hình dạng một bài hoàn chỉnh.",
+          "Đọc README.md để nắm rubric 100 điểm và cấu trúc repo.",
+          "Thực hiện 01-worksheet.md theo đúng Phase 0 → Phase 7.",
+          "Chỉ sửa ba report hiện hữu; giữ example và worksheet làm nguồn tham chiếu."
+        ],
+        commands: {
+          windows: [
+            {
+              label: "Setup · clone và vào repo",
+              code: String.raw`git clone https://github.com/VinUni-AI20k/K4-Day02-AI-Product-Labs.git
+Set-Location .\K4-Day02-AI-Product-Labs`,
+              expected: "Cloning into 'K4-Day02-AI-Product-Labs'..."
+            },
+            {
+              label: "Contract validation · xác nhận nguồn",
+              code: String.raw`git rev-parse --show-toplevel
+git branch --show-current
+git rev-parse --short HEAD
+git status --short`,
+              expected: "Branch: main · commit audit: 13572a9 · status ban đầu không có thay đổi"
+            }
+          ],
+          macos: [
+            {
+              label: "Setup · clone và vào repo",
+              code: `git clone https://github.com/VinUni-AI20k/K4-Day02-AI-Product-Labs.git
+cd K4-Day02-AI-Product-Labs`,
+              expected: "Cloning into 'K4-Day02-AI-Product-Labs'..."
+            },
+            {
+              label: "Contract validation · xác nhận nguồn",
+              code: `git rev-parse --show-toplevel
+git branch --show-current
+git rev-parse --short HEAD
+git status --short`,
+              expected: "Branch: main · commit audit: 13572a9 · status ban đầu không có thay đổi"
+            }
+          ],
+          linux: [
+            {
+              label: "Setup · clone và vào repo",
+              code: `git clone https://github.com/VinUni-AI20k/K4-Day02-AI-Product-Labs.git
+cd K4-Day02-AI-Product-Labs`,
+              expected: "Cloning into 'K4-Day02-AI-Product-Labs'..."
+            },
+            {
+              label: "Contract validation · xác nhận nguồn",
+              code: `git rev-parse --show-toplevel
+git branch --show-current
+git rev-parse --short HEAD
+git status --short`,
+              expected: "Branch: main · commit audit: 13572a9 · status ban đầu không có thay đổi"
+            }
+          ]
+        }
+      },
+
+      roles: [
+        {
+          id: "scout",
+          name: "Problem Scout & Pitch Lead",
+          ownership: "Mỗi người sở hữu individual-report.md trong repo cá nhân; role này điều phối pitch.",
+          output: "Danh sách candidate, top 3 cards, câu hỏi challenge và nhật ký hội tụ."
+        },
+        {
+          id: "evidence",
+          name: "Evidence & Research Lead",
+          ownership: "Thu interview/survey/log và link nguồn; bàn giao evidence cho Integrator, không cùng sửa file shared.",
+          output: "Bảng validation, 2–3 solution/pattern, claim đã kiểm link và giả định được gắn nhãn."
+        },
+        {
+          id: "workflow",
+          name: "Workflow & Metric Architect",
+          ownership: "Sở hữu mô hình before/after, baseline, target, boundary và fallback.",
+          output: "Workflow có actor/input/output/handoff; Problem Statement v0 với metric đo được."
+        },
+        {
+          id: "integrator",
+          name: "Integrator & AI-fit Challenger",
+          ownership: "Người duy nhất tích hợp vào 02-group-problem-statement/group-report.md tại mỗi gate.",
+          output: "So sánh Rule/Workflow/Agent, PS v1, quyết định Go/Not Yet/No-Go và bản nhóm cuối."
+        }
+      ],
+
+      phases: [
+        {
+          id: "phase-0",
+          number: "Phase 0",
+          title: "Worked Example",
+          minutes: 15,
+          mode: "sequential",
+          checkpoint: "Cả nhóm giải thích được candidate problem khác Problem Statement thế nào và vì sao example chọn Workflow thay vì Agent.",
+          tasks: [
+            {
+              id: "p0-example",
+              title: "Đọc example như một bản đồ output",
+              owner: "Cả nhóm",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-deliverable-example.md`,
+                relative: "02-deliverable-example.md"
+              },
+              knowledge: [
+                "Problem tốt bắt đầu từ actor, workflow, bottleneck và metric — không bắt đầu từ chatbot.",
+                "Problem Statement chỉ chốt sau validation, research và workflow.",
+                "Rule hoặc Workflow có thể đúng hơn Agent."
+              ],
+              instructions: [
+                "Đọc case Weekly Report từ scan rộng đến final decision.",
+                "Đánh dấu baseline 90 phút, target dưới 30 phút và human boundary.",
+                "Tự nói lại vì sao Agent bị loại ở scope hiện tại."
+              ],
+              expected: [
+                "Quan sát được: mỗi người mô tả đúng chuỗi problem → evidence → workflow → PS → AI fit → decision.",
+                "Coach inference: nếu chưa phân biệt được Workflow và Agent, chưa chuyển sang Phase 1."
+              ],
+              deliverables: [
+                "Không có file nộp mới.",
+                "Một câu giải thích miệng từ mỗi thành viên."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-1",
+          number: "Phase 1",
+          title: "Individual Scan — 5+ problems",
+          minutes: 25,
+          mode: "parallel",
+          checkpoint: "Mỗi người có ít nhất 5 problem cụ thể, actor và dấu hiệu thật; không có item chỉ mô tả solution.",
+          tasks: [
+            {
+              id: "p1-scan",
+              title: "Scan rộng từ trải nghiệm thật",
+              owner: "Từng cá nhân",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\01-individual-problem-scan\individual-report.md`,
+                relative: "01-individual-problem-scan/individual-report.md"
+              },
+              knowledge: [
+                "Bốn lăng kính là lặp lại, tốn thời gian, AI có thể hỗ trợ tốt hơn và pain từ người khác.",
+                "Dấu hiệu thật là thời gian, tần suất, số người, log, ticket hoặc phản hồi — không phải cảm giác chung."
+              ],
+              instructions: [
+                "Tự scan trước khi hỏi AI.",
+                "Ghi tối thiểu 5 hàng: lăng kính, problem, actor và dấu hiệu thật.",
+                "Loại các câu bắt đầu bằng giải pháp như “xây chatbot cho…”.",
+                "Nếu dùng AI, ghi lại ý nào giữ và ý nào loại để đưa vào reflection."
+              ],
+              expected: [
+                "Quan sát được: file cá nhân không còn rỗng và có ít nhất 5 problem.",
+                "Mỗi problem đủ cụ thể để hỏi “xảy ra khi nào, ở bước nào, đo bằng gì?”."
+              ],
+              deliverables: [
+                "EXISTING FILE TO EDIT · 01-individual-problem-scan/individual-report.md",
+                "Bảng scan 5+ problems; 8–10+ chỉ tính bonus nếu vẫn cụ thể."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-2",
+          number: "Phase 2",
+          title: "Top 3 Problem Cards + draft workflow",
+          minutes: 35,
+          mode: "parallel",
+          breakAfter: 10,
+          checkpoint: "Mỗi người có đúng top 3, mỗi card có current/future workflow, bottleneck, metric, non-AI alternative và câu hỏi muốn bị challenge.",
+          tasks: [
+            {
+              id: "p2-cards",
+              title: "Biến top 3 thành card có thể pitch",
+              owner: "Từng cá nhân",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\01-individual-problem-scan\individual-report.md`,
+                relative: "01-individual-problem-scan/individual-report.md"
+              },
+              knowledge: [
+                "Card tốt cho thấy workflow 3–7 bước và một bottleneck cụ thể.",
+                "Success metric phải có baseline, target và cách đo.",
+                "Future workflow cần human boundary và fallback nếu AI sai."
+              ],
+              instructions: [
+                "Rank top 3 theo actor, workflow, evidence, impact và scope.",
+                "Viết đủ Problem, Actor, Context, Workflow, Bottleneck, Impact, Metric, Non-AI alternative, AI hypothesis và Quick gut.",
+                "Vẽ current/future workflow bằng ASCII hoặc Mermaid ngay trong report.",
+                "Chọn một card để pitch và chuẩn bị một câu hỏi challenge."
+              ],
+              expected: [
+                "Quan sát được: 3 card có thể đọc độc lập, mỗi card có before/after.",
+                "Không dùng “nhanh hơn/tốt hơn” nếu thiếu con số hoặc cách thu baseline."
+              ],
+              deliverables: [
+                "Ba Problem Cards trong existing individual-report.md.",
+                "Ba cặp current/future workflow.",
+                "Một card được chọn để pitch và một câu hỏi challenge."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-3",
+          number: "Phase 3",
+          title: "Group Convergence",
+          minutes: 30,
+          mode: "sequential",
+          checkpoint: "Nhóm chọn đúng một candidate problem bằng score + đồng thuận, ghi cả lý do không chọn các candidate còn lại.",
+          tasks: [
+            {
+              id: "p3-pitch",
+              title: "Pitch, challenge và cluster 9–12 candidates",
+              owner: "Problem Scout điều phối · cả nhóm nói",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Hội tụ bắt đầu bằng hiểu candidate, không bắt đầu bằng vote.",
+                "Cluster theo pattern của workflow/pain, không theo tên công cụ AI."
+              ],
+              instructions: [
+                "Mỗi người pitch top 3 trong 1–2 phút/card bằng lời của mình.",
+                "Ghi actor, bottleneck và challenge; gom các candidate trùng pattern.",
+                "Shortlist các bài có workflow thật, impact đo được và scope vừa lab.",
+                "Integrator ghi nhật ký vào group-report.md sau khi thảo luận."
+              ],
+              expected: [
+                "Quan sát được: có bảng 9–12 candidates và các cluster có lý do.",
+                "Không có quyết định do AI tự viết hoặc do vote không giải thích."
+              ],
+              deliverables: [
+                "EXISTING FILE TO EDIT · group-report.md",
+                "Danh sách candidates, cluster và shortlist."
+              ]
+            },
+            {
+              id: "p3-select",
+              title: "Score và chọn một candidate",
+              owner: "Integrator ghi · cả nhóm đồng thuận",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Score 1–5 là công cụ ép nhóm nói rõ lý do, không phải chân lý toán học.",
+                "Ở gate này chỉ chọn candidate problem; chưa viết PS hoàn chỉnh."
+              ],
+              instructions: [
+                "Chấm Actor, Workflow, Evidence, Impact, Scope, AI-fit comparability và Domain understanding.",
+                "Ghi candidate được chọn, lý do chọn, lý do loại và cách xử lý disagreement.",
+                "Dừng lại nếu nhóm đang mô tả solution thay vì pain."
+              ],
+              expected: [
+                "Quan sát được: một candidate có tổng điểm và rationale rõ.",
+                "Các candidate bị loại vẫn có lý do, không biến mất khỏi log."
+              ],
+              deliverables: [
+                "Bảng score trong group-report.md.",
+                "Candidate được chọn và convergence rationale."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-4",
+          number: "Phase 4",
+          title: "Quick Validation + Research",
+          minutes: 30,
+          mode: "parallel",
+          checkpoint: "Có ít nhất một nguồn validation thật, 2–3 solution/pattern, 1–2 hyperlink đã mở kiểm tra và ghi rõ problem đã thay đổi thế nào.",
+          tasks: [
+            {
+              id: "p4-validate",
+              title: "Kiểm chứng pain bằng người hoặc dữ liệu thật",
+              owner: "Evidence Lead",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Validation phải có tín hiệu xác nhận và phản bác.",
+                "Interview hỏi lần gần nhất và workflow thật; survey hỏi tần suất, pain và workaround."
+              ],
+              instructions: [
+                "Chọn interview 2–3 người, survey 5–10 người hoặc log/review/ticket.",
+                "Ghi số mẫu, tín hiệu xác nhận, tín hiệu phản bác và thay đổi đối với problem.",
+                "Không đưa dữ liệu cá nhân nhạy cảm hoặc secret vào repo.",
+                "Bàn giao evidence cho Integrator sau khi thu xong."
+              ],
+              expected: [
+                "Quan sát được: có evidence cụ thể và ít nhất một khả năng problem bị thu hẹp/sửa.",
+                "Nếu không thu được mẫu trong 30 phút, ghi “Not executed” và manual check chính xác."
+              ],
+              deliverables: [
+                "Bảng Quick validation trong group-report.md.",
+                "Evidence/anonymized result; không commit dữ liệu nhạy cảm."
+              ]
+            },
+            {
+              id: "p4-research",
+              title: "Research giải pháp đã tồn tại",
+              owner: "Research Lead hoặc thành viên song song",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Research không nhằm tìm tool để copy; nó cho biết bước nào đã được giải và khoảng trống còn lại.",
+                "AI có thể gợi ý nguồn, nhưng claim chỉ được dùng sau khi mở link kiểm tra."
+              ],
+              instructions: [
+                "Tìm 2–3 tool/case/pattern và tối thiểu 1–2 nguồn có hyperlink.",
+                "Ghi họ giải bước nào, điểm mạnh, khoảng trống/risk và bài học cho nhóm.",
+                "Xóa số liệu hoặc claim không thể kiểm nguồn.",
+                "Bàn giao link đã kiểm cho Integrator; không cùng sửa file shared."
+              ],
+              expected: [
+                "Quan sát được: bảng research phân tích workflow, không chỉ liệt kê tên tool.",
+                "Mọi claim quan trọng có link hoặc được gắn rõ là giả định."
+              ],
+              deliverables: [
+                "Bảng Research giải pháp trong group-report.md.",
+                "Danh sách link đã mở kiểm tra và research takeaway."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-5",
+          number: "Phase 5",
+          title: "Workflow + Problem Statement v0",
+          minutes: 45,
+          mode: "sequential",
+          breakAfter: 10,
+          checkpoint: "Before/after nhất quán với evidence; PS v0 đủ Actor, Workflow, Bottleneck, Impact, Success Metric và Boundary.",
+          tasks: [
+            {
+              id: "p5-workflow",
+              title: "Vẽ current và future workflow",
+              owner: "Workflow Architect → Integrator",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Mỗi bước cần actor, input, output, thời gian/tần suất và handoff.",
+                "Future state phải chỉ rõ Rule, AI/Workflow, human boundary, fallback và risk mới."
+              ],
+              instructions: [
+                "Vẽ current workflow 3–7 bước và đánh dấu bottleneck.",
+                "Vẽ future workflow; ghi bước nào tự động, bước nào AI, bước nào người thật.",
+                "So sánh before/after: số bước, tổng thời gian, bước thủ công, bottleneck và risk.",
+                "Integrator chép bản đã review vào group-report.md."
+              ],
+              expected: [
+                "Quan sát được: before/after có cùng phạm vi và metric so sánh được.",
+                "Coach inference: bottleneck mới có thể là human review nếu đó là điểm kiểm soát chất lượng có chủ đích."
+              ],
+              deliverables: [
+                "Current workflow và future workflow trong group-report.md.",
+                "Bảng before/after impact, boundary và fallback."
+              ]
+            },
+            {
+              id: "p5-ps0",
+              title: "Viết Problem Statement v0 từ workflow",
+              owner: "Integrator · cả nhóm phản biện",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "PS không phải slogan; nó là contract giữa actor, workflow, bottleneck, impact, metric và boundary.",
+                "Metric cần baseline, target và cách đo."
+              ],
+              instructions: [
+                "Điền 6 field Actor, Workflow, Bottleneck, Impact, Success Metric, Boundary.",
+                "Đối chiếu từng claim với validation/research hoặc gắn nhãn giả định.",
+                "Dùng AI chỉ để chỉ ra lỗ hổng; không để AI viết lại thay nhóm."
+              ],
+              expected: [
+                "Quan sát được: PS v0 đọc độc lập vẫn biết ai đau, đau ở bước nào, tác động gì và giới hạn ở đâu.",
+                "Không còn từ mơ hồ như “tốt hơn” nếu thiếu phép đo."
+              ],
+              deliverables: [
+                "Problem Statement v0 trong group-report.md.",
+                "Danh sách giả định hoặc evidence trỏ về phase 4."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-6",
+          number: "Phase 6",
+          title: "Rule / Workflow / Agent + Decision",
+          minutes: 25,
+          mode: "sequential",
+          checkpoint: "Nhóm chọn mức đơn giản nhất đủ giải problem, có người review, fallback và lý do Go/Not Yet/No-Go dựa trên evidence.",
+          tasks: [
+            {
+              id: "p6-fit",
+              title: "So sánh ba mức và viết PS v1",
+              owner: "AI-fit Challenger → Integrator",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Rule hợp output rõ; Workflow hợp chuỗi bước cố định; Agent chỉ đáng cân nhắc khi cần quyết định động và dùng nhiều tool.",
+                "Không được chọn mức phức tạp hơn chỉ vì nghe “AI” hơn."
+              ],
+              instructions: [
+                "Đặt problem vào ma trận ambiguity × complexity.",
+                "So sánh Rule, Workflow, Agent theo phương án, điều kiện đủ, risk và human review.",
+                "Chọn một mức; giải thích vì sao mức đơn giản hơn chưa đủ.",
+                "Cập nhật PS v1 với AI intervention point, mức chọn và người kiểm tra."
+              ],
+              expected: [
+                "Quan sát được: bảng so sánh có đủ cả ba mức và PS v1 nhất quán với workflow.",
+                "Nếu Rule đủ 70–80% case với risk thấp hơn, chọn Rule là kết quả hợp lệ."
+              ],
+              deliverables: [
+                "Ma trận AI-fit và bảng Rule/Workflow/Agent.",
+                "Problem Statement v1 trong group-report.md."
+              ]
+            },
+            {
+              id: "p6-decision",
+              title: "Chốt Go / Not Yet / No-Go",
+              owner: "Cả nhóm quyết định · Integrator ghi",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+                relative: "02-group-problem-statement/group-report.md"
+              },
+              knowledge: [
+                "Go cần problem, metric, data, risk và owner đủ rõ.",
+                "Not Yet và No-Go đều là kết luận tốt nếu evidence chưa đủ hoặc non-AI option tốt hơn."
+              ],
+              instructions: [
+                "Trả lời 6 câu về actor/workflow, metric, data, hậu quả sai, owner và non-AI option.",
+                "Chọn Go, Not Yet hoặc No-Go và ghi rationale.",
+                "Nếu Go, ghi pilot nhỏ nhất và rollback; nếu Not Yet, ghi validation kế tiếp; nếu No-Go, ghi giải pháp thay thế."
+              ],
+              expected: [
+                "Quan sát được: decision dẫn tới một next action cụ thể.",
+                "Decision không dựa trên mong muốn “phải làm AI”."
+              ],
+              deliverables: [
+                "Final decision và rationale trong group-report.md.",
+                "Pilot/validation/alternative tương ứng với decision."
+              ]
+            }
+          ]
+        },
+        {
+          id: "phase-7",
+          number: "Phase 7",
+          title: "Individual Reflection",
+          minutes: 15,
+          mode: "parallel",
+          checkpoint: "Mỗi người tự viết reflection, nêu đóng góp thật, AI hữu ích/sai ở đâu, mình đã sửa gì và nếu làm lại sẽ đổi gì.",
+          tasks: [
+            {
+              id: "p7-reflection",
+              title: "Phản tư bằng trải nghiệm của chính mình",
+              owner: "Từng cá nhân",
+              path: {
+                absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\03-individual-reflection\reflection.md`,
+                relative: "03-individual-reflection/reflection.md"
+              },
+              knowledge: [
+                "Reflection đánh giá khả năng nhận ra AI hữu ích và hời hợt ở đâu.",
+                "Nó phải nói rõ vai trò, đóng góp và thay đổi quan điểm — không phải recap chung."
+              ],
+              instructions: [
+                "Tự điền bảng hoạt động: mình làm gì và ảnh hưởng gì.",
+                "Ghi từng phase đã dùng AI thế nào, AI sai/hời hợt ở đâu và mình sửa gì.",
+                "Trả lời câu hỏi mở bằng trải nghiệm thật; không dùng AI viết thay.",
+                "Chạy validation cuối bài rồi đọc git diff."
+              ],
+              expected: [
+                "Quan sát được: reflection.md không còn rỗng và có ví dụ cụ thể từ buổi lab.",
+                "Mỗi claim về đóng góp trỏ được về artifact hoặc quyết định nhóm."
+              ],
+              deliverables: [
+                "EXISTING FILE TO EDIT · 03-individual-reflection/reflection.md",
+                "Bảng đóng góp, bảng dùng AI và reflection câu hỏi mở."
+              ]
+            }
+          ]
+        }
+      ],
+
+      files: [
+        {
+          status: "EXISTING FILE TO EDIT",
+          title: "Individual problem scan",
+          relative: "01-individual-problem-scan/individual-report.md",
+          absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\01-individual-problem-scan\individual-report.md`,
+          format: "Markdown · hiện 0 byte",
+          contract: "5+ problems, top 3 Problem Cards, draft current/future workflow, pitch choice và challenge."
+        },
+        {
+          status: "EXISTING FILE TO EDIT",
+          title: "Group problem statement",
+          relative: "02-group-problem-statement/group-report.md",
+          absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\02-group-problem-statement\group-report.md`,
+          format: "Markdown · hiện 456 byte",
+          contract: "Members, convergence log, validation, research, workflow, PS v0/v1, R/W/A và final decision."
+        },
+        {
+          status: "EXISTING FILE TO EDIT",
+          title: "Individual reflection",
+          relative: "03-individual-reflection/reflection.md",
+          absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs\03-individual-reflection\reflection.md`,
+          format: "Markdown · hiện 0 byte",
+          contract: "Vai trò/đóng góp, bảng dùng AI, điều học được và điều sẽ đổi nếu làm lại."
+        },
+        {
+          status: "NO REQUIRED NEW FILE",
+          title: "Artifact phụ là tùy chọn",
+          relative: "Ví dụ tên: 02-group-problem-statement-workflow.pdf",
+          absolute: String.raw`F:\Spiderman\build-repo-lab-guide\K4-Day02-AI-Product-Labs`,
+          format: "PNG / PDF / Markdown nếu cần",
+          contract: "Ưu tiên nhúng ASCII/Mermaid vào report để tránh thiếu link. Chỉ tạo file phụ khi nhóm có nội dung thật và kiểm tra file không rỗng."
+        }
+      ],
+
+      validations: [
+        {
+          title: "1. Kích thước ba report",
+          type: "Contract validation · không phải automated test",
+          description: "Trước lab, kích thước lần lượt là 0, 456, 0 byte. Cuối lab, cả ba phải lớn hơn 0 và nội dung phải đúng contract.",
+          commands: {
+            windows: {
+              label: "PowerShell · kiểm tra byte",
+              code: String.raw`$labFiles = @(
+  '01-individual-problem-scan\individual-report.md',
+  '02-group-problem-statement\group-report.md',
+  '03-individual-reflection\reflection.md'
+)
+$labFiles | ForEach-Object {
+  $labItem = Get-Item -LiteralPath $_
+  "{0}: {1} bytes" -f $_, $labItem.Length
+}`,
+              expected: "Mỗi file > 0 bytes; individual-report.md và reflection.md không còn bằng 0."
+            },
+            macos: {
+              label: "macOS · kiểm tra byte",
+              code: `wc -c \
+  01-individual-problem-scan/individual-report.md \
+  02-group-problem-statement/group-report.md \
+  03-individual-reflection/reflection.md`,
+              expected: "Ba dòng file đều có số byte > 0."
+            },
+            linux: {
+              label: "Linux · kiểm tra byte",
+              code: `wc -c \
+  01-individual-problem-scan/individual-report.md \
+  02-group-problem-statement/group-report.md \
+  03-individual-reflection/reflection.md`,
+              expected: "Ba dòng file đều có số byte > 0."
+            }
+          }
+        },
+        {
+          title: "2. Field bắt buộc của bản nhóm",
+          type: "Contract validation · read-only",
+          description: "Tìm các khái niệm bắt buộc. Có kết quả không đồng nghĩa nội dung đã tốt; reviewer vẫn phải đọc ngữ cảnh.",
+          commands: {
+            windows: {
+              label: "PowerShell · tìm field",
+              code: String.raw`Select-String -Path '.\02-group-problem-statement\group-report.md' -Pattern 'Workflow|Bottleneck|Success Metric|Boundary|Rule|Agent|Go|Not Yet|No-Go'`,
+              expected: "Có match cho workflow, metric/boundary, so sánh R/W/A và final decision."
+            },
+            macos: {
+              label: "macOS · tìm field",
+              code: `grep -nE 'Workflow|Bottleneck|Success Metric|Boundary|Rule|Agent|Go|Not Yet|No-Go' \
+  02-group-problem-statement/group-report.md`,
+              expected: "Có match cho workflow, metric/boundary, so sánh R/W/A và final decision."
+            },
+            linux: {
+              label: "Linux · tìm field",
+              code: `grep -nE 'Workflow|Bottleneck|Success Metric|Boundary|Rule|Agent|Go|Not Yet|No-Go' \
+  02-group-problem-statement/group-report.md`,
+              expected: "Có match cho workflow, metric/boundary, so sánh R/W/A và final decision."
+            }
+          }
+        },
+        {
+          title: "3. Diff và whitespace",
+          type: "Submission check",
+          description: "Đọc đúng file đã thay đổi, phát hiện whitespace lỗi và đảm bảo không vô tình sửa worksheet/example.",
+          commands: {
+            windows: {
+              label: "PowerShell · kiểm tra Git",
+              code: `git status --short
+git diff --check
+git diff -- README.md 01-worksheet.md 02-deliverable-example.md`,
+              expected: "Chỉ report/artifact dự kiến thay đổi; git diff --check không in lỗi."
+            },
+            macos: {
+              label: "macOS · kiểm tra Git",
+              code: `git status --short
+git diff --check
+git diff -- README.md 01-worksheet.md 02-deliverable-example.md`,
+              expected: "Chỉ report/artifact dự kiến thay đổi; git diff --check không in lỗi."
+            },
+            linux: {
+              label: "Linux · kiểm tra Git",
+              code: `git status --short
+git diff --check
+git diff -- README.md 01-worksheet.md 02-deliverable-example.md`,
+              expected: "Chỉ report/artifact dự kiến thay đổi; git diff --check không in lỗi."
+            }
+          }
+        },
+        {
+          title: "4. Manual rubric review",
+          type: "Manual check · bắt buộc",
+          description: "Không thể xác minh chất lượng evidence, trải nghiệm cá nhân hoặc link research bằng máy.",
+          manual: [
+            "Mở từng hyperlink research và đối chiếu claim.",
+            "Kiểm baseline → target → cách đo nhất quán giữa workflow và PS.",
+            "Kiểm boundary, human reviewer, fallback và risk mới.",
+            "Xác nhận reflection do chính học viên viết.",
+            "Xác nhận format nộp/remote với giảng viên vì repo không mô tả."
+          ]
+        }
+      ],
+
+      definitionOfDone: [
+        "Cá nhân có 5+ problems và top 3 Problem Cards.",
+        "Mỗi top card có current/future workflow, bottleneck và metric.",
+        "Nhóm có convergence log từ candidates về đúng một candidate.",
+        "Validation có tín hiệu xác nhận và phản bác; research có link đã kiểm.",
+        "Workflow before/after thể hiện actor, handoff, boundary và fallback.",
+        "PS v0/v1 có metric đo được và nhất quán với evidence.",
+        "So sánh đủ No AI/Rule/Workflow/Agent và chọn mức đơn giản nhất đủ dùng.",
+        "Final decision có rationale và next action phù hợp.",
+        "Reflection cá nhân ghi rõ đóng góp, AI sai ở đâu và mình sửa gì."
+      ],
+
+      securityChecklist: [
+        "Không commit API key, token, password, dữ liệu cá nhân hoặc transcript nhạy cảm.",
+        "Không dùng số liệu do AI đưa nếu chưa mở nguồn xác minh.",
+        "Không để AI viết thay pitch, challenge hoặc reflection.",
+        "git diff --check không báo lỗi.",
+        "git status chỉ chứa report và artifact dự kiến.",
+        "Đã đọc diff cuối cùng trước commit.",
+        "Đã xác nhận với giảng viên cách tạo repo cá nhân và kênh nộp."
+      ],
+
+      sources: [
+        "README.md",
+        "01-worksheet.md",
+        "02-deliverable-example.md",
+        "01-individual-problem-scan/individual-report.md",
+        "02-group-problem-statement/group-report.md",
+        "03-individual-reflection/reflection.md"
+      ]
+    };
+
+    const STORAGE_KEY = "day02-ai-product-lab-guide-v1";
+    const taskIds = LAB_CONFIG.phases.flatMap((phase) => phase.tasks.map((task) => task.id));
+    const totalSeconds = LAB_CONFIG.meta.totalMinutes * 60;
+
+    const defaultState = () => ({
+      os: "windows",
+      done: {},
+      roles: {},
+      focus: false,
+      checks: {},
+      timer: {
+        remaining: totalSeconds,
+        running: false,
+        updatedAt: Date.now()
+      }
+    });
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return {
+          ...defaultState(),
+          ...(saved || {}),
+          timer: { ...defaultState().timer, ...((saved && saved.timer) || {}) }
+        };
+      } catch {
+        return defaultState();
+      }
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function listHtml(items, ordered = false) {
+      const tag = ordered ? "ol" : "ul";
+      return `<${tag}>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</${tag}>`;
+    }
+
+    function pathHtml(path) {
+      if (!path) return "";
+      return `
+        <div class="path-box">
+          <span class="path-label">Absolute path · máy audit</span>
+          <span class="path-value">${escapeHtml(path.absolute)}</span>
+          <span class="path-label" style="margin-top:.55rem">Repository-relative</span>
+          <span class="path-value">${escapeHtml(path.relative)}</span>
+        </div>`;
+    }
+
+    function commandHtml(command, os) {
+      return `
+        <div class="command-card" data-os="${escapeHtml(os)}">
+          <div class="command-head">
+            <span>${escapeHtml(command.label)}</span>
+            <button class="copy-button" type="button" data-copy>Copy</button>
+          </div>
+          <pre><code>${escapeHtml(command.code)}</code></pre>
+          ${command.expected ? `<div class="expected-output">Expected: ${escapeHtml(command.expected)}</div>` : ""}
+        </div>`;
+    }
+
+    function commandsForAllOs(commands) {
+      return ["windows", "macos", "linux"]
+        .flatMap((os) => {
+          const value = commands[os];
+          if (!value) return [];
+          const list = Array.isArray(value) ? value : [value];
+          return list.map((command) => commandHtml(command, os));
+        })
+        .join("");
+    }
+
+    function renderMeta() {
+      const rows = [
+        ["Audience", LAB_CONFIG.meta.audience],
+        ["Team", LAB_CONFIG.meta.teamSize],
+        ["Timebox", `${LAB_CONFIG.meta.totalMinutes} phút`],
+        ["Branch / commit", `${LAB_CONFIG.meta.branch} · ${LAB_CONFIG.meta.commit}`],
+        ["Audit", LAB_CONFIG.meta.auditDate],
+        ["Format", "Standalone HTML · offline"]
+      ];
+      document.querySelector("#meta-grid").innerHTML = rows
+        .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
+        .join("");
+    }
+
+    function renderAudit() {
+      document.querySelector("#audit-grid").innerHTML = LAB_CONFIG.audit
+        .map((item) => `
+          <article class="audit-item" data-level="${escapeHtml(item.level)}">
+            <span class="tag">${escapeHtml(item.level)}</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.finding)}</p>
+            <p class="audit-action">Xử lý: ${escapeHtml(item.action)}</p>
+          </article>`)
+        .join("");
+    }
+
+    function renderSetup() {
+      document.querySelector("#setup-content").innerHTML = `
+        <p><strong>Thứ tự đọc:</strong></p>
+        ${listHtml(LAB_CONFIG.setup.readOrder, true)}
+        <div class="path-box">
+          <span class="path-label">Repository root đã audit</span>
+          <span class="path-value">${escapeHtml(LAB_CONFIG.meta.rootAbsolute)}</span>
+        </div>
+        ${commandsForAllOs(LAB_CONFIG.setup.commands)}`;
+    }
+
+    function renderRoles() {
+      document.querySelector("#roles-grid").innerHTML = LAB_CONFIG.roles
+        .map((role, index) => `
+          <article class="role-card">
+            <div class="role-number" aria-hidden="true">${index + 1}</div>
+            <h3>${escapeHtml(role.name)}</h3>
+            <p><strong>Ownership:</strong> ${escapeHtml(role.ownership)}</p>
+            <p><strong>Output:</strong> ${escapeHtml(role.output)}</p>
+            <label for="role-${escapeHtml(role.id)}">Tên học viên</label>
+            <input id="role-${escapeHtml(role.id)}" data-role-input="${escapeHtml(role.id)}"
+              value="${escapeHtml(state.roles[role.id] || "")}" placeholder="Nhập tên">
+          </article>`)
+        .join("");
+    }
+
+    function renderTask(task) {
+      const complete = Boolean(state.done[task.id]);
+      return `
+        <article class="task-card ${complete ? "is-complete" : ""}" data-task-card="${escapeHtml(task.id)}">
+          <div class="task-head">
+            <input type="checkbox" id="task-${escapeHtml(task.id)}"
+              data-task-check="${escapeHtml(task.id)}" ${complete ? "checked" : ""}>
+            <label for="task-${escapeHtml(task.id)}"><h4>${escapeHtml(task.title)}</h4></label>
+            <span class="task-owner">${escapeHtml(task.owner)}</span>
+          </div>
+          <div class="task-panels">
+            <section class="concept-panel concept-knowledge">
+              <h5>1 · Knowledge</h5>
+              ${listHtml(task.knowledge)}
+            </section>
+            <section class="concept-panel concept-instructions">
+              <h5>2 · Instructions</h5>
+              ${pathHtml(task.path)}
+              ${listHtml(task.instructions, true)}
+            </section>
+            <section class="concept-panel concept-expected">
+              <h5>3 · Expected outcome</h5>
+              ${listHtml(task.expected)}
+            </section>
+            <section class="concept-panel concept-deliverables">
+              <h5>4 · Deliverables</h5>
+              ${listHtml(task.deliverables)}
+            </section>
+          </div>
+        </article>`;
+    }
+
+    function renderPhases() {
+      document.querySelector("#phase-timeline").innerHTML = LAB_CONFIG.phases
+        .map((phase) => `
+          <article class="phase-card" id="${escapeHtml(phase.id)}">
+            <div class="phase-head">
+              <div>
+                <p class="phase-index">${escapeHtml(phase.number)}</p>
+                <h3>${escapeHtml(phase.title)}</h3>
+              </div>
+              <div class="phase-meta">
+                <span class="tag">${phase.minutes} phút</span>
+                <span class="tag ${escapeHtml(phase.mode)}">${phase.mode === "parallel" ? "Parallel" : "Sequential"}</span>
+              </div>
+            </div>
+            ${phase.tasks.map(renderTask).join("")}
+            <div class="checkpoint">
+              <strong>Checkpoint · chỉ đi tiếp khi</strong>
+              ${escapeHtml(phase.checkpoint)}
+            </div>
+            ${phase.breakAfter ? `<div class="break-note"><span class="tag break">Break</span> ${phase.breakAfter} phút · không lấy thời gian break để bỏ checkpoint.</div>` : ""}
+          </article>`)
+        .join("");
+    }
+
+    function renderFiles() {
+      document.querySelector("#new-files-grid").innerHTML = LAB_CONFIG.files
+        .map((file) => `
+          <article class="new-file-card">
+            <span class="tag">${escapeHtml(file.status)}</span>
+            <h3>${escapeHtml(file.title)}</h3>
+            <div class="path-box">
+              <span class="path-label">Absolute path / root</span>
+              <span class="path-value">${escapeHtml(file.absolute)}</span>
+              <span class="path-label" style="margin-top:.55rem">Repository-relative</span>
+              <span class="path-value">${escapeHtml(file.relative)}</span>
+            </div>
+            <p><strong>Format:</strong> ${escapeHtml(file.format)}</p>
+            <p><strong>Contract:</strong> ${escapeHtml(file.contract)}</p>
+          </article>`)
+        .join("");
+    }
+
+    function renderValidations() {
+      document.querySelector("#validation-grid").innerHTML = LAB_CONFIG.validations
+        .map((item) => `
+          <article class="validation-card">
+            <span class="tag">${escapeHtml(item.type)}</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.description)}</p>
+            ${item.commands ? commandsForAllOs(item.commands) : ""}
+            ${item.manual ? listHtml(item.manual) : ""}
+          </article>`)
+        .join("");
+    }
+
+    function renderChecklist(target, items, prefix) {
+      document.querySelector(target).innerHTML = items
+        .map((item, index) => {
+          const key = `${prefix}-${index}`;
+          return `
+            <li>
+              <label>
+                <input type="checkbox" data-quality-check="${escapeHtml(key)}"
+                  ${state.checks[key] ? "checked" : ""}>
+                <span>${escapeHtml(item)}</span>
+              </label>
+            </li>`;
+        })
+        .join("");
+    }
+
+    function renderSources() {
+      document.querySelector("#source-list").innerHTML = LAB_CONFIG.sources
+        .map((source) => `<div><code>${escapeHtml(source)}</code></div>`)
+        .join("");
+    }
+
+    function applyOs() {
+      document.querySelectorAll("[data-os]").forEach((element) => {
+        element.hidden = element.dataset.os !== state.os;
+      });
+      document.querySelectorAll("[data-os-choice]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.osChoice === state.os));
+      });
+    }
+
+    function updateProgress() {
+      const complete = taskIds.filter((id) => state.done[id]).length;
+      const percent = Math.round((complete / taskIds.length) * 100);
+      document.querySelector("#progress-bar").style.width = `${percent}%`;
+      document.querySelector("#progress-text").textContent = `${complete}/${taskIds.length} hoàn thành · ${percent}%`;
+      document.querySelector("#top-progress").textContent = `${complete}/${taskIds.length} task`;
+      document.querySelectorAll("[data-task-card]").forEach((card) => {
+        card.classList.toggle("is-complete", Boolean(state.done[card.dataset.taskCard]));
+      });
+    }
+
+    function formatTime(seconds) {
+      const safe = Math.max(0, seconds);
+      const hours = Math.floor(safe / 3600);
+      const minutes = Math.floor((safe % 3600) / 60);
+      const secs = safe % 60;
+      return [hours, minutes, secs].map((part) => String(part).padStart(2, "0")).join(":");
+    }
+
+    function syncTimerElapsed() {
+      if (!state.timer.running) return;
+      const now = Date.now();
+      const elapsed = Math.max(0, Math.floor((now - state.timer.updatedAt) / 1000));
+      if (elapsed > 0) {
+        state.timer.remaining = Math.max(0, state.timer.remaining - elapsed);
+        state.timer.updatedAt = now;
+      }
+      if (state.timer.remaining === 0) state.timer.running = false;
+    }
+
+    function updateTimerUi() {
+      document.querySelector("#timer-display").textContent = formatTime(state.timer.remaining);
+      document.querySelector("#timer-toggle").textContent = state.timer.running ? "Tạm dừng" : "Bắt đầu";
+    }
+
+    function applyFocus() {
+      document.body.classList.toggle("focus-mode", state.focus);
+      const button = document.querySelector("#focus-toggle");
+      button.setAttribute("aria-pressed", String(state.focus));
+      button.textContent = state.focus ? "Focus: bật" : "Focus: tắt";
+    }
+
+    async function copyText(button) {
+      const code = button.closest(".command-card").querySelector("code").textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch {
+        const textArea = document.createElement("textarea");
+        textArea.value = code;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      const oldText = button.textContent;
+      button.textContent = "Đã copy";
+      window.setTimeout(() => { button.textContent = oldText; }, 1200);
+    }
+
+    function bindEvents() {
+      document.addEventListener("click", (event) => {
+        const osButton = event.target.closest("[data-os-choice]");
+        if (osButton) {
+          state.os = osButton.dataset.osChoice;
+          applyOs();
+          saveState();
+          return;
+        }
+
+        const copyButton = event.target.closest("[data-copy]");
+        if (copyButton) {
+          copyText(copyButton);
+        }
+      });
+
+      document.addEventListener("change", (event) => {
+        if (event.target.matches("[data-task-check]")) {
+          const id = event.target.dataset.taskCheck;
+          state.done[id] = event.target.checked;
+          updateProgress();
+          saveState();
+        }
+
+        if (event.target.matches("[data-quality-check]")) {
+          state.checks[event.target.dataset.qualityCheck] = event.target.checked;
+          saveState();
+        }
+      });
+
+      document.addEventListener("input", (event) => {
+        if (event.target.matches("[data-role-input]")) {
+          state.roles[event.target.dataset.roleInput] = event.target.value;
+          saveState();
+        }
+      });
+
+      document.querySelector("#timer-toggle").addEventListener("click", () => {
+        syncTimerElapsed();
+        state.timer.running = !state.timer.running;
+        state.timer.updatedAt = Date.now();
+        updateTimerUi();
+        saveState();
+      });
+
+      document.querySelector("#timer-reset").addEventListener("click", () => {
+        if (!window.confirm("Đặt lại đồng hồ về 04:00:00?")) return;
+        state.timer = {
+          remaining: totalSeconds,
+          running: false,
+          updatedAt: Date.now()
+        };
+        updateTimerUi();
+        saveState();
+      });
+
+      document.querySelector("#focus-toggle").addEventListener("click", () => {
+        state.focus = !state.focus;
+        applyFocus();
+        saveState();
+      });
+
+      document.querySelector("#print-guide").addEventListener("click", () => window.print());
+
+      document.querySelector("#reset-all").addEventListener("click", () => {
+        if (!window.confirm("Xóa tên, tiến độ, checklist và đồng hồ đã lưu trên trình duyệt?")) return;
+        state = defaultState();
+        saveState();
+        window.location.reload();
+      });
+    }
+
+    function init() {
+      syncTimerElapsed();
+      renderMeta();
+      renderAudit();
+      renderSetup();
+      renderRoles();
+      renderPhases();
+      renderFiles();
+      renderValidations();
+      renderChecklist("#dod-list", LAB_CONFIG.definitionOfDone, "dod");
+      renderChecklist("#security-list", LAB_CONFIG.securityChecklist, "security");
+      renderSources();
+      applyOs();
+      updateProgress();
+      updateTimerUi();
+      applyFocus();
+      bindEvents();
+      saveState();
+
+      window.setInterval(() => {
+        if (!state.timer.running) return;
+        syncTimerElapsed();
+        updateTimerUi();
+        saveState();
+      }, 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
