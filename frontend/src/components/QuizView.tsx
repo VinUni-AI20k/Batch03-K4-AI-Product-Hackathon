@@ -5,16 +5,17 @@ type Props = {
   index: number;
   total: number;
   selected: string;
+  modeLabel: string;
   onSelectAnswer: (answer: string) => void;
   onNext: () => void;
 };
 
-export default function QuizView({ question, index, total, selected, onSelectAnswer, onNext }: Props) {
+export default function QuizView({ question, index, total, selected, modeLabel, onSelectAnswer, onNext }: Props) {
   return (
     <div className="quiz-view">
       <div className="quiz-header">
         <div>
-          <p className="eyebrow">Bài quiz trắc nghiệm</p>
+          <p className="eyebrow">{modeLabel}</p>
           <h2>Câu hỏi {index} trên {total}</h2>
         </div>
         <div className="quiz-status">{selected ? "Đã chọn đáp án" : "Chưa chọn đáp án"}</div>
