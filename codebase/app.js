@@ -198,26 +198,63 @@ function renderPages() {
   observePages();
 }
 
-/* scroll-spy: trang nào đang chiếm màn hình */
-let io;
+/* ---- scroll-spy: tính thẳng từ scrollTop, KHÔNG dùng IntersectionObserver ----
+   IntersectionObserver chỉ báo những entry vừa đổi trạng thái nên hay chọn nhầm sang
+   trang kế tiếp (hiển thị 12 khi đang đọc 11), và nó vẫn bắn giữa lúc smooth-scroll
+   làm S.page bị ghi đè → bấm chuyển trang bị nhảy 2-3 trang một lần.
+   Cách dưới đây tính trang theo một "đường ngắm" cố định ngay dưới toolbar,
+   và khoá hẳn việc cập nhật trong lúc đang bay tới trang đích. */
+const TOP_GAP = 86;        // = padding-top của .pages-scroll (chỗ chừa cho toolbar nổi)
+const AIM = TOP_GAP + 24;  // đường ngắm: trang nào vượt qua vạch này thì là trang đang đọc
+let pageEls = [];
+let scrollTarget = null;   // scrollTop đích khi đang smooth-scroll; null = người dùng tự cuộn
+let settleTimer = 0;
+
 function observePages() {
-  if (io) io.disconnect();
-  io = new IntersectionObserver(es => {
-    let best = null;
-    es.forEach(e => { if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) best = e; });
-    if (best) {
-      const n = +best.target.dataset.page;
-      if (n !== S.page) { S.page = n; syncChrome(); }
-    }
-  }, { root: $('#scroller'), threshold: [.25, .5, .75] });
-  $$('.page').forEach(p => io.observe(p));
+  pageEls = $$('.page');
+  const sc = $('#scroller');
+  sc.removeEventListener('scroll', onScroll);
+  sc.addEventListener('scroll', onScroll, { passive: true });
+}
+
+/* trang cuối cùng có mép trên đã vượt lên trên đường ngắm */
+function pageAtScroll() {
+  const y = $('#scroller').scrollTop + AIM;
+  let n = 1;
+  for (const el of pageEls) {
+    if (el.offsetTop <= y) n = +el.dataset.page;
+    else break;                       // pageEls theo đúng thứ tự trang nên dừng được sớm
+  }
+  return n;
+}
+
+function onScroll() {
+  if (scrollTarget !== null) {
+    // đang bay tới đích: chỉ mở khoá khi đã tới nơi, tuyệt đối không đụng S.page giữa chừng
+    if (Math.abs($('#scroller').scrollTop - scrollTarget) < 4) releaseScroll();
+    return;
+  }
+  const n = pageAtScroll();
+  if (n !== S.page) { S.page = n; syncChrome(); }
+}
+
+function releaseScroll() {
+  scrollTarget = null;
+  clearTimeout(settleTimer);
 }
 
 function goPage(n) {
   n = Math.min(Math.max(1, n), DOC.totalPages);
   S.page = n;
-  $('#pg' + n).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  syncChrome();
+  syncChrome();                        // cập nhật số trang ngay, không đợi cuộn xong
+  const sc = $('#scroller'), el = $('#pg' + n);
+  const max = Math.max(0, sc.scrollHeight - sc.clientHeight);
+  const top = Math.min(Math.max(0, el.offsetTop - TOP_GAP), max);
+  if (Math.abs(sc.scrollTop - top) < 4) { releaseScroll(); return; }  // đã ở đúng chỗ
+  scrollTarget = top;
+  clearTimeout(settleTimer);
+  settleTimer = setTimeout(releaseScroll, 1500);  // phòng khi người dùng cắt ngang cú cuộn
+  sc.scrollTo({ top, behavior: 'smooth' });
 }
 
 /* =============================================================
@@ -663,7 +700,6 @@ function openTutor(force) {
   const w = $('#workspace');
   if (force) w.classList.remove('tutor-off');
   else w.classList.toggle('tutor-off');
-  $('#fabTutor').hidden = !w.classList.contains('tutor-off');
 }
 
 /* =============================================================
@@ -797,7 +833,6 @@ $('#nextPage').onclick = () => goPage(S.page + 1);
 
 $('#tglSidebar').onclick = () => $('#workspace').classList.toggle('side-off');
 $('#tglTutor').onclick = () => openTutor(false);
-$('#fabTutor').onclick = () => openTutor(true);
 
 $('#btnTheme').onclick = () => {
   const dark = document.documentElement.dataset.theme === 'dark';

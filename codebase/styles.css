@@ -175,10 +175,10 @@ input{font:inherit}
 }
 .rail:hover{color:var(--accent)}
 .rail-left{left:0;border-left:0;border-radius:0 12px 12px 0}
-.rail-right{right:0;border-right:0;border-radius:12px 0 0 12px}
+.rail-right{right:0;border-right:0;border-radius:12px 0 0 12px;color:var(--accent)}
 .rail svg{width:16px;height:16px;transition:transform .25s}
+.rail-right svg{width:18px;height:18px;stroke-width:1.5}
 .workspace.side-off .rail-left svg{transform:rotate(180deg)}
-.workspace.tutor-off .rail-right svg{transform:rotate(180deg)}
 
 /* toolbar */
 .toolbar{
@@ -422,13 +422,7 @@ input{font:inherit}
 .send:hover{filter:brightness(1.1)}
 .send:active{transform:scale(.94)}
 
-/* FAB */
-.fab{
-  position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:55;
-  width:46px;height:60px;border-radius:14px;background:var(--surface);border:1px solid var(--line);
-  display:grid;place-items:center;color:var(--accent);box-shadow:var(--shadow-lg);transition:.18s;
-}
-.fab:hover{transform:translateY(-50%) scale(1.06)}
+
 
 /* popup bôi đen */
 .sel-popup{
