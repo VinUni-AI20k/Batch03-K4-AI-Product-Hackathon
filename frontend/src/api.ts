@@ -58,6 +58,19 @@ export type ValidationResult = {
   validated_at: string;
 };
 
+export type SimulatedSubmission = {
+  submission_id: string;
+  receipt_code: string;
+  form_code: string;
+  validation_id: string;
+  status: "submitted_simulation";
+  channel: "chat" | "review_form";
+  submitted_at: string;
+  simulation: true;
+  official_submission: false;
+  message_vi: string;
+};
+
 export type VoiceStatus = { available: boolean };
 
 export class ApiError extends Error {
@@ -292,5 +305,24 @@ export async function exportFormPdf(formCode: string, validationId: string): Pro
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError(503, "pdf_export_unavailable");
+  }
+}
+
+export async function simulateFormSubmission(formCode: string, validationId: string): Promise<SimulatedSubmission> {
+  try {
+    const response = await fetch(`${apiBaseUrl}/v1/forms/${formCode}/submissions/simulate`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ validation_id: validationId, confirmed: true }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { detail?: string };
+      throw new ApiError(response.status, body.detail ?? "simulated_submission_failed");
+    }
+    return await response.json() as SimulatedSubmission;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(503, "simulated_submission_unavailable");
   }
 }

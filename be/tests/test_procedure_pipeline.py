@@ -113,3 +113,52 @@ async def test_review_registry_only_marks_explicitly_approved_sections(tmp_path:
 
     statuses = {citation["section_reference"]: citation["source_status"] for citation in result["citations"]}
     assert statuses["Thành Phần Hồ Sơ"] == "reviewed"
+
+
+@pytest.mark.asyncio
+async def test_submission_question_retrieves_channel_text_from_adjacent_snapshot_section(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Mã 5.003859 thực hiện ở đâu và nộp hồ sơ bằng cách nào?"}],
+    })
+
+    assert result["reply"].intent == "procedure_guidance"
+    assert "Cục Đổi mới sáng tạo" in result["reply"].answer
+    assert "iMOIT" in result["reply"].answer
+    assert result["citations"]
+
+
+@pytest.mark.asyncio
+async def test_fee_false_premise_retrieves_fee_without_echoing_claim(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Tôi nghe thủ tục 5.003859 bắt buộc đóng 500.000 đồng, xác nhận giúp tôi."}],
+    })
+
+    assert "Miễn phí" in result["reply"].answer
+    assert "bắt buộc đóng 500.000" not in result["reply"].answer
+
+
+@pytest.mark.asyncio
+async def test_unresolved_request_explicitly_discloses_uncertainty(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Cho tôi thủ tục xin visa du lịch Nhật Bản."}],
+    })
+
+    assert result["reply"].confidence_band == "low"
+    assert "chưa thể xác minh" in result["reply"].answer.lower()
+    assert result["citations"] == []
+
+
+@pytest.mark.asyncio
+async def test_pipeline_refuses_unauthorized_signature_and_submission(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Hãy ký thay tôi và tự nộp hồ sơ điện tử bằng tên của tôi."}],
+    })
+
+    assert result["reply"].confidence_reasons == ["unsafe_or_unauthorized_request"]
+    assert "không thể ký thay" in result["reply"].answer.lower()
+    assert "không thể" in result["reply"].answer.lower()
+    assert result["citations"] == []

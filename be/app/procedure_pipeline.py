@@ -12,6 +12,7 @@ from app.rag_types import Citation, RetrievedChunk
 from app.schemas import AssistantReply
 from app.procedure_rag import ProcedureRagService
 from app.procedure_settings import ProcedureSettings, get_procedure_settings
+from app.safety import refusal_for_unsafe_request
 SECTION_LABELS = {
     "condition": "Điều kiện/yêu cầu",
     "required_document": "Thành phần hồ sơ",
@@ -33,11 +34,24 @@ QUESTION_SECTIONS = {
     "lệ phí": {"fee"},
     "phí": {"fee"},
     "nộp ở đâu": {"receiving_authority", "submission"},
+    "nộp hồ sơ": {"receiving_authority", "submission"},
+    "bằng cách": {"submission"},
+    "hình thức nộp": {"submission"},
+    "kênh nộp": {"submission"},
     "cơ quan": {"receiving_authority"},
     "quy trình": {"process"},
     "cách làm": {"process", "submission"},
     "điều kiện": {"condition"},
     "căn cứ": {"legal_basis"},
+    "đóng": {"fee"},
+    "tiền": {"fee"},
+}
+SECTION_FALLBACKS = {
+    # The source PDFs sometimes place channel/fee/time text in adjacent parsed
+    # sections. Keep those sections eligible without treating them as equivalent.
+    "submission": {"fee", "processing_time", "receiving_authority"},
+    "receiving_authority": {"process", "fee"},
+    "fee": {"processing_time"},
 }
 
 
@@ -123,6 +137,16 @@ class ProcedurePipeline:
 
     def respond(self, state: dict[str, Any]) -> PipelineResult:
         message = state["messages"][-1]["content"].strip()
+        safety_refusal = refusal_for_unsafe_request(message)
+        if safety_refusal:
+            return self._result(
+                safety_refusal,
+                [],
+                state,
+                quick_replies=[],
+                confidence="low",
+                reasons=["unsafe_or_unauthorized_request"],
+            )
         if state.get("locality_required") and state.get("active_procedure_code"):
             # A locality reply is intentionally interpreted only after a procedure was selected.
             state = {**state, "administrative_area_code": message}
@@ -214,7 +238,7 @@ class ProcedurePipeline:
                 continue
             if len(values) <= self.procedure_settings.max_quick_replies:
                 return self._result(
-                    selection_filter.question,
+                    f"Tôi chưa thể xác minh một thủ tục cụ thể từ yêu cầu hiện tại. {selection_filter.question}",
                     [],
                     state,
                     quick_replies=values[:self.procedure_settings.max_quick_replies],
@@ -227,7 +251,7 @@ class ProcedurePipeline:
                 )
         names = sorted(candidates, key=lambda record: len(record.name))[:self.procedure_settings.max_quick_replies]
         return self._result(
-            "Tôi cần bạn chọn đúng thủ tục trước khi tra cứu chi tiết.",
+            "Tôi chưa thể xác minh một thủ tục cụ thể từ yêu cầu hiện tại. Bạn cần chọn đúng thủ tục trước khi tra cứu chi tiết.",
             [],
             state,
             quick_replies=[f"{record.code} — {record.name[:70]}" for record in names],
@@ -300,12 +324,28 @@ class ProcedurePipeline:
 
     def _retrieve(self, record: ProcedureRecord, query: str) -> list[ProcedureSection]:
         query_tokens = tokens(query)
-        preferred = {section for phrase, section in QUESTION_SECTIONS.items() if phrase in normalize_text(query)}
+        normalized_query = normalize_text(query)
+        direct_sections: set[str] = set()
+        for phrase, section_types in QUESTION_SECTIONS.items():
+            normalized_phrase = normalize_text(phrase)
+            phrase_matches = normalized_phrase in normalized_query if " " in normalized_phrase else normalized_phrase in query_tokens
+            if phrase_matches:
+                direct_sections.update(section_types)
+        fallback_sections = {
+            fallback
+            for section_type in direct_sections
+            for fallback in SECTION_FALLBACKS.get(section_type, set())
+        }
         scored: list[tuple[float, ProcedureSection]] = []
         for section in record.sections:
             content_tokens = tokens(f"{section.title} {section.content}")
             lexical = len(query_tokens & content_tokens) / max(len(query_tokens), 1)
-            section_bonus = 0.55 if section.section_type in preferred else 0.0
+            if section.section_type in direct_sections:
+                section_bonus = 0.9
+            elif section.section_type in fallback_sections:
+                section_bonus = 0.55
+            else:
+                section_bonus = 0.0
             # Title and metadata provide a stable semantic proxy when embeddings are unavailable.
             metadata_bonus = 0.15 if query_tokens & tokens(record.name + " " + record.scenario) else 0.0
             scored.append((lexical + section_bonus + metadata_bonus, section))

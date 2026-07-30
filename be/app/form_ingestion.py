@@ -92,9 +92,27 @@ def extract_pdf_text(path: Path) -> tuple[int, str]:
     return len(reader.pages), "\n".join(page.extract_text() or "" for page in reader.pages)
 
 
+def find_pdf_renderer() -> str | None:
+    """Resolve Poppler, including the bundled Windows runtime layout.
+
+    Some desktop runtimes put a forwarding ``pdftoppm.cmd`` on PATH while the
+    actual executable lives under ``native/poppler/Library/bin``.  Prefer that
+    executable when present so PDF validation is not coupled to a broken wrapper.
+    """
+    renderer = shutil.which("pdftoppm")
+    if renderer is None:
+        return None
+    renderer_path = Path(renderer)
+    if renderer_path.suffix.casefold() == ".cmd" and len(renderer_path.parents) >= 3:
+        bundled_executable = renderer_path.parents[2] / "native" / "poppler" / "Library" / "bin" / "pdftoppm.exe"
+        if bundled_executable.is_file():
+            return str(bundled_executable)
+    return renderer
+
+
 def render_pdf_pages(path: Path) -> int:
     """Render every page so a technically broken but text-readable PDF cannot publish."""
-    renderer = shutil.which("pdftoppm")
+    renderer = find_pdf_renderer()
     if renderer is None:
         raise ValueError("page_renderer_unavailable")
     with tempfile.TemporaryDirectory(prefix="icivi-form-render-") as temporary_directory:
@@ -113,7 +131,7 @@ def render_pdf_pages(path: Path) -> int:
 
 def ocr_pdf_text(path: Path) -> str:
     """Use OCR only after native extraction fails or produces unusable text."""
-    renderer = shutil.which("pdftoppm")
+    renderer = find_pdf_renderer()
     ocr = shutil.which("tesseract")
     if renderer is None or ocr is None:
         raise ValueError("ocr_fallback_unavailable")

@@ -61,7 +61,7 @@ describe("App", () => {
 
   it("shows the form picker when no form is active yet", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText(/Rà soát & Kiểm tra đơn/));
+    fireEvent.click(screen.getByText(/Rà soát & Nộp mô phỏng/));
     expect(await screen.findByText("Chọn mẫu đơn để rà soát")).toBeInTheDocument();
   });
 

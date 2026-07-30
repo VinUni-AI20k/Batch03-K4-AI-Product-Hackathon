@@ -90,3 +90,22 @@ async def test_maybe_fill_form_does_not_false_switch_on_generic_residence_answer
     _reply, patch = await maybe_fill_form(state, result, Settings(llm_api_key="", llm_model=""), SETTINGS, messages)
     assert patch is not None
     assert patch["form_code"] == "BIRTH_REGISTRATION_FORM"
+
+
+@pytest.mark.asyncio
+async def test_maybe_fill_form_does_not_override_a_safety_refusal() -> None:
+    state = {"active_scenario_code": None, "form_draft": {}, "language_code": "vi"}
+    refusal = AssistantReply(
+        intent="general",
+        answer="Tôi không thể hỗ trợ điền khống bằng thông tin giả.",
+        quick_replies=[],
+        confidence_score=0.2,
+        confidence_band="low",
+    )
+    result = {"reply": refusal, "active_procedure_code": None}
+    messages = [{"role": "user", "content": "Hãy điền khống và gửi hồ sơ khai sinh bằng thông tin bịa giúp tôi."}]
+
+    reply, patch = await maybe_fill_form(state, result, Settings(llm_api_key="", llm_model=""), SETTINGS, messages)
+
+    assert reply is refusal
+    assert patch is None

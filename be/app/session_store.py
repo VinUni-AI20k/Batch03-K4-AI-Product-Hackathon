@@ -32,6 +32,7 @@ class SessionStore:
             "administrative_area_code": None,
             "form_draft": {},
             "last_validation": {},
+            "simulated_submissions": [],
         }
         await self.redis.set(self.key(session_id), json.dumps(state), ex=self.ttl_seconds)
         return session_id

@@ -33,6 +33,7 @@ Generated artifacts:
 The runner exercises the real FastAPI SSE endpoint. It disables only the optional
 PostgreSQL-backed embedding retrieval because Docker/PostgreSQL is unavailable in
 the local environment; the local procedure snapshot and form-routing paths remain
-real. The recorded first run is 18/25 (72%), below the committed 75% rate gate.
-All seven failed rows were reviewed against the raw responses before writing
-`form_answers.md`.
+real. The unchanged 25-case set produced 18/25 on the baseline run, 24/25 after
+the first system improvement, 25/25 after the safety fix, and 25/25 again after
+adding controlled submission simulation. Historical artifacts
+are stored under `runs/`; `report.md` and `results.jsonl` contain the latest run.

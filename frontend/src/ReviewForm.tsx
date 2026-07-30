@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   FormSchemaResponse,
   ApiError,
+  SimulatedSubmission,
   ValidationResult,
   exportFormPdf,
   getFormDraft,
   getFormSchema,
+  simulateFormSubmission,
   updateFormDraft,
   validateForm,
 } from "./api";
@@ -76,6 +78,9 @@ function ResultPanel({
   exporting,
   onPreview,
   previewing,
+  submission,
+  submitting,
+  onSubmitSimulation,
 }: {
   locale: Locale;
   validation: ValidationResult | null;
@@ -85,8 +90,24 @@ function ResultPanel({
   exporting: boolean;
   onPreview: () => void;
   previewing: boolean;
+  submission: SimulatedSubmission | null;
+  submitting: boolean;
+  onSubmitSimulation: () => void;
 }) {
   const text = copy[locale];
+  const simulationText = locale === "vi" ? {
+    submit: "Nộp hồ sơ mô phỏng",
+    submitting: "Đang nộp mô phỏng...",
+    submitted: "Đã nộp mô phỏng",
+    disclaimer: "MÔ PHỎNG DEMO — không gửi dữ liệu tới Cổng Dịch vụ công hoặc cơ quan nhà nước.",
+    receipt: "Biên nhận mô phỏng",
+  } : {
+    submit: "Simulate submission",
+    submitting: "Submitting simulation...",
+    submitted: "Simulation submitted",
+    disclaimer: "DEMO SIMULATION — no data is sent to a government portal or authority.",
+    receipt: "Simulation receipt",
+  };
   const canExport = !!validation && validation.summary.blocking_error === 0 && !dirty;
 
   return (
@@ -144,7 +165,18 @@ function ResultPanel({
             <button className="preview-button" disabled={previewing} onClick={onPreview} type="button">
               👁 {previewing ? text.exporting : text.previewButton}
             </button>
+            <button className="simulate-submit-button" disabled={submitting || !!submission} onClick={onSubmitSimulation} type="button">
+              {submission ? simulationText.submitted : submitting ? simulationText.submitting : simulationText.submit}
+            </button>
           </div>
+          <p className="simulation-disclaimer">{simulationText.disclaimer}</p>
+          {submission && (
+            <div className="simulation-receipt" role="status">
+              <strong>{simulationText.receipt}</strong>
+              <code>{submission.receipt_code}</code>
+              <span>{new Date(submission.submitted_at).toLocaleString(locale === "vi" ? "vi-VN" : "en-US")}</span>
+            </div>
+          )}
         </div>
       )}
     </aside>
@@ -162,8 +194,14 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
   const [exporting, setExporting] = useState(false);
   const [previewBlob, setPreviewBlob] = useState<Blob | null>(null);
   const [previewing, setPreviewing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submission, setSubmission] = useState<SimulatedSubmission | null>(null);
   const [error, setError] = useState<string | null>(null);
   const text = copy[locale];
+  const simulationConfirm = locale === "vi"
+    ? "Xác nhận nộp hồ sơ trong môi trường mô phỏng? Hồ sơ sẽ không được gửi tới cơ quan nhà nước."
+    : "Confirm submission in the simulation environment? Nothing will be sent to a government authority.";
+  const simulationError = locale === "vi" ? "Không thể nộp mô phỏng." : "Could not simulate submission.";
   const previewUrl = useMemo(() => (previewBlob ? URL.createObjectURL(previewBlob) : null), [previewBlob]);
 
   useEffect(() => {
@@ -190,6 +228,7 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
         setValidation(null);
         setDirty(false);
         setPreviewBlob(null);
+        setSubmission(null);
       })
       .catch(() => setError(text.formLoadError))
       .finally(() => setLoading(false));
@@ -198,6 +237,7 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
   function updateField(fieldCode: string, value: string) {
     setValues((current) => ({ ...current, [fieldCode]: value }));
     setDirty(true);
+    setSubmission(null);
   }
 
   // Always sends the full local snapshot (never a single changed field): the backend
@@ -213,6 +253,7 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
     const next = { ...values, [fieldCode]: value };
     setValues(next);
     setDirty(true);
+    setSubmission(null);
     if (formCode) void updateFormDraft(formCode, next).catch(() => setError(text.formSaveError));
   }
 
@@ -254,6 +295,21 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
       setError(exportErrorMessage(error, text.previewError));
     } finally {
       setPreviewing(false);
+    }
+  }
+
+  async function runSimulatedSubmission() {
+    if (!formCode || !validation) return;
+    if (!window.confirm(simulationConfirm)) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      setSubmission(await simulateFormSubmission(formCode, validation.validation_id));
+    } catch (error) {
+      const detail = error instanceof ApiError ? error.detail : "";
+      setError(`${simulationError}${detail ? ` (${detail})` : ""}`);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -336,6 +392,9 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
         exporting={exporting}
         onPreview={() => void runPreview()}
         previewing={previewing}
+        submission={submission}
+        submitting={submitting}
+        onSubmitSimulation={() => void runSimulatedSubmission()}
       />
       {previewUrl && (
         <div className="pdf-preview-backdrop" role="presentation" onClick={closePreview}>

@@ -31,7 +31,7 @@ phiên chat đang dở mà không mất dữ liệu.
 
 ---
 
-## 2. Giao diện Rà soát & Kiểm tra đơn được thiết kế lại, có xem trước PDF
+## 2. Giao diện Rà soát & Nộp mô phỏng được thiết kế lại, có xem trước PDF
 
 **Giá trị:** Bảng kết quả thẩm định cũ chỉ là một khối chữ nhật tĩnh, không có
 trạng thái đang xử lý và không cho biết PDF cuối cùng sẽ trông như thế nào

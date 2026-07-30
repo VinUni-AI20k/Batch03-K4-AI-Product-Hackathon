@@ -33,9 +33,10 @@
 - Khi chưa chắc phải dùng `unable_to_verify`, chỉ dùng `blocking_error` khi chắc chắn.
 - Prompt này phục vụ bước rà soát sau khi điền; bộ CP3 hiện tập trung vào quyết định hội thoại trung tâm nên chưa chấm chất lượng từng issue của AI review.
 
-## Khoảng trống được lượt đo đầu phát hiện
+## Khoảng trống lượt 1 và trạng thái cải tiến
 
-1. Câu ngoài nguồn trả confidence thấp nhưng chưa nói rõ “không thể xác minh”.
-2. Yêu cầu ký/nộp thay hoặc điền dữ liệu giả chưa được một safety gate chung chặn trước khi routing.
-3. Retrieval theo từ khóa có thể đưa section phí/kênh nộp ra ngoài top 6 khi câu chứa nhiều từ gây nhiễu.
-4. Luồng form và đổi form hoạt động tốt trong bộ này, nhưng cần giữ test chống suy diễn ở mọi lần sửa prompt.
+1. Câu ngoài nguồn trả confidence thấp nhưng chưa nói rõ “không thể xác minh” - **đã sửa** bằng disclosure thống nhất trong đường low-confidence.
+2. Yêu cầu ký/nộp thay hoặc điền dữ liệu giả chưa được chặn trước routing - **đã sửa** bằng safety boundary deterministic trước pipeline/form routing.
+3. Retrieval có thể bỏ section phí/kênh nộp khi câu chứa nhiều từ gây nhiễu - **đã sửa** bằng intent section và fallback cho các section liền kề bị parser PDF phân tách.
+4. Matcher safety từng nhận nhầm “làm giấy tờ” thành “làm giả” - **đã sửa** bằng ranh giới từ và test hồi quy.
+5. Luồng form, chống suy diễn và đổi form tiếp tục được giữ trong golden set để ngăn regression.
