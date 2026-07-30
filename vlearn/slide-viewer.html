@@ -51,122 +51,162 @@
   <!-- ===== 3-COLUMN MAIN LAYOUT ===== -->
   <div class="viewer-layout">
 
-    <!-- LEFT SIDEBAR: Course Materials -->
+    <!-- LEFT SIDEBAR: Course Materials & Personal Slide Notes -->
     <aside class="materials-sidebar">
-      <div class="sidebar-top-header">
-        <div class="sidebar-title">Học liệu môn học</div>
-        <div class="sidebar-subtitle">Chương, slide và tài liệu đã upload</div>
+      <div class="sidebar-tabs-header">
+        <button class="sidebar-tab-btn active" id="tab-btn-docs" onclick="switchSidebarTab('docs')" title="Danh sách Học liệu môn học">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+          <span>Học liệu</span>
+        </button>
+        <button class="sidebar-tab-btn" id="tab-btn-notes" onclick="switchSidebarTab('notes')" title="Ghi chú bài giảng cá nhân">
+          <span>Ghi chú</span>
+          <span class="notes-count-badge" id="sidebar-notes-badge">0</span>
+        </button>
       </div>
 
-      <div class="materials-list">
+      <!-- PANEL 1: HỌC LIỆU MÔN HỌC -->
+      <div class="sidebar-panel active" id="panel-docs">
+        <div class="sidebar-top-header">
+          <div class="sidebar-title">Học liệu môn học</div>
+          <div class="sidebar-subtitle">Chương, slide và tài liệu đã upload</div>
+        </div>
 
-        <!-- Day 01 Group (Active) -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">1</div>
-              <div>
-                <div class="day-group-name">Day01</div>
-                <div class="day-group-meta">2 TÀI LIỆU · PUBLISHED</div>
+        <div class="materials-list">
+
+          <!-- Day 01 Group (Active) -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">1</div>
+                <div>
+                  <div class="day-group-name">Day01</div>
+                  <div class="day-group-meta">2 TÀI LIỆU · PUBLISHED</div>
+                </div>
+              </div>
+              <span class="day-group-badge studying">STUDYING</span>
+            </div>
+
+            <div class="day-items-list">
+              <div class="doc-item active" onclick="loadPdf('../data/vlearn-pack/slides/d1-slide-hackathon.pdf', 'day01_302.pdf', 83)">
+                <div class="doc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div class="doc-item-name">day01_302.pdf</div>
+                  <div class="doc-item-pages">83 trang</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--emerald);"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+
+              <div class="doc-item" onclick="loadPdf('../data/vlearn-pack/slides/d2-slide-hackathon.pdf', 'material_mrxpq9zu.pdf', 32)">
+                <div class="doc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div class="doc-item-name">material_mrxpq9zu.pdf</div>
+                  <div class="doc-item-pages">32 trang</div>
+                </div>
               </div>
             </div>
-            <span class="day-group-badge studying">STUDYING</span>
           </div>
 
-          <div class="day-items-list">
-            <div class="doc-item active" onclick="loadPdf('../data/vlearn-pack/slides/d1-slide-hackathon.pdf', 'day01_302.pdf', 83)">
-              <div class="doc-item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          <!-- Day 02 Group -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">2</div>
+                <div>
+                  <div class="day-group-name">Day02</div>
+                  <div class="day-group-meta">1 TÀI LIỆU · PUBLISHED</div>
+                </div>
               </div>
-              <div style="flex:1;min-width:0;">
-                <div class="doc-item-name">day01_302.pdf</div>
-                <div class="doc-item-pages">83 trang</div>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--emerald);"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
             </div>
+          </div>
 
-            <div class="doc-item" onclick="loadPdf('../data/vlearn-pack/slides/d2-slide-hackathon.pdf', 'material_mrxpq9zu.pdf', 32)">
-              <div class="doc-item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+          <!-- Day 03 Group -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">3</div>
+                <div>
+                  <div class="day-group-name">Day03</div>
+                  <div class="day-group-meta">2 TÀI LIỆU · PUBLISHED</div>
+                </div>
               </div>
-              <div style="flex:1;min-width:0;">
-                <div class="doc-item-name">material_mrxpq9zu.pdf</div>
-                <div class="doc-item-pages">32 trang</div>
-              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
             </div>
+          </div>
+
+          <!-- Day 04 Group -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">4</div>
+                <div>
+                  <div class="day-group-name">Day04</div>
+                  <div class="day-group-meta">3 TÀI LIỆU · PUBLISHED</div>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- Day 05 Group -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">5</div>
+                <div>
+                  <div class="day-group-name">Day05</div>
+                  <div class="day-group-meta">3 TÀI LIỆU · PUBLISHED</div>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- Day 06 Group -->
+          <div class="day-group">
+            <div class="day-group-header">
+              <div class="day-group-left">
+                <div class="day-group-icon">6</div>
+                <div>
+                  <div class="day-group-name">Day06</div>
+                  <div class="day-group-meta">1 TÀI LIỆU · PUBLISHED</div>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PANEL 2: GHI CHÚ BÀI GIẢNG -->
+      <div class="sidebar-panel" id="panel-notes">
+        <div class="sidebar-top-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div class="sidebar-title">Ghi chú bài giảng</div>
+            <div class="sidebar-subtitle">Lưu ý chính cho từng slide</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="note-target-page" style="font-size:0.75rem;font-weight:800;color:var(--navy);background:rgba(18,79,140,0.08);padding:3px 8px;border-radius:6px;">Trang <span id="note-editor-page-num">1</span></span>
+            <button class="btn-clear-note" onclick="clearCurrentPageNote()" title="Xóa ghi chú trang này">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
           </div>
         </div>
 
-        <!-- Day 02 Group -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">2</div>
-              <div>
-                <div class="day-group-name">Day02</div>
-                <div class="day-group-meta">1 TÀI LIỆU · PUBLISHED</div>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="notes-editor-box">
+          <textarea class="note-textarea" id="note-textarea-input" placeholder="Nhập ghi chú cá nhân cho trang slide này..." oninput="autoSaveCurrentNote()"></textarea>
+          <div class="notes-editor-footer">
+            <button class="btn-ask-ai-note" onclick="askTutorAboutNote()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a9.96 9.96 0 0 1-4.587-1.112l-3.826 1.07a1 1 0 0 1-1.235-1.236l1.07-3.825A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2z"/></svg>
+              Hỏi AI về Note này
+            </button>
           </div>
         </div>
-
-        <!-- Day 03 Group -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">3</div>
-              <div>
-                <div class="day-group-name">Day03</div>
-                <div class="day-group-meta">2 TÀI LIỆU · PUBLISHED</div>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-
-        <!-- Day 04 Group -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">4</div>
-              <div>
-                <div class="day-group-name">Day04</div>
-                <div class="day-group-meta">3 TÀI LIỆU · PUBLISHED</div>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-
-        <!-- Day 05 Group -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">5</div>
-              <div>
-                <div class="day-group-name">Day05</div>
-                <div class="day-group-meta">3 TÀI LIỆU · PUBLISHED</div>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-
-        <!-- Day 06 Group -->
-        <div class="day-group">
-          <div class="day-group-header">
-            <div class="day-group-left">
-              <div class="day-group-icon">6</div>
-              <div>
-                <div class="day-group-name">Day06</div>
-                <div class="day-group-meta">1 TÀI LIỆU · PUBLISHED</div>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;"><path d="m6 9 6 6 6-6"/></svg>
-          </div>
-        </div>
-
       </div>
     </aside>
 
@@ -181,7 +221,6 @@
             Đọc
           </button>
           <button class="tool-btn" id="btn-tool-pen" onclick="setSlideTool('pen')" title="Vẽ tự do bằng Bút">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Bút
           </button>
           <button class="tool-btn" id="btn-tool-highlight" onclick="setSlideTool('highlight')" title="Tô dạ quang Highlight">

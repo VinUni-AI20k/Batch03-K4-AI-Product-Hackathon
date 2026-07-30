@@ -199,6 +199,119 @@ function updatePageUI() {
 
   updateActiveThumbnail(currentPage);
   resizeDrawCanvas();
+  updateNotesPanelUI();
+}
+
+// ============================================
+// Left Sidebar Tabs & Personal Notes Engine
+// ============================================
+
+const pageTextNotes = {
+  1: "Khái niệm nền tảng AI & LLM, mô hình tạo sinh GenAI."
+};
+
+function switchSidebarTab(tabName) {
+  document.querySelectorAll('.sidebar-tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.sidebar-panel').forEach(panel => panel.classList.remove('active'));
+
+  const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+  const targetPanel = document.getElementById(`panel-${tabName}`);
+
+  if (targetBtn) targetBtn.classList.add('active');
+  if (targetPanel) targetPanel.classList.add('active');
+
+  if (tabName === 'notes') {
+    updateNotesPanelUI();
+  }
+}
+
+function updateNotesPanelUI() {
+  const pageNumEl = document.getElementById('note-editor-page-num');
+  if (pageNumEl) pageNumEl.textContent = currentPage;
+
+  const textareaInput = document.getElementById('note-textarea-input');
+  if (textareaInput && document.activeElement !== textareaInput) {
+    textareaInput.value = pageTextNotes[currentPage] || '';
+  }
+
+  renderSavedNotesList();
+}
+
+function autoSaveCurrentNote() {
+  const textareaInput = document.getElementById('note-textarea-input');
+  if (!textareaInput) return;
+
+  const text = textareaInput.value.trim();
+  if (text) {
+    pageTextNotes[currentPage] = text;
+  } else {
+    delete pageTextNotes[currentPage];
+  }
+
+  const statusEl = document.getElementById('note-saved-status');
+  if (statusEl) {
+    statusEl.textContent = 'Đã lưu';
+    setTimeout(() => {
+      statusEl.textContent = 'Đã tự động lưu';
+    }, 1200);
+  }
+
+  renderSavedNotesList();
+}
+
+function clearCurrentPageNote() {
+  delete pageTextNotes[currentPage];
+  const textareaInput = document.getElementById('note-textarea-input');
+  if (textareaInput) textareaInput.value = '';
+  renderSavedNotesList();
+}
+
+function renderSavedNotesList() {
+  const container = document.getElementById('saved-notes-list');
+  const counterEl = document.getElementById('saved-notes-counter');
+  const badgeEl = document.getElementById('sidebar-notes-badge');
+  if (!container) return;
+
+  const pageKeys = Object.keys(pageTextNotes).map(Number).sort((a, b) => a - b);
+  if (counterEl) counterEl.textContent = pageKeys.length;
+  if (badgeEl) badgeEl.textContent = pageKeys.length;
+
+  if (pageKeys.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:24px 12px;color:#94a3b8;font-size:0.75rem;">
+        Chưa có ghi chú nào.<br>Hãy viết ghi chú ở trên để lưu lại!
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = '';
+  pageKeys.forEach(pg => {
+    const card = document.createElement('div');
+    card.className = `saved-note-card ${pg === currentPage ? 'active' : ''}`;
+    card.onclick = () => {
+      goToSlidePage(pg);
+    };
+    card.innerHTML = `
+      <div class="saved-note-card-title">📝 Slide Trang ${pg}</div>
+      <div class="saved-note-card-text">${escapeHtml(pageTextNotes[pg])}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function askTutorAboutNote() {
+  const noteText = pageTextNotes[currentPage];
+  if (!noteText) {
+    alert('Hãy nhập nội dung ghi chú cho trang này trước khi hỏi AI!');
+    return;
+  }
+  sendTutorMsgWithText(`Giải thích và tư vấn thêm dựa trên Ghi chú của tôi ở trang ${currentPage}: "${noteText}"`);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ============================================
@@ -730,6 +843,10 @@ window.toggleThumbnailsBar = toggleThumbnailsBar;
 window.goToSlidePage = goToSlidePage;
 window.setSlideTool = setSlideTool;
 window.setPenColor = setPenColor;
+window.switchSidebarTab = switchSidebarTab;
+window.autoSaveCurrentNote = autoSaveCurrentNote;
+window.clearCurrentPageNote = clearCurrentPageNote;
+window.askTutorAboutNote = askTutorAboutNote;
 
 // ============================================
 // Initial Load
