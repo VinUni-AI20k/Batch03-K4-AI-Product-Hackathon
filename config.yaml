@@ -38,6 +38,11 @@ agent:
   student_memory_dir: students    # nằm trong vault
   language: vi
 
+security:
+  user_rate_per_minute: 10        # tối đa tin nhắn/user/phút (chống spam + đội chi phí LLM)
+  max_upload_mb: 32               # trần file gửi qua Discord (Telegram bị Bot API chặn 20MB sẵn)
+  # audit log: data/audit.log — ghi mọi sự kiện nhạy cảm (user bị chặn, ingest, cài pack, tạo lịch)
+
 # Knowledge packs — bộ bài học cài từ GitHub qua chat (agent chỉ được cài các repo
 # khai báo ở đây, không clone URL tuỳ ý). Thay repo bằng repo bài học thật của bạn.
 knowledge_packs:

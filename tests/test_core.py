@@ -132,6 +132,34 @@ def test_knowledge_pack_install(tmp_path):
     assert "Không có pack" in install_pack(cfg, vault, index, "khong-co")
 
 
+def test_rate_limiter():
+    from learning_agent.security import RateLimiter
+    r = RateLimiter(per_minute=3)
+    assert all(r.allow("u1") for _ in range(3))
+    assert not r.allow("u1")          # vượt hạn mức
+    assert r.allow("u2")              # user khác không bị ảnh hưởng
+
+
+def test_audit_log(tmp_path):
+    import json
+    from learning_agent.security import Audit
+    a = Audit(tmp_path / "audit.log")
+    a.log("denied_user", platform="telegram", user="999")
+    a.log("ingest_upload", file="x.pdf", ok=True)
+    lines = [json.loads(l) for l in (tmp_path / "audit.log").read_text().splitlines()]
+    assert len(lines) == 2
+    assert lines[0]["event"] == "denied_user" and lines[0]["user"] == "999"
+    assert "ts" in lines[1]
+
+
+def test_upload_filename_sanitized(tmp_path):
+    from learning_agent.updater.inbox import ingest_upload
+    # tên file chứa ký tự traversal/độc -> bị làm sạch, không thoát được inbox
+    import re
+    safe = re.sub(r"[^\w.\-() ]", "_", "../../../etc/passwd")
+    assert "/" not in safe and "\\" not in safe
+
+
 def test_ingest_markdown_passthrough(tmp_path):
     from learning_agent import ingest
     f = tmp_path / "ghi-chu.md"

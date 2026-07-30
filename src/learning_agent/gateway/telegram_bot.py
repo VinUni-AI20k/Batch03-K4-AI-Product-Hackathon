@@ -19,6 +19,7 @@ from telegram.ext import (
 from ..agent import TutorAgent
 from ..agent.subagent import run_quiz, run_summary
 from ..index import LessonIndex
+from ..security import Audit, RateLimiter
 from ..updater.inbox import ingest_upload
 from ..vault import Vault
 from .base import HomeStore, allowed_users, split_message
@@ -36,12 +37,23 @@ class TelegramGateway:
         self.index = index
         self.home = home
         self.allowed = allowed_users("TELEGRAM_ALLOWED_USERS")
+        if not self.allowed:
+            print("⚠️ TELEGRAM_ALLOWED_USERS trống — bot đang MỞ CHO MỌI NGƯỜI (chỉ nên dùng khi dev).")
+        self.audit = Audit(cfg.root / "data" / "audit.log")
+        self.rate = RateLimiter(int(cfg.get("security", "user_rate_per_minute", default=10)))
         self.histories: dict[int, deque] = defaultdict(lambda: deque(maxlen=HISTORY_TURNS))
         self.app = Application.builder().token(os.environ["TELEGRAM_BOT_TOKEN"]).build()
         self._register()
 
     def _ok(self, update: Update) -> bool:
-        return not self.allowed or str(update.effective_user.id) in self.allowed
+        uid = str(update.effective_user.id)
+        if self.allowed and uid not in self.allowed:
+            self.audit.log("denied_user", platform="telegram", user=uid)
+            return False
+        if not self.rate.allow(uid):
+            self.audit.log("rate_limited", platform="telegram", user=uid)
+            return False
+        return True
 
     # ---------- handlers ----------
     def _register(self) -> None:
@@ -135,6 +147,8 @@ class TelegramGateway:
         msg = await asyncio.to_thread(
             ingest_upload, self.cfg, self.vault, self.index, data, name
         )
+        self.audit.log("ingest_upload", platform="telegram",
+                       user=str(update.effective_user.id), file=name, ok="✅" in msg)
         await update.message.reply_text(msg)
 
     # ---------- lifecycle & notifier ----------

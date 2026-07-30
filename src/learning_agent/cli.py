@@ -104,6 +104,11 @@ def _onboard(cfg) -> None:
         if example.exists():
             shutil.copy(example, env_file)
             print(f"→ Đã tạo {env_file} từ .env.example — mở lên điền key.")
+    if env_file.exists():
+        env_file.chmod(0o600)  # chỉ chủ máy đọc được secrets
+    import os
+    if not (os.environ.get("TELEGRAM_ALLOWED_USERS") or os.environ.get("DISCORD_ALLOWED_USERS")):
+        print("⚠️ Allowlist trống — bot sẽ mở cho MỌI người. Điền *_ALLOWED_USERS trước khi chạy thật.")
     checks = [
         ("LLM_API_KEY (bắt buộc)", bool(cfg.llm_api_key)),
         ("DISCORD_BOT_TOKEN (kênh Discord)", bool(cfg.discord_token)),

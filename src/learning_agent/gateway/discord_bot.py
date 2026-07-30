@@ -18,6 +18,7 @@ from discord import app_commands
 from ..agent import TutorAgent
 from ..agent.subagent import run_quiz, run_summary
 from ..index import LessonIndex
+from ..security import Audit, RateLimiter
 from ..updater.inbox import ingest_upload
 from ..vault import Vault
 from .base import HomeStore, allowed_users, split_message
@@ -37,6 +38,11 @@ class TutorBot(discord.Client):
         self.index = index
         self.home = home
         self.allowed = allowed_users("DISCORD_ALLOWED_USERS")
+        if not self.allowed:
+            print("⚠️ DISCORD_ALLOWED_USERS trống — bot đang MỞ CHO MỌI NGƯỜI (chỉ nên dùng khi dev).")
+        self.audit = Audit(cfg.root / "data" / "audit.log")
+        self.rate = RateLimiter(int(cfg.get("security", "user_rate_per_minute", default=10)))
+        self.max_upload = int(cfg.get("security", "max_upload_mb", default=32)) * 1024 * 1024
         self.tree = app_commands.CommandTree(self)
         # session -> lịch sử hội thoại (giữ trong RAM; memory dài hạn đã có vault)
         self.histories: dict[int, deque] = defaultdict(lambda: deque(maxlen=HISTORY_TURNS))
@@ -44,7 +50,14 @@ class TutorBot(discord.Client):
         self._register_commands()
 
     def _ok(self, user) -> bool:
-        return not self.allowed or str(user.id) in self.allowed
+        uid = str(user.id)
+        if self.allowed and uid not in self.allowed:
+            self.audit.log("denied_user", platform="discord", user=uid)
+            return False
+        if not self.rate.allow(uid):
+            self.audit.log("rate_limited", platform="discord", user=uid)
+            return False
+        return True
 
     # ---------- chống loop ----------
     def _budget_ok(self) -> bool:
@@ -71,11 +84,18 @@ class TutorBot(discord.Client):
         # file đính kèm -> nạp vào tài liệu học tập
         if message.attachments:
             for att in message.attachments:
+                if att.size > self.max_upload:
+                    await message.channel.send(
+                        f"⚠️ `{att.filename}` quá {self.max_upload // (1024*1024)}MB — bỏ vào source_mirror/ giúp mình."
+                    )
+                    continue
                 note = await message.channel.send(f"📥 Nhận `{att.filename}` — đang xử lý…")
                 data = await att.read()
                 msg = await asyncio.to_thread(
                     ingest_upload, self.cfg, self.vault, self.index, data, att.filename
                 )
+                self.audit.log("ingest_upload", platform="discord",
+                               user=str(message.author.id), file=att.filename, ok="✅" in msg)
                 await note.edit(content=msg)
             if not message.content.strip().replace(self.user.mention, "").strip():
                 return

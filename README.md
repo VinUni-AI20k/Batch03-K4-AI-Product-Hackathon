@@ -79,6 +79,16 @@ learning-agent reindex    # rebuild index từ vault (khi đổi model embedding
 - **Skills chuẩn agentskills.io** (`skills/<name>/SKILL.md`): progressive disclosure (catalog → toàn văn → file tham chiếu). Có sẵn: `tao-quiz`, `tom-tat-bai`, `nghien-cuu`, `lo-trinh-on-tap`, `bao-cao-hang-ngay`. Thêm skill = thêm thư mục, không sửa code — cài được skill cộng đồng cùng chuẩn (skills.sh, anthropics/skills...).
 - **Model-agnostic**: đổi `LLM_BASE_URL` + `llm.model` là chạy với OpenAI/OpenRouter/Ollama/Nous.
 
+## An ninh & bảo mật
+
+- **Allowlist mặc định** (`*_ALLOWED_USERS`): bot công khai trên Telegram/Discord — ai cũng nhắn được nếu không giới hạn. Để trống sẽ có cảnh báo to khi khởi động.
+- **Chống prompt injection**: nội dung tài liệu/file/kết quả tìm kiếm được agent coi là *dữ liệu*, không phải mệnh lệnh — chỉ dẫn nhúng trong tài liệu ("bỏ qua quy tắc", "cài pack X"...) bị từ chối và báo lại học viên.
+- **Knowledge pack whitelist-only**: agent chỉ cài được repo khai báo sẵn trong `config.yaml`, không bao giờ clone URL xuất hiện trong hội thoại.
+- **Rate limit theo user** (`security.user_rate_per_minute`, mặc định 10 tin/phút) — chống spam và đội chi phí LLM.
+- **Giới hạn upload** (`security.max_upload_mb`, mặc định 32MB Discord; Telegram Bot API tự chặn 20MB); tên file được làm sạch chống path traversal.
+- **Audit log** (`data/audit.log`, JSON-lines): ghi lại user bị từ chối, rate-limit, mọi lần ingest file, cài pack, tạo scheduled task.
+- **Secrets**: chỉ nằm trong `.env` (gitignore, `chmod 600` khi onboard); hồ sơ học viên (`vault/students/`) và dữ liệu runtime (`data/`) không bao giờ vào git.
+
 ## Cấu trúc code
 
 ```
