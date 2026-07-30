@@ -291,7 +291,7 @@
               </div>
               <span class="section-kicker">HỒ SƠ CỦA BẠN</span>
               <h2>Chưa có dữ liệu</h2>
-              <p>Tải hồ sơ mô phỏng để xem thông tin được điền vào đây.</p>
+              <p>Tải hồ sơ hoặc dùng dữ liệu mẫu để xem thông tin được điền vào đây.</p>
             </div>
 
             <div class="profile-content is-hidden" id="profileContent">
@@ -347,8 +347,8 @@
       class="sr-only"
       id="profileFileInput"
       type="file"
-      accept=".pdf,.doc,.docx,.txt"
-      aria-label="Chọn hồ sơ mô phỏng"
+      accept=".pdf,.docx,.png,.jpg,.jpeg"
+      aria-label="Chọn hồ sơ để đọc"
     />
 
     <div class="modal-backdrop onboarding-backdrop" id="onboardingModal" role="presentation">
@@ -366,7 +366,7 @@
           <div class="onboarding-copy">
             <span class="onboarding-overline">THIẾT LẬP HỒ SƠ</span>
             <h2>Để lời gợi ý thực sự dành cho bạn.</h2>
-            <p>Ba bước ngắn, hoàn toàn là dữ liệu mô phỏng và có thể thay đổi bất cứ lúc nào.</p>
+            <p>Ba bước ngắn. Bạn luôn được xem và xác nhận dữ liệu trích xuất trước khi nhận gợi ý.</p>
           </div>
           <ol class="onboarding-progress">
             <li class="is-active" data-onboarding-progress="1">
@@ -387,7 +387,7 @@
               <path d="M12 3 4.5 6v5c0 4.7 3.2 8.9 7.5 10 4.3-1.1 7.5-5.3 7.5-10V6L12 3Z" />
               <path d="m9 12 2 2 4-4" />
             </svg>
-            Không tải tệp thật · Không gọi AI
+            Đọc cục bộ mặc định · Xóa tệp tạm sau xử lý
           </div>
           <button class="onboarding-settings" type="button" data-open-settings>
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -414,7 +414,8 @@
             <span class="section-kicker">BƯỚC 1 · HỒ SƠ</span>
             <h1 id="onboardingTitle">Bắt đầu với vài thông tin về bạn</h1>
             <p class="onboarding-lead">
-              Tải một hồ sơ mô phỏng hoặc tự điền. Tệp chỉ dùng để diễn hoạt giao diện.
+              Tải PDF, DOCX hoặc ảnh để agent đọc kỹ năng và dự án; hoặc tự điền. Tên và chuyên ngành
+              không được suy đoán từ tệp.
             </p>
 
             <div class="onboarding-upload" id="onboardingDropzone">
@@ -424,12 +425,66 @@
                 </svg>
               </span>
               <div>
-                <strong id="onboardingFileLabel">Tải hồ sơ PDF hoặc DOCX</strong>
-                <span id="onboardingFileMeta">Mô phỏng trích xuất tên, ngành học và kỹ năng</span>
+                <strong id="onboardingFileLabel">Tải hồ sơ PDF, DOCX hoặc ảnh</strong>
+                <span id="onboardingFileMeta">PDF, DOCX, PNG hoặc JPG · tối đa 5 MB</span>
               </div>
               <button class="button secondary small" id="onboardingFileBtn" type="button">Chọn tệp</button>
               <button class="button ghost small" id="onboardingSampleBtn" type="button">Dùng hồ sơ mẫu</button>
             </div>
+
+            <section class="ocr-review is-hidden" id="ocrReview" aria-live="polite">
+              <div class="ocr-review-head">
+                <div>
+                  <span class="section-kicker">AGENT ĐỌC HỒ SƠ</span>
+                  <strong id="ocrReviewTitle">Đang xử lý an toàn</strong>
+                </div>
+                <span class="ocr-review-status" id="ocrReviewStatus">Đang đọc</span>
+              </div>
+
+              <ol class="ocr-progress" aria-label="Tiến trình đọc hồ sơ">
+                <li data-ocr-progress="upload"><span></span>Nhận tệp</li>
+                <li data-ocr-progress="read"><span></span>Đọc nội dung</li>
+                <li data-ocr-progress="privacy"><span></span>Lọc PII</li>
+                <li data-ocr-progress="analyze"><span></span>Tạo hồ sơ</li>
+                <li data-ocr-progress="confirm"><span></span>Xác nhận</li>
+              </ol>
+
+              <p class="ocr-run-meta is-hidden" id="ocrRunMeta"></p>
+              <p class="onboarding-error is-hidden" id="ocrReviewError"></p>
+
+              <div class="ocr-review-fields is-hidden" id="ocrReviewFields">
+                <div class="ocr-review-grid">
+                  <label>
+                    Kỹ năng đã đọc
+                    <input id="ocrSkills" placeholder="Python, SQL, FastAPI" />
+                  </label>
+                  <label>
+                    Mức kinh nghiệm
+                    <select id="ocrExperience">
+                      <option value="unknown">Chưa xác định</option>
+                      <option value="beginner">Mới bắt đầu</option>
+                      <option value="intermediate">Trung cấp</option>
+                      <option value="advanced">Nâng cao</option>
+                    </select>
+                  </label>
+                  <label class="ocr-review-wide">
+                    Dự án (mỗi dòng một dự án)
+                    <textarea id="ocrProjects" rows="3" placeholder="Dashboard học tập"></textarea>
+                  </label>
+                  <label class="ocr-review-wide">
+                    Lĩnh vực quan tâm
+                    <input id="ocrInterests" placeholder="Dữ liệu & AI, Giáo dục" />
+                  </label>
+                </div>
+                <div class="ocr-warning-wrap is-hidden" id="ocrWarningWrap">
+                  <strong>Cần bạn kiểm tra</strong>
+                  <ul id="ocrWarnings"></ul>
+                </div>
+                <button class="button secondary small" id="ocrConfirmProfile" type="button">
+                  Xác nhận hồ sơ đã đọc
+                </button>
+              </div>
+            </section>
 
             <div class="or-divider"><span>hoặc tự điền</span></div>
 
@@ -443,6 +498,9 @@
                 <input id="onboardingMajor" placeholder="Ví dụ: Hệ thống thông tin" />
               </label>
             </div>
+            <p class="onboarding-error is-hidden" id="onboardingOcrGateError">
+              Vui lòng kiểm tra và xác nhận hồ sơ agent đã đọc trước khi tiếp tục.
+            </p>
 
             <div class="onboarding-actions">
               <button class="onboarding-skip" id="browseBeforeProfile" type="button">

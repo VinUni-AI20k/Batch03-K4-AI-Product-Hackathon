@@ -795,6 +795,12 @@ svg {
   transform: translateY(-1px);
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+  transform: none;
+}
+
 .button.primary {
   color: #fff;
   background: var(--coral);
@@ -2190,6 +2196,184 @@ svg {
   font-size: 8px;
 }
 
+.ocr-review {
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #d8e1dd;
+  border-radius: 13px;
+  background: #fbfdfc;
+}
+
+.ocr-review-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ocr-review-head .section-kicker {
+  display: block;
+  color: var(--coral-dark);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+}
+
+.ocr-review-head strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.ocr-review-status {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: var(--forest);
+  background: var(--mint);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.ocr-progress {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ocr-progress li {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 7px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ocr-progress li span {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #cbd7d2;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.ocr-progress li.is-active {
+  color: var(--forest);
+}
+
+.ocr-progress li.is-active span {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(239, 133, 89, 0.14);
+}
+
+.ocr-progress li.is-complete {
+  color: var(--forest);
+}
+
+.ocr-progress li.is-complete span {
+  border-color: #67bf91;
+  background: #67bf91;
+}
+
+.ocr-progress li.is-failed {
+  color: var(--danger);
+}
+
+.ocr-progress li.is-failed span {
+  border-color: var(--danger);
+  background: #fff2ee;
+}
+
+.ocr-run-meta {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 7px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ocr-review-fields {
+  margin-top: 14px;
+}
+
+.ocr-review-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 155px;
+  gap: 10px;
+}
+
+.ocr-review-grid label {
+  display: grid;
+  gap: 6px;
+  color: #52655f;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.ocr-review-grid input,
+.ocr-review-grid select,
+.ocr-review-grid textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #d5dcd8;
+  border-radius: 8px;
+  outline: 0;
+  color: var(--ink);
+  background: #fff;
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.ocr-review-grid input,
+.ocr-review-grid select {
+  height: 36px;
+}
+
+.ocr-review-grid textarea {
+  min-height: 62px;
+  resize: vertical;
+}
+
+.ocr-review-grid :is(input, select, textarea):focus {
+  border-color: #7da696;
+  box-shadow: 0 0 0 3px rgba(125, 166, 150, 0.1);
+}
+
+.ocr-review-wide {
+  grid-column: 1 / -1;
+}
+
+.ocr-warning-wrap {
+  margin: 10px 0;
+  padding: 9px 10px;
+  border-left: 3px solid #d49a48;
+  border-radius: 6px;
+  color: #745423;
+  background: #fff9ec;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.ocr-warning-wrap strong {
+  display: block;
+}
+
+.ocr-warning-wrap ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+}
+
+.ocr-review-fields > .button {
+  margin-top: 10px;
+}
+
 .or-divider {
   position: relative;
   margin: 22px 0;
@@ -3543,6 +3727,7 @@ svg {
   }
 
   .onboarding-form-grid,
+  .ocr-review-grid,
   .onboarding-interest-grid,
   .onboarding-difficulty {
     grid-template-columns: 1fr;
@@ -3681,6 +3866,9 @@ html[data-theme="dark"] :is(
   .catalog-filters select,
   .topic-card,
   .onboarding-form-grid input,
+  .ocr-review-grid input,
+  .ocr-review-grid select,
+  .ocr-review-grid textarea,
   .onboarding-interest-grid button,
   .onboarding-skill-grid button,
   .onboarding-large-options button,
@@ -3702,6 +3890,7 @@ html[data-theme="dark"] :is(
   .segmented,
   .catalog-search,
   .onboarding-upload,
+  .ocr-review,
   .icon-button,
   .modal-note,
   .drawer-score-row,
@@ -3788,6 +3977,7 @@ html[data-theme="dark"] :is(
   .topic-team,
   .topic-card > p,
   .onboarding-form-grid label,
+  .ocr-review-grid label,
   .onboarding-fieldset > span,
   .onboarding-interest-grid button,
   .onboarding-skill-grid button,

@@ -29,7 +29,8 @@ http://localhost:8000/codebase/
 ## Luồng có thể trình diễn
 
 1. Hoàn tất popup ba bước: hồ sơ, sở thích/kỹ năng và cách thực hiện.
-2. Có thể chọn **Dùng hồ sơ mẫu** hoặc một tệp PDF/DOCX/TXT mô phỏng.
+2. Có thể chọn **Dùng hồ sơ mẫu** hoặc tải PDF/DOCX/PNG/JPG để agent đọc thật qua
+   service OCR cục bộ ở cổng `8080`.
 3. Xem ba đề tài được xếp hạng từ `../mock-data.json`.
 4. Chuyển sang **Kho đề tài** để tìm kiếm, lọc lĩnh vực/quy mô nhóm và sắp xếp toàn bộ dữ liệu.
 5. Bấm bất kỳ đề tài nào để xem lý do phù hợp và hướng dẫn setup bốn bước.
@@ -43,11 +44,14 @@ http://localhost:8000/codebase/
 - Tùy chọn giảm chuyển động hỗ trợ người dùng nhạy cảm với hiệu ứng.
 - Các lựa chọn chỉ được lưu trong `localStorage` của trình duyệt, không gửi ra ngoài.
 
-## Phần AI thật vs. phần mô phỏng
+## Phần chạy thật vs. phần mô phỏng
 
 - **AI thật**: quyết định trung tâm — xếp hạng 3 đề tài + sinh lý do/cảnh báo rủi ro — gọi model qua `codebase/server/main.py` (`POST /recommend`), log đầy đủ request/response/latency vào `codebase/server/logs/recommend_calls.jsonl` (không commit, xem `.gitignore`).
+- **Đọc hồ sơ thật, local-first**: `POST /api/ocr/parse` ở `backend/` kiểm tra
+  signature/MIME, đọc PDF/DOCX, OCR ảnh bằng Tesseract, redact PII và trả form có
+  evidence để người dùng sửa/xác nhận. Xem [`backend/README.md`](../backend/README.md).
 - **Mô phỏng còn lại**:
-  - Upload CV/hồ sơ (`populateProfileFromSimulatedFile`) vẫn hardcode kết quả, chưa đọc file thật.
+  - Nút **Dùng hồ sơ mẫu** vẫn điền dữ liệu giả, không gọi OCR.
   - Điểm số `%` trong Kho đề tài (catalog search) vẫn dùng quy tắc cố định (`scoreCatalogProject`) — chỉ luồng advisor 3 bước gọi AI.
   - Nếu backend AI không phản hồi (lỗi mạng, thiếu key), UI tự rơi về xếp hạng quy tắc cố định và **nói rõ trong chat** đây là fallback, không giả vờ là kết quả AI.
   - Form đề xuất đề tài chỉ tồn tại trong bộ nhớ phiên trình duyệt.

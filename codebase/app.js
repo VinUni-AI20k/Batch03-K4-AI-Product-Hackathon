@@ -5,7 +5,7 @@ const fallbackProjects = [
     stt: 1,
     khoi: "DATA - Nền tảng dữ liệu",
     ma_de: "DATA-001",
-    ten_de_tai: "Phát hiện báo cáo kinh doanh có dữ liệu bất thường",
+    ten_de_tai: "Phát hiện sai lệch báo cáo kinh doanh",
     job_executor: "Kỹ sư chất lượng dữ liệu",
     thuc_trang: "Theo dõi và kiểm tra dữ liệu trước khi đưa vào báo cáo.",
     pain_point: "Các quy tắc cố định khó phát hiện sai lệch nghiệp vụ và thay đổi phân phối dữ liệu.",
@@ -30,7 +30,7 @@ const fallbackProjects = [
     stt: 2,
     khoi: "EDU - Giáo dục và nghiên cứu",
     ma_de: "EDU-001",
-    ten_de_tai: "Hỗ trợ sớm sinh viên có nguy cơ trượt môn",
+    ten_de_tai: "Dự báo sinh viên có nguy cơ trượt môn",
     job_executor: "Cố vấn học tập",
     thuc_trang: "Theo dõi kết quả học tập, tiến độ bài tập và mức độ tham gia.",
     pain_point: "Dữ liệu học tập nằm rải rác khiến cố vấn khó phát hiện sớm.",
@@ -55,7 +55,7 @@ const fallbackProjects = [
     stt: 3,
     khoi: "BO - Back-office và nghiệp vụ nội bộ",
     ma_de: "BO-001",
-    ten_de_tai: "Kiểm tra hồ sơ hóa đơn trước khi phê duyệt",
+    ten_de_tai: "Kiểm tra hồ sơ hóa đơn nhà cung cấp",
     job_executor: "Chuyên viên kế toán công nợ phải trả",
     thuc_trang: "Đối chiếu hóa đơn với đơn mua và biên bản nhận hàng.",
     pain_point: "Hóa đơn đến từ nhiều kênh và định dạng khác nhau.",
@@ -166,6 +166,19 @@ const appearanceSettings = readAppearanceSettings();
 let appearanceTrigger = null;
 
 const API_BASE = window.DETAI_API_BASE || "http://localhost:8001";
+const OCR_API_BASE = window.DETAI_OCR_API_BASE || "http://localhost:8080";
+
+const ocrWarningLabels = {
+  OCR_LANGUAGE_UNAVAILABLE: "Thiếu gói ngôn ngữ OCR được yêu cầu; agent đã dùng ngôn ngữ có sẵn.",
+  OCR_LOW_CONFIDENCE: "Một phần nội dung ảnh có độ tin cậy thấp.",
+  NO_MEANINGFUL_TEXT: "Tệp có quá ít nội dung đọc được.",
+  PROMPT_INJECTION_DETECTED: "Phát hiện câu lệnh trong tài liệu; agent chỉ coi đó là dữ liệu không tin cậy.",
+  LLM_UNAVAILABLE: "Bộ phân tích tùy chọn không khả dụng; agent đã dùng quy tắc cục bộ.",
+  LLM_INVALID_JSON: "Kết quả phân tích tùy chọn không hợp lệ; agent đã dùng quy tắc cục bộ.",
+  EXTERNAL_PROCESSING_CONSENT_REQUIRED: "Không có đồng ý xử lý ngoài máy; agent chỉ xử lý cục bộ.",
+  EXTERNAL_VISION_DISABLED_FOR_PRIVACY: "Ảnh không được gửi ra ngoài vì không thể bảo đảm che PII.",
+  TEMP_FILE_DELETE_FAILED: "Không thể xác nhận đã xóa toàn bộ tệp tạm; quản trị viên cần kiểm tra.",
+};
 
 const state = {
   stage: "profile",
@@ -174,6 +187,12 @@ const state = {
   profileLoaded: false,
   profileName: "",
   profileMajor: "",
+  ocrProfile: null,
+  ocrRunId: null,
+  ocrConfirmed: false,
+  ocrRequestToken: 0,
+  extractedProjects: [],
+  experienceLevel: "unknown",
   interest: null,
   skills: ["Python", "SQL", "Phân tích dữ liệu"],
   teamSize: 4,
@@ -247,6 +266,20 @@ function cacheElements() {
     "onboardingSampleBtn",
     "onboardingFileLabel",
     "onboardingFileMeta",
+    "ocrReview",
+    "ocrReviewTitle",
+    "ocrReviewStatus",
+    "ocrRunMeta",
+    "ocrReviewError",
+    "ocrReviewFields",
+    "ocrSkills",
+    "ocrExperience",
+    "ocrProjects",
+    "ocrInterests",
+    "ocrWarningWrap",
+    "ocrWarnings",
+    "ocrConfirmProfile",
+    "onboardingOcrGateError",
     "onboardingName",
     "onboardingMajor",
     "onboardingNext1",
@@ -316,7 +349,7 @@ function bindGlobalEvents() {
 
   refs.profileFileInput.addEventListener("change", (event) => {
     const [file] = event.target.files;
-    if (file) populateProfileFromSimulatedFile(file);
+    if (file) void readProfileFile(file);
   });
 
   refs.composerAttach.addEventListener("click", () => openOnboarding(1));
@@ -366,6 +399,11 @@ function bindGlobalEvents() {
 
   refs.onboardingFileBtn.addEventListener("click", openFilePicker);
   refs.onboardingSampleBtn.addEventListener("click", useSampleProfile);
+  refs.ocrConfirmProfile.addEventListener("click", confirmExtractedProfile);
+  [refs.ocrSkills, refs.ocrProjects, refs.ocrInterests, refs.ocrExperience].forEach((field) => {
+    field.addEventListener("input", markOcrReviewDirty);
+    field.addEventListener("change", markOcrReviewDirty);
+  });
   refs.onboardingNext1.addEventListener("click", completeOnboardingStepOne);
   refs.onboardingNext2.addEventListener("click", completeOnboardingStepTwo);
   refs.completeOnboarding.addEventListener("click", finishOnboarding);
@@ -499,9 +537,180 @@ function syncOnboardingSelections() {
   });
 }
 
-function populateProfileFromSimulatedFile(file) {
+async function readProfileFile(file) {
+  resetOcrReview();
+  const requestToken = state.ocrRequestToken;
+  refs.ocrReview.classList.remove("is-hidden");
+  refs.ocrReviewTitle.textContent = "Đang xử lý an toàn";
+  refs.ocrReviewStatus.textContent = "Đang đọc";
   refs.onboardingFileLabel.textContent = file.name;
-  refs.onboardingFileMeta.textContent = `${formatFileSize(file.size)} · Đã trích xuất mô phỏng`;
+  refs.onboardingFileMeta.textContent = `${formatFileSize(file.size)} · Đang gửi tới agent đọc hồ sơ`;
+  refs.onboardingFileBtn.disabled = true;
+  refs.onboardingSampleBtn.disabled = true;
+  setOcrProgress(["upload"], "read");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("use_llm", "false");
+  formData.append("language_hint", "vie+eng");
+  formData.append("consent_external_processing", "false");
+
+  try {
+    const response = await fetch(`${OCR_API_BASE}/api/ocr/parse`, {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (requestToken !== state.ocrRequestToken) return;
+    if (!response.ok) {
+      throw new Error(payload?.detail?.message || `Agent đọc hồ sơ trả về lỗi ${response.status}.`);
+    }
+
+    state.ocrProfile = payload.profile;
+    state.ocrRunId = payload.run_id;
+    state.ocrConfirmed = false;
+    renderExtractedProfile(payload);
+    refs.onboardingFileMeta.textContent = `${formatFileSize(file.size)} · Đã đọc xong, cần bạn xác nhận`;
+  } catch (error) {
+    if (requestToken !== state.ocrRequestToken) return;
+    const message =
+      error instanceof TypeError
+        ? "Không kết nối được agent đọc hồ sơ tại cổng 8080. Bạn vẫn có thể tự điền hồ sơ."
+        : error.message;
+    refs.ocrReviewTitle.textContent = "Chưa thể đọc hồ sơ";
+    refs.ocrReviewStatus.textContent = "Có lỗi";
+    refs.ocrReviewError.textContent = message;
+    refs.ocrReviewError.classList.remove("is-hidden");
+    refs.onboardingFileMeta.textContent = `${formatFileSize(file.size)} · Chưa xử lý được`;
+    setOcrProgress(["upload"], null, "read");
+  } finally {
+    if (requestToken === state.ocrRequestToken) {
+      refs.onboardingFileBtn.disabled = false;
+      refs.onboardingSampleBtn.disabled = false;
+    }
+  }
+}
+
+function renderExtractedProfile(payload) {
+  const profile = payload.profile || {};
+  const skills = (profile.skills || []).map((skill) => skill.name).filter(Boolean);
+  const projects = (profile.projects || [])
+    .map((project) => project.title || String(project.description || "").split("\n")[0])
+    .filter(Boolean);
+  const interests = (profile.interests || []).filter(Boolean);
+  const questions = (profile.uncertain_fields || [])
+    .map((item) => item.question_for_user)
+    .filter(Boolean);
+  const warningCodes = [...new Set([...(payload.warnings || []), ...(profile.warnings || [])])];
+
+  refs.ocrSkills.value = skills.join(", ");
+  refs.ocrProjects.value = projects.join("\n");
+  refs.ocrInterests.value = interests.join(", ");
+  refs.ocrExperience.value = ["beginner", "intermediate", "advanced", "unknown"].includes(
+    profile.experience_level,
+  )
+    ? profile.experience_level
+    : "unknown";
+  refs.ocrRunMeta.textContent = `Run ID: ${payload.run_id} · Văn bản thô không được hiển thị hoặc lưu trong nhật ký.`;
+  refs.ocrRunMeta.classList.remove("is-hidden");
+  refs.ocrReviewTitle.textContent = "Kiểm tra hồ sơ agent đã đọc";
+  refs.ocrReviewStatus.textContent = "Cần xác nhận";
+  refs.ocrReviewFields.classList.remove("is-hidden");
+  refs.ocrReviewError.classList.add("is-hidden");
+
+  const notices = [
+    ...warningCodes.map((code) => ocrWarningLabels[code] || `Cảnh báo xử lý: ${code}`),
+    ...questions,
+  ];
+  refs.ocrWarnings.innerHTML = notices.map((notice) => `<li>${escapeHtml(notice)}</li>`).join("");
+  refs.ocrWarningWrap.classList.toggle("is-hidden", notices.length === 0);
+  setOcrProgress(["upload", "read", "privacy", "analyze"], "confirm");
+}
+
+function confirmExtractedProfile() {
+  if (!state.ocrProfile) return;
+  const skills = splitProfileValues(refs.ocrSkills.value);
+  const projects = refs.ocrProjects.value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const interests = splitProfileValues(refs.ocrInterests.value);
+
+  state.skills = skills;
+  state.extractedProjects = projects;
+  state.experienceLevel = refs.ocrExperience.value;
+  state.interest = inferInterestFromOcr(interests) || state.interest;
+  state.ocrConfirmed = true;
+
+  refs.ocrReviewStatus.textContent = "Đã xác nhận";
+  refs.ocrConfirmProfile.textContent = "Đã xác nhận · Bấm để cập nhật";
+  refs.onboardingOcrGateError.classList.add("is-hidden");
+  setOcrProgress(["upload", "read", "privacy", "analyze", "confirm"]);
+  syncOnboardingSelections();
+}
+
+function markOcrReviewDirty() {
+  if (!state.ocrProfile) return;
+  state.ocrConfirmed = false;
+  refs.ocrReviewStatus.textContent = "Cần xác nhận lại";
+  refs.ocrConfirmProfile.textContent = "Xác nhận hồ sơ đã đọc";
+  setOcrProgress(["upload", "read", "privacy", "analyze"], "confirm");
+}
+
+function splitProfileValues(value) {
+  return [...new Set(value.split(/[,;\n]/).map((item) => item.trim()).filter(Boolean))];
+}
+
+function inferInterestFromOcr(interests) {
+  const corpus = normalize(interests.join(" "));
+  return (
+    interestOptions.find((option) => {
+      const rule = interestRules[option.id];
+      return (
+        corpus.includes(normalize(rule.label)) ||
+        rule.keywords.some((keyword) => corpus.includes(normalize(keyword)))
+      );
+    })?.id || null
+  );
+}
+
+function setOcrProgress(completed, active = null, failed = null) {
+  document.querySelectorAll("[data-ocr-progress]").forEach((item) => {
+    const stage = item.dataset.ocrProgress;
+    item.classList.toggle("is-complete", completed.includes(stage));
+    item.classList.toggle("is-active", stage === active);
+    item.classList.toggle("is-failed", stage === failed);
+  });
+}
+
+function resetOcrReview() {
+  state.ocrRequestToken += 1;
+  state.ocrProfile = null;
+  state.ocrRunId = null;
+  state.ocrConfirmed = false;
+  state.extractedProjects = [];
+  state.experienceLevel = "unknown";
+  refs.ocrReview.classList.add("is-hidden");
+  refs.ocrReviewFields.classList.add("is-hidden");
+  refs.ocrRunMeta.classList.add("is-hidden");
+  refs.ocrReviewError.classList.add("is-hidden");
+  refs.ocrWarningWrap.classList.add("is-hidden");
+  refs.onboardingOcrGateError.classList.add("is-hidden");
+  refs.ocrSkills.value = "";
+  refs.ocrProjects.value = "";
+  refs.ocrInterests.value = "";
+  refs.ocrExperience.value = "unknown";
+  refs.ocrWarnings.innerHTML = "";
+  refs.ocrConfirmProfile.textContent = "Xác nhận hồ sơ đã đọc";
+  refs.onboardingFileBtn.disabled = false;
+  refs.onboardingSampleBtn.disabled = false;
+  setOcrProgress([]);
+}
+
+function populateProfileFromSimulatedFile(file) {
+  resetOcrReview();
+  refs.onboardingFileLabel.textContent = file.name;
+  refs.onboardingFileMeta.textContent = `${formatFileSize(file.size)} · Hồ sơ mẫu đã được điền`;
   refs.onboardingName.value = "Trần Minh Anh";
   refs.onboardingMajor.value = "Hệ thống thông tin";
   state.profileName = refs.onboardingName.value;
@@ -519,6 +728,11 @@ function useSampleProfile() {
 }
 
 function completeOnboardingStepOne() {
+  if (state.ocrProfile && !state.ocrConfirmed) {
+    refs.onboardingOcrGateError.classList.remove("is-hidden");
+    refs.ocrConfirmProfile.focus();
+    return;
+  }
   const name = refs.onboardingName.value.trim();
   const major = refs.onboardingMajor.value.trim();
   if (name) refs.onboardingName.removeAttribute("aria-invalid");
@@ -1720,6 +1934,11 @@ function resetDemo() {
   state.profileLoaded = false;
   state.profileName = "";
   state.profileMajor = "";
+  state.ocrProfile = null;
+  state.ocrRunId = null;
+  state.ocrConfirmed = false;
+  state.extractedProjects = [];
+  state.experienceLevel = "unknown";
   state.interest = null;
   state.skills = ["Python", "SQL", "Phân tích dữ liệu"];
   state.teamSize = 4;
@@ -1727,10 +1946,11 @@ function resetDemo() {
   state.recommendations = [];
   state.catalogLimit = 12;
   refs.profileFileInput.value = "";
+  resetOcrReview();
   refs.onboardingName.value = "";
   refs.onboardingMajor.value = "";
-  refs.onboardingFileLabel.textContent = "Tải hồ sơ PDF hoặc DOCX";
-  refs.onboardingFileMeta.textContent = "Mô phỏng trích xuất tên, ngành học và kỹ năng";
+  refs.onboardingFileLabel.textContent = "Tải hồ sơ PDF, DOCX hoặc ảnh";
+  refs.onboardingFileMeta.textContent = "PDF, DOCX, PNG hoặc JPG · tối đa 5 MB";
   refs.profileEmpty.classList.remove("is-hidden");
   refs.profileContent.classList.add("is-hidden");
   refs.fitSummary.classList.add("is-hidden");
