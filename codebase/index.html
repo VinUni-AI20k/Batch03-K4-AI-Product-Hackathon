@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Buddy — Prototype (Mock)</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --muted: #6b7280;
+    --brand: #4f46e5;
+    --brand-dark: #4338ca;
+    --good: #16a34a;
+    --bad: #dc2626;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .app { width: 100%; max-width: 680px; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; font-size: 13px; color: var(--muted);
+  }
+  .badge-mock {
+    background: #fef3c7; color: #92400e; padding: 3px 10px;
+    border-radius: 999px; font-weight: 600; font-size: 12px;
+  }
+  .phase-tag {
+    display: inline-block; background: #eef2ff; color: var(--brand);
+    font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    padding: 3px 10px; border-radius: 6px; margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .card {
+    background: var(--card); border-radius: 16px; padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+    min-height: 380px; display: flex; flex-direction: column;
+  }
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  h2 { font-size: 17px; margin: 0 0 14px; }
+  h3 { font-size: 14px; margin: 0 0 8px; }
+  p.sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+  .spacer { flex: 1; }
+  .btn {
+    background: var(--brand); color: #fff; border: none; padding: 12px 20px;
+    border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .btn:hover { background: var(--brand-dark); }
+  .btn.secondary { background: transparent; color: var(--brand); border: 1px solid var(--border); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; margin-top: 8px; }
+  .checklist-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--border);
+  }
+  .checklist-item .dot {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink:0;
+  }
+  .checklist-item.done { color: var(--ink); }
+  .checklist-item.done .dot { background: var(--good); border-color: var(--good); color: #fff; }
+  select, textarea {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+    font-size: 14px; font-family: inherit; margin-bottom: 16px;
+  }
+  .progress { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .option {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 10px; cursor: pointer; font-size: 14px;
+  }
+  .option:hover { border-color: var(--brand); }
+  .option.selected { border-color: var(--brand); background: #eef2ff; font-weight: 600; }
+  .option.correct { border-color: var(--good); background: #dcfce7; }
+  .option.wrong { border-color: var(--bad); background: #fee2e2; }
+  .result-block { margin-bottom: 16px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { padding: 5px 12px; border-radius: 999px; font-size: 13px; }
+  .tag.good { background: #dcfce7; color: var(--good); }
+  .tag.bad { background: #fee2e2; color: var(--bad); }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 13px; }
+  .tab.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .citation {
+    display: inline-block; background: #eef2ff; color: var(--brand);
+    font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-left: 6px;
+  }
+  .mini-card {
+    border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px;
+  }
+  .mini-card .label { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; margin-bottom: 6px; }
+  .mini-card .body { font-size: 14px; line-height: 1.6; }
+  .practice-opt {
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+    margin-bottom: 6px; cursor: pointer; font-size: 13px;
+  }
+  .score-compare { display: flex; gap: 16px; margin: 16px 0; }
+  .score-box { flex: 1; text-align: center; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .score-box .num { font-size: 28px; font-weight: 700; color: var(--brand); }
+  .score-box .lbl { font-size: 12px; color: var(--muted); }
+  .review-item {
+    border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 13px;
+  }
+  .review-item .q { font-weight: 600; margin-bottom: 6px; }
+  .review-item .ans-wrong { color: var(--bad); }
+  .review-item .ans-correct { color: var(--good); }
+  .spinner {
+    width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--brand);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin: 40px auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span>Self Study Buddy — VLearn</span>
+    <span class="badge-mock">Prototype: Mock — nội dung AI hardcode, logic rẽ nhánh chạy thật</span>
+  </div>
+  <div class="card">
+
+    <!-- PHASE 1: Knowledge Preparation -->
+    <section class="screen active" data-screen="upload">
+      <div class="phase-tag">Phase 1 — Knowledge Preparation</div>
+      <h1>Slide bài giảng đã upload</h1>
+      <p class="sub">d1-slide-hackathon.pdf + transcript buổi 3 — hệ thống đang xử lý:</p>
+      <div id="checklist"></div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" id="uploadNextBtn" onclick="startRound1()" disabled>Bắt đầu làm quiz chẩn đoán →</button>
+      </div>
+    </section>
+
+    <!-- PHASE 2 (Q1) / PHASE 4 (RET, GRADE) shared quiz screen -->
+    <section class="screen" data-screen="quiz">
+      <div class="phase-tag" id="quizPhaseTag">Phase 2 — Learning Diagnosis</div>
+      <div class="progress" id="quizProgress">Câu 1/20</div>
+      <h2 id="quizQuestion">...</h2>
+      <div id="quizOptions"></div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" id="quizNextBtn" onclick="nextQuestion()" disabled>Câu tiếp →</button>
+      </div>
+    </section>
+
+    <!-- PHASE 2: Diagnosis result + DEC1 -->
+    <section class="screen" data-screen="diagnosis">
+      <div class="phase-tag">Phase 2 — Learning Diagnosis</div>
+      <h1>Kết quả chẩn đoán</h1>
+      <div class="result-block">
+        <h3>✅ Bạn đã tốt phần nào</h3>
+        <div class="tag-list" id="goodTags"></div>
+      </div>
+      <div class="result-block">
+        <h3>⚠️ Bạn cần cải thiện phần nào</h3>
+        <div class="tag-list" id="badTags"></div>
+      </div>
+      <p class="sub" id="dec1Note" style="margin-top:16px;"></p>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" id="dec1Btn" onclick="handleDec1()">Tiếp tục →</button>
+      </div>
+    </section>
+
+    <!-- PHASE 3: STYLE -->
+    <section class="screen" data-screen="style">
+      <div class="phase-tag">Phase 3 — Adaptive Re-teaching</div>
+      <h1>Bạn muốn ôn theo cách nào?</h1>
+      <p class="sub">Áp dụng cho các phần: <b id="styleWeakList"></b></p>
+      <select id="styleSelect">
+        <option value="intuitive">Trực quan — ví dụ thực tế, ít công thức</option>
+        <option value="mathematical">Toán học — đi sâu công thức, chứng minh</option>
+        <option value="both" selected>Cả hai</option>
+      </select>
+      <select id="timeSelect">
+        <option value="5">5 phút — tóm tắt siêu ngắn</option>
+        <option value="15" selected>15 phút — vừa đủ hiểu sâu</option>
+        <option value="30">30 phút — đầy đủ, có ví dụ mở rộng</option>
+      </select>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" onclick="generateRoadmap()">Tạo lộ trình ôn tập →</button>
+      </div>
+    </section>
+
+    <!-- PHASE 3: loading (AL + RM) -->
+    <section class="screen" data-screen="loading">
+      <div class="phase-tag">Phase 3 — Adaptive Re-teaching</div>
+      <div class="spacer"></div>
+      <div class="spinner"></div>
+      <p class="sub" style="text-align:center;">AI đang đối chiếu phần yếu với transcript và tạo lộ trình ôn tập...</p>
+      <div class="spacer"></div>
+    </section>
+
+    <!-- PHASE 3: Roadmap + Cards -->
+    <section class="screen" data-screen="roadmap">
+      <div class="phase-tag">Phase 3 — Adaptive Re-teaching</div>
+      <h1>Lộ trình ôn tập của bạn</h1>
+      <div class="tabs" id="roadmapTabs"></div>
+      <div id="roadmapCards"></div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" onclick="startRetest('reteach')">Tôi đã học xong — Kiểm tra lại →</button>
+      </div>
+    </section>
+
+    <!-- PHASE 4: DEC2 Yes -> REPORT -->
+    <section class="screen" data-screen="report">
+      <div class="phase-tag">Phase 4 — Learning Validation</div>
+      <h1>🎉 Đạt mức hiểu vững (Mastery)</h1>
+      <div class="score-compare">
+        <div class="score-box"><div class="num" id="scoreBefore">-</div><div class="lbl">Trước (Quiz ban đầu)</div></div>
+        <div class="score-box"><div class="num" id="scoreAfter">-</div><div class="lbl">Sau (Retest)</div></div>
+      </div>
+      <div class="result-block">
+        <h3>Phần đã xác nhận vững</h3>
+        <div class="tag-list" id="reportTags"></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn secondary" onclick="resetDemo()">↺ Làm lại từ đầu</button>
+      </div>
+    </section>
+
+    <!-- PHASE 4: DEC2 No -> REVIEW -->
+    <section class="screen" data-screen="review">
+      <div class="phase-tag">Phase 4 — Learning Validation</div>
+      <h1>Chưa đạt mức hiểu vững</h1>
+      <p class="sub">Xem lại câu sai kèm nguồn tham chiếu:</p>
+      <div id="reviewList"></div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" onclick="loopToStyle()">Ôn tập lại phần chưa vững →</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+// ================= Mock data (shaped like real data contracts) =================
+const SECTIONS = {
+  S1: { title: "Supervised Learning" },
+  S2: { title: "Unsupervised Learning" },
+  S3: { title: "Neural Network cơ bản" },
+  S4: { title: "Overfitting & Regularization" },
+  S5: { title: "Evaluation Metrics" },
+};
+
+const ROUND1_BANK = [
+  { id:"q1", section:"S1", text:"Trong Supervised Learning, dữ liệu huấn luyện cần có gì?",
+    options:["Không cần nhãn","Có nhãn (label) đầu ra","Chỉ cần đặc trưng ngẫu nhiên","Không cần dữ liệu"], correct:1 },
+  { id:"q2", section:"S1", text:"Bài toán nào sau đây là Supervised Learning?",
+    options:["Phân cụm khách hàng","Dự đoán giá nhà từ dữ liệu có giá thực tế","Giảm chiều dữ liệu","Học không có nhãn"], correct:1 },
+  { id:"q3", section:"S1", text:"Linear Regression thường dùng để giải bài toán gì?",
+    options:["Phân loại nhị phân","Dự đoán giá trị liên tục","Phân cụm","Sinh ảnh"], correct:1 },
+  { id:"q4", section:"S1", text:"Classification khác Regression ở điểm nào?",
+    options:["Classification dự đoán nhãn rời rạc, Regression dự đoán giá trị liên tục","Ngược lại hoàn toàn","Không khác gì nhau","Chỉ dùng cho dữ liệu ảnh"], correct:0 },
+
+  { id:"q5", section:"S2", text:"Unsupervised Learning khác Supervised ở điểm nào?",
+    options:["Không có nhãn đầu ra","Luôn cần nhãn","Không dùng dữ liệu","Chỉ dùng cho ảnh"], correct:0 },
+  { id:"q6", section:"S2", text:"K-Means là thuật toán thuộc nhóm nào?",
+    options:["Supervised","Clustering (Unsupervised)","Reinforcement","Regression"], correct:1 },
+  { id:"q7", section:"S2", text:"Mục tiêu chính của Clustering là gì?",
+    options:["Dự đoán nhãn có sẵn","Nhóm các điểm dữ liệu giống nhau lại","Tối ưu hàm mất mát có giám sát","Sinh dữ liệu mới"], correct:1 },
+  { id:"q8", section:"S2", text:"PCA thường dùng để làm gì?",
+    options:["Giảm chiều dữ liệu","Tăng số lượng nhãn","Sinh ảnh mới","Phân loại nhị phân"], correct:0 },
+
+  { id:"q9", section:"S3", text:"Một Neural Network cơ bản gồm các thành phần nào?",
+    options:["Chỉ có input layer","Input – Hidden – Output layer","Chỉ có output layer","Không có layer nào"], correct:1 },
+  { id:"q10", section:"S3", text:"Hàm kích hoạt (activation function) dùng để làm gì?",
+    options:["Giảm số lượng layer","Thêm tính phi tuyến cho mạng","Xoá dữ liệu nhiễu","Tăng tốc độ GPU"], correct:1 },
+  { id:"q11", section:"S3", text:"ReLU là hàm kích hoạt phổ biến vì lý do gì?",
+    options:["Tính toán đơn giản, tránh vanishing gradient","Luôn trả về giá trị âm","Không thể đạo hàm","Chỉ dùng cho ảnh"], correct:0 },
+  { id:"q12", section:"S3", text:"Backpropagation dùng để làm gì?",
+    options:["Cập nhật trọng số dựa trên gradient lỗi","Tăng tốc độ GPU","Xoá layer dư thừa","Sinh dữ liệu mới"], correct:0 },
+
+  { id:"q13", section:"S4", text:"Overfitting xảy ra khi nào?",
+    options:["Model học quá tốt trên train nhưng kém trên test","Model học kém cả train và test","Model không học gì cả","Dữ liệu quá ít nên không train được"], correct:0 },
+  { id:"q14", section:"S4", text:"Regularization giúp gì cho model?",
+    options:["Tăng độ phức tạp model","Giảm overfitting bằng cách phạt trọng số lớn","Xoá bớt dữ liệu train","Tăng tốc độ inference"], correct:1 },
+  { id:"q15", section:"S4", text:"Dropout hoạt động bằng cách nào?",
+    options:["Ngẫu nhiên tắt một số neuron khi train","Xoá hẳn 1 layer vĩnh viễn","Tăng learning rate","Giảm số lớp output"], correct:0 },
+  { id:"q16", section:"S4", text:"Early stopping là kỹ thuật gì?",
+    options:["Dừng train khi validation loss không giảm nữa","Dừng train ngay từ epoch đầu","Tăng learning rate đột ngột","Xoá dữ liệu validation"], correct:0 },
+
+  { id:"q17", section:"S5", text:"Accuracy đo lường điều gì?",
+    options:["Tỷ lệ dự đoán đúng trên tổng số mẫu","Số lượng layer trong model","Tốc độ train","Kích thước dữ liệu"], correct:0 },
+  { id:"q18", section:"S5", text:"Khi dữ liệu mất cân bằng (imbalanced), metric nào đáng tin hơn Accuracy?",
+    options:["F1-score","Số epoch","Learning rate","Batch size"], correct:0 },
+  { id:"q19", section:"S5", text:"Precision đo lường điều gì?",
+    options:["Trong các dự đoán positive, bao nhiêu % đúng thật","Tốc độ train","Số lượng layer","Kích thước dữ liệu"], correct:0 },
+  { id:"q20", section:"S5", text:"Recall đo lường điều gì?",
+    options:["Trong các mẫu positive thật, model tìm đúng được bao nhiêu %","Tốc độ inference","Batch size","Learning rate"], correct:0 },
+];
+
+const RETEST_BANK = {
+  S1: [
+    { id:"r1a", text:"Trong Supervised Learning, nhãn (label) đóng vai trò gì khi huấn luyện?",
+      options:["Là đáp án đúng để model học theo","Không ảnh hưởng gì","Dùng để xoá dữ liệu nhiễu","Chỉ dùng khi test"], correct:0 },
+    { id:"r1b", text:"Nếu bài toán không có nhãn đầu ra, đó có phải Supervised Learning không?",
+      options:["Có","Không — đó là Unsupervised Learning","Có, miễn đủ dữ liệu","Tuỳ model"], correct:1 },
+  ],
+  S2: [
+    { id:"r2a", text:"Muốn nhóm khách hàng theo hành vi mà không có nhãn sẵn, nên dùng cách nào?",
+      options:["Supervised Learning","Unsupervised Learning (Clustering)","Regression","Backpropagation"], correct:1 },
+    { id:"r2b", text:"K trong K-Means đại diện cho điều gì?",
+      options:["Số cụm cần chia","Số layer mạng","Tốc độ học","Số nhãn dữ liệu"], correct:0 },
+  ],
+  S3: [
+    { id:"r3a", text:"Vì sao Neural Network cần hàm kích hoạt phi tuyến?",
+      options:["Để mạng học được quan hệ phức tạp, phi tuyến","Để tính nhanh hơn","Để giảm số layer","Không có lý do đặc biệt"], correct:0 },
+    { id:"r3b", text:"Input layer trong Neural Network có vai trò gì?",
+      options:["Nhận dữ liệu đầu vào","Trả kết quả cuối cùng","Tính hàm mất mát","Lưu trọng số đã học"], correct:0 },
+  ],
+  S4: [
+    { id:"r4a", text:"Dấu hiệu nào cho thấy model đang overfitting?",
+      options:["Accuracy train cao nhưng test thấp hẳn","Accuracy train và test đều thấp","Model chạy nhanh hơn","Không có dấu hiệu nào"], correct:0 },
+    { id:"r4b", text:"Weight decay là một dạng của kỹ thuật nào?",
+      options:["Regularization","Data Augmentation","Clustering","Backpropagation"], correct:0 },
+  ],
+  S5: [
+    { id:"r5a", text:"Model dự đoán tất cả là 'không bệnh' trong tập 95% người không bệnh — Accuracy sẽ ra sao?",
+      options:["Rất cao dù model vô dụng","Rất thấp","Bằng 0","Không tính được"], correct:0 },
+    { id:"r5b", text:"F1-score được tính từ hai đại lượng nào?",
+      options:["Precision và Recall","Learning rate và Batch size","Train time và Test time","Số layer và số neuron"], correct:0 },
+  ],
+};
+
+const STUDY_CONTENT = {
+  S1: { cite:"T3-014",
+    summary:"Supervised Learning học từ dữ liệu đã có nhãn đúng — model học ánh xạ input → output dựa trên các cặp ví dụ có sẵn đáp án.",
+    example:"Ví dụ thực tế: dự đoán giá nhà dựa trên diện tích, vị trí — vì đã có sẵn lịch sử giá nhà thật (nhãn) để model học theo.",
+    practice:{ text:"Dự đoán khách hàng có rời bỏ dịch vụ hay không (dựa trên lịch sử có nhãn rời/ở lại) là bài toán gì?",
+      options:["Supervised Learning","Unsupervised Learning","Clustering","Không phải Machine Learning"], correct:0 } },
+  S2: { cite:"T3-021",
+    summary:"Unsupervised Learning không có nhãn — model tự tìm cấu trúc/nhóm ẩn trong dữ liệu.",
+    example:"Ví dụ: nhóm khách hàng thành các phân khúc dựa trên hành vi mua sắm mà không cần biết trước nhãn phân khúc nào.",
+    practice:{ text:"Nếu dữ liệu hoàn toàn không có nhãn, nên nghĩ tới nhóm thuật toán nào trước?",
+      options:["Supervised Learning","Unsupervised Learning","Regression có nhãn","Không thể học được"], correct:1 } },
+  S3: { cite:"T3-033",
+    summary:"Neural Network gồm Input – Hidden – Output layer, mỗi layer biến đổi dữ liệu qua trọng số + hàm kích hoạt phi tuyến.",
+    example:"Ví dụ: nhận diện chữ viết tay — ảnh đi qua các hidden layer để trích xuất đặc trưng, output layer trả về chữ số dự đoán.",
+    practice:{ text:"Nếu bỏ hết hàm kích hoạt phi tuyến khỏi Neural Network, điều gì xảy ra?",
+      options:["Mạng chỉ còn tương đương phép biến đổi tuyến tính, mất khả năng học quan hệ phức tạp","Mạng chạy nhanh hơn nhưng vẫn học tốt","Không ảnh hưởng gì","Mạng sẽ tự thêm layer mới"], correct:0 } },
+  S4: { cite:"T3-041",
+    summary:"Overfitting là khi model học 'thuộc lòng' dữ liệu train, dự đoán kém trên dữ liệu mới. Regularization (Dropout, weight decay, early stopping) giúp giảm hiện tượng này.",
+    example:"Ví dụ: model đạt 99% accuracy trên train nhưng chỉ 60% trên test — dấu hiệu overfitting rõ ràng.",
+    practice:{ text:"Model đạt 98% accuracy trên train nhưng 55% trên test. Đây là dấu hiệu của điều gì?",
+      options:["Overfitting","Underfitting","Model đang hoạt động tốt","Dữ liệu bị thiếu nhãn"], correct:0 } },
+  S5: { cite:"T3-050",
+    summary:"Ngoài Accuracy, khi dữ liệu mất cân bằng nên dùng thêm Precision, Recall, F1-score để đánh giá đúng hơn.",
+    example:"Ví dụ: phát hiện gian lận thẻ tín dụng — dữ liệu gian lận rất ít, Accuracy cao dễ gây ảo tưởng, cần nhìn Recall để biết model có bỏ sót gian lận không.",
+    practice:{ text:"Trong bài toán phát hiện gian lận (dữ liệu rất mất cân bằng), metric nào quan trọng hơn Accuracy?",
+      options:["F1-score / Recall","Chỉ cần Accuracy là đủ","Batch size","Learning rate"], correct:0 } },
+};
+
+const MASTERY_THRESHOLD = 0.8;
+
+// ================= State =================
+let state = {
+  round1Records: [],
+  round1Accuracy: 0,
+  quizMode: null,        // 'round1' | 'retest'
+  currentQuiz: [],
+  currentIdx: 0,
+  currentRecords: [],
+  weakSections: [],
+  goodSections: [],
+  retestSource: null,    // 'verify' | 'reteach'
+};
+let selectedAnswer = null;
+
+function goTo(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelector(`.screen[data-screen="${name}"]`).classList.add("active");
+}
+
+// ---- Phase 1: upload checklist (U1 -> A1 -> A2 -> A3 -> KP) ----
+const CHECKLIST_STEPS = [
+  "AI phân loại transcript: nội dung giảng dạy / nhiễu",
+  "AI trích xuất outline (5 section, key_points)",
+  "AI sinh Initial Quiz — 20 câu MCQ",
+];
+function runChecklist() {
+  const el = document.getElementById("checklist");
+  el.innerHTML = CHECKLIST_STEPS.map((t, i) =>
+    `<div class="checklist-item" id="chk${i}"><div class="dot">${i+1}</div><div>${t}</div></div>`
+  ).join("");
+  CHECKLIST_STEPS.forEach((_, i) => {
+    setTimeout(() => {
+      const item = document.getElementById(`chk${i}`);
+      item.classList.add("done");
+      item.querySelector(".dot").textContent = "✓";
+      if (i === CHECKLIST_STEPS.length - 1) {
+        document.getElementById("uploadNextBtn").disabled = false;
+      }
+    }, (i + 1) * 500);
+  });
+}
+runChecklist();
+
+// ---- Generic quiz renderer (used for round1 Q1 and Phase4 RET) ----
+function renderQuestion() {
+  const q = state.currentQuiz[state.currentIdx];
+  const label = state.quizMode === "round1"
+    ? `Câu ${state.currentIdx + 1}/${state.currentQuiz.length} — Quiz chẩn đoán ban đầu`
+    : `Câu ${state.currentIdx + 1}/${state.currentQuiz.length} — Kiểm tra lại (${SECTIONS[q.section].title})`;
+  document.getElementById("quizPhaseTag").textContent =
+    state.quizMode === "round1" ? "Phase 2 — Learning Diagnosis" : "Phase 4 — Learning Validation";
+  document.getElementById("quizProgress").textContent = label;
+  document.getElementById("quizQuestion").textContent = q.text;
+  const optsDiv = document.getElementById("quizOptions");
+  optsDiv.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.textContent = opt;
+    div.onclick = () => selectOption(i);
+    optsDiv.appendChild(div);
+  });
+  document.getElementById("quizNextBtn").disabled = true;
+  document.getElementById("quizNextBtn").textContent =
+    state.currentIdx === state.currentQuiz.length - 1 ? "Nộp bài →" : "Câu tiếp →";
+  selectedAnswer = null;
+}
+
+function selectOption(i) {
+  selectedAnswer = i;
+  document.querySelectorAll("#quizOptions .option").forEach((el, idx) => {
+    el.classList.toggle("selected", idx === i);
+  });
+  document.getElementById("quizNextBtn").disabled = false;
+}
+
+function nextQuestion() {
+  const q = state.currentQuiz[state.currentIdx];
+  state.currentRecords.push({ ...q, userAnswer: selectedAnswer, isCorrect: selectedAnswer === q.correct });
+  if (state.currentIdx < state.currentQuiz.length - 1) {
+    state.currentIdx++;
+    renderQuestion();
+  } else {
+    if (state.quizMode === "round1") finishRound1();
+    else finishRetest();
+  }
+}
+
+function computeBySection(records) {
+  const by = {};
+  records.forEach(r => {
+    by[r.section] = by[r.section] || { total: 0, correct: 0 };
+    by[r.section].total++;
+    if (r.isCorrect) by[r.section].correct++;
+  });
+  return by;
+}
+
+// ---- Phase 1 -> Phase 2: start round1 quiz (A3 -> Q1) ----
+function startRound1() {
+  state.quizMode = "round1";
+  state.currentQuiz = ROUND1_BANK;
+  state.currentIdx = 0;
+  state.currentRecords = [];
+  renderQuestion();
+  goTo("quiz");
+}
+
+// ---- Phase 2: G1 grading + D1 diagnosis ----
+function finishRound1() {
+  state.round1Records = state.currentRecords;
+  state.round1Accuracy = state.round1Records.filter(r => r.isCorrect).length / state.round1Records.length;
+
+  const bySection = computeBySection(state.round1Records);
+  state.goodSections = Object.keys(bySection).filter(s => bySection[s].correct === bySection[s].total);
+  state.weakSections = Object.keys(bySection).filter(s => bySection[s].correct < bySection[s].total);
+
+  document.getElementById("goodTags").innerHTML = state.goodSections.length
+    ? state.goodSections.map(s => `<span class="tag good">${SECTIONS[s].title}</span>`).join("")
+    : `<span class="tag bad">Chưa có phần nào đạt 100%</span>`;
+  document.getElementById("badTags").innerHTML = state.weakSections.length
+    ? state.weakSections.map(s => `<span class="tag bad">${SECTIONS[s].title}</span>`).join("")
+    : `<span class="tag good">Không có — bạn làm đúng hết cả 5 phần!</span>`;
+
+  const dec1Note = document.getElementById("dec1Note");
+  const dec1Btn = document.getElementById("dec1Btn");
+  if (state.weakSections.length > 0) {
+    dec1Note.textContent = "→ DEC1: Cần re-teaching cá nhân hoá cho các phần yếu.";
+    dec1Btn.textContent = "Chọn cách ôn tập →";
+  } else {
+    dec1Note.textContent = "→ DEC1: Không cần re-teaching — chuyển thẳng sang kiểm tra xác nhận (Retest).";
+    dec1Btn.textContent = "Làm bài kiểm tra xác nhận →";
+  }
+  goTo("diagnosis");
+}
+
+// ---- DEC1 branching ----
+function handleDec1() {
+  if (state.weakSections.length > 0) {
+    renderStyleScreen();
+    goTo("style");
+  } else {
+    startRetest("verify");
+  }
+}
+
+function renderStyleScreen() {
+  document.getElementById("styleWeakList").textContent =
+    state.weakSections.map(s => SECTIONS[s].title).join(", ");
+}
+
+// ---- Phase 3: STYLE -> AL + RM (loading) -> Roadmap/Cards ----
+function generateRoadmap() {
+  goTo("loading");
+  setTimeout(() => {
+    renderRoadmap();
+    goTo("roadmap");
+  }, 900);
+}
+
+let currentRoadmapSection = null;
+function renderRoadmap() {
+  const tabsDiv = document.getElementById("roadmapTabs");
+  tabsDiv.innerHTML = "";
+  state.weakSections.forEach((s, i) => {
+    const tab = document.createElement("div");
+    tab.className = "tab" + (i === 0 ? " active" : "");
+    tab.textContent = `${i + 1}. ${SECTIONS[s].title}`;
+    tab.onclick = () => selectRoadmapTab(s, tab);
+    tabsDiv.appendChild(tab);
+  });
+  currentRoadmapSection = state.weakSections[0];
+  renderRoadmapCards(currentRoadmapSection);
+}
+
+function selectRoadmapTab(sectionId, tabEl) {
+  document.querySelectorAll("#roadmapTabs .tab").forEach(t => t.classList.remove("active"));
+  tabEl.classList.add("active");
+  currentRoadmapSection = sectionId;
+  renderRoadmapCards(sectionId);
+}
+
+function renderRoadmapCards(sectionId) {
+  const c = STUDY_CONTENT[sectionId];
+  const cardsDiv = document.getElementById("roadmapCards");
+  cardsDiv.innerHTML = `
+    <div class="mini-card">
+      <div class="label">Summary Card</div>
+      <div class="body">${c.summary} <span class="citation">nguồn: ${c.cite}</span></div>
+    </div>
+    <div class="mini-card">
+      <div class="label">Real-world Example</div>
+      <div class="body">${c.example}</div>
+    </div>
+    <div class="mini-card">
+      <div class="label">Mini Practice Question</div>
+      <div class="body" style="margin-bottom:10px;">${c.practice.text}</div>
+      <div id="practiceOpts-${sectionId}"></div>
+    </div>
+  `;
+  const optsDiv = document.getElementById(`practiceOpts-${sectionId}`);
+  c.practice.options.forEach((opt, i) => {
+    const div = document.createElement("div");
+    div.className = "practice-opt";
+    div.textContent = opt;
+    div.onclick = () => {
+      const all = optsDiv.querySelectorAll(".practice-opt");
+      all.forEach((el, idx) => {
+        el.classList.remove("correct", "wrong");
+        if (idx === c.practice.correct) el.classList.add("correct");
+        else if (idx === i) el.classList.add("wrong");
+      });
+    };
+    optsDiv.appendChild(div);
+  });
+}
+
+// ---- Phase 4: RET (generate retest) ----
+function startRetest(source) {
+  state.retestSource = source;
+  state.quizMode = "retest";
+  state.currentIdx = 0;
+  state.currentRecords = [];
+
+  let sections, perSection;
+  if (source === "verify") { sections = Object.keys(SECTIONS); perSection = 1; }
+  else { sections = state.weakSections; perSection = 2; }
+
+  state.currentQuiz = [];
+  sections.forEach(s => {
+    RETEST_BANK[s].slice(0, perSection).forEach(q => {
+      state.currentQuiz.push({ ...q, section: s });
+    });
+  });
+
+  renderQuestion();
+  goTo("quiz");
+}
+
+// ---- Phase 4: GRADE + DEC2 ----
+function finishRetest() {
+  const bySection = computeBySection(state.currentRecords);
+  const correct = state.currentRecords.filter(r => r.isCorrect).length;
+  const total = state.currentRecords.length;
+  const accuracy = correct / total;
+
+  if (accuracy >= MASTERY_THRESHOLD) {
+    document.getElementById("scoreBefore").textContent =
+      Math.round(state.round1Accuracy * 100) + "%";
+    document.getElementById("scoreAfter").textContent =
+      Math.round(accuracy * 100) + "%";
+    const masteredSections = state.retestSource === "verify" ? Object.keys(SECTIONS) : state.weakSections;
+    document.getElementById("reportTags").innerHTML =
+      masteredSections.map(s => `<span class="tag good">${SECTIONS[s].title}</span>`).join("");
+    goTo("report");
+  } else {
+    const stillWeak = Object.keys(bySection).filter(s => bySection[s].correct < bySection[s].total);
+    state.weakSections = stillWeak;
+    renderReview();
+    goTo("review");
+  }
+}
+
+function renderReview() {
+  const wrong = state.currentRecords.filter(r => !r.isCorrect);
+  document.getElementById("reviewList").innerHTML = wrong.map(r => `
+    <div class="review-item">
+      <div class="q">${r.text}</div>
+      <div class="ans-wrong">Bạn chọn: ${r.options[r.userAnswer]}</div>
+      <div class="ans-correct">Đáp án đúng: ${r.options[r.correct]} <span class="citation">nguồn: ${STUDY_CONTENT[r.section].cite}</span></div>
+    </div>
+  `).join("");
+}
+
+// ---- REVIEW -> STYLE loop ----
+function loopToStyle() {
+  renderStyleScreen();
+  goTo("style");
+}
+
+function resetDemo() {
+  state = {
+    round1Records: [], round1Accuracy: 0, quizMode: null, currentQuiz: [], currentIdx: 0,
+    currentRecords: [], weakSections: [], goodSections: [], retestSource: null,
+  };
+  document.getElementById("uploadNextBtn").disabled = true;
+  goTo("upload");
+  runChecklist();
+}
+</script>
+</body>
+</html>
