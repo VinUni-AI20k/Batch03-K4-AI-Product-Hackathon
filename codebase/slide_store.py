@@ -3,6 +3,7 @@
 The source PDFs stay on the user's machine. Only the few pages returned by a
 search tool are sent to the model.
 """
+
 from __future__ import annotations
 
 import math
@@ -12,7 +13,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pypdf import PdfReader
-
 
 TOKEN_PATTERN = re.compile(r"[^\W_]{2,}", flags=re.UNICODE)
 
@@ -116,9 +116,7 @@ class SlideStore:
                 inverse_frequency = math.log(
                     1 + (total - frequency_in_docs + 0.5) / (frequency_in_docs + 0.5)
                 )
-                length_norm = 1.5 * (
-                    1 - 0.75 + 0.75 * len(tokens) / max(average_length, 1)
-                )
+                length_norm = 1.5 * (1 - 0.75 + 0.75 * len(tokens) / max(average_length, 1))
                 score += inverse_frequency * frequency * 2.5 / (frequency + length_norm)
             if score > 0:
                 scored.append((score, page))

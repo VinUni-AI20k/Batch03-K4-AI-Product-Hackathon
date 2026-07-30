@@ -1,6 +1,9 @@
 """Convert a Google Forms CSV into reproducible pain/impact evidence."""
+
 from __future__ import annotations
-import argparse, csv
+
+import argparse
+import csv
 from collections import Counter
 from pathlib import Path
 
@@ -16,7 +19,12 @@ def find_column(headers: list[str], number: int) -> str:
 parser = argparse.ArgumentParser()
 parser.add_argument("csv_path", type=Path)
 parser.add_argument("--output", type=Path, default=Path("evidence/survey-summary.md"))
-parser.add_argument("--exclude-name", action="append", default=[], help="Tên thành viên nhóm cần loại; dùng nhiều lần được")
+parser.add_argument(
+    "--exclude-name",
+    action="append",
+    default=[],
+    help="Tên thành viên nhóm cần loại; dùng nhiều lần được",
+)
 args = parser.parse_args()
 
 with args.csv_path.open(encoding="utf-8-sig", newline="") as file:
@@ -27,17 +35,39 @@ headers = list(rows[0])
 columns = {number: find_column(headers, number) for number in range(1, 11)}
 excluded = {name.casefold().strip() for name in args.exclude_name}
 outside = [r for r in rows if not any(name in r[columns[1]].casefold() for name in excluded)]
-valid = [r for r in outside if r[columns[5]].strip().casefold() not in {"", "không gặp khó khăn"} and "không hậu quả" not in r[columns[8]].casefold()]
+valid = [
+    r
+    for r in outside
+    if r[columns[5]].strip().casefold() not in {"", "không gặp khó khăn"}
+    and "không hậu quả" not in r[columns[8]].casefold()
+]
 pain = Counter(r[columns[5]].strip() for r in valid)
 frequency = Counter(r[columns[6]].strip() for r in valid)
 time_cost = Counter(r[columns[7]].strip() for r in valid)
-consequences = Counter(item.strip() for r in valid for item in r[columns[8]].split(",") if item.strip())
+consequences = Counter(
+    item.strip() for r in valid for item in r[columns[8]].split(",") if item.strip()
+)
 denominator = len(outside)
 
-lines = ["# Survey evidence summary", "", f"- Tổng phản hồi: **{len(rows)}**", f"- Phản hồi ngoài nhóm sau loại tên: **{len(outside)}**", f"- Phản hồi xác nhận một pain + hậu quả: **{len(valid)}**", "", "## Primary pain", "", "| Pain | Số người | % mẫu ngoài nhóm |", "|---|---:|---:|"]
+lines = [
+    "# Survey evidence summary",
+    "",
+    f"- Tổng phản hồi: **{len(rows)}**",
+    f"- Phản hồi ngoài nhóm sau loại tên: **{len(outside)}**",
+    f"- Phản hồi xác nhận một pain + hậu quả: **{len(valid)}**",
+    "",
+    "## Primary pain",
+    "",
+    "| Pain | Số người | % mẫu ngoài nhóm |",
+    "|---|---:|---:|",
+]
 for label, count in pain.most_common():
     lines.append(f"| {label} | {count} | {count / denominator:.1%} |")
-for title, values in [("Tần suất", frequency), ("Thời gian/lần", time_cost), ("Hậu quả", consequences)]:
+for title, values in [
+    ("Tần suất", frequency),
+    ("Thời gian/lần", time_cost),
+    ("Hậu quả", consequences),
+]:
     lines += ["", f"## {title}", "", "| Giá trị | Số lượt |", "|---|---:|"]
     lines += [f"| {label} | {count} |" for label, count in values.most_common()]
 lines += ["", "## Quote gần nhất", ""]

@@ -1,4 +1,5 @@
-import json, sys, unittest
+import sys
+import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -21,25 +22,48 @@ class QuizBackendTests(unittest.TestCase):
             api_server.load_chunks(["T99-999"])
 
     def test_validate_quiz_schema(self):
-        question = {"question":"Q?", "options":["A","B","C","D"], "correct":1, "explanation":"E", "source_ids":["T03-030"]}
-        payload = {"status":"OK", "questions":[question] * 15}
+        question = {
+            "question": "Q?",
+            "options": ["A", "B", "C", "D"],
+            "correct": 1,
+            "explanation": "E",
+            "source_ids": ["T03-030"],
+        }
+        payload = {"status": "OK", "questions": [question] * 15}
         self.assertEqual(api_server.validate_quiz(payload, {"T03-030"})["status"], "OK")
 
     def test_validate_short_reinforcement_quiz(self):
-        question = {"question":"Q?", "options":["A","B","C","D"], "correct":1, "explanation":"E", "source_ids":["T03-030"]}
-        payload = {"status":"OK", "questions":[question] * 5}
-        self.assertEqual(api_server.validate_quiz(payload, {"T03-030"}, question_count=5)["status"], "OK")
+        question = {
+            "question": "Q?",
+            "options": ["A", "B", "C", "D"],
+            "correct": 1,
+            "explanation": "E",
+            "source_ids": ["T03-030"],
+        }
+        payload = {"status": "OK", "questions": [question] * 5}
+        self.assertEqual(
+            api_server.validate_quiz(payload, {"T03-030"}, question_count=5)["status"], "OK"
+        )
 
     def test_reject_untraceable_question(self):
-        question = {"question":"Q?", "options":["A","B","C","D"], "correct":1, "explanation":"E", "source_ids":["T99-999"]}
+        question = {
+            "question": "Q?",
+            "options": ["A", "B", "C", "D"],
+            "correct": 1,
+            "explanation": "E",
+            "source_ids": ["T99-999"],
+        }
         with self.assertRaises(ValueError):
-            api_server.validate_quiz({"status":"OK", "questions":[question]*15}, {"T03-030"})
+            api_server.validate_quiz({"status": "OK", "questions": [question] * 15}, {"T03-030"})
 
     def test_langgraph_quiz_agent_retrieves_then_validates(self):
         calls = []
         question = {
-            "question": "Q?", "options": ["A", "B", "C", "D"], "correct": 1,
-            "explanation": "E", "source_ids": ["T03-030"],
+            "question": "Q?",
+            "options": ["A", "B", "C", "D"],
+            "correct": 1,
+            "explanation": "E",
+            "source_ids": ["T03-030"],
         }
 
         def loader(source_ids):
@@ -56,7 +80,22 @@ class QuizBackendTests(unittest.TestCase):
         self.assertEqual(quiz["status"], "OK")
         self.assertEqual(calls[0], ("retrieve", ["T03-030"]))
         self.assertEqual(calls[1][0], "generate")
-        self.assertEqual(trace["langgraph"]["workflow"], "retrieve_transcript → generate_quiz → validate_quiz")
+        self.assertEqual(
+            trace["langgraph"]["workflow"], "retrieve_transcript → generate_quiz → validate_quiz"
+        )
+
+    def test_langgraph_quiz_agent_stops_cleanly_when_retrieval_fails(self):
+        def failing_loader(_source_ids):
+            raise ValueError("Không có transcript")
+
+        with self.assertRaisesRegex(RuntimeError, "Không truy xuất được transcript"):
+            run_quiz_agent(
+                "Day03",
+                ["T03-030"],
+                failing_loader,
+                lambda *_args: ({}, {}),
+                api_server.validate_quiz,
+            )
 
     def test_slide_agent_forces_responses_api(self):
         fake_model = MagicMock()
@@ -66,4 +105,5 @@ class QuizBackendTests(unittest.TestCase):
         self.assertTrue(constructor.call_args.kwargs["use_responses_api"])
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+    unittest.main()

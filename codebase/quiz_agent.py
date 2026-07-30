@@ -1,7 +1,9 @@
 """LangGraph workflow that grounds one quiz in retrieved lesson transcripts."""
+
 from __future__ import annotations
 
-from typing import Callable, TypedDict
+from collections.abc import Callable
+from typing import TypedDict
 
 from langchain.tools import tool
 from langgraph.graph import END, START, StateGraph
@@ -35,7 +37,7 @@ def build_quiz_graph(
         try:
             chunks = retrieve_transcript_chunks.invoke({"source_ids": state["source_ids"]})
             return {"chunks": chunks, "generation_error": ""}
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - error is returned in LangGraph state
             return {
                 "generation_error": f"Không truy xuất được transcript: {exc}",
                 "attempt": state.get("attempt", 0) + 1,
@@ -43,7 +45,9 @@ def build_quiz_graph(
 
     def generate_node(state: QuizState):
         if state.get("generation_error") and not state.get("chunks"):
-            return {}
+            # Retrieval cannot be repaired by regenerating without source chunks.
+            # Increment so the graph reaches its bounded failure exit, not recursion limit.
+            return {"attempt": state.get("attempt", 0) + 1}
         try:
             raw_quiz, trace = generate(
                 state["lesson_title"],
@@ -56,7 +60,7 @@ def build_quiz_graph(
                 "generation_error": "",
                 "validation_error": "",
             }
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - error is returned in LangGraph state
             return {
                 "generation_error": f"Không tạo được quiz: {exc}",
                 "attempt": state.get("attempt", 0) + 1,
@@ -68,7 +72,7 @@ def build_quiz_graph(
         try:
             quiz = validate(state["raw_quiz"], {chunk["id"] for chunk in state["chunks"]})
             return {"quiz": quiz}
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - error is returned in LangGraph state
             return {
                 "validation_error": str(exc),
                 "attempt": state.get("attempt", 0) + 1,
@@ -109,7 +113,9 @@ def run_quiz_agent(
         config={"recursion_limit": 8},
     )
     if "quiz" not in result:
-        error = result.get("validation_error") or result.get("generation_error") or "Lỗi không xác định"
+        error = (
+            result.get("validation_error") or result.get("generation_error") or "Lỗi không xác định"
+        )
         raise RuntimeError(f"Quiz agent dừng sau {result.get('attempt', 0)} lần thử: {error}")
     trace = result.get("trace", {})
     trace["output"] = result["quiz"]

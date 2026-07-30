@@ -1,10 +1,11 @@
 """LangGraph tool agent for grounded questions over local lesson slides."""
+
 from __future__ import annotations
 
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,9 +14,7 @@ from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
-
 from slide_store import SlideStore
-
 
 SYSTEM_PROMPT = """Bạn là VLearn Tutor, trợ lý ôn tập bằng tiếng Việt.
 
@@ -64,7 +63,9 @@ def build_graph(store: SlideStore, model: Any | None = None):
     model_with_tools = chat_model.bind_tools(tools)
 
     def call_model(state: MessagesState):
-        response = model_with_tools.invoke([SystemMessage(content=SYSTEM_PROMPT), *state["messages"]])
+        response = model_with_tools.invoke(
+            [SystemMessage(content=SYSTEM_PROMPT), *state["messages"]]
+        )
         return {"messages": [response]}
 
     builder = StateGraph(MessagesState)
@@ -104,7 +105,7 @@ def answer_question(
     if not os.getenv("OPENAI_API_KEY") and graph is None:
         raise RuntimeError("Thiếu OPENAI_API_KEY trong .env")
 
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     agent = graph or build_graph(store)
     result = agent.invoke(
         {
@@ -112,8 +113,7 @@ def answer_question(
                 {
                     "role": "user",
                     "content": (
-                        f"LESSON_ID ĐÃ CHỌN: {lesson_id}\n"
-                        f"CÂU HỎI CỦA HỌC VIÊN: {question}"
+                        f"LESSON_ID ĐÃ CHỌN: {lesson_id}\nCÂU HỎI CỦA HỌC VIÊN: {question}"
                     ),
                 }
             ]
@@ -122,7 +122,11 @@ def answer_question(
     )
     messages = result["messages"]
     final_message = next(
-        (message for message in reversed(messages) if isinstance(message, AIMessage) and not message.tool_calls),
+        (
+            message
+            for message in reversed(messages)
+            if isinstance(message, AIMessage) and not message.tool_calls
+        ),
         None,
     )
     if final_message is None:

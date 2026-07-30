@@ -1,4 +1,5 @@
 """Local VLearn prototype server for quiz generation and grounded slide Q&A."""
+
 from __future__ import annotations
 
 import json
@@ -8,7 +9,7 @@ import shutil
 import sys
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -33,10 +34,12 @@ SLIDE_FILES = {
 
 def load_env_file() -> None:
     path = ROOT / ".env"
-    if not path.exists(): return
+    if not path.exists():
+        return
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
-        if not line or line.startswith("#") or "=" not in line: continue
+        if not line or line.startswith("#") or "=" not in line:
+            continue
         key, value = line.split("=", 1)
         os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
@@ -60,7 +63,11 @@ def validate_quiz(payload: dict, allowed_ids: set[str], question_count: int = 15
     if payload.get("status") not in {"OK", "INSUFFICIENT_EVIDENCE"}:
         raise ValueError("status không hợp lệ")
     if payload["status"] == "INSUFFICIENT_EVIDENCE":
-        return {"status": payload["status"], "questions": [], "message": payload.get("message", "Chưa đủ học liệu để tạo quiz tin cậy.")}
+        return {
+            "status": payload["status"],
+            "questions": [],
+            "message": payload.get("message", "Chưa đủ học liệu để tạo quiz tin cậy."),
+        }
     questions = payload.get("questions")
     if not isinstance(questions, list) or len(questions) != question_count:
         raise ValueError(f"Quiz phải có đúng {question_count} câu")
@@ -110,16 +117,28 @@ Trả về JSON thuần, không markdown, theo schema:
 LESSON_TITLE: {lesson_title}
 SOURCE_CHUNKS:
 {json.dumps(chunks, ensure_ascii=False)}"""
-    body = {"model": model, "input": prompt, "reasoning": {"effort": "low"}, "text": {"verbosity": "low"}}
-    request = urllib.request.Request("https://api.openai.com/v1/responses", data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}, method="POST")
-    started = datetime.now(timezone.utc)
+    body = {
+        "model": model,
+        "input": prompt,
+        "reasoning": {"effort": "low"},
+        "text": {"verbosity": "low"},
+    }
+    request = urllib.request.Request(
+        "https://api.openai.com/v1/responses",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
+        method="POST",
+    )
+    started = datetime.now(UTC)
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             raw = json.loads(response.read())
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode(errors="replace")[:500]
         raise RuntimeError(f"OpenAI HTTP {exc.code}: {detail}") from exc
-    text = raw.get("output_text") or "".join(part.get("text", "") for item in raw.get("output", []) for part in item.get("content", []))
+    text = raw.get("output_text") or "".join(
+        part.get("text", "") for item in raw.get("output", []) for part in item.get("content", [])
+    )
     text = text.strip()
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
     quiz = json.loads(text)
@@ -135,8 +154,10 @@ SOURCE_CHUNKS:
 
 def save_trace(trace: dict) -> str:
     TRACE_DIR.mkdir(parents=True, exist_ok=True)
-    trace_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    (TRACE_DIR / f"{trace_id}.json").write_text(json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
+    trace_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    (TRACE_DIR / f"{trace_id}.json").write_text(
+        json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return trace_id
 
 
@@ -161,7 +182,13 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond(payload)
                 return
             if request_data.get("purpose", "practice") != "practice":
-                self.respond({"status": "OUT_OF_SCOPE", "message": "Quiz và practice credits chỉ dùng cho ôn tập, không dùng trong đánh giá chính thức.", "ai_generated": False})
+                self.respond(
+                    {
+                        "status": "OUT_OF_SCOPE",
+                        "message": "Quiz và practice credits chỉ dùng cho ôn tập, không dùng trong đánh giá chính thức.",
+                        "ai_generated": False,
+                    }
+                )
                 return
             source_ids = request_data.get("source_ids") or DEFAULT_SOURCE_IDS
             question_count = int(request_data.get("question_count", 15))
@@ -188,15 +215,20 @@ class Handler(SimpleHTTPRequestHandler):
                 validate=lambda payload, ids: validate_quiz(payload, ids, question_count),
             )
             trace_id = save_trace(trace)
-            self.respond({
-                **quiz,
-                "trace_id": trace_id,
-                "ai_generated": True,
-                "agent": "langgraph_transcript_quiz",
-                "quiz_kind": "reinforcement" if focus_topics else "teacher_release_draft",
-            })
-        except Exception as exc:
-            self.respond({"status": "ERROR", "message": str(exc), "ai_generated": False}, HTTPStatus.BAD_REQUEST)
+            self.respond(
+                {
+                    **quiz,
+                    "trace_id": trace_id,
+                    "ai_generated": True,
+                    "agent": "langgraph_transcript_quiz",
+                    "quiz_kind": "reinforcement" if focus_topics else "teacher_release_draft",
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 - convert expected API/runtime errors to JSON
+            self.respond(
+                {"status": "ERROR", "message": str(exc), "ai_generated": False},
+                HTTPStatus.BAD_REQUEST,
+            )
 
     def do_GET(self):
         path = urlparse(self.path).path

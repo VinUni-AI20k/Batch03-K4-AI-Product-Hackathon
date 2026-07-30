@@ -32,7 +32,7 @@ const publishedTopics = [
 publishedQuiz.forEach((question, index) => { question.topic = publishedTopics[index]; });
 
 let activeQuiz = publishedQuiz;
-const state = { index: 0, answers: [], credits: 7, maxCredits: 20, quizType: "published", focusTopics: [] };
+const state = { index: 0, answers: [], credits: 7, maxCredits: 20, quizType: "published", focusTopics: [], rewardGranted: false };
 const modal = document.querySelector("#quiz-modal");
 const quizView = document.querySelector("#quiz-view");
 const creditValue = document.querySelector("#credit-value");
@@ -76,6 +76,7 @@ function openQuiz() {
   state.focusTopics = [];
   state.index = 0;
   state.answers = [];
+  state.rewardGranted = false;
   modal.classList.remove("hidden");
   renderQuestion();
 }
@@ -190,12 +191,18 @@ function renderLearningAnalysis() {
 function renderResults() {
   const score = state.answers.reduce((total, answer, index) => total + (answer === activeQuiz[index].correct ? 1 : 0), 0);
   const isPublished = state.quizType === "published";
-  const eligibleForCredit = isPublished && score >= 12 && state.credits < state.maxCredits;
+  const qualifiesForCredit = isPublished && score >= 12;
+  const eligibleForCredit = qualifiesForCredit && !state.rewardGranted && state.credits < state.maxCredits;
   const review = activeQuiz.find((item, index) => state.answers[index] !== item.correct)?.review || "Bạn đã nắm tốt các ý chính trong quiz này.";
-  if (eligibleForCredit) { state.credits += 1; updateCredits(); }
+  if (eligibleForCredit) {
+    state.credits += 1;
+    state.rewardGranted = true;
+    updateCredits();
+  }
+  const creditEarned = qualifiesForCredit && state.rewardGranted;
   const answers = activeQuiz.map((item, index) => `<li><span class="${state.answers[index] === item.correct ? "status-correct" : "status-wrong"}">${state.answers[index] === item.correct ? "✓ Đúng" : "× Cần xem lại"}</span> · ${item.source}</li>`).join("");
   const reward = isPublished
-    ? `<div class="reward-banner"><span class="reward-icon">+${eligibleForCredit ? 1 : 0}</span><div><strong>${eligibleForCredit ? "Bạn nhận được 1 practice credit" : state.credits >= state.maxCredits ? "Bạn đã đạt giới hạn 20 credits" : "Đạt từ 12/15 để nhận credit"}</strong><small>Credits hiện tại: ${state.credits}/${state.maxCredits} · Chỉ dùng trong chế độ ôn tập.</small></div></div>`
+    ? `<div class="reward-banner"><span class="reward-icon">${creditEarned ? "+1" : "0"}</span><div><strong>${creditEarned ? "Bạn nhận được 1 practice credit" : state.credits >= state.maxCredits ? "Bạn đã đạt giới hạn 20 credits" : "Đạt từ 12/15 để nhận credit"}</strong><small>Credits hiện tại: ${state.credits}/${state.maxCredits} · Chỉ dùng trong chế độ ôn tập.</small></div></div>`
     : `<div class="reward-banner"><span class="reward-icon">✓</span><div><strong>Bạn đã hoàn thành quiz củng cố</strong><small>Quiz này dùng để ôn đúng trọng tâm, không thay đổi điểm học phần hay credit.</small></div></div>`;
   quizView.innerHTML = `
     <span class="quiz-eyebrow">${isPublished ? "KẾT QUẢ QUIZ CUỐI BÀI" : "KẾT QUẢ QUIZ CỦNG CỐ"}</span>
