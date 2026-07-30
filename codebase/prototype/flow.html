@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow — AI Glossary Tutor</title>
+<style>
+  :root{
+    --primary:#4353ff; --primary-soft:#eef0ff; --primary-dark:#2b38c9;
+    --violet:#7c3aed; --violet-soft:#f3ebff;
+    --ink:#1c2140; --ink-soft:#5a6080; --line:#e4e7f2;
+    --bg:#f6f7fc; --card:#ffffff;
+    --green:#0e9f6e; --green-soft:#e6f7f1;
+    --amber:#b45309; --amber-soft:#fff4e0;
+    --red:#dc2626; --red-soft:#fdecec;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; padding-bottom:70px;
+  }
+
+  header{
+    background:linear-gradient(135deg,#3a49f9 0%,#6a3df5 100%);
+    color:#fff; padding:30px 24px 70px; text-align:center;
+  }
+  header h1{font-size:1.65rem;}
+  header p{opacity:.92; margin-top:6px; font-size:.95rem;}
+
+  .wrap{max-width:1060px; margin:-40px auto 0; padding:0 20px;}
+
+  section{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:0 6px 22px rgba(38,48,120,.08);
+    padding:24px 26px; margin-bottom:26px;
+  }
+  section > h2{
+    font-size:1.05rem; display:flex; align-items:center; gap:10px; margin-bottom:4px;
+  }
+  section > h2 .num{
+    width:28px; height:28px; border-radius:9px; background:var(--primary); color:#fff;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.85rem; flex:none;
+  }
+  section > .sub{color:var(--ink-soft); font-size:.85rem; margin-bottom:20px;}
+
+  /* ========== legend ========== */
+  .legend{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:4px;}
+  .lg{display:flex; align-items:center; gap:7px; font-size:.8rem; color:var(--ink-soft);}
+  .lg i{width:14px; height:14px; border-radius:4px; display:inline-block;}
+
+  /* ========== user flow (horizontal) ========== */
+  .uflow{display:flex; align-items:stretch; flex-wrap:wrap; justify-content:center; gap:0; margin-top:8px;}
+  .ustep{
+    flex:1; min-width:170px; max-width:210px; position:relative;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:12px 14px; opacity:0; animation:appear .5s forwards;
+  }
+  .ustep:nth-child(1){animation-delay:.1s} .ustep:nth-child(2){animation-delay:.45s}
+  .ustep:nth-child(3){animation-delay:.8s} .ustep:nth-child(4){animation-delay:1.15s}
+  .ustep:nth-child(5){animation-delay:1.5s}
+  @keyframes appear{from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:none;}}
+  .ustep .ico{
+    width:56px; height:56px; border-radius:16px; font-size:1.6rem;
+    display:flex; align-items:center; justify-content:center; margin-bottom:10px;
+    background:var(--primary-soft); border:2px solid #c9cffc;
+  }
+  .ustep.res .ico{background:var(--green-soft); border-color:#9bdcc4;}
+  .ustep b{font-size:.9rem;}
+  .ustep span{font-size:.76rem; color:var(--ink-soft); margin-top:3px;}
+  .ustep:not(:last-child)::after{
+    content:"➔"; position:absolute; right:-10px; top:22px;
+    font-size:1.3rem; color:#aab2e8; font-weight:700;
+  }
+  .ushot{
+    margin-top:10px; font-size:.72rem; background:#111633; color:#e6e9ff;
+    border-radius:8px; padding:5px 10px; font-family:Consolas, monospace;
+  }
+
+  /* ========== system flow (vertical flowchart) ========== */
+  .sflow{display:flex; flex-direction:column; align-items:center; margin-top:6px;}
+  .node{
+    width:min(560px, 100%); border-radius:13px; padding:13px 18px;
+    border:2px solid; position:relative; background:#fff;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .node .nico{font-size:1.3rem; line-height:1.4;}
+  .node b{font-size:.92rem; display:block;}
+  .node p{font-size:.8rem; color:var(--ink-soft); margin-top:2px;}
+  .node .tag{
+    position:absolute; top:-11px; right:14px; font-size:.68rem; font-weight:700;
+    padding:2px 10px; border-radius:99px; color:#fff; letter-spacing:.5px;
+  }
+  .n-user{border-color:#c9cffc; background:var(--primary-soft);}
+  .n-user .tag{background:var(--primary);}
+  .n-sys{border-color:#dcc8fb; background:var(--violet-soft);}
+  .n-sys .tag{background:var(--violet);}
+  .n-ai{border-color:#dcc8fb; background:linear-gradient(135deg,#f3ebff,#eef0ff);}
+  .n-ai .tag{background:var(--violet);}
+  .n-out{border-color:#9bdcc4; background:var(--green-soft);}
+  .n-out .tag{background:var(--green);}
+
+  .arrow{
+    height:34px; width:2.5px; background:#b9c0e4; position:relative; margin:2px 0;
+  }
+  .arrow::after{
+    content:""; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%);
+    border:6px solid transparent; border-top:8px solid #b9c0e4; border-bottom:0;
+  }
+  .arrow .albl{
+    position:absolute; left:14px; top:4px; font-size:.72rem; color:var(--ink-soft); white-space:nowrap;
+    background:var(--card); padding:0 6px; border-radius:6px;
+  }
+
+  /* decision diamond */
+  .decision{
+    width:min(420px,100%); text-align:center; padding:14px 18px;
+    background:var(--amber-soft); border:2px dashed #ecc186; border-radius:13px;
+    font-size:.9rem; font-weight:700; color:var(--amber); position:relative;
+  }
+  .decision small{display:block; font-weight:400; font-size:.75rem; color:#96692a; margin-top:2px;}
+
+  .branches{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px; width:100%; max-width:820px; margin-top:14px;
+  }
+  @media(max-width:720px){ .branches{grid-template-columns:1fr;} }
+  .branch{
+    border-radius:13px; padding:14px 16px; border:1.5px solid var(--line); background:#fbfbfe;
+  }
+  .branch .bhead{
+    display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.6px;
+    padding:3px 12px; border-radius:99px; margin-bottom:10px;
+  }
+  .branch.yes .bhead{background:var(--green-soft); color:var(--green);}
+  .branch.no .bhead{background:var(--red-soft); color:var(--red);}
+  .mini{
+    border-left:3px solid var(--line); padding:6px 12px; margin:8px 0; font-size:.82rem;
+    background:#fff; border-radius:0 9px 9px 0;
+  }
+  .mini b{font-size:.82rem;}
+  .mini small{color:var(--ink-soft); display:block; font-size:.74rem;}
+  .branch.yes .mini{border-left-color:var(--green);}
+  .branch.no .mini{border-left-color:var(--violet);}
+  .note-risk{
+    margin-top:14px; font-size:.78rem; background:var(--red-soft); color:#8f1f1f;
+    border-radius:10px; padding:9px 13px; border:1px solid #f3c1c1;
+  }
+  .note-risk b{font-size:.78rem;}
+
+  /* ========== example I/O ========== */
+  .io{display:grid; grid-template-columns:.9fr auto 1.4fr; gap:16px; align-items:center; margin-top:6px;}
+  @media(max-width:760px){ .io{grid-template-columns:1fr;} .io .mid{transform:rotate(90deg); margin:0 auto;} }
+  .iobox{border-radius:13px; border:1.5px solid var(--line); overflow:hidden;}
+  .iobox .ihead{
+    padding:9px 16px; font-size:.75rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+  }
+  .iobox.in .ihead{background:var(--primary-soft); color:var(--primary-dark);}
+  .iobox.out .ihead{background:var(--green-soft); color:var(--green);}
+  .iobox .ibody{padding:14px 16px; background:#fff;}
+  .sel-demo{font-size:.95rem;}
+  .sel-demo mark{background:#ffe9a8; padding:2px 4px; border-radius:4px; font-weight:700;}
+  .sel-demo .zap{
+    display:inline-flex; width:26px; height:26px; border-radius:8px; background:var(--primary);
+    color:#fff; align-items:center; justify-content:center; font-size:.8rem; margin-left:6px;
+    vertical-align:middle; box-shadow:0 3px 8px rgba(67,83,255,.4);
+  }
+  .ctxline{margin-top:10px; font-size:.76rem; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:8px;}
+  .mid{font-size:1.7rem; color:#aab2e8; font-weight:800; text-align:center;}
+  .orow{display:flex; gap:8px; margin-bottom:8px; font-size:.86rem; align-items:baseline;}
+  .orow .k{
+    flex:0 0 92px; font-size:.72rem; font-weight:800; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  .orow .v b.term{color:var(--primary-dark); font-size:1.05rem;}
+  .pillvi{background:var(--primary-soft); color:var(--primary-dark); font-weight:700; border-radius:7px; padding:2px 9px;}
+  .pillf{background:#111633; color:#fff; font-weight:700; border-radius:99px; padding:2px 11px; font-size:.75rem;}
+
+  footer{max-width:1060px; margin:8px auto 0; padding:0 20px; font-size:.74rem; color:var(--ink-soft); text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔀 Flow — AI Glossary Tutor</h1>
+  <p>Luồng trải nghiệm người dùng &nbsp;·&nbsp; Luồng xử lý hệ thống &nbsp;·&nbsp; Ví dụ Input → Output</p>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ 1. USER FLOW ============ -->
+  <section>
+    <h2><span class="num">1</span> Luồng người dùng <small style="font-weight:400;color:var(--ink-soft)">· 5 bước, không rời trang tài liệu</small></h2>
+    <p class="sub">Người mới học AI đang đọc tài liệu tiếng Anh — toàn bộ việc tra cứu diễn ra tại chỗ, không cần mở Google/ChatGPT.</p>
+    <div class="uflow">
+      <div class="ustep">
+        <div class="ico">📖</div>
+        <b>Đọc tài liệu</b>
+        <span>Gặp từ/thuật ngữ chưa hiểu trong bài tiếng Anh</span>
+      </div>
+      <div class="ustep">
+        <div class="ico">🖍️</div>
+        <b>Bôi đen từ bất kỳ</b>
+        <span>Chọn đúng từ hoặc cụm từ muốn tìm hiểu</span>
+        <span class="ushot">"RAG"</span>
+      </div>
+      <div class="ustep">
+        <div class="ico">⚡</div>
+        <b>Icon hiện cạnh từ</b>
+        <span>Kiểu DDICT — chỉ hiện khi có vùng chọn, không làm phiền</span>
+      </div>
+      <div class="ustep">
+        <div class="ico">👆</div>
+        <b>Bấm icon</b>
+        <span>Xác nhận muốn được giải thích (chủ động, không tự bung)</span>
+      </div>
+      <div class="ustep res">
+        <div class="ico">💡</div>
+        <b>Nhận giải thích</b>
+        <span>Tiếng Việt dễ hiểu + ví dụ → lưu vào sổ tay ôn tập</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. SYSTEM FLOW ============ -->
+  <section>
+    <h2><span class="num">2</span> Luồng xử lý hệ thống</h2>
+    <p class="sub">Điều gì xảy ra sau khi người dùng bấm icon ⚡ — bao gồm nhánh quyết định và đường xử lý khi thiếu căn cứ.</p>
+
+    <div class="legend">
+      <span class="lg"><i style="background:var(--primary-soft);border:1.5px solid #c9cffc"></i> Hành động người dùng</span>
+      <span class="lg"><i style="background:var(--violet-soft);border:1.5px solid #dcc8fb"></i> Hệ thống / AI</span>
+      <span class="lg"><i style="background:var(--amber-soft);border:1.5px dashed #ecc186"></i> Điểm quyết định</span>
+      <span class="lg"><i style="background:var(--green-soft);border:1.5px solid #9bdcc4"></i> Kết quả cho người dùng</span>
+    </div>
+    <br>
+
+    <div class="sflow">
+      <div class="node n-user">
+        <span class="tag">NGƯỜI DÙNG</span>
+        <span class="nico">🖍️</span>
+        <div><b>Bôi đen từ + bấm icon ⚡</b>
+        <p>Ví dụ: chọn <b>"RAG"</b> trong câu đang đọc</p></div>
+      </div>
+      <div class="arrow"><span class="albl">gửi: từ được chọn + câu chứa từ</span></div>
+
+      <div class="node n-sys">
+        <span class="tag">HỆ THỐNG</span>
+        <span class="nico">📎</span>
+        <div><b>Trích ngữ cảnh</b>
+        <p>Lấy nguyên câu/đoạn chứa từ — để AI hiểu từ này đang được dùng theo nghĩa nào</p></div>
+      </div>
+      <div class="arrow"></div>
+
+      <div class="decision">
+        ❓ Từ đã có trong sổ tay / cache của lớp chưa?
+        <small>tránh gọi AI lặp lại cho từ phổ biến — nhanh hơn, rẻ hơn</small>
+      </div>
+
+      <div class="branches">
+        <div class="branch yes">
+          <span class="bhead">✓ CÓ — trả ngay từ cache</span>
+          <div class="mini"><b>⚡ Hiển thị tức thì</b><small>Lấy giải thích đã kiểm chứng, kèm ngữ cảnh mới</small></div>
+        </div>
+        <div class="branch no">
+          <span class="bhead">✗ CHƯA — gọi AI (1 lời gọi thật)</span>
+          <div class="mini"><b>🧠 Prompt gửi đi gồm 3 phần</b><small>① từ được chọn · ② câu ngữ cảnh · ③ yêu cầu: giải thích tiếng Việt dễ hiểu cho người mới, mở rộng viết tắt, 1 ví dụ đời thường, lĩnh vực, khái niệm liên quan</small></div>
+          <div class="mini"><b>🔍 Kiểm tra đầu ra</b><small>Đủ 5 trường? Đúng nghĩa theo ngữ cảnh? Độ dài vừa đọc?</small></div>
+          <div class="note-risk"><b>⚠️ Đường thiếu căn cứ:</b> nếu AI không chắc nghĩa của từ trong ngữ cảnh này (từ quá hiếm, câu mơ hồ) → hiển thị "chưa chắc chắn" + gợi ý hỏi tutor của VLearn, <b>không đoán bừa</b> — tránh dạy sai kiến thức cho người mới.</div>
+        </div>
+      </div>
+
+      <div class="arrow" style="margin-top:14px"></div>
+
+      <div class="node n-out">
+        <span class="tag">KẾT QUẢ</span>
+        <span class="nico">💡</span>
+        <div><b>Thẻ giải thích hiện cạnh tài liệu</b>
+        <p>Tên đầy đủ · nghĩa tiếng Việt · giải thích dễ hiểu · ví dụ · lĩnh vực · khái niệm liên quan</p></div>
+      </div>
+      <div class="arrow"><span class="albl">người dùng bấm 💾 Lưu</span></div>
+
+      <div class="node n-out">
+        <span class="tag">ÔN TẬP</span>
+        <span class="nico">📒</span>
+        <div><b>Sổ tay ôn tập</b>
+        <p>Từ được lưu lại theo từng người học — xem lại trước buổi học sau, và trở thành cache cho cả lớp</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. EXAMPLE I/O ============ -->
+  <section>
+    <h2><span class="num">3</span> Ví dụ cụ thể — Input → Output</h2>
+    <p class="sub">Đúng một lượt tra cứu: người dùng bôi đen "RAG" trong bài đọc về chatbot.</p>
+
+    <div class="io">
+      <div class="iobox in">
+        <div class="ihead">⬅ INPUT — từ người dùng</div>
+        <div class="ibody">
+          <div class="sel-demo">
+            …Retrieval-Augmented Generation (<mark>RAG</mark>)<span class="zap">⚡</span> solves this problem by letting the system retrieve relevant information first…
+          </div>
+          <div class="ctxline"><b>Kèm theo:</b> nguyên câu chứa từ (ngữ cảnh) — AI biết "RAG" ở đây là kỹ thuật của LLM, không phải nghĩa nào khác.</div>
+        </div>
+      </div>
+
+      <div class="mid">➜</div>
+
+      <div class="iobox out">
+        <div class="ihead">OUTPUT — thẻ giải thích ➡</div>
+        <div class="ibody">
+          <div class="orow"><span class="k">Thuật ngữ</span><span class="v"><b class="term">RAG</b> — Retrieval-Augmented Generation</span></div>
+          <div class="orow"><span class="k">Tiếng Việt</span><span class="v"><span class="pillvi">Sinh nội dung tăng cường bằng truy xuất</span></span></div>
+          <div class="orow"><span class="k">Giải thích</span><span class="v">Kỹ thuật cho phép mô hình tìm thông tin từ nguồn bên ngoài trước khi tạo câu trả lời — như làm bài kiểm tra <i>được mở sách</i>, nên ít bịa và có trích dẫn.</span></div>
+          <div class="orow"><span class="k">Ví dụ</span><span class="v">Chatbot công ty tra đúng file quy định mới nhất rồi mới trả lời "Chính sách nghỉ phép 2026", kèm số trang.</span></div>
+          <div class="orow"><span class="k">Lĩnh vực</span><span class="v"><span class="pillf">Generative AI / NLP</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Flow — AI Glossary Tutor · Mini Hackathon AI Batch 03 · Hướng A (VLearn) · dùng cho spec §4 &amp; demo slides</footer>
+
+</body>
+</html>
