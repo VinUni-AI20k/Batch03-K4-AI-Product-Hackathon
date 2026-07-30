@@ -11,11 +11,11 @@ kiểm chứng, chuẩn bị quy trình validation và xây dựng câu chuyện
 Tôi đối chiếu từng nội dung trình bày với artifact trong repo để tránh sử dụng
 số liệu không có nguồn.
 
-Từ 24 phản hồi Google Form, tôi tổng hợp được ba tín hiệu chính:
+Từ 36 phản hồi Google Form, tôi tổng hợp được ba tín hiệu chính:
 
-- 20/24 học viên sẵn sàng làm Quiz nếu bài Quiz ngắn.
-- 9/24 học viên muốn được hỏi ý kiến trước khi chuyển câu hỏi cho giảng viên.
-- 10/24 học viên đề nghị bỏ cơ chế tự động gửi và chỉ gửi khi họ chủ động bấm.
+- 32/36 học viên sẵn sàng làm Quiz nếu bài Quiz ngắn.
+- 14/36 học viên muốn được hỏi ý kiến trước khi chuyển câu hỏi cho giảng viên.
+- 33/36 học viên sẵn sàng chia sẻ lịch sử câu sai để nhận gợi ý ôn tập.
 
 Các tín hiệu này dẫn tới quyết định dùng Conditional Automation: AI phân tích
 kết quả, nhưng học viên giữ quyền quyết định có chuyển vùng slide cho TA hay
@@ -31,7 +31,7 @@ AI không được dùng để tạo người tham gia hoặc bịa quote valida
 ## Một case fail và bài học
 
 Case fail quan trọng nhất của phần tôi là nhầm lẫn giữa khảo sát nhu cầu và
-validation sau khi dùng thử. Báo cáo Google Form có 24 phản hồi thật nhưng không
+validation sau khi dùng thử. Báo cáo Google Form có 36 phản hồi thật nhưng không
 thu tên và được thực hiện trước khi người dùng thao tác trên prototype, nên chưa
 đáp ứng đầy đủ R6.
 
