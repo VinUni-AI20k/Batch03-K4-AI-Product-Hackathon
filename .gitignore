@@ -4,3 +4,7 @@ node_modules/
 .venv/
 .ipynb_checkpoints/
 eda/outputs/
+__pycache__/
+*.pyc
+evidence/raw/
+.cache/

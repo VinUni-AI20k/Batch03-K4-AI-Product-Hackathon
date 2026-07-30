@@ -13,10 +13,10 @@
           <span class="brand-mark" aria-hidden="true">◆</span>
           <span>VLearn</span>
         </div>
-        <div class="document-name">
+        <div class="document-name" id="document-name">
           <span class="doc-icon">▣</span>
-          day03-tu-chatbot-den-agentic-agent-react.pdf
-          <small>COMP2010 · Day03 · 46 trang</small>
+          <span id="document-title">day03-material.pdf</span>
+          <small id="document-meta">COMP2010 · Day03</small>
         </div>
         <div class="top-actions">
           <button class="icon-button" aria-label="Chế độ sáng">☼</button>
@@ -29,11 +29,13 @@
         <nav class="day-list" aria-label="Danh sách bài học">
           <button class="day-item"><span>◉</span><div><strong>Day01</strong><small>2 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
           <button class="day-item"><span>◉</span><div><strong>Day02</strong><small>1 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
-          <div class="day-item selected"><span>◉</span><div><strong>Day03</strong><small>2 TÀI LIỆU · STUDYING</small></div><span>⌃</span></div>
-          <button class="lesson-file active"><span>◉</span><div><strong>day03-tu-chatbot-den-agentic-agent...</strong><small>46 trang</small></div></button>
-          <button class="lesson-file"><span>◉</span><div><strong>Day03-D302-tu-chatbot-den...</strong><small>60 trang</small></div></button>
-          <button class="day-item"><span>◉</span><div><strong>Day04</strong><small>3 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
-          <button class="day-item"><span>◉</span><div><strong>Day05</strong><small>3 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
+          <button class="day-item selected lesson-trigger" data-lesson="day03"><span>◉</span><div><strong>Day03</strong><small>2 NỘI DUNG · STUDYING</small></div><span>⌃</span></button>
+          <button class="lesson-file active lesson-trigger" data-lesson="day03"><span>◉</span><div><strong>day03-material.pdf</strong><small>Slide Day03</small></div></button>
+          <button class="lesson-file quiz-entry" id="side-end-quiz"><span>✓</span><div><strong>Quiz cuối bài</strong><small>15 câu · ~10–12 phút</small></div><span class="quiz-arrow">→</span></button>
+          <button class="day-item lesson-trigger" data-lesson="day04"><span>◉</span><div><strong>Day04</strong><small>1 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
+          <button class="lesson-file lesson-trigger" data-lesson="day04"><span>◉</span><div><strong>day04-prompt-engineering-tool-calling...</strong><small>Slide Day04</small></div></button>
+          <button class="day-item lesson-trigger" data-lesson="day05"><span>◉</span><div><strong>Day05</strong><small>1 TÀI LIỆU · PUBLISHED</small></div><span>⌄</span></button>
+          <button class="lesson-file lesson-trigger" data-lesson="day05"><span>◉</span><div><strong>AI Product...</strong><small>Slide Day05</small></div></button>
         </nav>
       </aside>
 
@@ -42,21 +44,17 @@
           <button class="tool active-tool">▷ Đọc</button><button class="tool">✎ Bút</button><button class="tool">⌁ Highlight</button>
           <span class="toolbar-divider"></span><span class="page-pill">Trang 46 · 1 note</span><span class="zoom">− &nbsp; 100% &nbsp; +</span>
         </div>
+        <section class="slide-preview">
+          <div class="slide-topline"><span id="slide-label">Day03</span><span id="slide-filename">day03-material.pdf</span></div>
+          <iframe id="slide-frame" class="slide-frame" title="Slide bài học Day03" src="/slides/day03#view=FitH"></iframe>
+        </section>
         <section class="lesson-complete-card" id="lesson-card">
           <div class="complete-badge">✓ Hoàn thành bài học</div>
-          <h1>Từ Chatbot đến Agentic Agent</h1>
-          <p>Bạn vừa hoàn thành Day03. Dành 3 phút để kiểm tra các ý chính và biết phần nào cần ôn lại.</p>
-          <div class="lesson-meta"><span>◷ 3 câu · ~3 phút</span><span>▣ Dựa trên học liệu Day03</span></div>
+          <h1 id="lesson-heading">Từ Chatbot đến Agentic Agent</h1>
+          <p id="lesson-description">Bạn vừa hoàn thành Day03. Dành 3 phút để kiểm tra các ý chính và biết phần nào cần ôn lại.</p>
+          <div class="lesson-meta"><span>◷ 15 câu · ~10–12 phút</span><span>▣ Dựa trên học liệu Day03</span></div>
           <button class="primary-button" id="start-quiz">Làm quiz củng cố <span>→</span></button>
           <p class="practice-note">Quiz phục vụ ôn tập. Credit chỉ mở thêm lượt hỏi trong chế độ luyện tập.</p>
-        </section>
-        <section class="slide-preview">
-          <div class="slide-topline"><span>Trang 46 / 46</span><span>day03-tu-chatbot-den-agentic-agent-react.pdf</span></div>
-          <div class="slide-content">
-            <p class="slide-kicker">TỔNG KẾT DAY03</p>
-            <h2>Từ Chatbot đến<br />Agentic Agent</h2>
-            <div class="slide-points"><span>• ReAct: Reason + Act</span><span>• Tool calling</span><span>• Context & state</span></div>
-          </div>
         </section>
       </main>
 
@@ -67,9 +65,25 @@
           <div class="credit-track"><span id="credit-progress"></span></div>
           <small>Hoàn thành quiz để nhận thêm lượt hỏi ôn tập.</small>
         </div>
-        <div class="tutor-message">Bạn đã học xong Day03. Làm quiz 3 câu để xem phần nào nên ôn lại nhé.</div>
+        <label class="lesson-picker" for="lesson-select">BÀI ĐANG HỎI</label>
+        <select id="lesson-select" class="lesson-select">
+          <option value="day03">Day03 · Từ Chatbot đến Agentic Agent</option>
+          <option value="day04">Day04 · Prompt Engineering & Tool Calling</option>
+          <option value="day05">Day05 · AI Product</option>
+        </select>
+        <div id="tutor-conversation" class="tutor-conversation" aria-live="polite">
+          <div class="tutor-message" id="tutor-message">Bạn đã học xong Day03. Hỏi mình một ý trong slide, mình sẽ trả lời kèm trang nguồn.</div>
+        </div>
+        <div class="ask-suggestions">
+          <button type="button" class="suggestion" data-question="ReAct khác chatbot thông thường ở điểm nào?">ReAct khác chatbot ở điểm nào?</button>
+          <button type="button" class="suggestion" data-question="Tool calling dùng để làm gì trong agent?">Tool calling dùng để làm gì?</button>
+        </div>
         <button class="secondary-button" id="side-start">Bắt đầu quiz củng cố</button>
-        <div class="chat-input">Nhập câu hỏi hoặc bôi đen tài liệu... <span>➤</span></div>
+        <form class="chat-form" id="ask-form">
+          <input id="ask-input" autocomplete="off" placeholder="Hỏi nội dung bài học..." />
+          <button type="submit" aria-label="Gửi câu hỏi">➤</button>
+        </form>
+        <small class="grounding-note">Agent chỉ trả lời từ 3 file PDF trong thư mục slide/.</small>
       </aside>
     </div>
 

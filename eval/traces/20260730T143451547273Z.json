@@ -1,0 +1,239 @@
+{
+  "timestamp_utc": "2026-07-30T14:34:39.169525+00:00",
+  "model": "gpt-5.6-luna",
+  "lesson_title": "Day03 — Agentic AI",
+  "source_ids": [
+    "T03-024",
+    "T03-025",
+    "T03-026",
+    "T03-027",
+    "T03-028",
+    "T03-029",
+    "T03-030",
+    "T03-031",
+    "T03-032",
+    "T03-033",
+    "T03-034",
+    "T03-035",
+    "T03-036",
+    "T03-037",
+    "T03-038"
+  ],
+  "output": {
+    "status": "OK",
+    "message": "Đủ bằng chứng để tạo 15 câu hỏi.",
+    "questions": [
+      {
+        "question": "Trong ví dụ lập kế hoạch du lịch cho gia đình, yếu tố nào được nêu là một yêu cầu của người dùng?",
+        "options": [
+          "Số lượng máy chủ cần triển khai",
+          "Sở thích ăn chay",
+          "Ngôn ngữ lập trình sử dụng",
+          "Loại cơ sở dữ liệu"
+        ],
+        "correct": 1,
+        "explanation": "Ví dụ bao gồm các yêu cầu như số người lớn tuổi, trẻ em, thích ăn chay và thích đi bộ.",
+        "source_ids": [
+          "T03-024"
+        ]
+      },
+      {
+        "question": "Theo một ý kiến trong lớp, hệ thống nào phù hợp để biểu diễn các địa điểm và đặc điểm của chúng?",
+        "options": [
+          "Hệ cơ sở tri thức dạng graph",
+          "Trình biên dịch",
+          "Bộ nhớ đệm",
+          "Hệ thống email"
+        ],
+        "correct": 0,
+        "explanation": "Học viên đề xuất graph với các node chứa đặc điểm của công viên, khu vui chơi hoặc khách sạn.",
+        "source_ids": [
+          "T03-027"
+        ]
+      },
+      {
+        "question": "Trong đề xuất kết hợp nhiều phương thức, cơ sở dữ liệu được dùng để lưu loại thông tin nào?",
+        "options": [
+          "Thông tin có sẵn và gần như không thay đổi",
+          "Các câu hỏi chưa được người dùng trả lời",
+          "Kết quả suy luận tạm thời của LLM",
+          "Mật khẩu người dùng"
+        ],
+        "correct": 0,
+        "explanation": "Ví dụ nêu bãi biển và khách sạn là những dữ liệu có sẵn, gần như không thay đổi.",
+        "source_ids": [
+          "T03-028"
+        ]
+      },
+      {
+        "question": "Tool API thời tiết có thể giúp hệ thống lập kế hoạch du lịch biết điều gì?",
+        "options": [
+          "Người dùng thích món ăn nào",
+          "Thời tiết trong khoảng thời gian dự định có phù hợp hay không",
+          "Số lượng node trong graph",
+          "Mức độ thông minh của LLM"
+        ],
+        "correct": 1,
+        "explanation": "API thời tiết cung cấp thông tin để đánh giá thời tiết trong hai ngày dự kiến.",
+        "source_ids": [
+          "T03-028"
+        ]
+      },
+      {
+        "question": "Kỹ thuật chuyên sâu hơn được giảng viên liên hệ với ý tưởng graph là gì?",
+        "options": [
+          "Markov model",
+          "Mạng nơ-ron tích chập",
+          "Mã hóa Huffman",
+          "Cây quyết định"
+        ],
+        "correct": 0,
+        "explanation": "Giảng viên nói graph được đề cập có liên hệ sâu hơn với Markov, một model dựa trên xác suất thống kê.",
+        "source_ids": [
+          "T03-029"
+        ]
+      },
+      {
+        "question": "Theo bài học, LLM mạnh về năng lực nào?",
+        "options": [
+          "Duyệt đồ thị tối ưu một cách mặc định",
+          "Suy luận ngữ nghĩa dựa trên văn bản hội thoại",
+          "Dự báo thời tiết chính xác tuyệt đối",
+          "Lưu trữ cơ sở dữ liệu"
+        ],
+        "correct": 1,
+        "explanation": "LLM được mô tả là mạnh về suy luận ngữ nghĩa trên nền tảng văn bản hội thoại.",
+        "source_ids": [
+          "T03-030"
+        ]
+      },
+      {
+        "question": "Trong giai đoạn đầu của dự án lập kế hoạch vui chơi, nên làm gì?",
+        "options": [
+          "Giải quyết ngay mọi yêu cầu của người dùng",
+          "Chỉ tập trung vào một số tiêu chí đơn giản như thời gian rảnh và khoảng cách",
+          "Bỏ qua hoàn toàn yêu cầu người dùng",
+          "Fine-tune model trong nhiều năm"
+        ],
+        "correct": 1,
+        "explanation": "Bài học khuyên narrow down phạm vi ban đầu, chẳng hạn phân loại theo thời gian rảnh và khoảng cách.",
+        "source_ids": [
+          "T03-031"
+        ]
+      },
+      {
+        "question": "Khi nhiều yêu cầu cùng lúc chưa được xử lý tốt, chiến lược nào được khuyên dùng?",
+        "options": [
+          "Cải tiến lần lượt và dần dần",
+          "Thay đổi toàn bộ sản phẩm mỗi ngày",
+          "Cố hoàn thiện tất cả cùng lúc",
+          "Bỏ sản phẩm ngay lập tức"
+        ],
+        "correct": 0,
+        "explanation": "Giảng viên khuyên tập trung làm lần lượt rồi cải tiến dần để tránh ảnh hưởng lẫn nhau.",
+        "source_ids": [
+          "T03-032"
+        ]
+      },
+      {
+        "question": "Việc đưa lựa chọn vào UI/UX giúp agent đạt lợi ích nào?",
+        "options": [
+          "Mở rộng sự tự do trả lời lung tung",
+          "Thu hẹp các hướng xử lý và làm logic đơn giản hơn",
+          "Loại bỏ hoàn toàn nhu cầu người dùng nhập liệu",
+          "Thay thế mọi công cụ bên ngoài"
+        ],
+        "correct": 1,
+        "explanation": "Các lựa chọn giúp agent narrow down hướng trả lời và chuyển sang luồng phù hợp.",
+        "source_ids": [
+          "T03-032"
+        ]
+      },
+      {
+        "question": "Vì sao chỉ dùng LLM cho bài toán lập kế hoạch du lịch phức tạp được xem là không khả thi?",
+        "options": [
+          "Vì LLM không thể nhận văn bản",
+          "Vì bài toán còn liên quan đến duyệt đồ thị, tìm kiếm tối ưu và Markov model",
+          "Vì không có địa điểm du lịch nào",
+          "Vì người dùng không thể đặt câu hỏi"
+        ],
+        "correct": 1,
+        "explanation": "Bài học xác định đây là bài toán cần các phương thức khác ngoài LLM, như duyệt đồ thị và tìm kiếm tối ưu.",
+        "source_ids": [
+          "T03-033"
+        ]
+      },
+      {
+        "question": "Để đếm chính xác số lần xuất hiện của một chữ cái trong từ, cách tiếp cận nào được nêu?",
+        "options": [
+          "Chỉ yêu cầu LLM trả lời trực tiếp",
+          "Gọi tool Python sau khi nhận diện intent và tham số",
+          "Fine-tune LLM bằng mọi từ điển",
+          "Dùng API thời tiết"
+        ],
+        "correct": 1,
+        "explanation": "LLM nhận diện ý định và bóc tách từ, chữ cái; tool Python thực hiện phép đếm.",
+        "source_ids": [
+          "T03-034"
+        ]
+      },
+      {
+        "question": "Để thực hiện phép cộng bằng tool, hệ thống cần trích xuất gì từ yêu cầu người dùng?",
+        "options": [
+          "Hai số trong phép cộng",
+          "Tên khách sạn và thời tiết",
+          "Số lượng node trong graph",
+          "Tài liệu nội bộ công ty"
+        ],
+        "correct": 0,
+        "explanation": "Lớp xử lý intent cần nhận ra phép cộng và lấy hai số để đưa vào tool.",
+        "source_ids": [
+          "T03-035"
+        ]
+      },
+      {
+        "question": "Khi chatbot cần trả lời về quy tắc nội bộ công ty, kỹ thuật nào được nói là bắt buộc?",
+        "options": [
+          "RAG",
+          "Duyệt sâu בלבד",
+          "API bản đồ",
+          "Nén dữ liệu"
+        ],
+        "correct": 0,
+        "explanation": "Tài liệu nội bộ không nằm trong dữ liệu training chung, nên cần RAG để truy xuất và cung cấp ngữ cảnh.",
+        "source_ids": [
+          "T03-036"
+        ]
+      },
+      {
+        "question": "Ngoài việc xác định bài toán có thể dùng AI hay không, sản phẩm cần kiểm tra thêm điều gì?",
+        "options": [
+          "Người dùng có thể tự làm bằng các công cụ sẵn có như Gemini hay không",
+          "Tên của mọi model trên thị trường",
+          "Số lượng nhân viên của công ty",
+          "Có thể bỏ qua chi phí API hay không"
+        ],
+        "correct": 0,
+        "explanation": "Bài học nhấn mạnh phải đánh giá khả năng cạnh tranh với các phương tiện sẵn có của người dùng.",
+        "source_ids": [
+          "T03-037"
+        ]
+      },
+      {
+        "question": "Giá trị của ứng dụng học tiếng Anh được mô tả không chỉ là tiết kiệm thời gian mà còn là gì?",
+        "options": [
+          "Cung cấp không gian tương tác, cạnh tranh hoặc cộng đồng",
+          "Thay thế hoàn toàn giáo viên trong mọi trường hợp",
+          "Chỉ tạo một bài kiểm tra duy nhất",
+          "Lưu trữ mọi dữ liệu không cần cải tiến"
+        ],
+        "correct": 0,
+        "explanation": "Ứng dụng có thể cung cấp môi trường tương tác, sự cạnh tranh hoặc cộng đồng mà cá nhân tự làm khó có được.",
+        "source_ids": [
+          "T03-038"
+        ]
+      }
+    ]
+  },
+  "usage": {}
+}

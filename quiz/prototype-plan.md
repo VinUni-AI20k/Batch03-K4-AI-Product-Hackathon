@@ -8,17 +8,17 @@ Mock là đủ nếu flow bấm hoàn chỉnh và có **một AI call thật** �
 
 | Thời gian | Thao tác | Điều cần chứng minh |
 |---:|---|---|
-| 0:00–0:30 | Chọn bài, xem “Quiz 3 câu, ~3 phút, chỉ dùng cho ôn tập” | Phạm vi và quyền dùng AI rõ ràng |
-| 0:30–1:30 | Nhấn tạo quiz | AI call thật tạo 3 câu từ 3 đoạn nguồn; mọi câu có mã nguồn học liệu |
+| 0:00–0:30 | Chọn bài, xem “Quiz 15 câu, ~10–12 phút, chỉ dùng cho ôn tập” | Phạm vi và quyền dùng AI rõ ràng |
+| 0:30–1:30 | Nhấn tạo quiz | AI call thật tạo 15 câu từ học liệu; mọi câu có mã nguồn học liệu |
 | 1:30–2:30 | Làm quiz, cố ý sai 1 câu | Flow chính: chấm và feedback |
-| 2:30–3:15 | Xem 2/3, phần cần ôn lại, credit 7→8/20 | Giá trị sản phẩm và cap |
+| 2:30–3:15 | Demo nhanh vài câu rồi mở kết quả 12/15, phần cần ôn, credit 7→8/20 | Giá trị sản phẩm và cap |
 | 3:15–4:00 | Bấm mở nguồn hoặc báo câu sai | Truy vết học liệu và correction |
 | 4:00–5:00 | Demo thiếu nguồn hoặc xin dùng credit trong bài thi | Failure và guardrail |
 
 ## Màn hình tối thiểu
 
 1. **Lesson recap:** tên bài, credit `7/20`, nhãn “chỉ dùng cho ôn tập”.
-2. **Quiz:** 3 câu, tiến độ, nút xem nguồn.
+2. **Quiz:** 15 câu, tiến độ, nút xem nguồn.
 3. **Kết quả:** đúng/sai, giải thích, mã nguồn học liệu, một phần cần ôn lại, credit.
 4. **Fallback:** “chưa đủ nguồn để tạo quiz tin cậy” và nút chọn nội dung khác.
 
@@ -35,7 +35,7 @@ Nếu không đủ nguồn để tạo câu công bằng, trả về INSUFFICIEN
 Không đưa kiến thức ngoài nguồn và không tạo câu đánh đố.
 ```
 
-**Output:** `status`, đúng 3 câu, 4 options/câu, `correct_option`, `explanation`, `source_ids`.
+**Output:** `status`, đúng 15 câu, 4 options/câu, `correct_option`, `explanation`, `source_ids`.
 
 Chỉ render khi `status = OK`, mọi source ID thuộc input, option hợp lệ và mã nguồn học liệu không rỗng.
 
@@ -53,7 +53,7 @@ Chỉ render khi `status = OK`, mọi source ID thuộc input, option hợp lệ
 
 | Case | Kết quả mong muốn |
 |---|---|
-| Nguồn rõ | 3 câu có mã nguồn học liệu, đáp án đúng theo nguồn |
+| Nguồn rõ | 15 câu có mã nguồn học liệu, đáp án đúng theo nguồn |
 | Nguồn không đủ | `INSUFFICIENT_EVIDENCE`, không bịa câu |
 | Mã nguồn học liệu không tồn tại | Validator chặn render |
 | Credit 19/20 + pass | Thành 20/20 |

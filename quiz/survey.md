@@ -12,7 +12,7 @@
 | 6 | Pain này xuất hiện với tần suất nào? | Trắc nghiệm | Hiếm khi (<1/10) / thỉnh thoảng (1–3/10) / khá thường xuyên (4–6/10) / rất thường xuyên (>6/10) / không nhớ. |
 | 7 | Pain này khiến bạn tốn thêm bao nhiêu thời gian mỗi lần? | Trắc nghiệm | Không tốn / <2 phút / 2–<5 / 5–<10 / 10–<20 / ≥20 phút / không ước lượng được. |
 | 8 | Hậu quả thực tế là gì? | Hộp kiểm | Không ôn lại; ôn không đúng trọng tâm; hỏi người/công cụ khác; mang lỗ hổng sang bài sau; thiếu tự tin khi làm bài; tốn thời gian; không hậu quả; khác. |
-| 9 | Quiz 3 câu, ≤5 phút, dựa trên đúng bài vừa học có phù hợp không? Vì sao? | Thang 1–5 + đoạn văn | 1 = không phù hợp; 5 = rất phù hợp; yêu cầu giải thích ngắn. |
+| 9 | Quiz 15 câu, khoảng 10–12 phút, dựa trên đúng bài vừa học có phù hợp không? Vì sao? | Thang 1–5 + đoạn văn | 1 = không phù hợp; 5 = rất phù hợp; yêu cầu giải thích ngắn. |
 | 10 | Bạn có sẵn sàng thử prototype 10 phút không? Nếu có, ghi thời gian phù hợp. | Trắc nghiệm + trả lời ngắn | Có / Có thể / Không; ghi thời gian nếu có. |
 
 ## Cách phân tích

@@ -11,7 +11,7 @@
 | Core JTBD | Sau khi học xong một buổi, kiểm tra ý chính mình chưa nắm để biết cần ôn lại phần nào trước khi quên hoặc bước sang bài tiếp theo. |
 | Pain giả thuyết | Học viên vừa hoàn thành buổi học nhưng không có phản hồi nhanh, đáng tin về mức hiểu của mình, nên khó ưu tiên nội dung cần ôn lại và dễ mang lỗ hổng kiến thức sang bài sau. |
 | Bằng chứng cần có | Khảo sát ≥20 người ngoài nhóm, ≥50% xác nhận pain, lưu toàn bộ câu hỏi và phản hồi. |
-| Lát cắt một câu | Một học viên vừa học xong một bài được hệ thống tạo quiz 3 câu có căn cứ theo đúng bài vừa học, chấm đáp án và chỉ ra một nội dung cần ôn lại, để học viên quyết định bước học tiếp theo. |
+| Lát cắt một câu | Một học viên vừa học xong một bài được hệ thống tạo quiz 15 câu có căn cứ theo đúng bài vừa học, chấm đáp án và chỉ ra nội dung cần ôn lại, để học viên quyết định bước học tiếp theo. |
 | Automation | Conditional/augment: AI chỉ sinh câu có mã nguồn học liệu và nguồn đủ; thiếu nguồn thì không sinh hoặc yêu cầu chọn nội dung khác. |
 | Willing users | Lâm Vũ, Lê Văn Tuấn, Cao Hương Giang — D303, đã đồng ý thử lúc 14:00 ngày 2. |
 
@@ -19,7 +19,7 @@
 
 | Hạng mục | Thiết kế đề xuất |
 |---|---|
-| Reward | Đạt ngưỡng quiz đề xuất, ví dụ 2/3, nhận 1 **practice-question credit**. |
+| Reward | Đạt từ 12/15 câu đúng (80%) nhận 1 **practice-question credit**. |
 | Cap | Tối đa 20 credits trong một học phần/chu kỳ. |
 | Credit dùng cho | Mở thêm lượt hỏi **trong chế độ ôn tập VLearn**. |
 | Không dùng cho | Bài thi/kiểm tra chính thức VinUni, điểm học phần, hoặc bất kỳ quyền lợi học vụ nào khi chưa được phê duyệt. |
@@ -31,7 +31,7 @@
 | In scope | Non-goals |
 |---|---|
 | Chọn 1 bài học và 3 đoạn nguồn đã duyệt | Không tích hợp điểm chính thức VinUni |
-| Sinh quiz 3 câu: 2 MCQ + 1 câu áp dụng ngắn | Không dùng AI trong bài thi/kiểm tra thật |
+| Sinh quiz 15 câu MCQ, dự kiến 10–12 phút | Không dùng AI trong bài thi/kiểm tra thật |
 | Mã nguồn học liệu cạnh từng câu và đáp án | Không tạo ngân hàng quiz toàn khóa |
 | Chấm, feedback và một mục cần ôn | Không thưởng credit thật nếu chưa duyệt chính sách |
 | Mô phỏng credit 0–20 | Không tự chẩn đoán toàn bộ lỗ hổng dài hạn |

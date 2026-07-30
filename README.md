@@ -7,7 +7,7 @@
 
 ## Dự án hiện tại — Quiz củng cố cuối buổi
 
-Nhóm đang xây tính năng Quiz 3 câu sau mỗi buổi học để giúp học viên xác định phần
+Nhóm đang xây tính năng Quiz 15 câu sau mỗi buổi học để giúp học viên xác định phần
 cần ôn lại. Các artifact dùng cho CP1 và prototype:
 
 - `eda/bao-cao-de-xuat-bai-toan.md` — báo cáo đề xuất bài toán.

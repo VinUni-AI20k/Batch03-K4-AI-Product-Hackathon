@@ -21,7 +21,7 @@ với bài vừa học để tự kiểm tra điều đó.
 
 ### Lát cắt prototype — một câu
 
-> Một học viên vừa học xong một bài được hệ thống tạo quiz 3 câu có căn cứ theo
+> Một học viên vừa học xong một bài được hệ thống tạo quiz 15 câu có căn cứ theo
 > đúng bài vừa học, chấm đáp án và chỉ ra một nội dung cần ôn lại, để học viên
 > quyết định bước học tiếp theo.
 
@@ -90,7 +90,7 @@ không phải kết luận.
 |---|---:|---:|---:|---|---|
 | Không biết mình hiểu đúng chưa sau buổi | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: quiz + feedback ngắn | Ứng viên chính |
 | Không biết cần ôn phần nào | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: chỉ ra một nội dung cần ôn | Ứng viên gần |
-| Không có bài tự kiểm tra ngắn | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: quiz 3 câu | Ứng viên gần |
+| Không có bài tự kiểm tra vừa sức | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Cao: quiz 15 câu | Ứng viên gần |
 | Quiz/bài hiện có quá dài | `[khảo sát]` | `[khảo sát]` | `[phút/hậu quả]` | Trung bình: cần hiểu quiz hiện có | Có thể loại |
 
 ### Quy tắc chốt
@@ -107,7 +107,7 @@ statement phải bám pain được chọn.
 1. Học viên chọn bài vừa học hoặc hệ thống nhận biết bài vừa hoàn thành.
 2. Hệ thống lấy các đoạn nguồn đã duyệt của bài.
 3. AI quyết định có đủ nguồn để sinh quiz hay không.
-4. Nếu đủ: sinh 3 câu, mỗi câu/đáp án có mã nguồn học liệu.
+4. Nếu đủ: sinh 15 câu, mỗi câu/đáp án có mã nguồn học liệu.
 5. Học viên trả lời; hệ thống chấm và chỉ ra một nội dung cần ôn lại.
 6. Nếu thiếu nguồn: không sinh quiz, nói rõ lý do và cho chọn đoạn/chủ đề khác.
 7. User có thể báo câu hỏi hoặc đáp án sai nguồn.
@@ -132,7 +132,7 @@ mình. Chi phí không sinh được một quiz thấp hơn chi phí sinh quiz c
 
 | Hạng mục | Thiết kế prototype | Điều kiện triển khai thật |
 |---|---|---|
-| Reward | Đạt ngưỡng demo, ví dụ 2/3, nhận 1 practice-question credit | Giảng viên/ban vận hành phê duyệt |
+| Reward | Đạt từ 12/15 câu đúng (80%), nhận 1 practice-question credit | Giảng viên/ban vận hành phê duyệt |
 | Cap | Hiển thị cap 20 credits | Xác định theo học phần/chu kỳ rõ ràng |
 | Lợi ích credit | Mở lượt hỏi trong **chế độ ôn tập VLearn** | Không ảnh hưởng đặc quyền học vụ/đánh giá |
 | Thi chính thức | Không có flow nào cho phép dùng credit | Phải tuân thủ quy định assessment của VinUni |
@@ -210,9 +210,9 @@ vì sao; bạn có dùng thật không và vì sao.
 
 Quiz cuối buổi là một **giải pháp khả thi**, không phải pain đã được chứng minh.
 Nhóm chỉ nên chốt bài toán sau khi khảo sát xác nhận pain chính, quy mô, tần suất
-và hậu quả. Nếu pain được xác nhận, lát cắt 3 câu có căn cứ, feedback một mục cần
+và hậu quả. Nếu pain được xác nhận, lát cắt 15 câu có căn cứ, feedback nội dung cần
 ôn và practice credits có cap 20 là đủ nhỏ để build/demo, đồng thời giữ an toàn học
-thuật bằng cách tách hoàn toàn khỏi đánh giá chính thức.
+thuật bằng cách tách hoàn toàn khỏi đánh giá chính thức. Thời lượng 10–12 phút cần được xác nhận lại qua khảo sát.
 
 ## Tài liệu liên quan
 

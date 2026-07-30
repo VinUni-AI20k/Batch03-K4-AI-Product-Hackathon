@@ -14,7 +14,7 @@ function createQuizPainSurvey() {
   form.addMultipleChoiceItem().setTitle('6. Pain này xuất hiện với tần suất nào?').setChoiceValues(['Hiếm khi (<1/10)', 'Thỉnh thoảng (1–3/10)', 'Khá thường xuyên (4–6/10)', 'Rất thường xuyên (>6/10)', 'Không nhớ']).setRequired(true);
   form.addMultipleChoiceItem().setTitle('7. Pain này khiến bạn tốn thêm bao nhiêu thời gian mỗi lần?').setChoiceValues(['Không tốn', '<2 phút', '2–<5 phút', '5–<10 phút', '10–<20 phút', '≥20 phút', 'Không ước lượng được']).setRequired(true);
   form.addCheckboxItem().setTitle('8. Hậu quả thực tế là gì?').setChoiceValues(['Không ôn lại', 'Ôn không đúng trọng tâm', 'Hỏi người/công cụ khác', 'Mang lỗ hổng sang bài sau', 'Thiếu tự tin khi làm bài', 'Tốn thời gian', 'Không hậu quả']).showOtherOption(true).setRequired(true);
-  form.addScaleItem().setTitle('9. Quiz 3 câu, ≤5 phút, dựa trên đúng bài vừa học có phù hợp không?').setBounds(1, 5).setLabels('Không phù hợp', 'Rất phù hợp').setRequired(true);
+  form.addScaleItem().setTitle('9. Quiz 15 câu, khoảng 10–12 phút, dựa trên đúng bài vừa học có phù hợp không?').setBounds(1, 5).setLabels('Không phù hợp', 'Rất phù hợp').setRequired(true);
   form.addMultipleChoiceItem().setTitle('10. Bạn có sẵn sàng thử prototype 10 phút không?').setChoiceValues(['Có — nhóm có thể liên hệ', 'Có thể — tùy thời gian', 'Không']).setRequired(true);
 
   Logger.log('FORM EDIT URL: ' + form.getEditUrl());
