@@ -1,3 +1,8 @@
 .DS_Store
 node_modules/
 *.env
+.venv
+*instruct_for_ai
+*__pycache__
+rag_storage*
+*.log
