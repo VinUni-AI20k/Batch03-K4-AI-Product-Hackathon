@@ -1,3 +1,13 @@
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const dropzone = document.getElementById('dropzone');
 const pdfInput = document.getElementById('pdf-input');
 const dzEmpty = document.getElementById('dropzone-empty');
@@ -66,7 +76,114 @@ pdfInput.addEventListener('change', () => {
   if (pdfInput.files[0]) setFile(pdfInput.files[0]);
 });
 
-function setFile(f) {
+let hasCachedDoc = false;
+const docViewerBar = document.getElementById('doc-viewer-bar');
+const toggleDocBtn = document.getElementById('toggle-doc-btn');
+const docPagesCount = document.getElementById('doc-pages-count');
+const docPreviewContent = document.getElementById('doc-preview-content');
+const docPagesList = document.getElementById('doc-pages-list');
+const docLibraryWrapper = document.getElementById('doc-library-wrapper');
+const docLibrarySelect = document.getElementById('doc-library-select');
+const openPdfLink = document.getElementById('open-pdf-link');
+
+if (toggleDocBtn) {
+  toggleDocBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    docPreviewContent.classList.toggle('hidden');
+  });
+}
+
+async function loadDocumentLibrary() {
+  try {
+    const res = await fetch('/api/documents');
+    const data = await res.json();
+    if (data.documents && data.documents.length > 0) {
+      docLibraryWrapper.classList.remove('hidden');
+      docLibrarySelect.innerHTML = data.documents.map(d => `
+        <option value="${d.doc_id}" ${d.doc_id === data.active_doc_id ? 'selected' : ''}>
+          📄 ${d.filename} (${d.total_pages} trang, ${d.total_chars} ký tự) — Nạp lúc ${d.upload_time}
+        </option>
+      `).join('');
+    }
+  } catch (err) {
+    console.log('Lỗi nạp kho tài liệu:', err);
+  }
+}
+
+if (docLibrarySelect) {
+  docLibrarySelect.addEventListener('change', async () => {
+    const docId = docLibrarySelect.value;
+    if (!docId) return;
+    try {
+      const res = await fetch('/api/select-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doc_id: docId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        selectedFile = null;
+        hasCachedDoc = true;
+        if (fileNameEl) fileNameEl.textContent = `Tài liệu đã chọn: ${data.filename} (${data.total_pages} trang)`;
+        if (dzEmpty) dzEmpty.classList.add('hidden');
+        if (dzFilled) dzFilled.classList.remove('hidden');
+        if (generateBtn) generateBtn.disabled = false;
+
+        if (openPdfLink) {
+          openPdfLink.href = `/api/view-pdf?doc_id=${docId}`;
+        }
+        if (docViewerBar && data.pages) {
+          docViewerBar.classList.remove('hidden');
+          if (toggleDocBtn) toggleDocBtn.innerHTML = `📖 Xem nội dung: <strong style="text-decoration: underline;">${data.filename}</strong> (${data.total_pages} trang)`;
+          if (docPagesList) docPagesList.innerHTML = data.pages.map(p => `
+            <div style="margin-bottom: 14px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <strong style="color: #4f46e5; font-size: 13px;">📄 [Trang ${p.page}] (${p.text.length} ký tự)</strong>
+              <p style="margin: 6px 0 0 0; white-space: pre-wrap; word-break: break-word; color: #1e293b; font-family: inherit; font-size: 13px;">${escapeHtml(p.text)}</p>
+            </div>
+          `).join('');
+        }
+      }
+    } catch (err) {
+      showError('Lỗi chọn tài liệu từ kho.');
+    }
+  });
+}
+
+async function checkActiveDocument() {
+  await loadDocumentLibrary();
+  try {
+    const res = await fetch('/api/active-document');
+    const data = await res.json();
+    if (data.has_cached_doc) {
+      hasCachedDoc = true;
+      if (fileNameEl) fileNameEl.textContent = `Tài liệu đang chọn: ${data.filename} (${data.total_pages} trang, ${data.total_chars} ký tự)`;
+      if (dzEmpty) dzEmpty.classList.add('hidden');
+      if (dzFilled) dzFilled.classList.remove('hidden');
+      if (generateBtn) generateBtn.disabled = false;
+
+      if (openPdfLink && data.doc_id) {
+        openPdfLink.href = `/api/view-pdf?doc_id=${data.doc_id}`;
+      }
+      if (docViewerBar && data.pages) {
+        docViewerBar.classList.remove('hidden');
+        toggleDocBtn.innerHTML = `📖 Xem nội dung: <strong style="text-decoration: underline;">${data.filename}</strong> (${data.total_pages} trang)`;
+        docPagesList.innerHTML = data.pages.map(p => `
+          <div style="margin-bottom: 14px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <strong style="color: #4f46e5; font-size: 13px;">📄 [Trang ${p.page}] (${p.text.length} ký tự)</strong>
+            <p style="margin: 6px 0 0 0; white-space: pre-wrap; word-break: break-word; color: #1e293b; font-family: inherit; font-size: 13px;">${escapeHtml(p.text)}</p>
+          </div>
+        `).join('');
+      }
+    }
+  } catch (err) {
+    console.log('Chưa có active document:', err);
+  }
+}
+
+// Gọi kiểm tra tài liệu đã lưu ngay khi load trang
+checkActiveDocument();
+
+async function setFile(f) {
   if (f.type !== 'application/pdf') {
     showError('Chỉ nhận file PDF.');
     return;
@@ -75,13 +192,197 @@ function setFile(f) {
     showError(`File ${(f.size / 1024 / 1024).toFixed(1)}MB vượt quá giới hạn 30MB.`);
     return;
   }
-  selectedFile = f;
-  fileNameEl.textContent = `${f.name} (${(f.size / 1024).toFixed(0)} KB)`;
-  dzEmpty.classList.add('hidden');
-  dzFilled.classList.remove('hidden');
-  generateBtn.disabled = false;
+
   hideError();
-  setStep('upload');
+  
+  // Hiển thị progress bar thay vì chuyển màn hình
+  showUploadProgress(f.name, 0, 'Chuẩn bị upload...');
+  
+  const fd = new FormData();
+  fd.append('pdf', f);
+
+  try {
+    // Upload với XMLHttpRequest để theo dõi tiến độ
+    const data = await uploadWithProgress(fd, (percent, status) => {
+      updateUploadProgress(percent, status);
+    });
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Lỗi xử lý file PDF');
+    }
+
+    selectedFile = f;
+    hasCachedDoc = true;
+
+    if (fileNameEl) fileNameEl.textContent = `Tài liệu vừa nạp & Embedding thành công: ${data.filename} (${data.total_pages} trang, ${data.total_chars} ký tự)`;
+    dzEmpty.classList.add('hidden');
+    dzFilled.classList.remove('hidden');
+    generateBtn.disabled = false;
+
+    if (openPdfLink && data.doc_id) {
+      openPdfLink.href = `/api/view-pdf?doc_id=${data.doc_id}`;
+    }
+
+    if (docViewerBar && data.pages) {
+      docViewerBar.classList.remove('hidden');
+      toggleDocBtn.innerHTML = `📖 Xem nội dung: <strong style="text-decoration: underline;">${data.filename}</strong> (${data.total_pages} trang)`;
+      docPagesList.innerHTML = data.pages.map(p => `
+        <div style="margin-bottom: 14px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+          <strong style="color: #4f46e5; font-size: 13px;">📄 [Trang ${p.page}] (${p.text.length} ký tự)</strong>
+          <p style="margin: 6px 0 0 0; white-space: pre-wrap; word-break: break-word; color: #1e293b; font-family: inherit; font-size: 13px;">${escapeHtml(p.text)}</p>
+        </div>
+      `).join('');
+    }
+
+    hideUploadProgress();
+    await loadDocumentLibrary();
+
+  } catch (err) {
+    hideUploadProgress();
+    showError(err.message || 'Lỗi xử lý & Embedding file PDF');
+  }
+}
+
+// Hàm upload với progress tracking thông minh
+function uploadWithProgress(formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    let uploadComplete = false;
+    let fakeProgressInterval = null;
+    let currentFakeProgress = 0;
+    
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        // Upload thật: 0-60% (nhanh)
+        const uploadPercent = Math.round((e.loaded / e.total) * 60);
+        onProgress(uploadPercent, 'Đang upload file...');
+        currentFakeProgress = uploadPercent;
+      }
+    });
+    
+    xhr.upload.addEventListener('loadend', () => {
+      uploadComplete = true;
+      // Upload xong, bắt đầu fake progress cho phần xử lý backend: 60-95%
+      onProgress(60, 'Đang trích xuất text từ PDF...');
+      currentFakeProgress = 60;
+      
+      fakeProgressInterval = setInterval(() => {
+        if (currentFakeProgress < 90) {
+          // 60-90%: nhích bình thường (mỗi 300ms tăng 1%)
+          currentFakeProgress += 1;
+          onProgress(currentFakeProgress, 'Đang chạy Embedding (Qwen3-8B)...');
+        } else if (currentFakeProgress < 95) {
+          // 90-95%: nhích chậm lại (mỗi 500ms tăng 1%)
+          currentFakeProgress += 0.5;
+          onProgress(Math.floor(currentFakeProgress), 'Đang hoàn tất indexing...');
+        }
+        // Dừng ở 95%, chờ response thật
+      }, currentFakeProgress < 90 ? 300 : 500);
+    });
+    
+    xhr.addEventListener('load', () => {
+      // Dừng fake progress
+      if (fakeProgressInterval) {
+        clearInterval(fakeProgressInterval);
+      }
+      
+      if (xhr.status >= 200 && xhr.status < 300) {
+        // Vọt lên 100% khi thành công
+        onProgress(100, 'Hoàn thành!');
+        
+        try {
+          setTimeout(() => {
+            resolve(JSON.parse(xhr.responseText));
+          }, 300);
+        } catch (err) {
+          reject(new Error('Invalid JSON response'));
+        }
+      } else {
+        try {
+          const errData = JSON.parse(xhr.responseText);
+          reject(new Error(errData.error || `HTTP ${xhr.status}`));
+        } catch {
+          reject(new Error(`HTTP ${xhr.status}`));
+        }
+      }
+    });
+    
+    xhr.addEventListener('error', () => {
+      if (fakeProgressInterval) {
+        clearInterval(fakeProgressInterval);
+      }
+      reject(new Error('Network error'));
+    });
+    
+    xhr.open('POST', '/api/upload-and-index');
+    xhr.send(formData);
+  });
+}
+
+// Hiển thị progress bar
+function showUploadProgress(filename, percent, status) {
+  // Tạo progress bar nếu chưa có
+  let progressContainer = document.getElementById('upload-progress-container');
+  if (!progressContainer) {
+    progressContainer = document.createElement('div');
+    progressContainer.id = 'upload-progress-container';
+    progressContainer.style.cssText = `
+      margin-top: 12px;
+      padding: 16px;
+      background: #f0f9ff;
+      border: 2px solid #0284c7;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+    `;
+    dropzone.parentNode.insertBefore(progressContainer, dropzone.nextSibling);
+  }
+  
+  progressContainer.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <div style="font-size: 20px;">📤</div>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; color: #0c4a6e; font-size: 14px; margin-bottom: 4px;">
+          ${escapeHtml(filename)}
+        </div>
+        <div id="upload-status" style="font-size: 12px; color: #475569;">
+          ${status || 'Chuẩn bị...'}
+        </div>
+      </div>
+      <div id="upload-percent" style="font-size: 18px; font-weight: 700; color: #0284c7; min-width: 50px; text-align: right;">
+        ${percent}%
+      </div>
+    </div>
+    <div style="width: 100%; height: 8px; background: #e0f2fe; border-radius: 4px; overflow: hidden;">
+      <div id="upload-progress-bar" style="height: 100%; background: linear-gradient(90deg, #0284c7, #06b6d4); border-radius: 4px; transition: width 0.3s ease; width: ${percent}%;"></div>
+    </div>
+  `;
+  
+  progressContainer.classList.remove('hidden');
+}
+
+// Cập nhật progress bar
+function updateUploadProgress(percent, status) {
+  const percentEl = document.getElementById('upload-percent');
+  const barEl = document.getElementById('upload-progress-bar');
+  const statusEl = document.getElementById('upload-status');
+  
+  if (percentEl) percentEl.textContent = `${percent}%`;
+  if (barEl) barEl.style.width = `${percent}%`;
+  if (statusEl && status) statusEl.textContent = status;
+}
+
+// Ẩn progress bar
+function hideUploadProgress() {
+  const progressContainer = document.getElementById('upload-progress-container');
+  if (progressContainer) {
+    setTimeout(() => {
+      progressContainer.style.transition = 'opacity 0.5s ease';
+      progressContainer.style.opacity = '0';
+      setTimeout(() => {
+        progressContainer.remove();
+      }, 500);
+    }, 500);
+  }
 }
 
 // ---------- Option groups ----------
@@ -100,7 +401,7 @@ wireGroup(difficultyGroup, 'pill-btn', v => { difficultyLevel = v; });
 
 // ---------- Generate ----------
 generateBtn.addEventListener('click', async () => {
-  if (!selectedFile || generateBtn.disabled) return; // chặn double-submit (BUG-006): request thật tốn phí OpenAI
+  if ((!selectedFile && !hasCachedDoc) || generateBtn.disabled) return;
   hideError();
   generateBtn.disabled = true;
 
@@ -109,15 +410,23 @@ generateBtn.addEventListener('click', async () => {
   resultsPanel.classList.add('hidden');
   loadingPanel.classList.remove('hidden');
   setStep('generate');
-  loadingText.textContent = mode === 'stress'
-    ? 'Đang gọi OpenAI (chế độ sáng tạo — temperature cao)…'
-    : 'Đang gọi OpenAI để sinh quiz…';
+  if (loadingText) {
+    loadingText.textContent = mode === 'stress'
+      ? 'Đang gọi AI (chế độ sáng tạo — temperature cao)…'
+      : 'Đang gọi AI để sinh quiz…';
+  }
 
   const fd = new FormData();
-  fd.append('pdf', selectedFile);
+  if (selectedFile) {
+    fd.append('pdf', selectedFile);
+  }
   fd.append('num_questions', numQuestions);
   fd.append('mode', mode);
   fd.append('difficulty_level', difficultyLevel);
+  
+  // Thêm tuỳ chọn bật/tắt RAG
+  const useRagCheckbox = document.getElementById('use-rag-checkbox');
+  fd.append('use_rag', useRagCheckbox && useRagCheckbox.checked ? 'true' : 'false');
 
   // AbortController để nút Hủy có tác dụng thật (BUG-004): backend có thể mất
   // tới vài phút (timeout 90s x tối đa 3 lần retry) nếu OpenAI bị rate-limit.
@@ -150,11 +459,14 @@ cancelBtn.addEventListener('click', () => {
 });
 
 // ---------- Demo mẫu: thu gọn mặc định, tránh chiếm màn hình đầu (BUG-005) ----------
-demoToggle.addEventListener('click', () => {
-  const willShow = demoContent.classList.contains('hidden');
-  demoContent.classList.toggle('hidden', !willShow);
-  demoToggle.textContent = willShow ? '🙈 Ẩn demo' : '👀 Xem thử quiz sẽ trông như thế nào';
-});
+if (demoToggle) {
+  demoToggle.addEventListener('click', () => {
+    if (!demoContent) return;
+    const willShow = demoContent.classList.contains('hidden');
+    demoContent.classList.toggle('hidden', !willShow);
+    demoToggle.textContent = willShow ? '🙈 Ẩn demo' : '👀 Xem thử quiz sẽ trông như thế nào';
+  });
+}
 
 // ---------- Render 1 thẻ câu hỏi (dùng chung cho demo + kết quả thật) ----------
 function renderQuizCard(q, idx, { interactive = true } = {}) {
@@ -192,12 +504,27 @@ function renderQuizCard(q, idx, { interactive = true } = {}) {
   card.querySelectorAll('.option').forEach(btn => {
     btn.addEventListener('click', () => {
       const chosen = parseInt(btn.dataset.i, 10);
+      let targetIndex = typeof q.correct_index === 'number' ? q.correct_index : undefined;
+      if (targetIndex === undefined) {
+        const rawAns = String(q.answer || q.correct_answer || q.correct_index || '').trim();
+        const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+        const firstChar = rawAns.toUpperCase().charAt(0);
+        if (letterMap[firstChar] !== undefined) {
+          targetIndex = letterMap[firstChar];
+        } else if (!isNaN(parseInt(rawAns, 10))) {
+          targetIndex = parseInt(rawAns, 10);
+        } else {
+          const matchIdx = q.options.findIndex(opt => opt.toLowerCase().includes(rawAns.toLowerCase()));
+          if (matchIdx !== -1) targetIndex = matchIdx;
+        }
+      }
+
       card.querySelectorAll('.option').forEach((b, i) => {
         b.disabled = true;
-        if (i === q.correct_index) b.classList.add('correct');
+        if (i === targetIndex) b.classList.add('correct');
         else if (i === chosen) b.classList.add('wrong');
       });
-      exprEl.textContent = q.explanation || '';
+      if (exprEl) exprEl.textContent = q.explanation || '';
       if (srcEl) srcEl.textContent = q.source_snippet || '(không có)';
       feedback.classList.add('show');
       setStep('quiz');
@@ -212,22 +539,28 @@ function renderResults(data) {
   resultsPanel.classList.remove('hidden');
   setStep('review');
 
-  if (data.mode === 'stress') {
-    modeBanner.textContent = '⚡ Kết quả từ CHẾ ĐỘ SÁNG TẠO — AI được phép liên hệ ví dụ ngoài tài liệu. Câu nào chưa xác minh được nguồn sẽ có nhãn ⚠️. Không dùng chế độ này để phát quiz thật.';
-    modeBanner.classList.remove('hidden');
-  } else {
-    modeBanner.classList.add('hidden');
+  if (modeBanner) {
+    if (data.mode === 'stress') {
+      modeBanner.textContent = '⚡ Kết quả từ CHẾ ĐỘ SÁNG TẠO — AI được phép liên hệ ví dụ ngoài tài liệu. Câu nào chưa xác minh được nguồn sẽ có nhãn ⚠️. Không dùng chế độ này để phát quiz thật.';
+      modeBanner.classList.remove('hidden');
+    } else {
+      modeBanner.classList.add('hidden');
+    }
   }
 
-  if (data.warning) {
-    warningBanner.textContent = '⚠️ ' + data.warning;
-    warningBanner.classList.remove('hidden');
-  } else {
-    warningBanner.classList.add('hidden');
+  if (warningBanner) {
+    if (data.warning) {
+      warningBanner.textContent = '⚠️ ' + data.warning;
+      warningBanner.classList.remove('hidden');
+    } else {
+      warningBanner.classList.add('hidden');
+    }
   }
 
   const diffLabel = DIFFICULTY_GROUP_LABEL[data.difficulty_level] || data.difficulty_level;
-  metaLine.textContent = `Model: ${data.model} · Mức độ khó: ${diffLabel} · ${data.pages_used} trang có text (${data.total_chars} ký tự) · ${data.questions.length} câu · thời gian gọi API: ${data.elapsed_seconds}s`;
+  if (metaLine) {
+    metaLine.textContent = `Model: ${data.model} · Mức độ khó: ${diffLabel} · ${data.pages_used} trang có text (${data.total_chars} ký tự) · ${data.questions.length} câu · thời gian gọi API: ${data.elapsed_seconds}s`;
+  }
 
   quizList.innerHTML = '';
   data.questions.forEach((q, idx) => {
@@ -240,6 +573,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   formPanel.classList.remove('hidden');
   demoPanel.classList.remove('hidden');
   setStep('upload');
+  checkActiveDocument();
 });
 
 // ---------- Demo mẫu (hiện sẵn khi chưa upload gì, minh hoạ G2 - làm rõ AI làm được gì) ----------
@@ -284,9 +618,13 @@ DEMO_QUESTIONS.forEach((q, idx) => {
 
 // ---------- Helpers ----------
 function showError(msg) {
-  errorBox.textContent = msg;
-  errorBox.classList.remove('hidden');
+  if (errorBox) {
+    errorBox.textContent = msg;
+    errorBox.classList.remove('hidden');
+  }
 }
 function hideError() {
-  errorBox.classList.add('hidden');
+  if (errorBox) {
+    errorBox.classList.add('hidden');
+  }
 }

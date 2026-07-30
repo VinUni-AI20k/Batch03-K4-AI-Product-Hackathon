@@ -31,7 +31,7 @@ import time
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file
 from dotenv import load_dotenv
 from pypdf import PdfReader
 import requests
@@ -66,6 +66,7 @@ MODEL = LLM_MODEL  # dùng chung cho hiển thị UI + response JSON
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30MB, khớp copy trên UI
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0  # Vô hiệu hóa cache static file trên trình duyệt
 
 
 @app.errorhandler(413)
@@ -498,17 +499,230 @@ def call_openai(prompt: str, mode: str) -> dict:
             raise RuntimeError("LLM trả về kết quả không parse được JSON hay Markdown. Vui lòng bấm Tạo Quiz lại.")
 
 
+import hashlib
+
+UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "uploads"))
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+ACTIVE_DOC_ID = ""
+LAST_UPLOADED_PAGES = []
+LAST_UPLOADED_FILENAME = ""
+LAST_UPLOADED_PDF_BYTES = b""
+
+
+def get_document_index():
+    index_path = os.path.join(UPLOAD_DIR, "index.json")
+    if os.path.exists(index_path):
+        try:
+            with open(index_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+
+def save_document_index(docs):
+    index_path = os.path.join(UPLOAD_DIR, "index.json")
+    with open(index_path, "w", encoding="utf-8") as f:
+        json.dump(docs, f, ensure_ascii=False, indent=2)
+
+
+def set_active_document(doc_id):
+    global ACTIVE_DOC_ID, LAST_UPLOADED_PAGES, LAST_UPLOADED_FILENAME, LAST_UPLOADED_PDF_BYTES
+    meta_path = os.path.join(UPLOAD_DIR, f"{doc_id}.json")
+    pdf_path = os.path.join(UPLOAD_DIR, f"{doc_id}.pdf")
+    if os.path.exists(meta_path) and os.path.exists(pdf_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+                LAST_UPLOADED_PAGES = meta.get("pages", [])
+                LAST_UPLOADED_FILENAME = meta.get("filename", "Slide_BaiGiang.pdf")
+                ACTIVE_DOC_ID = doc_id
+            with open(pdf_path, "rb") as f:
+                LAST_UPLOADED_PDF_BYTES = f.read()
+            return True
+        except Exception as e:
+            print(f"[DOC LIB ERROR] Lỗi nạp doc_id {doc_id}: {e}")
+    return False
+
+
+def load_cached_doc_from_disk():
+    global ACTIVE_DOC_ID, LAST_UPLOADED_PAGES, LAST_UPLOADED_FILENAME, LAST_UPLOADED_PDF_BYTES
+    if LAST_UPLOADED_PAGES and LAST_UPLOADED_PDF_BYTES:
+        return True
+
+    docs = get_document_index()
+    if docs:
+        latest_doc_id = docs[0].get("doc_id")
+        if latest_doc_id:
+            return set_active_document(latest_doc_id)
+    return False
+
+
+def add_document_to_library(filename, pages, pdf_bytes):
+    global ACTIVE_DOC_ID, LAST_UPLOADED_PAGES, LAST_UPLOADED_FILENAME, LAST_UPLOADED_PDF_BYTES
+    doc_id = hashlib.md5((filename + str(len(pdf_bytes))).encode("utf-8")).hexdigest()[:12]
+    meta_path = os.path.join(UPLOAD_DIR, f"{doc_id}.json")
+    pdf_path = os.path.join(UPLOAD_DIR, f"{doc_id}.pdf")
+
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump({"doc_id": doc_id, "filename": filename, "pages": pages}, f, ensure_ascii=False, indent=2)
+    with open(pdf_path, "wb") as f:
+        f.write(pdf_bytes)
+
+    docs = get_document_index()
+    docs = [d for d in docs if d.get("doc_id") != doc_id]
+    docs.insert(0, {
+        "doc_id": doc_id,
+        "filename": filename,
+        "total_pages": len(pages),
+        "total_chars": sum(len(p.get("text", "")) for p in pages),
+        "upload_time": time.strftime("%Y-%m-%d %H:%M:%S")
+    })
+    save_document_index(docs)
+
+    ACTIVE_DOC_ID = doc_id
+    LAST_UPLOADED_PAGES = pages
+    LAST_UPLOADED_FILENAME = filename
+    LAST_UPLOADED_PDF_BYTES = pdf_bytes
+    return doc_id
+
+
 @app.route("/")
 def index():
     return render_template("index.html", model=MODEL)
 
 
-@app.route("/api/generate-quiz", methods=["POST"])
-def generate_quiz():
-    if "pdf" not in request.files:
+@app.route("/api/upload-and-index", methods=["POST"])
+def upload_and_index():
+    if "pdf" not in request.files or not request.files["pdf"].filename:
         return jsonify({"error": "Thiếu file PDF."}), 400
 
     pdf_file = request.files["pdf"]
+    filename = pdf_file.filename
+
+    try:
+        pdf_bytes = pdf_file.read()
+        pages = extract_pdf_text(io.BytesIO(pdf_bytes))
+        if not pages:
+            return jsonify({"error": "Không trích xuất được text từ PDF."}), 400
+
+        doc_id = add_document_to_library(filename, pages, pdf_bytes)
+
+        # Chạy LightRAG Indexing & Embedding ngay lập tức
+        try:
+            import asyncio
+            from services.rag_engine import get_rag_instance
+            doc_full_content = "\n\n".join(f"[Trang {p['page']}]\n{p['text']}" for p in pages)
+
+            async def do_index():
+                rag = await get_rag_instance()
+                await rag.ainsert(doc_full_content)
+
+            asyncio.run(do_index())
+        except Exception as rag_err:
+            print(f"[RAG INDEX WARNING] LightRAG indexing info: {rag_err}")
+
+        return jsonify({
+            "success": True,
+            "doc_id": doc_id,
+            "filename": filename,
+            "total_pages": len(pages),
+            "total_chars": sum(len(p.get("text", "")) for p in pages),
+            "pages": pages,
+            "documents": get_document_index()
+        })
+    except Exception as e:
+        return jsonify({"error": f"Lỗi xử lý file: {e}"}), 500
+
+
+@app.route("/api/documents", methods=["GET"])
+def get_documents():
+    docs = get_document_index()
+    return jsonify({
+        "documents": docs,
+        "active_doc_id": ACTIVE_DOC_ID
+    })
+
+
+@app.route("/api/select-document", methods=["POST"])
+def select_document():
+    doc_id = request.json.get("doc_id") if request.is_json else request.form.get("doc_id")
+    if not doc_id:
+        return jsonify({"error": "Thiếu doc_id"}), 400
+
+    if set_active_document(doc_id):
+        return jsonify({
+            "success": True,
+            "filename": LAST_UPLOADED_FILENAME,
+            "total_pages": len(LAST_UPLOADED_PAGES),
+            "pages": LAST_UPLOADED_PAGES
+        })
+    return jsonify({"error": "Không tìm thấy tài liệu"}), 404
+
+
+@app.route("/api/view-pdf", methods=["GET"])
+def view_pdf():
+    global LAST_UPLOADED_PDF_BYTES, LAST_UPLOADED_FILENAME
+    doc_id = request.args.get("doc_id")
+    if doc_id:
+        set_active_document(doc_id)
+
+    if not LAST_UPLOADED_PDF_BYTES:
+        load_cached_doc_from_disk()
+
+    if not LAST_UPLOADED_PDF_BYTES:
+        return "Chưa có file PDF nào được nạp.", 404
+    return send_file(
+        io.BytesIO(LAST_UPLOADED_PDF_BYTES),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=LAST_UPLOADED_FILENAME or "document.pdf"
+    )
+
+
+@app.route("/api/active-document", methods=["GET"])
+def active_document():
+    global LAST_UPLOADED_PAGES, LAST_UPLOADED_FILENAME, LAST_UPLOADED_PDF_BYTES, ACTIVE_DOC_ID
+    if not LAST_UPLOADED_PAGES:
+        load_cached_doc_from_disk()
+
+    if not LAST_UPLOADED_PAGES:
+        return jsonify({"has_cached_doc": False})
+
+    total_chars = sum(len(p.get("text", "")) for p in LAST_UPLOADED_PAGES)
+    return jsonify({
+        "has_cached_doc": True,
+        "doc_id": ACTIVE_DOC_ID,
+        "filename": LAST_UPLOADED_FILENAME or "Slide_BaiGiang_Cache.pdf",
+        "total_pages": len(LAST_UPLOADED_PAGES),
+        "total_chars": total_chars,
+        "has_pdf_bytes": bool(LAST_UPLOADED_PDF_BYTES),
+        "pages": LAST_UPLOADED_PAGES
+    })
+
+
+@app.route("/api/generate-quiz", methods=["POST"])
+def generate_quiz():
+    global LAST_UPLOADED_PAGES, LAST_UPLOADED_FILENAME, LAST_UPLOADED_PDF_BYTES
+
+    pages = []
+    if "pdf" in request.files and request.files["pdf"].filename:
+        pdf_file = request.files["pdf"]
+        try:
+            pdf_bytes = pdf_file.read()
+            pages = extract_pdf_text(io.BytesIO(pdf_bytes))
+            if pages:
+                add_document_to_library(pdf_file.filename, pages, pdf_bytes)
+        except Exception as e:
+            return jsonify({"error": f"Không đọc được PDF: {e}"}), 400
+    else:
+        load_cached_doc_from_disk()
+        pages = LAST_UPLOADED_PAGES
+
+    if not pages:
+        return jsonify({"error": "Thiếu file PDF. Vui lòng chọn file slide PDF."}), 400
+
     try:
         num_questions = int(request.form.get("num_questions", 5))
     except ValueError:
@@ -523,11 +737,6 @@ def generate_quiz():
     if difficulty_level not in ("easy", "medium", "hard", "mixed"):
         difficulty_level = "mixed"
 
-    try:
-        pages = extract_pdf_text(io.BytesIO(pdf_file.read()))
-    except Exception as e:
-        return jsonify({"error": f"Không đọc được PDF: {e}"}), 400
-
     if not pages:
         return jsonify({
             "error": "Không trích được text nào từ PDF (có thể slide toàn ảnh/scan, chưa hỗ trợ OCR trong bản demo này)."
@@ -541,15 +750,44 @@ def generate_quiz():
             "khá ít, quiz sinh ra có thể nông hoặc AI phải suy diễn nhiều hơn bình thường."
         )
 
-    prompt = build_prompt(pages, num_questions, mode, difficulty_level)
-
     t0 = time.time()
+    
+    # Tuỳ chọn bật/tắt RAG (mặc định TẮT để tăng tốc với tài liệu ngắn)
+    use_rag = request.form.get("use_rag", "false").lower() == "true"
+    
     try:
-        result = call_openai(prompt, mode)
-    except RuntimeError as e:
-        return jsonify({"error": str(e)}), 502
-    except Exception as e:  # lưới an toàn cuối - không để lộ traceback thô ra frontend
-        return jsonify({"error": f"Lỗi không lường trước: {e}"}), 500
+        from services.langgraph_workflow import run_quiz_workflow
+        doc_full_content = "\n\n".join(f"[Trang {p['page']}]\n{p['text']}" for p in pages)
+        
+        # Kích hoạt luồng LangGraph Workflow (gồm LightRAG Graph Context + DeepSeek Model Factory)
+        raw_result_str = run_quiz_workflow(
+            slide_content=doc_full_content,
+            model_name=OPENAI_MODEL,
+            num_questions=num_questions,
+            mode=mode,
+            difficulty_level=difficulty_level,
+            use_rag=use_rag
+        )
+        
+        cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_result_str.strip(), flags=re.IGNORECASE)
+        cleaned_text = re.sub(r"\s*```$", "", cleaned_text).strip()
+        try:
+            result = json.loads(cleaned_text)
+        except json.JSONDecodeError:
+            try:
+                from json_repair import repair_json
+                result = json.loads(repair_json(cleaned_text))
+            except Exception:
+                result = {"questions": parse_markdown_quiz(raw_result_str)}
+    except Exception as e:
+        print(f"[LANGGRAPH FALLBACK] LangGraph/LightRAG pipeline info: {e}. Executing fallback call_openai...")
+        try:
+            prompt = build_prompt(pages, num_questions, mode, difficulty_level)
+            result = call_openai(prompt, mode)
+        except RuntimeError as err:
+            return jsonify({"error": str(err)}), 502
+        except Exception as err:
+            return jsonify({"error": f"Lỗi không lường trước: {err}"}), 500
     elapsed = round(time.time() - t0, 2)
 
     if isinstance(result, list):
@@ -566,6 +804,16 @@ def generate_quiz():
     verified_questions = []
     dropped = 0
     for q in questions:
+        raw_ans = str(q.get("answer") or q.get("correct_answer") or q.get("correct_index") or "").strip()
+        ans_letter = raw_ans.upper()[:1]
+        letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
+        if ans_letter in letter_map:
+            q["correct_index"] = letter_map[ans_letter]
+        elif isinstance(q.get("correct_index"), int):
+            pass
+        else:
+            q["correct_index"] = 0
+
         raw_q = q.get("raw_quote") or q.get("source_snippet") or ""
         q["source_snippet"] = raw_q
         q["source_verified"] = verify_source(raw_q, full_text_norm)
