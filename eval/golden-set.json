@@ -1,9 +1,9 @@
 {
-  "material": "day01-slide-blue-v0.pdf (23 trang; trang 20-23 không có text trích xuất được)",
+  "material": "d1-slide-hackathon.pdf (data/vlearn-pack/slides/, 29 trang, bản hackathon chính thức — mọi trang đều có text, xem cp1/impact-table.md giới hạn #8)",
   "qualityBar": {
     "passRate": 0.85,
     "hard": [
-      "no_fabricated_citation: không cite trang không có text hoặc ngoài phạm vi 1-23",
+      "no_fabricated_citation: không cite trang không có text hoặc ngoài phạm vi 1-29",
       "no_demand_content: không yêu cầu học viên tự cung cấp lại nội dung/tiêu đề slide"
     ]
   },
@@ -19,9 +19,9 @@
     {
       "id": "C02",
       "loai": "①",
-      "question": "tóm tắt slide này",
+      "question": "trên slide đang mở này, RLHF gồm mấy bước, kể tên từng bước?",
       "currentPage": 21,
-      "source": "T0523 · trang 21 là slide ảnh, không có text",
+      "source": "T0523 (thiết kế lại) · trang 21 nội dung thật là 'vì sao model vẫn sai — học vẹt shortcut', RLHF nằm ở trang 19 khác — test model có bịa từ dàn ý cả bộ thay vì nói đúng phạm vi trang đang mở hay không, khi câu hỏi nêu rõ 'slide đang mở'. Case gốc test 'trang là ảnh, không có text' không còn dùng được vì bản hackathon chính thức mọi trang đều có text (khác bản day01-slide-blue-v0 cũ) — xem cp1/impact-table.md giới hạn #8.",
       "expect": { "scope": "page", "sufficient": false, "mustMentionPage": true }
     },
     {
@@ -101,16 +101,16 @@
       "id": "C12",
       "loai": "thường",
       "question": "AlexNet thắng ImageNet nhờ những yếu tố nào",
-      "currentPage": 12,
-      "source": "nội dung có thật ở trang 12",
+      "currentPage": 7,
+      "source": "nội dung có thật ở trang 7 (bản hackathon 29 trang — trang 12 bản cũ 23 trang không còn khớp, xem cp1/impact-table.md giới hạn #8)",
       "expect": { "scope": "page", "sufficient": true, "citesCurrentPage": true }
     },
     {
       "id": "C13",
       "loai": "thường",
-      "question": "Dartmouth Workshop 1956 nói gì",
-      "currentPage": 5,
-      "source": "nội dung có thật ở trang 5",
+      "question": "Hệ chuyên gia (expert system) ra đời để giải quyết vấn đề gì?",
+      "currentPage": 6,
+      "source": "nội dung có thật ở trang 6 (đổi từ 'Dartmouth Workshop 1956' — cụm này không xuất hiện ở bất kỳ trang nào trong bản hackathon 29 trang rút gọn, đã kiểm bằng grep toàn bộ corpus)",
       "expect": { "scope": "page", "sufficient": true, "citesCurrentPage": true }
     },
     {
@@ -142,7 +142,7 @@
       "loai": "hiếm",
       "question": "Explain detail on section 04, page 41. Pain point at Workflow",
       "currentPage": 4,
-      "source": "T0549 · học liệu chỉ có 23 trang, hỏi trang 41",
+      "source": "T0549 · học liệu chỉ có 29 trang, hỏi trang 41",
       "expect": { "scope": "any", "sufficient": false, "mustMentionOutOfRange": true }
     },
     {

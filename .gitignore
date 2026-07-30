@@ -12,3 +12,8 @@ venv/
 .env*
 *.env
 !.env.example
+
+# Script cào dữ liệu & file thử nghiệm tạm thời
+scripts/
+scratch/
+docs/research/

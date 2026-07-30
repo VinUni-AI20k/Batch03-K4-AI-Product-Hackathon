@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import deck from "@/data/day01-pages.json";
+// Corpus là bản slide hackathon THẬT trong data pack (không phải
+// day01-slide-blue-v0/v1 — bản đó không thuộc data pack được cấp).
+// Xem scripts/extract-pdf.mjs và cp1/impact-table.md giới hạn #8.
+import deck from "@/data/d1-pages.json";
 
 const MODELS = {
   gemini: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",

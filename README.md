@@ -49,7 +49,7 @@ Số chính, mining **1.261 lượt hỏi-đáp thật** (369 user, 585 hội th
 
 Giới hạn bằng chứng ghi nhận trung thực — gồm cả 2 giả thuyết đã kiểm và **không** đứng vững: [cp1/impact-table.md](cp1/impact-table.md) mục "Giới hạn bằng chứng".
 
-## Chạy prototype CP2
+## Chạy prototype
 
 ```bash
 cd codebase
@@ -57,7 +57,7 @@ npm install
 npm run dev
 ```
 
-Mở `http://localhost:3000`. Bản CP2 dùng dữ liệu mock và không cần API key. Flow demo chi tiết nằm trong [codebase/README.md](codebase/README.md).
+Mở `http://localhost:3000`. Cần `codebase/.env.local` với `GEMINI_API_KEY` để gọi AI thật ở quyết định trung tâm. Flow chi tiết + phần nào thật/mock: [codebase/README.md](codebase/README.md).
 
 ## Tiến độ theo checkpoint
 
