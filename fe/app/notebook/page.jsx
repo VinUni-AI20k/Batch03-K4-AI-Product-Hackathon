@@ -1,7 +1,7 @@
 'use client';
 import Header from '../../components/Header'
 import { useEffect, useState, useRef } from 'react'
-import { getCourseInfo, getCourseDays } from '../../utils/api'
+import { getCourseInfo, getCourseDays, sendChatMessage } from '../../utils/api'
 
 const STORAGE_KEY_CHAT = 'vlearn_notebook_chat'
 const STORAGE_KEY_NOTES = 'vlearn_notebook_notes'
@@ -15,6 +15,7 @@ export default function NotebookPage() {
   const [chatInput, setChatInput] = useState('')
   const [notes, setNotes] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [chatError, setChatError] = useState('')
   const chatEndRef = useRef(null)
 
   // Load data
@@ -50,41 +51,43 @@ export default function NotebookPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages, isTyping])
 
-  // AI responses (simulated)
-  const AI_RESPONSES = [
-    "Chào bạn! Mình là VLearn Tutor. Bạn cần hỗ trợ gì về bài học hôm nay?",
-    "Đó là một câu hỏi hay! Trong bài slide, khái niệm này được giải thích ở phần 3. Bạn có thể xem lại slide Day01 nhé.",
-    "Để hiểu rõ hơn về AI agents, bạn nên tập trung vào kiến trúc ReAct và cách tool-use hoạt động trong LLM pipeline.",
-    "Bạn đang làm tốt lắm! Tiến độ của bạn cho thấy bạn đã nắm được các khái niệm cốt lõi. Hãy tiếp tục!",
-    "Phần Prompt Engineering rất quan trọng. Hãy thử áp dụng kỹ thuật Chain-of-Thought trong bài tập tiếp theo nhé.",
-    "Mình gợi ý bạn nên ôn lại Day02 về Retrieval-Augmented Generation (RAG) trước khi sang Day03.",
-  ]
-
-  function handleSendMessage(e) {
+  async function handleSendMessage(e) {
     e?.preventDefault()
     if (!chatInput.trim()) return
 
+    const message = chatInput.trim()
     const userMsg = {
       id: Date.now(),
       role: 'user',
-      content: chatInput.trim(),
+      content: message,
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     }
     setChatMessages(prev => [...prev, userMsg])
     setChatInput('')
     setIsTyping(true)
+    setChatError('')
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await sendChatMessage({
+        message,
+        context: { course_id: 'comp2010-phase-1' }
+      })
       const aiMsg = {
         id: Date.now() + 1,
         role: 'ai',
-        content: AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)],
+        content: response.answer,
+        status: response.status,
+        scope: response.scope,
+        citations: response.citations || [],
+        suggestedQuestions: response.suggested_questions || [],
         time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
       }
       setChatMessages(prev => [...prev, aiMsg])
+    } catch {
+      setChatError('Không kết nối được VLearn Tutor. Hãy kiểm tra backend và thử lại.')
+    } finally {
       setIsTyping(false)
-    }, 1200 + Math.random() * 800)
+    }
   }
 
   function clearChat() {
@@ -298,6 +301,26 @@ export default function NotebookPage() {
                       : 'bg-slate-50 border border-slate-100 text-slate-800'
                   }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    {msg.role !== 'user' && msg.citations?.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-slate-200 space-y-1.5">
+                        <div className="text-[11px] font-semibold text-slate-600">Nguồn từ slide</div>
+                        {msg.citations.map(citation => (
+                          <div key={citation.source_id} className="text-xs text-[#1565A8]">
+                            {citation.lecture_title} · trang {citation.page ?? '?'}
+                            {citation.excerpt && (
+                              <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">
+                                {citation.excerpt}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {msg.role !== 'user' && msg.status && (
+                      <div className="mt-2 text-[10px] uppercase tracking-wide text-slate-400">
+                        {msg.status} · {msg.scope}
+                      </div>
+                    )}
                     <div className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-blue-200' : 'text-[#94A3B8]'}`}>
                       {msg.time}
                     </div>
@@ -319,6 +342,12 @@ export default function NotebookPage() {
 
               <div ref={chatEndRef} />
             </div>
+
+            {chatError && (
+              <div className="mx-6 mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+                {chatError}
+              </div>
+            )}
 
             {/* Input */}
             <form
