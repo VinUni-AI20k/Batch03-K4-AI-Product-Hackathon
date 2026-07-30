@@ -1,2 +1,0 @@
-[console_scripts]
-gmail-mcp = gmail_mcp_client.cli:main

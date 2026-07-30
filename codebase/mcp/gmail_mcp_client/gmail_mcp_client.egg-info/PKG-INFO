@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: gmail-mcp-client
-Version: 0.1.0
-Summary: A small Python client for Gmail MCP servers
-Requires-Python: >=3.10
-Requires-Dist: httpx>=0.27
-Requires-Dist: mcp<2,>=1.28
-Requires-Dist: pydantic>=2.0
-Requires-Dist: python-dotenv>=1.0

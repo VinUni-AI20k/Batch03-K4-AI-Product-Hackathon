@@ -2,7 +2,7 @@
 
 A real tool-calling agent (system prompt + `tools.yaml` + a tool-execution
 loop, in the style of `example/Day04-.../starter_v0`) wired to the MCP
-integrations in `codebase/mcp/`: **Gmail** (`gmail_mcp_client`), **Discord**
+integrations in `codebase/mcp/`: **Gmail** (`gmail_mcp`), **Discord**
 (`discord_mcp`), and **Google Calendar** (`google_calendar_mcp`). Outlook is
 intentionally not wired up yet.
 
@@ -13,14 +13,7 @@ tool-calling path.
 
 ## How the 3 MCPs are reached
 
-- **Gmail**: `tools/gmail_search`, `tools/gmail_read_thread` import
-  `GmailMcpClient` from `codebase/mcp/gmail_mcp_client` directly (it talks to
-  Google's hosted Gmail MCP over HTTP+OAuth — no local server to run).
-- **Discord** and **Google Calendar**: both ship as MCP *servers only* — run
-  each as its own process, and this agent connects to them over
-  streamable-HTTP (`mcp_bridge/http_mcp_client.py`), exactly as their own
-  READMEs describe ("run both at once, your agent connects to each
-  separately").
+- **Gmail**, **Discord**, and **Google Calendar**: all ship as local MCP servers (`gmail_mcp`, `discord_mcp`, `google_calendar_mcp`). Run each as its own process, and this agent connects to them over streamable-HTTP (`mcp_bridge/http_mcp_client.py`).
 
 ## Setup
 
@@ -34,10 +27,10 @@ test -f .env || cp .env.example .env
 
 Fill in `OPENAI_API_KEY` in `codebase/backend/.env`. Discord/Calendar/Gmail
 credentials go in `codebase/mcp/.env` (see `codebase/mcp/discord_mcp/README.md`,
-`codebase/mcp/google_calendar_mcp/README.md`, `codebase/mcp/gmail_mcp_client/README.md`
+`codebase/mcp/google_calendar_mcp/README.md`, `codebase/mcp/gmail_mcp/README.md`
 for how to obtain each).
 
-In two other terminals (same `codebase/mcp/.venv`), start the servers this
+In three other terminals (same `codebase/mcp/.venv`), start the servers this
 agent needs:
 
 ```bash
@@ -50,8 +43,10 @@ cd codebase/mcp && source .venv/bin/activate
 python -m google_calendar_mcp    # http://localhost:8086/mcp
 ```
 
-Gmail needs no local server — `gmail_search`/`gmail_read_thread` will prompt
-for OAuth in the browser on first use if `GMAIL_MCP_ACCESS_TOKEN` isn't set.
+```bash
+cd codebase/mcp && source .venv/bin/activate
+python -m gmail_mcp              # http://localhost:8087/mcp
+```
 
 ## Run
 
