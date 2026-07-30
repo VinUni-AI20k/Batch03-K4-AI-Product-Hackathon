@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/slide-viewer.css" />
+  <!-- PDF.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 </head>
 <body>
 
@@ -72,7 +74,7 @@
           </div>
 
           <div class="day-items-list">
-            <div class="doc-item active" onclick="loadPdf('../data/vlearn-pack/slides/d1-slide-hackathon.pdf', 'day01_302.pdf', 83)">
+            <div class="doc-item active" onclick="loadPdf('/data/vlearn-pack/slides/d1-slide-hackathon.pdf', 'day01_302.pdf', 83)">
               <div class="doc-item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
               </div>
@@ -83,7 +85,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--emerald);"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
 
-            <div class="doc-item" onclick="loadPdf('../data/vlearn-pack/slides/d2-slide-hackathon.pdf', 'material_mrxpq9zu.pdf', 32)">
+            <div class="doc-item" onclick="loadPdf('/data/vlearn-pack/slides/d2-slide-hackathon.pdf', 'material_mrxpq9zu.pdf', 32)">
               <div class="doc-item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
               </div>
@@ -215,8 +217,15 @@
             <span class="doc-watermark-id" id="doc-watermark-id">day01_302.pdf</span>
           </div>
 
-          <div class="slide-aspect-frame">
-            <iframe class="pdf-viewer-frame" id="pdf-frame" src="../data/vlearn-pack/slides/d1-slide-hackathon.pdf#toolbar=0&navpanes=0&view=FitH&page=1"></iframe>
+          <div class="slide-aspect-frame" id="slide-aspect-frame">
+            <!-- PDF.js renders here -->
+            <canvas id="pdf-canvas"></canvas>
+            <div id="text-layer" class="textLayer"></div>
+            <!-- Loading spinner -->
+            <div class="pdf-loading" id="pdf-loading">
+              <div class="pdf-spinner"></div>
+              <span>Đang tải trang slide...</span>
+            </div>
           </div>
 
           <div class="slide-page-footer">
@@ -295,6 +304,22 @@
 
   </div>
 
-  <script src="js/slide-viewer.js"></script>
+  <!-- Floating tooltip when user selects text on slide -->
+  <div class="selection-tooltip" id="selection-tooltip">
+    <button class="sel-tooltip-btn" id="btn-ask-selection" title="Hỏi VLearn Tutor về đoạn này">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a9.96 9.96 0 0 1-4.587-1.112l-3.826 1.07a1 1 0 0 1-1.235-1.236l1.07-3.825A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2z"/></svg>
+      Hỏi Tutor
+    </button>
+    <button class="sel-tooltip-btn" id="btn-explain-selection" title="Giải thích đoạn đã chọn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      Giải thích
+    </button>
+    <button class="sel-tooltip-btn" id="btn-summarize-selection" title="Tóm tắt đoạn đã chọn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>
+      Tóm tắt
+    </button>
+  </div>
+
+  <script src="js/slide-viewer.js" type="module"></script>
 </body>
 </html>
