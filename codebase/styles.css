@@ -300,7 +300,9 @@ input{font:inherit}
 
 /* highlight + mực bút */
 .slide mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px;box-decoration-break:clone}
-.ink{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible}
+/* width/height phải ghi đè quy tắc svg{width:20px;height:20px} dùng cho icon,
+   nếu không lớp mực bị co thành ô 20×20px ở góc và nét vẽ biến mất */
+.ink{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
 .ink path,.ink ellipse{fill:none;stroke:#e0483b;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .page.pen-mode .slide{cursor:crosshair}
 .page.pen-mode .slide *{user-select:none}

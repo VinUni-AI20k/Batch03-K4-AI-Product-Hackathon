@@ -344,7 +344,7 @@ document.addEventListener('pointerdown', e => {
     draw = { mode: 'pen', el: path, pts: [], slide };
     addPoint(e);
   }
-  slide.setPointerCapture?.(e.pointerId);
+  try { slide.setPointerCapture(e.pointerId); } catch { }
 });
 
 document.addEventListener('pointermove', e => {
