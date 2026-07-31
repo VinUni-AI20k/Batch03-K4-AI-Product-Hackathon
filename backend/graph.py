@@ -101,7 +101,7 @@ def retrieve_node(state: AgentState):
 
 def generate_node(state: AgentState):
     """Generates the final answer using retrieved context."""
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.7)
+    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.1)
     
     context = state.get("context", "")
     lecture_id = state.get("lecture_id", "day01")
