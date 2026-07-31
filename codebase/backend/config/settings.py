@@ -13,11 +13,27 @@ if str(BASE_DIR) not in sys.path:
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    for env_p in [BASE_DIR / ".env", BASE_DIR / "codebase" / ".env", BACKEND_DIR / ".env"]:
+    for env_p in [BASE_DIR / "codebase" / ".env", BASE_DIR / ".env", BACKEND_DIR / ".env"]:
         if env_p.exists():
             load_dotenv(dotenv_path=env_p, override=True)
 except ImportError:
-    pass
+    # Manual fallback parser in case python-dotenv is not installed
+    for env_p in [BASE_DIR / "codebase" / ".env", BASE_DIR / ".env", BACKEND_DIR / ".env"]:
+        if env_p.exists():
+            try:
+                with open(env_p, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            parts = line.split("=", 1)
+                            if len(parts) == 2:
+                                k, v = parts
+                                val = v.strip()
+                                if (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
+                                    val = val[1:-1]
+                                os.environ[k.strip()] = val
+            except Exception as e:
+                print(f"[VLearn Warning] Failed to manually load .env file: {e}")
 
 # LLM Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
