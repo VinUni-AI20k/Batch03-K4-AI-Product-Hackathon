@@ -151,6 +151,14 @@ export default function App() {
     setMessages(history);
     setIsTyping(true);
 
+    // Create a placeholder streaming message so the bubble appears immediately
+    const streamingId = `${Date.now()}-stream`;
+    const streamingMessage = createMessage("assistant", "", { _streamingId: streamingId });
+    // We'll track the accumulated text outside of state to avoid closure stale issues
+    let streamedText = "";
+
+    setMessages((current) => [...current, { ...streamingMessage, id: streamingId }]);
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -164,25 +172,95 @@ export default function App() {
           messages: history.map(({ role, content }) => ({ role, content }))
         })
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "AI Tutor gặp lỗi.");
 
-      setServiceMode(result.mode || "openrouter");
-      setMessages((current) => [
-        ...current,
-        createMessage("assistant", result.answer, {
-          quiz: result.quiz || null
-        })
-      ]);
+      const contentType = response.headers.get("content-type") || "";
+
+      // ── SSE streaming path ──────────────────────────────────────────────
+      if (contentType.includes("text/event-stream")) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let finalResult = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          // Parse SSE lines
+          const lines = buffer.split("\n");
+          buffer = lines.pop(); // keep incomplete last line
+
+          let currentEvent = null;
+          for (const line of lines) {
+            if (line.startsWith("event:")) {
+              currentEvent = line.slice(6).trim();
+            } else if (line.startsWith("data:")) {
+              const dataStr = line.slice(5).trim();
+              if (!dataStr) continue;
+              try {
+                const data = JSON.parse(dataStr);
+                if (currentEvent === "delta" && data.text) {
+                  streamedText += data.text;
+                  // Update the streaming bubble in place
+                  setMessages((current) =>
+                    current.map((m) =>
+                      m.id === streamingId ? { ...m, content: streamedText } : m
+                    )
+                  );
+                } else if (currentEvent === "done") {
+                  finalResult = data;
+                } else if (currentEvent === "error") {
+                  throw new Error(data.message || "AI stream error");
+                }
+              } catch (parseErr) {
+                if (currentEvent === "error") throw parseErr;
+              }
+              currentEvent = null;
+            }
+          }
+        }
+
+        // Replace streaming bubble with the final structured message
+        if (finalResult) {
+          setServiceMode(finalResult.mode || "gemini");
+          setMessages((current) =>
+            current.map((m) =>
+              m.id === streamingId
+                ? createMessage("assistant", finalResult.answer, { quiz: finalResult.quiz || null })
+                : m
+            )
+          );
+        } else {
+          // No done event — keep whatever text streamed
+          setMessages((current) =>
+            current.map((m) =>
+              m.id === streamingId ? { ...m, content: streamedText || "…" } : m
+            )
+          );
+        }
+
+      // ── Fallback: plain JSON (demo / error path) ──────────────────────
+      } else {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "AI Tutor gặp lỗi.");
+        setServiceMode(result.mode || "gemini");
+        setMessages((current) =>
+          current.map((m) =>
+            m.id === streamingId
+              ? createMessage("assistant", result.answer, { quiz: result.quiz || null })
+              : m
+          )
+        );
+      }
     } catch (error) {
-      setMessages((current) => [
-        ...current,
-        createMessage(
-          "assistant",
-          `Không thể kết nối AI Tutor. ${error.message}`,
-          { retryText: text }
+      setMessages((current) =>
+        current.map((m) =>
+          m.id === streamingId
+            ? createMessage("assistant", `Không thể kết nối AI Tutor. ${error.message}`, { retryText: text })
+            : m
         )
-      ]);
+      );
     } finally {
       setIsTyping(false);
     }

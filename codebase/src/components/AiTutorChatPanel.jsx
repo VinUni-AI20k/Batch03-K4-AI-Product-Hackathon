@@ -147,7 +147,11 @@ export default function AiTutorChatPanel({
               <h2 className="text-[15px] font-bold text-white">AI Tutor</h2>
               <p className="mt-0.5 text-[10px] text-slate-500">
                 Powered by{" "}
-                {serviceMode === "mock" ? "demo fallback" : "OpenRouter"}
+                {serviceMode === "mock"
+                  ? "demo fallback"
+                  : serviceMode === "ollama"
+                  ? "Ollama (local)"
+                  : "Gemini"}
               </p>
             </div>
           </div>
