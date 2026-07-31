@@ -77,12 +77,14 @@ async def summarize_page_endpoint(req: SummarizeRequest):
     return {"answer": answer, "page_number": req.page_number}
 
 
-# Mount thư mục vlearn làm static files cho Frontend HTML
-VLEARN_DIR = ROOT_DIR / "vlearn"
+# Mount thư mục codebase làm static files cho Frontend
+VLEARN_DIR = ROOT_DIR / "codebase" if (ROOT_DIR / "codebase").exists() else ROOT_DIR / "vlearn"
 DATA_DIR = ROOT_DIR / "data"
 
-app.mount("/data", StaticFiles(directory=str(DATA_DIR)), name="data")
-app.mount("/", StaticFiles(directory=str(VLEARN_DIR), html=True), name="vlearn_frontend")
+if DATA_DIR.exists():
+    app.mount("/data", StaticFiles(directory=str(DATA_DIR)), name="data")
+if VLEARN_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(VLEARN_DIR), html=True), name="vlearn_frontend")
 
 if __name__ == "__main__":
     import uvicorn
