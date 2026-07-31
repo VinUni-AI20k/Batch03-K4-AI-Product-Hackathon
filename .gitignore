@@ -1,7 +1,20 @@
 .DS_Store
+
+# Node
 node_modules/
+
+# Environment
 *.env
-.venv/
+
+# Vite
+frontend/.vite/
+
+# Python cache
 __pycache__/
 *.pyc
-backend/data/*.db
+
+# Local database
+*.db
+
+# Logs
+*.log

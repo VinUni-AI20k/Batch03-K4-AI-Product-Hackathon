@@ -4,6 +4,10 @@ import { useSession } from '../context/SessionContext';
 import MarkdownWithCitations from './shared/MarkdownWithCitations';
 import ProgressLoader from './shared/ProgressLoader';
 import LearningProgressCard from './shared/LearningProgressCard';
+<<<<<<< HEAD
+=======
+import AskPanel from './AskPanel';
+>>>>>>> feature/dat
 
 function TutorBubble({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
   return (
@@ -117,6 +121,10 @@ export default function ChatPanel() {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <LearningProgressCard />
+<<<<<<< HEAD
+=======
+        <AskPanel />
+>>>>>>> feature/dat
       </div>
     </div>
   );
