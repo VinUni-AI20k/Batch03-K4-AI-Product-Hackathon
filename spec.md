@@ -122,13 +122,13 @@ Golden set nằm trong năm file JSON của `eval/`; 10/20 case tham chiếu pat
 
 Tên thật của thành viên chưa có trong repo; không gán tên hư cấu. Trước CP1, thay các vai sau bằng tên/mã học viên thật trong README và bảng này.
 
-|Thành viên | Vai | Trách nhiệm | Artifact |
+| Thành viên | Vai trò | Trách nhiệm | Artifact |
 |---|---|---|---|
-|Hồ Văn Tâm| Spec owner | Chốt §1–§9 và changelog | `spec.md` |
-| Evidence owner | Mining, phương pháp đếm và quote | log evidence riêng |
-| Prompt/eval owner | Case, rubric và lượt chạy | `eval/` |
-| Build owner | Prototype và AI trace | `codebase/` |
-| Demo/validation owner | User test, dry run, slide | `validation/`, slide |
+| Hồ Văn Tâm - 2A202601542 | Spec owner | Chốt §1–§9 và changelog | `spec.md` |
+| Trần Văn Ngọc - 2A202601512 | Evidence owner | Mining, phương pháp đếm và quote | log evidence riêng |
+| Nguyễn Quý Dương - 2A202601642  | Prompt/eval owner | Case, rubric và lượt chạy | `eval/` |
+| Nguyễn Hoàng Bảo Minh - 2A202601626  | Build owner | Prototype và AI trace | `codebase/` |
+| Hoàng Công Thành - 2A202601662| Demo/validation owner | User test, dry run, slide | `validation/`, slide |
 
 ### Validation CP5
 
