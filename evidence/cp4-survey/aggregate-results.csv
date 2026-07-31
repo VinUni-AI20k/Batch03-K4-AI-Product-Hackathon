@@ -1,0 +1,36 @@
+﻿category,option,count,denominator,rate
+online,Khó tìm kiếm tên thủ tục phức tạp,24,45,0.5333333333333333
+online,"Quy trình, danh mục hồ sơ cần chuẩn bị ghi không rõ ràng",17,45,0.37777777777777777
+online,Thiếu kênh hỗ trợ Chatbot tư vấn trực tuyến,17,45,0.37777777777777777
+online,Thông tin giữa các trang web không đồng nhất,16,45,0.35555555555555557
+online,Lỗi kỹ thuật hệ thống báo lỗi kết nối,15,45,0.3333333333333333
+online,Thanh tìm kiếm trên Cổng Dịch vụ công không trả về kết quả chính xác,13,45,0.28888888888888886
+online,Giao diện khó dùng Biểu mẫu rườm rà,13,45,0.28888888888888886
+travel,Phải đi lại nhiều lần do hồ sơ thiếu/sai sót,26,45,0.5777777777777777
+travel,"Phải bốc số, xếp hàng mất nhiều thời gian do tình trạng quá tải tại bộ phận Một cửa.",26,45,0.5777777777777777
+travel,Không được hướng dẫn đầy đủ từ đầu.,18,45,0.4
+travel,Thời gian tiếp nhận hồ sơ trùng với giờ hành chính,16,45,0.35555555555555557
+travel,"Cơ quan thiếu máy tính, máy quét hoặc Wifi để người dân tự thao tác tại chỗ.",8,45,0.17777777777777778
+service,Không giải thích rõ ràng cho người dân,21,45,0.4666666666666667
+service,Hồ sơ bị ngâm lâu quá thời hạn quy định nhưng không phản hồi rõ lý do chậm trễ,21,45,0.4666666666666667
+service,Hướng dẫn bổ sung hồ sơ lặt vặt nhiều lần,17,45,0.37777777777777777
+service,Sử dụng nhiều thuật ngữ chuyên môn/pháp lý phức tạp,16,45,0.35555555555555557
+service,"Cán bộ thiếu thân thiện, hách dịch, thiếu kiên nhẫn khi giải thích cho người dân",15,45,0.3333333333333333
+service,Cán bộ xử lý chưa nắm vững quy trình hoặc thao tác phần mềm còn chậm,11,45,0.24444444444444444
+overall,"Quy trình, giấy tờ quá rườm rà, chồng chéo",25,45,0.5555555555555556
+overall,"Phải di chuyển, đi lại nhiều lần tốn thời gian",25,45,0.5555555555555556
+overall,"Giao diện & Hạ tầng công nghệ kém (hay lỗi, khó tìm, khó thao tác)",20,45,0.4444444444444444
+overall,Thời gian chờ trả kết quả quá lâu,18,45,0.4
+overall,Thái độ và cách xử lý của cán bộ chưa tốt,8,45,0.17777777777777778
+age,16 - 24,28,45,0.6222222222222222
+age,30 - 35,11,45,0.24444444444444444
+age,25 - 30,3,45,0.06666666666666667
+age,Trên 55,2,45,0.044444444444444446
+age,Dưới 16,1,45,0.022222222222222223
+profession,Công nghệ thông tin,24,45,0.5333333333333333
+profession,Kinh doanh và Thương mại,8,45,0.17777777777777778
+profession,Dịch vụ khách hàng,4,45,0.08888888888888889
+profession,Khác,3,45,0.06666666666666667
+profession,Kỹ thuật và Xây dựng,3,45,0.06666666666666667
+profession,Giáo dục và Đào tạo,2,45,0.044444444444444446
+profession,Y tế và Sức khỏe,1,45,0.022222222222222223

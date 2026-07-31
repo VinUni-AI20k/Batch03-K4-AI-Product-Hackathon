@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 *.env
+__pycache__/
+*.py[cod]
+tmp/pytest-*/
+.pytest_codex_*/
+be/.pytest_codex_*/
+docs/vps-deployment-handoff.md

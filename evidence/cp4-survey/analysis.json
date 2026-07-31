@@ -1,0 +1,68 @@
+{
+  "source_zip_sha256": "633C4BF6DAD9A77856FD52799BC03EF16EF71D1ED54534FDDA17C77148220874",
+  "response_count": 45,
+  "removed_columns": [
+    "Timestamp",
+    "Họ và tên của bạn"
+  ],
+  "output_columns": [
+    "respondent_id",
+    "age_band",
+    "profession",
+    "online_pain_points",
+    "travel_pain_points",
+    "service_pain_points",
+    "overall_pain_points",
+    "open_feedback"
+  ],
+  "pii_replacements_in_open_feedback": 0,
+  "counts": {
+    "online": {
+      "Khó tìm kiếm tên thủ tục phức tạp": 24,
+      "Quy trình, danh mục hồ sơ cần chuẩn bị ghi không rõ ràng": 17,
+      "Thông tin giữa các trang web không đồng nhất": 16,
+      "Thiếu kênh hỗ trợ Chatbot tư vấn trực tuyến": 17,
+      "Thanh tìm kiếm trên Cổng Dịch vụ công không trả về kết quả chính xác": 13,
+      "Giao diện khó dùng Biểu mẫu rườm rà": 13,
+      "Lỗi kỹ thuật hệ thống báo lỗi kết nối": 15
+    },
+    "travel": {
+      "Không được hướng dẫn đầy đủ từ đầu.": 18,
+      "Phải đi lại nhiều lần do hồ sơ thiếu/sai sót": 26,
+      "Thời gian tiếp nhận hồ sơ trùng với giờ hành chính": 16,
+      "Phải bốc số, xếp hàng mất nhiều thời gian do tình trạng quá tải tại bộ phận Một cửa.": 26,
+      "Cơ quan thiếu máy tính, máy quét hoặc Wifi để người dân tự thao tác tại chỗ.": 8
+    },
+    "service": {
+      "Cán bộ thiếu thân thiện, hách dịch, thiếu kiên nhẫn khi giải thích cho người dân": 15,
+      "Hướng dẫn bổ sung hồ sơ lặt vặt nhiều lần": 17,
+      "Không giải thích rõ ràng cho người dân": 21,
+      "Sử dụng nhiều thuật ngữ chuyên môn/pháp lý phức tạp": 16,
+      "Hồ sơ bị ngâm lâu quá thời hạn quy định nhưng không phản hồi rõ lý do chậm trễ": 21,
+      "Cán bộ xử lý chưa nắm vững quy trình hoặc thao tác phần mềm còn chậm": 11
+    },
+    "overall": {
+      "Quy trình, giấy tờ quá rườm rà, chồng chéo": 25,
+      "Thời gian chờ trả kết quả quá lâu": 18,
+      "Giao diện & Hạ tầng công nghệ kém (hay lỗi, khó tìm, khó thao tác)": 20,
+      "Phải di chuyển, đi lại nhiều lần tốn thời gian": 25,
+      "Thái độ và cách xử lý của cán bộ chưa tốt": 8
+    },
+    "age": {
+      "16 - 24": 28,
+      "25 - 30": 3,
+      "Trên 55": 2,
+      "30 - 35": 11,
+      "Dưới 16": 1
+    },
+    "profession": {
+      "Công nghệ thông tin": 24,
+      "Y tế và Sức khỏe": 1,
+      "Kinh doanh và Thương mại": 8,
+      "Dịch vụ khách hàng": 4,
+      "Giáo dục và Đào tạo": 2,
+      "Khác": 3,
+      "Kỹ thuật và Xây dựng": 3
+    }
+  }
+}

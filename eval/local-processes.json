@@ -1,0 +1,12 @@
+{
+  "backend": {
+    "pid": 24020,
+    "port": 8000,
+    "status": "started"
+  },
+  "frontend": {
+    "pid": 29324,
+    "port": 5173,
+    "status": "started"
+  }
+}

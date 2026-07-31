@@ -1,0 +1,181 @@
+"""Render a filled form draft as a PDF overlay on the original source template."""
+
+import io
+import os
+import subprocess
+from pathlib import Path
+
+from pypdf import PdfReader, PdfWriter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+
+from app.procedure_settings import FormCandidate, FormField
+
+TEMPLATES_DIR = Path(__file__).resolve().with_name("assets") / "form_templates"
+
+# The source forms embed Liberation Serif. Times New Roman is its metric-compatible
+# local Windows counterpart; production installs the exact Liberation font.
+# A serif fallback is mandatory so filled values do not visually clash with the
+# official form's headings and body copy.
+_FONT_NAME = "LiberationSerif"
+_WINDOWS_FONTS_DIR = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+_FONT_CANDIDATES = (
+    Path(__file__).resolve().with_name("assets") / "fonts" / "LiberationSerif-Regular.ttf",
+    Path("/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf"),
+    Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"),
+    _WINDOWS_FONTS_DIR / "times.ttf",
+    Path("/System/Library/Fonts/Supplemental/Times New Roman.ttf"),
+    Path("/usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf"),
+)
+_registered = False
+
+
+class ExportError(ValueError):
+    def __init__(self, field_code: str | None, reason: str) -> None:
+        self.field_code = field_code
+        self.reason = reason
+        super().__init__(f"{reason}:{field_code}")
+
+
+def _ensure_font_registered() -> None:
+    global _registered
+    if _registered:
+        return
+    font_path = next((path for path in (*_FONT_CANDIDATES, _fontconfig_match()) if path and path.is_file()), None)
+    if font_path is None:
+        raise ExportError(None, "vietnamese_font_missing")
+    pdfmetrics.registerFont(TTFont(_FONT_NAME, str(font_path)))
+    _registered = True
+
+
+def ensure_vietnamese_font() -> None:
+    """Fail deployment startup early when the PDF font is unavailable."""
+    _ensure_font_registered()
+
+
+def _fontconfig_match() -> Path | None:
+    """Ask Fontconfig for a Vietnamese-capable serif at non-standard paths."""
+    for requested_family in ("Liberation Serif", "Noto Serif"):
+        try:
+            result = subprocess.run(
+                ["fc-match", "-f", "%{family}\n%{file}", requested_family],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+        except (FileNotFoundError, subprocess.SubprocessError):
+            return None
+        family, _, value = result.stdout.strip().partition("\n")
+        if family.startswith(requested_family) and value:
+            return Path(value)
+    return None
+
+
+def _format_value(value: object, field: FormField) -> str:
+    if field.data_type == "table":
+        if isinstance(value, list):
+            return "; ".join(", ".join(f"{k}: {v}" for k, v in row.items()) if isinstance(row, dict) else str(row) for row in value)
+        return str(value) if value else ""
+    return "" if value is None else str(value)
+
+
+def _group_fields_by_page(candidate: FormCandidate, values: dict) -> dict[int, list[FormField]]:
+    by_page: dict[int, list[FormField]] = {}
+    for field in candidate.fields:
+        if field.export is None:
+            continue
+        text_value = _format_value(values.get(field.field_code), field)
+        if not text_value:
+            continue
+        by_page.setdefault(field.export.page, []).append(field)
+    return by_page
+
+
+def _wrap_text(text_value: str, width: float, font_size: float) -> list[str] | None:
+    words = text_value.split()
+    if not words:
+        return []
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if pdfmetrics.stringWidth(candidate, _FONT_NAME, font_size) <= width:
+            current = candidate
+            continue
+        if not current or pdfmetrics.stringWidth(word, _FONT_NAME, font_size) > width:
+            return None
+        lines.append(current)
+        current = word
+    lines.append(current)
+    return lines
+
+
+def _fit_lines(text_value: str, field: FormField, preferred_font_size: float | None = None) -> tuple[list[str], float]:
+    export = field.export
+    assert export is not None
+    maximum_font_size = preferred_font_size or export.font_size
+    if export.overflow_policy == "reject":
+        if pdfmetrics.stringWidth(text_value, _FONT_NAME, maximum_font_size) > export.width:
+            raise ExportError(field.field_code, "text_exceeds_field_width")
+        return [text_value], maximum_font_size
+
+    font_size = maximum_font_size
+    while font_size >= export.min_font_size:
+        lines = _wrap_text(text_value, export.width, font_size)
+        if lines is not None and len(lines) <= export.max_lines:
+            return lines, font_size
+        font_size -= 0.5
+    raise ExportError(field.field_code, "text_exceeds_field_width")
+
+
+def _draw_lines(
+    canvas_obj: canvas.Canvas,
+    field: FormField,
+    lines: list[str],
+    font_size: float,
+    baseline_offset: float = 0,
+) -> None:
+    export = field.export
+    assert export is not None
+    canvas_obj.setFont(_FONT_NAME, font_size)
+    for index, line in enumerate(lines):
+        y = export.y + baseline_offset - (index * export.line_height)
+        if export.align == "right":
+            canvas_obj.drawRightString(export.x + export.width, y, line)
+        elif export.align == "center":
+            canvas_obj.drawCentredString(export.x + export.width / 2, y, line)
+        else:
+            canvas_obj.drawString(export.x, y, line)
+
+
+def render_export(candidate: FormCandidate, values: dict) -> bytes:
+    _ensure_font_registered()
+    if candidate.export_style.font_family != _FONT_NAME:
+        raise ExportError(None, "unsupported_form_font")
+    base_path = TEMPLATES_DIR / candidate.source_pdf
+    base_reader = PdfReader(base_path)
+    writer = PdfWriter()
+    by_page = _group_fields_by_page(candidate, values)
+
+    for page_index, page in enumerate(base_reader.pages, start=1):
+        overlay_fields = by_page.get(page_index, [])
+        if overlay_fields:
+            buffer = io.BytesIO()
+            page_width, page_height = float(page.mediabox.width), float(page.mediabox.height)
+            canvas_obj = canvas.Canvas(buffer, pagesize=(page_width, page_height))
+            for field in overlay_fields:
+                export = field.export
+                text_value = _format_value(values.get(field.field_code), field)
+                preferred_font_size = export.font_size if field.data_type == "table" else candidate.export_style.font_size
+                lines, font_size = _fit_lines(text_value, field, preferred_font_size)
+                _draw_lines(canvas_obj, field, lines, font_size, candidate.export_style.baseline_offset)
+            canvas_obj.save()
+            buffer.seek(0)
+            page.merge_page(PdfReader(buffer).pages[0])
+        writer.add_page(page)
+
+    output = io.BytesIO()
+    writer.write(output)
+    return output.getvalue()

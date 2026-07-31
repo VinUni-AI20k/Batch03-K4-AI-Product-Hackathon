@@ -19,7 +19,7 @@ Mining data và đề xuất sản phẩm AI khác cho khoá — qua đủ 5 ti�
 
 ## Data cấp cho mọi nhóm
 
-Chatlog VLearn tutor × học viên đã ẩn danh + **6 transcript bài giảng bản sạch có mã đoạn để trích dẫn** + **2 bộ slide bài giảng bản hackathon** (xem `data/vlearn-pack/`). Với Trợ lý Học viên: không có data pack riêng — nhóm **tự tìm kiếm và quan sát trực tiếp trong Discord khoá** (đây cũng là một bài tập mining thực tế). **Cả lớp là người dùng thật** — nhóm có thể khảo sát 20 người ngay trong giờ nghỉ.
+Data pack VLearn từng được cung cấp cho hoạt động hackathon nhưng đã được loại khỏi repo sản phẩm SPDVC vì không phục vụ runtime. Với Trợ lý Học viên: nhóm **tự tìm kiếm và quan sát trực tiếp trong Discord khoá** (đây cũng là một bài tập mining thực tế). **Cả lớp là người dùng thật** — nhóm có thể khảo sát 20 người ngay trong giờ nghỉ.
 
 ## Lát cắt = MỘT CÂU
 
@@ -27,7 +27,7 @@ Chatlog VLearn tutor × học viên đã ẩn danh + **6 transcript bài giảng
 
 ## Ràng buộc chung
 
-1. Build **prototype** (Sketch / Mock / Working) — mức nào cũng phải có **≥1 lời gọi AI chạy thật**. Không yêu cầu product hoàn chỉnh, không yêu cầu deploy.
+1.  Build **prototype** (Sketch / Mock / Working) — mức nào cũng phải có **≥1 lời gọi AI chạy thật**. Không yêu cầu product hoàn chỉnh, không yêu cầu deploy.
 2. Tự xác định **4 lớp chỗ khó** theo taxonomy — duyệt tại các mốc theo `04-rubric.md`:
    - ① **Nguồn sự thật** — chỗ nào AI bịa được? Không có căn cứ thì làm gì?
    - ② **Mơ hồ / thiếu thông tin** — input không đủ chắc: hỏi lại, đoán có báo, hay từ chối?
@@ -36,6 +36,7 @@ Chatlog VLearn tutor × học viên đã ẩn danh + **6 transcript bài giảng
 3. Chỉ dùng data trong `data/` hoặc data giả tự sinh — không data thật của người thật ngoài pack đã rà. **Data được cấp thuộc quy định bảo mật** (xem README mục "Bảo mật dữ liệu được cung cấp") — không chia sẻ ra ngoài khoá, không commit vào repo nộp bài.
 
 ## 5 tiêu chí nghiệm thu bài toán *(áp cho MỌI hướng — kể cả tối ưu tính năng có sẵn)*
+
 
 | # | Tiêu chí | Đạt khi |
 |---|---|---|
