@@ -259,6 +259,9 @@ class LLMExtractedItem(BaseModel):
     confidence_score: float = Field(description="0.0-1.0 extraction confidence")
     requires_clarification: bool = Field(default=False, description="Ambiguous date/info")
     conflict_detected: bool = Field(default=False, description="Conflicting sources found")
+    meeting_link: Optional[str] = Field(default=None, description="Zoom/Meet URL if present, else null")
+    naming_convention: Optional[str] = Field(default=None, description="Naming rules for submission if present, else null")
+    required_materials: Optional[str] = Field(default=None, description="Documents/files/websites to open/read/prepare, else null")
 
 
 class ExtractionResult(BaseModel):
@@ -309,7 +312,19 @@ def ai_extraction_node(state: StudyPulseState) -> StudyPulseState:
             language_detected=Language(language),
             pii_masked=True,
             raw_snippet=text[:500],
-            **item.model_dump(),
+            meeting_link=item.meeting_link,
+            naming_convention=item.naming_convention,
+            required_materials=item.required_materials,
+            category=item.category,
+            title=item.title,
+            description=item.description,
+            due_date=item.due_date,
+            due_time=item.due_time,
+            time_unspecified=item.time_unspecified,
+            priority=item.priority,
+            confidence_score=item.confidence_score,
+            requires_clarification=item.requires_clarification,
+            conflict_detected=item.conflict_detected,
         ).model_dump()
         for item in result.items
     ]
@@ -752,7 +767,7 @@ def spam_rescue_node(state: StudyPulseState) -> StudyPulseState:
 # ═══════════════════════════════════════════════════════════════════════════
 
 def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
-    """Generate next-day reminder. Aggregation in Python."""
+    """Generate next-day reminder. Aggregates in Python, summarizes with LLM."""
     language = state.get("language", "vi")
     timeline = state.get("dashboard_timeline", [])
     tomorrow = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -760,34 +775,82 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
     tomorrow_items = [i for i in timeline if i.get("due_date", "")[:10] == tomorrow]
     critical = [i for i in tomorrow_items if i.get("priority") == "critical"]
 
-    if language == "vi":
-        if tomorrow_items:
-            items_text = "\n".join(
-                f"  {'[QUAN TRỌNG]' if i.get('priority') == 'critical' else '[LỊCH TRÌNH]'} "
-                f"{i['title']} — {i.get('due_time') or 'chưa rõ giờ'}"
-                for i in tomorrow_items
-            )
-            msg = (
-                f"**Nhắc nhở deadline ngày mai ({_format_date(tomorrow, 'vi')})**\n\n"
-                f"Bạn có {len(tomorrow_items)} mục cần hoàn thành "
-                f"({len(critical)} quan trọng):\n\n{items_text}"
-            )
+    msg = ""
+    if tomorrow_items:
+        # Prepare list for LLM query
+        items_for_llm = []
+        for i in tomorrow_items:
+            items_for_llm.append({
+                "title": i.get("title", ""),
+                "priority": i.get("priority", "medium"),
+                "due_time": i.get("due_time") or "TBD",
+                "description": i.get("description", ""),
+                "raw_snippet": i.get("raw_snippet", "")
+            })
+
+        # Call Gemini model
+        from langchain_core.messages import HumanMessage, SystemMessage
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        import os
+
+        model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
+        llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.3)
+
+        prompt_text = get_reminder_prompt(
+            target_date=tomorrow,
+            items_json=json.dumps(items_for_llm, ensure_ascii=False),
+            language=language
+        )
+
+        try:
+            response = llm.invoke([
+                SystemMessage(content=get_base_persona() + "\nRule: Never use emojis, icons or visual symbols in the output message. Keep it clean and text-only."),
+                HumanMessage(content=prompt_text)
+            ])
+            content_text = ""
+            if isinstance(response.content, list):
+                content_text = "\n".join(
+                    part.get("text", "") if isinstance(part, dict) else str(part)
+                    for part in response.content
+                )
+            else:
+                content_text = str(response.content)
+            msg = content_text.strip()
+            print(f"  [DailyReminder] Generated with LLM summary.")
+        except Exception as e:
+            print(f"  [DailyReminder] LLM call failed, falling back: {e}")
+            msg = ""
+
+    # Fallback/Empty message
+    if not msg:
+        if language == "vi":
+            if tomorrow_items:
+                items_text = "\n".join(
+                    f"  {'[QUAN TRỌNG]' if i.get('priority') == 'critical' else '[LỊCH TRÌNH]'} "
+                    f"{i['title']} — {i.get('due_time') or 'chưa rõ giờ'}"
+                    for i in tomorrow_items
+                )
+                msg = (
+                    f"**Nhắc nhở deadline ngày mai ({_format_date(tomorrow, 'vi')})**\n\n"
+                    f"Bạn có {len(tomorrow_items)} mục cần hoàn thành "
+                    f"({len(critical)} quan trọng):\n\n{items_text}"
+                )
+            else:
+                msg = f"Không có deadline nào vào ngày mai ({_format_date(tomorrow, 'vi')}). Nghỉ ngơi nhé!"
         else:
-            msg = f"Không có deadline nào vào ngày mai ({_format_date(tomorrow, 'vi')}). Nghỉ ngơi nhé!"
-    else:
-        if tomorrow_items:
-            items_text = "\n".join(
-                f"  {'[CRITICAL]' if i.get('priority') == 'critical' else '[SCHEDULE]'} "
-                f"{i['title']} — {i.get('due_time') or 'time TBD'}"
-                for i in tomorrow_items
-            )
-            msg = (
-                f"**Tomorrow's Deadline Reminder ({_format_date(tomorrow, 'en')})**\n\n"
-                f"You have {len(tomorrow_items)} items due "
-                f"({len(critical)} critical):\n\n{items_text}"
-            )
-        else:
-            msg = f"No deadlines tomorrow ({_format_date(tomorrow, 'en')}). Rest well!"
+            if tomorrow_items:
+                items_text = "\n".join(
+                    f"  {'[CRITICAL]' if i.get('priority') == 'critical' else '[SCHEDULE]'} "
+                    f"{i['title']} — {i.get('due_time') or 'time TBD'}"
+                    for i in tomorrow_items
+                )
+                msg = (
+                    f"**Tomorrow's Deadline Reminder ({_format_date(tomorrow, 'en')})**\n\n"
+                    f"You have {len(tomorrow_items)} items due "
+                    f"({len(critical)} critical):\n\n{items_text}"
+                )
+            else:
+                msg = f"No deadlines tomorrow ({_format_date(tomorrow, 'en')}). Rest well!"
 
     reminder = DailyReminder(
         target_date=tomorrow,
@@ -799,6 +862,8 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
     ).model_dump()
 
     metadata = _trace(state, "daily_reminder_node")
+    metadata["reminder_generator"] = "llm_summary"
+    
     return {**state, "daily_reminder": reminder, "final_response": msg, "metadata": metadata}
 
 
@@ -834,3 +899,75 @@ def _mock_extract(text: str, source: str, language: str) -> list[dict]:
             ).model_dump()
             items.append(item)
     return items
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NODE 13: EMERGENCY ALERT NODE (Pure Python — 0 tokens)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def emergency_alert_node(state: StudyPulseState) -> StudyPulseState:
+    """
+    Emergency Alert Node (Pure Python, 0 tokens).
+    Formats next-step actions, materials, naming rules, and links for due tasks.
+    """
+    language = state.get("language", "vi")
+    items = state.get("dashboard_timeline", []) or state.get("extracted_items", [])
+    
+    if not items:
+        msg = "Không tìm thấy thông tin deadline cần nhắc nhở." if language == "vi" else "No upcoming deadline details found."
+        metadata = _trace(state, "emergency_alert_node")
+        return {**state, "final_response": msg, "metadata": metadata}
+        
+    item = items[0]
+    title = item.get("title", "")
+    desc = item.get("description", "")
+    materials = item.get("required_materials")
+    naming = item.get("naming_convention")
+    link = item.get("meeting_link")
+    
+    if language == "vi":
+        msg = (
+            f"**THÔNG BÁO KHẨN CẤP**\n"
+            f"Hạn chót cho mục sau chỉ còn đúng 10 phút nữa:\n"
+            f"**{title}**\n"
+        )
+        if desc:
+            msg += f"Chi tiết: {desc}\n"
+        msg += "\n"
+        msg += f"Cần chuẩn bị:\n"
+        msg += f"- Tài liệu cần mở: {materials or 'Không yêu cầu tài liệu cụ thể'}\n"
+        msg += f"- Quy tắc đặt tên: {naming or 'Tự do đặt tên'}\n"
+        msg += f"- Link Meet/Zoom: {link or 'Không có link phòng họp'}\n"
+        msg += "\n"
+        msg += "Nhanh tay lên kẻo trễ nhé!"
+    else:
+        msg = (
+            f"**EMERGENCY ALERT**\n"
+            f"The deadline for the following item is in 10 minutes:\n"
+            f"**{title}**\n"
+        )
+        if desc:
+            msg += f"Details: {desc}\n"
+        msg += "\n"
+        msg += f"What to prepare:\n"
+        msg += f"- Required materials: {materials or 'No specific materials required'}\n"
+        msg += f"- Naming convention: {naming or 'No specific naming convention'}\n"
+        msg += f"- Meet/Zoom link: {link or 'No meeting link'}\n"
+        msg += "\n"
+        msg += "Hurry up before it's too late!"
+        
+    alert = {
+        "alert_id": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "item_id": item.get("id", ""),
+        "message_text": msg
+    }
+    
+    metadata = _trace(state, "emergency_alert_node")
+    return {
+        **state,
+        "emergency_alert": alert,
+        "final_response": msg,
+        "metadata": metadata
+    }
+

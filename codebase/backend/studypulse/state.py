@@ -147,6 +147,7 @@ class FlowType(str, Enum):
     SURVEY_LOG = "survey_log"
     SPAM_RESCUE = "spam_rescue"
     DAILY_REMINDER = "daily_reminder"
+    EMERGENCY_ALERT = "emergency_alert"
 
 
 class Language(str, Enum):
@@ -188,6 +189,9 @@ class ExtractedItem(BaseModel):
     language_detected: Language = Language.VI
     pii_masked: bool = False
     raw_snippet: str = Field(default="", max_length=500)
+    meeting_link: Optional[str] = None
+    naming_convention: Optional[str] = None
+    required_materials: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -221,7 +225,7 @@ class DailyReminder(BaseModel):
     reminder_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     generated_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     target_date: str  # YYYY-MM-DD
-    scheduled_send_time: str = "22:00"
+    scheduled_send_time: str = "08:00"
     language: Language = Language.VI
     items: List[ExtractedItem] = Field(default_factory=list)
     total_items: int = 0
@@ -255,6 +259,7 @@ class StudyPulseState(TypedDict, total=False):
 
     chat_response: Dict[str, Any]
     daily_reminder: Dict[str, Any]
+    emergency_alert: Dict[str, Any]
     confidence_score: float
     requires_hitl: bool
     retry_count: int

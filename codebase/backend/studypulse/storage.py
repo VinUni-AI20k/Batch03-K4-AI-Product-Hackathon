@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS timeline_items (
     language_detected TEXT DEFAULT 'vi',
     conflict_detected INTEGER DEFAULT 0,
     requires_clarification INTEGER DEFAULT 0,
+    meeting_link TEXT DEFAULT NULL,
+    naming_convention TEXT DEFAULT NULL,
+    required_materials TEXT DEFAULT NULL,
+    alert_sent INTEGER DEFAULT 0,
     created_at TEXT NOT NULL,
     raw_json TEXT NOT NULL
 );
@@ -101,6 +105,20 @@ class StudyPulseDB:
             self._conn.execute(_CREATE_EVIDENCE_TABLE)
             self._conn.execute(_CREATE_TOKEN_USAGE_TABLE)
             self._conn.commit()
+
+            # Migration: Add new columns if they do not exist
+            for col, col_type in [
+                ("meeting_link", "TEXT DEFAULT NULL"),
+                ("naming_convention", "TEXT DEFAULT NULL"),
+                ("required_materials", "TEXT DEFAULT NULL"),
+                ("alert_sent", "INTEGER DEFAULT 0")
+            ]:
+                try:
+                    self._conn.execute(f"ALTER TABLE timeline_items ADD COLUMN {col} {col_type};")
+                    self._conn.commit()
+                except sqlite3.OperationalError:
+                    pass  # Column already exists
+
             logger.info(f"StudyPulseDB initialized at: {self._db_path}")
         except Exception as e:
             logger.error(f"Failed to initialize StudyPulseDB: {e}")
@@ -123,13 +141,24 @@ class StudyPulseDB:
             return False
 
         try:
+            alert_sent = item.get("alert_sent", 0)
+            if not alert_sent:
+                try:
+                    cursor = self._conn.execute("SELECT alert_sent FROM timeline_items WHERE id = ?", (item.get("id", ""),))
+                    row = cursor.fetchone()
+                    if row:
+                        alert_sent = row[0]
+                except Exception:
+                    pass
+
             self._conn.execute(
                 """INSERT OR REPLACE INTO timeline_items 
                    (id, category, title, description, due_date, due_time, 
                     priority, confidence_score, source_platform, source_message_id,
                     language_detected, conflict_detected, requires_clarification,
+                    meeting_link, naming_convention, required_materials, alert_sent,
                     created_at, raw_json)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     item.get("id", ""),
                     item.get("category", "other"),
@@ -144,6 +173,10 @@ class StudyPulseDB:
                     item.get("language_detected", "vi"),
                     1 if item.get("conflict_detected") else 0,
                     1 if item.get("requires_clarification") else 0,
+                    item.get("meeting_link"),
+                    item.get("naming_convention"),
+                    item.get("required_materials"),
+                    alert_sent,
                     item.get("timestamp", datetime.utcnow().isoformat()),
                     json.dumps(item, ensure_ascii=False, default=str),
                 ),
@@ -186,6 +219,82 @@ class StudyPulseDB:
             return cursor.fetchone()[0]
         except Exception:
             return 0
+
+    def get_pending_alerts(self, window_minutes: int = 10) -> List[Dict[str, Any]]:
+        """Find items due within window_minutes from now that haven't been alerted."""
+        if not self._ensure_conn():
+            return []
+        try:
+            cursor = self._conn.execute(
+                "SELECT raw_json FROM timeline_items WHERE alert_sent = 0 AND due_date IS NOT NULL"
+            )
+            now = datetime.utcnow()
+            results = []
+            for row in cursor.fetchall():
+                item = json.loads(row[0])
+                due_date_str = item.get("due_date")
+                if not due_date_str:
+                    continue
+                try:
+                    dt_str = due_date_str.strip()
+                    if dt_str.endswith("Z"):
+                        dt_str = dt_str[:-1]
+                    
+                    has_tz = False
+                    tz_offset = 0.0
+                    if "T" in dt_str:
+                        time_part = dt_str.split("T")[1]
+                        if "+" in time_part:
+                            has_tz = True
+                            base_time, offset = time_part.split("+")
+                            dt_str = dt_str.split("+")[0]
+                            h, m = map(int, offset.split(":"))
+                            tz_offset = h + m / 60.0
+                        elif "-" in time_part:
+                            has_tz = True
+                            base_time, offset = time_part.split("-")
+                            dt_str = dt_str.split("-")[0]
+                            h, m = map(int, offset.split(":"))
+                            tz_offset = -(h + m / 60.0)
+                    
+                    due_dt = datetime.fromisoformat(dt_str)
+                    if has_tz:
+                        due_dt = due_dt - timedelta(hours=tz_offset)
+                    
+                    diff_seconds = (due_dt - now).total_seconds()
+                    # Trigger alert if the due date is within window (e.g. 0 to 10 minutes)
+                    if 0 <= diff_seconds <= (window_minutes * 60):
+                        results.append(item)
+                except Exception as ex:
+                    logger.error(f"Error parsing due_date {due_date_str}: {ex}")
+            return results
+        except Exception as e:
+            logger.error(f"Failed to query pending alerts: {e}")
+            return []
+
+    def mark_alert_sent(self, item_id: str) -> bool:
+        """Mark timeline item alert_sent to 1 to prevent double-alerts."""
+        if not self._ensure_conn():
+            return False
+        try:
+            cursor = self._conn.execute(
+                "SELECT raw_json FROM timeline_items WHERE id = ?", (item_id,)
+            )
+            row = cursor.fetchone()
+            if row:
+                item = json.loads(row[0])
+                item["alert_sent"] = 1
+                self._conn.execute(
+                    "UPDATE timeline_items SET alert_sent = 1, raw_json = ? WHERE id = ?",
+                    (json.dumps(item, ensure_ascii=False, default=str), item_id)
+                )
+                self._conn.commit()
+                logger.info(f"Marked alert_sent = 1 for item: {item_id}")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Failed to mark alert sent: {e}")
+            return False
 
     # ── EVIDENCE OPERATIONS ──
 

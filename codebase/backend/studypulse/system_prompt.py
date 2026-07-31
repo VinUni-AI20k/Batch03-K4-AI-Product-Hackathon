@@ -44,6 +44,9 @@ RULES:
 - Missing time component: set time_unspecified=true. Do NOT default to 23:59.
 - Missing year: assume {current_year}, flag for confirmation.
 - Conflicting info: set conflict_detected=true, list all versions.
+- If Zoom, Google Meet, MS Teams, or other video conference link/URL is present in the source text, extract it to `meeting_link`.
+- If submission naming rules (e.g., format like "mssv_tensv.pdf" or "[BTL]...") are mentioned, extract them to `naming_convention`.
+- If specific materials, documents, readings, tools, or files are explicitly mentioned to open/read/prepare, extract them to `required_materials`.
 - If nothing extractable, return empty list.
 
 SOURCE PLATFORM: {source_platform}
@@ -105,9 +108,12 @@ EMAILS TO CLASSIFY:
 """
 
 REMINDER_PROMPT = """\
-Generate a consolidated deadline reminder for tomorrow ({target_date}).
-Format as a clear, actionable message in {language}.
-Prioritize critical items first. Include time if known, flag if unspecified.
+Generate a consolidated daily reminder for tomorrow's deadlines ({target_date}) in {language}.
+
+For each item:
+1. List the title, priority, and due time.
+2. Under each item, add a brief 2-3 line summary of the content/requirements that the student needs to prepare, extracted from its description and raw snippet. Write this wittily and concisely.
+3. Strictly DO NOT use any emojis, icons, or visual symbols in the message. Keep the tone professional but warm/cute.
 
 ITEMS DUE TOMORROW:
 {items_json}
