@@ -52,9 +52,16 @@ class VoyageEmbedder:
 
 def make_embedder(cfg) -> VoyageEmbedder | None:
     """None = dùng embedding mặc định của Chroma (chạy local, không cần key)."""
-    if cfg.get("index", "embedding_provider") == "voyage" and cfg.voyage_api_key:
+    key = (cfg.voyage_api_key or "").strip()
+    if cfg.get("index", "embedding_provider") == "voyage" and key:
+        # Key đi vào HTTP header (chỉ nhận latin-1). Nếu lỡ dán nhầm chữ có dấu
+        # (vd dòng chú thích '# ... bỏ trống ...'), embed sẽ vỡ 'latin-1 codec' -> chặn sớm.
+        if not key.isascii():
+            print("⚠️ VOYAGE_API_KEY chứa ký tự không hợp lệ (có thể dán nhầm) — "
+                  "dùng embedding local miễn phí. Sửa/để trống VOYAGE_API_KEY trong .env nếu muốn.")
+            return None
         try:
-            return VoyageEmbedder(cfg.voyage_api_key, cfg.get("index", "voyage_model"))
+            return VoyageEmbedder(key, cfg.get("index", "voyage_model"))
         except ImportError:
             print("⚠️ Chưa cài voyageai (pip install 'learning-agent[voyage]') — dùng embedding local.")
     return None

@@ -411,8 +411,10 @@ def _config_wizard(cfg) -> None:
 
     if key and key.strip():
         _env_set(env_path, preset["key_env"], key.strip())
-    if vk and vk.strip():
+    if use_voyage and vk and vk.strip():
         _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
+    elif not use_voyage:
+        _env_set(env_path, "VOYAGE_API_KEY", "")  # No -> dùng local; xoá key cũ/hỏng nếu có
     if tg and tg.strip():
         _env_set(env_path, "TELEGRAM_BOT_TOKEN", tg.strip())
         _env_set(env_path, "TELEGRAM_ALLOWED_USERS", (tg_allow or "").strip())
