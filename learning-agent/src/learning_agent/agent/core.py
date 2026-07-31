@@ -12,6 +12,7 @@ from openai import OpenAI
 from ..index.store import LessonIndex
 from ..vault import Vault
 from .assessment import Mastery
+from .external_ingest import ExternalIngestQueue
 from .flashcards import FlashcardStore
 from .memory import StudentMemory
 from .skills import SkillSet
@@ -93,6 +94,10 @@ THÍCH ỨNG & TỰ HỌC (điều làm bạn khác chatbot thường):
 15. TỰ HỌC GIÚP HỌC VIÊN — giáo trình chưa có mà học viên cần: đề nghị nghiên cứu ngoài; họ đồng ý
     -> research (nhiều nguồn nếu cần) -> TỔNG HỢP thành bài có cấu trúc -> save_research_note để
     kho kiến thức GIÀU LÊN (lần sau trả lời được ngay). Nội dung này là nguồn ngoài 🌐 — luôn nói rõ.
+    Học viên đưa THẲNG một URL cụ thể (bài báo/trang web/link PDF) muốn học nguyên văn -> dùng
+    hoc_tu_nguon_ngoai thay vì research+save_research_note (tool đó cho tìm kiếm MỞ không có URL,
+    ra bản LLM tổng hợp; hoc_tu_nguon_ngoai lưu ĐÚNG nội dung gốc). Luôn action='fetch' trước, cho
+    học viên xem preview, CHỈ action='confirm' sau khi họ đồng ý ở lượt sau — không tự confirm ngay.
 
 Danh sách skills:
 {skills_catalog}
@@ -114,6 +119,7 @@ PUBLIC_DENY_TOOLS = {
     "install_knowledge_pack",
     "save_concept", "update_memory", "update_soul", "read_soul", "update_student_memory",
     "log_assessment", "save_research_note", "flashcards",  # ghi dữ liệu của chủ agent — không cho web công khai
+    "hoc_tu_nguon_ngoai",  # tool tải URL (SSRF-guard riêng) + ghi kho — chỉ chủ agent
 }
 
 
@@ -145,9 +151,11 @@ class TutorAgent:
 
         self.mastery = Mastery(cfg.root)  # đánh giá ngầm: mức nắm vững theo chủ đề
         self.flashcards = FlashcardStore(cfg.root)  # thẻ ghi nhớ bền vững + SRS
+        self.external = ExternalIngestQueue(cfg, vault, index)  # nạp kiến thức từ URL ngoài
         self.tool_schemas, self.tool_impls = build_tools(vault, index, cfg)
         self.tool_schemas += [self.skills.tool_schema(), self.memory.tool_schema(),
-                              self.mastery.tool_schema(), self.flashcards.tool_schema()]
+                              self.mastery.tool_schema(), self.flashcards.tool_schema(),
+                              self.external.tool_schema()]
         self.tool_schemas += self.addons.schemas()  # tools từ addons/ (gate bật/tắt lúc gọi)
         self.tool_schemas += [
             {
@@ -391,6 +399,17 @@ class TutorAgent:
                 if topic and args.get("action") == "grade":
                     self.mastery.log(user_id, topic, bool(args.get("correct")))
                 return result
+            if name == "hoc_tu_nguon_ngoai":
+                action = (args.get("action") or "").strip().lower()
+                self.audit.log("external_ingest", user=user_id, action=action,
+                               url=(args.get("url") or "")[:200])
+                if action == "fetch":
+                    return self.external.fetch(user_id, args.get("url", ""))
+                if action == "confirm":
+                    return self.external.confirm(user_id, bool(args.get("keep_both")))
+                if action == "discard":
+                    return self.external.discard(user_id)
+                return "action phải là: fetch | confirm | discard"
             if name == "schedule_task":
                 if self.task_store is None or origin is None:
                     return "Tính năng lên lịch chỉ hoạt động khi chat qua Discord/Telegram."
