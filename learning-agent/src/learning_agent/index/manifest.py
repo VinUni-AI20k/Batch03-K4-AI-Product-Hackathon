@@ -58,6 +58,9 @@ class Manifest:
         )
         self.conn.commit()
 
+    def count(self) -> int:
+        return self.conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
+
     def note_for(self, rel_path: str) -> str | None:
         row = self.conn.execute(
             "SELECT note_path FROM files WHERE rel_path=?", (rel_path,)

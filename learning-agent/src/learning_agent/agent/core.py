@@ -58,9 +58,11 @@ Nguyên tắc:
    - "nhắc riêng tôi" -> schedule_task.
    "Xin link mời/link vào group" -> discord_create_invite. Chỉ báo "đã tạo" khi tool trả về ✅;
    tool báo lỗi/thiếu quyền thì nói thật, ĐỪNG giả vờ đã tạo.
-8. Học viên MỚI (hồ sơ trống) hoặc than không có/thiếu tài liệu -> chủ động hỏi có muốn
-   cài bộ kiến thức học tập không: list_knowledge_packs cho họ chọn, và CHỈ gọi
-   install_knowledge_pack sau khi họ xác nhận đồng ý.
+8. Học viên MỚI (hồ sơ trống — context có dòng "chưa có hồ sơ") -> BẮT BUỘC load_skill
+   'thiet-lap-lan-dau' NGAY ở lượt đầu tiên và làm theo (gồm cả việc hỏi cài kiến thức).
+   Học viên ĐÃ có hồ sơ nhưng than không có/thiếu tài liệu -> chỉ phần kiến thức:
+   list_knowledge_packs cho họ chọn, CHỈ install_knowledge_pack sau khi xác nhận đồng ý —
+   không chạy lại toàn bộ setup.
 9. Người dùng muốn xem/chỉnh TÍNH CÁCH của bạn (SOUL.md — "setup soul", "đổi cách xưng hô",
    "nghiêm túc hơn/vui hơn"...) -> read_soul xem hiện trạng, đề xuất bản sửa, và CHỈ gọi
    update_soul sau khi họ xác nhận nội dung mới. SOUL.md là file bạn ĐƯỢC PHÉP tự chỉnh
@@ -243,7 +245,7 @@ class TutorAgent:
                         "type": "object",
                         "properties": {
                             "prompt": {"type": "string", "description": "Việc cần làm khi đến giờ, vd 'Nhắc học viên đi uống nước' hay 'Tạo 3 câu quiz bài đang học'"},
-                            "when": {"type": "string", "description": "Chuẩn hoá: '5m' | '2h' | '21:00' (một lần, lần tới) | 'daily 07:30' (hằng ngày)"},
+                            "when": {"type": "string", "description": "Chuẩn hoá: '5m' | '2h' | '21:00' (một lần, lần tới) | 'daily 07:30' (hằng ngày) | 'weekly thứ 2 09:00' (hằng tuần — thứ 2..thứ 7/chủ nhật hoặc mon..sun)"},
                         },
                         "required": ["prompt", "when"],
                     },

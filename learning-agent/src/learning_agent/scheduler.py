@@ -20,10 +20,28 @@ from typing import Awaitable, Callable
 Notifier = Callable[[str], Awaitable[None]]            # gửi text về home chat
 Sender = Callable[[str, str], Awaitable[None]]         # gửi text về (chat_id, text)
 
+# Thứ trong tuần: chuẩn hoá về mã 3 ký tự tiếng Anh (khớp datetime.weekday(), không phụ
+# thuộc locale hệ điều hành). Hỗ trợ cả tiếng Anh và tiếng Việt có dấu.
+_WD_MAP = {
+    "mon": "MON", "monday": "MON", "thứ 2": "MON",
+    "tue": "TUE", "tuesday": "TUE", "thứ 3": "TUE",
+    "wed": "WED", "wednesday": "WED", "thứ 4": "WED",
+    "thu": "THU", "thursday": "THU", "thứ 5": "THU",
+    "fri": "FRI", "friday": "FRI", "thứ 6": "FRI",
+    "sat": "SAT", "saturday": "SAT", "thứ 7": "SAT",
+    "sun": "SUN", "sunday": "SUN", "chủ nhật": "SUN", "cn": "SUN",
+}
+_WD_VI = {"MON": "Hai", "TUE": "Ba", "WED": "Tư", "THU": "Năm", "FRI": "Sáu", "SAT": "Bảy", "SUN": "Nhật"}
+_WD_BY_INDEX = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]  # datetime.weekday(): 0=Thứ Hai
+_DAY_ALT = "|".join(sorted((re.escape(k) for k in _WD_MAP), key=len, reverse=True))
+_WEEKLY_PREFIX_RE = re.compile(rf"(?:weekly|hằng tuần|hàng tuần|mỗi tuần)\s+({_DAY_ALT})\s+(\d{{1,2}}):(\d{{2}})")
+_WEEKLY_SUFFIX_RE = re.compile(rf"({_DAY_ALT})\s+(\d{{1,2}}):(\d{{2}})\s*(?:weekly|hằng tuần|hàng tuần|mỗi tuần)")
+
 
 def parse_when(when: str, now: datetime | None = None) -> tuple[str, str] | None:
     """'5m'/'10 phút'/'2h' -> ('once', iso) · 'daily 07:30' -> ('daily', 'HH:MM')
-    · '21:00' -> ('once', iso lần tới) · ISO datetime -> ('once', iso). None = không hiểu."""
+    · 'weekly thứ 2 09:00' -> ('weekly', 'MON:09:00') · '21:00' -> ('once', iso lần tới)
+    · ISO datetime -> ('once', iso). None = không hiểu."""
     now = now or datetime.now()
     s = when.strip().lower()
 
@@ -33,6 +51,11 @@ def parse_when(when: str, now: datetime | None = None) -> tuple[str, str] | None
     m = re.fullmatch(r"(\d+)\s*(h|gio|giờ)", s)
     if m:
         return "once", (now + timedelta(hours=int(m.group(1)))).isoformat(timespec="seconds")
+
+    m = _WEEKLY_PREFIX_RE.fullmatch(s) or _WEEKLY_SUFFIX_RE.fullmatch(s)
+    if m:
+        day = _WD_MAP[m.group(1)]
+        return "weekly", f"{day}:{int(m.group(2)):02d}:{m.group(3)}"
 
     m = re.fullmatch(r"(?:daily|hằng ngày|hàng ngày|mỗi ngày)\s*(\d{1,2}):(\d{2})", s) \
         or re.fullmatch(r"(\d{1,2}):(\d{2})\s*(?:daily|hằng ngày|hàng ngày|mỗi ngày)", s)
@@ -50,6 +73,15 @@ def parse_when(when: str, now: datetime | None = None) -> tuple[str, str] | None
         return "once", datetime.fromisoformat(when.strip()).isoformat(timespec="seconds")
     except ValueError:
         return None
+
+
+def _describe(when_type: str, at: str) -> str:
+    if when_type == "daily":
+        return f"mỗi ngày lúc {at}"
+    if when_type == "weekly":
+        day, time = at.split(":", 1)
+        return f"mỗi thứ {_WD_VI.get(day, day)} lúc {time}"
+    return f"lúc {at.replace('T', ' ')}"
 
 
 class TaskStore:
@@ -90,15 +122,14 @@ class TaskStore:
         }
         self.tasks.append(task)
         self._save()
-        desc = f"mỗi ngày lúc {at}" if when_type == "daily" else f"lúc {at.replace('T', ' ')}"
-        return f"✅ Đã lên lịch [{task['id']}] {desc}: {prompt}"
+        return f"✅ Đã lên lịch [{task['id']}] {_describe(when_type, at)}: {prompt}"
 
     def list(self) -> str:
         if not self.tasks:
             return "Chưa có công việc nào được lên lịch."
         lines = []
         for t in self.tasks:
-            when = f"hằng ngày {t['at']}" if t["type"] == "daily" else t["at"].replace("T", " ")
+            when = _describe(t["type"], t["at"]) if t["type"] in ("daily", "weekly") else t["at"].replace("T", " ")
             lines.append(f"- [{t['id']}] {when} — {t['prompt']} (kênh {t['platform']})")
         return "\n".join(lines)
 
@@ -134,11 +165,15 @@ class Scheduler:
                     self._last_run[name] = now.date()
                     asyncio.create_task(self._run_static(job))
             for task in list(self.store.tasks):
-                due = (
-                    task["at"] <= now.isoformat() if task["type"] == "once"
-                    else now.strftime("%H:%M") == task["at"]
-                    and self._last_run.get(task["id"]) != now.date()
-                )
+                if task["type"] == "once":
+                    due = task["at"] <= now.isoformat()
+                elif task["type"] == "daily":
+                    due = (now.strftime("%H:%M") == task["at"]
+                           and self._last_run.get(task["id"]) != now.date())
+                else:  # weekly — 'at' = 'MON:HH:MM'
+                    wd, hhmm = task["at"].split(":", 1)
+                    due = (wd == _WD_BY_INDEX[now.weekday()] and now.strftime("%H:%M") == hhmm
+                           and self._last_run.get(task["id"]) != now.date())
                 if due:
                     self._last_run[task["id"]] = now.date()
                     if task["type"] == "once":
