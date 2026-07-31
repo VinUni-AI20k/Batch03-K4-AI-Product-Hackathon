@@ -134,7 +134,7 @@ function checkMcAns(qNum) {
             btnSubmit.disabled = true;
             btnSubmit.style.opacity = '0.5';
             btnSubmit.style.cursor = 'not-allowed';
-            btnSubmit.innerText = '⚠️ Vui lòng chọn đáp án khác trước khi nộp lại';
+            btnSubmit.innerText = '⚠️ Oops, thử lại lần nữa nào';
         }
 
         resBox.style.borderLeftColor = '#f43f5e';
@@ -165,7 +165,7 @@ function checkMcAns(qNum) {
             btnSubmit.disabled = true;
             btnSubmit.style.opacity = '0.5';
             btnSubmit.style.cursor = 'not-allowed';
-            btnSubmit.innerText = '🔒 Đã hết 2 lần thử (Đã khóa câu hỏi)';
+            btnSubmit.innerText = '🔒 Đã hết lượt trả lời câu này (Đã khóa câu hỏi)';
         }
 
         resBox.style.borderLeftColor = '#dc2626';
@@ -177,7 +177,7 @@ function checkMcAns(qNum) {
         let correctConcept = conceptExplanations[qNum].correct;
 
         resBox.innerHTML = `
-            <div class="result-tag" style="color: #dc2626; font-weight: 700;">🔒 ĐÃ HẾT 2 LẦN THỬ — BẢNG PHÂN TÍCH SO SÁNH ĐÁP ÁN ĐÚNG & SAI</div>
+            <div class="result-tag" style="color: #dc2626; font-weight: 700;">🔒 ĐÃ HẾT LƯỢT TRẢ LỜI CÂU NÀY — BẢNG PHÂN TÍCH SO SÁNH ĐÁP ÁN ĐÚNG & SAI</div>
             
             <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-top: 10px;">
                 <div style="font-weight: 700; color: #e11d48; font-size: 13px;">❌ Đáp án bạn đã chọn (Option ${opt} — SAI):</div>
