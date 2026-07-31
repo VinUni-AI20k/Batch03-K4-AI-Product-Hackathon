@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 *.env
+__pycache__/
+*.pyc
+eval/agent_traces.jsonl
+eval/*_smoke.json
+eval/*_smoke.jsonl
+eval/*_smoke.md

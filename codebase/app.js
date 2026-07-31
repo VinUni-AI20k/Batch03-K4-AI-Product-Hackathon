@@ -1,7 +1,4 @@
-/* =============================================================
-   app.js — VLearn prototype (CP2 · mức Mock, bấm đi hết flow)
-   Mọi câu trả lời của tutor đang là MOCK — xem mục AI_CALL bên dưới.
-   ============================================================= */
+/* VLearn prototype CP3 — UI thật + backend AI cùng origin. */
 'use strict';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -16,6 +13,8 @@ const S = {
   penSize: 3,
   penColor: '#e0483b',
   moreOpen: false,    // "..." trên toolbar có đang mở thanh phụ không
+  sideManual: false,  // người dùng đã tự bấm ẩn/hiện sidebar chưa (xem fitPanels)
+  tutorManual: false, // như trên, cho panel trợ lý
   notes: [],          // {id,page,kind,quote,text,x,y}
   undo: [],           // {page,label,fn}
   chat: [],
@@ -194,6 +193,7 @@ function renderPages() {
       <div class="page-head"><span>${t('page')} ${i} / ${DOC.totalPages}</span><span class="r">${DOC.file}</span></div>
       <div class="slide pdf-loading">
         <canvas class="pdf-canvas"></canvas>
+        <div class="hl-layer"></div>
         <div class="pdf-text-layer"></div>
         <svg class="ink" viewBox="0 0 1000 562" preserveAspectRatio="none"></svg>
       </div>`;
@@ -357,7 +357,7 @@ function syncChrome() {
   $('#zoomVal').textContent = Math.round(S.zoom * 100) + '%';
   $('#btnUndo').disabled = !S.undo.length;
   const pg = $('#pg' + S.page);
-  const hasInk = pg && pg.querySelector('.ink > *, mark, .note-pin, .slide-text, .slide-img');
+  const hasInk = pg && pg.querySelector('.ink > *, .hl-mark, .note-pin, .slide-text, .slide-img');
   $('#btnClear').disabled = !hasInk;
 }
 
@@ -533,7 +533,7 @@ function eraseAt(slide, cx, cy) {
   const page = +slide.closest('.page').dataset.page;
 
   // 1) chữ, ảnh, ghim, highlight — bắt theo khung bao, phần tử mới nhất được ưu tiên
-  const plain = [...slide.querySelectorAll('.slide-text,.slide-img,.note-pin,mark')].reverse();
+  const plain = [...slide.querySelectorAll('.slide-text,.slide-img,.note-pin,.hl-mark')].reverse();
   for (const el of plain) {
     const r = el.getBoundingClientRect();
     if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) { removeAnn(el, page); return true; }
@@ -556,21 +556,14 @@ function eraseAt(slide, cx, cy) {
 }
 
 function removeAnn(el, page) {
+  // Mọi annotation giờ đều là phần tử độc lập (nét bút, hình khoanh, ô chữ, ảnh,
+  // ghim, vệt highlight) nên xoá và hoàn tác chỉ là gỡ ra rồi cắm lại đúng chỗ.
   const parent = el.parentNode, next = el.nextSibling;
-  if (el.tagName === 'MARK') {
-    // gỡ thẻ mark nhưng giữ nguyên các node con để hoàn tác bọc lại được
-    const kids = [...el.childNodes];
-    kids.forEach(k => parent.insertBefore(k, el));
-    el.remove();
-    pushUndo(page, 'tẩy highlight', () => {
-      parent.insertBefore(el, next);
-      kids.forEach(k => el.appendChild(k));
-    });
-  } else {
-    if (el.classList?.contains('note-pin')) S.notes = S.notes.filter(n => (n.text || n.quote) !== el.title);
-    el.remove();
-    pushUndo(page, 'tẩy', () => parent.insertBefore(el, next));
+  if (el.classList?.contains('note-pin')) {
+    S.notes = S.notes.filter(n => (n.text || n.quote) !== el.title);
   }
+  el.remove();
+  pushUndo(page, 'tẩy', () => parent.insertBefore(el, next));
   syncChrome();
 }
 
@@ -580,23 +573,40 @@ function pushUndo(page, label, fn) {
 }
 
 /* ----- highlight ----- */
+/* Highlight vẽ lên lớp phủ riêng, KHÔNG đụng vào DOM của text layer.
+   Text layer của pdf.js là các <span> định vị tuyệt đối từng mẩu một; cách cũ
+   dùng extractContents() rồi bọc <mark> làm chữ bị bứt khỏi span định vị của nó
+   nên vệt vàng nhảy về góc trên-trái và chữ hiện lại ở cỡ mặc định.
+   Ở đây chỉ đọc hình chữ nhật của vùng chọn rồi vẽ đè lên, quy về % của slide
+   để zoom hay đổi kích thước cửa sổ vẫn nằm đúng chỗ. */
 function highlightSelection() {
   const sel = window.getSelection();
   if (!sel.rangeCount || sel.isCollapsed) return null;
   const range = sel.getRangeAt(0);
   const slide = slideOf(range.commonAncestorContainer);
   if (!slide) return null;
-  const mark = document.createElement('mark');
-  try { mark.appendChild(range.extractContents()); range.insertNode(mark); }
-  catch { return null; }
+  const layer = slide.querySelector('.hl-layer');
+  if (!layer) return null;
+
+  const sr = slide.getBoundingClientRect();
+  const rects = [...range.getClientRects()].filter(r => r.width > 1 && r.height > 1);
+  if (!rects.length) return null;
+
+  const marks = rects.map(r => {
+    const el = document.createElement('div');
+    el.className = 'hl-mark';
+    el.style.left = ((r.left - sr.left) / sr.width * 100) + '%';
+    el.style.top = ((r.top - sr.top) / sr.height * 100) + '%';
+    el.style.width = (r.width / sr.width * 100) + '%';
+    el.style.height = (r.height / sr.height * 100) + '%';
+    layer.appendChild(el);
+    return el;
+  });
+
   sel.removeAllRanges();
   const page = +slide.closest('.page').dataset.page;
-  pushUndo(page, 'highlight', () => {
-    const parent = mark.parentNode;
-    while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
-    mark.remove(); parent.normalize();
-  });
-  return { page, mark };
+  pushUndo(page, 'highlight', () => marks.forEach(el => el.remove()));
+  return { page, marks };
 }
 
 /* ----- ghim ghi chú lên slide ----- */
@@ -726,14 +736,65 @@ function pageUnderSnip() {
   return pg ? +pg.dataset.page : S.page;
 }
 
-$('#snipAsk').onclick = () => {
+$('#snipAsk').onclick = async () => {
   const p = pageUnderSnip();
-  S.snap = { page: p, w: Math.round(snip.w), h: Math.round(snip.h) };
-  const r = snipBar.getBoundingClientRect();
+  const w = Math.round(snip.w);
+  const h = Math.round(snip.h);
+  const relX = Math.round(snip.x);
+  const relY = Math.round(snip.y);
+
+  const pageEl = document.getElementById('pg' + p);
+  const textLayer = pageEl && pageEl.querySelector('.pdf-text-layer');
+  const slideTextContent = textLayer ? (textLayer.textContent || '').trim() : '';
+  const imageDataUrl = captureSnipImage(p);
+
+  S.snap = { page: p, w, h, imageDataUrl };
   closeSnip();
-  openAskPopup(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, { page: p, region: true },
-    r.left + r.width / 2, r.top);
+  openTutor(true);
+  renderAttach();
+
+  // Gửi pixel crop thật + text layer của đúng trang cho backend.
+  send(`Giải thích giúp mình vùng vừa chọn ở trang ${p}`, {
+    page: p,
+    region: true,
+    w,
+    h,
+    x: relX,
+    y: relY,
+    slideText: slideTextContent.slice(0, 5000),
+    imageDataUrl,
+  });
 };
+
+function captureSnipImage(page) {
+  const layerRect = snipLayer.getBoundingClientRect();
+  const slide = $(`#pg${page} .slide`);
+  const source = slide && slide.querySelector('.pdf-canvas');
+  if (!source || !source.width || !snip) return null;
+  const slideRect = slide.getBoundingClientRect();
+  const selected = {
+    left: layerRect.left + snip.x,
+    top: layerRect.top + snip.y,
+    right: layerRect.left + snip.x + snip.w,
+    bottom: layerRect.top + snip.y + snip.h,
+  };
+  const left = Math.max(selected.left, slideRect.left);
+  const top = Math.max(selected.top, slideRect.top);
+  const right = Math.min(selected.right, slideRect.right);
+  const bottom = Math.min(selected.bottom, slideRect.bottom);
+  if (right <= left || bottom <= top) return null;
+
+  const sx = (left - slideRect.left) * source.width / slideRect.width;
+  const sy = (top - slideRect.top) * source.height / slideRect.height;
+  const sw = (right - left) * source.width / slideRect.width;
+  const sh = (bottom - top) * source.height / slideRect.height;
+  const scale = Math.min(1, 1200 / Math.max(sw, sh));
+  const output = document.createElement('canvas');
+  output.width = Math.max(1, Math.round(sw * scale));
+  output.height = Math.max(1, Math.round(sh * scale));
+  output.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, output.width, output.height);
+  return output.toDataURL('image/jpeg', .86);
+}
 $('#snipNote').onclick = () => {
   const p = pageUnderSnip();
   const box = { ...snip };
@@ -839,7 +900,9 @@ $('#askInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitA
 /* =============================================================
    TUTOR CHAT
    ============================================================= */
-/* ---- AI_CALL: điểm duy nhất sẽ nối model thật ở CP3 ---- */
+/* ---- AI_CALL: DeepSeek Agent với 6 Tool Calls ---- */
+
+// Fallback mock khi không có API key
 function mockAnswer(q, opts = {}) {
   const s = q.toLowerCase();
   if (opts.region) return withPage(ANSWERS.region, opts.page);
@@ -851,6 +914,7 @@ function mockAnswer(q, opts = {}) {
   if (/lịch sử|nguồn gốc|ai phát minh|năm nào|tác giả gốc/.test(s)) return ANSWERS.lowconf;
   return withPage(ANSWERS.generic, opts.page || S.page);
 }
+
 function withPage(a, p) {
   return {
     ...a,
@@ -859,7 +923,33 @@ function withPage(a, p) {
   };
 }
 
-function send(text, opts = {}) {
+// Production path: browser talks only to the same-origin backend.
+const MOCK_MODE = new URLSearchParams(location.search).get('mock') === '1';
+
+async function callBackendAgent(question, opts = {}) {
+  const response = await fetch('/api/agent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question,
+      document: DOC.file,
+      page: opts.page || S.page,
+      selected_text: opts.quote || '',
+      slide_text: opts.slideText || '',
+      image_data_url: opts.imageDataUrl || null,
+      region: opts.region ? { x: opts.x, y: opts.y, w: opts.w, h: opts.h } : null,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Backend trả lỗi ${response.status}`);
+  return data;
+}
+
+// UNUSED LEGACY DIRECT-API IMPLEMENTATION.
+// Kept temporarily for diff archaeology; send() never calls this block.
+// The only supported production path is callBackendAgent() above.
+
+async function send(text, opts = {}) {
   if (S.busy || !text.trim()) return;
   const page = opts.page || S.page;
   S.chat.push({ role: 'user', text, ctxPage: page, snap: S.snap });
@@ -872,17 +962,32 @@ function send(text, opts = {}) {
   S.chat.push({ role: 'typing' });
   renderChat();
 
-  setTimeout(() => {
-    S.chat.pop();
-    if (failing) {
-      S.chat.push({ role: 'ai', error: true, retry: { text, opts } });
+  // Dùng setTimeout để render typing bubble trước khi thực thi async
+  await new Promise(r => setTimeout(r, 50));
+
+  try {
+    if (failing) throw new Error('simulated network error');
+
+    let a;
+    if (MOCK_MODE) {
+      await new Promise(r => setTimeout(r, 900 + Math.random() * 500));
+      a = mockAnswer(text, { ...opts, page });
     } else {
-      const a = mockAnswer(text, { ...opts, page });
-      S.chat.push({ role: 'ai', data: a, ctxPage: page });
+      a = await callBackendAgent(text, { ...opts, page });
     }
+
+    // Xóa typing bubble và hiển thị kết quả
+    S.chat.pop();
+    S.chat.push({ role: 'ai', data: a, ctxPage: page });
+  } catch (err) {
+    console.error('Agent error:', err);
+    // Xóa typing bubble và hiển lỗi thực sự (không chỉ "mô phỏng")
+    S.chat.pop();
+    S.chat.push({ role: 'ai', error: true, errMsg: err.message, retry: { text, opts } });
+  } finally {
     S.busy = false;
     renderChat();
-  }, 900 + Math.random() * 500);
+  }
 }
 
 function confLabel(c) {
@@ -903,10 +1008,16 @@ function renderChat() {
         <div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div></div>`;
     }
     if (m.error) {
+      const isCors = (m.errMsg || '').toLowerCase().includes('failed to fetch') || (m.errMsg || '').toLowerCase().includes('network');
+      const isSimulated = (m.errMsg || '').includes('simulated');
+      let hint = '';
+      if (isCors) hint = `<p style="font-size:11px;color:var(--fg2);margin:4px 0 0">Hãy chạy ứng dụng bằng <code>python3 codebase/server.py</code>, không mở file HTML trực tiếp.</p>`;
+      else if (m.errMsg && !isSimulated) hint = `<p style="font-size:11px;color:var(--fg2);margin:4px 0 0">Chi tiết: ${esc(m.errMsg)}</p>`;
+      const label = isSimulated ? 'Mô phỏng lỗi mạng' : isCors ? 'Lỗi kết nối' : 'Lỗi Agent';
       return `<div class="msg-ai">
-        <div class="ai-meta"><span class="state err">${t('failed')}</span></div>
-        <div class="bubble"><p>Không gọi được trợ lý (mô phỏng lỗi mạng). Câu hỏi của bạn vẫn được giữ nguyên.</p>
-        <div class="chips"><button class="qchip" data-retry="${i}">${t('retry')}</button></div></div></div>`;
+        <div class="ai-meta"><span class="state err">${label}</span></div>
+        <div class="bubble"><p>Không gọi được trợ lý. Câu hỏi của bạn vẫn được giữ nguyên.</p>${hint}
+        <div class="chips"><button class="qchip" data-retry="${i}">${t('retry')}</button><button class="qchip" data-ai-status>Kiểm tra cấu hình AI</button></div></div></div>`;
     }
     const a = m.data;
     const isClarify = a.kind === 'clarify', isRefuse = a.kind === 'refuse', low = a.conf > 0 && a.conf < 60;
@@ -918,14 +1029,21 @@ function renderChat() {
           <span class="state${low ? ' warn' : ''}">${low ? t('lowconf') : t('answered')}</span>
         </div>`;
 
+    // Nguồn nào đối chiếu được với text thật của trang thì hiện bình thường;
+    // nguồn chưa đối chiếu được phải nhìn ra ngay là chưa kiểm chứng, không
+    // được để nó trông giống hệt nguồn đã xác minh.
+    const nUnver = (a.sources || []).filter(s => s.verified === false).length;
     const srcs = (a.sources || []).length ? `
       <div class="sources open">
-        <button class="src-head" data-src>${ICO.ext}<span>${a.sources.length} ${t('srcOne')}</span><span class="car">${ICO.caret}</span></button>
+        <button class="src-head" data-src>${ICO.ext}<span>${a.sources.length} ${t('srcOne')}</span>
+          ${nUnver ? `<span class="src-warn">${nUnver} chưa đối chiếu</span>` : ''}
+          <span class="car">${ICO.caret}</span></button>
         <div class="src-body">${a.sources.map((s, k) => `
-          <div class="src-card" data-goto="${s.page}">
+          <div class="src-card${s.verified === false ? ' unverified' : ''}" data-goto="${s.page}">
             <div class="src-top"><span class="src-n">${k + 1}</span>
-            <span class="src-pg">${ICO.book} Tr.${s.page}</span></div>
-            <div class="src-q">${s.text}</div>
+            <span class="src-pg">${ICO.book} Tr.${s.page}${s.verified === false
+              ? ' · <b>chưa đối chiếu được</b>' : ' · đã đối chiếu'}</span></div>
+            <div class="src-q">${esc(s.text)}</div>
           </div>`).join('')}</div>
       </div>` : '';
 
@@ -973,6 +1091,7 @@ function wireChat() {
     b.classList.add('on');
     toast(dir === 'up' ? 'ok' : 'warn', dir === 'up' ? 'Cảm ơn phản hồi!' : 'Đã ghi nhận — câu này sẽ được TA rà lại');
   });
+  $$('#chat [data-ai-status]').forEach(b => b.onclick = showAiStatus);
 }
 
 function renderAttach() {
@@ -1080,7 +1199,7 @@ $$('#moreMenu button').forEach(b => b.onclick = () => {
   else if (a === 'info') openModal('Thông tin tài liệu',
     `<p><b>Tên file:</b> ${DOC.file}<br><b>Môn:</b> ${DOC.course}<br><b>Mã tài liệu:</b> ${DOC.code}<br>
      <b>Số trang:</b> ${DOC.totalPages}<br><b>Giảng viên:</b> ${DOC.instructor}</p>
-     <p><b>Mức prototype:</b> Mock — nội dung slide và câu trả lời tutor đều là dữ liệu giả.</p>`);
+     <p><b>Mức prototype:</b> CP3 — PDF thật, backend AI thật; chỉ dùng mock khi URL có <code>?mock=1</code>.</p>`);
   else if (a === 'report') openModal('Báo lỗi tài liệu',
     `<textarea class="note-input" placeholder="Mô tả lỗi bạn gặp ở trang ${S.page}..."></textarea>`,
     `<button class="btn" data-close>${t('cancel')}</button><button class="btn primary" data-close>Gửi</button>`);
@@ -1117,8 +1236,7 @@ $('#btnClear').onclick = () => {
     `<button class="btn" data-close>${t('cancel')}</button><button class="btn primary" id="doClear">Xoá</button>`);
   $('#doClear').onclick = () => {
     $$('.ink > *', pg).forEach(p => p.remove());
-    $$('.note-pin, .slide-text, .slide-img', pg).forEach(p => p.remove());
-    $$('mark', pg).forEach(m => { const par = m.parentNode; while (m.firstChild) par.insertBefore(m.firstChild, m); m.remove(); par.normalize(); });
+    $$('.note-pin, .slide-text, .slide-img, .hl-mark', pg).forEach(p => p.remove());
     S.notes = S.notes.filter(n => n.page !== S.page);
     S.undo = S.undo.filter(u => u.page !== S.page);
     closeModal(); syncChrome();
@@ -1126,12 +1244,60 @@ $('#btnClear').onclick = () => {
   };
 };
 
+
+
+$('#tglSidebar').onclick = () => { S.sideManual = true; $('#workspace').classList.toggle('side-off'); };
+$('#tglTutor').onclick = () => { S.tutorManual = true; openTutor(false); };
+
+/* Dưới một bề rộng nhất định thì hai panel ăn hết chỗ của khung xem, nên tự thu gọn.
+   Chỉ tự động khi người dùng CHƯA tự bấm nút ẩn/hiện — bấm rồi thì tôn trọng lựa chọn
+   của họ, không tự bật lại khi resize. */
+function fitPanels() {
+  const w = $('#workspace'), vw = window.innerWidth;
+  if (!S.sideManual) w.classList.toggle('side-off', vw < 1080);
+  if (!S.tutorManual) w.classList.toggle('tutor-off', vw < 860);
+}
+fitPanels();
+addEventListener('resize', fitPanels);
+
+async function updateAiBadge() {
+  const badge = document.getElementById('aiModeBadge');
+  if (!badge) return;
+  if (MOCK_MODE) {
+    badge.textContent = '🔵 MOCK CÓ CHỦ ĐÍCH';
+    badge.style.background = 'var(--border)';
+    badge.style.color = 'var(--fg2)';
+    return;
+  }
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    const state = await response.json();
+    badge.textContent = state.ai_configured ? '🤖 AI THẬT' : '⚠ CHƯA CÓ KEY';
+    badge.style.background = state.ai_configured ? 'var(--accent)' : 'var(--warn)';
+    badge.style.color = '#fff';
+    badge.dataset.health = JSON.stringify(state);
+  } catch (_) {
+    badge.textContent = '⚠ BACKEND OFFLINE';
+    badge.style.background = 'var(--danger)';
+    badge.style.color = '#fff';
+  }
+}
+
+async function showAiStatus() {
+  await updateAiBadge();
+  const badge = $('#aiModeBadge');
+  const state = badge.dataset.health ? JSON.parse(badge.dataset.health) : null;
+  openModal('Trạng thái AI', state
+    ? `<p><b>Text AI:</b> ${state.ai_configured ? 'đã cấu hình' : 'chưa cấu hình'}<br><b>Vision AI:</b> ${state.vision_configured ? 'đã cấu hình' : 'chưa cấu hình'}<br><b>Model:</b> ${esc(state.model)}</p><p>API key chỉ nằm trong biến môi trường phía server.</p>`
+    : '<p>Không kết nối được backend. Chạy <code>python3 codebase/server.py</code>.</p>');
+}
+$('#aiModeBadge').onclick = showAiStatus;
+
+// Ba handler này từng có ở nhánh 2 (f86dd28) nhưng bị commit "sync codebase with p2"
+// ghi đè mất, khiến pager dưới cùng và chip số trang bấm không ăn.
 $('#chipPage').onclick = () => openNotesModal();
 $('#prevPage').onclick = () => goPage(S.page - 1);
 $('#nextPage').onclick = () => goPage(S.page + 1);
-
-$('#tglSidebar').onclick = () => $('#workspace').classList.toggle('side-off');
-$('#tglTutor').onclick = () => openTutor(false);
 
 $('#btnTheme').onclick = () => {
   const dark = document.documentElement.dataset.theme === 'dark';
@@ -1158,6 +1324,7 @@ $('#btnSend').onclick = () => {
   i.value = '';
 };
 $('#ask').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnSend').click(); });
+$('#btnSummary').onclick = () => send('Tóm tắt toàn bộ tài liệu này thành 5 gạch đầu dòng, ưu tiên các ý cần nhớ để ôn tập.', { page: S.page });
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
@@ -1177,23 +1344,9 @@ document.addEventListener('keydown', e => {
 renderChapters();
 renderSwatches();
 setPenSize(S.penSize, true);
-S.chat = SEED_CHAT.map(m => m.role === 'user'
-  ? { role: 'user', text: m.text, ctxPage: m.ctxPage }
-  : { role: 'ai', data: ANSWERS[m.key], ctxPage: m.ctxPage });
+S.chat = [];
 renderChat();
 applyLang();
 applyZoom();
-
-// Tìm document active và load PDF
-(async () => {
-  let activeDoc = null;
-  for (const ch of CHAPTERS) {
-    const d = ch.docs.find(d => d.active);
-    if (d) { activeDoc = d; break; }
-  }
-  if (activeDoc) {
-    await loadDocument(activeDoc.name);
-  } else {
-    renderPages(); // fallback nếu không có active doc
-  }
-})();
+updateAiBadge();
+loadDocument(DOC.file);
