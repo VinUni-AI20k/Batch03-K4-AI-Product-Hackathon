@@ -34,20 +34,44 @@ if [[ "$INGEST" == "1" ]]; then
 fi
 
 # ── cấu hình ──
-[[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env — mở lên điền LLM key + token bot"; }
+[[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env"; }
+
+# Ghi/ghi đè KEY=value trong .env (awk: an toàn với ký tự đặc biệt trong value)
+_set_env() {
+  local k="$1" v="$2"
+  if grep -qE "^${k}=" .env; then
+    awk -v k="$k" -v v="$v" 'BEGIN{FS="="} $1==k{print k"="v; next} {print}' .env > .env.tmp && mv .env.tmp .env
+  else
+    printf '%s=%s\n' "$k" "$v" >> .env
+  fi
+}
+# Hỏi bí mật (ẩn khi gõ), đọc từ /dev/tty để chạy được cả khi cài qua `curl | bash`
+_ask() { local v=""; printf "%s" "$1" >/dev/tty; read -rs v </dev/tty; printf "\n" >/dev/tty; printf "%s" "$v"; }
+
+# Điền key ngay trong lúc cài — xong là chat được, không phải mở .env sửa tay
+if [[ -r /dev/tty ]] && ! grep -qE '^OPENAI_API_KEY=.+' .env; then
+  printf "\n\033[1;35m── Điền API key (dán vào rồi Enter; để trống + Enter = bỏ qua, sửa sau trong .env) ──\033[0m\n" >/dev/tty
+  k="$(_ask '1) OpenAI API key (bắt buộc để chat, dạng sk-...): ')"; [[ -n "$k" ]] && { _set_env OPENAI_API_KEY "$k"; say "✓ Đã lưu OPENAI_API_KEY (${#k} ký tự)"; }
+  k="$(_ask '2) VOYAGE_API_KEY (Enter = bỏ, dùng embedding local miễn phí): ')"; [[ -n "$k" ]] && { _set_env VOYAGE_API_KEY "$k"; say "✓ Đã lưu VOYAGE_API_KEY"; }
+  k="$(_ask '3) TELEGRAM_BOT_TOKEN (Enter nếu không dùng Telegram): ')"; [[ -n "$k" ]] && { _set_env TELEGRAM_BOT_TOKEN "$k"; say "✓ Đã lưu TELEGRAM_BOT_TOKEN"; }
+  k="$(_ask '4) DISCORD_BOT_TOKEN (Enter nếu không dùng Discord): ')"; [[ -n "$k" ]] && { _set_env DISCORD_BOT_TOKEN "$k"; say "✓ Đã lưu DISCORD_BOT_TOKEN"; }
+  chmod 600 .env
+else
+  say "Bỏ qua hỏi key (đã có OPENAI_API_KEY hoặc không có bàn phím) — chỉnh trong .env nếu cần."
+fi
+
 learning-agent onboard || true
 
 cat <<'EOF'
 
 ────────────────────────────────────────────────
-✅ Cài xong. Repo đã kèm sẵn KHO KIẾN THỨC (thư mục vault/) — lần đầu chạy bot/ui
-   sẽ TỰ ĐỘNG index để dùng được ngay (không cần nạp lại).
+✅ Cài xong. Kho kiến thức (vault/) có sẵn — lần đầu chạy tự index, dùng được ngay.
+   (Đã điền key ở bước trên thì bỏ qua mục 1, chạy thẳng mục 2–3.)
 
 Tiếp theo:
-  1. Mở .env điền: LLM key (theo provider trong config.yaml), TELEGRAM_BOT_TOKEN/DISCORD_BOT_TOKEN
-     (VOYAGE_API_KEY tuỳ chọn — bỏ trống sẽ dùng embedding local miễn phí)
+  1. (Nếu chưa điền key) mở .env: LLM key, tuỳ chọn VOYAGE_API_KEY / token bot
   2. Kích hoạt môi trường:   source .venv/bin/activate
-  3. Chạy bot:               learning-agent bot   (lần đầu tự index kho kiến thức, chờ chút)
-  4. Dashboard (cửa sổ khác): learning-agent ui   → http://127.0.0.1:8321
+  3. Dashboard chat:         learning-agent ui   → http://127.0.0.1:8321
+     (hoặc Telegram/Discord: learning-agent bot — lần đầu tự index, chờ chút)
 ────────────────────────────────────────────────
 EOF
