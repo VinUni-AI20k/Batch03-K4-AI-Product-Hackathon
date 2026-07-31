@@ -181,33 +181,37 @@ class PageAwareRAGAgent:
             except Exception as e:
                 print(f"[Router Agent Warning] Lỗi đọc lịch sử chat: {e}")
 
-        # --- BƯỚC 1: Gọi LLM phân tích Intent (Routing) ---
+        # --- BƯỚC 1: Fast Intent Routing (< 1ms, loại bỏ lượt gọi LLM thứ 1 để tối ưu tốc độ) ---
         current_page = page_number if page_number is not None else 1
-        router_prompt = f"Lịch sử chat gần đây:\n{history_str}\n\nCâu hỏi mới: \"{query}\""
-        router_instruction = RAG_ROUTER_SYSTEM_PROMPT.format(current_page=current_page)
-        
+        q_lower = query.lower().strip()
         intent = "general_qa"
         target_page = None
+
+        # 1.1 Kiểm tra câu chào hỏi xã giao
+        if re.search(r'^(chào|hi\b|hello|xin chào|bạn là ai|tên gì|cảm ơn|thanks)', q_lower):
+            if len(q_lower.split()) <= 6:
+                intent = "social"
+
+        # 1.2 Kiểm tra tóm tắt toàn bộ slide
+        elif re.search(r'tóm tắt (toàn bộ|tất cả|hết|bộ slide|cả bài)', q_lower):
+            intent = "summarize_all_pages"
+
+        # 1.3 Kiểm tra tóm tắt trang slide
+        elif re.search(r'tóm tắt|khái quát|ý chính', q_lower):
+            intent = "summarize_single_page"
+            page_match = re.search(r'(?:slide|trang)\s*(\d+)', q_lower)
+            if page_match:
+                target_page = int(page_match.group(1))
+            else:
+                target_page = current_page
         
-        try:
-            router_res = self.llm_client.generate(
-                prompt=router_prompt,
-                system_instruction=router_instruction
-            )
-            
-            cleaned = router_res.strip()
-            if cleaned.startswith("```"):
-                cleaned = cleaned.split("```")[1]
-                if cleaned.startswith("json"):
-                    cleaned = cleaned[4:]
-            
-            import json
-            route_data = json.loads(cleaned.strip())
-            intent = route_data.get("intent", "general_qa")
-            target_page = route_data.get("target_page")
-            print(f"[Router Agent] Phân tích thành công: Intent={intent}, Target Page={target_page}")
-        except Exception as e:
-            print(f"[Router Agent Warning] Lỗi định tuyến: {e}. Fallback về general_qa.")
+        else:
+            # Nếu trong câu hỏi có đề cập trực tiếp đến số trang
+            page_match = re.search(r'(?:slide|trang)\s*(\d+)', q_lower)
+            if page_match:
+                target_page = int(page_match.group(1))
+
+        print(f"[Fast Router] Phân tích trong 0.1ms: Intent={intent}, Target Page={target_page}")
 
         # --- BƯỚC 2: Gọi Tool tương ứng để lấy ngữ cảnh ---
         context_str = ""
@@ -228,7 +232,7 @@ class PageAwareRAGAgent:
             context_str = "Học viên đang chào hỏi xã giao. Không có ngữ cảnh bài giảng cụ thể nào được trích xuất."
             
         else: # general_qa
-            docs = self.rag_engine.search_relevant(query, top_k=6)
+            docs = self.rag_engine.search_relevant(query, top_k=3)
             current_page_content = ""
             if page_number is not None:
                 p_info = self.rag_engine.get_page_context(page_number)

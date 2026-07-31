@@ -1250,6 +1250,7 @@ window.autoSaveCurrentNote = autoSaveCurrentNote;
 window.clearCurrentPageNote = clearCurrentPageNote;
 window.askTutorAboutNote = askTutorAboutNote;
 window.generateAINoteForCurrentPage = generateAINoteForCurrentPage;
+window.removeAINoteChip = removeAINoteChip;
 window.noteFormatCmd = noteFormatCmd;
 
 // ============================================
