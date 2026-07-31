@@ -1,3 +1,37 @@
-.DS_Store
-node_modules/
+# --- Secrets -------------------------------------------------------
+# `*.env` also matches a bare `.env`. `.env.example` does not end in `.env`,
+# so templates stay in the repo on purpose.
 *.env
+.env.local
+
+# --- Hackathon data pack -------------------------------------------
+# README.md §"Bảo mật dữ liệu được cung cấp" #3 forbids committing the data
+# pack to the submission repo. NOTE: files already tracked stay tracked —
+# this rule only stops NEW data files from being added.
+data/
+
+# --- Python --------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# --- Node / frontend ------------------------------------------------
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# --- Cloudflare Wrangler local state --------------------------------
+.wrangler/
+
+# --- Editors & OS ---------------------------------------------------
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Logs -----------------------------------------------------------
+*.log
