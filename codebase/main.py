@@ -26,6 +26,15 @@ app.add_middleware(
 # Initialize AI QA Agent
 qa_agent = AIQAAgent()
 
+try:
+    from pymongo import MongoClient
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+    MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "ai_hackathon_kb")
+    _mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
+    mongo_db = _mongo_client[MONGO_DB_NAME]
+except Exception:
+    mongo_db = None
+
 class ChatRequest(BaseModel):
     message: str
 
@@ -35,6 +44,7 @@ class ChatResponse(BaseModel):
     guardrails_triggered: List[str]
     confidence_score: float
     citations: List[Dict[str, Any]]
+    tool_calls: List[Dict[str, Any]] = []
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_with_agent(request: ChatRequest):
@@ -56,6 +66,67 @@ async def search_kb(q: Optional[str] = ""):
         return {"results": qa_agent.fb_kb}
     results = qa_agent._retrieve_relevant_docs(q, top_k=10)
     return {"results": results}
+
+class GoogleAuthRequest(BaseModel):
+    email: str
+    name: str
+    picture: Optional[str] = "https://lh3.googleusercontent.com/a/default-user=s96-c"
+    google_id: Optional[str] = ""
+
+@app.post("/api/auth/google")
+async def google_login(request: GoogleAuthRequest):
+    if not request.email or "@" not in request.email:
+        raise HTTPException(status_code=400, detail="Email Google không hợp lệ")
+    try:
+        if mongo_db is not None:
+            from datetime import datetime
+            now_str = datetime.utcnow().isoformat() + "Z"
+            existing = mongo_db["users"].find_one({"email": request.email})
+            if existing:
+                mongo_db["users"].update_one(
+                    {"email": request.email},
+                    {"$set": {"last_login": now_str, "name": request.name, "picture": request.picture}}
+                )
+            else:
+                new_user = {
+                    "email": request.email,
+                    "name": request.name,
+                    "picture": request.picture or "https://lh3.googleusercontent.com/a/default-user=s96-c",
+                    "google_id": request.google_id or "google_personal_" + request.email.split("@")[0],
+                    "role": "student",
+                    "status": "active",
+                    "auth_provider": "google",
+                    "created_at": now_str,
+                    "last_login": now_str
+                }
+                mongo_db["users"].insert_one(new_user)
+        return {
+            "success": True,
+            "user": {
+                "email": request.email,
+                "name": request.name,
+                "picture": request.picture or "https://lh3.googleusercontent.com/a/default-user=s96-c",
+                "role": "student"
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/users")
+async def get_all_users():
+    if mongo_db is None:
+        return {"users": [], "count": 0}
+    users = list(mongo_db["users"].find({}, {"_id": 0}))
+    return {"users": users, "count": len(users)}
+
+@app.get("/api/docs/{file_path:path}")
+async def serve_docs(file_path: str):
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    full_path = os.path.join(base_dir, file_path)
+    if os.path.exists(full_path) and os.path.isfile(full_path):
+        return FileResponse(full_path)
+    raise HTTPException(status_code=404, detail="File not found")
 
 # Serve React Frontend Build if available, fallback to static UI
 frontend_dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "dist")

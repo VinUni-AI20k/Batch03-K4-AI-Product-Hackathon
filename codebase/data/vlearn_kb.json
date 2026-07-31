@@ -70,5 +70,29 @@
     "category": "lecture_slide",
     "content": "AI Spec là tài liệu trung tâm, được chấm theo Rubric 100 điểm: R1 Bằng chứng (15đ) — khảo sát ≥20 người hoặc data mining với ≥5 quote; R2 Lát cắt (20đ) — một câu rõ ràng, có thể triển khai; R3 4 Lớp chỗ khó (11đ) — ≥8 kịch bản; R4 HAX/PAIR (4đ) — ≥4 nguyên tắc áp dụng cụ thể; R5 Prototype (8đ) — có ≥1 lời gọi AI thật; R6-R8 Demo & giải thích (42đ). Vibe-coding rule: dùng AI build thoải mái nhưng phải giải thích được code của mình tại CP5.",
     "source_url": "data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  },
+  {
+    "id": "course_admissions_overview",
+    "source_id": "COURSE-INFO-01",
+    "title": "Thông tin Tuyển sinh & Lộ trình Đào tạo — Khóa AI Thực Chiến (Vingroup - VinUni)",
+    "category": "course_admissions",
+    "content": "Khóa học AI Thực Chiến Vingroup - VinUni là chương trình đào tạo chuyên sâu kéo dài 3 tháng, với 80% thời lượng thực hành thực tế trên các dự án AI nội bộ. Chương trình tài trợ 100% học phí cho học viên trúng tuyển. Đối tượng tuyển sinh: sinh viên, kỹ sư và người làm sản phẩm công nghệ có tư duy logic và kiến thức lập trình cơ bản (Python).",
+    "source_url": "https://www.facebook.com/groups/1450219003271674/"
+  },
+  {
+    "id": "campus_facilities_logistics",
+    "source_id": "CAMPUS-INFO-02",
+    "title": "Sổ tay Học viên — Cơ sở vật chất, Căng tin & Tiện ích tại trường (VinUni / Tòa Vin)",
+    "category": "campus_logistics",
+    "content": "Học viên Khóa AI Thực Chiến được tham gia học tập trực tiếp tại Tòa VinUni (Khu đô thị Vinhomes Ocean Park). Các tiện ích dành cho học viên bao gồm: (1) Căng tin VinUni tại tầng 1 phục vụ ăn sáng, trưa, tối với thực đơn đa dạng; (2) Khu phòng tự học và hội trường học tập mở cửa từ 07:30 đến 21:00 hàng ngày; (3) Hệ thống mạng wifi tốc độ cao miễn phí (VinUni-Guest / VinAI-Edu); (4) Bãi giữ xe miễn phí khi xuất trình thẻ học viên.",
+    "source_url": "https://www.facebook.com/groups/1450219003271674/"
+  },
+  {
+    "id": "student_support_services",
+    "source_id": "SUPPORT-INFO-03",
+    "title": "Quy chế Học viên — Hỗ trợ cá nhân & Cơ hội nghề nghiệp tại Vingroup",
+    "category": "student_services",
+    "content": "Trong suốt 3 tháng khóa học, học viên được cấp tài khoản VLearn để truy cập bài giảng, tham gia thảo luận trên Discord/Facebook Group QA và nhận hỗ trợ 1:1 từ Mentor/TA. Những học viên làm đồ án tốt nghiệp xuất sắc (Top 5) có cơ hội được phỏng vấn tuyển dụng trực tiếp vào các đơn vị công nghệ của Vingroup (VinAI, VinBigData...) và nhận trợ cấp dự án.",
+    "source_url": "https://www.facebook.com/groups/1450219003271674/"
   }
 ]
