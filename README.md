@@ -1,5 +1,38 @@
 # Mini Hackathon AI — Batch 03
 
+## Thông tin nhóm
+- Tên nhóm: **HoiNguoiCaoTuoi**
+- Khóa: **K4**
+- Lớp lab: **D304**
+- Zone: Chưa cung cấp
+- Hướng: **A — VLearn**
+- Loại: **Tối ưu tính năng có sẵn**
+
+### Thành viên và phân công
+- P1 — `2A202601993` — Sái Hoài Nam (nhóm trưởng) — Product Lead, spec, evidence,
+  validation và nội dung demo
+- P2 — `2A202601748` — Dương Ngọc Hải — Frontend và trải nghiệm giảng viên
+- P3 — `2A202601460` — Nguyễn Hoàng Đạt — Taxonomy retrieval và AI matching
+- P4 — `2A202601792` — Trần Duy Sơn — Grouping, intent và grounded summary
+- P5 — `2A202601442` — Phạm Hoàng Nam — API, schema, eval và packaging
+
+---
+
+## Lát cắt sản phẩm
+
+Sau buổi học, giảng viên dùng hệ thống để nhận biết phần kiến thức nào
+nhiều sinh viên chưa rõ. Hệ thống phân loại câu hỏi theo taxonomy của
+buổi học, gom câu tương tự, tạo summary có căn cứ và chuyển trường hợp
+không chắc chắn cho giảng viên duyệt hoặc sửa.
+
+- Đặc tả sản phẩm: [`spec.md`](spec.md)
+- Kịch bản validation:
+  [`validation/test-script.md`](validation/test-script.md)
+- Trạng thái tích hợp Giai đoạn 3:
+  [`validation/phase3-integration-status.md`](validation/phase3-integration-status.md)
+
+---
+
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
