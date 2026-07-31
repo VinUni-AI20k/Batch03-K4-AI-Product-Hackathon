@@ -24,8 +24,8 @@ class PageAwareRAGAgent:
 
     def __init__(
         self,
-        provider: str = "gemini",
-        model_name: Optional[str] = DEFAULT_GEMINI_MODEL,
+        provider: Optional[str] = None,
+        model_name: Optional[str] = None,
         temperature: float = 0.1
     ):
         self.llm_client = LLMClient(provider=provider, model_name=model_name, temperature=temperature)
