@@ -8,13 +8,13 @@
 
 ## Loại bằng chứng
 
-**Chọn A — Đã khảo sát người thật. Không chọn B:** repo đã có đủ 45 phản hồi khử định danh, cách đếm và hash nguồn, nhưng chưa có một phép mining chatlog/log độc lập chứng minh pain theo chuẩn B.
+**Chọn cả A — Đã khảo sát người thật và B — Đã phân tích dữ liệu.** A dùng 45 phản hồi khảo sát ngoài nhóm; B dùng 10 tin nhắn trong log nhóm tự dùng thử, có bộ lọc, quy tắc đếm, hash nguồn và ví dụ nguyên văn đã khử định danh.
 
-> Artifact kiểm chứng nằm trong `evidence/cp4-survey/`: đủ 45 hàng đã khử định danh, bảng tổng hợp, script tái lập, hash ZIP nguồn và sáu biểu đồ. Nhóm cần bảo đảm 45 người trả lời đều ở ngoài nhóm.
+> Artifact A nằm trong `evidence/cp4-survey/`; artifact B nằm trong `evidence/cp4-log-mining/`. Cả hai đều có dữ liệu đã khử định danh, script tái lập, hash nguồn và cách đếm.
 
 ## Con số bằng chứng mạnh nhất
 
-**26/45 người được khảo sát (57,8%) chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót” trong câu hỏi “Về việc Bất tiện di chuyển & Tương tác trực tiếp”. Cách đo: lấy số 26 trên thanh lựa chọn trong Google Forms, chia cho tổng 45 phản hồi và làm tròn một chữ số thập phân. Kết quả được đối chiếu bằng biểu đồ `evidence/cp4-survey/04-travel-pain-points.png`; 25/45 người (55,6%) cũng chọn quy trình, giấy tờ rườm rà/chồng chéo là khó khăn tổng quan lớn nhất.**
+**Bằng chứng A: 26/45 người được khảo sát (57,8%) chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót” trong câu hỏi “Về việc Bất tiện di chuyển & Tương tác trực tiếp”; cách đếm là đếm các dòng có lựa chọn này rồi chia cho 45. Bằng chứng B: lọc `eval/cases.json` theo `source=group_self_test_deidentified_2026-07-30` và `real_observation=true`, có 8/10 tin nhắn (80%) dùng cách viết đời thường, viết tắt/lỗi gõ hoặc đưa nhiều dữ kiện trong một lượt. Quy tắc đếm, hash nguồn và 8 ví dụ nguyên văn đã khử định danh được lưu trong `evidence/cp4-log-mining/`.**
 
 ## Các ý tưởng đã cân nhắc và lý do chọn
 
@@ -36,7 +36,7 @@
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Evidence chuẩn A/B có log | **Đạt chuẩn A về artifact** — đủ câu hỏi, 45 hàng khử định danh, cách đếm, hash nguồn và biểu đồ; nhóm xác nhận người trả lời ngoài nhóm |
+| Evidence chuẩn A/B có log | **Đạt A+B về artifact** — A có 45 phản hồi khảo sát; B có 10 tin nhắn log tự dùng thử, phép đếm tái lập, hash nguồn và 8 ví dụ |
 | Bảng impact + ứng viên bị loại | **Đạt về cấu trúc** — 3 ứng viên, có phương án loại và lý do |
 | 4 lớp tình huống cụ thể | **Đạt** — mỗi lớp có ít nhất 2 ví dụ |
 | ≥4 nguyên tắc có nơi áp dụng | **Đạt** |

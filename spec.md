@@ -42,9 +42,10 @@ flowchart TD
 ```
 - Core JTBD (không tên sản phẩm/AI trong câu): Tìm đúng thủ tục, chuẩn bị đủ thông tin và hoàn tất một lượt khai hồ sơ có thể kiểm tra được mà không phải tự nối nhiều trang và biểu mẫu.
 - Problem statement: Người ít kỹ năng công nghệ phải chuyển qua lại giữa trang tra cứu, hướng dẫn và biểu mẫu; họ dễ chọn sai thủ tục, thiếu trường bắt buộc hoặc không biết bước tiếp theo, dẫn tới mất thời gian và phải làm lại hồ sơ.
-- Evidence (dự kiến nộp theo chuẩn A — khảo sát người thật):
+- Evidence (nộp theo cả chuẩn A và B):
   - Google Forms ghi nhận **45 phản hồi**. Bằng chứng mạnh nhất gắn với sản phẩm: **26/45 người (57,8%)** chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót”; **25/45 (55,6%)** xem quy trình/giấy tờ rườm rà, chồng chéo là khó khăn tổng quan lớn nhất; **24/45 (53,3%)** gặp khó khi tìm tên thủ tục phức tạp.
-  - Câu hỏi, đủ **45 hàng phản hồi đã khử định danh**, bảng đếm tái lập được, hash ZIP nguồn và sáu biểu đồ không chứa PII nằm tại [`evidence/cp4-survey/`](evidence/cp4-survey/). Tên và timestamp đã bị loại; nhóm xác nhận người trả lời ở ngoài nhóm khi tích chuẩn A. Không tích B vì đây vẫn là dữ liệu khảo sát, không phải chatlog/log độc lập.
+  - **Chuẩn A:** Câu hỏi, đủ **45 hàng phản hồi đã khử định danh**, bảng đếm tái lập được, hash ZIP nguồn và sáu biểu đồ không chứa PII nằm tại [`evidence/cp4-survey/`](evidence/cp4-survey/). Tên và timestamp đã bị loại; nhóm xác nhận người trả lời ở ngoài nhóm khi tích chuẩn A.
+  - **Chuẩn B:** Mining 10 tin nhắn từ log nhóm tự dùng thử trong `eval/cases.json`, lọc `source=group_self_test_deidentified_2026-07-30` và `real_observation=true`, cho thấy **8/10 (80%)** câu có cách viết đời thường/viết tắt/lỗi gõ hoặc nhiều dữ kiện trong một lượt; **5/10 (50%)** cần chọn form và ánh xạ field. Quy tắc đếm, hash nguồn và 8 ví dụ nguyên văn đã khử định danh nằm tại [`evidence/cp4-log-mining/`](evidence/cp4-log-mining/).
   - Ví dụ nguyên văn từ khảo sát — Thực hiện thủ tục trực tuyến
 ```text
 - “Thông tin giữa các trang web không đồng nhất, thiếu kênh hỗ trợ chatbot tư vấn trực tuyến.”  
