@@ -168,8 +168,18 @@ class TelegramGateway:
             self.pending.context(uid), {"platform": "telegram", "chat_id": chat.id},
         )
         session.append({"role": "assistant", "content": answer})
+        # Có sơ đồ/mindmap (```mermaid) -> render PNG + HTML đính kèm (Telegram không vẽ code được)
+        import tempfile
+        from ..render import diagram_attachments
+        files, answer = await asyncio.to_thread(diagram_attachments, answer, tempfile.mkdtemp())
         await self._send_formatted(
             lambda t, pm: update.message.reply_text(t, parse_mode=pm), answer)
+        for p in files:
+            with open(p, "rb") as fh:
+                if p.endswith(".png"):
+                    await update.message.reply_photo(fh)
+                else:
+                    await update.message.reply_document(fh)
 
     async def on_file(self, update: Update, _ctx) -> None:
         if not self._ok(update):

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import asyncio
+import tempfile
 import time
 from collections import defaultdict, deque
 
@@ -181,6 +182,11 @@ class TutorBot(discord.Client):
                 {"platform": "discord", "chat_id": target.id, "discord_actions": actions},
             )
         session.append({"role": "assistant", "content": answer})
+        # Có sơ đồ/mindmap (```mermaid) -> render ra PNG + HTML đính kèm (Discord không vẽ code được)
+        import discord
+        from ..render import diagram_attachments
+        _tmp = tempfile.mkdtemp()
+        files, answer = await asyncio.to_thread(diagram_attachments, answer, _tmp)
         chunks = split_message(answer, MAX_LEN)
         # trả lời thẳng trong channel: reply (trích dẫn) tin học viên cho rõ đang đáp ai; DM/thread thì gửi thường
         for i, chunk in enumerate(chunks):
@@ -188,6 +194,8 @@ class TutorBot(discord.Client):
                 await message.reply(chunk, mention_author=False)
             else:
                 await target.send(chunk)
+        if files:
+            await target.send(files=[discord.File(p) for p in files])
 
     # ---------- slash commands ----------
     def _register_commands(self):
