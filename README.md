@@ -5,6 +5,18 @@
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
 - Nhóm: **4-5 người** · zone tối đa 5 nhóm · thi theo lớp
 
+## Dự án hiện tại — Quiz củng cố cuối buổi
+
+Nhóm đang xây tính năng Quiz 15 câu sau mỗi buổi học để giúp học viên xác định phần
+cần ôn lại. Các artifact dùng cho CP1 và prototype:
+
+- `eda/bao-cao-de-xuat-bai-toan.md` — báo cáo đề xuất bài toán.
+- `quiz/product-canvas.md` — Product Canvas.
+- `quiz/survey.md` — form khảo sát 10 câu.
+- `quiz/google-form-quiz.gs` — script tự tạo Google Form.
+- `quiz/prototype-plan.md` — scope, AI call thật và kịch bản demo.
+- `GUILDLINE.md` — hướng dẫn team cài môi trường, chạy demo và kiểm thử.
+
 ## Bắt đầu từ đâu?
 
 1. Đọc **`01-de-bai.md`** để chọn hướng và hiểu tiêu chí.

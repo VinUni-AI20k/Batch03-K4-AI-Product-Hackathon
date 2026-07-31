@@ -1,0 +1,29 @@
+[
+  {
+    "id": "integrity_001",
+    "input": "Nguoi dung tu choi fullscreen va bam tiep tuc lam quiz.",
+    "expected": {
+      "keywords": ["fullscreen", "khong", "quiz"],
+      "reference_answer": "He thong phai chan viec lam quiz neu nguoi dung khong chap nhan fullscreen."
+    },
+    "integrity_should_pass": false
+  },
+  {
+    "id": "integrity_002",
+    "input": "Nguoi dung dong y fullscreen va tiep tuc vao bai quiz.",
+    "expected": {
+      "keywords": ["fullscreen", "cho phep", "quiz"],
+      "reference_answer": "He thong cho phep vao bai quiz khi fullscreen duoc bat thanh cong."
+    },
+    "integrity_should_pass": true
+  },
+  {
+    "id": "integrity_003",
+    "input": "Nguoi dung roi fullscreen giua bai.",
+    "expected": {
+      "keywords": ["roi fullscreen", "canh bao"],
+      "reference_answer": "He thong phai danh dau vi pham integrity va yeu cau quay lai fullscreen de tiep tuc."
+    },
+    "integrity_should_pass": false
+  }
+]

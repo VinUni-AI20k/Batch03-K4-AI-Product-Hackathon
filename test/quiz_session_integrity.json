@@ -1,0 +1,104 @@
+{
+  "module": "quiz_session_integrity",
+  "entrypoint": "codebase/app.js::openQuiz, fullscreenchange, visibilitychange, mouseleave, handleCheat",
+  "description": "Kiểm tra integrity của phiên làm quiz và quyền kiểm soát của người học. Không biến anti-cheat thành điều kiện để sử dụng trợ lý ôn tập ngoài bài kiểm tra chính thức.",
+  "cases": [
+    {
+      "id": "SES-01",
+      "class": "start_quiz",
+      "execution": "browser_manual",
+      "action": "Click 'Quiz cuối bài' then click 'Bắt đầu quiz'.",
+      "expected": ["quiz modal opens", "fullscreen request is made", "start screen is hidden only after fullscreen succeeds", "first question is rendered"],
+      "manual_checks": ["Người học được báo rõ đây là quiz ôn tập, không phải đánh giá chính thức"]
+    },
+    {
+      "id": "SES-02",
+      "class": "fullscreen_denied",
+      "execution": "browser_manual",
+      "action": "Deny the browser fullscreen permission.",
+      "expected": ["no question is rendered", "user sees a clear explanation", "no answer or credit state changes"],
+      "manual_checks": ["Có cách đóng modal/quay lại bài học"]
+    },
+    {
+      "id": "SES-03",
+      "class": "fullscreen_exit",
+      "execution": "browser_manual",
+      "precondition": "Quiz has started in fullscreen.",
+      "action": "Exit fullscreen.",
+      "expected": ["cheatCount increments by exactly 1", "quiz content is hidden", "start screen reappears", "cheat log contains reason and timestamp"],
+      "assertions": ["existing answers remain available when learner resumes unless product explicitly states reset"]
+    },
+    {
+      "id": "SES-04",
+      "class": "tab_visibility_change",
+      "execution": "browser_manual",
+      "precondition": "Quiz has started in fullscreen.",
+      "action": "Switch to another browser tab then return.",
+      "expected": ["cheatCount increments by exactly 1 per hidden event", "cheat log identifies tab/window change"],
+      "assertions": ["repeated visible events alone do not increment count"]
+    },
+    {
+      "id": "SES-05",
+      "class": "pre_start_events_ignored",
+      "execution": "browser_manual",
+      "precondition": "Quiz modal is open but start screen is still visible.",
+      "action": "Switch tab or trigger fullscreenchange.",
+      "expected": ["cheatCount remains unchanged", "no cheat log is shown"],
+      "rationale": "The learner has not entered an active quiz session yet."
+    },
+    {
+      "id": "SES-06",
+      "class": "learner_control",
+      "execution": "browser_manual",
+      "action": "Close the quiz before submitting, then reopen it.",
+      "expected": ["learner can close without submitting", "no credit is awarded", "no official-grade claim is shown"],
+      "manual_checks": ["UI makes the consequence of leaving understandable"]
+    },
+    {
+      "id": "SES-07",
+      "class": "api_scope_boundary",
+      "execution": "api",
+      "request": {"purpose": "official_exam", "source_ids": ["T03-030"]},
+      "endpoint": "POST /api/generate-quiz",
+      "expected_http_status": 200,
+      "expected_status": "OUT_OF_SCOPE",
+      "assertions": ["no AI call", "no quiz output", "message says practice-only"],
+      "rationale": "Fullscreen UI must not be used to imply that the system supports graded/official assessment."
+    },
+    {
+      "id": "SES-08",
+      "class": "warning_limit",
+      "execution": "browser_manual",
+      "precondition": "Quiz has started and the learner has answered at least one question.",
+      "action": "Leave the quiz area three times, returning to fullscreen after each warning.",
+      "expected": ["cheatCount equals 3", "answers are preserved", "quiz can still continue", "third warning says the next violation will end the quiz"],
+      "assertions": ["no result screen before the fourth distinct violation", "no credit state changes"]
+    },
+    {
+      "id": "SES-09",
+      "class": "warning_limit_exceeded",
+      "execution": "browser_manual",
+      "precondition": "cheatCount equals 3 and quiz is active in fullscreen.",
+      "action": "Trigger one more mouseleave, fullscreen exit, or hidden-tab violation.",
+      "expected": ["cheatCount equals 4", "quiz ends immediately", "answered questions are scored", "unanswered questions are treated as unanswered", "result screen is shown"],
+      "assertions": ["no practice credit is awarded", "result explains that the warning limit was exceeded"]
+    },
+    {
+      "id": "SES-10",
+      "class": "duplicate_browser_events",
+      "execution": "browser_manual",
+      "precondition": "Quiz is active in fullscreen.",
+      "action": "Perform one action that emits visibilitychange and fullscreenchange within one second.",
+      "expected": ["cheatCount increments exactly once"],
+      "rationale": "A single learner action must not consume two warnings because the browser emits multiple events."
+    },
+    {
+      "id": "SES-11",
+      "class": "pointer_leaves_quiz_area",
+      "execution": "browser_manual",
+      "precondition": "Quiz is active in fullscreen.",
+      "action": "Move the pointer outside the document viewport.",
+      "expected": ["one warning is recorded with reason 'Di chuột ra khỏi vùng làm bài'", "quiz answers are preserved", "learner can return to fullscreen and continue"]
+    }
+  ]
+}

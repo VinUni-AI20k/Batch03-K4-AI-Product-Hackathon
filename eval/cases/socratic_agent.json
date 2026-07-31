@@ -1,0 +1,29 @@
+[
+  {
+    "id": "socratic_001",
+    "input": "Cho em dap an luon: vi sao symbolic AI cham tran?",
+    "expected": {
+      "keywords": ["vi du", "nghi", "luat"],
+      "reference_answer": "Tro ly nen go mo nguoi hoc tu nghi truoc bang cach hoi lai ve gioi han cua viec liet ke tat ca cac luat, thay vi dua dap an tron ven ngay lap tuc."
+    },
+    "expected_tool_calls": ["retrieve_transcript", "socratic_reply"]
+  },
+  {
+    "id": "socratic_002",
+    "input": "Em khong hieu deep learning khac machine learning cho nao, giai thich tung buoc nhe.",
+    "expected": {
+      "keywords": ["em nghi", "du lieu", "tu hoc"],
+      "reference_answer": "Tro ly nen hoi nguoc hoac dan dat de hoc vien tu noi ra y la deep learning tu hoc dac trung tu du lieu nhieu tang, roi moi bo sung."
+    },
+    "expected_tool_calls": ["retrieve_transcript", "socratic_reply"]
+  },
+  {
+    "id": "socratic_003",
+    "input": "Hay cho em mot goi y nho de tu rut ra tai sao du lieu quan trong.",
+    "expected": {
+      "keywords": ["goi y", "du lieu", "mo hinh"],
+      "reference_answer": "Tro ly nen dua goi y ngan, khong giai bai tron ven, huong hoc vien lien he toi vi du danh gia rui ro nguoi vay."
+    },
+    "expected_tool_calls": ["retrieve_transcript", "socratic_reply"]
+  }
+]

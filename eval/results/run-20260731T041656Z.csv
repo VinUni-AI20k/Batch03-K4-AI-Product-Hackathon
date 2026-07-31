@@ -1,0 +1,21 @@
+case,class,origin,reference,status,machine_pass,trace_id,manual_grounded,manual_relevance,notes
+N01,normal,transcript,T03-030..032,OK,True,20260731T041505112590Z,PENDING,PENDING,Tạo đủ 15 câu hỏi dựa trên nội dung nguồn.
+N02,normal,transcript,T03-024..026,INSUFFICIENT_EVIDENCE,False,20260731T041507542774Z,PENDING,PENDING,Nguồn học liệu không đủ để tạo công bằng 15 câu hỏi MCQ khác nhau.
+N03,normal,transcript,T03-027..029,INSUFFICIENT_EVIDENCE,False,20260731T041510922502Z,PENDING,PENDING,"Nguồn học liệu chỉ cung cấp một số ít ý chính, không đủ để tạo 15 câu MCQ công bằng mà không lặp lại hoặc đánh đố."
+N04,normal,transcript,T03-033..035,OK,True,20260731T041524650787Z,PENDING,PENDING,Đủ bằng chứng để tạo 15 câu hỏi củng cố.
+N05,normal,transcript,T03-036..038,OK,True,20260731T041537525334Z,PENDING,PENDING,Đã tạo 15 câu hỏi củng cố dựa trên các SOURCE_CHUNKS được cung cấp.
+N06,normal,transcript,T03-039..041,OK,True,20260731T041547888301Z,PENDING,PENDING,Tạo đủ 15 câu hỏi dựa trên nội dung nguồn.
+N07,normal,transcript,T03-042..044,OK,True,20260731T041559123684Z,PENDING,PENDING,Đã tạo 15 câu hỏi củng cố dựa trên nguồn cung cấp.
+N08,normal,transcript,T03-045..047,OK,True,20260731T041608520837Z,PENDING,PENDING,Đủ thông tin để tạo 15 câu hỏi củng cố dựa trên nguồn.
+S01,source_truth,chatlog-derived,T0649,ERROR,True,,PENDING,PENDING,Quiz agent dừng sau 2 lần thử: Không truy xuất được transcript: Không tìm thấy source ID: T99-999
+S02,source_truth,chatlog-derived,T0905,ERROR,True,,PENDING,PENDING,Quiz agent dừng sau 2 lần thử: Không truy xuất được transcript: Không tìm thấy source ID: T99-001
+A01,ambiguous,chatlog-derived,T0115,INSUFFICIENT_EVIDENCE,True,20260731T041610564132Z,PENDING,PENDING,Không đủ thông tin trong nguồn để tạo công bằng 15 câu hỏi MCQ.
+A02,ambiguous,chatlog-derived,T0154,INSUFFICIENT_EVIDENCE,True,20260731T041613358657Z,PENDING,PENDING,Nguồn học liệu không đủ để tạo công bằng 15 câu hỏi MCQ khác nhau mà không lặp ý hoặc hỏi trivia.
+O01,out_of_scope,chatlog-derived,T1189,OUT_OF_SCOPE,True,,PENDING,PENDING,"Quiz và practice credits chỉ dùng cho ôn tập, không dùng trong đánh giá chính thức."
+O02,out_of_scope,chatlog-derived,T0909,OUT_OF_SCOPE,True,,PENDING,PENDING,"Quiz và practice credits chỉ dùng cho ôn tập, không dùng trong đánh giá chính thức."
+D01,domain,chatlog-derived,T0811,INSUFFICIENT_EVIDENCE,True,20260731T041615671130Z,PENDING,PENDING,"Nguồn học liệu chỉ cung cấp một ý chính bị lặp lại, không đủ thông tin để tạo công bằng 15 câu hỏi khác nhau."
+D02,domain,chatlog-derived,T0122,INSUFFICIENT_EVIDENCE,True,20260731T041619111352Z,PENDING,PENDING,"Nguồn học liệu chỉ cung cấp hai ý chính, không đủ cơ sở để tạo 15 câu MCQ công bằng, không lặp lại và không mang tính đánh đố."
+R01,rare,chatlog-derived,T0769,OK,True,20260731T041631264780Z,PENDING,PENDING,Đủ bằng chứng để tạo 15 câu hỏi củng cố.
+R02,rare,chatlog-derived,T0399,INSUFFICIENT_EVIDENCE,False,20260731T041631978124Z,PENDING,PENDING,Nguồn học liệu không đủ để tạo công bằng 15 câu MCQ khác nhau mà không lặp ý hoặc suy diễn ngoài nguồn.
+R03,rare,synthetic,credit-cap,OK,True,20260731T041644355792Z,PENDING,PENDING,Đủ bằng chứng để tạo 15 câu hỏi củng cố từ các nguồn đã cung cấp.
+R04,rare,synthetic,unicode-vietnamese,OK,True,20260731T041656738321Z,PENDING,PENDING,Đủ bằng chứng để tạo 15 câu hỏi củng cố.

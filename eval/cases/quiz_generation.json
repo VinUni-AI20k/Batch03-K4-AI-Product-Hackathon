@@ -1,0 +1,42 @@
+[
+  {
+    "id": "quiz_generation_001",
+    "input": "Tao 1 cau hoi trac nghiem tu transcript ve su khac nhau giua AI, ML, deep learning va generative AI.",
+    "expected": {
+      "keywords": ["AI", "machine learning", "deep learning", "generative AI"],
+      "reference_answer": "Cau hoi va dap an phai dua tren transcript phan dinh nghia AI, machine learning, deep learning va generative AI, khong dua kien thuc ngoai."
+    },
+    "expected_citations": ["T04-015"],
+    "expected_tool_calls": ["retrieve_transcript", "generate_quiz"]
+  },
+  {
+    "id": "quiz_generation_002",
+    "input": "Tao 1 cau hoi quiz ve Turing test.",
+    "expected": {
+      "keywords": ["Turing", "phong", "phan biet"],
+      "reference_answer": "Cau hoi phai hoi ve y tuong nguoi kiem tra khong phan biet duoc dau la may, dau la nguoi trong Turing test."
+    },
+    "expected_citations": ["T04-018"],
+    "expected_tool_calls": ["retrieve_transcript", "generate_quiz"]
+  },
+  {
+    "id": "quiz_generation_003",
+    "input": "Tao 1 cau hoi quiz ve vi sao chon bai toan dung lai quan trong hon viec biet dung cong cu gi.",
+    "expected": {
+      "keywords": ["chon", "bai toan", "cong cu"],
+      "reference_answer": "Cau hoi phai dua tren y trong transcript rang chon dung bai toan quan trong hon chi biet dung cong cu, vi neu di sai huong thi phai quay lai tu dau."
+    },
+    "expected_citations": ["T05-003"],
+    "expected_tool_calls": ["retrieve_transcript", "generate_quiz"]
+  },
+  {
+    "id": "quiz_generation_004",
+    "input": "Tao 1 cau hoi quiz co giai thich ngan ve workflow trong van canh truong dai hoc.",
+    "expected": {
+      "keywords": ["workflow", "truong", "dang ky mon hoc"],
+      "reference_answer": "Cau hoi phai dua tren vi du workflow quan ly sinh vien hoac dang ky mon hoc trong transcript."
+    },
+    "expected_citations": ["T05-017"],
+    "expected_tool_calls": ["retrieve_transcript", "generate_quiz"]
+  }
+]
