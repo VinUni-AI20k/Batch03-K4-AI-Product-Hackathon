@@ -5,6 +5,7 @@ import type {
   OutlineSection,
   Section,
   StudyContent,
+  SelfCheckGrade,
 } from "./api/client";
 import {
   MASTERY_THRESHOLD,
@@ -14,6 +15,8 @@ import {
   getStudyContent,
   gradeQuiz,
   uploadSlide,
+  enrichKnowledge,
+  checkEnrichmentStatus,
 } from "./api/client";
 import UploadStep from "./components/UploadStep";
 import QuizView from "./components/QuizView";
@@ -31,6 +34,7 @@ type RetestSource = "verify" | "reteach";
 
 function App() {
   const [slideText, setSlideText] = useState<string>("");
+  const [slideFilename, setSlideFilename] = useState<string>("");
   const [stage, setStage] = useState<Stage>("upload");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -61,6 +65,7 @@ function App() {
     setIsLoading(true);
     const result = await uploadSlide(file);
     setSlideText(result.textContent);
+    setSlideFilename(file.name);
     setStage("ready");
     setIsLoading(false);
   };
@@ -99,6 +104,12 @@ function App() {
     setRound1Accuracy(result.accuracy);
     setWeakSections(result.weakSections);
     setGoodSections(result.goodSections);
+
+    if (result.weakSections.length > 0 && slideFilename) {
+      // Start background enrichment of knowledge.md
+      enrichKnowledge(result.weakSections, slideFilename).catch(console.error);
+    }
+
     setStage("diagnosis");
     setIsLoading(false);
   };
@@ -169,6 +180,25 @@ function App() {
     selectedActiveMode: boolean,
   ) => {
     setIsLoading(true);
+
+    // Wait for enrichment process to finish if it's running
+    try {
+      let isRunning = true;
+      let attempts = 0;
+      const maxAttempts = 30; // Max 30 seconds wait (1s interval)
+
+      while (isRunning && attempts < maxAttempts) {
+        const status = await checkEnrichmentStatus();
+        isRunning = status.is_running;
+        if (isRunning) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          attempts++;
+        }
+      }
+    } catch (err) {
+      console.error("Error checking enrichment status, proceeding anyway:", err);
+    }
+
     const content = await getStudyContent(
       weakSections,
       outline,

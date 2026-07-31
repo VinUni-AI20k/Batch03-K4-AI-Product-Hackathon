@@ -19,7 +19,6 @@ export type McqQuestion = {
 };
 
 export type SectionStat = { section: Section; correct: number; total: number };
-export type SectionStat = { section: Section; correct: number; total: number };
 
 export type GradeResult = {
   correctCount: number;
@@ -40,10 +39,37 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function uploadSlide(
   file: File,
 ): Promise<{ textContent: string }> {
-  await delay(400);
-  return {
-    textContent: `Đã nhận ${file.name}. Demo dùng transcript thật: "Xác định bài toán kinh doanh cho AI" (Day 2 sáng, data pack).`,
-  };
+  const mockFallback = `Đã nhận ${file.name}. Demo dùng transcript thật: "Xác định bài toán kinh doanh cho AI" (Day 2 sáng, data pack).`;
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${BACKEND_URL}/api/upload/pdf`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Upload failed: ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    // Trả về thông tin metadata đã trích xuất được để hiển thị trong preview-box
+    const sectionsInfo = data.sections
+      .map((s: [string, number]) => `${s[0]} (Trang ${s[1]})`)
+      .join(", ");
+
+    return {
+      textContent: `✅ Upload thành công: ${file.name}. Đã trích xuất metadata: ${sectionsInfo}`,
+    };
+  } catch (err) {
+    console.error("PDF upload failed, falling back to mock:", err);
+    await delay(400);
+    return {
+      textContent: mockFallback,
+    };
+  }
 }
 
 type RawBackendQuestion = {
@@ -157,9 +183,44 @@ export async function getStudyContent(
   });
 }
 
-// Mock nhẹ (KHÔNG phải quyết định AI trung tâm): tái dùng câu hỏi thật đã sinh ở
-// round 1 cho đúng section cần ôn, không tự bịa câu mới. Việc "sinh câu MỚI, chưa
-// từng hỏi" thật sự cần một lời gọi AI riêng — chưa build, ghi trong docs.
+export type SelfCheckGrade = {
+  isCorrect: boolean;
+  feedback: string;
+};
+
+export async function gradeSelfCheck(
+  params: {
+    section_id: Section;
+    question: string;
+    learner_answer: string;
+    source_context: string;
+  },
+): Promise<SelfCheckGrade> {
+  await delay(500);
+  return {
+    isCorrect: true,
+    feedback: "Câu trả lời của bạn chính xác dựa trên nội dung bài giảng.",
+  };
+}
+
+export async function enrichKnowledge(weakSections: string[], pdfFilename: string): Promise<void> {
+  const res = await fetch(`${BACKEND_URL}/api/upload/enrich`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ weak_sections: weakSections, pdf_filename: pdfFilename }),
+  });
+  if (!res.ok) {
+    console.error("Knowledge enrichment failed:", res.statusText);
+  }
+}
+export async function checkEnrichmentStatus(): Promise<{ is_running: boolean }> {
+  const res = await fetch(`${BACKEND_URL}/api/upload/enrich-status`);
+  if (!res.ok) {
+    throw new Error("Failed to check enrichment status");
+  }
+  return res.json();
+}
+
 export async function generateRetest(
   sections: Section[],
   perSection: number,

@@ -4,12 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import TRANSCRIPT_DIR
 from app.pipeline.outline import outline_json, parse_transcript
 from app.pipeline.quiz_bank import QuizGenerationError, generate_quiz
+from app.api.routes_reteach import router as reteach_router
+from app.api.routes_upload import router as upload_router
 
 app = FastAPI(title="Self Study Buddy — backend")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -45,17 +48,7 @@ def post_generate_quiz(transcript_file: str = "transcript-01-clean.md", n_questi
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes_reteach import router as reteach_router
-
-app = FastAPI(title="IllumiMATE API")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 app.include_router(reteach_router)
+app.include_router(upload_router)
+

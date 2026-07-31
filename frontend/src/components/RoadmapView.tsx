@@ -21,6 +21,7 @@ export default function RoadmapView({
 }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [selfCheckAnswer, setSelfCheckAnswer] = useState("");
+  const [practicePick, setPracticePick] = useState<string | null>(null);
   const [selfCheckGrades, setSelfCheckGrades] = useState<
     Record<string, SelfCheckGrade>
   >({});
@@ -39,9 +40,11 @@ export default function RoadmapView({
     setIsGrading(true);
     setGradeError("");
     try {
+      const practice = active.practice;
+      if (!practice) return;
       const grade = await onGradeSelfCheck({
         section: active.section,
-        question: active.practice.question,
+        question: practice.question,
         answer: selfCheckAnswer.trim(),
         sourceContext: `${active.summary}\n${active.example}`,
       });
