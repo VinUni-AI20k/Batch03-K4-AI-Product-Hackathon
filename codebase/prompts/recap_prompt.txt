@@ -1,0 +1,8 @@
+# RECAP PROMPT TEMPLATE
+
+Hãy đọc transcript và slide của {PREVIOUS_DAY_CODE}: {PREVIOUS_DAY_TITLE}.
+Tạo ra 5–7 ý recap cốt lõi nhất giúp học viên ôn lại trong ≤3 phút.
+
+Mỗi ý recap phải có cấu trúc:
+- Tóm tắt kiến thức ngắn gọn (1-2 câu).
+- Trích dẫn cụ thể: [slide X] hoặc [Txx-NNN].

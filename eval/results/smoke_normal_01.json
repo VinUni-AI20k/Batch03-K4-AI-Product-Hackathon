@@ -1,0 +1,107 @@
+{
+  "case_id": "normal_01",
+  "case_version": "1.0",
+  "expected_status": "ok",
+  "model": "gemini-3.1-flash-lite",
+  "prompt_version": "v1",
+  "prompt_hashes": {
+    "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+    "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+    "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+  },
+  "timestamp_utc": "2026-07-31T03:22:48.810093+00:00",
+  "latency_ms": 5038,
+  "attempts": 2,
+  "output": {
+    "status": "ok",
+    "recap": [
+      {
+        "claim": "Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi của các ứng dụng AI, trong đó chatbot chỉ đóng vai trò là giao diện tương tác.",
+        "citations": [
+          "T04-046"
+        ]
+      },
+      {
+        "claim": "Khả năng nổi bật của LLM là tạo ra dữ liệu mới như văn bản, hình ảnh, video và nhạc.",
+        "citations": [
+          "T04-046"
+        ]
+      },
+      {
+        "claim": "Bản chất vận hành của Transformer là dự đoán xác suất của token hoặc từ tiếp theo dựa trên dữ liệu đã học để sinh ra nội dung theo vòng lặp.",
+        "citations": [
+          "T04-047"
+        ]
+      },
+      {
+        "claim": "Hiện tượng ảo giác (hallucination) xảy ra do mô hình ưu tiên việc nối các từ sao cho hợp lý thay vì đảm bảo tính chính xác của tri thức.",
+        "citations": [
+          "T04-048"
+        ]
+      },
+      {
+        "claim": "Token là đơn vị tính toán cơ bản của LLM, là ngôn ngữ của máy và tốn chi phí khác nhau tùy theo ngôn ngữ (tiếng Việt thường tốn nhiều token hơn tiếng Anh).",
+        "citations": [
+          "T04-049",
+          "T04-050"
+        ]
+      },
+      {
+        "claim": "Việc tính toán số lượng token là quan trọng khi xây dựng sản phẩm AI vì nó liên quan trực tiếp đến chi phí sử dụng API.",
+        "citations": [
+          "T04-050"
+        ]
+      }
+    ],
+    "bridges": [
+      {
+        "from_concept": "Bản chất vận hành của các mô hình ngôn ngữ lớn",
+        "to_concept": "Nền tảng kiến thức cho kỹ sư AI",
+        "explanation": "Việc hiểu cơ chế dự đoán token của Transformer là bước đầu tiên để làm chủ các kỹ năng cần thiết cho một AI Engineer.",
+        "source_citations": [
+          "T04-047"
+        ],
+        "target_citations": [
+          "T01-026"
+        ]
+      },
+      {
+        "from_concept": "Chi phí token khi xây dựng sản phẩm AI",
+        "to_concept": "Sự khác biệt giữa sản phẩm AI và sản phẩm truyền thống",
+        "explanation": "Việc kiểm soát chi phí token là yếu tố then chốt tạo nên sự khác biệt trong tư duy vận hành sản phẩm AI so với các sản phẩm truyền thống.",
+        "source_citations": [
+          "T04-050"
+        ],
+        "target_citations": [
+          "T01-025"
+        ]
+      }
+    ],
+    "warnings": []
+  },
+  "validator": {
+    "passed": true,
+    "errors": [],
+    "word_count": 269,
+    "recap_has_existing_citation": true,
+    "untraceable_bridge_count": 0
+  },
+  "errors": [],
+  "attempt_log": [
+    {
+      "stage": "recap",
+      "attempt": 1,
+      "latency_ms": 2253,
+      "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi của các ứng dụng AI, trong đó chatbot chỉ đóng vai trò là giao diện tương tác.\",\n      \"citations\": [\"T04-046\"]\n    },\n    {\n      \"claim\": \"Khả năng nổi bật của LLM là tạo ra dữ liệu mới như văn bản, hình ảnh, video và nhạc.\",\n      \"citations\": [\"T04-046\"]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của Transformer là dự đoán xác suất của token hoặc từ tiếp theo dựa trên dữ liệu đã học để sinh ra nội dung theo vòng lặp.\",\n      \"citations\": [\"T04-047\"]\n    },\n    {\n      \"claim\": \"Hiện tượng ảo giác (hallucination) xảy ra do mô hình ưu tiên việc nối các từ sao cho hợp lý thay vì đảm bảo tính chính xác của tri thức.\",\n      \"citations\": [\"T04-048\"]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản của LLM, là ngôn ngữ của máy và tốn chi phí khác nhau tùy theo ngôn ngữ (tiếng Việt thường tốn nhiều token hơn tiếng Anh).\",\n      \"citations\": [\"T04-049\", \"T04-050\"]\n    },\n    {\n      \"claim\": \"Việc tính toán số lượng token là quan trọng khi xây dựng sản phẩm AI vì nó liên quan trực tiếp đến chi phí sử dụng API.\",\n      \"citations\": [\"T04-050\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+      "validation_errors": []
+    },
+    {
+      "stage": "bridge",
+      "attempt": 1,
+      "latency_ms": 2784,
+      "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi của các ứng dụng AI, trong đó chatbot chỉ đóng vai trò là giao diện tương tác.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"Khả năng nổi bật của LLM là tạo ra dữ liệu mới như văn bản, hình ảnh, video và nhạc.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của Transformer là dự đoán xác suất của token hoặc từ tiếp theo dựa trên dữ liệu đã học để sinh ra nội dung theo vòng lặp.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Hiện tượng ảo giác (hallucination) xảy ra do mô hình ưu tiên việc nối các từ sao cho hợp lý thay vì đảm bảo tính chính xác của tri thức.\",\n      \"citations\": [\n        \"T04-048\"\n      ]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản của LLM, là ngôn ngữ của máy và tốn chi phí khác nhau tùy theo ngôn ngữ (tiếng Việt thường tốn nhiều token hơn tiếng Anh).\",\n      \"citations\": [\n        \"T04-049\",\n        \"T04-050\"\n      ]\n    },\n    {\n      \"claim\": \"Việc tính toán số lượng token là quan trọng khi xây dựng sản phẩm AI vì nó liên quan trực tiếp đến chi phí sử dụng API.\",\n      \"citations\": [\n        \"T04-050\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Bản chất vận hành của các mô hình ngôn ngữ lớn\",\n      \"to_concept\": \"Nền tảng kiến thức cho kỹ sư AI\",\n      \"explanation\": \"Việc hiểu cơ chế dự đoán token của Transformer là bước đầu tiên để làm chủ các kỹ năng cần thiết cho một AI Engineer.\",\n      \"source_citations\": [\n        \"T04-047\"\n      ],\n      \"target_citations\": [\n        \"T01-026\"\n      ]\n    },\n    {\n      \"from_concept\": \"Chi phí token khi xây dựng sản phẩm AI\",\n      \"to_concept\": \"Sự khác biệt giữa sản phẩm AI và sản phẩm truyền thống\",\n      \"explanation\": \"Việc kiểm soát chi phí token là yếu tố then chốt tạo nên sự khác biệt trong tư duy vận hành sản phẩm AI so với các sản phẩm truyền thống.\",\n      \"source_citations\": [\n        \"T04-050\"\n      ],\n      \"target_citations\": [\n        \"T01-025\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+      "validation_errors": []
+    }
+  ],
+  "passed": true
+}

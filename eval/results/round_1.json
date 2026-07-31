@@ -1,0 +1,1633 @@
+{
+  "round": 1,
+  "created_at_utc": "2026-07-31T03:32:54.138904+00:00",
+  "prompt_version": "v1",
+  "results": [
+    {
+      "case_id": "normal_01",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:23:26.682852+00:00",
+      "latency_ms": 5804,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi công nghệ, trong khi chatbot chỉ là lớp giao diện người dùng bên ngoài.",
+            "citations": [
+              "T04-046"
+            ]
+          },
+          {
+            "claim": "LLM hoạt động dựa trên cơ chế dự đoán xác suất để tạo ra từ hoặc token tiếp theo trong một chuỗi văn bản.",
+            "citations": [
+              "T04-047"
+            ]
+          },
+          {
+            "claim": "Quá trình sinh dữ liệu của LLM là một vòng lặp liên tục: dự đoán, sinh ra token, thêm vào chuỗi gốc và lặp lại cho đến khi hoàn tất.",
+            "citations": [
+              "T04-047"
+            ]
+          },
+          {
+            "claim": "Hiện tượng ảo giác (hallucination) xảy ra vì mô hình ưu tiên việc nối từ sao cho có nghĩa về mặt xác suất hơn là tính chính xác của thông tin.",
+            "citations": [
+              "T04-048"
+            ]
+          },
+          {
+            "claim": "Token là đơn vị tính toán cơ bản thay vì từ hay ký tự, trong đó tiếng Việt thường tiêu tốn nhiều token hơn tiếng Anh do sự khác biệt về dấu.",
+            "citations": [
+              "T04-049"
+            ]
+          },
+          {
+            "claim": "Việc quản lý số lượng token là rất quan trọng khi phát triển sản phẩm AI để kiểm soát chi phí vận hành API.",
+            "citations": [
+              "T04-050"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Bản chất LLM và chatbot",
+            "to_concept": "Cấu phần sản phẩm AI",
+            "explanation": "Kiến thức về việc LLM chỉ là nền tảng (trái tim) phía sau lớp vỏ chatbot giúp người làm sản phẩm phân biệt được các lớp cấu phần trong việc xây dựng sản phẩm AI.",
+            "source_citations": [
+              "T04-046"
+            ],
+            "target_citations": [
+              "T01-025"
+            ]
+          },
+          {
+            "from_concept": "Token và chi phí vận hành",
+            "to_concept": "Tư duy xây dựng sản phẩm AI",
+            "explanation": "Hiểu về token giúp kiểm soát chi phí API, tạo tiền đề cho tư duy sản phẩm AI khác biệt so với sản phẩm truyền thống khi cần tối ưu vận hành.",
+            "source_citations": [
+              "T04-050"
+            ],
+            "target_citations": [
+              "T01-025",
+              "T01-026"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 259,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2126,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi công nghệ, trong khi chatbot chỉ là lớp giao diện người dùng bên ngoài.\",\n      \"citations\": [\"T04-046\"]\n    },\n    {\n      \"claim\": \"LLM hoạt động dựa trên cơ chế dự đoán xác suất để tạo ra từ hoặc token tiếp theo trong một chuỗi văn bản.\",\n      \"citations\": [\"T04-047\"]\n    },\n    {\n      \"claim\": \"Quá trình sinh dữ liệu của LLM là một vòng lặp liên tục: dự đoán, sinh ra token, thêm vào chuỗi gốc và lặp lại cho đến khi hoàn tất.\",\n      \"citations\": [\"T04-047\"]\n    },\n    {\n      \"claim\": \"Hiện tượng ảo giác (hallucination) xảy ra vì mô hình ưu tiên việc nối từ sao cho có nghĩa về mặt xác suất hơn là tính chính xác của thông tin.\",\n      \"citations\": [\"T04-048\"]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản thay vì từ hay ký tự, trong đó tiếng Việt thường tiêu tốn nhiều token hơn tiếng Anh do sự khác biệt về dấu.\",\n      \"citations\": [\"T04-049\"]\n    },\n    {\n      \"claim\": \"Việc quản lý số lượng token là rất quan trọng khi phát triển sản phẩm AI để kiểm soát chi phí vận hành API.\",\n      \"citations\": [\"T04-050\"]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 3677,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các mô hình ngôn ngữ lớn (LLM) như ChatGPT, Claude, Gemini là cốt lõi công nghệ, trong khi chatbot chỉ là lớp giao diện người dùng bên ngoài.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"LLM hoạt động dựa trên cơ chế dự đoán xác suất để tạo ra từ hoặc token tiếp theo trong một chuỗi văn bản.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình sinh dữ liệu của LLM là một vòng lặp liên tục: dự đoán, sinh ra token, thêm vào chuỗi gốc và lặp lại cho đến khi hoàn tất.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Hiện tượng ảo giác (hallucination) xảy ra vì mô hình ưu tiên việc nối từ sao cho có nghĩa về mặt xác suất hơn là tính chính xác của thông tin.\",\n      \"citations\": [\n        \"T04-048\"\n      ]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản thay vì từ hay ký tự, trong đó tiếng Việt thường tiêu tốn nhiều token hơn tiếng Anh do sự khác biệt về dấu.\",\n      \"citations\": [\n        \"T04-049\"\n      ]\n    },\n    {\n      \"claim\": \"Việc quản lý số lượng token là rất quan trọng khi phát triển sản phẩm AI để kiểm soát chi phí vận hành API.\",\n      \"citations\": [\n        \"T04-050\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Bản chất LLM và chatbot\",\n      \"to_concept\": \"Cấu phần sản phẩm AI\",\n      \"explanation\": \"Kiến thức về việc LLM chỉ là nền tảng (trái tim) phía sau lớp vỏ chatbot giúp người làm sản phẩm phân biệt được các lớp cấu phần trong việc xây dựng sản phẩm AI.\",\n      \"source_citations\": [\n        \"T04-046\"\n      ],\n      \"target_citations\": [\n        \"T01-025\"\n      ]\n    },\n    {\n      \"from_concept\": \"Token và chi phí vận hành\",\n      \"to_concept\": \"Tư duy xây dựng sản phẩm AI\",\n      \"explanation\": \"Hiểu về token giúp kiểm soát chi phí API, tạo tiền đề cho tư duy sản phẩm AI khác biệt so với sản phẩm truyền thống khi cần tối ưu vận hành.\",\n      \"source_citations\": [\n        \"T04-050\"\n      ],\n      \"target_citations\": [\n        \"T01-025\",\n        \"T01-026\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_02",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:23:31.962613+00:00",
+      "latency_ms": 5280,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Kiến trúc Transformer được giới thiệu qua bài báo 'Attention Is All You Need' năm 2017 bởi đội ngũ Google.",
+            "citations": [
+              "T04-038",
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Khác với kiến trúc RNN xử lý tuần tự từng từ gây quên nội dung ở đầu câu dài, Transformer đọc toàn bộ cụm văn bản để nhận diện các từ quan trọng.",
+            "citations": [
+              "T04-039",
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Cơ chế 'attention' của Transformer giúp xác định các từ khóa có liên hệ ngữ nghĩa trong câu để xử lý văn bản hiệu quả hơn.",
+            "citations": [
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Các sản phẩm như ChatGPT hay Gemini sử dụng mô hình ngôn ngữ lớn (LLM) làm nền tảng cốt lõi, trong khi chatbot chỉ đóng vai trò giao diện tương tác.",
+            "citations": [
+              "T04-046"
+            ]
+          },
+          {
+            "claim": "Bản chất vận hành của LLM dựa trên việc dự đoán từ hoặc token tiếp theo dựa trên xác suất từ dữ liệu đã học.",
+            "citations": [
+              "T04-047"
+            ]
+          },
+          {
+            "claim": "Quá trình sinh văn bản của Transformer là một vòng lặp: dự đoán, sinh từ, thêm vào chuỗi, rồi tiếp tục cập nhật xác suất cho từ kế tiếp.",
+            "citations": [
+              "T04-047"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Khả năng sinh văn bản và tự động hóa của Transformer/LLM",
+            "to_concept": "Ứng dụng thực tế của AI trong xử lý công việc",
+            "explanation": "Từ hiểu biết về khả năng vận hành tự động của LLM (dự đoán và sinh văn bản), người học cần chuyển sang tư duy đánh giá tính thực tiễn khi áp dụng chúng để giải quyết các vấn đề vận hành cụ thể.",
+            "source_citations": [
+              "T04-046",
+              "T04-047"
+            ],
+            "target_citations": [
+              "T01-033"
+            ]
+          },
+          {
+            "from_concept": "Sự phổ biến của AI và kiến trúc Transformer",
+            "to_concept": "Tránh lạm dụng AI khi giải quyết bài toán kinh doanh",
+            "explanation": "Việc nắm rõ sức mạnh của kiến trúc Transformer giúp người học nhận ra AI không phải là lời giải duy nhất cho mọi vấn đề, từ đó tránh việc 'lao đầu vào' xây dựng AI khi chưa hiểu rõ bài toán thực sự.",
+            "source_citations": [
+              "T04-038",
+              "T04-046"
+            ],
+            "target_citations": [
+              "T01-032",
+              "T01-033"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 295,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2190,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Kiến trúc Transformer được giới thiệu qua bài báo 'Attention Is All You Need' năm 2017 bởi đội ngũ Google.\",\n      \"citations\": [\n        \"T04-038\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Khác với kiến trúc RNN xử lý tuần tự từng từ gây quên nội dung ở đầu câu dài, Transformer đọc toàn bộ cụm văn bản để nhận diện các từ quan trọng.\",\n      \"citations\": [\n        \"T04-039\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' của Transformer giúp xác định các từ khóa có liên hệ ngữ nghĩa trong câu để xử lý văn bản hiệu quả hơn.\",\n      \"citations\": [\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Các sản phẩm như ChatGPT hay Gemini sử dụng mô hình ngôn ngữ lớn (LLM) làm nền tảng cốt lõi, trong khi chatbot chỉ đóng vai trò giao diện tương tác.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của LLM dựa trên việc dự đoán từ hoặc token tiếp theo dựa trên xác suất từ dữ liệu đã học.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình sinh văn bản của Transformer là một vòng lặp: dự đoán, sinh từ, thêm vào chuỗi, rồi tiếp tục cập nhật xác suất cho từ kế tiếp.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 3090,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Kiến trúc Transformer được giới thiệu qua bài báo 'Attention Is All You Need' năm 2017 bởi đội ngũ Google.\",\n      \"citations\": [\n        \"T04-038\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Khác với kiến trúc RNN xử lý tuần tự từng từ gây quên nội dung ở đầu câu dài, Transformer đọc toàn bộ cụm văn bản để nhận diện các từ quan trọng.\",\n      \"citations\": [\n        \"T04-039\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' của Transformer giúp xác định các từ khóa có liên hệ ngữ nghĩa trong câu để xử lý văn bản hiệu quả hơn.\",\n      \"citations\": [\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Các sản phẩm như ChatGPT hay Gemini sử dụng mô hình ngôn ngữ lớn (LLM) làm nền tảng cốt lõi, trong khi chatbot chỉ đóng vai trò giao diện tương tác.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của LLM dựa trên việc dự đoán từ hoặc token tiếp theo dựa trên xác suất từ dữ liệu đã học.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình sinh văn bản của Transformer là một vòng lặp: dự đoán, sinh từ, thêm vào chuỗi, rồi tiếp tục cập nhật xác suất cho từ kế tiếp.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Khả năng sinh văn bản và tự động hóa của Transformer/LLM\",\n      \"to_concept\": \"Ứng dụng thực tế của AI trong xử lý công việc\",\n      \"explanation\": \"Từ hiểu biết về khả năng vận hành tự động của LLM (dự đoán và sinh văn bản), người học cần chuyển sang tư duy đánh giá tính thực tiễn khi áp dụng chúng để giải quyết các vấn đề vận hành cụ thể.\",\n      \"source_citations\": [\n        \"T04-046\",\n        \"T04-047\"\n      ],\n      \"target_citations\": [\n        \"T01-033\"\n      ]\n    },\n    {\n      \"from_concept\": \"Sự phổ biến của AI và kiến trúc Transformer\",\n      \"to_concept\": \"Tránh lạm dụng AI khi giải quyết bài toán kinh doanh\",\n      \"explanation\": \"Việc nắm rõ sức mạnh của kiến trúc Transformer giúp người học nhận ra AI không phải là lời giải duy nhất cho mọi vấn đề, từ đó tránh việc 'lao đầu vào' xây dựng AI khi chưa hiểu rõ bài toán thực sự.\",\n      \"source_citations\": [\n        \"T04-038\",\n        \"T04-046\"\n      ],\n      \"target_citations\": [\n        \"T01-032\",\n        \"T01-033\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_03",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:23:37.244426+00:00",
+      "latency_ms": 5282,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Cơ chế attention trong Transformer cho phép mô hình nhận diện các từ quan trọng và xác định độ liên quan giữa các cặp từ thông qua một ma trận trọng số.",
+            "citations": [
+              "T04-054"
+            ]
+          },
+          {
+            "claim": "Transformer vượt trội hơn các mô hình cũ nhờ khả năng xử lý toàn cảnh cả câu thay vì chỉ nhìn hạn hẹp vào các từ liền kề.",
+            "citations": [
+              "T04-054",
+              "T04-055"
+            ]
+          },
+          {
+            "claim": "Multi-head attention là kỹ thuật sử dụng nhiều 'con mắt' để cùng lúc nhận diện đa dạng các đặc trưng và quy luật trong văn bản.",
+            "citations": [
+              "T04-056"
+            ]
+          },
+          {
+            "claim": "Việc quản lý sự chú ý và ngữ cảnh chủ động giúp người dùng tối ưu hóa chi phí và hiệu năng khi làm việc với AI.",
+            "citations": [
+              "T04-057"
+            ]
+          },
+          {
+            "claim": "Thay vì để AI tự động tóm tắt khi tràn ngữ cảnh, chuyên gia khuyên nên tự lưu trữ các quyết định quan trọng để kiểm soát thông tin tốt hơn.",
+            "citations": [
+              "T04-057"
+            ]
+          },
+          {
+            "claim": "Tham số (parameter) phản ánh năng lực của mô hình, nhưng các mô hình ít tham số chuyên biệt vẫn có thể làm tốt các tác vụ cụ thể và chạy local hiệu quả.",
+            "citations": [
+              "T04-058"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Quản lý ngữ cảnh và sự chú ý (context management)",
+            "to_concept": "Mức độ tự động hóa (Automation vs Augmentation)",
+            "explanation": "Việc chủ động quản lý ngữ cảnh và ghi lại các bước quan trọng là một hình thức của augmentation, giúp con người duy trì sự kiểm soát thay vì để AI tự động xử lý toàn bộ.",
+            "source_citations": [
+              "T04-057"
+            ],
+            "target_citations": [
+              "T02-033",
+              "T02-034"
+            ]
+          },
+          {
+            "from_concept": "Mô hình chuyên biệt (specialized models)",
+            "to_concept": "Lựa chọn nhu cầu và thế mạnh AI",
+            "explanation": "Việc sử dụng các mô hình ít tham số nhưng tập trung vào tác vụ cụ thể là một chiến lược thực tế khi đánh giá giao điểm giữa nhu cầu và khả năng thực sự của AI.",
+            "source_citations": [
+              "T04-058"
+            ],
+            "target_citations": [
+              "T02-031"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 287,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2286,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Cơ chế attention trong Transformer cho phép mô hình nhận diện các từ quan trọng và xác định độ liên quan giữa các cặp từ thông qua một ma trận trọng số.\",\n      \"citations\": [\"T04-054\"]\n    },\n    {\n      \"claim\": \"Transformer vượt trội hơn các mô hình cũ nhờ khả năng xử lý toàn cảnh cả câu thay vì chỉ nhìn hạn hẹp vào các từ liền kề.\",\n      \"citations\": [\"T04-054\", \"T04-055\"]\n    },\n    {\n      \"claim\": \"Multi-head attention là kỹ thuật sử dụng nhiều 'con mắt' để cùng lúc nhận diện đa dạng các đặc trưng và quy luật trong văn bản.\",\n      \"citations\": [\"T04-056\"]\n    },\n    {\n      \"claim\": \"Việc quản lý sự chú ý và ngữ cảnh chủ động giúp người dùng tối ưu hóa chi phí và hiệu năng khi làm việc với AI.\",\n      \"citations\": [\"T04-057\"]\n    },\n    {\n      \"claim\": \"Thay vì để AI tự động tóm tắt khi tràn ngữ cảnh, chuyên gia khuyên nên tự lưu trữ các quyết định quan trọng để kiểm soát thông tin tốt hơn.\",\n      \"citations\": [\"T04-057\"]\n    },\n    {\n      \"claim\": \"Tham số (parameter) phản ánh năng lực của mô hình, nhưng các mô hình ít tham số chuyên biệt vẫn có thể làm tốt các tác vụ cụ thể và chạy local hiệu quả.\",\n      \"citations\": [\"T04-058\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2994,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Cơ chế attention trong Transformer cho phép mô hình nhận diện các từ quan trọng và xác định độ liên quan giữa các cặp từ thông qua một ma trận trọng số.\",\n      \"citations\": [\n        \"T04-054\"\n      ]\n    },\n    {\n      \"claim\": \"Transformer vượt trội hơn các mô hình cũ nhờ khả năng xử lý toàn cảnh cả câu thay vì chỉ nhìn hạn hẹp vào các từ liền kề.\",\n      \"citations\": [\n        \"T04-054\",\n        \"T04-055\"\n      ]\n    },\n    {\n      \"claim\": \"Multi-head attention là kỹ thuật sử dụng nhiều 'con mắt' để cùng lúc nhận diện đa dạng các đặc trưng và quy luật trong văn bản.\",\n      \"citations\": [\n        \"T04-056\"\n      ]\n    },\n    {\n      \"claim\": \"Việc quản lý sự chú ý và ngữ cảnh chủ động giúp người dùng tối ưu hóa chi phí và hiệu năng khi làm việc với AI.\",\n      \"citations\": [\n        \"T04-057\"\n      ]\n    },\n    {\n      \"claim\": \"Thay vì để AI tự động tóm tắt khi tràn ngữ cảnh, chuyên gia khuyên nên tự lưu trữ các quyết định quan trọng để kiểm soát thông tin tốt hơn.\",\n      \"citations\": [\n        \"T04-057\"\n      ]\n    },\n    {\n      \"claim\": \"Tham số (parameter) phản ánh năng lực của mô hình, nhưng các mô hình ít tham số chuyên biệt vẫn có thể làm tốt các tác vụ cụ thể và chạy local hiệu quả.\",\n      \"citations\": [\n        \"T04-058\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Quản lý ngữ cảnh và sự chú ý (context management)\",\n      \"to_concept\": \"Mức độ tự động hóa (Automation vs Augmentation)\",\n      \"explanation\": \"Việc chủ động quản lý ngữ cảnh và ghi lại các bước quan trọng là một hình thức của augmentation, giúp con người duy trì sự kiểm soát thay vì để AI tự động xử lý toàn bộ.\",\n      \"source_citations\": [\n        \"T04-057\"\n      ],\n      \"target_citations\": [\n        \"T02-033\",\n        \"T02-034\"\n      ]\n    },\n    {\n      \"from_concept\": \"Mô hình chuyên biệt (specialized models)\",\n      \"to_concept\": \"Lựa chọn nhu cầu và thế mạnh AI\",\n      \"explanation\": \"Việc sử dụng các mô hình ít tham số nhưng tập trung vào tác vụ cụ thể là một chiến lược thực tế khi đánh giá giao điểm giữa nhu cầu và khả năng thực sự của AI.\",\n      \"source_citations\": [\n        \"T04-058\"\n      ],\n      \"target_citations\": [\n        \"T02-031\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_04",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:23:42.430444+00:00",
+      "latency_ms": 5186,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Rumors suggest the team behind the Kimi K3 model may have faced financial instability and relied on copying existing model architectures.",
+            "citations": [
+              "T04-063"
+            ]
+          },
+          {
+            "claim": "The development of robust AI models requires mastering the design of systems capable of self-learning.",
+            "citations": [
+              "T04-063"
+            ]
+          },
+          {
+            "claim": "A board game experiment demonstrated that LLMs do not merely predict tokens based on probability but can internalize the rules to reconstruct a mental model of the game state.",
+            "citations": [
+              "T04-064",
+              "T04-066"
+            ]
+          },
+          {
+            "claim": "Research into 'black box' reasoning suggests that models maintain an internal world representation during their inference process.",
+            "citations": [
+              "T04-066"
+            ]
+          },
+          {
+            "claim": "LLMs have inherent limitations regarding real-time knowledge because they are constrained by the data available during their training phase.",
+            "citations": [
+              "T04-067"
+            ]
+          },
+          {
+            "claim": "To overcome static knowledge limitations, modern AI systems are evolving by integrating external tools, user-provided context, and real-time retrieval capabilities.",
+            "citations": [
+              "T04-067"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Developing robust AI systems requires mastering self-learning architecture design.",
+            "to_concept": "The dogfooding strategy in product development.",
+            "explanation": "Mastering system design is essential for foundational AI progress, while dogfooding allows developers to act as the primary user to continuously optimize the specific pain points of the systems they build.",
+            "source_citations": [
+              "T04-063"
+            ],
+            "target_citations": [
+              "T01-042",
+              "T01-043"
+            ]
+          },
+          {
+            "from_concept": "LLMs evolving by integrating external tools to overcome static limitations.",
+            "to_concept": "Building personal AI assistants to solve real-world problems.",
+            "explanation": "Just as large models overcome their static knowledge by integrating external tools and ecosystems, individuals can build their own AI assistants using personal workflows to solve their unique, daily pain points.",
+            "source_citations": [
+              "T04-067"
+            ],
+            "target_citations": [
+              "T01-044"
+            ]
+          },
+          {
+            "from_concept": "Internal world representation vs. black box reasoning.",
+            "to_concept": "Identifying true problems behind user requests.",
+            "explanation": "Research indicates models possess deeper internal logic than surface-level predictions, mirroring the design philosophy of looking past surface-level requests to identify the 'real' problem that needs solving.",
+            "source_citations": [
+              "T04-066"
+            ],
+            "target_citations": [
+              "T01-045"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 264,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2191,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Rumors suggest the team behind the Kimi K3 model may have faced financial instability and relied on copying existing model architectures.\",\n      \"citations\": [\n        \"T04-063\"\n      ]\n    },\n    {\n      \"claim\": \"The development of robust AI models requires mastering the design of systems capable of self-learning.\",\n      \"citations\": [\n        \"T04-063\"\n      ]\n    },\n    {\n      \"claim\": \"A board game experiment demonstrated that LLMs do not merely predict tokens based on probability but can internalize the rules to reconstruct a mental model of the game state.\",\n      \"citations\": [\n        \"T04-064\",\n        \"T04-066\"\n      ]\n    },\n    {\n      \"claim\": \"Research into 'black box' reasoning suggests that models maintain an internal world representation during their inference process.\",\n      \"citations\": [\n        \"T04-066\"\n      ]\n    },\n    {\n      \"claim\": \"LLMs have inherent limitations regarding real-time knowledge because they are constrained by the data available during their training phase.\",\n      \"citations\": [\n        \"T04-067\"\n      ]\n    },\n    {\n      \"claim\": \"To overcome static knowledge limitations, modern AI systems are evolving by integrating external tools, user-provided context, and real-time retrieval capabilities.\",\n      \"citations\": [\n        \"T04-067\"\n      ]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2994,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Rumors suggest the team behind the Kimi K3 model may have faced financial instability and relied on copying existing model architectures.\",\n      \"citations\": [\n        \"T04-063\"\n      ]\n    },\n    {\n      \"claim\": \"The development of robust AI models requires mastering the design of systems capable of self-learning.\",\n      \"citations\": [\n        \"T04-063\"\n      ]\n    },\n    {\n      \"claim\": \"A board game experiment demonstrated that LLMs do not merely predict tokens based on probability but can internalize the rules to reconstruct a mental model of the game state.\",\n      \"citations\": [\n        \"T04-064\",\n        \"T04-066\"\n      ]\n    },\n    {\n      \"claim\": \"Research into 'black box' reasoning suggests that models maintain an internal world representation during their inference process.\",\n      \"citations\": [\n        \"T04-066\"\n      ]\n    },\n    {\n      \"claim\": \"LLMs have inherent limitations regarding real-time knowledge because they are constrained by the data available during their training phase.\",\n      \"citations\": [\n        \"T04-067\"\n      ]\n    },\n    {\n      \"claim\": \"To overcome static knowledge limitations, modern AI systems are evolving by integrating external tools, user-provided context, and real-time retrieval capabilities.\",\n      \"citations\": [\n        \"T04-067\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Developing robust AI systems requires mastering self-learning architecture design.\",\n      \"to_concept\": \"The dogfooding strategy in product development.\",\n      \"explanation\": \"Mastering system design is essential for foundational AI progress, while dogfooding allows developers to act as the primary user to continuously optimize the specific pain points of the systems they build.\",\n      \"source_citations\": [\n        \"T04-063\"\n      ],\n      \"target_citations\": [\n        \"T01-042\",\n        \"T01-043\"\n      ]\n    },\n    {\n      \"from_concept\": \"LLMs evolving by integrating external tools to overcome static limitations.\",\n      \"to_concept\": \"Building personal AI assistants to solve real-world problems.\",\n      \"explanation\": \"Just as large models overcome their static knowledge by integrating external tools and ecosystems, individuals can build their own AI assistants using personal workflows to solve their unique, daily pain points.\",\n      \"source_citations\": [\n        \"T04-067\"\n      ],\n      \"target_citations\": [\n        \"T01-044\"\n      ]\n    },\n    {\n      \"from_concept\": \"Internal world representation vs. black box reasoning.\",\n      \"to_concept\": \"Identifying true problems behind user requests.\",\n      \"explanation\": \"Research indicates models possess deeper internal logic than surface-level predictions, mirroring the design philosophy of looking past surface-level requests to identify the 'real' problem that needs solving.\",\n      \"source_citations\": [\n        \"T04-066\"\n      ],\n      \"target_citations\": [\n        \"T01-045\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_05",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:23:47.613156+00:00",
+      "latency_ms": 5183,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "AI agent được hình thành bằng cách trang bị cho mô hình LLM các khả năng như sử dụng công cụ, bộ nhớ và ngữ cảnh để tương tác với thế giới thay vì chỉ sinh văn bản.",
+            "citations": [
+              "T04-073",
+              "T04-074"
+            ]
+          },
+          {
+            "claim": "Các lớp chức năng bổ trợ cho LLM bao gồm ngữ cảnh (context), kết nối công cụ (tool), bộ nhớ (memory) và lan can an toàn (guardrail).",
+            "citations": [
+              "T04-074"
+            ]
+          },
+          {
+            "claim": "Việc xây dựng hệ thống đánh giá (evaluation) tự động đóng vai trò quyết định đến 80% sự thành công và tốc độ triển khai sản phẩm AI ra môi trường thực tế.",
+            "citations": [
+              "T04-075"
+            ]
+          },
+          {
+            "claim": "Hệ thống evaluation giúp doanh nghiệp kiểm soát lỗi, debug hiệu quả và đánh giá nhanh chóng khả năng thay thế các mô hình mới.",
+            "citations": [
+              "T04-075"
+            ]
+          },
+          {
+            "claim": "Chi phí sử dụng các mô hình AI có xu hướng giảm khoảng 10 lần mỗi năm, trong khi năng lực của các mô hình liên tục được nâng cao.",
+            "citations": [
+              "T04-076"
+            ]
+          },
+          {
+            "claim": "Do tốc độ tiến hóa nhanh của AI, nhà phát triển không nên quá chú trọng tối ưu hóa các yếu tố nhỏ vì chúng có thể sớm bị các mô hình mới giải quyết.",
+            "citations": [
+              "T04-077"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Hệ thống evaluation cho AI agent",
+            "to_concept": "Đo lường hiệu quả sản phẩm thông qua metrics",
+            "explanation": "Việc xây dựng evaluation benchmark để đánh giá AI tương đồng với tư duy thiết kế metrics (North Star Metric) trong sản phẩm nhằm chứng minh giá trị thực tế của tính năng.",
+            "source_citations": [
+              "T04-075"
+            ],
+            "target_citations": [
+              "T02-025"
+            ]
+          },
+          {
+            "from_concept": "Kiểm chứng năng lực AI thông qua bộ dataset benchmark",
+            "to_concept": "Thực nghiệm kiểm chứng (A/B testing) với người dùng",
+            "explanation": "Nếu hệ thống evaluation là bộ kiểm chứng tự động cho agent, thì A/B testing và các thử nghiệm với người dùng thực tế là phương pháp kiểm chứng sự thay đổi về hành vi hoặc kiến thức.",
+            "source_citations": [
+              "T04-075"
+            ],
+            "target_citations": [
+              "T02-026",
+              "T02-028"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 295,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2295,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"AI agent được hình thành bằng cách trang bị cho mô hình LLM các khả năng như sử dụng công cụ, bộ nhớ và ngữ cảnh để tương tác với thế giới thay vì chỉ sinh văn bản.\",\n      \"citations\": [\n        \"T04-073\",\n        \"T04-074\"\n      ]\n    },\n    {\n      \"claim\": \"Các lớp chức năng bổ trợ cho LLM bao gồm ngữ cảnh (context), kết nối công cụ (tool), bộ nhớ (memory) và lan can an toàn (guardrail).\",\n      \"citations\": [\n        \"T04-074\"\n      ]\n    },\n    {\n      \"claim\": \"Việc xây dựng hệ thống đánh giá (evaluation) tự động đóng vai trò quyết định đến 80% sự thành công và tốc độ triển khai sản phẩm AI ra môi trường thực tế.\",\n      \"citations\": [\n        \"T04-075\"\n      ]\n    },\n    {\n      \"claim\": \"Hệ thống evaluation giúp doanh nghiệp kiểm soát lỗi, debug hiệu quả và đánh giá nhanh chóng khả năng thay thế các mô hình mới.\",\n      \"citations\": [\n        \"T04-075\"\n      ]\n    },\n    {\n      \"claim\": \"Chi phí sử dụng các mô hình AI có xu hướng giảm khoảng 10 lần mỗi năm, trong khi năng lực của các mô hình liên tục được nâng cao.\",\n      \"citations\": [\n        \"T04-076\"\n      ]\n    },\n    {\n      \"claim\": \"Do tốc độ tiến hóa nhanh của AI, nhà phát triển không nên quá chú trọng tối ưu hóa các yếu tố nhỏ vì chúng có thể sớm bị các mô hình mới giải quyết.\",\n      \"citations\": [\n        \"T04-077\"\n      ]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2887,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"AI agent được hình thành bằng cách trang bị cho mô hình LLM các khả năng như sử dụng công cụ, bộ nhớ và ngữ cảnh để tương tác với thế giới thay vì chỉ sinh văn bản.\",\n      \"citations\": [\n        \"T04-073\",\n        \"T04-074\"\n      ]\n    },\n    {\n      \"claim\": \"Các lớp chức năng bổ trợ cho LLM bao gồm ngữ cảnh (context), kết nối công cụ (tool), bộ nhớ (memory) và lan can an toàn (guardrail).\",\n      \"citations\": [\n        \"T04-074\"\n      ]\n    },\n    {\n      \"claim\": \"Việc xây dựng hệ thống đánh giá (evaluation) tự động đóng vai trò quyết định đến 80% sự thành công và tốc độ triển khai sản phẩm AI ra môi trường thực tế.\",\n      \"citations\": [\n        \"T04-075\"\n      ]\n    },\n    {\n      \"claim\": \"Hệ thống evaluation giúp doanh nghiệp kiểm soát lỗi, debug hiệu quả và đánh giá nhanh chóng khả năng thay thế các mô hình mới.\",\n      \"citations\": [\n        \"T04-075\"\n      ]\n    },\n    {\n      \"claim\": \"Chi phí sử dụng các mô hình AI có xu hướng giảm khoảng 10 lần mỗi năm, trong khi năng lực của các mô hình liên tục được nâng cao.\",\n      \"citations\": [\n        \"T04-076\"\n      ]\n    },\n    {\n      \"claim\": \"Do tốc độ tiến hóa nhanh của AI, nhà phát triển không nên quá chú trọng tối ưu hóa các yếu tố nhỏ vì chúng có thể sớm bị các mô hình mới giải quyết.\",\n      \"citations\": [\n        \"T04-077\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Hệ thống evaluation cho AI agent\",\n      \"to_concept\": \"Đo lường hiệu quả sản phẩm thông qua metrics\",\n      \"explanation\": \"Việc xây dựng evaluation benchmark để đánh giá AI tương đồng với tư duy thiết kế metrics (North Star Metric) trong sản phẩm nhằm chứng minh giá trị thực tế của tính năng.\",\n      \"source_citations\": [\n        \"T04-075\"\n      ],\n      \"target_citations\": [\n        \"T02-025\"\n      ]\n    },\n    {\n      \"from_concept\": \"Kiểm chứng năng lực AI thông qua bộ dataset benchmark\",\n      \"to_concept\": \"Thực nghiệm kiểm chứng (A/B testing) với người dùng\",\n      \"explanation\": \"Nếu hệ thống evaluation là bộ kiểm chứng tự động cho agent, thì A/B testing và các thử nghiệm với người dùng thực tế là phương pháp kiểm chứng sự thay đổi về hành vi hoặc kiến thức.\",\n      \"source_citations\": [\n        \"T04-075\"\n      ],\n      \"target_citations\": [\n        \"T02-026\",\n        \"T02-028\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_06",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:26.189891+00:00",
+      "latency_ms": 5541,
+      "attempts": 2,
+      "output": null,
+      "validator": null,
+      "errors": [
+        "Bridge fail sau retry hoặc API error"
+      ],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2291,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Người dùng không nên tin tưởng hoàn toàn vào các benchmark leaderboard vì tính chủ quan của đơn vị phát triển mô hình.\",\n      \"citations\": [\"T04-084\"]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mô hình cần dựa trên hiểu biết về bài toán thực tế, nhu cầu độ phức tạp và chi phí vận hành.\",\n      \"citations\": [\"T04-084\"]\n    },\n    {\n      \"claim\": \"Quy trình làm việc hiệu quả thường kết hợp dùng mô hình mạnh cho khâu lập kế hoạch và mô hình đơn giản, chi phí thấp cho các tác vụ thực thi.\",\n      \"citations\": [\"T04-085\"]\n    },\n    {\n      \"claim\": \"Trải nghiệm thực tế là cách duy nhất để đánh giá sự phù hợp của các mô hình khác nhau đối với từng công việc cụ thể.\",\n      \"citations\": [\"T04-085\"]\n    },\n    {\n      \"claim\": \"Kiến trúc Mixture of Experts giúp tối ưu hóa chi phí và tốc độ bằng cách chỉ kích hoạt các cụm tham số chuyên biệt thay vì toàn bộ mô hình.\",\n      \"citations\": [\"T04-086\"]\n    },\n    {\n      \"claim\": \"Chi phí gọi API LLM tính trên cả input và output, trong đó output thường đắt hơn và tăng dần khi phải lưu trữ lịch sử hội thoại trong context.\",\n      \"citations\": [\"T04-087\", \"T04-088\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 3249,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Người dùng không nên tin tưởng hoàn toàn vào các benchmark leaderboard vì tính chủ quan của đơn vị phát triển mô hình.\",\n      \"citations\": [\n        \"T04-084\"\n      ]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mô hình cần dựa trên hiểu biết về bài toán thực tế, nhu cầu độ phức tạp và chi phí vận hành.\",\n      \"citations\": [\n        \"T04-084\"\n      ]\n    },\n    {\n      \"claim\": \"Quy trình làm việc hiệu quả thường kết hợp dùng mô hình mạnh cho khâu lập kế hoạch và mô hình đơn giản, chi phí thấp cho các tác vụ thực thi.\",\n      \"citations\": [\n        \"T04-085\"\n      ]\n    },\n    {\n      \"claim\": \"Trải nghiệm thực tế là cách duy nhất để đánh giá sự phù hợp của các mô hình khác nhau đối với từng công việc cụ thể.\",\n      \"citations\": [\n        \"T04-085\"\n      ]\n    },\n    {\n      \"claim\": \"Kiến trúc Mixture of Experts giúp tối ưu hóa chi phí và tốc độ bằng cách chỉ kích hoạt các cụm tham số chuyên biệt thay vì toàn bộ mô hình.\",\n      \"citations\": [\n        \"T04-086\"\n      ]\n    },\n    {\n      \"claim\": \"Chi phí gọi API LLM tính trên cả input và output, trong đó output thường đắt hơn và tăng dần khi phải lưu trữ lịch sử hội thoại trong context.\",\n      \"citations\": [\n        \"T04-087\",\n        \"T04-088\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Lựa chọn mô hình dựa trên độ phức tạp và chi phí\",\n      \"to_concept\": \"Ưu tiên giải pháp đơn giản trước khi dùng AI\",\n      \"explanation\": \"Cả hai buổi học đều nhấn mạnh tư duy chọn giải pháp tối giản để tối ưu chi phí và kiểm soát lỗi trước khi áp dụng các kiến trúc AI phức tạp.\",\n      \"source_citations\": [\n        \"T04-084\",\n        \"T04-085\"\n      ],\n      \"target_citations\": [\n        \"T02-036\",\n        \"T02-037\"\n      ]\n    },\n    {\n      \"from_concept\": \"Quy trình lập kế hoạch và thực thi bằng các mô hình\",\n      \"to_concept\": \"Xây dựng hệ thống theo mô hình Workflow\",\n      \"explanation\": \"Kỹ thuật dùng AI hỗ trợ cho các bước trong workflow (tóm tắt, phân nhánh, tuần tự) là sự kế thừa từ phương pháp dùng mô hình mạnh cho lập kế hoạch và mô hình nhỏ cho thực thi.\",\n      \"source_citations\": [\n        \"T04-085\"\n      ],\n      \"target_citations\": [\n        \"T02-037\"\n      ]\n    },\n    {\n      \"from_concept\": \"Chi phí API và quản lý context\",\n      \"to_concept\": \"Rủi ro chi phí khi mở rộng hệ thống agent\",\n      \"explanation\": \"Chi phí token tăng cao khi gọi API lặp lại hoặc dùng nhiều agent không kiểm soát được được nhận diện là rào cản khi nâng cấp lên các kiến trúc phức tạp.\",\n      \"source_citations\": [\n        \"T04-087\",\n        \"T04-088\"\n      ],\n      \"target_citations\": [\n        \"T02-038\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": [
+            "Vượt 300 từ: 332"
+          ]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case_id": "normal_07",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:24:02.267934+00:00",
+      "latency_ms": 5190,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Deep learning khác biệt với machine learning nhờ cấu trúc nhiều lớp ẩn có khả năng tự trích xuất đặc điểm dữ liệu.",
+            "citations": [
+              "T06-042"
+            ]
+          },
+          {
+            "claim": "Deep learning yêu cầu khả năng tính toán cao hơn và tập dữ liệu lớn hơn so với các phương pháp truyền thống.",
+            "citations": [
+              "T06-043"
+            ]
+          },
+          {
+            "claim": "Foundation model là các mô hình được huấn luyện trên lượng dữ liệu khổng lồ, ngày càng tăng trưởng nhanh chóng.",
+            "citations": [
+              "T06-044"
+            ]
+          },
+          {
+            "claim": "Xu hướng tương lai của AI đang chuyển dịch sang các physical model có khả năng quan sát và học hỏi từ thực tế thay vì chỉ từ kho dữ liệu tĩnh.",
+            "citations": [
+              "T06-044"
+            ]
+          },
+          {
+            "claim": "Mục tiêu cốt lõi của foundation model là hỗ trợ, nâng cấp và giải quyết đa dạng các bài toán chuyên môn thay vì chỉ thay thế con người.",
+            "citations": [
+              "T06-044"
+            ]
+          },
+          {
+            "claim": "Trong thời đại LLM, lập trình viên cần trau dồi khả năng ngôn từ để điều khiển và tương tác hiệu quả với AI.",
+            "citations": [
+              "T06-045"
+            ]
+          },
+          {
+            "claim": "Việc đọc sách thường xuyên là phương pháp thiết yếu để nâng cao trình độ ngôn ngữ và làm chủ các công cụ AI.",
+            "citations": [
+              "T06-045"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Đặc tính xác suất của AI",
+            "to_concept": "Quản lý kỳ vọng người dùng trong sản phẩm AI",
+            "explanation": "Việc hiểu AI vận hành dựa trên xác suất (được đề cập ở buổi trước qua các lớp mạng thần kinh) giúp lập trình viên kiểm soát kỳ vọng người dùng vì AI không đảm bảo kết quả chính xác 100% trong mọi lần chạy.",
+            "source_citations": [
+              "T06-043"
+            ],
+            "target_citations": [
+              "T01-019"
+            ]
+          },
+          {
+            "from_concept": "Khả năng ngôn từ của lập trình viên",
+            "to_concept": "Cạnh tranh sản phẩm trong kỷ nguyên AI",
+            "explanation": "Khả năng làm chủ ngôn từ để tương tác hiệu quả với AI là tiền đề để lập trình viên tạo ra sản phẩm chất lượng, từ đó chiếm lấy sự chú ý của người dùng trong bối cảnh cạnh tranh gay gắt hiện nay.",
+            "source_citations": [
+              "T06-045"
+            ],
+            "target_citations": [
+              "T01-020"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 298,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2287,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Deep learning khác biệt với machine learning nhờ cấu trúc nhiều lớp ẩn có khả năng tự trích xuất đặc điểm dữ liệu.\",\n      \"citations\": [\"T06-042\"]\n    },\n    {\n      \"claim\": \"Deep learning yêu cầu khả năng tính toán cao hơn và tập dữ liệu lớn hơn so với các phương pháp truyền thống.\",\n      \"citations\": [\"T06-043\"]\n    },\n    {\n      \"claim\": \"Foundation model là các mô hình được huấn luyện trên lượng dữ liệu khổng lồ, ngày càng tăng trưởng nhanh chóng.\",\n      \"citations\": [\"T06-044\"]\n    },\n    {\n      \"claim\": \"Xu hướng tương lai của AI đang chuyển dịch sang các physical model có khả năng quan sát và học hỏi từ thực tế thay vì chỉ từ kho dữ liệu tĩnh.\",\n      \"citations\": [\"T06-044\"]\n    },\n    {\n      \"claim\": \"Mục tiêu cốt lõi của foundation model là hỗ trợ, nâng cấp và giải quyết đa dạng các bài toán chuyên môn thay vì chỉ thay thế con người.\",\n      \"citations\": [\"T06-044\"]\n    },\n    {\n      \"claim\": \"Trong thời đại LLM, lập trình viên cần trau dồi khả năng ngôn từ để điều khiển và tương tác hiệu quả với AI.\",\n      \"citations\": [\"T06-045\"]\n    },\n    {\n      \"claim\": \"Việc đọc sách thường xuyên là phương pháp thiết yếu để nâng cao trình độ ngôn ngữ và làm chủ các công cụ AI.\",\n      \"citations\": [\"T06-045\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2902,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Deep learning khác biệt với machine learning nhờ cấu trúc nhiều lớp ẩn có khả năng tự trích xuất đặc điểm dữ liệu.\",\n      \"citations\": [\n        \"T06-042\"\n      ]\n    },\n    {\n      \"claim\": \"Deep learning yêu cầu khả năng tính toán cao hơn và tập dữ liệu lớn hơn so với các phương pháp truyền thống.\",\n      \"citations\": [\n        \"T06-043\"\n      ]\n    },\n    {\n      \"claim\": \"Foundation model là các mô hình được huấn luyện trên lượng dữ liệu khổng lồ, ngày càng tăng trưởng nhanh chóng.\",\n      \"citations\": [\n        \"T06-044\"\n      ]\n    },\n    {\n      \"claim\": \"Xu hướng tương lai của AI đang chuyển dịch sang các physical model có khả năng quan sát và học hỏi từ thực tế thay vì chỉ từ kho dữ liệu tĩnh.\",\n      \"citations\": [\n        \"T06-044\"\n      ]\n    },\n    {\n      \"claim\": \"Mục tiêu cốt lõi của foundation model là hỗ trợ, nâng cấp và giải quyết đa dạng các bài toán chuyên môn thay vì chỉ thay thế con người.\",\n      \"citations\": [\n        \"T06-044\"\n      ]\n    },\n    {\n      \"claim\": \"Trong thời đại LLM, lập trình viên cần trau dồi khả năng ngôn từ để điều khiển và tương tác hiệu quả với AI.\",\n      \"citations\": [\n        \"T06-045\"\n      ]\n    },\n    {\n      \"claim\": \"Việc đọc sách thường xuyên là phương pháp thiết yếu để nâng cao trình độ ngôn ngữ và làm chủ các công cụ AI.\",\n      \"citations\": [\n        \"T06-045\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Đặc tính xác suất của AI\",\n      \"to_concept\": \"Quản lý kỳ vọng người dùng trong sản phẩm AI\",\n      \"explanation\": \"Việc hiểu AI vận hành dựa trên xác suất (được đề cập ở buổi trước qua các lớp mạng thần kinh) giúp lập trình viên kiểm soát kỳ vọng người dùng vì AI không đảm bảo kết quả chính xác 100% trong mọi lần chạy.\",\n      \"source_citations\": [\n        \"T06-043\"\n      ],\n      \"target_citations\": [\n        \"T01-019\"\n      ]\n    },\n    {\n      \"from_concept\": \"Khả năng ngôn từ của lập trình viên\",\n      \"to_concept\": \"Cạnh tranh sản phẩm trong kỷ nguyên AI\",\n      \"explanation\": \"Khả năng làm chủ ngôn từ để tương tác hiệu quả với AI là tiền đề để lập trình viên tạo ra sản phẩm chất lượng, từ đó chiếm lấy sự chú ý của người dùng trong bối cảnh cạnh tranh gay gắt hiện nay.\",\n      \"source_citations\": [\n        \"T06-045\"\n      ],\n      \"target_citations\": [\n        \"T01-020\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_08",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:24:11.033829+00:00",
+      "latency_ms": 8766,
+      "attempts": 3,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "LLM hoạt động dựa trên đơn vị token thay vì đọc ký tự hay từ ngữ thông thường.",
+            "citations": [
+              "T06-135"
+            ]
+          },
+          {
+            "claim": "Cơ chế tự chú ý (self-attention) đóng vai trò quan trọng trong việc tính toán điểm tương đồng (similarity score) để dự đoán token kế tiếp.",
+            "citations": [
+              "T06-135",
+              "T06-136"
+            ]
+          },
+          {
+            "claim": "Tham số 'temperature' cho phép người dùng điều chỉnh mức độ sáng tạo của mô hình trong quá trình dự báo.",
+            "citations": [
+              "T06-136"
+            ]
+          },
+          {
+            "claim": "Cơ chế autoregressive cho phép output của các bước trước trở thành input cho bước tiếp theo, khác biệt với các hệ thống cũ không sử dụng cơ chế song song.",
+            "citations": [
+              "T06-137"
+            ]
+          },
+          {
+            "claim": "LLM không thể đúng 100% và luôn tồn tại nguy cơ xảy ra hiện tượng ảo giác (hallucination) do dữ liệu đầu vào chứa nhiều định kiến (bias).",
+            "citations": [
+              "T06-138",
+              "T06-139"
+            ]
+          },
+          {
+            "claim": "Quá trình fine-tuning và học tăng cường với con người (RLHF) vẫn không loại bỏ hoàn toàn sai số vì bản thân chuyên gia cũng mang theo định kiến.",
+            "citations": [
+              "T06-139"
+            ]
+          },
+          {
+            "claim": "Hệ thống RAG (Retrieval Augmented Generation) được đề xuất như một giải pháp để giảm thiểu ảo giác bằng cách truy xuất dữ liệu chuẩn và cung cấp trích dẫn nguồn gốc.",
+            "citations": [
+              "T06-139"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Nguy cơ ảo giác (hallucination)",
+            "to_concept": "Xây dựng hệ thống an toàn (safety layer)",
+            "explanation": "Từ việc nhận diện LLM có thể sai sót do định kiến dữ liệu, chúng ta chuyển sang xây dựng cơ chế kiểm soát logic cứng để ngăn chặn các tác nhân không chắc chắn gây tai nạn hệ thống.",
+            "source_citations": [
+              "T06-138",
+              "T06-139"
+            ],
+            "target_citations": [
+              "T03-079",
+              "T03-080"
+            ]
+          },
+          {
+            "from_concept": "Sử dụng RAG để xác thực dữ liệu",
+            "to_concept": "Sử dụng Tool Call để tăng tính chính xác",
+            "explanation": "Nếu RAG giúp LLM truy xuất nguồn dữ liệu chuẩn để giảm ảo giác, thì việc sử dụng Tool Call chuyển đổi các tác vụ LLM làm không tốt (như đếm ký tự) thành các hàm thực thi chắc chắn.",
+            "source_citations": [
+              "T06-139"
+            ],
+            "target_citations": [
+              "T03-079"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 297,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2153,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"LLM hoạt động dựa trên đơn vị token thay vì đọc ký tự hay từ ngữ thông thường.\",\n      \"citations\": [\"T06-135\"]\n    },\n    {\n      \"claim\": \"Cơ chế tự chú ý (self-attention) đóng vai trò quan trọng trong việc tính toán điểm tương đồng (similarity score) để dự đoán token kế tiếp.\",\n      \"citations\": [\"T06-135\", \"T06-136\"]\n    },\n    {\n      \"claim\": \"Tham số 'temperature' cho phép người dùng điều chỉnh mức độ sáng tạo của mô hình trong quá trình dự báo.\",\n      \"citations\": [\"T06-136\"]\n    },\n    {\n      \"claim\": \"Cơ chế autoregressive cho phép output của các bước trước trở thành input cho bước tiếp theo, khác biệt với các hệ thống cũ không sử dụng cơ chế song song.\",\n      \"citations\": [\"T06-137\"]\n    },\n    {\n      \"claim\": \"LLM không thể đúng 100% và luôn tồn tại nguy cơ xảy ra hiện tượng ảo giác (hallucination) do dữ liệu đầu vào chứa nhiều định kiến (bias).\",\n      \"citations\": [\"T06-138\", \"T06-139\"]\n    },\n    {\n      \"claim\": \"Quá trình fine-tuning và học tăng cường với con người (RLHF) vẫn không loại bỏ hoàn toàn sai số vì bản thân chuyên gia cũng mang theo định kiến.\",\n      \"citations\": [\"T06-139\"]\n    },\n    {\n      \"claim\": \"Hệ thống RAG (Retrieval Augmented Generation) được đề xuất như một giải pháp để giảm thiểu ảo giác bằng cách truy xuất dữ liệu chuẩn và cung cấp trích dẫn nguồn gốc.\",\n      \"citations\": [\"T06-139\"]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 3427,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"LLM hoạt động dựa trên đơn vị token thay vì đọc ký tự hay từ ngữ thông thường.\",\n      \"citations\": [\n        \"T06-135\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế tự chú ý (self-attention) đóng vai trò quan trọng trong việc tính toán điểm tương đồng (similarity score) để dự đoán token kế tiếp.\",\n      \"citations\": [\n        \"T06-135\",\n        \"T06-136\"\n      ]\n    },\n    {\n      \"claim\": \"Tham số 'temperature' cho phép người dùng điều chỉnh mức độ sáng tạo của mô hình trong quá trình dự báo.\",\n      \"citations\": [\n        \"T06-136\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế autoregressive cho phép output của các bước trước trở thành input cho bước tiếp theo, khác biệt với các hệ thống cũ không sử dụng cơ chế song song.\",\n      \"citations\": [\n        \"T06-137\"\n      ]\n    },\n    {\n      \"claim\": \"LLM không thể đúng 100% và luôn tồn tại nguy cơ xảy ra hiện tượng ảo giác (hallucination) do dữ liệu đầu vào chứa nhiều định kiến (bias).\",\n      \"citations\": [\n        \"T06-138\",\n        \"T06-139\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình fine-tuning và học tăng cường với con người (RLHF) vẫn không loại bỏ hoàn toàn sai số vì bản thân chuyên gia cũng mang theo định kiến.\",\n      \"citations\": [\n        \"T06-139\"\n      ]\n    },\n    {\n      \"claim\": \"Hệ thống RAG (Retrieval Augmented Generation) được đề xuất như một giải pháp để giảm thiểu ảo giác bằng cách truy xuất dữ liệu chuẩn và cung cấp trích dẫn nguồn gốc.\",\n      \"citations\": [\n        \"T06-139\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Hiện tượng ảo giác (hallucination)\",\n      \"to_concept\": \"Tính không chắc chắn trong ứng dụng thực tế\",\n      \"explanation\": \"Khả năng sinh ra lỗi của LLM do dữ liệu chứa định kiến (ảo giác) được tiếp nối bởi việc nhận diện LLM như một tác nhân không chắc chắn khi xử lý các tác vụ cụ thể như đếm ký tự.\",\n      \"source_citations\": [\n        \"T06-138\",\n        \"T06-139\"\n      ],\n      \"target_citations\": [\n        \"T03-079\"\n      ]\n    },\n    {\n      \"from_concept\": \"Tham số temperature\",\n      \"to_concept\": \"Kiểm soát độ sáng tạo trong output\",\n      \"explanation\": \"Độ sáng tạo của LLM được điều chỉnh qua temperature, nay được giải thích thêm là yếu tố gây ra sự thiếu ổn định cho kết quả đầu ra khi triển khai ứng dụng.\",\n      \"source_citations\": [\n        \"T06-136\"\n      ],\n      \"target_citations\": [\n        \"T03-079\"\n      ]\n    },\n    {\n      \"from_concept\": \"Giải quyết sai số của LLM (RAG)\",\n      \"to_concept\": \"Tích hợp tầng safety và tool calling\",\n      \"explanation\": \"Từ việc dùng RAG để cung cấp dữ liệu chuẩn thay thế khả năng ghi nhớ của LLM, hệ thống phát triển thêm tầng hard code logic và tool call để đảm bảo an toàn tuyệt đối.\",\n      \"source_citations\": [\n        \"T06-139\"\n      ],\n      \"target_citations\": [\n        \"T03-079\",\n        \"T03-080\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": [
+            "Vượt 300 từ: 338"
+          ]
+        },
+        {
+          "stage": "bridge",
+          "attempt": 2,
+          "latency_ms": 3185,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"LLM hoạt động dựa trên đơn vị token thay vì đọc ký tự hay từ ngữ thông thường.\",\n      \"citations\": [\n        \"T06-135\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế tự chú ý (self-attention) đóng vai trò quan trọng trong việc tính toán điểm tương đồng (similarity score) để dự đoán token kế tiếp.\",\n      \"citations\": [\n        \"T06-135\",\n        \"T06-136\"\n      ]\n    },\n    {\n      \"claim\": \"Tham số 'temperature' cho phép người dùng điều chỉnh mức độ sáng tạo của mô hình trong quá trình dự báo.\",\n      \"citations\": [\n        \"T06-136\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế autoregressive cho phép output của các bước trước trở thành input cho bước tiếp theo, khác biệt với các hệ thống cũ không sử dụng cơ chế song song.\",\n      \"citations\": [\n        \"T06-137\"\n      ]\n    },\n    {\n      \"claim\": \"LLM không thể đúng 100% và luôn tồn tại nguy cơ xảy ra hiện tượng ảo giác (hallucination) do dữ liệu đầu vào chứa nhiều định kiến (bias).\",\n      \"citations\": [\n        \"T06-138\",\n        \"T06-139\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình fine-tuning và học tăng cường với con người (RLHF) vẫn không loại bỏ hoàn toàn sai số vì bản thân chuyên gia cũng mang theo định kiến.\",\n      \"citations\": [\n        \"T06-139\"\n      ]\n    },\n    {\n      \"claim\": \"Hệ thống RAG (Retrieval Augmented Generation) được đề xuất như một giải pháp để giảm thiểu ảo giác bằng cách truy xuất dữ liệu chuẩn và cung cấp trích dẫn nguồn gốc.\",\n      \"citations\": [\n        \"T06-139\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Nguy cơ ảo giác (hallucination)\",\n      \"to_concept\": \"Xây dựng hệ thống an toàn (safety layer)\",\n      \"explanation\": \"Từ việc nhận diện LLM có thể sai sót do định kiến dữ liệu, chúng ta chuyển sang xây dựng cơ chế kiểm soát logic cứng để ngăn chặn các tác nhân không chắc chắn gây tai nạn hệ thống.\",\n      \"source_citations\": [\n        \"T06-138\",\n        \"T06-139\"\n      ],\n      \"target_citations\": [\n        \"T03-079\",\n        \"T03-080\"\n      ]\n    },\n    {\n      \"from_concept\": \"Sử dụng RAG để xác thực dữ liệu\",\n      \"to_concept\": \"Sử dụng Tool Call để tăng tính chính xác\",\n      \"explanation\": \"Nếu RAG giúp LLM truy xuất nguồn dữ liệu chuẩn để giảm ảo giác, thì việc sử dụng Tool Call chuyển đổi các tác vụ LLM làm không tốt (như đếm ký tự) thành các hàm thực thi chắc chắn.\",\n      \"source_citations\": [\n        \"T06-139\"\n      ],\n      \"target_citations\": [\n        \"T03-079\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "normal_09",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:30.936403+00:00",
+      "latency_ms": 4741,
+      "attempts": 2,
+      "output": null,
+      "validator": null,
+      "errors": [
+        "Bridge fail sau retry hoặc API error"
+      ],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 1896,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"System prompt là lớp quy luật tổng quát, luôn nằm ở vị trí đầu tiên để định hướng hành vi và vai trò cho mô hình AI.\",\n      \"citations\": [\"T04-089\"]\n    },\n    {\n      \"claim\": \"Cấu trúc gọi API bao gồm system prompt, user input (câu hỏi/ngữ cảnh) và các cặp hội thoại tiếp nối giữa user và assistant.\",\n      \"citations\": [\"T04-089\"]\n    },\n    {\n      \"claim\": \"Khi nhận phản hồi từ API, cần xử lý để trích xuất nội dung kết quả và kiểm soát số lượng token đã tiêu thụ.\",\n      \"citations\": [\"T04-089\"]\n    },\n    {\n      \"claim\": \"Mô hình ngôn ngữ lớn hoạt động trên nền tảng Transformer với cơ chế dự đoán các token tiếp theo.\",\n      \"citations\": [\"T04-091\"]\n    },\n    {\n      \"claim\": \"Để ứng dụng mô hình vào thực tế, cần xây dựng thêm các lớp công cụ, ngữ cảnh và hệ thống bao phủ bên ngoài.\",\n      \"citations\": [\"T04-091\"]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mô hình đòi hỏi sự hiểu biết về điểm mạnh của AI, đặc thù công việc và quá trình thử nghiệm thực tế.\",\n      \"citations\": [\"T04-091\"]\n    },\n    {\n      \"claim\": \"Tư duy đánh giá (evaluation mindset) là yếu tố then chốt giúp tối ưu hóa sản phẩm và thích nghi nhanh chóng với sự thay đổi.\",\n      \"citations\": [\"T04-091\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2844,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"System prompt là lớp quy luật tổng quát, luôn nằm ở vị trí đầu tiên để định hướng hành vi và vai trò cho mô hình AI.\",\n      \"citations\": [\n        \"T04-089\"\n      ]\n    },\n    {\n      \"claim\": \"Cấu trúc gọi API bao gồm system prompt, user input (câu hỏi/ngữ cảnh) và các cặp hội thoại tiếp nối giữa user và assistant.\",\n      \"citations\": [\n        \"T04-089\"\n      ]\n    },\n    {\n      \"claim\": \"Khi nhận phản hồi từ API, cần xử lý để trích xuất nội dung kết quả và kiểm soát số lượng token đã tiêu thụ.\",\n      \"citations\": [\n        \"T04-089\"\n      ]\n    },\n    {\n      \"claim\": \"Mô hình ngôn ngữ lớn hoạt động trên nền tảng Transformer với cơ chế dự đoán các token tiếp theo.\",\n      \"citations\": [\n        \"T04-091\"\n      ]\n    },\n    {\n      \"claim\": \"Để ứng dụng mô hình vào thực tế, cần xây dựng thêm các lớp công cụ, ngữ cảnh và hệ thống bao phủ bên ngoài.\",\n      \"citations\": [\n        \"T04-091\"\n      ]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mô hình đòi hỏi sự hiểu biết về điểm mạnh của AI, đặc thù công việc và quá trình thử nghiệm thực tế.\",\n      \"citations\": [\n        \"T04-091\"\n      ]\n    },\n    {\n      \"claim\": \"Tư duy đánh giá (evaluation mindset) là yếu tố then chốt giúp tối ưu hóa sản phẩm và thích nghi nhanh chóng với sự thay đổi.\",\n      \"citations\": [\n        \"T04-091\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Sử dụng các lớp công cụ và hệ thống bao phủ (wrappers) trên mô hình AI\",\n      \"to_concept\": \"Triển khai sản phẩm thực tế với hệ thống giám sát và guardrail\",\n      \"explanation\": \"Từ việc nhận định cần các lớp công cụ bao phủ bên ngoài để đưa AI vào thực tế, buổi hiện tại cụ thể hóa bằng việc áp dụng các hệ thống giám sát và guardrail cho các sản phẩm dựa trên LLM.\",\n      \"source_citations\": [\n        \"T04-091\"\n      ],\n      \"target_citations\": [\n        \"T05-138\"\n      ]\n    },\n    {\n      \"from_concept\": \"Tư duy đánh giá (evaluation mindset) cho kết quả đầu ra\",\n      \"to_concept\": \"Xây dựng metric đo lường và quy trình review của con người\",\n      \"explanation\": \"Tư duy đánh giá được nhấn mạnh ở buổi trước giờ đây được chuyển hóa thành yêu cầu kỹ thuật cụ thể: thiết lập các metric đo lường rõ ràng và duy trì sự kiểm soát, đánh giá của con người đối với sản phẩm LLM.\",\n      \"source_citations\": [\n        \"T04-091\"\n      ],\n      \"target_citations\": [\n        \"T05-138\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": [
+            "Vượt 300 từ: 315"
+          ]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case_id": "normal_10",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:24:23.509122+00:00",
+      "latency_ms": 4603,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Trong các ngành đòi hỏi độ chính xác cao như y tế hay tài chính, cần thiết lập mức độ sáng tạo (temperature) ở mức thấp.",
+            "citations": [
+              "T06-140"
+            ]
+          },
+          {
+            "claim": "Cơ chế xử lý của LLM là đoán token kế tiếp dựa trên các token trước đó, trong đó các token nhìn lẫn nhau và xử lý song song.",
+            "citations": [
+              "T06-140"
+            ]
+          },
+          {
+            "claim": "Giai đoạn pretraining giúp mô hình học toàn bộ tri thức của loài người nhưng chưa định hình được cách sử dụng kiến thức đúng ngữ pháp.",
+            "citations": [
+              "T06-141"
+            ]
+          },
+          {
+            "claim": "Lượng dữ liệu khổng lồ của phiên bản năm 2022 tương đương với việc một giáo sư đọc liên tục 8 tiếng mỗi ngày trong suốt 2.600 năm.",
+            "citations": [
+              "T06-142"
+            ]
+          },
+          {
+            "claim": "Giai đoạn supervised fine-tuning giúp mô hình học cách trả lời đúng ngữ pháp và cấu trúc.",
+            "citations": [
+              "T06-143"
+            ]
+          },
+          {
+            "claim": "Bước cuối cùng của quá trình huấn luyện nhằm đảm bảo mô hình phản hồi phù hợp với ngữ cảnh, sở thích người dùng và đảm bảo tính an toàn.",
+            "citations": [
+              "T06-143",
+              "T06-144"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Đảm bảo tính an toàn cho mô hình",
+            "to_concept": "Quản trị rủi ro hệ thống AI",
+            "explanation": "Việc tinh chỉnh để đảm bảo tính an toàn ở bước cuối huấn luyện là nền tảng để đối mặt với các rủi ro hệ thống như hành vi tiêu cực hoặc lỗi logic ngoài dự kiến khi triển khai thực tế.",
+            "source_citations": [
+              "T06-143",
+              "T06-144"
+            ],
+            "target_citations": [
+              "T03-117"
+            ]
+          },
+          {
+            "from_concept": "Supervised fine-tuning",
+            "to_concept": "Lựa chọn phương pháp triển khai AI",
+            "explanation": "Kiến thức về fine-tuning được dùng để chuẩn hóa cấu trúc phản hồi, nhưng cần được cân nhắc kỹ lưỡng so với RAG tùy theo yêu cầu về tính chính xác và đặc thù domain của ứng dụng.",
+            "source_citations": [
+              "T06-143"
+            ],
+            "target_citations": [
+              "T03-119"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 265,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 1705,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Trong các ngành đòi hỏi độ chính xác cao như y tế hay tài chính, cần thiết lập mức độ sáng tạo (temperature) ở mức thấp.\",\n      \"citations\": [\"T06-140\"]\n    },\n    {\n      \"claim\": \"Cơ chế xử lý của LLM là đoán token kế tiếp dựa trên các token trước đó, trong đó các token nhìn lẫn nhau và xử lý song song.\",\n      \"citations\": [\"T06-140\"]\n    },\n    {\n      \"claim\": \"Giai đoạn pretraining giúp mô hình học toàn bộ tri thức của loài người nhưng chưa định hình được cách sử dụng kiến thức đúng ngữ pháp.\",\n      \"citations\": [\"T06-141\"]\n    },\n    {\n      \"claim\": \"Lượng dữ liệu khổng lồ của phiên bản năm 2022 tương đương với việc một giáo sư đọc liên tục 8 tiếng mỗi ngày trong suốt 2.600 năm.\",\n      \"citations\": [\"T06-142\"]\n    },\n    {\n      \"claim\": \"Giai đoạn supervised fine-tuning giúp mô hình học cách trả lời đúng ngữ pháp và cấu trúc.\",\n      \"citations\": [\"T06-143\"]\n    },\n    {\n      \"claim\": \"Bước cuối cùng của quá trình huấn luyện nhằm đảm bảo mô hình phản hồi phù hợp với ngữ cảnh, sở thích người dùng và đảm bảo tính an toàn.\",\n      \"citations\": [\"T06-143\", \"T06-144\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2897,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Trong các ngành đòi hỏi độ chính xác cao như y tế hay tài chính, cần thiết lập mức độ sáng tạo (temperature) ở mức thấp.\",\n      \"citations\": [\n        \"T06-140\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế xử lý của LLM là đoán token kế tiếp dựa trên các token trước đó, trong đó các token nhìn lẫn nhau và xử lý song song.\",\n      \"citations\": [\n        \"T06-140\"\n      ]\n    },\n    {\n      \"claim\": \"Giai đoạn pretraining giúp mô hình học toàn bộ tri thức của loài người nhưng chưa định hình được cách sử dụng kiến thức đúng ngữ pháp.\",\n      \"citations\": [\n        \"T06-141\"\n      ]\n    },\n    {\n      \"claim\": \"Lượng dữ liệu khổng lồ của phiên bản năm 2022 tương đương với việc một giáo sư đọc liên tục 8 tiếng mỗi ngày trong suốt 2.600 năm.\",\n      \"citations\": [\n        \"T06-142\"\n      ]\n    },\n    {\n      \"claim\": \"Giai đoạn supervised fine-tuning giúp mô hình học cách trả lời đúng ngữ pháp và cấu trúc.\",\n      \"citations\": [\n        \"T06-143\"\n      ]\n    },\n    {\n      \"claim\": \"Bước cuối cùng của quá trình huấn luyện nhằm đảm bảo mô hình phản hồi phù hợp với ngữ cảnh, sở thích người dùng và đảm bảo tính an toàn.\",\n      \"citations\": [\n        \"T06-143\",\n        \"T06-144\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Đảm bảo tính an toàn cho mô hình\",\n      \"to_concept\": \"Quản trị rủi ro hệ thống AI\",\n      \"explanation\": \"Việc tinh chỉnh để đảm bảo tính an toàn ở bước cuối huấn luyện là nền tảng để đối mặt với các rủi ro hệ thống như hành vi tiêu cực hoặc lỗi logic ngoài dự kiến khi triển khai thực tế.\",\n      \"source_citations\": [\n        \"T06-143\",\n        \"T06-144\"\n      ],\n      \"target_citations\": [\n        \"T03-117\"\n      ]\n    },\n    {\n      \"from_concept\": \"Supervised fine-tuning\",\n      \"to_concept\": \"Lựa chọn phương pháp triển khai AI\",\n      \"explanation\": \"Kiến thức về fine-tuning được dùng để chuẩn hóa cấu trúc phản hồi, nhưng cần được cân nhắc kỹ lưỡng so với RAG tùy theo yêu cầu về tính chính xác và đặc thù domain của ứng dụng.\",\n      \"source_citations\": [\n        \"T06-143\"\n      ],\n      \"target_citations\": [\n        \"T03-119\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "hard_truth_01",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:36.227377+00:00",
+      "latency_ms": 5286,
+      "attempts": 2,
+      "output": null,
+      "validator": null,
+      "errors": [
+        "Bridge fail sau retry hoặc API error"
+      ],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2373,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các sản phẩm như ChatGPT, Claude hay Gemini dựa trên nền tảng cốt lõi là các mô hình ngôn ngữ lớn (LLM), trong khi chatbot chỉ đóng vai trò là giao diện tương tác với người dùng.\",\n      \"citations\": [\n        \"[T04-046]\"\n      ]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của các mô hình Transformer là dự đoán xác suất của từ hoặc token tiếp theo dựa trên dữ liệu đã học để tạo ra chuỗi văn bản.\",\n      \"citations\": [\n        \"[T04-047]\"\n      ]\n    },\n    {\n      \"claim\": \"Do cơ chế chỉ tập trung vào việc nối các từ có xác suất cao, mô hình có thể tạo ra văn bản trông hợp lý nhưng chứa thông tin sai lệch, hiện tượng này được gọi là ảo giác (hallucination).\",\n      \"citations\": [\n        \"[T04-048]\"\n      ]\n    },\n    {\n      \"claim\": \"Streaming là chế độ hiển thị kết quả từng từ một thay vì đợi toàn bộ đoạn văn bản được tạo xong, giúp cải thiện trải nghiệm tương tác.\",\n      \"citations\": [\n        \"[T04-048]\"\n      ]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản của LLM, đại diện cho ngôn ngữ của máy thay vì từ ngữ thông thường, với số lượng token cần thiết cho tiếng Việt thường cao hơn tiếng Anh do đặc thù dấu.\",\n      \"citations\": [\n        \"[T04-049]\"\n      ]\n    },\n    {\n      \"claim\": \"Việc tính toán số lượng token là cần thiết khi xây dựng sản phẩm AI để ước tính chi phí, vì mỗi yêu cầu từ người dùng đều tiêu tốn một số lượng token nhất định.\",\n      \"citations\": [\n        \"[T04-050]\"\n      ]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2913,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Các sản phẩm như ChatGPT, Claude hay Gemini dựa trên nền tảng cốt lõi là các mô hình ngôn ngữ lớn (LLM), trong khi chatbot chỉ đóng vai trò là giao diện tương tác với người dùng.\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"Bản chất vận hành của các mô hình Transformer là dự đoán xác suất của từ hoặc token tiếp theo dựa trên dữ liệu đã học để tạo ra chuỗi văn bản.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Do cơ chế chỉ tập trung vào việc nối các từ có xác suất cao, mô hình có thể tạo ra văn bản trông hợp lý nhưng chứa thông tin sai lệch, hiện tượng này được gọi là ảo giác (hallucination).\",\n      \"citations\": [\n        \"T04-048\"\n      ]\n    },\n    {\n      \"claim\": \"Streaming là chế độ hiển thị kết quả từng từ một thay vì đợi toàn bộ đoạn văn bản được tạo xong, giúp cải thiện trải nghiệm tương tác.\",\n      \"citations\": [\n        \"T04-048\"\n      ]\n    },\n    {\n      \"claim\": \"Token là đơn vị tính toán cơ bản của LLM, đại diện cho ngôn ngữ của máy thay vì từ ngữ thông thường, với số lượng token cần thiết cho tiếng Việt thường cao hơn tiếng Anh do đặc thù dấu.\",\n      \"citations\": [\n        \"T04-049\"\n      ]\n    },\n    {\n      \"claim\": \"Việc tính toán số lượng token là cần thiết khi xây dựng sản phẩm AI để ước tính chi phí, vì mỗi yêu cầu từ người dùng đều tiêu tốn một số lượng token cần thiết.\",\n      \"citations\": [\n        \"T04-050\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Cấu trúc chatbot và các ứng dụng AI\",\n      \"to_concept\": \"Tư duy xây dựng sản phẩm AI chuyên nghiệp\",\n      \"explanation\": \"Người học đã làm quen với khái niệm chatbot như một giao diện của LLM, điều này là nền tảng để chuyển sang hiểu sâu hơn về cấu phần và cách phân tách sản phẩm AI so với phần mềm truyền thống.\",\n      \"source_citations\": [\n        \"T04-046\"\n      ],\n      \"target_citations\": [\n        \"T01-025\"\n      ]\n    },\n    {\n      \"from_concept\": \"Sự phát triển của các công cụ AI\",\n      \"to_concept\": \"Tầm quan trọng của kỹ năng AI Engineering\",\n      \"explanation\": \"Từ hiểu biết về cách các mô hình như Claude vận hành, người học cần trang bị kiến thức chuyên sâu về AI Engineering để giải quyết sự thiếu hụt kỹ năng trên thị trường khi xây dựng sản phẩm.\",\n      \"source_citations\": [\n        \"T04-046\"\n      ],\n      \"target_citations\": [\n        \"T01-026\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": [
+            "Vượt 300 từ: 331"
+          ]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case_id": "hard_truth_02",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:40.870028+00:00",
+      "latency_ms": 4638,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Việc tích hợp AI cần xác định giao điểm giữa nhu cầu thực tế và thế mạnh của công nghệ để đảm bảo tính cần thiết.",
+            "citations": [
+              "T02-031"
+            ]
+          },
+          {
+            "claim": "Có hai trạng thái chính khi ứng dụng AI là automation (tự động hóa) và augmentation (tăng cường hỗ trợ).",
+            "citations": [
+              "T02-032"
+            ]
+          },
+          {
+            "claim": "Việc lựa chọn mức độ tự động hóa tạo thành một phổ, không phải hai thái cực tách biệt.",
+            "citations": [
+              "T02-032"
+            ]
+          },
+          {
+            "claim": "Quy trình triển khai an toàn thường bắt đầu từ augmentation và tăng dần mức độ automate khi kiểm soát được rủi ro.",
+            "citations": [
+              "T02-033"
+            ]
+          },
+          {
+            "claim": "Những công việc có hậu quả sai sót nghiêm trọng cần ưu tiên duy trì ở mức độ augmentation để con người giám sát.",
+            "citations": [
+              "T02-034"
+            ]
+          },
+          {
+            "claim": "Ma trận tác động giúp ưu tiên xử lý automation cho các tác vụ có impact lớn.",
+            "citations": [
+              "T02-034"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Sử dụng augmentation để kiểm soát rủi ro sai sót",
+            "to_concept": "Thiết lập lớp kiểm soát safety trong hệ thống AI",
+            "explanation": "Triết lý ưu tiên augmentation cho các tác vụ có hậu quả nghiêm trọng từ buổi trước được hiện thực hóa bằng việc thiết lập các lớp safety và logic hard-code nhằm ngăn chặn rủi ro khi AI hoạt động sai.",
+            "source_citations": [
+              "T02-034"
+            ],
+            "target_citations": [
+              "T03-080"
+            ]
+          },
+          {
+            "from_concept": "Phân loại tác vụ dựa trên độ hậu quả và mức độ can thiệp",
+            "to_concept": "Đánh giá khả năng sai sót của AI khi triển khai dự án",
+            "explanation": "Từ việc nhận diện độ hậu quả của công việc để quyết định mức độ automate, hệ thống hiện tại yêu cầu team phải dự báo cụ thể các kịch bản AI sai sót trong workflow để đảm bảo an toàn.",
+            "source_citations": [
+              "T02-034"
+            ],
+            "target_citations": [
+              "T03-081"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 259,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 1840,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Việc tích hợp AI cần xác định giao điểm giữa nhu cầu thực tế và thế mạnh của công nghệ để đảm bảo tính cần thiết.\",\n      \"citations\": [\"T02-031\"]\n    },\n    {\n      \"claim\": \"Có hai trạng thái chính khi ứng dụng AI là automation (tự động hóa) và augmentation (tăng cường hỗ trợ).\",\n      \"citations\": [\"T02-032\"]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mức độ tự động hóa tạo thành một phổ, không phải hai thái cực tách biệt.\",\n      \"citations\": [\"T02-032\"]\n    },\n    {\n      \"claim\": \"Quy trình triển khai an toàn thường bắt đầu từ augmentation và tăng dần mức độ automate khi kiểm soát được rủi ro.\",\n      \"citations\": [\"T02-033\"]\n    },\n    {\n      \"claim\": \"Những công việc có hậu quả sai sót nghiêm trọng cần ưu tiên duy trì ở mức độ augmentation để con người giám sát.\",\n      \"citations\": [\"T02-034\"]\n    },\n    {\n      \"claim\": \"Ma trận tác động giúp ưu tiên xử lý automation cho các tác vụ có impact lớn.\",\n      \"citations\": [\"T02-034\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2798,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Việc tích hợp AI cần xác định giao điểm giữa nhu cầu thực tế và thế mạnh của công nghệ để đảm bảo tính cần thiết.\",\n      \"citations\": [\n        \"T02-031\"\n      ]\n    },\n    {\n      \"claim\": \"Có hai trạng thái chính khi ứng dụng AI là automation (tự động hóa) và augmentation (tăng cường hỗ trợ).\",\n      \"citations\": [\n        \"T02-032\"\n      ]\n    },\n    {\n      \"claim\": \"Việc lựa chọn mức độ tự động hóa tạo thành một phổ, không phải hai thái cực tách biệt.\",\n      \"citations\": [\n        \"T02-032\"\n      ]\n    },\n    {\n      \"claim\": \"Quy trình triển khai an toàn thường bắt đầu từ augmentation và tăng dần mức độ automate khi kiểm soát được rủi ro.\",\n      \"citations\": [\n        \"T02-033\"\n      ]\n    },\n    {\n      \"claim\": \"Những công việc có hậu quả sai sót nghiêm trọng cần ưu tiên duy trì ở mức độ augmentation để con người giám sát.\",\n      \"citations\": [\n        \"T02-034\"\n      ]\n    },\n    {\n      \"claim\": \"Ma trận tác động giúp ưu tiên xử lý automation cho các tác vụ có impact lớn.\",\n      \"citations\": [\n        \"T02-034\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Sử dụng augmentation để kiểm soát rủi ro sai sót\",\n      \"to_concept\": \"Thiết lập lớp kiểm soát safety trong hệ thống AI\",\n      \"explanation\": \"Triết lý ưu tiên augmentation cho các tác vụ có hậu quả nghiêm trọng từ buổi trước được hiện thực hóa bằng việc thiết lập các lớp safety và logic hard-code nhằm ngăn chặn rủi ro khi AI hoạt động sai.\",\n      \"source_citations\": [\n        \"T02-034\"\n      ],\n      \"target_citations\": [\n        \"T03-080\"\n      ]\n    },\n    {\n      \"from_concept\": \"Phân loại tác vụ dựa trên độ hậu quả và mức độ can thiệp\",\n      \"to_concept\": \"Đánh giá khả năng sai sót của AI khi triển khai dự án\",\n      \"explanation\": \"Từ việc nhận diện độ hậu quả của công việc để quyết định mức độ automate, hệ thống hiện tại yêu cầu team phải dự báo cụ thể các kịch bản AI sai sót trong workflow để đảm bảo an toàn.\",\n      \"source_citations\": [\n        \"T02-034\"\n      ],\n      \"target_citations\": [\n        \"T03-081\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "hard_missing_01",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:24:26.700913+00:00",
+      "latency_ms": 879,
+      "attempts": 1,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "recap model báo insufficient_context"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 4,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 879,
+          "raw_output": "{\"status\":\"insufficient_context\",\"recap\":[],\"bridges\":[],\"warnings\":[\"The provided source content is too brief to generate 5-7 distinct claims.\"]}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "hard_missing_02",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:40.871933+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "nguồn buổi trước có ít hơn 5 đoạn độc lập"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 10,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    },
+    {
+      "case_id": "hard_scope_01",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:40.873681+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "nguồn buổi trước có ít hơn 5 đoạn độc lập"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 10,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    },
+    {
+      "case_id": "hard_scope_02",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:40.875279+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "nguồn buổi trước có ít hơn 5 đoạn độc lập"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 10,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    },
+    {
+      "case_id": "hard_domain_01",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:45.612632+00:00",
+      "latency_ms": 4736,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Kiến trúc transformer được giới thiệu qua bài báo 'Attention Is All You Need' của Google vào năm 2017.",
+            "citations": [
+              "T04-038",
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Transformer khắc phục hạn chế của RNN bằng cách xử lý cả cụm văn bản thay vì đọc từng từ một cách tuần tự.",
+            "citations": [
+              "T04-039",
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Cơ chế 'attention' giúp mô hình xác định và tập trung vào các từ khóa quan trọng để hiểu ngữ nghĩa văn bản.",
+            "citations": [
+              "T04-040"
+            ]
+          },
+          {
+            "claim": "Token là đơn vị xử lý ngôn ngữ cơ bản của các mô hình ngôn ngữ lớn, không đồng nhất với từ hay ký tự.",
+            "citations": [
+              "T04-049"
+            ]
+          },
+          {
+            "claim": "Số lượng token thay đổi tùy theo ngôn ngữ; ví dụ tiếng Việt thường tốn nhiều token hơn tiếng Anh do có dấu.",
+            "citations": [
+              "T04-049"
+            ]
+          },
+          {
+            "claim": "Việc nắm vững cách tính token là cần thiết để dự báo chi phí khi xây dựng và vận hành các sản phẩm AI như chatbot.",
+            "citations": [
+              "T04-050"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Xây dựng sản phẩm AI (Chatbot)",
+            "to_concept": "Phát triển hệ thống LMS (Learning Management System)",
+            "explanation": "Việc nắm vững cách tính chi phí token của mô hình ngôn ngữ là nền tảng để dự toán vận hành khi xây dựng chatbot, tương tự như việc cần tư duy hệ thống sâu sắc khi phát triển hoặc tích hợp các hệ thống LMS để tránh việc lắp ghép rời rạc.",
+            "source_citations": [
+              "T04-050"
+            ],
+            "target_citations": [
+              "T06-120"
+            ]
+          },
+          {
+            "from_concept": "Sự tối ưu của transformer",
+            "to_concept": "Hệ sinh thái Google Education và Google Classroom",
+            "explanation": "Nếu transformer cải thiện dịch máy bằng cách xử lý văn bản hiệu quả hơn RNN, thì Google Classroom tận dụng các nền tảng mạnh mẽ (như Workspace) để giải quyết bài toán vận hành quy mô lớn cho hàng trăm triệu người dùng, đóng vai trò như 'bộ xương sống' trong giáo dục.",
+            "source_citations": [
+              "T04-040"
+            ],
+            "target_citations": [
+              "T06-123"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 274,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 1908,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Kiến trúc transformer được giới thiệu qua bài báo 'Attention Is All You Need' của Google vào năm 2017.\",\n      \"citations\": [\"T04-038\", \"T04-040\"]\n    },\n    {\n      \"claim\": \"Transformer khắc phục hạn chế của RNN bằng cách xử lý cả cụm văn bản thay vì đọc từng từ một cách tuần tự.\",\n      \"citations\": [\"T04-039\", \"T04-040\"]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' giúp mô hình xác định và tập trung vào các từ khóa quan trọng để hiểu ngữ nghĩa văn bản.\",\n      \"citations\": [\"T04-040\"]\n    },\n    {\n      \"claim\": \"Token là đơn vị xử lý ngôn ngữ cơ bản của các mô hình ngôn ngữ lớn, không đồng nhất với từ hay ký tự.\",\n      \"citations\": [\"T04-049\"]\n    },\n    {\n      \"claim\": \"Số lượng token thay đổi tùy theo ngôn ngữ; ví dụ tiếng Việt thường tốn nhiều token hơn tiếng Anh do có dấu.\",\n      \"citations\": [\"T04-049\"]\n    },\n    {\n      \"claim\": \"Việc nắm vững cách tính token là cần thiết để dự báo chi phí khi xây dựng và vận hành các sản phẩm AI như chatbot.\",\n      \"citations\": [\"T04-050\"]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2827,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Kiến trúc transformer được giới thiệu qua bài báo 'Attention Is All You Need' của Google vào năm 2017.\",\n      \"citations\": [\n        \"T04-038\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Transformer khắc phục hạn chế của RNN bằng cách xử lý cả cụm văn bản thay vì đọc từng từ một cách tuần tự.\",\n      \"citations\": [\n        \"T04-039\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' giúp mô hình xác định và tập trung vào các từ khóa quan trọng để hiểu ngữ nghĩa văn bản.\",\n      \"citations\": [\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Token là đơn vị xử lý ngôn ngữ cơ bản của các mô hình ngôn ngữ lớn, không đồng nhất với từ hay ký tự.\",\n      \"citations\": [\n        \"T04-049\"\n      ]\n    },\n    {\n      \"claim\": \"Số lượng token thay đổi tùy theo ngôn ngữ; ví dụ tiếng Việt thường tốn nhiều token hơn tiếng Anh do có dấu.\",\n      \"citations\": [\n        \"T04-049\"\n      ]\n    },\n    {\n      \"claim\": \"Việc nắm vững cách tính token là cần thiết để dự báo chi phí khi xây dựng và vận hành các sản phẩm AI như chatbot.\",\n      \"citations\": [\n        \"T04-050\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Xây dựng sản phẩm AI (Chatbot)\",\n      \"to_concept\": \"Phát triển hệ thống LMS (Learning Management System)\",\n      \"explanation\": \"Việc nắm vững cách tính chi phí token của mô hình ngôn ngữ là nền tảng để dự toán vận hành khi xây dựng chatbot, tương tự như việc cần tư duy hệ thống sâu sắc khi phát triển hoặc tích hợp các hệ thống LMS để tránh việc lắp ghép rời rạc.\",\n      \"source_citations\": [\n        \"T04-050\"\n      ],\n      \"target_citations\": [\n        \"T06-120\"\n      ]\n    },\n    {\n      \"from_concept\": \"Sự tối ưu của transformer\",\n      \"to_concept\": \"Hệ sinh thái Google Education và Google Classroom\",\n      \"explanation\": \"Nếu transformer cải thiện dịch máy bằng cách xử lý văn bản hiệu quả hơn RNN, thì Google Classroom tận dụng các nền tảng mạnh mẽ (như Workspace) để giải quyết bài toán vận hành quy mô lớn cho hàng trăm triệu người dùng, đóng vai trò như 'bộ xương sống' trong giáo dục.\",\n      \"source_citations\": [\n        \"T04-040\"\n      ],\n      \"target_citations\": [\n        \"T06-123\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "hard_domain_02",
+      "case_version": "1.0",
+      "expected_status": "ok",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:49.177738+00:00",
+      "latency_ms": 3560,
+      "attempts": 2,
+      "output": {
+        "status": "ok",
+        "recap": [
+          {
+            "claim": "Prompt engineering là quá trình thiết kế các chỉ dẫn dành cho mô hình ngôn ngữ.",
+            "citations": [
+              "DOM-101"
+            ]
+          },
+          {
+            "claim": "Few-shot prompt hỗ trợ cải thiện phản hồi bằng cách cung cấp các ví dụ đầu vào và đầu ra cụ thể.",
+            "citations": [
+              "DOM-102"
+            ]
+          },
+          {
+            "claim": "System prompt được sử dụng để xác định vai trò của AI và thiết lập các ràng buộc trong tương tác.",
+            "citations": [
+              "DOM-103"
+            ]
+          },
+          {
+            "claim": "Chain-of-Thought là kỹ thuật giúp mô hình trình bày rõ ràng các bước suy luận logic.",
+            "citations": [
+              "DOM-104"
+            ]
+          },
+          {
+            "claim": "Structured output đảm bảo kết quả trả về từ mô hình tuân thủ đúng định dạng đã yêu cầu.",
+            "citations": [
+              "DOM-105"
+            ]
+          }
+        ],
+        "bridges": [
+          {
+            "from_concept": "Structured output",
+            "to_concept": "Workflow chaining",
+            "explanation": "Kết quả được kiểm soát định dạng bởi structured output là nền tảng để truyền dữ liệu giữa các bước trong workflow chaining.",
+            "source_citations": [
+              "DOM-105"
+            ],
+            "target_citations": [
+              "DOM-201"
+            ]
+          },
+          {
+            "from_concept": "Chain-of-Thought",
+            "to_concept": "Deterministic gate",
+            "explanation": "Khả năng suy luận từ Chain-of-Thought tạo ra các giá trị đầu ra cần thiết để hệ thống thực hiện kiểm tra điều kiện tại các deterministic gate.",
+            "source_citations": [
+              "DOM-104"
+            ],
+            "target_citations": [
+              "DOM-202"
+            ]
+          },
+          {
+            "from_concept": "Prompt engineering",
+            "to_concept": "Evaluation",
+            "explanation": "Các chỉ dẫn thiết kế từ prompt engineering cần được kiểm chứng thông qua quy trình đánh giá (evaluation) để đảm bảo chất lượng vận hành của workflow.",
+            "source_citations": [
+              "DOM-101"
+            ],
+            "target_citations": [
+              "DOM-203"
+            ]
+          }
+        ],
+        "warnings": []
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 190,
+        "recap_has_existing_citation": true,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 1369,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Prompt engineering là quá trình thiết kế các chỉ dẫn dành cho mô hình ngôn ngữ.\",\n      \"citations\": [\"DOM-101\"]\n    },\n    {\n      \"claim\": \"Few-shot prompt hỗ trợ cải thiện phản hồi bằng cách cung cấp các ví dụ đầu vào và đầu ra cụ thể.\",\n      \"citations\": [\"DOM-102\"]\n    },\n    {\n      \"claim\": \"System prompt được sử dụng để xác định vai trò của AI và thiết lập các ràng buộc trong tương tác.\",\n      \"citations\": [\"DOM-103\"]\n    },\n    {\n      \"claim\": \"Chain-of-Thought là kỹ thuật giúp mô hình trình bày rõ ràng các bước suy luận logic.\",\n      \"citations\": [\"DOM-104\"]\n    },\n    {\n      \"claim\": \"Structured output đảm bảo kết quả trả về từ mô hình tuân thủ đúng định dạng đã yêu cầu.\",\n      \"citations\": [\"DOM-105\"]\n    }\n  ],\n  \"bridges\": [],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2190,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Prompt engineering là quá trình thiết kế các chỉ dẫn dành cho mô hình ngôn ngữ.\",\n      \"citations\": [\n        \"DOM-101\"\n      ]\n    },\n    {\n      \"claim\": \"Few-shot prompt hỗ trợ cải thiện phản hồi bằng cách cung cấp các ví dụ đầu vào và đầu ra cụ thể.\",\n      \"citations\": [\n        \"DOM-102\"\n      ]\n    },\n    {\n      \"claim\": \"System prompt được sử dụng để xác định vai trò của AI và thiết lập các ràng buộc trong tương tác.\",\n      \"citations\": [\n        \"DOM-103\"\n      ]\n    },\n    {\n      \"claim\": \"Chain-of-Thought là kỹ thuật giúp mô hình trình bày rõ ràng các bước suy luận logic.\",\n      \"citations\": [\n        \"DOM-104\"\n      ]\n    },\n    {\n      \"claim\": \"Structured output đảm bảo kết quả trả về từ mô hình tuân thủ đúng định dạng đã yêu cầu.\",\n      \"citations\": [\n        \"DOM-105\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Structured output\",\n      \"to_concept\": \"Workflow chaining\",\n      \"explanation\": \"Kết quả được kiểm soát định dạng bởi structured output là nền tảng để truyền dữ liệu giữa các bước trong workflow chaining.\",\n      \"source_citations\": [\n        \"DOM-105\"\n      ],\n      \"target_citations\": [\n        \"DOM-201\"\n      ]\n    },\n    {\n      \"from_concept\": \"Chain-of-Thought\",\n      \"to_concept\": \"Deterministic gate\",\n      \"explanation\": \"Khả năng suy luận từ Chain-of-Thought tạo ra các giá trị đầu ra cần thiết để hệ thống thực hiện kiểm tra điều kiện tại các deterministic gate.\",\n      \"source_citations\": [\n        \"DOM-104\"\n      ],\n      \"target_citations\": [\n        \"DOM-202\"\n      ]\n    },\n    {\n      \"from_concept\": \"Prompt engineering\",\n      \"to_concept\": \"Evaluation\",\n      \"explanation\": \"Các chỉ dẫn thiết kế từ prompt engineering cần được kiểm chứng thông qua quy trình đánh giá (evaluation) để đảm bảo chất lượng vận hành của workflow.\",\n      \"source_citations\": [\n        \"DOM-101\"\n      ],\n      \"target_citations\": [\n        \"DOM-203\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "rare_01",
+      "case_version": "1.0",
+      "expected_status": "low_overlap",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:54.123209+00:00",
+      "latency_ms": 4940,
+      "attempts": 2,
+      "output": null,
+      "validator": null,
+      "errors": [
+        "Bridge fail sau retry hoặc API error"
+      ],
+      "attempt_log": [
+        {
+          "stage": "recap",
+          "attempt": 1,
+          "latency_ms": 2007,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Bài báo 'Attention Is All You Need' năm 2017 do Google công bố là nền tảng khởi điểm của kiến trúc transformer.\",\n      \"citations\": [\"T04-038\", \"T04-040\"]\n    },\n    {\n      \"claim\": \"Kiến trúc transformer khắc phục nhược điểm xử lý tuần tự từng từ của mô hình RNN, cho phép nhận diện mối liên hệ giữa các từ trong cả câu dài.\",\n      \"citations\": [\"T04-039\", \"T04-040\"]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' giúp mô hình tập trung vào các từ khóa quan trọng và hiểu rõ ngữ nghĩa thay vì dịch từng từ riêng lẻ.\",\n      \"citations\": [\"T04-040\"]\n    },\n    {\n      \"claim\": \"Các ứng dụng như ChatGPT, Claude hay Gemini sử dụng giao diện chatbot làm lớp vỏ bên ngoài, trong khi nền tảng cốt lõi là mô hình ngôn ngữ lớn (LLM).\",\n      \"citations\": [\"T04-046\"]\n    },\n    {\n      \"claim\": \"LLM hoạt động dựa trên cơ chế dự đoán xác suất các từ hoặc token tiếp theo dựa trên dữ liệu đã học.\",\n      \"citations\": [\"T04-047\"]\n    },\n    {\n      \"claim\": \"Quá trình sinh dữ liệu của transformer là một vòng lặp: dự đoán từ tiếp theo, thêm vào chuỗi ban đầu, sau đó cập nhật lại để dự đoán từ kế tiếp cho đến khi kết thúc.\",\n      \"citations\": [\"T04-047\"]\n    }\n  ],\n  \"bridges\": []\n}",
+          "validation_errors": []
+        },
+        {
+          "stage": "bridge",
+          "attempt": 1,
+          "latency_ms": 2932,
+          "raw_output": "{\n  \"status\": \"ok\",\n  \"recap\": [\n    {\n      \"claim\": \"Bài báo 'Attention Is All You Need' năm 2017 do Google công bố là nền tảng khởi điểm của kiến trúc transformer.\",\n      \"citations\": [\n        \"T04-038\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Kiến trúc transformer khắc phục nhược điểm xử lý tuần tự từng từ của mô hình RNN, cho phép nhận diện mối liên hệ giữa các từ trong cả câu dài.\",\n      \"citations\": [\n        \"T04-039\",\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Cơ chế 'attention' giúp mô hình tập trung vào các từ khóa quan trọng và hiểu rõ ngữ nghĩa thay vì dịch từng từ riêng lẻ.\",\n      \"citations\": [\n        \"T04-040\"\n      ]\n    },\n    {\n      \"claim\": \"Các ứng dụng như ChatGPT, Claude hay Gemini sử dụng giao diện chatbot làm lớp vỏ bên ngoài, trong khi nền tảng cốt lõi là mô hình ngôn ngữ lớn (LLM).\",\n      \"citations\": [\n        \"T04-046\"\n      ]\n    },\n    {\n      \"claim\": \"LLM hoạt động dựa trên cơ chế dự đoán xác suất các từ hoặc token tiếp theo dựa trên dữ liệu đã học.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    },\n    {\n      \"claim\": \"Quá trình sinh dữ liệu của transformer là một vòng lặp: dự đoán từ tiếp theo, thêm vào chuỗi ban đầu, sau đó cập nhật lại để dự đoán từ kế tiếp cho đến khi kết thúc.\",\n      \"citations\": [\n        \"T04-047\"\n      ]\n    }\n  ],\n  \"bridges\": [\n    {\n      \"from_concept\": \"Cơ chế dự đoán xác suất trong LLM\",\n      \"to_concept\": \"Đo lường hiệu quả thông qua giả thuyết và dữ liệu\",\n      \"explanation\": \"Cơ chế dự đoán xác suất của transformer dựa trên dữ liệu đã học tương đồng với cách các sản phẩm xây dựng giả thuyết (assumption) dựa trên phân tích dữ liệu để đo lường giá trị tính năng.\",\n      \"source_citations\": [\n        \"T04-047\"\n      ],\n      \"target_citations\": [\n        \"T02-025\"\n      ]\n    },\n    {\n      \"from_concept\": \"Quá trình lặp lại dự đoán và cập nhật dữ liệu của Transformer\",\n      \"to_concept\": \"Nguyên lý kiểm soát biến trong A/B Testing\",\n      \"explanation\": \"Sự lặp lại trong vòng lặp sinh dữ liệu của transformer (dự đoán-cập nhật-dự đoán) đòi hỏi sự nhất quán, tương tự như việc duy trì tính ổn định của các nhóm kiểm soát trong A/B testing để đánh giá hiệu quả từng biến riêng lẻ.\",\n      \"source_citations\": [\n        \"T04-047\"\n      ],\n      \"target_citations\": [\n        \"T02-029\"\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+          "validation_errors": [
+            "Fallback sai: expected=low_overlap, actual=ok"
+          ]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "case_id": "rare_02",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:54.128731+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "nguồn buổi trước có ít hơn 5 đoạn độc lập"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 10,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    },
+    {
+      "case_id": "rare_03",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:54.133366+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "nguồn buổi trước có ít hơn 5 đoạn độc lập"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 10,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    },
+    {
+      "case_id": "rare_04",
+      "case_version": "1.0",
+      "expected_status": "insufficient_context",
+      "model": "gemini-3.1-flash-lite",
+      "prompt_version": "v1",
+      "prompt_hashes": {
+        "system_prompt.md": "52c063c7612663020c0274071ad8fa5f9cf3113ad4230812ca55558c1e11cac1",
+        "recap_prompt.md": "9867932f90523b2b0ca95117b6b4e0dba631fea07f1a3ac471f8a4ec3884a937",
+        "bridge_prompt.md": "1bee5d2fbd023692ce7a2c2da7d52ba993e82735e28454ab4163df32492758a6"
+      },
+      "timestamp_utc": "2026-07-31T03:32:54.136577+00:00",
+      "latency_ms": 0,
+      "attempts": 0,
+      "output": {
+        "status": "insufficient_context",
+        "recap": [],
+        "bridges": [],
+        "warnings": [
+          "thiếu nguồn buổi hiện tại"
+        ]
+      },
+      "validator": {
+        "passed": true,
+        "errors": [],
+        "word_count": 5,
+        "recap_has_existing_citation": false,
+        "untraceable_bridge_count": 0
+      },
+      "errors": [],
+      "attempt_log": [],
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "total_cases": 22,
+    "recap_eligible_cases": 15,
+    "case_pass_percent": 81.8,
+    "recap_with_existing_citation_percent": 73.3,
+    "untraceable_bridge_count": 0,
+    "user_helpfulness": "pending validation"
+  }
+}
