@@ -459,6 +459,21 @@ h1 {
   margin-left: 0.35rem;
 }
 
+.markdown-stream {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.markdown-stream pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.7;
+}
+
 .practice-options {
   display: grid;
   gap: 0.6rem;
@@ -486,6 +501,29 @@ h1 {
 
 .roadmap-finish {
   margin-top: 0.5rem;
+}
+
+.open-answer-view {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.open-answer-label {
+  display: block;
+  margin: 1.2rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.open-answer-textarea {
+  width: 100%;
+  min-height: 130px;
+  box-sizing: border-box;
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+  font: inherit;
+  resize: vertical;
 }
 
 .self-check-card textarea {

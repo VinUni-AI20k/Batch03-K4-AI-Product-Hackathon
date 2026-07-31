@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 class Segment:
     segment_id: str
     text: str
+    slide_id: str | None = None
 
 
 @dataclass
@@ -19,6 +20,7 @@ class Section:
     section_id: str
     title: str
     segments: list[Segment] = field(default_factory=list)
+    slide_ids: list[str] = field(default_factory=list)
 
     @property
     def key_points(self) -> list[str]:
@@ -64,6 +66,11 @@ def parse_transcript(markdown_text: str, section_prefix: str = "S") -> list[Sect
 
 def outline_json(sections: list[Section]) -> list[dict]:
     return [
-        {"section_id": s.section_id, "title": s.title, "key_points": s.key_points}
+        {
+            "section_id": s.section_id,
+            "title": s.title,
+            "key_points": s.key_points,
+            "slide_ids": s.slide_ids,
+        }
         for s in sections
     ]

@@ -1,36 +1,41 @@
+import type {
+  GradeResult,
+  McqQuestion,
+  OutlineSection,
+  QuizPayload,
+  Section,
+  SectionStat,
+  SelfCheckGrade,
+} from "../../../shared/types";
+
+export type {
+  GradeResult,
+  McqQuestion,
+  OutlineSection,
+  QuizPayload,
+  Section,
+  SectionStat,
+  SelfCheckGrade,
+} from "../../../shared/types";
+
 const BACKEND_URL = "http://127.0.0.1:8000";
 
-export type Section = string;
-
-export type OutlineSection = {
-  section_id: Section;
-  title: string;
-  key_points: string[];
-};
-
-export type McqQuestion = {
-  id: string;
-  section: Section;
-  question: string;
-  options: string[];
-  answer: string;
-  explanation: string;
-  segment_id?: string;
-};
-
-export type SectionStat = { section: Section; correct: number; total: number };
-export type SectionStat = { section: Section; correct: number; total: number };
-
-export type GradeResult = {
-  correctCount: number;
-  total: number;
-  accuracy: number;
-  bySection: SectionStat[];
-  weakSections: Section[];
-  goodSections: Section[];
-};
-
 export const MASTERY_THRESHOLD = 0.8;
+
+export async function gradeSelfCheck(payload: {
+  section_id: string;
+  question: string;
+  learner_answer: string;
+  source_context: string;
+}): Promise<SelfCheckGrade> {
+  const response = await fetch(`${BACKEND_URL}/api/reteach/self-check/grade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error("Self-check grading unavailable");
+  return response.json();
+}
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,10 +44,19 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // thiếu, ghi rõ trong docs/product-overview.md.
 export async function uploadSlide(
   file: File,
-): Promise<{ textContent: string }> {
-  await delay(400);
+): Promise<{ textContent: string; outline: OutlineSection[] }> {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await fetch(`${BACKEND_URL}/api/outline/pdf`, {
+    method: "POST",
+    body: form,
+  });
+  if (!response.ok)
+    throw new Error("Không thể trích xuất outline từ PDF slide");
+  const data = await response.json();
   return {
-    textContent: `Đã nhận ${file.name}. Demo dùng transcript thật: "Xác định bài toán kinh doanh cho AI" (Day 2 sáng, data pack).`,
+    textContent: `Đã trích xuất ${file.name} từ slide PDF.`,
+    outline: data.outline,
   };
 }
 
@@ -50,6 +64,7 @@ type RawBackendQuestion = {
   question: string;
   options: string[];
   correct_index: number;
+  misconception_tag?: string;
   section_id: string;
   segment_id: string;
   explanation: string;
@@ -59,7 +74,28 @@ type GenerateQuizResponse = {
   questions: RawBackendQuestion[];
 };
 
-// ---- QUYẾT ĐỊNH AI TRUNG TÂM: gọi backend thật (OpenAI), không hardcode ----
+/** Convert the backend's generated MCQ into the single payload shape used by UI and diagnosis. */
+function normalizeQuizPayload(data: GenerateQuizResponse): QuizPayload {
+  return {
+    outline: data.outline,
+    questions: data.questions.map((question, index) => ({
+      id: `${question.section_id}-${index}`,
+      section_id: question.section_id,
+      question: question.question,
+      options: question.options.map((text, optionIndex) => ({
+        text,
+        misconception_tag:
+          optionIndex === question.correct_index
+            ? undefined
+            : question.misconception_tag,
+      })),
+      correct_index: question.correct_index,
+      explanation: question.explanation,
+      segment_id: question.segment_id,
+    })),
+  };
+}
+
 export async function generateQuiz(): Promise<{
   outline: OutlineSection[];
   questions: McqQuestion[];
@@ -72,33 +108,42 @@ export async function generateQuiz(): Promise<{
     throw new Error(`Sinh MCQ thất bại: ${body.detail ?? res.statusText}`);
   }
   const data: GenerateQuizResponse = await res.json();
-  const questions: McqQuestion[] = data.questions.map((q, i) => ({
-    id: `${q.section_id}-${i}`,
-    section: q.section_id,
-    question: q.question,
-    options: q.options,
-    answer: q.options[q.correct_index],
-    explanation: q.explanation,
-    segment_id: q.segment_id,
-  }));
-  return { outline: data.outline, questions };
+  return normalizeQuizPayload(data);
+}
+
+export async function generateQuizFromPdf(file: File): Promise<{
+  outline: OutlineSection[];
+  questions: McqQuestion[];
+}> {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await fetch(
+    `${BACKEND_URL}/api/quiz/generate/pdf?n_questions=20`,
+    {
+      method: "POST",
+      body: form,
+    },
+  );
+  if (!response.ok) throw new Error("Không thể sinh quiz từ slide PDF");
+  const data: GenerateQuizResponse = await response.json();
+  return normalizeQuizPayload(data);
 }
 
 export async function gradeQuiz(
   questions: McqQuestion[],
-  answers: string[],
+  answers: number[],
 ): Promise<GradeResult> {
   await delay(200);
   const bySectionMap = new Map<Section, SectionStat>();
   questions.forEach((q, i) => {
-    const stat = bySectionMap.get(q.section) ?? {
-      section: q.section,
+    const stat = bySectionMap.get(q.section_id) ?? {
+      section: q.section_id,
       correct: 0,
       total: 0,
     };
     stat.total += 1;
-    if (answers[i] === q.answer) stat.correct += 1;
-    bySectionMap.set(q.section, stat);
+    if (answers[i] === q.correct_index) stat.correct += 1;
+    bySectionMap.set(q.section_id, stat);
   });
   const bySection = Array.from(bySectionMap.values());
   const weakSections = bySection
@@ -121,6 +166,7 @@ export async function gradeQuiz(
 export type StudyContent = {
   section: Section;
   title: string;
+  markdown: string;
   summary: string;
   example: string;
   practice: { question: string; options: string[]; answer: string } | null;
@@ -134,22 +180,42 @@ export async function getStudyContent(
   sections: Section[],
   outline: OutlineSection[],
   questionPool: McqQuestion[],
+  level = "intermediate",
+  style = "both",
+  timeAvailableMinutes = 15,
 ): Promise<StudyContent[]> {
   await delay(400);
   return sections.map((sectionId) => {
     const outlineSection = outline.find((o) => o.section_id === sectionId);
-    const poolQuestion = questionPool.find((q) => q.section === sectionId);
+    const poolQuestion = questionPool.find((q) => q.section_id === sectionId);
+    const summary =
+      outlineSection?.key_points.join(" ") ?? "(chưa có nội dung)";
+    const citations = questionPool
+      .filter((q) => q.section_id === sectionId && q.segment_id)
+      .map((q) => q.segment_id as string)
+      .filter((id, index, all) => all.indexOf(id) === index);
+    const markdown = [
+      `## ${outlineSection?.title ?? sectionId}`,
+      "",
+      `**Mức độ:** ${level} · **Phong cách:** ${style} · **Thời gian:** ${timeAvailableMinutes} phút`,
+      "",
+      summary,
+      "",
+      `**Citation:** ${citations.length ? citations.map((id) => `[${id}]`).join(", ") : "chưa có"}`,
+    ].join("\n");
     return {
       section: sectionId,
       title: outlineSection?.title ?? sectionId,
+      markdown,
       summary: outlineSection?.key_points.join(" ") ?? "(chưa có tóm tắt)",
       example:
         "(Mock — bước sinh ví dụ thực tế bằng AI chưa build, xem docs/product-overview.md)",
       practice: poolQuestion
         ? {
             question: poolQuestion.question,
-            options: poolQuestion.options,
-            answer: poolQuestion.answer,
+            options: poolQuestion.options.map((option) => option.text),
+            answer:
+              poolQuestion.options[poolQuestion.correct_index]?.text ?? "",
           }
         : null,
       citation: poolQuestion?.segment_id ?? "(không có)",
@@ -168,7 +234,7 @@ export async function generateRetest(
   await delay(300);
   return sections.flatMap((s) =>
     questionPool
-      .filter((q) => q.section === s)
+      .filter((q) => q.section_id === s)
       .slice(0, perSection)
       .map((q) => ({
         ...q,

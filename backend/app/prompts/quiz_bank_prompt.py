@@ -18,12 +18,15 @@ Schema JSON trả về:
       "question": "...",
       "options": ["...", "...", "...", "..."],
       "correct_index": 0,
+      "misconception_tag": "off_by_one_error",
       "section_id": "S1",
       "segment_id": "T01-001",
       "explanation": "giải thích ngắn vì sao đáp án đúng, trích ý từ đoạn gốc"
     }
   ]
 }
+
+Với mỗi đáp án SAI, gắn thêm "misconception_tag": một string ngắn (snake_case, tiếng Anh) mô tả LOẠI nhầm lẫn dẫn đến đáp án đó, ví dụ "forgot_stop_condition", "confuses_index_with_value", "off_by_one_error". Hai đáp án sai ở hai câu khác nhau nhưng cùng bản chất nhầm lẫn PHẢI dùng chung một tag (để hệ thống sau này gộp được). Đáp án đúng không cần tag.
 """
 
 USER_PROMPT_TEMPLATE = """Sinh tối đa {n_questions} câu hỏi MCQ trải đều các section dưới đây.
