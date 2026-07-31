@@ -1,19 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import MindmapTree from '@/app/components/MindmapTree';
 
 // Interfaces for structured data
 interface Scene {
   id: string;
-  type: 'slide' | 'code' | 'dashboard' | 'mindmap' | 'quiz' | 'game';
+  type: 'slide' | 'code' | 'dashboard' | 'mindmap' | 'quiz' | 'game' | 'animation';
   title: string;
-}
-
-interface Peer {
-  initial: string;
-  name: string;
-  role: string;
-  desc: string;
+  sessionIndex?: number;
 }
 
 interface Message {
@@ -23,7 +18,116 @@ interface Message {
   avatar: string;
   name: string;
   showPlay?: boolean;
+  // id nhân vật debate (vd 'curious_mind', 'note_taker'...) - dùng để tô màu
+  // riêng cho từng agent trong UI, giúp người dùng dễ phân biệt ai đang nói.
+  agentId?: string;
 }
+
+interface OutlineItem {
+  index: number;
+  type: 'slide' | 'quiz' | 'animation' | 'mindmap' | string;
+  content: string;
+  // Grounding vào slide gốc (chỉ có ở item type="slide") - do backend gắn lúc upload PDF,
+  // giữ nguyên ở đây để có thể gửi lại cho /api/generate/slide[/stream].
+  page_no?: number | null;
+  page_width?: number | null;
+  page_height?: number | null;
+  bg_image?: string | null;
+  elements?: SlideElement[] | null;
+}
+
+// Shapes returned by POST /api/generate/{type}, mirroring backend app/schemas.py
+interface QuizOption {
+  key: string;
+  text: string;
+}
+
+interface QuizOutput {
+  index: number;
+  type: 'quiz';
+  question: string;
+  question_format: 'multiple_choice';
+  options: QuizOption[];
+  correct_answer: string;
+  explanation: string;
+}
+
+// Phần tử văn bản thực tế trên ĐÚNG trang slide gốc người dùng đã upload (toạ độ PDF gốc)
+interface SlideElement {
+  id: string;
+  text: string;
+  bbox: number[]; // [left, top, right, bottom]
+  label: string;
+}
+
+interface NarrationSegment {
+  text: string;
+  focus_element_id?: string | null;
+  focus_bbox?: number[] | null;
+}
+
+// Slide hiển thị đúng ảnh gốc (bg_image) đã upload; narration chỉ dùng để đọc + khoanh vị trí
+interface SlideOutput {
+  index: number;
+  type: 'slide';
+  title: string;
+  summary: string;
+  narration: NarrationSegment[];
+  page_no?: number | null;
+  page_width?: number | null;
+  page_height?: number | null;
+  bg_image?: string | null;
+  elements: SlideElement[];
+}
+
+interface AnimationStep {
+  order: number;
+  label: string;
+  description: string;
+  duration_ms?: number;
+}
+
+interface AnimationOutput {
+  index: number;
+  type: 'animation';
+  animation_type: 'timeline' | 'flow' | 'comparison';
+  title: string;
+  steps: AnimationStep[];
+  html?: string | null;
+}
+
+interface MindmapNode {
+  id: string;
+  label: string;
+  parent_id?: string | null;
+}
+
+interface MindmapOutput {
+  index: number;
+  type: 'mindmap';
+  root_label: string;
+  nodes: MindmapNode[];
+}
+
+type SessionContent = QuizOutput | SlideOutput | AnimationOutput | MindmapOutput;
+
+const API_BASE = 'http://localhost:8000';
+
+const GENERATE_ENDPOINTS: Record<string, string> = {
+  quiz: `${API_BASE}/api/generate/quiz`,
+  slide: `${API_BASE}/api/generate/slide`,
+  animation: `${API_BASE}/api/generate/animation`,
+  mindmap: `${API_BASE}/api/generate/mindmap`,
+};
+
+const DEBATE_TURN_ENDPOINT = `${API_BASE}/api/debate/turn`;
+
+const OUTLINE_TYPE_ICONS: Record<string, string> = {
+  slide: '📑',
+  quiz: '📝',
+  animation: '🎬',
+  mindmap: '🧠',
+};
 
 const SCENE_TYPES = {
   slide: { label: 'Slide', icon: '📑' },
@@ -32,6 +136,7 @@ const SCENE_TYPES = {
   mindmap: { label: 'Sơ đồ tư duy', icon: '🧠' },
   quiz: { label: 'Bài tập', icon: '📝' },
   game: { label: 'Trò chơi', icon: '🎮' },
+  animation: { label: 'Minh hoạ', icon: '🎬' },
 };
 
 const INITIAL_SCENES: Scene[] = [
@@ -62,29 +167,65 @@ const QUIZ_BANK = [
 
 const GAME_CHIPS = ['for', 'i', 'in', 'range(5):', 'print(i)'];
 
-const PEERS: Peer[] = [
-  { initial: '🙂', name: 'Curious Mind', role: 'Student', desc: 'Always curious, loves asking why and how' },
-  { initial: '🤓', name: 'Logic Master', role: 'Student', desc: 'Thinks in patterns, enjoys solving step by step' },
-  { initial: '✨', name: 'Bright Spark', role: 'Student', desc: 'Quick to try things out, learns by experimenting' },
+interface DebateAgent {
+  id: string;
+  initial: string;
+  name: string;
+  role: string;
+  desc: string;
+}
+
+// Danh sách "nhân vật" tham gia debate mode - id phải khớp đúng với Literal
+// next_speaker trong DebateTurnRequest (backend: app/agents/debate_agent.py).
+const DEBATE_AGENTS: DebateAgent[] = [
+  { id: 'curious_mind', initial: '🙂', name: 'Curious Mind', role: 'Student', desc: 'Always curious, loves asking why and how' },
+  { id: 'logic_master', initial: '🤓', name: 'Logic Master', role: 'Student', desc: 'Thinks in patterns, enjoys solving step by step' },
+  { id: 'bright_spark', initial: '✨', name: 'Bright Spark', role: 'Student', desc: 'Quick to try things out, learns by experimenting' },
+  { id: 'note_taker', initial: '📝', name: 'Note Taker', role: 'Assistant', desc: 'Tóm tắt lại các ý chính trong buổi thảo luận' },
 ];
 
-const DISCUSSION_TEMPLATES: Record<string, (t: string) => string[]> = {
-  'Curious Mind': (t: string) => [
-    `Mình tò mò là tại sao "${t}" lại quan trọng trong bài học này nhỉ?`,
-    `Cho hỏi thêm, "${t}" có liên quan gì tới biến hay vòng lặp không?`,
-    `Có ví dụ thực tế nào cho "${t}" không, mình muốn thử ngay!`
-  ],
-  'Logic Master': (t: string) => [
-    `Theo mình hiểu, "${t}" hoạt động rất logic nếu chia nhỏ từng bước.`,
-    `Nếu áp dụng "${t}" vào bài tập trước thì kết quả sẽ khác đấy.`,
-    `Mình nghĩ nên viết ra sơ đồ để dễ hình dung "${t}" hơn.`
-  ],
-  'Bright Spark': (t: string) => [
-    `Để mình thử code nhanh với "${t}" xem sao!`,
-    `Mình vừa thử nghiệm liên quan tới "${t}" và thấy khá hay ho.`,
-    `"${t}" làm mình nhớ tới một bài tập mình từng làm trước đây.`
-  ]
+const AI_TEACHER = { id: 'ai_teacher', initial: '🧑‍🏫', name: 'AI Teacher' };
+
+// Màu riêng cho từng nhân vật debate, giúp người dùng phân biệt nhanh ai đang
+// nói trong lúc nhiều agent liên tục trao đổi (áp dụng cho avatar + tên +
+// viền trái bong bóng chat, xem .fmsg-row trong globals.css).
+const AGENT_COLORS: Record<string, string> = {
+  curious_mind: '#f5a623',
+  logic_master: '#22c55e',
+  bright_spark: '#ec4899',
+  note_taker: '#06b6d4',
+  ai_teacher: '#8a5cf6',
+  user: '#5b7cfa',
 };
+
+// Chu kỳ lặp lại vô hạn của các nhân vật phát biểu trong 1 buổi debate: 3 bạn
+// học lần lượt, cứ hết 1 vòng thì Note Taker tóm tắt lại 1 lần. Buổi thảo
+// luận cứ lặp lại chu kỳ này MÃI MÃI (không có điểm dừng cố định) cho tới khi
+// người dùng bấm "Kết thúc thảo luận" - lúc đó AI Teacher mới vào tổng kết.
+const DEBATE_CYCLE = ['curious_mind', 'logic_master', 'bright_spark', 'note_taker'];
+
+interface DebateTranscriptEntry {
+  speaker_id: string;
+  speaker_name: string;
+  role: 'user' | 'agent';
+  text: string;
+}
+
+// Bọc đoạn HTML (Tailwind class + <style> @keyframes) do animation_agent sinh ra thành 1 tài
+// liệu HTML đầy đủ để nạp vào <iframe srcDoc>: iframe là 1 document tách biệt nên cần tự nạp
+// Tailwind CDN (JIT runtime) ở đây, không thể dùng lại CSS đã build sẵn của trang chính vì
+// class Tailwind LLM sinh ra là động, Tailwind build-time của Next.js không quét thấy.
+function buildAnimationSrcDoc(html: string): string {
+  return `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>html,body{margin:0;padding:12px;box-sizing:border-box;font-family:inherit;}</style>
+</head>
+<body>${html}</body>
+</html>`;
+}
 
 const LOADING_STEPS = [
   { label: 'Đang phân tích nội dung slide bạn vừa tải lên', from: 0, to: 20 },
@@ -107,6 +248,11 @@ export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadProgressVisible, setUploadProgressVisible] = useState(false);
   const [startBtnReady, setStartBtnReady] = useState(false);
+  const [outline, setOutline] = useState<OutlineItem[]>([]);
+
+  // Per-session generated content, keyed by outline item index
+  const [sessionData, setSessionData] = useState<Record<number, SessionContent>>({});
+  const [quizRuntime, setQuizRuntime] = useState<Record<number, { selected: string | null; answered: boolean }>>({});
 
   // Loading animation state
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
@@ -114,6 +260,7 @@ export default function Home() {
   const [stepStatuses, setStepStatuses] = useState<('pending' | 'active' | 'done')[]>(
     new Array(LOADING_STEPS.length).fill('pending')
   );
+  const [loadingStepLabels, setLoadingStepLabels] = useState<string[]>(LOADING_STEPS.map((s) => s.label));
   const [loadingSub, setLoadingSub] = useState(LOADING_STEPS[0].label);
 
   // App & Slide State
@@ -156,6 +303,8 @@ export default function Home() {
   // Narration (TTS) state
   const [narrationSpeaking, setNarrationSpeaking] = useState(false);
   const [speechTimer, setSpeechTimer] = useState<NodeJS.Timeout | null>(null);
+  const [narrationSegmentText, setNarrationSegmentText] = useState<string | null>(null);
+  const [focusedBbox, setFocusedBbox] = useState<number[] | null>(null);
 
   // Chat and Discussion state
   const [chatBoxOpen, setChatBoxOpen] = useState(false);
@@ -163,12 +312,34 @@ export default function Home() {
   const [chatLog, setChatLog] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [discussionActive, setDiscussionActive] = useState(false);
-  const [typingIndicator, setTypingIndicator] = useState<{ name: string; avatar: string } | null>(null);
+  const [typingIndicator, setTypingIndicator] = useState<{ name: string; avatar: string; agentId: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const playTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Transcript của buổi debate hiện tại, giữ ở ref (không phải state) vì
+  // runDebateLoop là 1 async loop - đọc từ state React trong đó sẽ bị "stale
+  // closure". Nhờ giữ ở ref, tin nhắn người dùng chen vào giữa chừng
+  // (human-in-the-loop) được vòng lặp đọc thấy ngay ở lượt gọi API kế tiếp.
+  const debateTranscriptRef = useRef<DebateTranscriptEntry[]>([]);
+  const debateTopicRef = useRef<string>('');
+  // true khi người dùng bấm "Kết thúc thảo luận" - runDebateLoop kiểm tra cờ
+  // này trước mỗi vòng lặp để biết khi nào dừng và chuyển sang AI Teacher
+  // tổng kết, thay vì có 1 số lượt cố định.
+  const debateStopRef = useRef(false);
+  const streamAbortRef = useRef<AbortController | null>(null);
+  const ttsBufferRef = useRef('');
+  // Giữ tham chiếu utterance đang phát + interval "đánh thức" định kỳ: Chrome/Edge có bug nổi
+  // tiếng là garbage-collect SpeechSynthesisUtterance nếu không còn biến nào giữ tham chiếu tới
+  // nó (utterance chỉ được speechSynthesis giữ tham chiếu YẾU), khiến audio im lặng dừng ngang
+  // mà không có lỗi gì; và tự動 tạm dừng (auto-pause) sau ~15s không thao tác. Giữ ref +
+  // resume() định kỳ để tránh cả 2.
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const ttsKeepAliveRef = useRef<NodeJS.Timeout | null>(null);
+  // Cache giọng đọc tiếng Việt tìm được, vì Chrome nạp danh sách voices bất đồng bộ (sự kiện
+  // onvoiceschanged) - lần gọi getVoices() đầu tiên ngay sau khi trang load thường trả về mảng
+  // rỗng. Nếu chỉ set utterance.lang mà không gán utterance.voice, Chrome hay fallback về giọng
+  // tiếng Anh mặc định và đọc tiếng Việt sai giọng/không dấu.
+  const viVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const chatLogEndRef = useRef<HTMLDivElement>(null);
-  const mindmapCanvasRef = useRef<HTMLDivElement>(null);
 
   // Keyboard navigation
   useEffect(() => {
@@ -184,18 +355,39 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [appVisible, current, scenes.length, loopEnabled, playing]);
 
-  // Handle automatic slide playing
+  // Nạp danh sách giọng đọc của trình duyệt và ghim lại 1 giọng tiếng Việt (ưu tiên vi-VN) vào
+  // viVoiceRef. Chrome nạp voices bất đồng bộ nên phải lắng nghe onvoiceschanged, không chỉ gọi
+  // getVoices() 1 lần lúc mount.
   useEffect(() => {
-    if (playTimerRef.current) clearInterval(playTimerRef.current);
-    if (playing) {
-      playTimerRef.current = setInterval(() => {
-        nextSlide();
-      }, 3000 / playSpeed);
-    }
-    return () => {
-      if (playTimerRef.current) clearInterval(playTimerRef.current);
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const pickViVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const viVoice =
+        voices.find((v) => v.lang?.toLowerCase() === 'vi-vn') ||
+        voices.find((v) => v.lang?.toLowerCase().startsWith('vi')) ||
+        null;
+      if (viVoice) viVoiceRef.current = viVoice;
     };
-  }, [playing, current, playSpeed, scenes.length]);
+    pickViVoice();
+    window.speechSynthesis.addEventListener('voiceschanged', pickViVoice);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', pickViVoice);
+  }, []);
+
+  // playingRef: bản sao của state "playing" nhưng đọc được ngay trong callback bất đồng bộ
+  // (utterance.onend, event NDJSON "done"...) mà không bị đóng băng theo closure cũ (stale).
+  const playingRef = useRef(false);
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
+
+  // Handle automatic slide playing: KHÔNG dùng timer cố định (3s) như trước — timer cố định
+  // luôn cắt ngang giữa lúc agent đang đọc narration vì không biết audio đã đọc xong hay chưa.
+  // Thay vào đó: khi playing=true, đọc narration của scene hiện tại; chỉ chuyển sang scene kế
+  // tiếp SAU KHI audio thật sự đọc xong (xem onNarrationFinished / advanceIfAutoplay bên dưới).
+  useEffect(() => {
+    if (!playing || scenes.length === 0) return;
+    startNarration();
+  }, [playing, current, scenes.length]);
 
   // Update narration when slide changes
   useEffect(() => {
@@ -206,15 +398,6 @@ export default function Home() {
   useEffect(() => {
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog, typingIndicator]);
-
-  // Trigger mindmap build
-  useEffect(() => {
-    if (scenes[current]?.type === 'mindmap') {
-      // Small timeout to wait for react container mounting
-      const timer = setTimeout(buildMindmap, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [current, scenes]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -240,7 +423,7 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      
+
       // Gọi API Backend
       const response = await fetch('http://localhost:8000/api/upload-slide', {
         method: 'POST',
@@ -248,18 +431,20 @@ export default function Home() {
       });
 
       setUploadProgress(80); // Đã nhận xong, chuẩn bị xử lý
-      
+
       if (!response.ok) {
         throw new Error('Upload failed');
       }
 
       const data = await response.json();
       console.log('Markdown trích xuất từ Docling:', data.markdown);
-      
+
+      setOutline(Array.isArray(data.outline) ? data.outline : []);
       setUploadProgress(100);
       setStartBtnReady(true);
     } catch (error) {
       console.error('Lỗi khi xử lý file:', error);
+      setOutline([]);
       setUploadProgress(100);
       setStartBtnReady(true); // Fallback để không bị kẹt UI
     }
@@ -272,6 +457,7 @@ export default function Home() {
     setUploadProgressVisible(false);
     setUploadProgress(0);
     setStartBtnReady(false);
+    setOutline([]);
   };
 
   const startCourse = (skip = false) => {
@@ -279,59 +465,153 @@ export default function Home() {
     setStartScreenHidden(true);
     setTimeout(() => {
       setStartScreenVisible(false);
-      runGeneratingSequence();
+      runGeneratingSequence(skip ? [] : outline);
     }, 350);
   };
 
-  const runGeneratingSequence = () => {
+  // Gọi API generate tương ứng với type của 1 phần trong outline (quiz/slide/animation/mindmap)
+  const fetchSessionContent = async (item: OutlineItem): Promise<SessionContent | null> => {
+    const url = GENERATE_ENDPOINTS[item.type];
+    if (!url) return null;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          index: item.index,
+          type: item.type,
+          content: item.content,
+          page_no: item.page_no,
+          page_width: item.page_width,
+          page_height: item.page_height,
+          bg_image: item.bg_image,
+          elements: item.elements,
+        }),
+      });
+      if (!res.ok) throw new Error(`Generate ${item.type} thất bại`);
+      return await res.json();
+    } catch (err) {
+      console.error(`Lỗi khi tạo nội dung cho phần ${item.index} (${item.type}):`, err);
+      return null;
+    }
+  };
+
+  const sceneTitleFromContent = (item: OutlineItem, content: SessionContent): string => {
+    switch (item.type) {
+      case 'slide':
+        return (content as SlideOutput).title;
+      case 'quiz':
+        return (content as QuizOutput).question;
+      case 'animation':
+        return (content as AnimationOutput).title;
+      case 'mindmap':
+        return (content as MindmapOutput).root_label;
+      default:
+        return `Phần ${item.index + 1}`;
+    }
+  };
+
+  const finishGeneratingSequence = () => {
+    setTimeout(() => {
+      setLoadingScreenOpacity(false);
+      setTimeout(() => {
+        setLoadingScreenVisible(false);
+        setAppVisible(true);
+        if (selectedFile) {
+          const displayName = selectedFile.name.replace(/\.[^/.]+$/, '');
+          setCourseName('Khóa học: ' + displayName);
+        }
+      }, 400);
+    }, 400);
+  };
+
+  // Lặp qua từng phần trong outline nhận từ API upload, gọi API generate tương ứng
+  // để lấy nội dung chi tiết, rồi dựng danh sách scene thực tế từ kết quả trả về.
+  const runGeneratingSequence = async (outlineItems: OutlineItem[]) => {
     setLoadingScreenVisible(true);
     setTimeout(() => setLoadingScreenOpacity(true), 50);
 
-    let stepIdx = 0;
-    let pct = 0;
+    if (outlineItems.length === 0) {
+      // Không có outline (vd. dùng slide mẫu) -> giữ hoạt ảnh tải giả lập như cũ
+      setLoadingStepLabels(LOADING_STEPS.map((s) => s.label));
+      setStepStatuses(new Array(LOADING_STEPS.length).fill('pending'));
+      let stepIdx = 0;
+      let pct = 0;
+      const runStep = () => {
+        if (stepIdx >= LOADING_STEPS.length) {
+          finishGeneratingSequence();
+          return;
+        }
+        const step = LOADING_STEPS[stepIdx];
+        setLoadingSub(step.label);
+        setStepStatuses((prev) => {
+          const next = [...prev];
+          next[stepIdx] = 'active';
+          return next;
+        });
+        const tick = setInterval(() => {
+          pct += (step.to - step.from) / 14;
+          if (pct >= step.to) {
+            pct = step.to;
+            clearInterval(tick);
+            setStepStatuses((prev) => {
+              const next = [...prev];
+              next[stepIdx] = 'done';
+              return next;
+            });
+            stepIdx++;
+            setTimeout(runStep, 220);
+          }
+          setLoadingPct(Math.round(pct));
+        }, 90);
+      };
+      runStep();
+      return;
+    }
 
-    const runStep = () => {
-      if (stepIdx >= LOADING_STEPS.length) {
-        setTimeout(() => {
-          setLoadingScreenOpacity(false);
-          setTimeout(() => {
-            setLoadingScreenVisible(false);
-            setAppVisible(true);
-            if (selectedFile) {
-              const displayName = selectedFile.name.replace(/\.[^/.]+$/, '');
-              setCourseName('Khóa học: ' + displayName);
-            }
-          }, 400);
-        }, 400);
-        return;
-      }
+    const total = outlineItems.length;
+    setLoadingStepLabels(outlineItems.map((item) => `Đang tạo ${item.type} cho phần ${item.index + 1}`));
+    setStepStatuses(new Array(total).fill('pending'));
+    setLoadingPct(0);
 
-      const step = LOADING_STEPS[stepIdx];
-      setLoadingSub(step.label);
+    const newSessionData: Record<number, SessionContent> = {};
+    const newScenes: Scene[] = [];
+
+    for (let i = 0; i < total; i++) {
+      const item = outlineItems[i];
+      setLoadingSub(`Đang tạo ${OUTLINE_TYPE_ICONS[item.type] || ''} ${item.type} cho phần ${item.index + 1}...`);
       setStepStatuses((prev) => {
         const next = [...prev];
-        next[stepIdx] = 'active';
+        next[i] = 'active';
         return next;
       });
 
-      const tick = setInterval(() => {
-        pct += (step.to - step.from) / 14;
-        if (pct >= step.to) {
-          pct = step.to;
-          clearInterval(tick);
-          setStepStatuses((prev) => {
-            const next = [...prev];
-            next[stepIdx] = 'done';
-            return next;
-          });
-          stepIdx++;
-          setTimeout(runStep, 220);
-        }
-        setLoadingPct(Math.round(pct));
-      }, 90);
-    };
+      const content = await fetchSessionContent(item);
+      if (content) {
+        newSessionData[item.index] = content;
+        newScenes.push({
+          id: `session-${item.index}`,
+          type: item.type as Scene['type'],
+          title: sceneTitleFromContent(item, content),
+          sessionIndex: item.index,
+        });
+      }
 
-    runStep();
+      setStepStatuses((prev) => {
+        const next = [...prev];
+        next[i] = 'done';
+        return next;
+      });
+      setLoadingPct(Math.round(((i + 1) / total) * 100));
+    }
+
+    setSessionData(newSessionData);
+    if (newScenes.length > 0) {
+      setScenes(newScenes);
+      setCurrent(0);
+    }
+
+    finishGeneratingSequence();
   };
 
   const goTo = (i: number) => {
@@ -350,8 +630,26 @@ export default function Home() {
   const nextSlide = () => goTo(current + 1);
   const prevSlide = () => goTo(current - 1);
 
+  // Gọi khi 1 scene đọc XONG HẲN (audio đã kết thúc, không phải lúc bắt đầu đọc) -> nếu đang ở
+  // chế độ autoplay (playing=true) thì mới chuyển sang scene kế tiếp; nếu người dùng chỉ bấm
+  // nghe thử 1 scene (không autoplay) thì không tự chuyển.
+  const advanceIfAutoplay = () => {
+    if (playingRef.current) {
+      nextSlide();
+    }
+  };
+
+  const onNarrationFinished = () => {
+    setNarrationSpeaking(false);
+    advanceIfAutoplay();
+  };
+
   const togglePlay = (force?: boolean) => {
     const nextPlay = force !== undefined ? force : !playing;
+    if (!nextPlay) {
+      // Tắt autoplay -> dừng luôn narration đang đọc dở, tránh audio kêu tiếp trong lúc đã pause.
+      stopNarration();
+    }
     setPlaying(nextPlay);
   };
 
@@ -363,7 +661,11 @@ export default function Home() {
   };
 
   const toggleMute = () => {
-    setMuted(!muted);
+    const next = !muted;
+    setMuted(next);
+    if (next && typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
   };
 
   const toggleLoop = () => {
@@ -378,9 +680,9 @@ export default function Home() {
     const el = document.getElementById('stage-wrap');
     if (!el) return;
     if (!document.fullscreenElement) {
-      el.requestFullscreen?.().catch(() => {});
+      el.requestFullscreen?.().catch(() => { });
     } else {
-      document.exitFullscreen?.().catch(() => {});
+      document.exitFullscreen?.().catch(() => { });
     }
   };
 
@@ -389,24 +691,173 @@ export default function Home() {
     narrationSpeaking ? stopNarration() : startNarration();
   };
 
+  // Đọc to 1 đoạn text bằng giọng đọc có sẵn của trình duyệt (Web Speech API). Không hỗ trợ
+  // hoặc đang tắt tiếng (muted) -> gọi luôn onEnd để caller không bị treo timing.
+  const stopTtsKeepAlive = () => {
+    if (ttsKeepAliveRef.current) {
+      clearInterval(ttsKeepAliveRef.current);
+      ttsKeepAliveRef.current = null;
+    }
+  };
+
+  const speakText = (text: string, onEnd?: () => void) => {
+    const trimmed = text.trim();
+    if (!trimmed || typeof window === 'undefined' || !window.speechSynthesis) {
+      onEnd?.();
+      return;
+    }
+    if (muted) {
+      onEnd?.();
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(trimmed);
+    utterance.lang = 'vi-VN';
+    // Gán voice tường minh: chỉ set lang không đủ, Chrome hay fallback về giọng tiếng Anh mặc
+    // định nếu không có voice nào được chọn rõ ràng (xem viVoiceRef ở trên).
+    if (viVoiceRef.current) utterance.voice = viVoiceRef.current;
+    utterance.rate = playSpeed || 1;
+    const cleanup = () => {
+      stopTtsKeepAlive();
+      currentUtteranceRef.current = null;
+    };
+    utterance.onend = () => {
+      cleanup();
+      onEnd?.();
+    };
+    utterance.onerror = () => {
+      cleanup();
+      onEnd?.();
+    };
+    // Giữ tham chiếu để tránh bị GC giữa chừng (xem giải thích ở khai báo currentUtteranceRef).
+    currentUtteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+    // Né bug Chrome/Edge tự động pause speechSynthesis sau ~15s không thao tác.
+    stopTtsKeepAlive();
+    ttsKeepAliveRef.current = setInterval(() => {
+      if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 5000);
+  };
+
   const startNarration = () => {
+    stopNarration();
     setNarrationSpeaking(true);
-    if (speechTimer) clearTimeout(speechTimer);
 
     const activeScene = scenes[current];
-    const text = NARRATIONS[activeScene.id] || '';
-    const duration = Math.min(6000, 1500 + text.length * 40);
 
-    const timer = setTimeout(stopNarration, duration);
-    setSpeechTimer(timer);
+    // Slide: stream lời thuyết trình trực tiếp từ backend, gõ dần từng chữ + đọc to bằng TTS
+    // của trình duyệt, khoanh sáng đúng phần nội dung trên ảnh slide gốc mà agent đang nhắc tới.
+    if (activeScene.type === 'slide' && activeScene.sessionIndex !== undefined) {
+      const outlineItem = outline.find((o) => o.index === activeScene.sessionIndex);
+      if (outlineItem) {
+        streamSlideNarration(outlineItem);
+        return;
+      }
+    }
+
+    const text = getNarrationText(activeScene);
+    if (typeof window !== 'undefined' && window.speechSynthesis && !muted) {
+      speakText(text, onNarrationFinished);
+    } else {
+      // Không hỗ trợ TTS hoặc đang tắt tiếng -> vẫn giữ hiệu ứng đang đọc theo thời lượng ước tính
+      const duration = Math.min(6000, 1500 + text.length * 40);
+      const timer = setTimeout(onNarrationFinished, duration);
+      setSpeechTimer(timer);
+    }
+  };
+
+  // Đọc NDJSON stream từ /api/generate/slide/stream: mỗi dòng là 1 event JSON
+  // ({"type":"focus"|"text"|"meta"|"done", ...}) - gõ dần text, đổi vùng khoanh sáng theo focus,
+  // và đọc to bằng TTS trình duyệt theo từng đoạn (flush lúc đổi vùng focus / kết thúc stream).
+  const streamSlideNarration = async (item: OutlineItem) => {
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
+    setNarrationSegmentText('');
+    setFocusedBbox(null);
+    ttsBufferRef.current = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/generate/slide/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          index: item.index,
+          type: 'slide',
+          content: item.content,
+          page_no: item.page_no,
+          page_width: item.page_width,
+          page_height: item.page_height,
+          bg_image: item.bg_image,
+          elements: item.elements,
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok || !res.body) throw new Error('Stream slide narration thất bại');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let lineBuffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        lineBuffer += decoder.decode(value, { stream: true });
+
+        const lines = lineBuffer.split('\n');
+        lineBuffer = lines.pop() || ''; // dòng cuối có thể chưa trọn vẹn, giữ lại chờ chunk sau
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const event = JSON.parse(line);
+          if (event.type === 'text') {
+            setNarrationSegmentText((prev) => (prev || '') + event.text);
+            ttsBufferRef.current += event.text;
+          } else if (event.type === 'focus') {
+            // Đọc to hết đoạn vừa gõ xong trước khi chuyển sang vùng focus mới
+            speakText(ttsBufferRef.current);
+            ttsBufferRef.current = '';
+            setFocusedBbox(event.focus_bbox ?? null);
+          } else if (event.type === 'done') {
+            // Chỉ coi slide này là "đọc xong" (và chỉ lúc đó mới cho phép autoplay chuyển sang
+            // scene kế tiếp) SAU KHI đoạn audio cuối cùng này thật sự phát xong - không phải
+            // ngay khi nhận xong text từ stream.
+            speakText(ttsBufferRef.current, onNarrationFinished);
+            ttsBufferRef.current = '';
+            setFocusedBbox(null);
+          }
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error('Lỗi khi stream narration slide:', err);
+      }
+    } finally {
+      if (streamAbortRef.current === controller) {
+        streamAbortRef.current = null;
+      }
+    }
   };
 
   const stopNarration = () => {
     setNarrationSpeaking(false);
+    setNarrationSegmentText(null);
+    setFocusedBbox(null);
+    ttsBufferRef.current = '';
     if (speechTimer) {
       clearTimeout(speechTimer);
       setSpeechTimer(null);
     }
+    if (streamAbortRef.current) {
+      streamAbortRef.current.abort();
+      streamAbortRef.current = null;
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    stopTtsKeepAlive();
+    currentUtteranceRef.current = null;
   };
 
   // Chat toggle
@@ -421,72 +872,6 @@ export default function Home() {
   // Interactive Code run
   const runCode = () => {
     setConsoleText('>>> Hello, World!');
-  };
-
-  // Mindmap generation helper
-  const buildMindmap = () => {
-    const canvas = mindmapCanvasRef.current;
-    if (!canvas) return;
-    canvas.innerHTML = '';
-    const w = canvas.clientWidth || 880;
-    const h = canvas.clientHeight || 380;
-    const cx = w / 2;
-    const cy = h / 2;
-
-    // Helper functions inside useEffect to paint directly to DOM ref
-    const addMMNode = (text: string, x: number, y: number, cls: string) => {
-      const el = document.createElement('div');
-      el.className = 'mm-node ' + cls;
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      el.textContent = text;
-      canvas.appendChild(el);
-    };
-
-    const addMMLine = (x1: number, y1: number, x2: number, y2: number, color: string) => {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-      const el = document.createElement('div');
-      el.className = 'mm-line';
-      el.style.left = x1 + 'px';
-      el.style.top = y1 + 'px';
-      el.style.width = len + 'px';
-      el.style.background = color;
-      el.style.transform = `rotate(${angle}deg)`;
-      canvas.appendChild(el);
-    };
-
-    addMMNode(mindmapData.root, cx, cy, 'root');
-
-    const branchR = Math.min(w, h) * 0.32;
-    mindmapData.branches.forEach((b) => {
-      const rad = (b.angle * Math.PI) / 180;
-      const bx = cx + Math.cos(rad) * branchR * 1.3;
-      const by = cy + Math.sin(rad) * branchR * 0.62 + 40;
-      addMMLine(cx, cy, bx, by, '#a9b8ea');
-      addMMNode(b.name, bx, by, 'branch');
-
-      const leafR = 130;
-      b.leaves.forEach((leaf, li) => {
-        const leafAngle = rad + (li === 0 ? -0.42 : 0.42);
-        const lx = bx + Math.cos(leafAngle) * leafR;
-        const ly = by + Math.sin(leafAngle) * leafR * 0.75 + 46;
-        addMMLine(bx, by, lx, ly, '#dbe0f2');
-        addMMNode(leaf, lx, ly, 'leaf');
-      });
-    });
-  };
-
-  // Mindmap data structure
-  const mindmapData = {
-    root: 'Control Flow',
-    branches: [
-      { name: 'if / else', angle: -55, leaves: ['Điều kiện đúng/sai', 'Rẽ nhánh chương trình'] },
-      { name: 'for loop', angle: 5, leaves: ['Lặp qua tập hợp', 'range(), list, string'] },
-      { name: 'while loop', angle: 65, leaves: ['Lặp khi còn đúng', 'Cẩn thận vòng lặp vô hạn'] },
-    ],
   };
 
   // Interactive Quiz Actions
@@ -517,6 +902,42 @@ export default function Home() {
     }
   };
 
+  // Answer handler for quiz sessions generated from the uploaded outline: đáp án đúng đã được
+  // sinh kèm ngay trong QuizOutput (correct_answer), nên chỉ cần so khớp trực tiếp ở FE, không
+  // cần gọi thêm API/LLM nào sau khi người dùng chọn đáp án.
+  const answerGeneratedQuiz = (sessionIndex: number, selectedKey: string) => {
+    setQuizRuntime((prev) => {
+      if (prev[sessionIndex]?.answered) return prev;
+      return { ...prev, [sessionIndex]: { selected: selectedKey, answered: true } };
+    });
+  };
+
+  // Narration text for the current scene: generated content summary/explanation when available,
+  // otherwise the static demo narration.
+  const getNarrationText = (s: Scene): string => {
+    if (s.type === 'slide' && narrationSegmentText !== null) {
+      return narrationSegmentText;
+    }
+    if (s.sessionIndex !== undefined) {
+      const content = sessionData[s.sessionIndex];
+      if (content) {
+        switch (s.type) {
+          case 'slide':
+            return (content as SlideOutput).summary;
+          case 'quiz':
+            return (content as QuizOutput).explanation;
+          case 'animation':
+            return (content as AnimationOutput).steps[0]?.description || '';
+          case 'mindmap':
+            return `Đây là sơ đồ tư duy về ${(content as MindmapOutput).root_label}.`;
+          default:
+            break;
+        }
+      }
+    }
+    return NARRATIONS[s.id] || '…';
+  };
+
   // Interactive Drag & Click Code Game Actions
   const pickChip = (i: number) => {
     if (gameOrder.includes(i)) return;
@@ -536,72 +957,132 @@ export default function Home() {
     }
   };
 
-  // Chat message send and peer discussion simulation
+  // Gọi backend cho đúng 1 lượt phát biểu của 1 nhân vật debate, dựa trên
+  // chủ đề + transcript hiện tại (đọc trực tiếp từ ref để luôn thấy tin nhắn
+  // chen ngang mới nhất của người dùng).
+  const fetchDebateTurn = async (speakerId: string): Promise<DebateTranscriptEntry> => {
+    const res = await fetch(DEBATE_TURN_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topic: debateTopicRef.current,
+        history: debateTranscriptRef.current,
+        next_speaker: speakerId,
+      }),
+    });
+    if (!res.ok) throw new Error(`Lượt debate của ${speakerId} thất bại`);
+    const data = await res.json();
+    return { speaker_id: data.speaker_id, speaker_name: data.speaker_name, role: 'agent', text: data.text };
+  };
+
+  // Lặp lại DEBATE_CYCLE vô hạn (curious_mind -> logic_master -> bright_spark
+  // -> note_taker -> lặp lại...) cho tới khi người dùng bấm "Kết thúc thảo
+  // luận" (debateStopRef.current = true, xem endDebate). Người dùng có thể
+  // gửi tin nhắn mới bất kỳ lúc nào trong lúc vòng lặp đang chạy (xem
+  // sendChat) - tin nhắn đó được đẩy thẳng vào debateTranscriptRef nên lượt
+  // gọi API kế tiếp sẽ tự động "thấy" và phản hồi theo hướng mới, không cần
+  // dừng vòng lặp lại.
+  const runDebateLoop = async () => {
+    let cycleIdx = 0;
+    while (!debateStopRef.current) {
+      const speakerId = DEBATE_CYCLE[cycleIdx % DEBATE_CYCLE.length];
+      cycleIdx++;
+      const agent = DEBATE_AGENTS.find((a) => a.id === speakerId);
+      if (!agent) continue;
+
+      setTypingIndicator({ name: agent.name, avatar: agent.initial, agentId: agent.id });
+      try {
+        const entry = await fetchDebateTurn(speakerId);
+        debateTranscriptRef.current = [...debateTranscriptRef.current, entry];
+        setChatLog((prev) => [
+          ...prev,
+          {
+            id: 'chat_' + Date.now() + '_' + speakerId,
+            role: 'peer',
+            text: entry.text,
+            avatar: agent.initial,
+            name: entry.speaker_name,
+            showPlay: true,
+            agentId: speakerId,
+          },
+        ]);
+      } catch (err) {
+        console.error('Lỗi khi lấy lượt debate:', err);
+      } finally {
+        setTypingIndicator(null);
+      }
+
+      if (debateStopRef.current) break;
+      await new Promise((r) => setTimeout(r, 900 + Math.random() * 600));
+    }
+
+    // Người dùng đã bấm "Kết thúc thảo luận" -> AI Teacher tổng kết toàn bộ
+    setTypingIndicator({ name: AI_TEACHER.name, avatar: AI_TEACHER.initial, agentId: 'ai_teacher' });
+    try {
+      const entry = await fetchDebateTurn('ai_teacher');
+      setChatLog((prev) => [
+        ...prev,
+        {
+          id: 'chat_' + Date.now() + '_ai_wrap',
+          role: 'ai',
+          text: entry.text,
+          avatar: AI_TEACHER.initial,
+          name: entry.speaker_name,
+          showPlay: true,
+          agentId: 'ai_teacher',
+        },
+      ]);
+    } catch (err) {
+      console.error('Lỗi khi lấy lời tổng kết của AI Teacher:', err);
+    } finally {
+      setTypingIndicator(null);
+    }
+
+    setDiscussionActive(false);
+    debateTranscriptRef.current = [];
+    debateTopicRef.current = '';
+  };
+
+  // Gửi tin nhắn chat: nếu chưa có buổi debate nào đang chạy, tin nhắn này
+  // trở thành CHỦ ĐỀ và khởi động runDebateLoop. Nếu debate đang chạy, đây là
+  // 1 lượt CHEN NGANG của người dùng (human-in-the-loop) - chỉ cần đẩy vào
+  // transcript, vòng lặp đang chạy sẽ tự đọc thấy ở lượt gọi kế tiếp.
   const sendChat = () => {
-    if (discussionActive || !chatInput.trim()) return;
+    if (!chatInput.trim()) return;
     const userMsg = chatInput.trim();
     setChatInput('');
 
-    // Append user message
     const userMsgObj: Message = {
       id: 'chat_' + Date.now() + '_user',
       role: 'user',
       text: userMsg,
       avatar: '🧑',
       name: 'Bạn',
+      agentId: 'user',
     };
     setChatLog((prev) => [...prev, userMsgObj]);
+    debateTranscriptRef.current = [
+      ...debateTranscriptRef.current,
+      { speaker_id: 'user', speaker_name: 'Bạn', role: 'user', text: userMsg },
+    ];
 
-    // Start class discussion sequence
+    if (discussionActive) {
+      // Chen ngang giữa buổi thảo luận - vòng lặp runDebateLoop đang chạy sẽ
+      // tự thấy tin nhắn này ở lượt gọi API kế tiếp, không cần làm gì thêm.
+      return;
+    }
+
+    debateTopicRef.current = userMsg;
+    debateStopRef.current = false;
     setDiscussionActive(true);
+    runDebateLoop();
+  };
 
-    let round = 0;
-
-    const nextTurn = () => {
-      if (round >= PEERS.length) {
-        // AI teacher final wrap-up
-        setTypingIndicator({ name: 'AI Teacher', avatar: '🧑‍🏫' });
-        setTimeout(() => {
-          setTypingIndicator(null);
-          const aiMsgObj: Message = {
-            id: 'chat_' + Date.now() + '_ai_wrap',
-            role: 'ai',
-            text: `Cảm ơn cả lớp đã thảo luận sôi nổi về "${userMsg}"! Đây là một điểm quan trọng của bài học — các bạn hãy thử áp dụng vào bài tập tiếp theo nhé.`,
-            avatar: '🧑‍🏫',
-            name: 'AI Teacher',
-            showPlay: true,
-          };
-          setChatLog((prev) => [...prev, aiMsgObj]);
-          setDiscussionActive(false);
-        }, 1000 + Math.random() * 400);
-        return;
-      }
-
-      const peer = PEERS[round];
-      setTypingIndicator({ name: peer.name, avatar: peer.initial });
-
-      setTimeout(() => {
-        setTypingIndicator(null);
-        const templates = DISCUSSION_TEMPLATES[peer.name];
-        const lines = templates ? templates(userMsg) : [`Mình thấy "${userMsg}" khá thú vị.`];
-        const peerLine = lines[round % lines.length];
-
-        const peerMsgObj: Message = {
-          id: 'chat_' + Date.now() + '_peer_' + round,
-          role: 'peer',
-          text: peerLine,
-          avatar: peer.initial,
-          name: peer.name,
-          showPlay: true,
-        };
-        setChatLog((prev) => [...prev, peerMsgObj]);
-        round++;
-        setTimeout(nextTurn, 700);
-      }, 900 + Math.random() * 500);
-    };
-
-    // First timeout to start class conversation after user prints
-    setTimeout(nextTurn, 400);
+  // Người dùng chủ động đóng buổi thảo luận: đặt cờ dừng, vòng lặp
+  // runDebateLoop sẽ thoát ngay sau lượt agent đang chạy dở (nếu có) rồi
+  // chuyển sang để AI Teacher tổng kết.
+  const endDebate = () => {
+    debateStopRef.current = true;
   };
 
   const speakFloating = (e: React.MouseEvent, text: string) => {
@@ -727,13 +1208,13 @@ export default function Home() {
         return (
           <div style={{ padding: '28px 34px' }}>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', margin: '0 0 4px', color: '#181b2e' }}>
-              {mindmapData.root} Map
+              Control Flow Map
             </h1>
             <div className="slide-underline" style={{ width: '60px', height: '3px', margin: '8px 0 16px' }}></div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-              {mindmapData.branches.map((b, bi) => (
-                <div key={bi} className="mm-node branch" style={{ position: 'static', transform: 'none', fontSize: '11px', padding: '6px 10px' }}>
-                  {b.name}
+              {['if / else', 'for loop', 'while loop'].map((name) => (
+                <div key={name} className="mmtree-node depth-1" style={{ position: 'static', fontSize: '11px', padding: '6px 10px' }}>
+                  {name}
                 </div>
               ))}
             </div>
@@ -799,6 +1280,61 @@ export default function Home() {
   const renderSceneBody = (s: Scene) => {
     switch (s.type) {
       case 'slide':
+        if (s.sessionIndex !== undefined && sessionData[s.sessionIndex]) {
+          const data = sessionData[s.sessionIndex] as SlideOutput;
+
+          // Slide gốc người dùng đã upload: hiển thị ĐÚNG ảnh gốc, không vẽ lại nội dung.
+          // focusedBbox (toạ độ gốc theo trang PDF) được quy đổi sang % để khoanh đúng vị trí
+          // agent đang thuyết trình tới, bất kể ảnh được scale theo kích thước màn hình nào.
+          if (data.bg_image && data.page_width && data.page_height) {
+            const [fl, ft, fr, fb] = focusedBbox || [0, 0, 0, 0];
+            return (
+              <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: `${data.page_width} / ${data.page_height}`,
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                    background: '#fff',
+                  }}
+                >
+                  <img
+                    src={`data:image/png;base64,${data.bg_image}`}
+                    alt={data.title}
+                    style={{ width: '100%', height: '100%', display: 'block' }}
+                  />
+                  {narrationSpeaking && focusedBbox && (
+                    // box-shadow lan rộng ra ngoài chính khung này tạo hiệu ứng "spotlight":
+                    // toàn bộ phần còn lại của slide bị tối màu (overlay), chỉ riêng vùng agent
+                    // đang nhắc tới được giữ sáng nguyên vẹn.
+                    <div
+                      className="slide-spotlight-box"
+                      style={{
+                        left: `${(fl / data.page_width) * 100}%`,
+                        top: `${(ft / data.page_height) * 100}%`,
+                        width: `${((fr - fl) / data.page_width) * 100}%`,
+                        height: `${((fb - ft) / data.page_height) * 100}%`,
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          }
+
+          // Fallback: block được sinh riêng lẻ (không qua pipeline upload PDF) nên không có
+          // ảnh slide gốc để hiển thị -> hiện tạm tiêu đề/summary.
+          return (
+            <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
+              <h1>{data.title}</h1>
+              <div className="slide-underline"></div>
+              <p style={{ fontSize: '14px', color: '#42465a' }}>{data.summary}</p>
+            </div>
+          );
+        }
         if (s.id === 's0') {
           return (
             <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
@@ -954,17 +1490,91 @@ export default function Home() {
             </div>
           </div>
         );
-      case 'mindmap':
+      case 'mindmap': {
+        const mmData =
+          s.sessionIndex !== undefined && sessionData[s.sessionIndex]
+            ? sessionData[s.sessionIndex] as MindmapOutput
+            : null;
         return (
           <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)', overflow: 'hidden' }}>
             <div className="mindmap-slide" style={{ position: 'absolute', inset: 0, padding: '36px 44px' }}>
-              <h1 style={{ fontSize: '26px' }}>The Logic Flowchart</h1>
+              <h1 style={{ fontSize: '26px' }}>{mmData ? `${mmData.root_label} Map` : 'The Logic Flowchart'}</h1>
               <div className="slide-underline" style={{ margin: '10px 0 6px' }}></div>
-              <div className="mindmap-canvas" ref={mindmapCanvasRef}></div>
+              <MindmapTree rootLabel={mmData?.root_label || 'Control Flow'} nodes={mmData?.nodes || []} />
             </div>
           </div>
         );
-      case 'quiz':
+      }
+      case 'animation': {
+        if (s.sessionIndex !== undefined && sessionData[s.sessionIndex]) {
+          const data = sessionData[s.sessionIndex] as AnimationOutput;
+          return (
+            <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
+              <h1>{data.title}</h1>
+              <div className="slide-underline"></div>
+              {data.html ? (
+                <iframe
+                  title={`animation-${data.index}`}
+                  srcDoc={buildAnimationSrcDoc(data.html)}
+                  sandbox="allow-scripts"
+                  style={{ width: '100%', height: '420px', border: 'none', marginTop: '14px', borderRadius: '12px', background: '#fff' }}
+                />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px' }}>
+                  {[...data.steps]
+                    .sort((a, b) => a.order - b.order)
+                    .map((step) => (
+                      <div key={step.order} className="info-card" style={{ padding: '12px 16px' }}>
+                        <h3>
+                          {step.order}. {step.label}
+                        </h3>
+                        <p>{step.description}</p>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          );
+        }
+        return <h1>{s.title}</h1>;
+      }
+      case 'quiz': {
+        const genData = s.sessionIndex !== undefined ? (sessionData[s.sessionIndex] as QuizOutput | undefined) : undefined;
+        if (genData) {
+          const runtime = quizRuntime[s.sessionIndex!] || { selected: null, answered: false };
+          return (
+            <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
+              <div className="slide-index">Q</div>
+              <div className="quiz-slide">
+                <h1>{genData.question}</h1>
+                <div className="slide-underline"></div>
+                {genData.options.map((opt) => {
+                  let optClass = 'quiz-opt';
+                  if (runtime.answered) {
+                    if (opt.key === genData.correct_answer) optClass += ' correct';
+                    else if (opt.key === runtime.selected) optClass += ' wrong';
+                  }
+                  return (
+                    <button
+                      key={opt.key}
+                      className={optClass}
+                      onClick={() => answerGeneratedQuiz(s.sessionIndex!, opt.key)}
+                      style={{ pointerEvents: runtime.answered ? 'none' : 'auto' }}
+                    >
+                      {opt.key}. {opt.text}
+                    </button>
+                  );
+                })}
+                {runtime.answered && (
+                  <div className={runtime.selected === genData.correct_answer ? 'quiz-feedback show ok' : 'quiz-feedback show no'}>
+                    {runtime.selected === genData.correct_answer ? '✓ Chính xác! ' : '✗ Chưa đúng. '}
+                    {genData.explanation}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
         return (
           <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
             <div className="slide-index">Q</div>
@@ -1036,6 +1646,7 @@ export default function Home() {
             </div>
           </div>
         );
+      }
       case 'game':
         return (
           <div className="slide active" style={{ pointerEvents: 'auto', opacity: 1, transform: 'translateX(0px)' }}>
@@ -1094,7 +1705,7 @@ export default function Home() {
           <div className="start-card">
             <div className="start-brand">
               <span className="logo">◆</span>
-              <span className="name">OpenMAIC</span>
+              <span className="name">50s</span>
             </div>
             <h1 className="start-title">Tải lên slide bài học</h1>
             <p className="start-sub">
@@ -1136,8 +1747,8 @@ export default function Home() {
                     {selectedFile.size < 1024
                       ? selectedFile.size + ' B'
                       : selectedFile.size < 1024 * 1024
-                      ? (selectedFile.size / 1024).toFixed(1) + ' KB'
-                      : (selectedFile.size / (1024 * 1024)).toFixed(1) + ' MB'}
+                        ? (selectedFile.size / 1024).toFixed(1) + ' KB'
+                        : (selectedFile.size / (1024 * 1024)).toFixed(1) + ' MB'}
                   </div>
                 </div>
                 <button className="fc-remove" onClick={removeFile}>
@@ -1152,13 +1763,36 @@ export default function Home() {
               </div>
             )}
 
+            {startBtnReady && outline.length > 0 && (
+              <div className="outline-preview">
+                <div className="outline-preview-title">
+                  Dàn ý bài học được tạo ra ({outline.length} phần)
+                </div>
+                <div className="outline-preview-list">
+                  {outline.map((item) => (
+                    <div key={item.index} className="outline-preview-item">
+                      <span className="outline-item-icon">
+                        {OUTLINE_TYPE_ICONS[item.type] || '•'}
+                      </span>
+                      <div className="outline-item-body">
+                        <div className="outline-item-meta">
+                          Phần {item.index + 1} · {item.type}
+                        </div>
+                        <div className="outline-item-content">{item.content}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               className={`start-btn ${startBtnReady ? 'ready' : ''}`}
               id="startBtn"
               onClick={() => startCourse()}
               style={{ pointerEvents: startBtnReady ? 'auto' : 'none' }}
             >
-              Bắt đầu học →
+              {startBtnReady && outline.length > 0 ? 'Xác nhận dàn ý →' : 'Bắt đầu học →'}
             </button>
 
             <div className="start-skip">
@@ -1182,7 +1816,7 @@ export default function Home() {
             </p>
 
             <div className="loading-steps" id="loadingSteps">
-              {LOADING_STEPS.map((st, i) => {
+              {loadingStepLabels.map((label, i) => {
                 let stepClass = 'lstep';
                 let statusText = '○';
                 if (stepStatuses[i] === 'active') {
@@ -1194,7 +1828,7 @@ export default function Home() {
                 return (
                   <div key={i} className={stepClass}>
                     <span className="lstep-icon">•</span>
-                    <span className="lstep-label">{st.label}</span>
+                    <span className="lstep-label">{label}</span>
                     <span className="lstep-status">{statusText}</span>
                   </div>
                 );
@@ -1217,7 +1851,7 @@ export default function Home() {
           {/* SIDEBAR */}
           <div id="sidebar">
             <div className="brand">
-              <span className="logo">◆</span> OpenMAIC
+              <span className="logo">◆</span> 50s
               <span className="collapse-btn" title="Thu gọn">
                 ⟨⟩
               </span>
@@ -1395,7 +2029,7 @@ export default function Home() {
                       <div className="msg-who">AI Teacher</div>
                       <div className="msg-text-wrap">
                         <div id="narrationText">
-                          {NARRATIONS[scenes[current].id] || '…'}
+                          {getNarrationText(scenes[current])}
                         </div>
                         <div
                           className={`msg-play ${narrationSpeaking ? 'speaking' : ''}`}
@@ -1412,8 +2046,12 @@ export default function Home() {
 
                 <div className="rail-right">
                   <div className="peer-stack" title="Bạn học cùng lớp">
-                    {PEERS.map((p, pi) => (
-                      <div key={pi} className="peer-wrap">
+                    {DEBATE_AGENTS.map((p, pi) => (
+                      <div
+                        key={pi}
+                        className="peer-wrap"
+                        style={{ '--msg-color': AGENT_COLORS[p.id] } as React.CSSProperties}
+                      >
                         <div className="peer">{p.initial}</div>
                         <div className="peer-card">
                           <div className="pc-head">
@@ -1449,19 +2087,68 @@ export default function Home() {
 
                 {/* FLOATING CHAT BOX */}
                 <div id="floatingChatBox" className={chatBoxOpen ? 'open' : ''} onClick={(e) => e.stopPropagation()}>
+                  <div id="floating-chat-header">
+                    <span className="fc-header-title">
+                      {discussionActive ? '🗣️ Thảo luận nhóm' : '💬 Nhắn tin với AI Teacher'}
+                    </span>
+                    <button
+                      type="button"
+                      className="fc-close-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setChatBoxOpen(false);
+                      }}
+                      title="Đóng"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Debate mode banner - đặt NGOÀI vùng log có thể cuộn, luôn hiển thị cố
+                      định phía trên suốt buổi thảo luận (không bị trôi mất khi có tin nhắn
+                      mới), vì người dùng có thể chen tin nhắn mới vào bất kỳ lúc nào
+                      (human-in-the-loop). Buổi thảo luận lặp lại liên tục cho tới khi người
+                      dùng chủ động bấm "Kết thúc thảo luận". */}
+                  {discussionActive && (
+                    <div className="discussion-banner">
+                      <span>
+                        🗣️ Đang thảo luận: "{debateTopicRef.current}" — gõ để chen vào bất kỳ lúc nào
+                      </span>
+                      <button
+                        type="button"
+                        className="discussion-end-btn"
+                        onClick={endDebate}
+                        title="Kết thúc buổi thảo luận"
+                      >
+                        ⏹ Kết thúc
+                      </button>
+                    </div>
+                  )}
+
                   <div id="floating-chat-log">
                     {chatLog.map((msg) => (
                       <div
                         key={msg.id}
                         className={`fmsg-row ${msg.role === 'user' ? 'user' : 'agent'}`}
+                        style={{ '--msg-color': AGENT_COLORS[msg.agentId || ''] || 'var(--accent)' } as React.CSSProperties}
                       >
                         <div className="fmsg-avatar">{msg.avatar}</div>
                         <div className="fmsg-content">
                           {msg.role !== 'user' && <div className="fmsg-who">{msg.name}</div>}
                           <div className="fmsg-text-wrap">
-                            <div className={msg.role === 'user' ? 'fmsg-bubble' : 'fmsg-bubble'}>
-                              {msg.text}
-                            </div>
+                            {msg.agentId === 'note_taker' ? (
+                              <ul className="fmsg-bubble fmsg-notes">
+                                {msg.text
+                                  .split('\n')
+                                  .map((line) => line.replace(/^[-•]\s*/, '').trim())
+                                  .filter(Boolean)
+                                  .map((line, i) => (
+                                    <li key={i}>{line}</li>
+                                  ))}
+                              </ul>
+                            ) : (
+                              <div className="fmsg-bubble">{msg.text}</div>
+                            )}
                             {msg.showPlay && (
                               <div
                                 className="fmsg-play"
@@ -1476,16 +2163,12 @@ export default function Home() {
                       </div>
                     ))}
 
-                    {/* Class discussion banner */}
-                    {discussionActive && chatLog.length > 0 && chatLog[chatLog.length - 1].role === 'user' && (
-                      <div className="discussion-banner">
-                        🗣️ Chế độ thảo luận: "{chatLog[chatLog.length - 1].text}"
-                      </div>
-                    )}
-
                     {/* Typing Indicator */}
                     {typingIndicator && (
-                      <div className="fmsg-row agent">
+                      <div
+                        className="fmsg-row agent"
+                        style={{ '--msg-color': AGENT_COLORS[typingIndicator.agentId] || 'var(--accent)' } as React.CSSProperties}
+                      >
                         <div className="fmsg-avatar">{typingIndicator.avatar}</div>
                         <div className="fmsg-content">
                           <div className="fmsg-who">{typingIndicator.name}</div>
@@ -1500,19 +2183,20 @@ export default function Home() {
 
                     <div ref={chatLogEndRef} />
                   </div>
-                  <div id="floating-input-row" className={discussionActive ? 'disabled' : ''}>
+                  {/* Input KHÔNG bị khoá khi discussionActive - người dùng có thể chen tin
+                      nhắn vào bất kỳ lúc nào trong buổi thảo luận (human-in-the-loop). */}
+                  <div id="floating-input-row">
                     <input
                       id="chat-input"
                       type="text"
-                      placeholder="Nhắn tin cho AI Teacher..."
+                      placeholder={discussionActive ? 'Chen vào cuộc thảo luận...' : 'Nhắn tin cho AI Teacher...'}
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      disabled={discussionActive}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') sendChat();
                       }}
                     />
-                    <button id="send-btn" onClick={sendChat} disabled={discussionActive}>
+                    <button id="send-btn" onClick={sendChat}>
                       ➤
                     </button>
                   </div>

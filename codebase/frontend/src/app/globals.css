@@ -481,6 +481,23 @@ html, body {
   font-weight: 700;
 }
 
+/*
+ * Hiệu ứng "spotlight" trên ảnh slide gốc: box-shadow lan ra 9999px phủ tối toàn bộ phần còn
+ * lại của slide (nằm trong container overflow:hidden), chỉ chừa đúng khung này sáng nguyên vẹn
+ * -> đúng vùng nội dung mà agent đang nhắc tới trong lúc thuyết trình.
+ */
+.slide-spotlight-box {
+  position: absolute;
+  border-radius: 6px;
+  border: 2px solid rgba(37, 99, 235, 0.85);
+  box-shadow:
+    0 0 0 9999px rgba(6, 8, 20, 0.62),
+    0 0 22px rgba(37, 99, 235, 0.55);
+  pointer-events: none;
+  transition: left 0.35s ease, top 0.35s ease, width 0.35s ease, height 0.35s ease;
+  z-index: 5;
+}
+
 .info-card p {
   margin: 0;
   font-size: 13.5px;
@@ -736,54 +753,130 @@ html, body {
   background: linear-gradient(180deg, #fbfcff, #f4f7ff);
 }
 
-.mindmap-canvas {
+.mmtree-canvas {
   position: relative;
   width: 100%;
   height: calc(100% - 90px);
+  overflow: hidden;
+  cursor: grab;
+  border-radius: 12px;
+  background: repeating-linear-gradient(0deg, rgba(91, 124, 250, .05) 0px, rgba(91, 124, 250, .05) 1px, transparent 1px, transparent 28px);
 }
 
-.mm-node {
+.mmtree-canvas:active {
+  cursor: grabbing;
+}
+
+.mmtree-toolbar {
   position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #e3e6ef;
+  border-radius: 10px;
+  padding: 4px 6px;
+  box-shadow: 0 6px 16px -8px rgba(30, 40, 80, .35);
+}
+
+.mmtree-toolbar button {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: #f2f4fb;
+  color: var(--accent-2);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mmtree-toolbar button:hover {
+  background: var(--accent-soft, #eef1ff);
+}
+
+.mmtree-toolbar span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7086;
+  min-width: 34px;
+  text-align: center;
+}
+
+.mmtree-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.mmtree-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.mmtree-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   border-radius: 12px;
   padding: 10px 16px;
   font-size: 13px;
   font-weight: 700;
-  text-align: center;
   box-shadow: 0 8px 18px -6px rgba(30, 40, 80, .25);
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
-.mm-node.root {
+.mmtree-node.depth-0 {
   background: linear-gradient(135deg, var(--accent), #8a5cf6);
   color: #fff;
-  font-size: 16px;
-  padding: 14px 22px;
-  z-index: 3;
+  font-size: 15px;
 }
 
-.mm-node.branch {
+.mmtree-node.depth-1 {
   background: #eef4ff;
   color: var(--accent-2);
   border: 1.5px solid #cddaff;
-  z-index: 2;
 }
 
-.mm-node.leaf {
+.mmtree-node.depth-2 {
   background: #fff;
   color: #42465a;
   border: 1.5px solid #e3e6ef;
   font-weight: 600;
-  font-size: 11.5px;
-  z-index: 2;
+  font-size: 12px;
 }
 
-.mm-line {
+.mmtree-toggle {
   position: absolute;
-  background: #c7cbe0;
-  height: 2px;
-  transform-origin: left center;
-  z-index: 1;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #cddaff;
+  background: #fff;
+  color: var(--accent-2);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.mmtree-toggle:hover {
+  background: var(--accent-soft, #eef1ff);
 }
 
 /* ===== DASHBOARD (interactive) slide ===== */
@@ -1269,7 +1362,7 @@ html, body {
   position: absolute;
   right: 20px;
   bottom: calc(100% + 10px);
-  width: min(380px, 60%);
+  width: min(440px, 68vw);
   background: var(--bg-panel-2);
   border: 1.5px solid var(--accent);
   border-radius: 16px;
@@ -1285,13 +1378,49 @@ html, body {
   display: flex;
 }
 
+#floating-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fc-header-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.fc-close-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--ink-dim);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fc-close-btn:hover {
+  color: #fff;
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
 #floating-chat-log {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 180px;
+  gap: 10px;
+  max-height: 360px;
   overflow-y: auto;
-  padding: 2px 4px;
+  padding: 4px 4px 2px;
+  scroll-behavior: smooth;
 }
 
 #floating-chat-log::-webkit-scrollbar {
@@ -1322,20 +1451,17 @@ html, body {
 }
 
 .fmsg-avatar {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: linear-gradient(135deg, var(--accent), #8a5cf6);
-}
-
-.fmsg-row.user .fmsg-avatar {
-  background: linear-gradient(135deg, #f5a623, #e6683c);
+  background: var(--msg-color, var(--accent));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--msg-color, var(--accent)) 30%, transparent);
 }
 
 .fmsg-content {
@@ -1344,9 +1470,9 @@ html, body {
 }
 
 .fmsg-who {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--ink-faint);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--msg-color, var(--ink-faint));
   margin-bottom: 3px;
 }
 
@@ -1359,9 +1485,10 @@ html, body {
 .fmsg-bubble {
   max-width: 100%;
   font-size: 12.5px;
-  line-height: 1.5;
+  line-height: 1.55;
   background: var(--bg-panel);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--msg-color, var(--border));
   border-radius: 10px;
   padding: 7px 10px;
   color: var(--ink);
@@ -1374,11 +1501,39 @@ html, body {
 }
 
 .fmsg-row.user .fmsg-bubble {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--msg-color, var(--accent));
+  border-color: var(--msg-color, var(--accent));
   color: #fff;
   max-width: 80%;
   flex: none;
+}
+
+/* Note Taker: bong bóng tóm tắt hiển thị dạng gạch đầu dòng thay vì đoạn văn
+   liền mạch, để người dùng lướt nhanh các ý chính đã được thảo luận. */
+ul.fmsg-notes {
+  list-style: none;
+  margin: 0;
+  padding: 7px 10px 7px 12px;
+  background: color-mix(in srgb, var(--msg-color, var(--accent)) 10%, var(--bg-panel));
+  border-style: dashed;
+}
+
+ul.fmsg-notes li {
+  position: relative;
+  padding-left: 12px;
+  margin-bottom: 3px;
+}
+
+ul.fmsg-notes li:last-child {
+  margin-bottom: 0;
+}
+
+ul.fmsg-notes li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--msg-color, var(--accent));
+  font-weight: 800;
 }
 
 .fmsg-play {
@@ -1436,6 +1591,11 @@ html, body {
 }
 
 .discussion-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
   text-align: center;
   font-size: 11px;
   font-weight: 700;
@@ -1447,9 +1607,30 @@ html, body {
   margin: 2px auto 4px;
   width: fit-content;
   max-width: 100%;
+}
+
+.discussion-banner span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+}
+
+.discussion-end-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #ef4444;
+  border: none;
+  border-radius: 14px;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.discussion-end-btn:hover {
+  background: #dc2626;
 }
 
 .rail-round.discussing {
@@ -1530,7 +1711,7 @@ html, body {
   border-radius: 50%;
   border: 2px solid var(--bg-panel);
   margin-left: -8px;
-  background: linear-gradient(135deg, #5b7cfa, #8a5cf6);
+  background: var(--msg-color, var(--accent));
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -1576,7 +1757,7 @@ html, body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #5b7cfa, #8a5cf6);
+  background: var(--msg-color, var(--accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1587,7 +1768,7 @@ html, body {
 .peer-card .pc-name {
   font-size: 13px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--msg-color, var(--ink));
   margin-bottom: 4px;
 }
 
@@ -1905,6 +2086,66 @@ html, body {
 
 .start-btn.ready:hover {
   filter: brightness(1.08);
+}
+
+.outline-preview {
+  margin-top: 18px;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.outline-preview-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.outline-preview-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.outline-preview-item {
+  display: flex;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.outline-item-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.outline-item-body {
+  min-width: 0;
+}
+
+.outline-item-meta {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  margin-bottom: 2px;
+}
+
+.outline-item-content {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .start-skip {
