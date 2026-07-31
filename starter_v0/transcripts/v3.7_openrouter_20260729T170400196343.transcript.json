@@ -1,0 +1,195 @@
+{
+  "transcript_id": "v3.7_openrouter_20260729T170400196343",
+  "version": "v3.7",
+  "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+  "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+  "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T17:04:00",
+  "updated_at": "2026-07-29T17:04:23",
+  "turns": [
+    {
+      "turn_index": 1,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T17:04:00",
+      "user": "tóm tắt 1 bài twitter",
+      "status": "waiting_for_user",
+      "assistant_text": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "ask_for_missing_info",
+              "args": {
+                "question": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+                "response_type": "text"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "ask_for_missing_info",
+              "args": {
+                "question": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+                "response_type": "text"
+              },
+              "result": {
+                "tool": "ask_for_missing_info",
+                "question": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+                "response_type": "text",
+                "options": [],
+                "awaiting_user": true
+              }
+            }
+          ]
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "ask_for_missing_info",
+          "args": {
+            "question": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_for_missing_info",
+            "question": "Bạn muốn tóm tắt bài Twitter nào? Vui lòng cung cấp tên tài khoản hoặc nội dung cụ thể.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T17:04:01"
+    },
+    {
+      "turn_index": 2,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T17:04:10",
+      "user": "ngẫu nhiên",
+      "status": "waiting_for_user",
+      "assistant_text": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "ask_for_missing_info",
+              "args": {
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "ask_for_missing_info",
+              "args": {
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text"
+              },
+              "result": {
+                "tool": "ask_for_missing_info",
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text",
+                "options": [],
+                "awaiting_user": true
+              }
+            }
+          ]
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "ask_for_missing_info",
+          "args": {
+            "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_for_missing_info",
+            "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T17:04:12"
+    },
+    {
+      "turn_index": 3,
+      "version": "v3.7",
+      "artifact_version": "v3.7+pfaab8d858fd9+t863e8a7ee170",
+      "prompt_hash": "faab8d858fd96d750d1c451c3d7af7a2769ca9730a32c4a9a346328c8e3fe5ee",
+      "tools_hash": "863e8a7ee17082f1ea3a6b66b57a91c485fbd790f1c4d1e8cec17e75d6ac8aa3",
+      "started_at": "2026-07-29T17:04:21",
+      "user": "random",
+      "status": "waiting_for_user",
+      "assistant_text": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "ask_for_missing_info",
+              "args": {
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "ask_for_missing_info",
+              "args": {
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text"
+              },
+              "result": {
+                "tool": "ask_for_missing_info",
+                "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+                "response_type": "text",
+                "options": [],
+                "awaiting_user": true
+              }
+            }
+          ]
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "ask_for_missing_info",
+          "args": {
+            "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_for_missing_info",
+            "question": "Vui lòng cung cấp tên tài khoản Twitter để tôi có thể tóm tắt bài viết.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T17:04:23"
+    }
+  ],
+  "surface": "streamlit_ui"
+}

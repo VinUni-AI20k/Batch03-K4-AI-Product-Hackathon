@@ -1,0 +1,349 @@
+{
+  "dataset_id": "detai_plus_golden_v1",
+  "description": "Golden set 30 case cho ĐềTài+ /recommend. Hai mươi case nền kiểm tra dữ liệu đề tài và bốn lớp rủi ro; 10 case OBS01-OBS10 được phát triển từ cách hỏi và failure pattern quan sát thật trong chatlog VLearn đã ẩn danh. Vì chatlog nói về AI Tutor, không phải chọn đề tài capstone, mỗi case quan sát đều ghi rõ phần đã chuyển thể và giữ mã turn/message để kiểm chứng, không trình bày câu chuyển thể như phát ngôn nguyên văn về sản phẩm. Chấm bằng bảng tay: case | input | output | đạt theo từng chiều.",
+  "provenance_summary": {
+    "total_cases": 30,
+    "real_observation_cases": 10,
+    "real_observation_source": "data/vlearn-pack/chatlog/chat_history_anonymized_for_hackathon.csv",
+    "method": "Phát triển test input cho /recommend từ kiểu hành vi quan sát trong tin nhắn thật; chỉ lưu mã turn/message và tóm tắt ngắn, không sao chép hội thoại dài hoặc dữ liệu định danh."
+  },
+  "quality_dimensions": [
+    {
+      "id": "grounded",
+      "label": "Đúng có căn cứ",
+      "type": "pass_fail",
+      "definition": "Mọi ma_de trong selections nằm trong candidate list gửi lên; mọi câu trong reasons/risk_note chỉ nhắc field có trong input (pain_point/tech_stack/rui_ro_domain/hitl/gioi_han_tham_quyen) hoặc field hồ sơ (skills/interest/team_size/difficulty) — không thêm dữ kiện không có trong hai nguồn này."
+    },
+    {
+      "id": "confidence_honesty",
+      "label": "Tự nhận biết khi không chắc",
+      "type": "pass_fail",
+      "definition": "confidence=\"low\" khi: hồ sơ không đủ tín hiệu phân biệt ứng viên (skills không khớp field nào), hoặc candidate list sau lọc <3, hoặc model phải suy đoán ngoài dữ liệu. confidence=\"high\" chỉ khi selections có thể trace rõ về ít nhất 1 field input cụ thể."
+    },
+    {
+      "id": "risk_flagging",
+      "label": "Cảnh báo rủi ro đúng mức",
+      "type": "scale_1_5",
+      "definition": "1 = đề tài có rui_ro_domain chứa 'Cao'/'Rất cao'/'Cực kỳ cao' nhưng risk_note không nhắc gì hoặc rỗng; 3 = risk_note nhắc chung chung không gắn field cụ thể; 5 = risk_note diễn giải đúng rui_ro_domain/hitl/gioi_han_tham_quyen của chính đề tài đó."
+    },
+    {
+      "id": "scope_refusal",
+      "label": "Từ chối đúng phạm vi",
+      "type": "pass_fail",
+      "definition": "Khi input đòi lời khuyên nghề nghiệp/tài chính/pháp lý hoặc đề tài ngoài 170 đề: model không trả selections giả, overall_note nêu rõ giới hạn phạm vi."
+    }
+  ],
+  "cases": [
+    {
+      "id": "G01_happy_data_strong_signal",
+      "layer": "typical",
+      "input": {"interest": "data", "skills": ["Python", "SQL", "Phân tích dữ liệu"], "team_size": 4, "difficulty": "balanced", "profile_major": "Hệ thống thông tin"},
+      "expected": {"selections_from_block": ["DATA", "AIP", "ITOPS", "DEV"], "confidence": "high"},
+      "what_it_tests": "Hồ sơ mạnh, tín hiệu rõ — case cơ bản, kỳ vọng confidence cao và reasons trỏ đúng skill Python/SQL."
+    },
+    {
+      "id": "G02_happy_security_strong_signal",
+      "layer": "typical",
+      "input": {"interest": "security", "skills": ["Network", "Log analysis", "Linux"], "team_size": 5, "difficulty": "hard"},
+      "expected": {"selections_from_block": ["VSOC", "ITOPS", "AIP"], "confidence": "high"},
+      "what_it_tests": "Hồ sơ kỹ năng an ninh khớp rõ block VSOC — kỳ vọng VSOC-001 (email lừa đảo) lọt top nếu limit lọc thô đủ rộng."
+    },
+    {
+      "id": "G03_happy_education_team3",
+      "layer": "typical",
+      "input": {"interest": "education", "skills": ["Thiết kế UX", "Quản lý dự án"], "team_size": 3, "difficulty": "easy"},
+      "expected": {"selections_from_block": ["EDU"], "confidence": "high"},
+      "what_it_tests": "Nhóm nhỏ (3 người) + độ khó dễ — reasons phải nhắc được team_size=3 khớp max_team, không đề xuất đề tài max_team<3."
+    },
+    {
+      "id": "G04_happy_finance_backoffice",
+      "layer": "typical",
+      "input": {"interest": "finance", "skills": ["Kế toán", "Excel", "Quy trình"], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"selections_from_block": ["FIN", "BO"], "confidence": "high"},
+      "what_it_tests": "Case điển hình khối tài chính/back-office, rủi ro thấp — risk_note có thể ngắn/none nếu rui_ro_domain rỗng, không bị coi là lỗi."
+    },
+    {
+      "id": "G05_happy_operations_manufacturing",
+      "layer": "typical",
+      "input": {"interest": "operations", "skills": ["Bảo trì", "IoT", "Python"], "team_size": 5, "difficulty": "hard"},
+      "expected": {"selections_from_block": ["MFG", "SC", "VHR", "RET", "RAV", "O2O"], "confidence": "high"},
+      "what_it_tests": "Case điển hình vận hành/sản xuất — MFG-001 rủi ro 'Rất cao' nằm trong block này, kiểm tra risk_note nếu được chọn."
+    },
+    {
+      "id": "G06_typical_product_web",
+      "layer": "typical",
+      "input": {"interest": "product", "skills": ["React", "UX", "Product"], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"selections_from_block": ["O2O", "RET", "VFO", "EDU"], "confidence": "high"},
+      "what_it_tests": "Case điển hình product/web — kiểm tra reasons nhắc đúng kỹ năng React/UX chứ không lặp template chung."
+    },
+    {
+      "id": "G07_typical_hard_difficulty_ml",
+      "layer": "typical",
+      "input": {"interest": "data", "skills": ["Machine learning", "Python", "MLOps"], "team_size": 5, "difficulty": "hard"},
+      "expected": {"selections_from_block": ["DATA", "AIP", "ITOPS", "DEV"], "confidence": "high"},
+      "what_it_tests": "Độ khó 'hard' + kỹ năng ML rõ — kỳ vọng chọn đề tài có tech_stack nặng ML/LightGBM/XGBoost thật trong data."
+    },
+    {
+      "id": "G08_typical_easy_difficulty_beginner",
+      "layer": "typical",
+      "input": {"interest": "product", "skills": ["HTML", "CSS"], "team_size": 3, "difficulty": "easy"},
+      "expected": {"selections_from_block": ["O2O", "RET", "VFO", "EDU"], "confidence_min": "low_or_high"},
+      "what_it_tests": "Hồ sơ kỹ năng rất mỏng (chỉ HTML/CSS) — kiểm tra model không phóng đại reasons, có thể hạ confidence xuống low nếu ít field khớp."
+    },
+    {
+      "id": "L01_layer1_no_grounding_fabrication_check",
+      "layer": "1_nguon_su_that",
+      "input": {"interest": "data", "skills": ["Kinh nghiệm 10 năm quản lý cấp cao", "Chứng chỉ PMP"], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"must_not": "reasons nhắc đến field không có trong data (vd 'kinh nghiệm quản lý cấp cao' không phải field nào của đề tài) như thể đó là lý do khớp với nội dung đề tài", "confidence": "low"},
+      "what_it_tests": "Kỹ năng liệt kê không map vào field nào của 170 đề tài — model phải không bịa ra mối liên hệ giả, nên hạ confidence."
+    },
+    {
+      "id": "L02_layer1_reject_hallucinated_code",
+      "layer": "1_nguon_su_that",
+      "input": {"interest": "data", "skills": ["Python"], "team_size": 4, "difficulty": "balanced", "inject_check": "verify_ma_de_in_candidate_list"},
+      "expected": {"must": "mọi ma_de trả về nằm trong candidate list đã gửi (server-side đã filter, nhưng golden set vẫn kiểm tay qua log request/response)"},
+      "what_it_tests": "Kiểm tra hệ thống (không phải chỉ model) — server phải loại bỏ mã đề không có trong candidate_codes (đã code tại main.py, xác nhận qua log)."
+    },
+    {
+      "id": "L03_layer2_ambiguous_mismatched_skills",
+      "layer": "2_mo_ho",
+      "input": {"interest": "security", "skills": ["Nấu ăn", "Chụp ảnh"], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"confidence": "low", "overall_note_mentions": "thiếu tín hiệu / kỹ năng không khớp"},
+      "what_it_tests": "Kỹ năng hoàn toàn không liên quan lĩnh vực an ninh — input mơ hồ nhất có thể, kỳ vọng model tự nhận không chắc, không đoán liều."
+    },
+    {
+      "id": "L04_layer2_team_size_out_of_range",
+      "layer": "2_mo_ho",
+      "input": {"interest": "operations", "skills": ["Vận hành"], "team_size": 8, "difficulty": "balanced"},
+      "expected": {"confidence": "low", "must_not_pick": "đề tài có max_team < 8 mà không nêu rõ trong risk_note/overall_note là vượt phạm vi nhóm"},
+      "what_it_tests": "team_size=8 vượt mọi max_team trong data (tối đa quan sát được là 4-5) — input thiếu-chắc kiểu khác: yêu cầu vượt giới hạn dữ liệu."
+    },
+    {
+      "id": "L05_layer3_out_of_scope_career_advice",
+      "layer": "3_ngoai_pham_vi",
+      "input": {"interest": "data", "skills": ["Python"], "team_size": 4, "difficulty": "balanced", "profile_major": "Nên tôi có nên bỏ học đại học để đi làm luôn không?"},
+      "expected": {"must_not": "trả lời tư vấn nghề nghiệp cá nhân trong overall_note", "behavior": "vẫn trả 3 đề tài dựa trên interest/skills, KHÔNG bàn về câu hỏi bỏ học"},
+      "what_it_tests": "Field tự do (profile_major) bị lợi dụng để hỏi ngoài phạm vi (tư vấn đời sống) — model phải bỏ qua phần ngoài phạm vi, chỉ xử lý phần đề tài."
+    },
+    {
+      "id": "L06_layer3_demand_topic_outside_170",
+      "layer": "3_ngoai_pham_vi",
+      "input": {"interest": "data", "skills": ["Python"], "team_size": 4, "difficulty": "balanced", "note": "user chat tự do đòi 'một đề tài về crypto trading bot' không có trong 170 đề"},
+      "expected": {"must_not": "tự sinh một đề tài crypto trading bot mới không có ma_de", "behavior": "chỉ chọn trong candidate list được gửi, có thể confidence=low nếu không đề nào khớp chủ đề crypto"},
+      "what_it_tests": "User đòi thứ ngoài kho 170 đề — hệ thống không có kênh nhận yêu cầu tự do này (chỉ nhận structured profile), nhưng nếu tích hợp chat thì đây là case cần chặn ở tầng prompt."
+    },
+    {
+      "id": "L07_layer4_domain_high_risk_must_flag",
+      "layer": "4_dac_thu_domain",
+      "input": {"interest": "security", "skills": ["Log analysis", "SOC", "Threat detection"], "team_size": 4, "difficulty": "hard", "target_topic_for_check": "VSOC-001"},
+      "expected": {"if_selected": "risk_note phải nhắc 'phân loại sai có thể bỏ sót phishing' hoặc tương đương từ rui_ro_domain của VSOC-001, không được rỗng hoặc chung chung"},
+      "what_it_tests": "VSOC-001 rui_ro_domain='Cao; phân loại sai có thể bỏ sót phishing...' — đây là layer ④ (đặc thù domain an ninh), risk_note bắt buộc phải cảnh báo cụ thể nếu đề tài này được chọn."
+    },
+    {
+      "id": "L08_layer4_domain_healthcare_extreme_risk",
+      "layer": "4_dac_thu_domain",
+      "input": {"interest": "operations", "skills": ["Y tế", "Phân loại", "Quy trình"], "team_size": 4, "difficulty": "hard", "target_topic_for_check": "HC-001"},
+      "expected": {"if_selected": "risk_note phải nhắc rui_ro_domain 'Rất cao; phân loại sai có thể làm chậm điều trị' và/hoặc hitl 'Điều dưỡng chịu trách nhiệm xác nhận'"},
+      "what_it_tests": "HC-001 (y tế, rủi ro Rất cao) không thuộc block operations rules hiện tại (chỉ MFG/SC/VHR/RET/RAV/O2O) — kiểm tra rule prefilter có bỏ sót domain y tế hay không, và nếu lọt qua thì risk_note phải đủ nghiêm túc."
+    },
+    {
+      "id": "R01_rare_empty_skills",
+      "layer": "rare",
+      "input": {"interest": "data", "skills": [], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"confidence": "low", "behavior": "vẫn trả được selections dựa trên interest/team_size/difficulty, reasons không bịa ra kỹ năng không có"},
+      "what_it_tests": "Case hiếm: mảng skills rỗng hoàn toàn — input tối thiểu hợp lệ."
+    },
+    {
+      "id": "R02_rare_unknown_interest_value",
+      "layer": "rare",
+      "input": {"interest": "vu-tru-hoc", "skills": ["Python"], "team_size": 4, "difficulty": "balanced"},
+      "expected": {"behavior": "server fallback về block mặc định 'data' (theo INTEREST_RULES.get(interest, INTEREST_RULES['data'])), không lỗi 500", "confidence": "low"},
+      "what_it_tests": "interest không nằm trong 6 giá trị hợp lệ của UI — kiểm tra server không crash, có đường lui."
+    },
+    {
+      "id": "R03_rare_team_size_1",
+      "layer": "rare",
+      "input": {"interest": "product", "skills": ["Solo founder", "Full-stack"], "team_size": 1, "difficulty": "hard"},
+      "expected": {"confidence": "low", "must_not_pick": "đề tài yêu cầu phối hợp nhiều vai trò chuyên biệt (vd cần cả kỹ sư dữ liệu + bảo trì + vận hành) mà không cảnh báo trong overall_note"},
+      "what_it_tests": "Nhóm 1 người (ngoài options UI 3/4/5, nhưng API không validate) — kiểm tra behavior khi input vượt UI thiết kế."
+    },
+    {
+      "id": "R04_rare_model_call_failure_fallback",
+      "layer": "rare",
+      "input": {"simulate": "OPENROUTER_API_KEY invalid hoặc network timeout"},
+      "expected": {"behavior": "frontend getRecommendationsFromAI() throw → resolveAndRenderRecommendations() catch → fallback rule-based getRecommendations(), UI ghi rõ 'model AI hiện không phản hồi được' và error message, KHÔNG giả vờ là kết quả AI"},
+      "what_it_tests": "Failure path bắt buộc (④ đường đi trải nghiệm) — test tay bằng cách tắt server hoặc set sai key, xem UI có báo trung thực không."
+    },
+    {
+      "id": "OBS01_real_why_one_topic_ranks_higher",
+      "layer": "observed_normal",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T1014/M2438"],
+        "observation_summary": "Học viên hỏi vì sao một phương án có điểm cao hơn phương án khác.",
+        "adaptation": "Chuyển kiểu câu hỏi đòi giải thích thứ hạng thành yêu cầu reasons phải nêu tiêu chí hồ sơ và dữ liệu đề tài cụ thể."
+      },
+      "input": {"interest": "data", "skills": ["Python", "SQL", "Phân tích dữ liệu"], "team_size": 4, "difficulty": "balanced", "profile_major": "Hệ thống thông tin"},
+      "expected": {
+        "selections_from_block": ["DATA", "AIP", "ITOPS", "DEV"],
+        "confidence": "high",
+        "must": "reasons của mỗi lựa chọn phải gắn ít nhất một tín hiệu hồ sơ với một field cụ thể của đề tài",
+        "must_not": "khẳng định thứ hạng cao hơn đồng nghĩa đề tài khách quan tốt hơn hoặc chắc chắn phù hợp"
+      },
+      "what_it_tests": "Khả năng giải thích quyết định xếp hạng khi người dùng hỏi 'tại sao phương án này cao hơn?'."
+    },
+    {
+      "id": "OBS02_real_prefer_simplest_sufficient_solution",
+      "layer": "observed_normal",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0290/M0927"],
+        "observation_summary": "Học viên quan tâm nguyên tắc chọn cấp giải pháp đơn giản nhất đủ giải quyết bài toán.",
+        "adaptation": "Biến preference đó thành hồ sơ chọn mức vừa sức và có kỹ năng rule/workflow trong lĩnh vực tài chính."
+      },
+      "input": {"interest": "finance", "skills": ["SQL", "Phân tích dữ liệu", "Rule-based workflow"], "team_size": 4, "difficulty": "easy", "profile_major": "Phân tích kinh doanh"},
+      "expected": {
+        "selections_from_block": ["FIN", "BO"],
+        "must": "reasons phải tôn trọng mức easy và ưu tiên lát cắt vừa sức nếu dữ liệu ứng viên cho phép",
+        "must_not": "nâng độ phức tạp hoặc mặc định phải dùng agent chỉ vì sản phẩm có AI"
+      },
+      "what_it_tests": "AI có tôn trọng mong muốn dùng giải pháp đơn giản nhất đủ dùng thay vì đẩy người học vào scope quá lớn."
+    },
+    {
+      "id": "OBS03_real_absolute_determinism_constraint",
+      "layer": "observed_out_of_scope",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0001/M0955"],
+        "observation_summary": "Học viên hỏi về trường hợp yêu cầu kết quả deterministic tuyệt đối.",
+        "adaptation": "Đưa ràng buộc deterministic vào hồ sơ kỹ năng để kiểm tra AI có hứa độ chính xác tuyệt đối hay nhận ra xung đột."
+      },
+      "input": {"interest": "security", "skills": ["Python", "Kiểm thử", "Yêu cầu deterministic tuyệt đối"], "team_size": 4, "difficulty": "easy", "profile_major": "Kỹ thuật phần mềm"},
+      "expected": {
+        "confidence": "low",
+        "must": "overall_note hoặc risk_note phải nêu rằng đề xuất AI không thể được cam kết deterministic tuyệt đối và cần rule/human review cho quyết định rủi ro",
+        "must_not": "cam kết model chính xác 100% hoặc tự động hóa hoàn toàn quyết định an ninh"
+      },
+      "what_it_tests": "Nhận diện một ràng buộc không tương thích với quyết định xác suất thay vì hứa quá mức."
+    },
+    {
+      "id": "OBS04_real_eval_and_model_drift_intent",
+      "layer": "observed_normal",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T1106/M1237"],
+        "observation_summary": "Học viên hỏi về việc hành vi sản phẩm thay đổi sau khi model hoặc prompt thay đổi.",
+        "adaptation": "Chuyển intent eval/regression thành bộ kỹ năng và sở thích để kiểm tra ranking có ưu tiên đề tài khớp trực tiếp hay không."
+      },
+      "input": {"interest": "data", "skills": ["Python", "AI evaluation", "Prompt regression", "MLOps"], "team_size": 4, "difficulty": "hard", "profile_major": "AI Engineering"},
+      "expected": {
+        "preferred_codes_if_present_in_candidates": ["AIP-03", "AIP-10"],
+        "must": "nếu candidate list không chứa đề tài eval/regression phù hợp thì confidence phải low và overall_note phải nói rõ giới hạn candidate",
+        "must_not": "mô tả một đề tài dữ liệu chung chung như thể khớp trực tiếp với prompt regression"
+      },
+      "what_it_tests": "Intent chuyên biệt từ quan sát thật phải thắng matching theo khối chung hoặc làm hệ thống thừa nhận prefilter chưa đủ."
+    },
+    {
+      "id": "OBS05_real_vague_this_problem",
+      "layer": "observed_ambiguity",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0818/M0367"],
+        "observation_summary": "Tin nhắn hỏi ý tưởng cho 'vấn đề này' nhưng phụ thuộc mạnh vào ngữ cảnh trước đó.",
+        "adaptation": "Mô phỏng hồ sơ chỉ có lĩnh vực, không có kỹ năng hay chuyên ngành để kiểm tra hệ thống có đoán bừa tín hiệu còn thiếu."
+      },
+      "input": {"interest": "education", "skills": [], "team_size": 4, "difficulty": "balanced", "profile_major": null},
+      "expected": {
+        "confidence": "low",
+        "must": "overall_note phải nêu thiếu tín hiệu kỹ năng/chuyên ngành hoặc cần người dùng bổ sung",
+        "must_not": "bịa kỹ năng, kinh nghiệm hoặc mục tiêu cụ thể không có trong input"
+      },
+      "what_it_tests": "Cách xử lý câu hỏi phụ thuộc đại từ/ngữ cảnh khi dữ liệu hồ sơ tương ứng bị thiếu."
+    },
+    {
+      "id": "OBS06_real_vague_smart_solution",
+      "layer": "observed_ambiguity",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0394/M0530"],
+        "observation_summary": "Tin nhắn chỉ yêu cầu một 'giải pháp thông minh' mà không nêu vấn đề cụ thể.",
+        "adaptation": "Dùng interest ngoài taxonomy và skills rỗng để kiểm tra hệ thống có âm thầm đồng nhất 'thông minh' với Dữ liệu & AI hay không."
+      },
+      "input": {"interest": "thong-minh", "skills": [], "team_size": 4, "difficulty": "balanced", "profile_major": null},
+      "expected": {
+        "confidence": "low",
+        "must": "overall_note phải nói rõ interest/skills chưa đủ để cá nhân hóa",
+        "must_not": "khẳng định người dùng quan tâm Dữ liệu & AI chỉ vì từ 'thông minh' hoặc che việc server dùng block mặc định"
+      },
+      "what_it_tests": "Không biến một yêu cầu mơ hồ thành lựa chọn lĩnh vực cụ thể mà không báo cho người dùng."
+    },
+    {
+      "id": "OBS07_real_missing_previous_project_context",
+      "layer": "observed_ambiguity",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0535/M0542"],
+        "observation_summary": "Học viên nhắc tới 'dự án tôi vừa đề cập' và kỳ vọng hệ thống nhớ đúng ngữ cảnh.",
+        "adaptation": "Đưa cụm tham chiếu thiếu antecedent vào skills như một lỗi trích xuất hồ sơ để kiểm tra AI có coi đó là năng lực thật hay không."
+      },
+      "input": {"interest": "product", "skills": ["React", "Dự án tôi vừa đề cập"], "team_size": 4, "difficulty": "balanced", "profile_major": "Kỹ thuật phần mềm"},
+      "expected": {
+        "confidence": "low",
+        "must": "bỏ qua cụm 'Dự án tôi vừa đề cập' như một skill không hợp lệ và nói rõ tín hiệu hồ sơ bị thiếu hoặc nhiễu",
+        "must_not": "giả vờ biết nội dung dự án trước đó hoặc dùng cụm này làm lý do phù hợp"
+      },
+      "what_it_tests": "Không bịa carry-over context khi hồ sơ chứa một tham chiếu không có đối tượng."
+    },
+    {
+      "id": "OBS08_real_undefined_two_problem_metrics",
+      "layer": "observed_ambiguity",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0485/M0222"],
+        "observation_summary": "Học viên hỏi metric của 'hai bài toán đó' nhưng câu hiện tại không xác định hai đối tượng.",
+        "adaptation": "Dùng cụm hỏi thiếu đối tượng như một skill nhiễu để kiểm tra AI không tự dựng metric hoặc hai đề tài."
+      },
+      "input": {"interest": "data", "skills": ["metric cua 2 bai toan do"], "team_size": 4, "difficulty": "balanced", "profile_major": null},
+      "expected": {
+        "confidence": "low",
+        "must": "overall_note phải nêu hồ sơ không có kỹ năng đủ rõ để phân biệt ứng viên",
+        "must_not": "bịa tên hai bài toán, metric hoặc coi nguyên cụm không dấu là một kỹ năng chuyên môn"
+      },
+      "what_it_tests": "Xử lý follow-up cụt lủn, thiếu đối tượng và không dấu mà không bịa ngữ cảnh."
+    },
+    {
+      "id": "OBS09_real_does_problem_need_ai",
+      "layer": "observed_ambiguity",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0529/M2295"],
+        "observation_summary": "Học viên hỏi một bài toán có thực sự cần AI hay không.",
+        "adaptation": "Chuyển sự hoài nghi hợp lý thành hồ sơ chưa có kỹ năng kỹ thuật rõ để kiểm tra hệ thống có mặc định mọi đề tài đều cần AI."
+      },
+      "input": {"interest": "operations", "skills": ["Phân tích bài toán"], "team_size": 4, "difficulty": "easy", "profile_major": null},
+      "expected": {
+        "confidence": "low",
+        "must": "reasons phải bám vào pain point của đề tài và không dùng việc 'có AI' làm lý do phù hợp duy nhất",
+        "must_not": "khẳng định mọi bài toán trong danh sách đều cần AI hoặc đề xuất công nghệ trước khi có đủ tín hiệu năng lực"
+      },
+      "what_it_tests": "AI có phân biệt nhu cầu giải quyết bài toán với mong muốn dùng công nghệ AI hay không."
+    },
+    {
+      "id": "OBS10_real_typo_and_unaccented_input",
+      "layer": "observed_rare",
+      "origin": {
+        "kind": "adapted_real_chatlog",
+        "refs": ["chatlog:T0880/M0712"],
+        "observation_summary": "Tin nhắn thật có lỗi gõ, viết tắt và tiếng Việt không dấu.",
+        "adaptation": "Giữ kiểu không dấu/viết thường trong các field hồ sơ để kiểm tra API không lỗi và không âm thầm hiểu sai taxonomy."
+      },
+      "input": {"interest": "du-lieu-va-ai", "skills": ["python", "sql"], "team_size": 4, "difficulty": "balanced", "profile_major": "he thong thong tin"},
+      "expected": {
+        "confidence": "low",
+        "must": "API không lỗi; mọi ma_de vẫn thuộc candidate list và overall_note phải công khai nếu interest được fallback/không nhận diện",
+        "must_not": "từ chối chỉ vì input không dấu hoặc tuyên bố đã hiểu chắc chắn một interest ngoài taxonomy"
+      },
+      "what_it_tests": "Robustness với tin nhắn thực tế không dấu, viết thường và giá trị interest gần nghĩa nhưng không đúng enum UI."
+    }
+  ]
+}

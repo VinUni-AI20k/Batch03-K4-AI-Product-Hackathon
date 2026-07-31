@@ -1,0 +1,322 @@
+{
+  "transcript_id": "v3.6_openrouter_20260729T162326402733",
+  "version": "v3.6",
+  "artifact_version": "v3.6+pdca42daf7795+t31a62147a843",
+  "prompt_hash": "dca42daf7795c299bc9274e03e7f3a35f045d780bc404aa1dbe6cba674817da4",
+  "tools_hash": "31a62147a843ddafca9555c613ace5c01b20a80506e30f2614eb0c436d56934a",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T16:23:26",
+  "updated_at": "2026-07-29T16:24:08",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-07-29T16:23:31",
+      "user": "Tìm 3 tin tức nổi bật về AI agents trên web hôm nay và tóm tắt ngắn gọn.",
+      "status": "answered",
+      "assistant_text": "Dưới đây là 3 tin tức nổi bật về AI agents hôm nay:\n\n1. **[Emerson Expands Ovation AI Portfolio with New Intelligent Agents](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)** - Emerson đã giới thiệu các Ovation AI Agents mới cho ngành điện và nước, nâng cao khả năng của nền tảng tự động hóa Ovation 4.0 với năm đại lý mới có khả năng tự động theo dõi điều kiện và đề xuất tối ưu hóa.\n\n2. **[The future of Wall Street is here as startups and brokers build AI agents to trade 24/7](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)** - Các công ty môi giới và khởi nghiệp đang phát triển các AI agents để tự động hóa giao dịch và quản lý danh mục đầu tư, có khả năng xử lý phần lớn hoạt động giao dịch vào năm tới.\n\n3. **[Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)** - Hội thảo AI Core for Agent Communication Network đã nhấn mạnh sự chuyển mình hướng tới các mạng di động AI-native, nhấn mạnh sự cần thiết cho các nhà mạng thích ứng với agentic AI cho kiến trúc 6G trong tương lai.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "query": "AI agents",
+                "topic": "news",
+                "timeframe": "day",
+                "max_results": 3
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "lookup",
+              "args": {
+                "query": "AI agents",
+                "topic": "news",
+                "timeframe": "day",
+                "max_results": 3
+              },
+              "result": {
+                "tool": "web_search",
+                "query": "AI agents",
+                "topic": "news",
+                "timeframe": "day",
+                "items": [
+                  {
+                    "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents - Automation World",
+                    "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                    "source": "automationworld.com",
+                    "summary": "# Emerson Expands Ovation AI Portfolio with New Intelligent Agents. The new Ovation AI Agents enable operators to resolve issues more swiftly, according to the company. Emerson introduced new Ovation AI Agents for the power and water industries, expanding the AI capabilities of its Ovation Automation Platform 4.0 release with five new agents. The new release includes a Sequence Assistant Agent; Alarm Insight Agent; Predictive Maintenance Agent; Root Cause Agent and Loop Performance Monitor Agent. This expansion builds on the success of Ovation Virtual Advisor and delivers new capabilities to Ovation’s growing portfolio of AI solutions for the power and water industry. While Ovation Virtual Advisor provides real-time, AI-driven insights through natural language interaction, the new AI Agents are time synchronized with the Ovation 4.0 system and work autonomously in the background, continuously monitoring plant and equipment conditions and recommending optimizations.",
+                    "score": 0.8003337
+                  },
+                  {
+                    "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7 - CNBC",
+                    "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                    "source": "cnbc.com",
+                    "summary": "# The future of Wall Street is here as startups and brokers build AI agents to trade 24/7. * Brokerages, startups and even retail investors are building AI agents that can help oversee portfolios and automate investing tasks once handled by humans. AI agents could soon trade stocks on your behalf. Imagine telling an AI agent how much risk you're willing to take, your retirement goals and when your kids will start college — then letting it manage your portfolio while you sleep. it goes away from just being able to research something by yourself and then make up your own ideas and then trade the way you've traded where it's now becoming automated and where AI agents can actually execute investment strategies on your behalf,\" said Leif Abraham, Public's co-founder and co-CEO. \"By the end of next year, we think that on some of these platforms, the majority of transaction activity by number of trades will be done by agents, if you can believe that,\" Ryan said.",
+                    "score": 0.758958
+                  },
+                  {
+                    "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle) - RCR Wireless News",
+                    "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                    "source": "rcrwireless.com",
+                    "summary": "*Agentic AI is moving from research to implementation, with growing industry consensus that future mobile networks must become AI-native. For the third year running, the AI Core for Agent Communication Network (ACN) Seminar at MWC26 Shanghai showed the potential of intelligent network agents to move beyond theory and toward practical implementation. AI is being incorporated into telco operations, but it is essential that the telco community does not fall behind the enterprise and hyperscaler sector. If this is to be the case, agentic AI has architectural requirements for the 6G core, rather than as a software overlay on legacy network functions. The 6G core is expected to evolve from a comms-centric 5G ‘service-based architecture’ (SBA) toward a more cognitive and intent-driven architecture. The role, resources, and policy access for AI agents are already being discussed across multiple 3GPP SA2 6G architectural key issues, including ‘non-access stratum’ (NAS) – the core control-plane signaling layer between a device and the network core, location services, ‘AI for network’ (AI4NET), remote and near field sensing, and the data framework.",
+                    "score": 0.71137124
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "format",
+              "args": {
+                "items": [
+                  {
+                    "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                    "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                    "source": "automationworld.com",
+                    "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+                  },
+                  {
+                    "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                    "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                    "source": "cnbc.com",
+                    "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+                  },
+                  {
+                    "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                    "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                    "source": "rcrwireless.com",
+                    "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+                  }
+                ],
+                "template": "sections",
+                "headline": "Tin tức nổi bật về AI agents hôm nay"
+              }
+            },
+            {
+              "name": "format",
+              "args": {
+                "items": [
+                  {
+                    "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                    "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                    "source": "automationworld.com",
+                    "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+                  },
+                  {
+                    "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                    "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                    "source": "cnbc.com",
+                    "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+                  },
+                  {
+                    "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                    "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                    "source": "rcrwireless.com",
+                    "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+                  }
+                ],
+                "template": "bullets",
+                "headline": "Tin tức nổi bật về AI agents hôm nay"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "format",
+              "args": {
+                "items": [
+                  {
+                    "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                    "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                    "source": "automationworld.com",
+                    "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+                  },
+                  {
+                    "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                    "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                    "source": "cnbc.com",
+                    "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+                  },
+                  {
+                    "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                    "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                    "source": "rcrwireless.com",
+                    "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+                  }
+                ],
+                "template": "sections",
+                "headline": "Tin tức nổi bật về AI agents hôm nay"
+              },
+              "result": {
+                "tool": "render_digest",
+                "template": "sections",
+                "markdown": "# Tin tức nổi bật về AI agents hôm nay\n\n## Tổng hợp\n- Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations. - [automationworld.com](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)\n- Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year. - [cnbc.com](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)\n- The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture. - [rcrwireless.com](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)\n",
+                "item_count": 3
+              }
+            },
+            {
+              "tool": "format",
+              "args": {
+                "items": [
+                  {
+                    "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                    "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                    "source": "automationworld.com",
+                    "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+                  },
+                  {
+                    "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                    "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                    "source": "cnbc.com",
+                    "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+                  },
+                  {
+                    "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                    "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                    "source": "rcrwireless.com",
+                    "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+                  }
+                ],
+                "template": "bullets",
+                "headline": "Tin tức nổi bật về AI agents hôm nay"
+              },
+              "result": {
+                "tool": "render_digest",
+                "template": "bullets",
+                "markdown": "- Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations. - [automationworld.com](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)\n- Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year. - [cnbc.com](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)\n- The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture. - [rcrwireless.com](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)",
+                "item_count": 3
+              }
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "assistant_text": "Dưới đây là 3 tin tức nổi bật về AI agents hôm nay:\n\n1. **[Emerson Expands Ovation AI Portfolio with New Intelligent Agents](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)** - Emerson đã giới thiệu các Ovation AI Agents mới cho ngành điện và nước, nâng cao khả năng của nền tảng tự động hóa Ovation 4.0 với năm đại lý mới có khả năng tự động theo dõi điều kiện và đề xuất tối ưu hóa.\n\n2. **[The future of Wall Street is here as startups and brokers build AI agents to trade 24/7](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)** - Các công ty môi giới và khởi nghiệp đang phát triển các AI agents để tự động hóa giao dịch và quản lý danh mục đầu tư, có khả năng xử lý phần lớn hoạt động giao dịch vào năm tới.\n\n3. **[Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)** - Hội thảo AI Core for Agent Communication Network đã nhấn mạnh sự chuyển mình hướng tới các mạng di động AI-native, nhấn mạnh sự cần thiết cho các nhà mạng thích ứng với agentic AI cho kiến trúc 6G trong tương lai.",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI agents",
+            "topic": "news",
+            "timeframe": "day",
+            "max_results": 3
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI agents",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents - Automation World",
+                "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                "source": "automationworld.com",
+                "summary": "# Emerson Expands Ovation AI Portfolio with New Intelligent Agents. The new Ovation AI Agents enable operators to resolve issues more swiftly, according to the company. Emerson introduced new Ovation AI Agents for the power and water industries, expanding the AI capabilities of its Ovation Automation Platform 4.0 release with five new agents. The new release includes a Sequence Assistant Agent; Alarm Insight Agent; Predictive Maintenance Agent; Root Cause Agent and Loop Performance Monitor Agent. This expansion builds on the success of Ovation Virtual Advisor and delivers new capabilities to Ovation’s growing portfolio of AI solutions for the power and water industry. While Ovation Virtual Advisor provides real-time, AI-driven insights through natural language interaction, the new AI Agents are time synchronized with the Ovation 4.0 system and work autonomously in the background, continuously monitoring plant and equipment conditions and recommending optimizations.",
+                "score": 0.8003337
+              },
+              {
+                "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7 - CNBC",
+                "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                "source": "cnbc.com",
+                "summary": "# The future of Wall Street is here as startups and brokers build AI agents to trade 24/7. * Brokerages, startups and even retail investors are building AI agents that can help oversee portfolios and automate investing tasks once handled by humans. AI agents could soon trade stocks on your behalf. Imagine telling an AI agent how much risk you're willing to take, your retirement goals and when your kids will start college — then letting it manage your portfolio while you sleep. it goes away from just being able to research something by yourself and then make up your own ideas and then trade the way you've traded where it's now becoming automated and where AI agents can actually execute investment strategies on your behalf,\" said Leif Abraham, Public's co-founder and co-CEO. \"By the end of next year, we think that on some of these platforms, the majority of transaction activity by number of trades will be done by agents, if you can believe that,\" Ryan said.",
+                "score": 0.758958
+              },
+              {
+                "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle) - RCR Wireless News",
+                "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                "source": "rcrwireless.com",
+                "summary": "*Agentic AI is moving from research to implementation, with growing industry consensus that future mobile networks must become AI-native. For the third year running, the AI Core for Agent Communication Network (ACN) Seminar at MWC26 Shanghai showed the potential of intelligent network agents to move beyond theory and toward practical implementation. AI is being incorporated into telco operations, but it is essential that the telco community does not fall behind the enterprise and hyperscaler sector. If this is to be the case, agentic AI has architectural requirements for the 6G core, rather than as a software overlay on legacy network functions. The 6G core is expected to evolve from a comms-centric 5G ‘service-based architecture’ (SBA) toward a more cognitive and intent-driven architecture. The role, resources, and policy access for AI agents are already being discussed across multiple 3GPP SA2 6G architectural key issues, including ‘non-access stratum’ (NAS) – the core control-plane signaling layer between a device and the network core, location services, ‘AI for network’ (AI4NET), remote and near field sensing, and the data framework.",
+                "score": 0.71137124
+              }
+            ]
+          }
+        },
+        {
+          "tool": "format",
+          "args": {
+            "items": [
+              {
+                "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                "source": "automationworld.com",
+                "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+              },
+              {
+                "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                "source": "cnbc.com",
+                "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+              },
+              {
+                "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                "source": "rcrwireless.com",
+                "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+              }
+            ],
+            "template": "sections",
+            "headline": "Tin tức nổi bật về AI agents hôm nay"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "sections",
+            "markdown": "# Tin tức nổi bật về AI agents hôm nay\n\n## Tổng hợp\n- Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations. - [automationworld.com](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)\n- Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year. - [cnbc.com](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)\n- The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture. - [rcrwireless.com](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)\n",
+            "item_count": 3
+          }
+        },
+        {
+          "tool": "format",
+          "args": {
+            "items": [
+              {
+                "title": "Emerson Expands Ovation AI Portfolio with New Intelligent Agents",
+                "url": "https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents",
+                "source": "automationworld.com",
+                "summary": "Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations."
+              },
+              {
+                "title": "The future of Wall Street is here as startups and brokers build AI agents to trade 24/7",
+                "url": "https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html",
+                "source": "cnbc.com",
+                "summary": "Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year."
+              },
+              {
+                "title": "Network agents are “ready” for commercial use, but are telcos? (Analyst Angle)",
+                "url": "https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi",
+                "source": "rcrwireless.com",
+                "summary": "The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture."
+              }
+            ],
+            "template": "bullets",
+            "headline": "Tin tức nổi bật về AI agents hôm nay"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "bullets",
+            "markdown": "- Emerson introduced new Ovation AI Agents for the power and water industries, enhancing its Ovation Automation Platform 4.0 with five new agents that autonomously monitor conditions and recommend optimizations. - [automationworld.com](https://www.automationworld.com/analytics/news/55394179/emerson-expands-ovation-ai-portfolio-with-new-intelligent-agents)\n- Brokerages and startups are developing AI agents to automate trading and portfolio management, potentially handling the majority of transaction activity by next year. - [cnbc.com](https://www.cnbc.com/2026/07/28/ai-agents-build-to-trade-24/7-the-future-of-wall-street.html)\n- The AI Core for Agent Communication Network Seminar highlighted the shift towards AI-native mobile networks, emphasizing the need for telcos to adapt to agentic AI for future 6G architecture. - [rcrwireless.com](https://www.rcrwireless.com/20260728/analyst-angle/network-agents-ready-telcos-abi)",
+            "item_count": 3
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:23:49"
+    }
+  ]
+}

@@ -1,3 +1,13 @@
 .DS_Store
 node_modules/
 *.env
+__pycache__/
+.pytest_cache/
+backend/.venv/
+runtime/ocr/
+artifacts/ocr/logs/*.jsonl
+artifacts/ocr/reports/*.md
+codebase/server/.venv/
+codebase/server/logs/
+__pycache__/
+.venv

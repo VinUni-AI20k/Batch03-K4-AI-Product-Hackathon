@@ -1,0 +1,81 @@
+{
+  "transcript_id": "v3.6_openrouter_20260729T162643268140",
+  "version": "v3.6",
+  "artifact_version": "v3.6+pdca42daf7795+t31a62147a843",
+  "prompt_hash": "dca42daf7795c299bc9274e03e7f3a35f045d780bc404aa1dbe6cba674817da4",
+  "tools_hash": "31a62147a843ddafca9555c613ace5c01b20a80506e30f2614eb0c436d56934a",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T16:26:43",
+  "updated_at": "2026-07-29T16:27:26",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-07-29T16:26:49",
+      "user": "Tóm tắt bài báo tại http://127.0.0.1:8501/missing-article giúp tôi.",
+      "status": "guardrail_skipped",
+      "assistant_text": "Tôi không thể truy cập vào bài báo tại địa chỉ URL bạn cung cấp vì nó là một địa chỉ IP nội bộ và bị chặn. Nếu bạn có một URL khác hoặc một bài báo công khai nào khác, vui lòng chia sẻ để tôi có thể giúp bạn tóm tắt.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "fetch",
+              "args": {
+                "url": "http://127.0.0.1:8501/missing-article"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "fetch",
+              "args": {
+                "url": "http://127.0.0.1:8501/missing-article"
+              },
+              "result": {
+                "tool": "read_url",
+                "url": "http://127.0.0.1:8501/missing-article",
+                "status": "blocked",
+                "skipped": true,
+                "fallback_allowed": false,
+                "error": "unsafe_url",
+                "message": "Local, private, reserved, and non-global IP URLs are blocked.",
+                "items": []
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Tôi không thể truy cập vào bài báo tại địa chỉ URL bạn cung cấp vì nó là một địa chỉ IP nội bộ và bị chặn. Nếu bạn có một URL khác hoặc một bài báo công khai nào khác, vui lòng chia sẻ để tôi có thể giúp bạn tóm tắt.",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "http://127.0.0.1:8501/missing-article"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "http://127.0.0.1:8501/missing-article",
+            "status": "blocked",
+            "skipped": true,
+            "fallback_allowed": false,
+            "error": "unsafe_url",
+            "message": "Local, private, reserved, and non-global IP URLs are blocked.",
+            "items": []
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:26:53"
+    }
+  ]
+}

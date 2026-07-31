@@ -1,0 +1,912 @@
+{
+  "run_id": "v2_B_group_openrouter_20260729T150402438748",
+  "version": "v2",
+  "artifact_version": "v2+p970230724da1+t9101cb005006",
+  "prompt_hash": "970230724da110e6a75c57408192159699581e06c91cd502f9d40e5af406c45b",
+  "tools_hash": "9101cb005006140b3370ec8c4ee45138b2417cd21019df4eb049376bbcdfdaa9",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/Users/hundz/DAY04_G19_E403/starter_v0/artifacts/tools.yaml",
+  "eval_cases": "data/eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
+  "generated_at": "2026-07-29T15:04:02",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 8,
+    "case_accuracy": 0.8,
+    "tool_routing_accuracy": 0.9,
+    "argument_accuracy": 0.8,
+    "multiturn_accuracy": 0.8,
+    "failure_counts": {
+      "out_of_scope": 1,
+      "wrong_arg_value": 1
+    },
+    "observed_mismatch_counts": {
+      "unexpected_tool_call": 1,
+      "wrong_arg_value": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_timeline_explicit_handle_limit",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: bỏ ký tự @ khỏi handle và giữ đúng limit người dùng yêu cầu."
+      },
+      "input": "Lấy 7 bài đăng mới nhất của tài khoản @ylecun trên X.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "ylecun",
+              "limit": 7
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "ylecun",
+              "limit": 7
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "ylecun",
+            "limit": 7
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "ylecun",
+            "items": [
+              {
+                "title": "RT @finkd: Give it a read: https://t.co/Rq4O3xRHdL",
+                "summary": "RT @finkd: Give it a read: https://t.co/Rq4O3xRHdL",
+                "url": "https://x.com/ylecun/status/2082188279588544923",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 19:35:45 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 517,
+                  "views": "3951"
+                }
+              },
+              {
+                "title": "RT @finkd: I wrote about why we believe the future is for everyone. More coming about a positive vision for a world with",
+                "summary": "RT @finkd: I wrote about why we believe the future is for everyone. More coming about a positive vision for a world with superintelligence…",
+                "url": "https://x.com/ylecun/status/2082188225255211172",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 19:35:32 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1836,
+                  "views": "3495"
+                }
+              },
+              {
+                "title": "RT @Dan_Jeffries1: Go ahead and ask yourself, really ask yourself, if all these confident predictors are wrong about job",
+                "summary": "RT @Dan_Jeffries1: Go ahead and ask yourself, really ask yourself, if all these confident predictors are wrong about jobs and not training…",
+                "url": "https://x.com/ylecun/status/2082072377723371552",
+                "source": "@ylecun",
+                "date": "Tue Jul 28 11:55:12 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 42,
+                  "views": "4920"
+                }
+              },
+              {
+                "title": "RT @Dan_Jeffries1: Catalog of incorrect AI predictions.",
+                "summary": "RT @Dan_Jeffries1: Catalog of incorrect AI predictions.\n\nDoomers from the rationalist cosplay community are left out, presumably because th…",
+                "url": "https://x.com/ylecun/status/2081847285932269717",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 21:00:46 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 45,
+                  "views": "4595"
+                }
+              },
+              {
+                "title": "RT @iScienceLuvr: Music-JEPA: Learning a World Model of Sound from Action",
+                "summary": "RT @iScienceLuvr: Music-JEPA: Learning a World Model of Sound from Action\n\n\"we propose to learn a world model of piano sound using JEPA by…",
+                "url": "https://x.com/ylecun/status/2081758662159200422",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:08:36 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 88,
+                  "views": "4832"
+                }
+              },
+              {
+                "title": "RT @togelius: Right now we are defending open source (or open weights) models' right to exist. The debate is not about f",
+                "summary": "RT @togelius: Right now we are defending open source (or open weights) models' right to exist. The debate is not about forcing anyone to op…",
+                "url": "https://x.com/ylecun/status/2081758603128508793",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:08:22 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 7,
+                  "views": "4308"
+                }
+              },
+              {
+                "title": "RT @JensenHuang: Attackers have frontier AI. Defenders need a frontier AI ecosystem—the best open and closed models, for",
+                "summary": "RT @JensenHuang: Attackers have frontier AI. Defenders need a frontier AI ecosystem—the best open and closed models, force-multiplied by a…",
+                "url": "https://x.com/ylecun/status/2081757132752384339",
+                "source": "@ylecun",
+                "date": "Mon Jul 27 15:02:32 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 4098,
+                  "views": "4254"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_web_news_month",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: map ý định tin tức web và cụm tháng này sang topic=news, timeframe=month."
+      },
+      "input": "Tìm tin tức trên web về AI safety trong tháng này.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI safety",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI safety",
+              "topic": "news",
+              "timeframe": "month",
+              "max_results": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI safety",
+            "topic": "news",
+            "timeframe": "month",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI safety",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "The Most Important Words in the Battle Over AI",
+                "url": "https://www.politico.com/news/magazine/2026/07/17/ai-safety-regulation-debate-factions-00990453",
+                "source": "politico.com",
+                "summary": "“AI safety means systems which serve, not harm, real people — the woman denied a mortgage by an inscrutable algorithm, the teenager whose mental health deteriorates from curated feeds, the company whose critical infrastructure is lost to an AI agent’s irreversible error. Fundamentally, it’s about whether AI systems are safe from bias in consequential decisions, safe from manipulation that undermines democratic discourse, safe for young people’s development, safe for workers’ livelihoods. And do [...] On “AI Safety”\n“‘AI safety’ means protecting America’s national security from advanced AI threats such as weaponization and loss of control. Current AIs, like Claude Mythos, already can hack critical infrastructure. Future AIs will likely be superintelligent, greatly exceeding human expertise. As we accelerate innovation and promote AI’s upside, ‘AI safety’ means having the technical capacity to ensure such systems remain under human stewardship.”\n\n2 of 3⌖\n\n### Evan Swarztrauber [...] On “AI Safety”\n“AI safety is about preventing real harm. That means building a frontier-model vetting system capable of identifying models too risky for public release, and establishing a federal infrastructure with the resources, expertise and agility to monitor emerging threats and respond before they escalate.”\n\n›\n\nAI Safety Factions\n\n## Let It Rip Crowd",
+                "score": 0.90452427
+              },
+              {
+                "title": "A Path Forward on AI Safety for the United States and China | Carnegie Endowment for International Peace",
+                "url": "https://carnegieendowment.org/emissary/2026/07/ai-safety-parallel-us-china",
+                "source": "carnegieendowment.org",
+                "summary": "AI safety in parallel means creating touchpoints and information channels between the United States and China that strengthen the safety capabilities of each side. In practical terms, this could mean limited and strategic sharing of emerging threats and the best practices for detecting and mitigating dangerous AI capabilities. These exchanges can happen through the upcoming U.S.-China governmental dialogue and, for less sensitive areas of engagement, nongovernmental Track II dialogues between [...] Compared with some of the more ambitious proposals for international governance—a non-proliferation treaty for AI, for example—AI safety in parallel is modest in its goals. It treats binding agreements between the countries as a bonus rather than the immediate goal. Depending on where the technology goes in the coming years, this might well prove insufficient. If that’s the case, we will need to adapt quickly. But we have to start somewhere, and beginning with the mental model of safety in [...] Both the U.S. and China have experience worth sharing on AI safety and governance. Technical research on frontier AI safety has deep roots here in the United States but is a relatively newer field in China. One of the most valuable things that could come out of U.S.-China engagement on AI would be sharing approaches to testing for dangerous new capabilities in models: the ability to discover novel pathogens or to intentionally evade the control of a human operator.",
+                "score": 0.8923472
+              },
+              {
+                "title": "Gov. Pritzker Signs Nation-Leading Artificial Intelligence Safety Law",
+                "url": "https://gov-pritzker-newsroom.prezly.com/gov-pritzker-signs-nation-leading-artificial-intelligence-safety-law",
+                "source": "gov-pritzker-newsroom.prezly.com",
+                "summary": "First-in-the-Nation AI Safety Law\n\nThe Artificial Intelligence Safety Measures Act establishes a framework requiring developers of the largest advanced AI systems to publicly disclose safety practices, report significant safety incidents, and maintain robust compliance processes. The law also creates confidential reporting channels and whistleblower protections for employees raising AI safety concerns. [...] Safety Measures Act, a landmark legislation establishing the nation's strongest framework for AI safety, transparency, and accountability. The bipartisan law positions Illinois as the national leader by requiring the largest AI developers to identify, disclose, and mitigate risks while providing independent oversight and protections for workers who report safety concerns. The law earned widespread support, from safety and transparency advocates to technology industry leaders, demonstrating [...] “SB 315 is the strongest AI safety law in the country. It builds on the frameworks California and New York have already passed and goes one step further by requiring independent audits, so the public doesn't have to take AI companies at their word. Illinois has set the new standard,” said Sunny Gandhi, Co-Executive Director of Encode AI.",
+                "score": 0.8512743
+              },
+              {
+                "title": "Industry Leaders Unite in Open Secure AI Alliance for AI Safety and Security",
+                "url": "https://blogs.nvidia.com/blog/open-secure-ai-alliance",
+                "source": "blogs.nvidia.com",
+                "summary": "As policymakers and regulators grapple with AI safety, it will be crucial to recognize open models, harnesses and security tooling as defensive assets, not liabilities, in AI and cybersecurity policy. Blanket restrictions on open frontier AI systems would weaken defensive capacity and risk concentrating power, dependence and vulnerability in a few closed providers. [...] Real AI safety and security depend on the full agent stack — identity, permissions, harnesses, guardrails, logs and evaluation — not just on whether model weights are open or closed. Open harnesses and tools make those controls easier for many defenders to inspect, test and improve.\n\nNVIDIA is contributing open models, model weights, data and new agent harness research to the Open Secure AI Alliance to speed the development of new cybersecurity tools and techniques. [...] The age of AI agents can be one of resilience and shared security. With the right choices, open secure AI systems can give defenders the tools they need, strengthen competition, extend technological leadership and ensure that the safety and security of this extraordinary technology are built in the open for everyone.",
+                "score": 0.82994765
+              },
+              {
+                "title": "The US is advancing AI safety through state and federal action | OpenAI",
+                "url": "https://openai.com/index/advancing-ai-safety-through-state-and-federal-action",
+                "source": "openai.com",
+                "summary": "and create a global approach for the safe deployment of AI that is built on democratic values. If we want to create a safety framework that will truly prioritize getting in place a national and international standard—which is what will best support the safe deployment of AI—it will take hard work, a seriousness of purpose and a strategy that connects the states, the federal government, and the international conversation. A performative or virtue signaling approach will not get the job done [...] OpenAI’s frontier safety blueprint lays out what we believe are the essential elements of that framework.\n\nFirst, the federal government should lead the testing and evaluation of the most advanced systems. Frontier AI raises national security and public safety questions that require technical expertise, resources, and access that no state can fully replicate. [...] And if safety is the priority, such a national standard is the best policy approach to ensure (a) the US continues to lead in innovation and not be undermined by a patchwork of regulations that would slow the ability to build out a global democratic AI stack that will optimize for the good guys having the tools they need to defend against bad actors seeking to misuse AI in areas like cybersecurity; and (b) put the US in the strongest position to take the national standard and create a global",
+                "score": 0.78944516
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_citation_audit_routing",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: yêu cầu audit metadata đã có phải dùng tool mới citation_audit, không lookup hoặc fetch."
+      },
+      "input": "Chỉ kiểm tra độ đầy đủ của citation và source link trong danh sách này, không tìm thêm nguồn: [{\"title\": \"AI report\", \"url\": \"https://example.com/report\"}].",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {
+              "items": [
+                {
+                  "title": "AI report",
+                  "url": "https://example.com/report"
+                }
+              ]
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "citation_audit",
+          "args": {
+            "items": [
+              {
+                "title": "AI report",
+                "url": "https://example.com/report"
+              }
+            ]
+          },
+          "result": {
+            "tool": "audit_citations",
+            "items": [
+              {
+                "index": 0,
+                "title": "AI report",
+                "url": "https://example.com/report",
+                "source": "example.com",
+                "valid": true,
+                "issues": []
+              }
+            ],
+            "summary": {
+              "total": 1,
+              "valid": 1,
+              "invalid": 0,
+              "completeness_score": 1.0,
+              "issue_counts": {}
+            },
+            "duplicate_urls": [],
+            "require_https": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_missing_comparison_urls",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: thiếu cả hai URL nên phải hỏi lại, không tự đoán link."
+      },
+      "input": "So sánh nội dung của hai bài viết này giúp tôi.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh.",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh.",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Vui lòng cung cấp URL của hai bài viết mà bạn muốn so sánh.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_out_of_scope_marketing_copy",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Single-turn: sáng tác quảng cáo ngoài phạm vi research nên không gọi tool."
+      },
+      "input": "Viết cho tôi một slogan quảng cáo bán giày thật hài hước.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "\"Giày của chúng tôi: Đôi chân bạn sẽ không chỉ đi, mà còn nhảy múa và cười đùa!\"",
+              "confirmed": true
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": "unexpected_tool_call",
+        "failure_type": "out_of_scope",
+        "failures": [
+          "expected no tool call"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "\"Giày của chúng tôi: Đôi chân bạn sẽ không chỉ đi, mà còn nhảy múa và cười đùa!\"",
+            "confirmed": true
+          },
+          "result": {
+            "tool": "send_telegram",
+            "error": "RuntimeError",
+            "message": "Missing TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_multiturn_switch_topic_to_account",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: chuyển từ tìm theo chủ đề sang timeline tài khoản, carry tên và limit mới."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm các bài đăng đang bàn về AI agents trên X."
+        },
+        {
+          "role": "user",
+          "content": "Đổi lại, tôi muốn bài đăng từ tài khoản Demis Hassabis."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ lấy 4 bài mới nhất của đúng tài khoản đó."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "demishassabis",
+              "limit": 4
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "DemisHassabis",
+              "limit": 4
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "DemisHassabis",
+            "limit": 4
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "DemisHassabis",
+            "items": [
+              {
+                "title": "A strong and secure open ecosystem is important for the world to benefit from AI. We’ve always supported and contributed",
+                "summary": "A strong and secure open ecosystem is important for the world to benefit from AI. We’ve always supported and contributed heavily to open source and science from Jax to Transformers to AlphaFold to Gemma open models which have now been downloaded 300M+ times. And the standards framework we’ve proposed supports responsible deployment of both open and proprietary models.",
+                "url": "https://x.com/demishassabis/status/2081039623422177765",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 15:31:24 +0000 2026",
+                "metrics": {
+                  "favorites": 7377,
+                  "retweets": 773,
+                  "views": "1095237"
+                }
+              },
+              {
+                "title": "just to clarify: Gemma 4 models have been downloaded 300M+ times, the Gemma open model series as a whole has been downlo",
+                "summary": "just to clarify: Gemma 4 models have been downloaded 300M+ times, the Gemma open model series as a whole has been downloaded an incredible 900M+ times!! https://t.co/ezuKBVMr8Q",
+                "url": "https://x.com/demishassabis/status/2081075346208600103",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 17:53:21 +0000 2026",
+                "metrics": {
+                  "favorites": 819,
+                  "retweets": 38,
+                  "views": "93935"
+                }
+              },
+              {
+                "title": "RT @googlegemma: Gemma 4 just crossed 300 million downloads.",
+                "summary": "RT @googlegemma: Gemma 4 just crossed 300 million downloads.\n\nThank you to the developers, researchers, and open-source community building…",
+                "url": "https://x.com/demishassabis/status/2080971777375654089",
+                "source": "@demishassabis",
+                "date": "Sat Jul 25 11:01:48 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 111,
+                  "views": "7366"
+                }
+              },
+              {
+                "title": "Congratulations @KanishkaNarayan on your new role as UK's AI Minister in the Cabinet, great news for the UK AI ecosystem",
+                "summary": "Congratulations @KanishkaNarayan on your new role as UK's AI Minister in the Cabinet, great news for the UK AI ecosystem!",
+                "url": "https://x.com/demishassabis/status/2080332282028507234",
+                "source": "@demishassabis",
+                "date": "Thu Jul 23 16:40:41 +0000 2026",
+                "metrics": {
+                  "favorites": 1304,
+                  "retweets": 63,
+                  "views": "209966"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_topic_and_timeframe_correction",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: carry chủ đề đã sửa và ưu tiên timeframe mới nhất."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tin climate tech trong tuần này."
+        },
+        {
+          "role": "user",
+          "content": "Chuyển chủ đề sang quantum computing."
+        },
+        {
+          "role": "user",
+          "content": "Và đổi thành trong tháng này, vẫn là tin tức trên web."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "quantum computing",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "climate tech",
+              "timeframe": "month",
+              "max_results": 5,
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "query: expected 'quantum computing', got 'climate tech'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "climate tech",
+            "timeframe": "month",
+            "max_results": 5,
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "climate tech",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "AI power binge delivers best half since 2022 for climate tech venture funding",
+                "url": "https://www.theregister.com/ai-and-ml/2026/07/16/ai-power-binge-delivers-best-half-since-2022-for-climate-tech-venture-funding/5272401",
+                "source": "theregister.com",
+                "summary": "That shift is so dramatic that Currence has effectively rewritten the boundaries of climate tech itself. The firm says climate tech is \"a bigger space than it was six years ago,\" pointing to datacenters as drivers for long-duration energy storage, advanced nuclear, geothermal power, robotics, and even space-based solar. It now counts datacenter developers that rely primarily on clean power or make sustainability central to their business, while excluding conventional facilities and chipmakers. [...] Published\n\nClimate tech venture capital had its strongest first half since 2022 as investors poured billions into low-carbon datacenters and projects needed to feed AI's seemingly endless appetite for compute.\n\nAccording to investment tracker Currence, climate tech startups pulled in $26.1 billion in venture funding during the first six months of 2026, up 55 percent year-over-year. [...] The report may be about climate tech, but the money is following AI infrastructure: datacenters, power generation, grid capacity, and anything else that might keep the compute boom switched on. ®\n\nelectricity datacenter environment science nuclear power ai and ml\n\nREG AD\n\nNo robots allowed\n\nsecurity\n\n## America bans imported robots due to supply chain and security risks\n\nDocs point to China’s Unitree as prime example of the foreign clanker threat\n\nStorage",
+                "score": 0.86024034
+              },
+              {
+                "title": "Climate Tech Market to Reach $312.74 Billion by 2035 as",
+                "url": "https://www.globenewswire.com/news-release/2026/07/14/3326977/0/en/climate-tech-market-to-reach-312-74-billion-by-2035-as-clean-energy-investments-and-carbon-removal-technologies-accelerate-research-by-sns-insider.html",
+                "source": "globenewswire.com",
+                "summary": "The field of climate technology refers to innovations that aim at reducing greenhouse gas emissions, accelerating transition towards clean energy and making economies resilient to climate change. Total investments into global clean energy surpassed USD 1.8 trillion for the first time in 2024 when they outpaced investments into fossil fuels, according to IEA. Microsoft made an agreement on buying 10.5 million metric tons of carbon dioxide removal credits until 2030; it is the biggest single [...] | Source:\nSNS Insider pvt ltd\n\nSNS Insider pvt ltd\n\n1401 Lavaca ST 800, Austin Tx 78701\n\n1401 Lavaca ST 800, Austin Tx 78701\n\nAustin, July 14, 2026 (GLOBE NEWSWIRE) -- The Climate Tech Market was valued at USD 48.46 Billion in 2025 and is expected to reach USD 312.74 Billion by 2035, growing at a CAGR of 20.52%. [...] Europe’s climate tech market is forecasted to generate revenue of USD 12.49 Billion in 2025 and reach a value of USD 59.93 Billion by 2035, with a CAGR of 16.97%. Europe holds approximately 28.46% share of global climate tech revenue because of European Green Deal, REPowerEU, and Carbon Border Adjustment Mechanism which make the most comprehensive climate policy framework in the world with binding climate targets and carbon pricing. The Germany share of Europe’s revenue is approximately 28.47%,",
+                "score": 0.8568246
+              },
+              {
+                "title": "Energy Transition Today - Climate Tech Boom Powered By Policy Innovation And Investment",
+                "url": "https://finance.yahoo.com/energy/articles/energy-transition-today-climate-tech-113713031.html",
+                "source": "finance.yahoo.com",
+                "summary": "The climate technology sector is poised for significant growth, with the global market projected to expand from USD 48.46 billion in 2025 to USD 312.74 billion by 2035, driven by advancements in clean energy and carbon removal technologies. This expansion is supported by substantial investments surpassing USD 1.8 trillion in 2024, favoring renewable energy over fossil fuels and accelerating the commercialization of technologies like carbon capture and AI-driven climate solutions. Key policy [...] Key policy frameworks, such as the U.S. Inflation Reduction Act and Europe's Green Deal, along with cost reductions in solar, wind, and battery technologies, are accelerating the transition towards sustainable energy infrastructure. Moreover, innovations in energy storage and the adoption of green hydrogen highlight the opportunities within this sector, underscoring how climate tech is evolving from experimental phases to large-scale implementation. [...] Sources:\n\n Simply Wall St\n \"Climate Tech Market to Reach $312.74 Billion by 2035 as Clean Energy Investments and Carbon Removal Technologies Accelerate | Research by SNS Insider\" from SNS Insider pvt ltd on GlobeNewswire (published 14 July 2026)\n\nCompanies discussed in this article include TSE:7453 NasdaqGS:CEGNasdaqGS:TSLA OB:EQNR and TWSE:2492.\n\nThis article was originally published by Simply Wall St.",
+                "score": 0.82082915
+              },
+              {
+                "title": "AI power boom sparks record rush into climate tech deals - Los Angeles Times",
+                "url": "https://www.latimes.com/business/story/2026-07-15/ai-power-boom-sparks-record-rush-into-climate-tech-deals",
+                "source": "latimes.com",
+                "summary": "The global climate technology sector recorded its busiest first half on record for public listings and acquisitions, a milestone that may boost investor confidence and unlock fresh capital for decarbonization technologies.\n\nA total of 153 transactions were announced during the first six months of 2026, according to a report published Monday by market research firm Currence. That marks a 70% increase from the same period a year earlier. [...] While climate tech listings represent only a fraction of the broader global IPO market, the sector’s fundraising volume in the first half of 2026 almost doubled from the prior six months, Currence data show. Zou said the pipeline for new listings is robust for the next six to 12 months, pointing to companies such as Newcleo Ltd. and TAE Technologies Inc. that have already revealed their intent to go public. [...] Acquisitions accounted for most of the deals, up roughly 65% from a year ago. Meanwhile, the climate tech industry logged its busiest period for initial public offerings since 2022. Seventeen climate tech companies listed on stock exchanges in the first half of this year, raising a combined $6.7 billion. That’s the highest total since the first half of 2022, before the industry slumped amid rising interest rates and tighter capital markets.\n\nAdvertisement",
+                "score": 0.77873385
+              },
+              {
+                "title": "Why Meta’s Longtime CTO Is Now Investing in Climate Tech - Heatmap News",
+                "url": "https://heatmap.news/podcast/shift-key-s3-e56-gigascale-capital",
+                "source": "heatmap.news",
+                "summary": "It has been a hard few years for climate tech. But we recently got a bright spot: Earlier this month, Gigascale Capital announced it had raised $250 million to build the physical infrastructure driving decarbonization. That was notable in part because Gigscale’s founder is Mike Schroepfer, Meta’s former chief technology officer, who has gone deep on climate tech since leaving the company in 2022. [...] On Monday, the market released a series of proposed reforms and initiatives to bring on new generation and attempt to make up for its reliability gap. This includes a supposedly one-off procurement of new capacity later this year that had been requested by the region’s governors and the White House, a new registry of large loads, and a kind of connect-and-manage system whereby new large loads that don’t have their own capacity will face curtailment during times of high demand. [...] Heatmap Pro brings all of our research, reporting, and insights down to the local level. The software platform tracks all local opposition to clean energy and data centers, forecasts community sentiment, and guides data-driven engagement campaigns. Book a demo today to see the premier intelligence platform for project permitting and community engagement.\n\nMusic for Shift Key is by Adam Kromelow.\n\nBlue\n\nRobinson Meyer profile image\n\nRobinson Meyer",
+                "score": 0.6944897
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_confirmation_boundary",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: không coi duyệt nội dung là xác nhận gửi; phải hỏi yes/no trước write action."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Soạn nội dung Telegram: Bản tin AI đã sẵn sàng."
+        },
+        {
+          "role": "user",
+          "content": "Đăng nội dung đó lên Telegram giúp tôi."
+        },
+        {
+          "role": "user",
+          "content": "Nội dung ổn nhưng tôi chưa xác nhận gửi; hãy hỏi xác nhận trước."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn có muốn gửi nội dung \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+              "response_type": "yes_no"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn có muốn gửi nội dung \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+            "response_type": "yes_no"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn có muốn gửi nội dung \"Bản tin AI đã sẵn sàng\" lên Telegram không?",
+            "response_type": "yes_no",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_audit_existing_sources",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: dùng tool local mới với dữ liệu carry-over, không gọi live research tools."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi có hai nguồn: https://example.com/a và http://example.org/b."
+        },
+        {
+          "role": "user",
+          "content": "Đừng tìm hay đọc thêm nguồn nào."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ audit citation và kiểm tra các source link hiện có."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "citation_audit",
+            "args": {
+              "items": [
+                {
+                  "title": "Nguồn A",
+                  "url": "https://example.com/a",
+                  "source": "example.com"
+                },
+                {
+                  "title": "Nguồn B",
+                  "url": "http://example.org/b",
+                  "source": "example.org"
+                }
+              ]
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "citation_audit",
+          "args": {
+            "items": [
+              {
+                "title": "Nguồn A",
+                "url": "https://example.com/a",
+                "source": "example.com"
+              },
+              {
+                "title": "Nguồn B",
+                "url": "http://example.org/b",
+                "source": "example.org"
+              }
+            ]
+          },
+          "result": {
+            "tool": "audit_citations",
+            "items": [
+              {
+                "index": 0,
+                "title": "Nguồn A",
+                "url": "https://example.com/a",
+                "source": "example.com",
+                "valid": true,
+                "issues": []
+              },
+              {
+                "index": 1,
+                "title": "Nguồn B",
+                "url": "http://example.org/b",
+                "source": "example.org",
+                "valid": false,
+                "issues": [
+                  "insecure_url"
+                ]
+              }
+            ],
+            "summary": {
+              "total": 2,
+              "valid": 1,
+              "invalid": 1,
+              "completeness_score": 0.5,
+              "issue_counts": {
+                "insecure_url": 1
+              }
+            },
+            "duplicate_urls": [],
+            "require_https": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_cancel_to_no_tool",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu cuối hủy tác vụ và cấm tool phải ghi đè intent research cũ."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tweet mới về GPT-5."
+        },
+        {
+          "role": "user",
+          "content": "Hủy yêu cầu tìm kiếm đó."
+        },
+        {
+          "role": "user",
+          "content": "Không dùng công cụ; chỉ xác nhận là đã hủy."
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Yêu cầu tìm kiếm tweet mới về GPT-5 đã được hủy.",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ]
+}
