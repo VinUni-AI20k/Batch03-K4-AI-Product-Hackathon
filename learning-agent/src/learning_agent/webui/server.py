@@ -48,7 +48,7 @@ class TaskBody(BaseModel):
     platform: str = "telegram"
 
 
-def create_app(cfg) -> FastAPI:
+def create_app(cfg, watch: bool = False) -> FastAPI:
     app = FastAPI(title="learning-agent admin")
 
     # CORS: cho trang chat public (vd vlearn-agent.vercel.app) gọi /api/ask khi agent
@@ -141,6 +141,9 @@ def create_app(cfg) -> FastAPI:
     )
     agent = TutorAgent(cfg, vault, index)
     store = TaskStore(cfg.root / "data" / "schedules.json")
+    if watch:  # sửa vault bằng Obsidian -> RAG tự cập nhật (chỉ khi chạy server thật, không bật trong test)
+        from ..updater.watch import start_vault_watcher
+        start_vault_watcher(cfg, vault, index)
 
     @app.get("/", response_class=HTMLResponse)
     def home():
@@ -409,4 +412,4 @@ def run_ui(cfg, port: int = 8321, host: str = "127.0.0.1") -> None:
         import threading
         import webbrowser
         threading.Timer(1.5, lambda: webbrowser.open(f"http://{host}:{port}")).start()
-    uvicorn.run(create_app(cfg), host=host, port=port, log_level="warning")
+    uvicorn.run(create_app(cfg, watch=True), host=host, port=port, log_level="warning")

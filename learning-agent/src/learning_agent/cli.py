@@ -127,6 +127,8 @@ async def _run_gateway(cfg, vault, index) -> None:
     agent = TutorAgent(cfg, vault, index)
     home = HomeStore(cfg.root / "data" / "home.json")
     scheduler = Scheduler(cfg, agent)
+    from .updater.watch import start_vault_watcher
+    start_vault_watcher(cfg, vault, index)  # sửa vault bằng Obsidian -> RAG tự cập nhật
     agent.attach_task_store(scheduler.store)  # bật tools schedule_task từ chat
     tasks = []
 
