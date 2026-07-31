@@ -1763,6 +1763,23 @@ body,
   padding-top: 2px;
 }
 
+.community-comment.is-entering,
+.comment-reply.is-entering {
+  animation: discussion-item-enter 220ms var(--ease-out) both;
+}
+
+@keyframes discussion-item-enter {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .comment-avatar {
   display: grid;
   place-items: center;
@@ -1816,6 +1833,24 @@ body,
   border-color: color-mix(in oklch, var(--danger) 48%, var(--line-strong));
   background: var(--danger-soft);
   color: var(--danger);
+}
+
+.comment-reaction.is-reacting {
+  animation: reaction-pop 200ms var(--ease-out) both;
+}
+
+@keyframes reaction-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .comment-tools {

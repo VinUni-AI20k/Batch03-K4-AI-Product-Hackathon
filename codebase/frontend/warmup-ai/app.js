@@ -327,55 +327,18 @@ function renderDiscussion() {
   restoreBeaIdle();
   setCharacterVisibility("none");
 
-  const replyTarget = state.replyingTo
-    ? state.communityComments.find((comment) => comment.id === state.replyingTo)
-    : null;
-
   elements.sceneContent.innerHTML = `
     <section class="discussion" aria-labelledby="discussionTitle">
       <div class="discussion-heading">
         <div>
-          <p class="cover-prompt">Cộng đồng lớp học · ${state.communityComments.length} bình luận</p>
+          <p class="cover-prompt" id="discussionCount">Cộng đồng lớp học · ${state.communityComments.length} bình luận</p>
           <h1 id="discussionTitle">Thảo luận trước giờ học</h1>
         </div>
         <button class="text-nav" type="button" data-discussion-action="lobby">← Sảnh chờ</button>
       </div>
       <div class="community-layout">
         <div class="composer-side">
-          <form class="comment-composer ${replyTarget ? "comment-composer--reply" : ""}" id="commentForm">
-            <label for="commentInput">
-              ${
-                replyTarget
-                  ? `Đang trả lời <span class="reply-target-name">${escapeHtml(replyTarget.author)}</span>`
-                  : "Bạn đang nghĩ gì?"
-              }
-            </label>
-            <p>
-              ${
-                replyTarget
-                  ? `Câu trả lời sẽ đăng dưới bình luận của <strong>${escapeHtml(replyTarget.author)}</strong>.`
-                  : "Đăng một câu hỏi hoặc góc nhìn để cả lớp cùng thảo luận."
-              }
-            </p>
-            <textarea id="commentInput" maxlength="240" rows="8"
-              placeholder="${
-                replyTarget
-                  ? `Viết câu trả lời cho ${escapeHtml(replyTarget.author)}…`
-                  : "Ví dụ: Nếu AI chỉ dự đoán, “hiểu” nghĩa là gì?"
-              }"
-            ></textarea>
-            <div class="composer-actions">
-              <span id="commentCounter">0 / 240</span>
-              <div class="composer-buttons">
-                ${
-                  replyTarget
-                    ? `<button type="button" class="composer-cancel-btn" id="cancelReplyBtn">Hủy</button>`
-                    : ""
-                }
-                <button type="submit" disabled>${replyTarget ? "Trả lời" : "Đăng bình luận"}</button>
-              </div>
-            </div>
-          </form>
+          ${commentComposerMarkup()}
         </div>
         <div class="community-feed" aria-label="Bình luận của cộng đồng">
           ${state.communityComments.map(communityCommentMarkup).join("")}
@@ -383,54 +346,7 @@ function renderDiscussion() {
       </div>
     </section>
   `;
-  document.querySelector("[data-discussion-action]").addEventListener("click", returnToLobby);
-  const form = document.querySelector("#commentForm");
-  const input = document.querySelector("#commentInput");
-  const submit = form.querySelector("button[type='submit']");
-  const counter = document.querySelector("#commentCounter");
-  const cancelButton = document.querySelector("#cancelReplyBtn");
-
-  cancelButton?.addEventListener("click", () => {
-    state.replyingTo = null;
-    renderDiscussion();
-    announce("Đã hủy trả lời.");
-  });
-
-  input.addEventListener("input", () => {
-    const length = input.value.trim().length;
-    counter.textContent = `${input.value.length} / 240`;
-    submit.disabled = length === 0;
-  });
-
-  input.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-      form.requestSubmit();
-    }
-    if (event.key === "Escape" && state.replyingTo) {
-      state.replyingTo = null;
-      renderDiscussion();
-      announce("Đã hủy trả lời.");
-    }
-  });
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (state.replyingTo) {
-      postCommunityReply(state.replyingTo, input.value);
-    } else {
-      postCommunityComment(input.value);
-    }
-  });
-  document.querySelectorAll("[data-comment-id]").forEach((button) => {
-    button.addEventListener("click", () => reactToComment(button.dataset.commentId));
-  });
-  document.querySelectorAll("[data-reply-to]").forEach((button) => {
-    button.addEventListener("click", () => toggleReplyComposer(button.dataset.replyTo));
-  });
-
-  if (state.replyingTo) {
-    window.setTimeout(() => input.focus(), 60);
-  }
+  bindDiscussionEvents();
 
   elements.actionHint.innerHTML = "";
   elements.primaryAction.innerHTML = `Làm warm-up<span aria-hidden="true">→</span>`;
@@ -439,10 +355,73 @@ function renderDiscussion() {
   setProgress();
 }
 
+function commentComposerMarkup() {
+  return `
+    <form class="comment-composer" id="commentForm">
+      <label id="commentComposerLabel" for="commentInput">Bạn đang nghĩ gì?</label>
+      <p id="commentComposerHelp">Đăng một câu hỏi hoặc góc nhìn để cả lớp cùng thảo luận.</p>
+      <textarea id="commentInput" maxlength="240" rows="8" placeholder="Ví dụ: Nếu AI chỉ dự đoán, “hiểu” nghĩa là gì?"></textarea>
+      <div class="composer-actions">
+        <span id="commentCounter">0 / 240</span>
+        <div class="composer-buttons">
+          <button type="button" class="composer-cancel-btn" id="cancelReplyBtn" hidden>Hủy</button>
+          <button id="commentSubmitButton" type="submit" disabled>Đăng bình luận</button>
+        </div>
+      </div>
+    </form>
+  `;
+}
+
+function bindDiscussionEvents() {
+  const discussion = getDiscussionRoot();
+  const form = discussion.querySelector("#commentForm");
+  const input = discussion.querySelector("#commentInput");
+
+  discussion.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+
+    if (event.target.closest("[data-discussion-action='lobby']")) {
+      returnToLobby();
+      return;
+    }
+
+    const reactionButton = event.target.closest("[data-reaction-id]");
+    if (reactionButton) {
+      reactToComment(reactionButton.dataset.reactionId);
+      return;
+    }
+
+    const replyButton = event.target.closest("[data-reply-to]");
+    if (replyButton) {
+      toggleReplyComposer(replyButton.dataset.replyTo);
+      return;
+    }
+
+    if (event.target.closest("#cancelReplyBtn")) {
+      clearReplyComposer(true);
+      announce("Đã hủy trả lời.");
+    }
+  });
+
+  input.addEventListener("input", syncComposerSubmitState);
+  input.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") form.requestSubmit();
+    if (event.key === "Escape" && state.replyingTo) {
+      clearReplyComposer(true);
+      announce("Đã hủy trả lời.");
+    }
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (state.replyingTo) postCommunityReply(state.replyingTo, input.value);
+    else postCommunityComment(input.value);
+  });
+}
+
 function communityCommentMarkup(comment) {
   const replies = Array.isArray(comment.replies) ? comment.replies : [];
   return `
-    <article class="community-comment">
+    <article class="community-comment" data-comment-id="${escapeHtml(comment.id)}">
       <div class="comment-avatar" aria-hidden="true">${escapeHtml(comment.initials)}</div>
       <div class="comment-body">
         <div class="comment-meta">
@@ -451,45 +430,55 @@ function communityCommentMarkup(comment) {
         </div>
         <p>${escapeHtml(comment.text)}</p>
         <div class="comment-tools">
-          <button class="comment-reaction ${comment.liked ? "is-liked" : ""}" type="button" data-comment-id="${escapeHtml(comment.id)}" aria-pressed="${Boolean(comment.liked)}" aria-label="${comment.liked ? "Bỏ thích" : "Thích"} bình luận của ${escapeHtml(comment.author)}">
-            <span aria-hidden="true">${comment.liked ? "♥" : "♡"}</span> ${comment.reactions}
-          </button>
-          <button class="comment-reply-button" type="button" data-reply-to="${escapeHtml(comment.id)}">
-            Trả lời${replies.length ? ` · ${replies.length}` : ""}
-          </button>
+          ${reactionButtonMarkup(comment)}
+          <button class="comment-reply-button" type="button" data-reply-to="${escapeHtml(comment.id)}">${replyButtonLabel(replies.length)}</button>
         </div>
         ${
           replies.length
             ? `<div class="comment-replies">
-                ${replies
-                  .map(
-                    (reply) => `
-                      <article class="comment-reply">
-                        <div class="reply-avatar" aria-hidden="true">${escapeHtml(reply.initials)}</div>
-                        <div>
-                          <div class="comment-meta"><strong>${escapeHtml(reply.author)}</strong><span>${escapeHtml(reply.time)}</span></div>
-                          <p>${escapeHtml(reply.text)}</p>
-                        </div>
-                      </article>
-                    `
-                  )
-                  .join("")}
+                ${replies.map(replyMarkup).join("")}
               </div>`
             : ""
         }
-        ${
-          state.replyingTo === comment.id
-            ? `<div class="composer-typing-indicator composer-typing-indicator--inline" aria-live="polite">
-                <div class="composer-typing-avatar" aria-hidden="true">B</div>
-                <div class="composer-typing-info">
-                  <span class="composer-typing-label">Bạn · đang trả lời <strong>${escapeHtml(comment.author)}</strong></span>
-                  <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                </div>
-              </div>`
-            : ""
-        }
+        ${state.replyingTo === comment.id ? replyIndicatorMarkup(comment) : ""}
       </div>
     </article>
+  `;
+}
+
+function replyMarkup(reply) {
+  return `
+    <article class="comment-reply">
+      <div class="reply-avatar" aria-hidden="true">${escapeHtml(reply.initials)}</div>
+      <div>
+        <div class="comment-meta"><strong>${escapeHtml(reply.author)}</strong><span>${escapeHtml(reply.time)}</span></div>
+        <p>${escapeHtml(reply.text)}</p>
+      </div>
+    </article>
+  `;
+}
+
+function reactionButtonMarkup(comment) {
+  return `
+    <button class="comment-reaction ${comment.liked ? "is-liked" : ""}" type="button" data-reaction-id="${escapeHtml(comment.id)}" aria-pressed="${Boolean(comment.liked)}" aria-label="${comment.liked ? "Bỏ thích" : "Thích"} bình luận của ${escapeHtml(comment.author)}">
+      <span aria-hidden="true">${comment.liked ? "♥" : "♡"}</span> ${comment.reactions}
+    </button>
+  `;
+}
+
+function replyButtonLabel(count) {
+  return `Trả lời${count ? ` · ${count}` : ""}`;
+}
+
+function replyIndicatorMarkup(comment) {
+  return `
+    <div class="composer-typing-indicator composer-typing-indicator--inline" aria-live="polite">
+      <div class="composer-typing-avatar" aria-hidden="true">B</div>
+      <div class="composer-typing-info">
+        <span class="composer-typing-label">Bạn · đang trả lời <strong>${escapeHtml(comment.author)}</strong></span>
+        <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      </div>
+    </div>
   `;
 }
 
@@ -522,7 +511,7 @@ function postCommunityComment(rawText) {
   const text = rawText.trim();
   if (!text) return;
 
-  state.communityComments.unshift({
+  const comment = {
     id: `local-${Date.now()}`,
     author: "Bạn",
     initials: "B",
@@ -531,10 +520,19 @@ function postCommunityComment(rawText) {
     reactions: 0,
     liked: false,
     replies: []
-  });
+  };
+  state.communityComments.unshift(comment);
   state.replyingTo = null;
   persistCommunityComments();
-  renderDiscussion();
+  const feed = getDiscussionRoot().querySelector(".community-feed");
+  feed.insertAdjacentHTML("afterbegin", communityCommentMarkup(comment));
+  animateDiscussionElement(feed.firstElementChild, "is-entering");
+  updateDiscussionCount();
+  const input = getDiscussionRoot().querySelector("#commentInput");
+  input.value = "";
+  syncComposerSubmitState();
+  input.focus();
+  feed.scrollTop = 0;
   announce("Bình luận của bạn đã được đăng.");
 }
 
@@ -544,13 +542,21 @@ function reactToComment(id) {
   comment.liked = !comment.liked;
   comment.reactions = Math.max(0, comment.reactions + (comment.liked ? 1 : -1));
   persistCommunityComments();
-  renderDiscussion();
+  const button = getCommentNode(id)?.querySelector(".comment-reaction");
+  if (button) {
+    button.classList.toggle("is-liked", comment.liked);
+    button.setAttribute("aria-pressed", String(comment.liked));
+    button.setAttribute("aria-label", `${comment.liked ? "Bỏ thích" : "Thích"} bình luận của ${comment.author}`);
+    button.innerHTML = `<span aria-hidden="true">${comment.liked ? "♥" : "♡"}</span> ${comment.reactions}`;
+    animateDiscussionElement(button, "is-reacting", 200);
+  }
   announce(`${comment.liked ? "Đã thích" : "Đã bỏ thích"} bình luận của ${comment.author}.`);
 }
 
 function toggleReplyComposer(id) {
   state.replyingTo = state.replyingTo === id ? null : id;
-  renderDiscussion();
+  syncReplyIndicator();
+  updateDiscussionComposer({ focus: Boolean(state.replyingTo) });
   if (state.replyingTo) {
     const target = state.communityComments.find((comment) => comment.id === id);
     if (target) announce(`Đang trả lời bình luận của ${target.author}.`);
@@ -561,17 +567,109 @@ function postCommunityReply(commentId, rawText) {
   const text = rawText.trim();
   const comment = state.communityComments.find((item) => item.id === commentId);
   if (!comment || !text) return;
-  comment.replies.push({
+  const reply = {
     id: `reply-${Date.now()}`,
     author: "Bạn",
     initials: "B",
     time: "vừa xong",
     text: text.slice(0, 180)
-  });
+  };
+  comment.replies.push(reply);
   state.replyingTo = null;
   persistCommunityComments();
-  renderDiscussion();
+  const commentNode = getCommentNode(commentId);
+  let replies = commentNode?.querySelector(".comment-replies");
+  if (!replies && commentNode) {
+    commentNode.querySelector(".comment-tools").insertAdjacentHTML("afterend", '<div class="comment-replies"></div>');
+    replies = commentNode.querySelector(".comment-replies");
+  }
+  if (replies) {
+    replies.insertAdjacentHTML("beforeend", replyMarkup(reply));
+    animateDiscussionElement(replies.lastElementChild, "is-entering");
+  }
+  updateReplyButtonCount(comment);
+  syncReplyIndicator();
+  updateDiscussionComposer({ focus: true });
   announce(`Đã trả lời bình luận của ${comment.author}.`);
+}
+
+function clearReplyComposer(focus = false) {
+  state.replyingTo = null;
+  syncReplyIndicator();
+  updateDiscussionComposer({ focus });
+}
+
+function getDiscussionRoot() {
+  return elements.sceneContent.querySelector(".discussion");
+}
+
+function getCommentNode(id) {
+  return Array.from(getDiscussionRoot().querySelectorAll(".community-comment")).find((node) => node.dataset.commentId === id);
+}
+
+function syncComposerSubmitState() {
+  const discussion = getDiscussionRoot();
+  const input = discussion.querySelector("#commentInput");
+  const counter = discussion.querySelector("#commentCounter");
+  const submit = discussion.querySelector("#commentSubmitButton");
+  counter.textContent = `${input.value.length} / 240`;
+  submit.disabled = input.value.trim().length === 0;
+}
+
+function updateDiscussionComposer({ focus = false } = {}) {
+  const discussion = getDiscussionRoot();
+  const replyTarget = state.replyingTo
+    ? state.communityComments.find((comment) => comment.id === state.replyingTo)
+    : null;
+  const form = discussion.querySelector("#commentForm");
+  const input = discussion.querySelector("#commentInput");
+  const label = discussion.querySelector("#commentComposerLabel");
+  const help = discussion.querySelector("#commentComposerHelp");
+  const cancel = discussion.querySelector("#cancelReplyBtn");
+  const submit = discussion.querySelector("#commentSubmitButton");
+
+  form.classList.toggle("comment-composer--reply", Boolean(replyTarget));
+  label.innerHTML = replyTarget
+    ? `Đang trả lời <span class="reply-target-name">${escapeHtml(replyTarget.author)}</span>`
+    : "Bạn đang nghĩ gì?";
+  help.innerHTML = replyTarget
+    ? `Câu trả lời sẽ đăng dưới bình luận của <strong>${escapeHtml(replyTarget.author)}</strong>.`
+    : "Đăng một câu hỏi hoặc góc nhìn để cả lớp cùng thảo luận.";
+  input.placeholder = replyTarget
+    ? `Viết câu trả lời cho ${replyTarget.author}…`
+    : "Ví dụ: Nếu AI chỉ dự đoán, “hiểu” nghĩa là gì?";
+  input.value = "";
+  cancel.hidden = !replyTarget;
+  submit.textContent = replyTarget ? "Trả lời" : "Đăng bình luận";
+  syncComposerSubmitState();
+  if (focus) window.setTimeout(() => input.focus(), 0);
+}
+
+function syncReplyIndicator() {
+  const discussion = getDiscussionRoot();
+  discussion.querySelectorAll(".composer-typing-indicator--inline").forEach((node) => node.remove());
+  if (!state.replyingTo) return;
+  const target = state.communityComments.find((comment) => comment.id === state.replyingTo);
+  const commentNode = getCommentNode(state.replyingTo);
+  if (target && commentNode) commentNode.querySelector(".comment-body").insertAdjacentHTML("beforeend", replyIndicatorMarkup(target));
+}
+
+function updateDiscussionCount() {
+  const count = getDiscussionRoot().querySelector("#discussionCount");
+  count.textContent = `Cộng đồng lớp học · ${state.communityComments.length} bình luận`;
+}
+
+function updateReplyButtonCount(comment) {
+  const button = getCommentNode(comment.id)?.querySelector("[data-reply-to]");
+  if (button) button.textContent = replyButtonLabel(comment.replies.length);
+}
+
+function animateDiscussionElement(element, className, duration = 220) {
+  if (!element) return;
+  element.classList.remove(className);
+  void element.offsetWidth;
+  element.classList.add(className);
+  window.setTimeout(() => element.classList.remove(className), duration);
 }
 
 function escapeHtml(value) {
@@ -840,6 +938,7 @@ function startWarmup() {
 }
 
 function openDiscussion() {
+  state.replyingTo = null;
   state.view = "discussion";
   render();
   announce("Đang mở thảo luận trước giờ học.");
@@ -851,6 +950,7 @@ function openKeyMoments() {
 }
 
 function returnToLobby() {
+  state.replyingTo = null;
   state.view = "cover";
   state.sceneIndex = 0;
   state.dialogueIndex = 0;
