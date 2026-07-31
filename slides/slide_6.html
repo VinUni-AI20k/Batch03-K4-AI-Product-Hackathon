@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLearn Quiz AI — Demo Sản Phẩm</title>
+  
+  <!-- Fonts: Plus Jakarta Sans (Headings) + Be Vietnam Pro (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-slate: #0f172a;
+      --text-white: #ffffff;
+      --text-emerald: #34d399;
+      --text-muted: #94a3b8;
+      --text-subtle: #cbd5e1;
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      
+      --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-slate);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      padding: clamp(3.5rem, 7vw, 6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at 82% 18%, #1e293b 0%, transparent 60%),
+                  radial-gradient(circle at 15% 85%, #064e3b 0%, transparent 45%),
+                  var(--bg-slate);
+    }
+
+    .hero {
+      max-width: 1050px;
+      margin: auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
+    }
+
+    .main-title {
+      font-family: var(--font-heading);
+      font-size: clamp(3.2rem, 6.5vw, 5rem);
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: -0.035em;
+      color: var(--text-white);
+    }
+
+    .highlight-emerald {
+      color: var(--text-emerald);
+    }
+
+    /* Single Clean Demo Card */
+    .card-demo {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 2.5rem 2.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      transition: border-color 0.25s;
+    }
+
+    .card-demo:hover {
+      border-color: var(--text-emerald);
+    }
+
+    .demo-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--text-emerald);
+    }
+
+    .demo-text {
+      font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+      color: var(--text-subtle);
+      line-height: 1.6;
+      max-width: 880px;
+    }
+
+    .demo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 1rem 2rem;
+      border-radius: 6px;
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0f172a;
+      background-color: var(--text-emerald);
+      text-decoration: none;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .demo-btn:hover {
+      transform: translateY(-2px);
+      background-color: #6ee7b7;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link {
+      color: var(--text-emerald);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide">
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1 class="main-title">
+        Trải Nghiệm — <span class="highlight-emerald">Demo Sản Phẩm</span>
+      </h1>
+
+      <!-- Clean Demo Card -->
+      <div class="card-demo">
+        <span class="demo-badge">TRẢI NGHIỆM TRỰC TIẾP</span>
+        <p class="demo-text">
+          Tải slide bài giảng PDF và tự động trải nghiệm bộ trắc nghiệm tình huống thực tế ngay trên hệ thống.
+        </p>
+        <a href="http://localhost:5000" target="_blank" class="demo-btn">
+          TRẢI NGHIỆM DEMO SẢN PHẨM ➔
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer">
+      <a href="slide_5.html" class="nav-link">❮ TRỞ VỀ SLIDE 5</a>
+      <span>SLIDE 06 / 06</span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        window.location.href = 'slide_5.html';
+      }
+    });
+  </script>
+</body>
+</html>
