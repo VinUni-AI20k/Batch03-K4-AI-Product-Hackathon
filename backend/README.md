@@ -47,7 +47,7 @@ errors are returned immediately.
 - `GET /api/outline?transcript_file=transcript-01-clean.md` — outline parse từ transcript thật
 - `POST /api/outline/pdf` — upload PDF slide và trích xuất outline theo từng trang
 - `POST /api/quiz/generate/pdf` — sinh quiz trực tiếp từ outline của PDF slide
-- `POST /api/quiz/generate?transcript_file=...&n_questions=20` — **quyết định AI trung tâm**, gọi
+- `POST /api/quiz/generate?transcript_file=...&n_questions=10` — **quyết định AI trung tâm**, gọi
   OpenAI thật, trả về `{outline, questions}`
 
 ## Golden set / eval

@@ -44,7 +44,7 @@ def _validate(questions: list[dict], sections: list[Section]) -> tuple[list[dict
     return checked, reasons
 
 
-def call_llm_for_quiz(sections: list[Section], n_questions: int = 20) -> list[dict]:
+def call_llm_for_quiz(sections: list[Section], n_questions: int = 10) -> list[dict]:
     """Raw model call, no validation — used directly by eval to measure hallucination rate."""
     content = "\n\n".join(
         f"## {s.title} (section_id: {s.section_id})\n{s.as_text()}" for s in sections
@@ -63,7 +63,7 @@ def call_llm_for_quiz(sections: list[Section], n_questions: int = 20) -> list[di
     return questions
 
 
-def generate_quiz(sections: list[Section], n_questions: int = 20) -> list[dict]:
+def generate_quiz(sections: list[Section], n_questions: int = 10) -> list[dict]:
     raw = call_llm_for_quiz(sections, n_questions)
     checked, _reasons = _validate(raw, sections)
     if not checked:
@@ -71,7 +71,7 @@ def generate_quiz(sections: list[Section], n_questions: int = 20) -> list[dict]:
     return checked
 
 
-def generate_quiz_with_diagnostics(sections: list[Section], n_questions: int = 20) -> dict:
+def generate_quiz_with_diagnostics(sections: list[Section], n_questions: int = 10) -> dict:
     """Same call, but returns raw vs validated counts + drop reasons — for eval/golden set only."""
     if not sections:
         return {"raw": [], "valid": [], "drop_reasons": [], "error": "no_sections_provided"}

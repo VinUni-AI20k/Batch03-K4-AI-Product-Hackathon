@@ -277,7 +277,7 @@ async def upload_knowledge(
 
 
 @app.post("/api/quiz/generate")
-def post_generate_quiz(session_id: str = Query(...), n_questions: int = 20):
+def post_generate_quiz(session_id: str = Query(...), n_questions: int = 10):
     session = _require_session(session_id)
     if not session.outline:
         raise HTTPException(status_code=422, detail="Session has no uploaded learning context")
@@ -290,7 +290,7 @@ def post_generate_quiz(session_id: str = Query(...), n_questions: int = 20):
 
 
 @app.post("/api/quiz/generate/pdf")
-async def post_generate_quiz_from_pdf(session_id: str = Query(...), n_questions: int = 20):
+async def post_generate_quiz_from_pdf(session_id: str = Query(...), n_questions: int = 10):
     session = _require_session(session_id)
     if not session.outline:
         raise HTTPException(status_code=422, detail="Session has no uploaded learning context")

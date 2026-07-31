@@ -86,7 +86,7 @@ async function readError(res: Response): Promise<string> {
 
 /**
  * Phase 1 — upload whatever the user actually provided (a PDF slide, a
- * transcript, or both) and get back a generated 20Q quiz.
+ * transcript, or both) and get back a generated 10Q quiz.
  * Uses /api/knowledge/upload (real classify + align, session-persisted — the
  * backend fills in a sensible default when only one file type is given) then
  * /api/quiz/generate/pdf (the central AI decision — quiz_bank.py).
@@ -115,7 +115,7 @@ export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> 
   if (!uploadRes.ok) throw new Error(`Could not process the uploaded materials: ${await readError(uploadRes)}`);
 
   const quizRes = await fetch(
-    `${API_BASE}/api/quiz/generate/pdf?session_id=${encodeURIComponent(session.session_id)}&n_questions=20`,
+    `${API_BASE}/api/quiz/generate/pdf?session_id=${encodeURIComponent(session.session_id)}&n_questions=10`,
     { method: 'POST' },
   );
   if (!quizRes.ok) throw new Error(`Sinh MCQ thất bại: ${await readError(quizRes)}`);

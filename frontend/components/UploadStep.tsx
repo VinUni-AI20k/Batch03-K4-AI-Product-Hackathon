@@ -3,7 +3,7 @@ import { uploadKnowledge } from '../api/client';
 import { useSession } from '../context/SessionContext';
 import ProgressLoader from './shared/ProgressLoader';
 
-const AI_STEPS = ['Classifying transcript (teaching vs. noise)', 'Extracting section outline', 'Generating your 20-question quiz'];
+const AI_STEPS = ['Classifying transcript (teaching vs. noise)', 'Extracting section outline', 'Generating your 10-question quiz'];
 
 export default function UploadStep() {
   const { dispatch } = useSession();
