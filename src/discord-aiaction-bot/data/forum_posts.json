@@ -1,0 +1,14 @@
+[
+  {
+    "id": "post-01",
+    "topic": "Lỗi 'Disallowed Intents' khi khởi động Bot Discord",
+    "author": "Học viên A",
+    "solution": "Lỗi này xảy ra khi bạn chưa bật Message Content Intent trong Discord Developer Portal. Bạn cần truy cập trang Developer Portal, chọn Bot của bạn, cuộn xuống mục 'Privileged Gateway Intents' và bật 'Message Content Intent', sau đó lưu lại và chạy lại Bot."
+  },
+  {
+    "id": "post-02",
+    "topic": "Lỗi API OpenRouter trả về status 401 hoặc 403",
+    "author": "Học viên B",
+    "solution": "Kiểm tra lại xem API Key OpenRouter trong file `.env` đã chính xác chưa và có khoảng trắng thừa hay không. Ngoài ra, hãy đảm bảo tài khoản OpenRouter của bạn còn credit. Nếu hết credit, bot của bạn sẽ tự động chuyển sang cơ chế Fallback sử dụng Gemini API thông qua helper callLLM."
+  }
+]

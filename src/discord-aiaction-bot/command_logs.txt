@@ -1,0 +1,17 @@
+[16:19:15 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi
+[16:19:27 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: Chat Logger Bot)
+[16:19:51 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: tuanminh1509hp)
+[16:29:45 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi
+[16:31:31 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi
+[16:32:02 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi
+[16:32:24 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] yen4732 dùng lệnh: /hi
+[16:33:02 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] .leekwan dùng lệnh: /hi
+[16:33:17 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] tdinh_hw247 dùng lệnh: /hi
+[16:33:38 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] tuanminh1509hp dùng lệnh: /hi
+[16:45:50 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi
+[16:45:56 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: tuanminh1509hp)
+[16:46:04 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: .leekwan)
+[16:46:08 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: yen4732)
+[16:46:13 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] trickez dùng lệnh: /hi (target: tdinh_hw247)
+[16:50:13 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] .leekwan dùng lệnh: /hi
+[16:58:43 30/7/2026] [XỬ LÝ LỆNH] [S: TestBOT] [#chung] .leekwan dùng lệnh: /hi
