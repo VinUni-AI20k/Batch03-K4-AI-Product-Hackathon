@@ -304,8 +304,10 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed, embedde
       await enqueueDraftSave(values);
       setValidation(await validateForm(formCode));
       setDirty(false);
-    } catch {
-      setError(text.formValidateError);
+    } catch (error) {
+      const detail = error instanceof ApiError ? error.detail : "";
+      setValidation(null);
+      setError(`${text.formValidateError}${detail ? ` (${detail})` : ""}`);
     } finally {
       setValidating(false);
     }

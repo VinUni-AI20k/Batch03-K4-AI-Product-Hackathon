@@ -81,6 +81,6 @@ npm test -- --run
 ## Kết quả đã kiểm chứng
 
 - Golden set cố định: **25/25**, quality bar tối thiểu **19/25** và không có lỗi bịa nguồn/hành động vượt thẩm quyền.
-- Backend: **208 passed, 1 skipped** sau khi tái cấu trúc.
-- Frontend: **25/25 passed** và production build thành công sau khi tái cấu trúc.
+- Backend: **209 passed, 1 skipped** sau bản sửa vòng đời `validation_id`.
+- Frontend: **27/27 passed** và production build thành công sau bản sửa.
 - Bằng chứng khảo sát: **45 phản hồi**, trong đó **26/45 (57,8%)** từng phải đi lại do hồ sơ thiếu hoặc sai.

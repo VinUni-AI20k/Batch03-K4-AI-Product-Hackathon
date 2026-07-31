@@ -302,18 +302,12 @@ export async function validateForm(formCode: string): Promise<ValidationResult> 
   try {
     const response = await fetch(`${apiBaseUrl}/v1/forms/${formCode}/validate`, { method: "POST", credentials: "include" });
     if (response.ok) return await response.json() as ValidationResult;
-  } catch {
-    // fallback
+    const body = await response.json().catch(() => ({})) as { detail?: string };
+    throw new ApiError(response.status, body.detail ?? "form_validation_failed");
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(503, "form_validation_unavailable");
   }
-  return {
-    validation_id: crypto.randomUUID(),
-    form_code: formCode,
-    input_hash: "mock",
-    status: "valid",
-    summary: { blocking_error: 0, warning: 0, suggestion: 0, unable_to_verify: 0 },
-    issues: [],
-    validated_at: new Date().toISOString()
-  };
 }
 
 export async function exportFormPdf(formCode: string, validationId: string): Promise<Blob> {

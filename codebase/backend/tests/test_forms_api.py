@@ -6,6 +6,7 @@ from fakeredis.aioredis import FakeRedis
 from httpx import ASGITransport, AsyncClient
 
 from app import form_export
+from app.agent_runtime import record_tool_result
 from app.config import Settings
 from app.main import create_app
 
@@ -127,6 +128,47 @@ async def test_validate_reports_missing_required_fields(app) -> None:
     body = response.json()
     assert body["status"] == "invalid"
     assert body["summary"]["blocking_error"] > 0
+
+
+@pytest.mark.asyncio
+async def test_long_agent_collection_can_validate_preview_pdf_and_reuse_result(app, monkeypatch) -> None:
+    """A ten-field birth-registration chat used to consume the old 12-call
+    workflow budget before the user could validate, causing the frontend to
+    receive no server-issued validation id."""
+    font_path = _available_font()
+    if font_path is None:
+        pytest.skip("no Unicode-complete TTF available on this machine to exercise the real render path")
+    monkeypatch.setattr(form_export, "_FONT_CANDIDATES", (font_path,))
+    monkeypatch.setattr(form_export, "_registered", False)
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": VALID_BIRTH_VALUES})
+            session_id = client.cookies.get("icivi_session")
+            state = await app.state.store.get(session_id)
+            history = record_tool_result([], "lookup_procedure", {"form_code": "BIRTH_REGISTRATION_FORM"})
+            history = record_tool_result(history, "prepare_birth_registration", {"form_code": "BIRTH_REGISTRATION_FORM"})
+            for index in range(10):
+                history = record_tool_result(history, "collect_form_data", {"fields": {"step": index}})
+            state["agent_workflow"] = {
+                "form_code": "BIRTH_REGISTRATION_FORM",
+                "status": "ready_for_review",
+                "tool_history": history,
+            }
+            await app.state.store.save(session_id, state)
+
+            first = await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")
+            second = await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")
+            preview = await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/exports/pdf",
+                json={"validation_id": first.json()["validation_id"]},
+            )
+
+    assert first.status_code == 200
+    assert first.json()["status"] == "valid"
+    assert second.status_code == 200
+    assert second.json()["validation_id"] == first.json()["validation_id"]
+    assert preview.status_code == 200
+    assert preview.content.startswith(b"%PDF-")
 
 
 @pytest.mark.asyncio

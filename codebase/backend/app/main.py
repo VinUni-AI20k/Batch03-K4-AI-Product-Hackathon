@@ -660,6 +660,13 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
         if is_new:
             set_session_cookie(http_response, current_session_id)
         draft = state.get("form_draft", {}).get(form_code, {})
+        draft_hash = canonical_input_hash(draft)
+        stored_validation = state.get("last_validation", {}).get(form_code)
+        # Validation is an idempotent user action. Reuse the trusted result when
+        # the exact draft was already validated instead of spending another AI
+        # review/tool call or tripping the autonomous-agent loop guard.
+        if stored_validation and stored_validation.get("input_hash") == draft_hash:
+            return ValidationResult.model_validate(stored_validation)
         base_result = validate_form(candidate, draft)
         ai_issues = await ai_review_form(settings, candidate, draft, base_result.issues)
         result = merge_ai_issues(base_result, ai_issues)

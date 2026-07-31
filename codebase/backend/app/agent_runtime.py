@@ -34,7 +34,10 @@ CANONICAL_TAIL = ("collect_form_data", "validate_form", "render_pdf", "submit_si
 READ_ONLY_TOOLS = {"lookup_procedure", "validate_form"}
 SIDE_EFFECT_TOOLS = {"submit_simulation"}
 ALL_AGENT_TOOLS = {"lookup_procedure", *FORM_TOOL_MAP.values(), *CANONICAL_TAIL}
-MAX_TOOL_CALLS_PER_WORKFLOW = 12
+# Some official forms require more than ten conversational collection turns.
+# The budget limits a runaway workflow, while the identical-result guard below
+# still stops a stuck tool immediately on its second unchanged result.
+MAX_TOOL_CALLS_PER_WORKFLOW = 64
 
 
 class AgentPlanProposal(BaseModel):
