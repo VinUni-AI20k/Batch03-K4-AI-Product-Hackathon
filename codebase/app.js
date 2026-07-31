@@ -31,6 +31,9 @@ const publishedTopics = [
 ];
 publishedQuiz.forEach((question, index) => { question.topic = publishedTopics[index]; });
 
+const MAX_CHEAT_WARNINGS = 3;
+const CHEAT_EVENT_DEBOUNCE_MS = 1000;
+
 let activeQuiz = publishedQuiz;
 const state = { 
   index: 0, 
@@ -42,6 +45,9 @@ const state = {
   rewardGranted: false,
   previousMastery: null, // Track delta
   fullscreenActive: false,
+  cheatCount: 0,
+  lastCheatAt: 0,
+  terminatedForIntegrity: false,
 };
 
 const modal = document.querySelector("#quiz-modal");
@@ -96,6 +102,8 @@ function openQuiz() {
   state.answers = [];
   state.rewardGranted = false;
   state.cheatCount = 0;
+  state.lastCheatAt = 0;
+  state.terminatedForIntegrity = false;
   state.fullscreenActive = false;
   
   modal.classList.remove("hidden");
@@ -247,7 +255,9 @@ function renderLearningAnalysis() {
   state.previousMastery = currentMastery;
 }
 
-function renderResults() {
+function renderResults(options = {}) {
+  const terminatedForIntegrity = options.terminatedForIntegrity === true;
+  state.fullscreenActive = false;
   quizAgentView.classList.add("hidden"); // Ẩn agent lúc hiện kết quả
   const score = state.answers.reduce((total, answer, index) => total + (answer === activeQuiz[index].correct ? 1 : 0), 0);
   const isPublished = state.quizType === "published";
@@ -256,7 +266,7 @@ function renderResults() {
   let creditsToAward = 0;
   let rewardReason = "";
   
-  if (isPublished) {
+  if (isPublished && !terminatedForIntegrity) {
       const currentMastery = calculateMastery();
       if (!state.previousMastery) {
           // Lần đầu làm quiz: Thưởng nếu đạt ngưỡng cứng (như cũ)
@@ -297,12 +307,13 @@ function renderResults() {
   const answers = activeQuiz.map((item, index) => `<li><span class="${state.answers[index] === item.correct ? "status-correct" : "status-wrong"}"><i class="ph-fill ${state.answers[index] === item.correct ? "ph-check-circle" : "ph-x-circle"}"></i> ${state.answers[index] === item.correct ? "Đúng" : "Xem lại"}</span> · ${item.source}</li>`).join("");
   
   const reward = isPublished
-    ? `<div class="reward-banner"><span class="reward-icon">${eligibleForCredit ? `<i class="ph-fill ph-plus"></i>${creditsToAward}` : "0"}</span><div><strong>${eligibleForCredit ? `Bạn nhận được ${creditsToAward} practice credit(s)` : state.credits >= state.maxCredits ? "Bạn đã đạt giới hạn 20 credits" : rewardReason}</strong><small>Credits hiện tại: ${state.credits}/${state.maxCredits} · Chỉ dùng để hỏi Agent.</small></div></div>`
+    ? `<div class="reward-banner"><span class="reward-icon">${eligibleForCredit ? `<i class="ph-fill ph-plus"></i>${creditsToAward}` : "0"}</span><div><strong>${terminatedForIntegrity ? "Không cộng credit do bài bị kết thúc vì vượt giới hạn cảnh báo" : eligibleForCredit ? `Bạn nhận được ${creditsToAward} practice credit(s)` : state.credits >= state.maxCredits ? "Bạn đã đạt giới hạn 20 credits" : rewardReason}</strong><small>Credits hiện tại: ${state.credits}/${state.maxCredits} · Chỉ dùng để hỏi Agent.</small></div></div>`
     : `<div class="reward-banner"><span class="reward-icon"><i class="ph-fill ph-check"></i></span><div><strong>Bạn đã hoàn thành quiz củng cố</strong><small>Quiz này dùng để ôn đúng trọng tâm, không thay đổi điểm học phần hay credit.</small></div></div>`;
     
   quizView.innerHTML = `
-    <span class="quiz-eyebrow">${isPublished ? "KẾT QUẢ QUIZ CUỐI BÀI" : "KẾT QUẢ QUIZ CỦNG CỐ"}</span>
-    <h2>Bạn đã hoàn thành quiz!</h2>
+    <span class="quiz-eyebrow">${terminatedForIntegrity ? "BÀI LÀM ĐÃ KẾT THÚC" : isPublished ? "KẾT QUẢ QUIZ CUỐI BÀI" : "KẾT QUẢ QUIZ CỦNG CỐ"}</span>
+    <h2>${terminatedForIntegrity ? "Bạn đã vượt quá 3 lần cảnh báo" : "Bạn đã hoàn thành quiz!"}</h2>
+    ${terminatedForIntegrity ? '<p class="quiz-subtitle text-danger">Hệ thống đã tự động nộp bài và chấm các câu bạn đã trả lời.</p>' : ""}
     <div class="result-score">${score}/${activeQuiz.length}<small>câu đúng</small></div>
     <div class="result-grid"><div class="result-card"><small>NỘI DUNG NÊN ÔN LẠI</small><strong>${review}</strong></div><div class="result-card"><small>GỢI Ý TIẾP THEO</small><strong>${isPublished ? "Xem phân tích theo đề cương để biết phần cần củng cố." : "Mở lại transcript hoặc slide liên quan để ôn sâu hơn."}</strong></div></div>
     <ul class="feedback-list">${answers}</ul>${reward}
@@ -473,13 +484,31 @@ function handleCheat(reason) {
   if (modal.classList.contains("hidden")) return;
   if (!document.getElementById("quiz-start-screen").classList.contains("hidden")) return;
 
+  const now = Date.now();
+  if (now - state.lastCheatAt < CHEAT_EVENT_DEBOUNCE_MS) return;
+  state.lastCheatAt = now;
   state.cheatCount = (state.cheatCount || 0) + 1;
+  state.fullscreenActive = false;
+
+  if (state.cheatCount > MAX_CHEAT_WARNINGS) {
+    state.terminatedForIntegrity = true;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch((error) => console.log(error));
+    }
+    document.getElementById("quiz-start-screen").classList.add("hidden");
+    document.getElementById("quiz-layout-main").classList.remove("hidden");
+    renderResults({ terminatedForIntegrity: true });
+    return;
+  }
+
   document.getElementById("quiz-layout-main").classList.add("hidden");
   document.getElementById("quiz-start-screen").classList.remove("hidden");
   
   const cheatLog = document.getElementById("cheat-log");
   cheatLog.classList.remove("hidden");
-  cheatLog.innerHTML += `<div><i class="ph-fill ph-warning"></i> Vi phạm ${state.cheatCount}: ${reason} - Lúc ${new Date().toLocaleTimeString()}</div>`;
+  const remaining = MAX_CHEAT_WARNINGS - state.cheatCount;
+  cheatLog.innerHTML += `<div><i class="ph-fill ph-warning"></i> Cảnh báo ${state.cheatCount}/${MAX_CHEAT_WARNINGS}: ${reason} - Lúc ${new Date().toLocaleTimeString()}. ${remaining > 0 ? `Còn ${remaining} lần cảnh báo.` : "Vi phạm thêm một lần sẽ kết thúc bài."}</div>`;
+  document.getElementById("start-fullscreen-btn").innerHTML = '<i class="ph ph-arrows-out"></i> Trở lại Fullscreen và tiếp tục';
 }
 
 document.addEventListener("fullscreenchange", () => {
@@ -491,6 +520,12 @@ document.addEventListener("fullscreenchange", () => {
 document.addEventListener("visibilitychange", () => {
   if (state.fullscreenActive && document.visibilityState === "hidden" && !modal.classList.contains("hidden")) {
     handleCheat("Chuyển Tab / Ẩn trình duyệt");
+  }
+});
+
+document.documentElement.addEventListener("mouseleave", () => {
+  if (state.fullscreenActive && document.fullscreenElement && !modal.classList.contains("hidden")) {
+    handleCheat("Di chuột ra khỏi vùng làm bài");
   }
 });
 
