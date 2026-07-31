@@ -24,7 +24,7 @@ class SlideSummaryAgent:
 
     def __init__(
         self,
-        provider: str = "gemini",
+        provider: Optional[str] = None,
         model_name: Optional[str] = None,
         temperature: float = 0.2
     ):

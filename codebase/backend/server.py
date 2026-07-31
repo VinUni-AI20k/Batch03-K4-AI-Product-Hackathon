@@ -31,8 +31,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Khởi tạo Page-Aware RAG Agent
-rag_agent = PageAwareRAGAgent(provider=DEFAULT_PROVIDER, model_name=DEFAULT_OPENAI_MODEL)
+# Khởi tạo Page-Aware RAG Agent (Tự động nhận diện LLM Provider từ .env)
+rag_agent = PageAwareRAGAgent()
 
 class LoginRequest(BaseModel):
     email: str

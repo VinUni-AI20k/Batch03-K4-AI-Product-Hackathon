@@ -30,7 +30,20 @@ class LLMClient:
         model_name: Optional[str] = None,
         temperature: float = DEFAULT_TEMPERATURE,
     ):
-        self.provider = (provider or DEFAULT_PROVIDER).lower()
+        target_provider = (provider or DEFAULT_PROVIDER).lower()
+
+        # Tự động chọn Provider có API Key nếu provider chọn ban đầu không có Key
+        gemini_key = GEMINI_API_KEY or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        openai_key = OPENAI_API_KEY or os.getenv("OPENAI_API_KEY")
+
+        if target_provider == "gemini" and not gemini_key and openai_key:
+            target_provider = "openai"
+            model_name = model_name or DEFAULT_OPENAI_MODEL
+        elif target_provider == "openai" and not openai_key and gemini_key:
+            target_provider = "gemini"
+            model_name = model_name or DEFAULT_GEMINI_MODEL
+
+        self.provider = target_provider
         self.temperature = temperature
         
         if self.provider == "gemini":
