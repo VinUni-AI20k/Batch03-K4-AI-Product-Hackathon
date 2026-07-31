@@ -424,6 +424,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // 7. ROBOT DRAWER TOGGLE & DRAGGABLE AI ASSISTANT BUTTON (🤖)
     // ==========================================================================
+    function setDrawerState(open) {
+        if (!tutorDrawer) return;
+        const appLayout = document.getElementById('app-layout') || document.querySelector('.app-layout');
+        if (open) {
+            tutorDrawer.classList.remove('collapsed');
+            if (appLayout) appLayout.classList.add('drawer-open');
+        } else {
+            tutorDrawer.classList.add('collapsed');
+            if (appLayout) appLayout.classList.remove('drawer-open');
+        }
+        setTimeout(() => {
+            renderPDFVisualPage(currentSlide);
+        }, 150);
+    }
+
     if (robotToggleBtn) {
         let isDragging = false;
         let hasMoved = false;
@@ -493,14 +508,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             if (tutorDrawer) {
-                tutorDrawer.classList.toggle('collapsed');
+                const isCollapsed = tutorDrawer.classList.contains('collapsed');
+                setDrawerState(isCollapsed);
             }
         });
     }
 
     if (closeDrawerBtn && tutorDrawer) {
         closeDrawerBtn.addEventListener('click', () => {
-            tutorDrawer.classList.add('collapsed');
+            setDrawerState(false);
         });
     }
 
@@ -528,14 +544,121 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (navBackBtn) {
-        navBackBtn.addEventListener('click', () => {
-            updateSlidePage(1);
+    // ==========================================================================
+    // 9. CHAT HISTORY OVERLAY MANAGEMENT
+    // ==========================================================================
+    const btnChatHistory = document.getElementById('btn-chat-history');
+    const chatHistoryPanel = document.getElementById('chat-history-panel');
+    const historyListContainer = document.getElementById('history-list-container');
+    const btnNewChat = document.getElementById('btn-new-chat');
+
+    let chatHistory = [
+        {
+            id: 1,
+            title: 'Hỏi về AI & LLM Foundation',
+            time: '10:42',
+            messages: [
+                { sender: 'user', text: 'Tóm tắt slide này giúp mình với' },
+                { sender: 'bot', text: '📌 <strong>Tóm tắt Slide 1:</strong> Tổng quan về AI & LLM Foundation, cơ chế dự đoán token và Transformer.' }
+            ]
+        },
+        {
+            id: 2,
+            title: 'Giải thích cơ chế Attention',
+            time: 'Hôm qua',
+            messages: [
+                { sender: 'user', text: 'Cơ chế Attention hoạt động thế nào?' },
+                { sender: 'bot', text: 'Cơ chế Self-Attention giúp mô hình tính toán trọng số liên quan giữa các token trong câu.' }
+            ]
+        }
+    ];
+
+    const btnClearHistory = document.getElementById('btn-clear-history');
+
+    function renderHistoryList() {
+        if (!historyListContainer) return;
+        historyListContainer.innerHTML = '';
+        if (chatHistory.length === 0) {
+            historyListContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding: 20px;">Chưa có lịch sử chat nào.</div>';
+            return;
+        }
+
+        chatHistory.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'history-item-card';
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="history-item-title">${escapeHtml(item.title)}</div>
+                    <button class="delete-single-history-btn" title="Xóa đoạn chat này" style="background: none; border: none; color: #f43f5e; cursor: pointer; font-size: 0.75rem; padding: 2px 4px;">🗑️</button>
+                </div>
+                <div class="history-item-time">🕒 ${item.time} · ${item.messages.length} tin nhắn</div>
+            `;
+
+            const deleteBtn = card.querySelector('.delete-single-history-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    chatHistory.splice(index, 1);
+                    renderHistoryList();
+                });
+            }
+
+            card.addEventListener('click', () => {
+                loadHistorySession(item);
+                if (chatHistoryPanel) chatHistoryPanel.classList.add('hidden');
+            });
+            historyListContainer.appendChild(card);
+        });
+    }
+
+    function loadHistorySession(session) {
+        if (!drawerChatMessages) return;
+        drawerChatMessages.innerHTML = '';
+        session.messages.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = msg.sender === 'user' ? 'user-card' : 'bot-card';
+            div.innerHTML = msg.sender === 'user' ? escapeHtml(msg.text) : msg.text;
+            drawerChatMessages.appendChild(div);
+        });
+        drawerChatMessages.scrollTop = drawerChatMessages.scrollHeight;
+    }
+
+    if (btnChatHistory && chatHistoryPanel) {
+        btnChatHistory.addEventListener('click', () => {
+            renderHistoryList();
+            chatHistoryPanel.classList.toggle('hidden');
+        });
+    }
+
+    if (btnClearHistory) {
+        btnClearHistory.addEventListener('click', () => {
+            chatHistory = [];
+            renderHistoryList();
+            if (drawerChatMessages) {
+                drawerChatMessages.innerHTML = `
+                    <div class="bot-card">
+                        Xin chào! Mình là VLearn Tutor. Bạn có thể gửi câu hỏi trực tiếp để thảo luận về slide nhé!
+                    </div>
+                `;
+            }
+        });
+    }
+
+    if (btnNewChat) {
+        btnNewChat.addEventListener('click', () => {
+            if (drawerChatMessages) {
+                drawerChatMessages.innerHTML = `
+                    <div class="bot-card">
+                        Xin chào! Mình là VLearn Tutor. Bạn có thể gửi câu hỏi trực tiếp để thảo luận về slide nhé!
+                    </div>
+                `;
+            }
+            if (chatHistoryPanel) chatHistoryPanel.classList.add('hidden');
         });
     }
 
     // ==========================================================================
-    // 9. AI CHATBOT INTERACTION
+    // 10. AI CHATBOT INTERACTION
     // ==========================================================================
     async function sendChatMessage(text) {
         if (!text.trim()) return;

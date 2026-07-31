@@ -118,16 +118,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    ========================================================================== */
 .app-layout {
     flex: 1;
-    display: grid;
-    grid-template-columns: 280px 1fr;
+    display: flex;
+    width: 100%;
     height: calc(100vh - 50px);
     overflow: hidden;
     position: relative;
-    transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.app-layout.sidebar-collapsed {
-    grid-template-columns: 0px 1fr;
+    background-color: var(--bg-stage);
 }
 
 /* ==========================================================================
@@ -268,20 +264,37 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    CENTER VIEWER (FLOATING CONTROL BAR + SAGE GREEN SLIDE)
    ========================================================================== */
 .viewer-center {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
     background-color: var(--bg-stage);
     display: flex;
     flex-direction: column;
+    align-items: center;
     position: relative;
     overflow: hidden;
+    transition: padding-right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Floating Toolbar */
+.app-layout.drawer-open .viewer-center {
+    padding-right: 360px;
+}
+
+@media (max-width: 900px) {
+    .app-layout.drawer-open .viewer-center {
+        padding-right: 0;
+    }
+}
+
+/* Floating Toolbar - Centered Control Bar */
 .floating-toolbar {
-    margin: 6px auto 2px auto;
+    margin: 8px auto 4px auto;
+    align-self: center;
+    width: fit-content;
     background-color: var(--bg-toolbar);
     border: 1px solid var(--border-dark);
     border-radius: 20px;
-    padding: 3px 12px;
+    padding: 4px 14px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -294,27 +307,59 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: 14px;
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-muted);
     transition: all 0.15s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 .pill-tool-btn:hover { background-color: var(--border-dark); color: #ffffff; }
 .pill-tool-btn.active { background-color: var(--brand-primary); color: #ffffff; }
 
 .v-line { width: 1px; height: 14px; background-color: var(--border-dark); }
-.note-pill { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); background-color: var(--bg-stage); border: 1px solid var(--border-dark); padding: 2px 8px; border-radius: 12px; }
+.note-pill { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); background-color: var(--bg-stage); border: 1px solid var(--border-dark); padding: 2px 8px; border-radius: 12px; cursor: pointer; }
 
 .zoom-wrapper { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 600; }
-.zoom-action-btn { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.zoom-action-btn { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); background: none; border: none; cursor: pointer; }
 .zoom-action-btn:hover { background-color: var(--brand-primary); color: #ffffff; }
 
-.tool-icon-btn { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.8rem; }
+.tool-icon-btn { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.82rem; background: none; border: none; cursor: pointer; }
 .tool-icon-btn:hover { background-color: var(--brand-primary); color: #ffffff; }
 
-/* Stage Viewport Area */
+/* Custom Dark Scrollbars (No white bars on zoom) */
+.stage-area::-webkit-scrollbar,
+.viewer-center::-webkit-scrollbar,
+.drawer-chat-body::-webkit-scrollbar,
+.accordion-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.stage-area::-webkit-scrollbar-track,
+.viewer-center::-webkit-scrollbar-track,
+.drawer-chat-body::-webkit-scrollbar-track,
+.accordion-list::-webkit-scrollbar-track {
+    background: var(--bg-stage);
+}
+
+.stage-area::-webkit-scrollbar-thumb,
+.viewer-center::-webkit-scrollbar-thumb,
+.drawer-chat-body::-webkit-scrollbar-thumb,
+.accordion-list::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+    border-radius: 4px;
+}
+
+.stage-area::-webkit-scrollbar-thumb:hover,
+.viewer-center::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-primary);
+}
+
+/* Stage Viewport Area (Horizontal scrollbar for zoom, no vertical scrollbar) */
 .stage-area {
     flex: 1;
     display: flex;
@@ -322,17 +367,20 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     justify-content: center;
     position: relative;
     padding: 8px 16px 24px 16px;
-    overflow: auto;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    background-color: var(--bg-stage);
+    width: 100%;
 }
 
 .slide-stack {
     max-width: 760px;
     width: 100%;
+    margin: 4px auto 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 4px;
     transform-origin: top center;
     transition: max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -507,14 +555,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     border-left: 1px solid var(--border-dark);
     display: flex;
     flex-direction: column;
-    z-index: 90;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.25s ease;
+    z-index: 120;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.4);
     overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tutor-drawer-panel.collapsed {
     transform: translateX(100%);
+    pointer-events: none;
 }
 
 .drawer-header {
@@ -744,3 +793,122 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     cursor: pointer;
 }
 .add-note-confirm-btn:hover { background-color: #0284c7; }
+
+/* Chat History Overlay Drawer Styles */
+.history-toggle-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background-color: var(--bg-stage);
+    border: 1px solid var(--border-dark);
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.history-toggle-btn:hover {
+    background-color: var(--brand-primary);
+    color: #ffffff;
+}
+
+.chat-history-overlay {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-sidebar);
+    z-index: 150;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+}
+.chat-history-overlay.hidden {
+    display: none;
+}
+
+.history-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-dark);
+}
+.history-panel-header h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.new-chat-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff;
+    background-color: var(--brand-primary);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.new-chat-btn:hover {
+    background-color: #0284c7;
+}
+
+.clear-history-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #f43f5e;
+    background-color: var(--bg-stage);
+    border: 1px solid #881337;
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.clear-history-btn:hover {
+    background-color: #881337;
+    color: #ffffff;
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item-card {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--bg-stage);
+    border: 1px solid var(--border-dark);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+.history-item-card:hover {
+    border-color: var(--brand-primary);
+    background-color: #0c1a2e;
+}
+.history-item-card.active {
+    border-color: var(--brand-primary);
+    background-color: #0d2342;
+}
+.history-item-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.history-item-time {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
