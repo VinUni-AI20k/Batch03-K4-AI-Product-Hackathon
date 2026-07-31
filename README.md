@@ -6,11 +6,22 @@ Sản phẩm trong repo là **Trợ lý chuẩn bị và kiểm tra hồ sơ d�
 
 - [AI Spec](spec.md)
 - [Golden set và kết quả CP3](eval/README.md)
+- [Bằng chứng CP4 — chỉ mục dành cho người chấm](evidence/README.md)
+- [Nội dung đã điền form CP4](eval/cp4-form-answers.md)
 - [Kiến trúc Agent và phòng thủ nhiều lớp](docs/agent-security.md)
 - [Hướng dẫn chạy backend](be/README.md)
 - [Hướng dẫn chạy frontend](frontend/README.md)
 
 > Mọi mã `SPDVC-DEMO-*` là biên nhận mô phỏng; hệ thống không kết nối Cổng Dịch vụ công, không ký số và không gửi dữ liệu tới cơ quan nhà nước.
+
+## Bằng chứng CP4
+
+| Loại | Kết quả chính | Artifact kiểm chứng |
+|---|---|---|
+| **A — Khảo sát người thật** | 26/45 (57,8%) phải đi lại do hồ sơ thiếu/sai | [`evidence/cp4-survey/`](evidence/cp4-survey/) — 45 hàng khử định danh, câu hỏi, bảng đếm, biểu đồ và hash nguồn |
+| **B — Mining log** | 8/10 (80%) câu tự dùng thử có cách viết không sạch; 5/10 cần routing form | [`evidence/cp4-log-mining/`](evidence/cp4-log-mining/) — bộ lọc, script, log JSONL, hash nguồn và 8 ví dụ |
+
+Hai phép đo có vai trò khác nhau: A chứng minh người dùng gặp vấn đề; B chứng minh input quan sát được trong lúc vận hành có độ khó mà hệ thống phải xử lý. Xem diễn giải và quyết định sản phẩm tại [`spec.md` §1–§2](spec.md).
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
