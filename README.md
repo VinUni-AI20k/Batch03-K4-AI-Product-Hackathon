@@ -35,19 +35,24 @@
 
 Mỗi mốc cần show gì và được xác minh thế nào: xem bảng trong `04-rubric.md`.
 
-## Nộp bài
+## 👥 Thành viên nhóm Shark B — Zone E403
 
-Một repo nhóm, cấu trúc như sau. Spec chốt lúc 23:59 ngày 1; bản hoàn chỉnh trước CP6.
+| STT | Mã Học viên | Họ và Tên | Vai trò | Phân công nhiệm vụ cụ thể |
+|:---:|:---:|:---:|:---:|:---|
+| 1 | `HV-K4-0129` | **Nguyễn Thành Long** | Team Lead | Quản lý dự án, viết [spec.md](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/spec.md), chạy kiểm thử [eval/run_eval.py](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/eval/run_eval.py), thu thập [validation/feedback_log.json](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/validation/feedback_log.json) và viết [reflection/nguyen_thanh_long.md](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/reflection/nguyen_thanh_long.md). |
+| 2 | `HV-K4-0248` | **Hoàng Xuân Quân** | Lead Engineer | Lập trình backend RAG [page_rag_agent.py](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/codebase/backend/agents/page_rag_agent.py), Fast Router, Cache 0.5ms, UI Viewer [slide-viewer.html](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/codebase/slide-viewer.html), 3D Flashcard Deck [flashcard-modal.js](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/codebase/js/flashcard-modal.js) và viết [reflection/hoang_quan.md](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/reflection/hoang_quan.md). |
+| 3 | `HV-K4-0315` | **Đào Tùng Dương** | AI Spec & Data | Mining 1.261 chatlog (Evidence B), thiết kế 20 Golden set [eval/golden_set.json](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/eval/golden_set.json), xây dựng Prompts/Guardrails HAX G10 [rag_prompts.py](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/codebase/backend/prompts/rag_prompts.py) và viết [reflection/dao_tung_duong.md](file:///Users/hoangquan/Desktop/K4-hackathon-sharkb-E403/reflection/dao_tung_duong.md). |
+
+## 📁 Cấu trúc Thư mục Nộp bài
 
 ```
-repo/
-├── README.md          ← thành viên (mã HV + tên) + phân công có tên từng phần
-├── spec.md            ← AI Spec theo 03-template-ai-spec.md
-├── demo-slides.pdf    ← slide 6 trang theo 02-guide.md §5.1
-├── codebase/          ← prototype (ghi rõ phần nào mock)
-├── eval/              ← golden set + bảng kết quả các lượt chạy
-├── validation/        ← feedback log từ vòng user test
-└── reflection/        ← mỗi người 1 file
+K4-hackathon-sharkb-E403/
+├── README.md                  ← Thành viên (Mã HV + Tên) + Phân công chi tiết
+├── spec.md                    ← AI Spec hoàn thiện chuẩn theo 03-template-ai-spec.md
+├── codebase/                  ← Prototype hoàn chỉnh (Backend FastAPI + Frontend Slide Viewer & Flashcard 3D)
+├── eval/                      ← Golden set 20 cases + eval runner + bảng kết quả Pass Rate (80-100%)
+├── validation/                ← Feedback log từ 6 Willing Users (feedback_log.json)
+└── reflection/                ← 3 file reflection cá nhân cho từng thành viên
 ```
 
 ## Chấm điểm

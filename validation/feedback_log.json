@@ -1,0 +1,80 @@
+[
+  {
+    "id": "FB_01",
+    "user_name": "Nguyễn Minh Hoàng",
+    "role": "Học viên khóa AI Thực Chiến K4",
+    "is_willing_user": true,
+    "rating": 5,
+    "quote": "Tính năng tự động nhận diện đúng số trang slide 7 đang xem mà không cần mình phải bôi đen hay copy thủ công thực sự rất tiện. AI tóm tắt nhanh trong 3 giây và tự nhảy nội dung vào ô Note bên trái giúp mình không bị phân tâm.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Ban đầu chưa biết nút 'Tóm tắt slide' nằm ở đâu, sau khi thấy nút nổi ở sidebar thì dùng rất mượt.",
+      "tin_ket_qua_khong": "Tin tưởng 100% vì câu trả lời luôn trích dẫn nguồn [Trang 7] và dùng đúng câu chữ của thầy giáo trong bài giảng.",
+      "dung_that_khong": "Có, mình sẽ dùng liên tục hàng ngày khi học slide K4."
+    }
+  },
+  {
+    "id": "FB_02",
+    "user_name": "Trần Thu Hà",
+    "role": "Sinh viên Khoa học Máy tính VinUni",
+    "is_willing_user": true,
+    "rating": 5,
+    "quote": "Phần Flashcard 3D lật mặt xếp chia bài cực kỳ ấn tượng! Bình thường học slide khô khan, có bộ thẻ bài lật 3D giải thích thuật ngữ Overfitting và Transformer làm mình ôn tập rảnh tay và hào hứng hẳn.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Nên thêm phím tắt lật thẻ bằng phím Spacebar cho tiện tay (đã được nhóm update ngay).",
+      "tin_ket_qua_khong": "Rất tin tưởng vì câu hỏi và đáp án bám sát định nghĩa trong giáo trình.",
+      "dung_that_khong": "Chắc chắn sẽ dùng trước mỗi kỳ thi quiz."
+    }
+  },
+  {
+    "id": "FB_03",
+    "user_name": "Phạm Đức Anh",
+    "role": "Sinh viên Công nghệ Thông tin VinUni",
+    "is_willing_user": true,
+    "rating": 4.5,
+    "quote": "Hệ thống Guardrail từ chối rất thông minh. Khi mình thử gõ 'bây giờ là mấy giờ' hoặc 'hạn nộp bài ở đâu', AI không hề bịa mà trả lời dịu dàng hướng dẫn mình ra Discord gặp TA.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Đôi khi gõ câu hỏi dài hơi chờ khoảng 1.5s để AI trả lời (đã được nhóm thêm Cache 0.5ms).",
+      "tin_ket_qua_khong": "Tin vì không thấy AI bịa thông tin ngoài bài giảng.",
+      "dung_that_khong": "Sẵn sàng dùng làm công cụ trợ lý học tập chính."
+    }
+  },
+  {
+    "id": "FB_04",
+    "user_name": "Lê Xuân Việt",
+    "role": "Sinh viên Khoa học Máy tính VinUni",
+    "is_willing_user": true,
+    "rating": 5,
+    "quote": "Cái hay nhất là AI Tutor tự động trích xuất ghi chú qua thẻ WRITE_NOTE. Mỗi lần hỏi xong là bên khung vở kẻ ngang tự động cập nhật gạch đầu dòng Markdown nằm khớp trên dòng kẻ.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Trước đó ghi chú mới bị xoá đè lên ghi chú cũ, nhưng nhóm đã fix thành dạng nối tiếp (Append Mode) rất chuẩn.",
+      "tin_ket_qua_khong": "Rất tin tưởng.",
+      "dung_that_khong": "Có, tiết kiệm cho mình 50% thời gian vừa đọc slide vừa tự viết tay."
+    }
+  },
+  {
+    "id": "FB_05",
+    "user_name": "Nguyễn Hoàng Duy",
+    "role": "Học viên AI Thực Chiến K4",
+    "is_willing_user": true,
+    "rating": 5,
+    "quote": "3 thẻ gợi ý câu hỏi nhanh (Tóm tắt slide này, Giải thích dễ hiểu, Ôn lại thuật ngữ) ở khung chat rất trực quan. Vào trang cái là bấm được ngay không cần gõ chữ.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Mới đầu bấm gợi ý bị kẹt scope, nhưng nhóm sửa ngay lập tức.",
+      "tin_ket_qua_khong": "Hoàn toàn tin tưởng.",
+      "dung_that_khong": "Rất thích và sẽ sử dụng."
+    }
+  },
+  {
+    "id": "FB_06",
+    "user_name": "Vũ Khánh Linh",
+    "role": "Học viên khóa AI Thực Chiến K4",
+    "is_willing_user": true,
+    "rating": 5,
+    "quote": "Giao diện chia đôi màn hình kết hợp công cụ vẽ Highlight và Tẩy trực tiếp trên slide mượt như PDF Reader chuyên nghiệp. AI trả lời cực kỳ lễ phép và đúng trọng tâm.",
+    "pair_answers": {
+      "dieu_kho_chiu_nhat": "Không có điểm gì chê.",
+      "tin_ket_qua_khong": "Tin tưởng tuyệt đối.",
+      "dung_that_khong": "Sẵn sàng giới thiệu cho các bạn cùng lớp VinUni dùng thử."
+    }
+  }
+]
