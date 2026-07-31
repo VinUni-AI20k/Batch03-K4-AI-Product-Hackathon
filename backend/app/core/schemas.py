@@ -1,6 +1,7 @@
 """
 Pydantic schemas dung chung toan bo pipeline + API layer.
-Quy uoc: segment_id dang "T-001", section_id dang "s1" - PHAI nhat quan xuyen suot
+Quy uoc: transcript segment_id dang "T01-001", slide segment_id dang
+"P01-S01", section_id dang "S1" - PHAI nhat quan xuyen suot
 tu classify.py -> outline.py -> quiz_bank.py -> weakness.py -> align.py -> rewrite.py.
 
 Neu doi field/shape o day, phai bao ca 4 nguoi truoc khi sua.
@@ -8,8 +9,9 @@ Neu doi field/shape o day, phai bao ca 4 nguoi truoc khi sua.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -36,8 +38,27 @@ class Style(str, Enum):
 
 class TranscriptSegment(BaseModel):
     """Input tho: 1 doan transcript user upload, chua qua AI."""
-    segment_id: str = Field(..., pattern=r"^T-\d+$")
+    segment_id: str = Field(..., pattern=r"^T\d{2}-\d{3}$")
     text: str
+    # Optional because legacy transcript files are not aligned to a slide.
+    slide_id: Optional[str] = Field(default=None, pattern=r"^P\d{2}$")
+
+
+class Slide(BaseModel):
+    """A PDF page and its extracted text before it is converted to an outline."""
+    slide_id: str = Field(..., pattern=r"^P\d{2}$")
+    page_number: int = Field(..., gt=0)
+    title: str = Field(..., min_length=1)
+    text: str = Field(..., min_length=1)
+    segment_ids: List[str] = Field(default_factory=list)
+
+
+class Citation(BaseModel):
+    """A source marker and the result of validating it against section context."""
+    id: str = Field(..., min_length=1)
+    type: Literal["slide", "transcript"]
+    valid: bool
+    section_id: Optional[str] = None
 
 
 class SegmentLabel(str, Enum):
@@ -58,9 +79,10 @@ class ClassifiedSegment(BaseModel):
 # ---------------------------------------------------------------------------
 
 class OutlineSection(BaseModel):
-    section_id: str = Field(..., pattern=r"^s\d+$")
+    section_id: str = Field(..., pattern=r"^S\d+$")
     title: str
     key_points: List[str] = Field(..., min_length=1)
+    slide_ids: List[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -73,6 +95,7 @@ class MCQItem(BaseModel):
     options: List[str] = Field(..., min_length=2, max_length=4)
     correct_index: int = Field(..., ge=0)
     section_id: str
+    misconception_tag: Optional[str] = None
 
 
 class OpenQuestion(BaseModel):
@@ -125,7 +148,7 @@ class GradingResult(BaseModel):
 # weakness.py
 # ---------------------------------------------------------------------------
 
-class WeaknessRankingItem(BaseModel):
+class WeakSection(BaseModel):
     section_id: str
     weak_score: float = Field(..., ge=0, le=1)
     reason: str
@@ -134,7 +157,7 @@ class WeaknessRankingItem(BaseModel):
 class WeaknessAnalysis(BaseModel):
     quiz_result: List[QuizResultItem]
     open_answer_text: str
-    weakness_ranking: List[WeaknessRankingItem]
+    weakness_ranking: List[WeakSection]
     sections_to_reteach: List[str] = Field(..., min_length=1, max_length=3)
 
 
@@ -148,6 +171,52 @@ class AlignmentItem(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# active_mode - server-side self-check contracts
+# ---------------------------------------------------------------------------
+
+@dataclass
+class RubricPoint:
+    point: str
+    citation: str | None
+
+
+@dataclass
+class CheckQuestion:
+    section_id: str
+    question: str
+    # Deliberately not part of StudyNoteSection/API serialization.
+    rubric_points: list[RubricPoint]
+
+
+@dataclass
+class CheckJudgement:
+    section_id: str
+    verdict: str
+    feedback_markdown: str
+    missed_points: list[RubricPoint]
+
+
+class JudgeAnswerRequest(BaseModel):
+    """Payload for grading a server-retained active-mode check."""
+    session_id: str = Field(..., min_length=1)
+    section_id: str = Field(..., min_length=1)
+    learner_answer: str = Field(..., min_length=1, max_length=4000)
+
+
+class MissedRubricPoint(BaseModel):
+    point: str
+    citation: str | None = None
+
+
+class CheckJudgementResponse(BaseModel):
+    """Public representation of a grounded active-mode judgement."""
+    section_id: str
+    verdict: Literal["correct", "partial", "incorrect"]
+    feedback_markdown: str
+    missed_points: List[MissedRubricPoint] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # rewrite.py
 # ---------------------------------------------------------------------------
 
@@ -155,7 +224,36 @@ class StudyNoteSection(BaseModel):
     section_id: str
     title: str
     content_md: str
-    cited_segment_ids: List[str] = Field(..., min_length=1)
+    citations: List[Citation] = Field(default_factory=list)
+    check_question: str | None = None
+
+
+class StudyNote(BaseModel):
+    """The complete grounded study note produced for a learning session."""
+    sections: List[StudyNoteSection] = Field(default_factory=list)
+
+
+class SectionContextSlide(BaseModel):
+    """The minimal slide representation exposed to the rewrite prompt."""
+    id: str
+    page: int
+    text: str
+
+
+class SectionContextTranscript(BaseModel):
+    """The minimal transcript representation exposed to the rewrite prompt."""
+    id: str
+    text: str
+
+
+class SectionContext(BaseModel):
+    """Grounded source bundle used to write one study-note section."""
+    title: str
+    section_id: Optional[str] = None
+    slides: List[SectionContextSlide] = Field(default_factory=list)
+    transcript: List[SectionContextTranscript] = Field(default_factory=list)
+    weak_reason: Optional[str] = None
+    source_thin: bool = False
 
 
 class SelfCheckGradeRequest(BaseModel):
@@ -170,6 +268,23 @@ class SelfCheckGrade(BaseModel):
     score: int = Field(..., ge=0, le=100)
     feedback: str = Field(..., min_length=1)
     next_step: str = Field(..., min_length=1)
+
+
+class ReteachRequest(BaseModel):
+    """Parameters for deterministic, single-stream adaptive re-teaching."""
+    level: Level = Level.INTERMEDIATE
+    style: Style = Style.BOTH
+    time_available_minutes: int = Field(default=15, gt=0)
+    sections: List[str] = Field(..., min_length=1)
+    transcript_file: str = "transcript-01-clean.md"
+
+
+class ReteachContent(BaseModel):
+    markdown: str = Field(..., min_length=1)
+    citations: List[Citation] = Field(default_factory=list)
+    level: Level
+    style: Style
+    time_available_minutes: int
 
 
 # ---------------------------------------------------------------------------
@@ -225,7 +340,7 @@ class SessionState(BaseModel):
     weakness: Optional[WeaknessAnalysis] = None
 
     alignment: Optional[List[AlignmentItem]] = None
-    study_note: Optional[List[StudyNoteSection]] = None
+    study_note: Optional[StudyNote] = None
 
     retest_quiz: Optional[Quiz] = None
     retest_result: Optional[RetestResult] = None

@@ -1,6 +1,6 @@
 import type { McqQuestion, StudyContent } from "../api/client";
 
-type WrongItem = { question: McqQuestion; userAnswer: string };
+type WrongItem = { question: McqQuestion; userAnswer: number };
 
 type Props = {
   wrongItems: WrongItem[];
@@ -20,8 +20,8 @@ export default function ReviewList({ wrongItems, studyContentBySection, onLoop }
             <p className="review-question">{item.question.question}</p>
             <p className="review-wrong">Bạn chọn: {item.userAnswer}</p>
             <p className="review-correct">
-              Đáp án đúng: {item.question.answer}{" "}
-              <span className="citation">nguồn: {studyContentBySection[item.question.section]?.citation}</span>
+              Đáp án đúng: {item.question.options[item.question.correct_index]?.text}{" "}
+              <span className="citation">nguồn: {studyContentBySection[item.question.section_id]?.citation}</span>
             </p>
           </div>
         ))}

@@ -5,10 +5,12 @@ import type {
   OutlineSection,
   Section,
   StudyContent,
+  SelfCheckGrade,
 } from "./api/client";
 import {
   MASTERY_THRESHOLD,
   generateQuiz,
+  generateQuizFromPdf,
   generateRetest,
   gradeSelfCheck,
   getStudyContent,
@@ -23,14 +25,17 @@ import RoadmapView from "./components/RoadmapView";
 import ReviewList from "./components/ReviewList";
 import ReportView from "./components/ReportView";
 import ChatPanel from "./components/ChatPanel";
+import OpenAnswerView from "./components/OpenAnswerView";
 import type { Stage } from "./components/ChatPanel";
+import { analyzeWeakness } from "./weaknessAnalysis";
 import "./styles.css";
 
-type WrongItem = { question: McqQuestion; userAnswer: string };
+type WrongItem = { question: McqQuestion; userAnswer: number };
 type RetestSource = "verify" | "reteach";
 
 function App() {
   const [slideText, setSlideText] = useState<string>("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [stage, setStage] = useState<Stage>("upload");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -41,7 +46,8 @@ function App() {
   const [quizMode, setQuizMode] = useState<"round1" | "retest">("round1");
   const [questions, setQuestions] = useState<McqQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [openAnswer, setOpenAnswer] = useState("");
 
   const [round1Accuracy, setRound1Accuracy] = useState(0);
   const [weakSections, setWeakSections] = useState<Section[]>([]);
@@ -60,7 +66,9 @@ function App() {
   const handleUpload = async (file: File) => {
     setIsLoading(true);
     const result = await uploadSlide(file);
+    setUploadedFile(file);
     setSlideText(result.textContent);
+    setOutline(result.outline);
     setStage("ready");
     setIsLoading(false);
   };
@@ -69,13 +77,15 @@ function App() {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const { outline: newOutline, questions: newQuestions } =
-        await generateQuiz();
+      const { outline: newOutline, questions: newQuestions } = uploadedFile
+        ? await generateQuizFromPdf(uploadedFile)
+        : await generateQuiz();
       setOutline(newOutline);
       setRound1Questions(newQuestions);
       setQuizMode("round1");
       setQuestions(newQuestions);
       setAnswers([]);
+      setOpenAnswer("");
       setCurrentIndex(0);
       setStage("quiz");
     } catch (err) {
@@ -84,27 +94,50 @@ function App() {
     setIsLoading(false);
   };
 
-  const handleAnswer = (answer: string) => {
+  const handleAnswer = (answerIndex: number) => {
     setAnswers((prev) => {
       const next = [...prev];
-      next[currentIndex] = answer;
+      next[currentIndex] = answerIndex;
       return next;
     });
   };
 
   // ---- Phase 2: G1 grading + D1 diagnosis ----
-  const finishRound1 = async (finalAnswers: string[]) => {
+  const finishRound1 = async (finalAnswers: number[]) => {
     setIsLoading(true);
     const result = await gradeQuiz(questions, finalAnswers);
     setRound1Accuracy(result.accuracy);
     setWeakSections(result.weakSections);
     setGoodSections(result.goodSections);
-    setStage("diagnosis");
+    setStage("open-answer");
     setIsLoading(false);
   };
 
+  const submitOpenAnswer = async () => {
+    setIsLoading(true);
+    setErrorMessage("");
+    try {
+      const weaknesses = await analyzeWeakness(
+        round1Questions,
+        answers,
+        { answer: openAnswer },
+        outline,
+      );
+      const analyzedWeakSections = weaknesses.map((item) => item.outline_section_id);
+      setWeakSections(analyzedWeakSections);
+      setGoodSections((current) =>
+        current.filter((section) => !analyzedWeakSections.includes(section)),
+      );
+      setStage("diagnosis");
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ---- Phase 4: GRADE + DEC2 ----
-  const finishRetest = async (finalAnswers: string[]) => {
+  const finishRetest = async (finalAnswers: number[]) => {
     setIsLoading(true);
     const result = await gradeQuiz(questions, finalAnswers);
     setFinalAccuracy(result.accuracy);
@@ -120,7 +153,7 @@ function App() {
       setWeakSections(result.weakSections);
       const wrong: WrongItem[] = questions
         .map((q, i) => ({ question: q, userAnswer: finalAnswers[i] }))
-        .filter((_item, i) => finalAnswers[i] !== questions[i].answer);
+        .filter((_item, i) => finalAnswers[i] !== questions[i].correct_index);
       setWrongItems(wrong);
       setStage("review");
     }
@@ -145,6 +178,7 @@ function App() {
     const qs = await generateRetest(sections, perSection, round1Questions);
     setQuestions(qs);
     setAnswers([]);
+    setOpenAnswer("");
     setCurrentIndex(0);
     setStage("quiz");
     setIsLoading(false);
@@ -164,15 +198,18 @@ function App() {
 
   // ---- Phase 3: STYLE -> AL + RM -> Roadmap ----
   const handleStyleSubmit = async (
-    _style: string,
-    _timeframe: string,
-    selectedActiveMode: boolean,
+    level: string,
+    style: string,
+    timeframe: string,
   ) => {
     setIsLoading(true);
     const content = await getStudyContent(
       weakSections,
       outline,
       round1Questions,
+      level,
+      style,
+      Number.parseInt(timeframe, 10) || 15,
     );
     setStudyContent(content);
     setStage("roadmap");
@@ -204,6 +241,7 @@ function App() {
 
   const handleReset = () => {
     setSlideText("");
+    setUploadedFile(null);
     setStage("upload");
     setOutline([]);
     setRound1Questions([]);
@@ -211,6 +249,7 @@ function App() {
     setQuestions([]);
     setCurrentIndex(0);
     setAnswers([]);
+    setOpenAnswer("");
     setRound1Accuracy(0);
     setWeakSections([]);
     setGoodSections([]);
@@ -297,7 +336,7 @@ function App() {
               question={questions[currentIndex]}
               index={currentIndex + 1}
               total={questions.length}
-              selected={answers[currentIndex] || ""}
+              selected={answers[currentIndex]}
               modeLabel={
                 quizMode === "round1"
                   ? "Phase 2 — Quiz chẩn đoán ban đầu"
@@ -320,6 +359,16 @@ function App() {
                   : "Làm bài kiểm tra xác nhận →"
               }
               onContinue={handleDec1}
+            />
+          </section>
+        )}
+
+        {stage === "open-answer" && !isLoading && (
+          <section className="card result-card">
+            <OpenAnswerView
+              value={openAnswer}
+              onChange={setOpenAnswer}
+              onSubmit={submitOpenAnswer}
             />
           </section>
         )}

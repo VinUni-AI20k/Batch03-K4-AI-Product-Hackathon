@@ -2,6 +2,8 @@
 lọc (chỉ lời giảng viên), gắn section_id + segment_id để trích dẫn được.
 
 Đây là lời gọi AI thật duy nhất bắt buộc cho CP3 — không hardcode."""
+import re
+
 from app.core.llm_client_openai import call_json
 from app.pipeline.outline import Section
 from app.prompts.quiz_bank_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
@@ -30,6 +32,13 @@ def _validate(questions: list[dict], sections: list[Section]) -> tuple[list[dict
             continue
         if not isinstance(q.get("correct_index"), int) or not (0 <= q["correct_index"] < 4):
             reasons.append(f"invalid_correct_index: {q.get('question', '?')[:50]}")
+            continue
+        misconception_tag = q.get("misconception_tag")
+        if misconception_tag is not None and (
+            not isinstance(misconception_tag, str)
+            or not re.fullmatch(r"[a-z][a-z0-9_]*", misconception_tag)
+        ):
+            reasons.append(f"invalid_misconception_tag: {q.get('question', '?')[:50]}")
             continue
         checked.append(q)
     return checked, reasons

@@ -1,4 +1,4 @@
-export type Stage = "upload" | "ready" | "quiz" | "diagnosis" | "style" | "roadmap" | "review" | "report";
+export type Stage = "upload" | "ready" | "quiz" | "open-answer" | "diagnosis" | "style" | "roadmap" | "review" | "report";
 
 type Props = {
   stage: Stage;
@@ -20,6 +20,11 @@ const messages: Record<Stage, { phase: string; title: string; text: string }> = 
     phase: "Phase 2 / 4",
     title: "Làm quiz từng câu",
     text: "AI hiển thị từng câu hỏi một. Chọn đáp án và tiếp tục đến câu tiếp theo.",
+  },
+  "open-answer": {
+    phase: "Phase 2 — Learning Diagnosis",
+    title: "Chia sẻ mục tiêu học tập",
+    text: "Câu trả lời của bạn sẽ giúp AI hiểu phần nào cần được ưu tiên ôn tập.",
   },
   diagnosis: {
     phase: "Phase 2 — Learning Diagnosis",

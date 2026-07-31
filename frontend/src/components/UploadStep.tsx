@@ -30,7 +30,7 @@ export default function UploadStep({ onUpload, disabled = false }: Props) {
         ref={fileInputRef}
         id="slide-upload"
         type="file"
-        accept=".pdf,.pptx,.ppt,.txt"
+        accept="application/pdf,.pdf"
         onChange={handleFileChange}
         disabled={disabled}
         hidden
