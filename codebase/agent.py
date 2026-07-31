@@ -33,6 +33,12 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 from dotenv import load_dotenv
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 try:
     from sentence_transformers import SentenceTransformer, util as st_util
 except ImportError:
@@ -45,7 +51,10 @@ except ImportError:
     BM25Okapi = None
 
 try:
-    from duckduckgo_search import DDGS
+    try:
+        from ddgs import DDGS
+    except ImportError:
+        from duckduckgo_search import DDGS
 except ImportError:
     DDGS = None
 
@@ -442,13 +451,15 @@ class AIQAAgent:
             return json.dumps({"error": "duckduckgo-search chưa được cài. Chạy: pip install duckduckgo-search"}, ensure_ascii=False)
         try:
             results = []
-            with DDGS() as ddgs:
-                for r in ddgs.text(query, max_results=max_results):
-                    results.append({
-                        "title": r.get("title", ""),
-                        "url": r.get("href", ""),
-                        "snippet": r.get("body", "")[:400]
-                    })
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with DDGS() as ddgs:
+                    for r in ddgs.text(query, max_results=max_results):
+                        results.append({
+                            "title": r.get("title", ""),
+                            "url": r.get("href", ""),
+                            "snippet": r.get("body", "")[:400]
+                        })
             if not results:
                 return json.dumps({"found": 0, "results": [], "message": "Không tìm thấy kết quả."}, ensure_ascii=False)
             return json.dumps({"found": len(results), "results": results}, ensure_ascii=False, indent=2)
@@ -505,7 +516,7 @@ class AIQAAgent:
     # Hybrid search (used by search_knowledge_base tool)
     # ------------------------------------------------------------------
 
-    def _retrieve_relevant_docs(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def _retrieve_relevant_docs(self, query: str, top_k: int = 15) -> List[Dict[str, Any]]:
         if not self.all_docs:
             return []
 
@@ -523,7 +534,8 @@ class AIQAAgent:
             cos_scores = st_util.cos_sim(query_embedding, self.doc_embeddings)[0].cpu().numpy()
             semantic_scores = np.clip(cos_scores, 0, 1)
 
-        hybrid_scores = 0.7 * semantic_scores + 0.3 * bm25_scores
+        # Semantic 60% + BM25 40% for richer diversity
+        hybrid_scores = 0.6 * semantic_scores + 0.4 * bm25_scores
 
         # Tag bonus & keyword relevance boost
         query_words = set(re.findall(r"\w+", query.lower()))
@@ -560,8 +572,8 @@ class AIQAAgent:
             overlap = len(query_words.intersection(doc_words))
             has_bm25 = (self.bm25 is not None and bm25_scores[idx] > 0)
 
-            # Lọc tài liệu thực sự liên quan: tránh đính kèm tài liệu không liên quan cho câu hỏi của người dùng
-            is_relevant = (score >= 0.22 and (overlap > 0 or has_bm25)) or (score >= 0.35) or (overlap >= 2 and score >= 0.15)
+            # Mở rộng ngưỡng liên quan: 0.12 thay vì 0.22, 0.20 thay vì 0.35 — để thu thập đa dạng tài liệu hơn
+            is_relevant = (score >= 0.12 and (overlap > 0 or has_bm25)) or (score >= 0.20) or (overlap >= 1 and score >= 0.08)
             if is_relevant:
                 doc_copy = doc.copy()
                 doc_copy["score"] = score
@@ -601,7 +613,7 @@ class AIQAAgent:
         r"|c[aá]ch\s*n[aấ]u|m[oó]n\s*[aă]n|c[oô]ng\s*th[uứ]c\s*n[aấ]u|qu[aá]n\s*[aă]n|du\s*l[iị]ch|đ[iị]a\s*đi[eể]m"
         r"|gi[aá]\s*v[aà]ng|b[aấ]t\s*đ[oộ]ng\s*s[aả]n|c[oổ]\s*phi[eế]u|ch[uứ]ng\s*kho[aá]n|x[oổ]\s*s[oố]|t[uử]\s*vi"
         r"|cung\s*ho[aà]ng\s*đ[aạ]o|th[oờ]i\s*ti[eế]t"
-        r"|ph[uơ]ng\s*tr[iì]nh\s*ho[aá]|h[oó]a\s*h[oọ]c|v[aậ]t\s*l[yý]\s*(l[oớ]p|h[aạ]t)|sinh\s*h[oọ]c|v[aă]n\s*h[oọ]c|b[aà]i\s*v[aă]n",
+        r"|ph[uơ]ng\s*tr[iì]nh\s*ho[aá]|(?:\s|^)h[oó]a\s*h[oọ]c|v[aậ]t\s*l[yý]\s*(l[oớ]p|h[aạ]t)|(?:\s|^)sinh\s*h[oọ]c|v[aă]n\s*h[oọ]c|b[aà]i\s*v[aă]n",
         re.IGNORECASE,
     )
     _IN_DOMAIN_KW = re.compile(
@@ -611,7 +623,20 @@ class AIQAAgent:
         r"|th[aầ]y|c[oô]|ta|mentor|gi[aả]ng\s*vi[eê]n|kh[oó]a\s*h[oọ]c|batch|l[oớ]p|ch[oỗ]\s*kh[oó]"
         r"|ch[aấ]m\s*đi[eể]m|evidence|b[aằ]ng\s*ch[uứ]ng|dataset|model|token|embedding|api|key"
         r"|t[aà]i\s*li[eệ]u|s[oổ]\s*tay|slide|b[aà]i\s*gi[aả]ng|ph[aâ]n\s*c[oô]ng|n[oộ]p\s*b[aà]i"
-        r"|m[aá]y\s*t[ií]nh|c[aà]i\s*đ[aặ]t|th[uư]\s*vi[eệ]n|package|git|github|vscode|cursor|cline|selenium|scraper|scrape",
+        r"|m[aá]y\s*t[ií]nh|c[aà]i\s*đ[aặ]t|th[uư]\s*vi[eệ]n|package|git|github|vscode|cursor|cline|selenium|scraper|scrape"
+        r"|bao\s*l[aâ]u|th[oờ]i\s*gian|tuy[eể]n\s*sinh|l[oộ]\s*tr[iì]nh|h[oọ]c\s*ph[ií]|c[aă]ng\s*tin|c[oơ]\s*s[oở]|v[aậ]t\s*ch[aấ]t|g[uử]i\s*xe|wifi"
+        r"|machine\s*learning|deep\s*learning|neural|transformer|gpt|claude|gemini|openai|anthropic"
+        r"|vector|database|mongodb|fastapi|react|javascript|typescript|html|css|web|backend|frontend"
+        r"|docker|cloud|deploy|server|localhost|port|api\s*key|environment|variable|import|library"
+        r"|data|train|inference|fine.tun|parameter|weight|gradient|loss|accuracy|precision|recall"
+        r"|career|job|interview|portfolio|project|skill|h[oọ]c|ki[eế]n\s*th[uứ]c|kinh\s*nghi[eệ]m"
+        r"|h[oọ]c\s*b[oổ]ng|h[oọ]c\s*ph[ií]|mi[eễ]n\s*ph[ií]|chi\s*ph[ií]|ti[eề]n|ph[ií]\s*h[oọ]c"
+        r"|đ[aă]ng\s*k[yý]|[uứ]ng\s*tuy[eể]n|ph[oỏ]ng\s*v[aấ]n|h[oồ]\s*s[oơ]"
+        r"|ai\s*th[uự]c\s*chi[eế]n|cong\s*dong|c[oộ]ng\s*đ[oồ]ng|nh[oó]m|group|facebook\s*group"
+        r"|gi[oờ]\s*h[oọ]c|l[iị]ch\s*h[oọ]c|th[oờ]i\s*kh[oó]a\s*bi[eể]u|bu[oổ]i|online|offline"
+        r"|t[eự]\s*h[oọ]c|đ[aà]o\s*t[aạ]o|ch[uứ]ng\s*ch[iỉ]|b[aằ]ng|c[aấ]p|certificate"
+        r"|notebook|jupyter|colab|kaggle|huggingface|langchain|llamaindex"
+        r"|[tT]r[uườ]ng|[sS]inh\s*vi[eê]n|[hH][oọ]c\s*vi[eê]n|[vV]in[Uu]ni|[hH]a[nN][oO]i|[tT][pP]HCM",
         re.IGNORECASE,
     )
     _CONVERSATIONAL_KW = re.compile(
@@ -646,13 +671,15 @@ class AIQAAgent:
 
     def _is_out_of_domain(self, query: str) -> bool:
         q_strip = query.strip()
+        # Conversational → NOT out of domain
         if self._CONVERSATIONAL_KW.search(q_strip):
             return False
+        # If query contains any in-domain keywords → NOT out of domain
+        if self._IN_DOMAIN_KW.search(query):
+            return False
+        # Only block the most explicitly off-topic patterns
         if self._L3_OUT_OF_DOMAIN_EXPLICIT.search(query):
             return True
-        if not self._IN_DOMAIN_KW.search(query):
-            if self._get_max_kb_similarity(query) < 0.25:
-                return True
         return False
 
     def _check_guardrails(self, query: str) -> Tuple[List[str], str, float]:
@@ -676,12 +703,12 @@ class AIQAAgent:
             if self._is_out_of_domain(query) and not self._L3_CHEAT.search(query):
                 override_msg = (
                     "🚫 **Từ chối trả lời (Ngoài phạm vi chuyên môn / Out of Domain):**\n\n"
-                    "Câu hỏi của bạn không thuộc phạm vi hỗ trợ của khóa học **AI Thực Chiến Vingroup - VinUni**.\n\n"
-                    "Mình là Trợ lý AI QA chuyên trách chỉ hỗ trợ giải đáp thuộc lĩnh vực:\n"
-                    "1. **Quy chế & Lịch trình khóa học:** Spec, Rubric, Checkpoints (CP1-CP6), Deadline, Vibe-coding rule...\n"
-                    "2. **Kiến thức AI & Lập trình:** Python, pip, môi trường, lỗi code, LLM, RAG, Agent, HAX, PAIR, JTBD...\n"
-                    "3. **Tra cứu cơ sở tri thức:** Các bài đăng hỏi-đáp đã được Giảng viên/TA xác nhận trên FB Group & VLearn.\n\n"
-                    "Vui lòng đặt câu hỏi liên quan đến nội dung khóa học hoặc bài tập Hackathon để mình hỗ trợ chính xác nhất nhé!"
+                    "Câu hỏi của bạn không thuộc phạm vi hỗ trợ của **AI Trợ lý Khóa học AI Thực Chiến (Vingroup - VinUni)**.\n\n"
+                    "Mình chuyên trách tư vấn và giải đáp thuộc các lĩnh vực:\n"
+                    "1. **Thông tin Tuyển sinh & Lộ trình 3 tháng:** Yêu cầu đầu vào, thời gian đào tạo, quyền lợi học viên & học bổng 100%...\n"
+                    "2. **Cơ sở vật chất & Tiện ích cá nhân:** Địa điểm học tại VinUni / Tòa Vin, giờ mở cửa Căng tin, phòng tự học, wifi, gửi xe...\n"
+                    "3. **Hỏi đáp Kỹ thuật & Chuyên môn:** Sửa lỗi Python, pip install, môi trường, tra cứu từ dữ liệu Facebook Group QA & VLearn (@codebase/data).\n\n"
+                    "Vui lòng đặt câu hỏi liên quan đến chương trình khóa học để mình hỗ trợ chính xác nhất nhé!"
                 )
             else:
                 override_msg = (
@@ -699,16 +726,7 @@ class AIQAAgent:
 
         if self._L2_AMBIGUOUS_KW.search(query):
             triggered.append("layer2_ambiguity")
-            override_msg = (
-                "🔍 **Cần làm rõ thêm:** Câu hỏi đang thiếu ngữ cảnh để mình tra cứu chính xác.\n\n"
-                "Hãy bổ sung:\n"
-                "- **Hệ điều hành:** Windows / macOS / Linux (và phiên bản)\n"
-                "- **Phiên bản Python:** `python --version`\n"
-                "- **Lệnh đã chạy:** lệnh đầy đủ bạn đã gõ\n"
-                "- **Thông báo lỗi:** copy toàn bộ stacktrace/error message\n"
-                "- **Thư mục đang làm việc:** đường dẫn hiện tại\n\n"
-                "Với thông tin trên mình sẽ tìm đúng đáp án TA đã giải trong Group!"
-            )
+            # Không override message — AI vẫn cố gắng trả lời, chỉ gắn tag để tracking
             conf_mod = 0.85
 
         if self._L4_DOMAIN.search(query):
@@ -720,20 +738,35 @@ class AIQAAgent:
     # Core: Agent Loop with Function Calling
     # ------------------------------------------------------------------
 
-    SYSTEM_PROMPT = """Bạn là AI Agent QA thông minh cho khóa học AI Thực Chiến Vingroup - VinUni (Batch 03).
+    SYSTEM_PROMPT = """Bạn là Trợ lý AI Thông minh của Khóa học AI Thực Chiến Vingroup - VinUni — một chuyên gia tư vấn am hiểu sâu về chương trình học, công nghệ AI/ML và hỗ trợ học viên toàn diện.
 
-Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
-1. CHỈ trả lời các câu hỏi trong phạm vi:
-   - Nội dung, quy chế, spec, rubric, lịch trình khóa học AI Thực Chiến Vingroup - VinUni.
-   - Kỹ thuật, lập trình Python, lỗi code, công nghệ AI, LLM, RAG, Agent, Vibe-coding.
-2. TUYỆT ĐỐI TỪ CHỐI trả lời mọi vấn đề NGOÀI LĨNH VỰC / NGOÀI PHẠM VI (ví dụ: địa lý, chính trị, lịch sử, tin tức giải trí, thể thao, nấu ăn, các chủ đề không liên quan đến khóa học và công nghệ AI/lập trình). Khi từ chối, giải thích rõ phạm vi hỗ trợ và KHÔNG được gửi/kèm bất kỳ tài liệu hay link tra cứu nào.
-3. Với câu giao tiếp thông thường (chào hỏi, cảm ơn, hỏi thăm): trả lời tự nhiên, thân thiện như người bạn, KHÔNG cần tra tài liệu và KHÔNG gửi link tài liệu.
-4. Với câu hỏi thuộc chuyên môn/khóa học: BẮT BUỘC dùng tool `search_knowledge_base` trước tiên. Chỉ khi tài liệu thực sự liên quan đến câu hỏi mới gửi kèm Danh sách Tài liệu & Link gốc liên quan ở cuối câu trả lời dưới định dạng Markdown link rõ ràng (ví dụ: `[📖 Sổ tay chương trình: spec.md](/api/docs/spec.md)`). TUYỆT ĐỐI KHÔNG gửi tài liệu hoặc link không liên quan đến câu hỏi mà người dùng hỏi.
-5. Nếu KB không đủ thông tin về chủ đề thuộc phạm vi khóa học/kỹ thuật: có thể dùng `search_internet` để tìm thêm.
-6. Với yêu cầu tính toán: dùng `calculate`.
-7. Với câu hỏi về thời gian: dùng `get_current_time`.
-8. Luôn trả lời bằng tiếng Việt, đúng trọng tâm và trình bày đẹp mắt.
-9. Không viết hộ toàn bộ code bài nộp/checkpoint; chỉ hướng dẫn tư duy và debug."""
+NHIỆM VỤ TRỌNG TÂM (CORE MISSION):
+Bạn được trang bị toàn bộ kiến thức từ cơ sở dữ liệu MongoDB của chương trình (gồm bài đăng Facebook Group Q&A, bài giảng VLearn, sổ tay chương trình) để trả lời CHÍNH XÁC và ĐẦY ĐỦ nhất có thể mọi câu hỏi mà người dùng đặt ra.
+
+ĐỐI TƯỢNG PHỤC VỤ:
+1. **Ứng viên/Học sinh mới tìm hiểu chương trình**: Tuyển sinh, lộ trình 3 tháng, yêu cầu đầu vào, học bổng 100% Vingroup, chính sách hỗ trợ học viên.
+2. **Học viên đang theo học**: Hướng dẫn kỹ thuật (Python, pip, môi trường, lỗi code, AI/LLM/RAG), thông tin sự kiện khóa học, cơ sở vật chất VinUni.
+3. **Bất kỳ người dùng nào**: Giải đáp kiến thức AI/ML/LLM tổng quát, tư vấn học tập, chia sẻ kinh nghiệm và kiến thức về lĩnh vực AI thực chiến.
+
+CHIẾN LƯỢC TRẢ LỜI (RESPONSE STRATEGY):
+1. **Ưu tiên tra cứu KB MongoDB**: Với mọi câu hỏi, LUÔN gọi tool `search_knowledge_base` trước để kiểm tra dữ liệu nội bộ. Nếu có dữ liệu phù hợp → trích dẫn chính xác, kèm link nguồn.
+2. **Mở rộng sáng tạo khi KB không đủ**: Nếu KB không có đủ thông tin, hãy dùng kiến thức chuyên môn về AI/ML/LLM/Python để trả lời một cách sáng tạo, chính xác và hữu ích. KHÔNG từ chối chỉ vì không có trong KB.
+3. **Tìm kiếm internet khi cần**: Với câu hỏi cần thông tin mới nhất (lỗi thư viện, tin tức AI mới...) hãy gọi tool `search_internet`.
+
+PHẠM VI HỖ TRỢ RỘNG (BROAD SUPPORT SCOPE):
+✅ Thông tin tuyển sinh, học bổng, lộ trình, cơ sở vật chất VinUni
+✅ Kỹ thuật AI/ML/LLM/RAG/Agent, Python, pip, lỗi code, môi trường
+✅ Giải thích khái niệm AI, tư vấn định hướng học tập, career path AI
+✅ Thông tin sự kiện khóa học, deadline, checkpoint từ Facebook Group
+✅ Câu hỏi chung về lập trình, công nghệ liên quan đến AI
+✅ Giao tiếp thông thường, chào hỏi, cảm ơn
+
+GIỚI HẠN (BOUNDARIES):
+❌ Nội dung chính trị, lãnh thổ, lịch sử quốc gia nhạy cảm
+❌ Viết hộ toàn bộ bài nộp/checkpoint (nhưng được hướng dẫn cách làm)
+❌ Thông tin giải trí hoàn toàn không liên quan (showbiz, thể thao, giá vàng...)
+
+VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ ràng. Ưu tiên tiếng Việt, dùng tiếng Anh cho thuật ngữ kỹ thuật."""
 
     def _agent_loop_openai(self, query: str, guardrail_prefix: str) -> Tuple[str, List[Dict]]:
         """Vòng lặp Agent OpenAI Function Calling. Trả về (answer, tool_citations)."""
@@ -751,7 +784,8 @@ Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
                 messages=messages,
                 tools=TOOL_SCHEMAS,
                 tool_choice="auto",
-                max_tokens=1500,
+                temperature=0.8,
+                max_tokens=3000,
             )
 
             msg = response.choices[0].message
@@ -790,8 +824,8 @@ Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
         return "Đã xử lý nhưng không tạo được câu trả lời cuối. Vui lòng thử lại.", all_tool_results
 
     def _fallback_answer(self, query: str, guardrail_prefix: str) -> Tuple[str, List[Dict]]:
-        """Fallback: dùng RAG + Gemini/Anthropic hoặc local match."""
-        retrieved = self._retrieve_relevant_docs(query, top_k=5)
+        """Fallback: dùng RAG + Gemini/Anthropic hoặc local match. Lấy top_k=8 từ toàn bộ MongoDB KB."""
+        retrieved = self._retrieve_relevant_docs(query, top_k=8)
         answer = guardrail_prefix + "\n\n---\n\n" if guardrail_prefix else ""
 
         if self.client and self.llm_provider in ("gemini", "anthropic"):
@@ -799,14 +833,20 @@ Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
             for i, doc in enumerate(retrieved, 1):
                 context_blocks.append(
                     f"[{i}] {doc.get('title', '')}\n"
-                    f"URL: {doc.get('url', '')}\n"
-                    f"Nội dung: {doc.get('content', '')[:1500]}"
+                    f"Nguồn: {doc.get('source_type', '')} | URL: {doc.get('url', '')}\n"
+                    f"Nội dung: {doc.get('content', '')[:2000]}"
                 )
-            context = "\n\n".join(context_blocks) or "Không tìm thấy nguồn liên quan."
+            context = "\n\n".join(context_blocks) if context_blocks else "Không tìm thấy nguồn liên quan trong KB nội bộ."
             prompt = (
                 self.SYSTEM_PROMPT + "\n\n"
-                f"Context từ Knowledge Base:\n{context}\n\n"
-                f"Câu hỏi: {query}"
+                f"=== DỮ LIỆU TỪ KNOWLEDGE BASE MONGODB ({len(retrieved)} tài liệu liên quan) ===\n"
+                f"{context}\n\n"
+                f"=== CÂU HỎI CỦA NGƯỜI DÙNG ===\n"
+                f"{query}\n\n"
+                f"Hãy trả lời đầy đủ, chính xác và hữu ích nhất có thể dựa trên dữ liệu KB trên "
+                f"và kiến thức chuyên môn của bạn về AI/ML/lập trình. "
+                f"Nếu KB có dữ liệu liên quan hãy trích dẫn rõ nguồn. "
+                f"Nếu KB không đủ, hãy dùng kiến thức chuyên môn để bổ sung."
             )
             try:
                 if self.llm_provider == "gemini":
@@ -816,7 +856,7 @@ Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
                     import anthropic
                     resp = self.client.messages.create(
                         model=self.model_name,
-                        max_tokens=1024,
+                        max_tokens=2048,
                         messages=[{"role": "user", "content": prompt}],
                     )
                     answer += resp.content[0].text.strip()
@@ -955,11 +995,11 @@ Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
             print(f"[Error] Agent loop failed: {e}")
             answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix)
 
-        # 3. Build citations from KB docs (for sidebar display)
-        retrieved_docs = self._retrieve_relevant_docs(query, top_k=5)
+        # 3. Build citations from KB docs (for sidebar display) — top_k=15 để học từ nhiều MongoDB docs
+        retrieved_docs = self._retrieve_relevant_docs(query, top_k=15)
         citations = self._build_citations(retrieved_docs)
 
-        base_conf = 0.96 if self.client and retrieved_docs else 0.90 if retrieved_docs else 0.40
+        base_conf = 0.96 if self.client and retrieved_docs else 0.90 if retrieved_docs else 0.70
         final_conf = round(base_conf * conf_mod, 2)
 
         return {

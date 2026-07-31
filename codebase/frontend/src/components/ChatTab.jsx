@@ -35,22 +35,22 @@ export default function ChatTab({
   const demoScripts = [
     {
       id: 'happy',
-      label: '1. Happy Path',
-      text: 'Khóa học AI Thực Chiến kéo dài trong bao lâu và lộ trình đào tạo 3 tháng ra sao?'
+      label: '1. Tuyển sinh & Lộ trình',
+      text: 'Khóa học AI Thực Chiến kéo dài trong bao lâu và yêu cầu đầu vào khóa học ra sao?'
     },
     {
       id: 'low_conf',
-      label: '2. Low Confidence',
-      text: 'Lỗi pip install trên Windows báo Visual C++ 14.0 là fix thế nào?'
+      label: '2. Học bổng & Học phí',
+      text: 'Học phí của khóa học AI Thực Chiến là bao nhiêu và chính sách học bổng 100% từ Vingroup như thế nào?'
     },
     {
       id: 'out_of_scope',
-      label: '3. Out of Scope (Failure)',
+      label: '3. Ngoài phạm vi',
       text: 'Xe VinFast VF8 bản Plus bây giờ giá lăn bánh bao nhiêu?'
     },
     {
       id: 'correction',
-      label: '4. Correction',
+      label: '4. Cơ sở vật chất',
       text: 'Căng tin VinUni mở cửa lúc mấy giờ và khu vực phục vụ sinh hoạt cá nhân của học viên ra sao?'
     }
   ];

@@ -5,6 +5,15 @@ Tài liệu này cung cấp cái nhìn toàn diện về cấu trúc kỹ thuậ
 
 ---
 
+> [!IMPORTANT]
+> **ĐIỂM RA QUYẾT ĐỊNH CỦA AI TRONG SẢN PHẨM (AI DECISION MAKING):**
+> **"AI quyết định câu hỏi của học viên thuộc chuyên môn có thể giải đáp chính xác từ nguồn sự thật nội bộ (Knowledge Base) hay là vấn đề ngoài phạm vi cần kích hoạt bộ lọc từ chối và chuyển cho tư vấn viên — dùng `gemini-2.5-flash` (và `gpt-4o-mini`)."**
+>
+> * **Bài toán**: Ngăn chặn AI sinh lời bịa đặt (Hallucination) hoặc trả lời sai thẩm quyền các vấn đề ngoài khóa học AI Thực Chiến Vingroup - VinUni.
+> * **Cách model thực hiện**: Mô hình hoạt động như bộ điều hướng (Agentic Router): (1) Phân tích ngữ cảnh để quyết định gọi tool tra cứu sự thật (`search_knowledge_base`) cho câu hỏi tuyển sinh/kỹ thuật/CSVC; (2) Quyết định kích hoạt từ chối an toàn (Graceful Refusal) và hiển thị nút chuyển tiếp cho TA/Tư vấn viên khi gặp câu hỏi ngoài lĩnh vực.
+
+---
+
 ## 1. DỰ ÁN CÓ NHỮNG TOOL / CÔNG NGHỆ NÀO? (TECHNOLOGY STACK & TOOLS)
 
 Hệ thống được xây dựng theo mô hình **Hiện đại (Modern Full-stack AI Application)**, tích hợp các công cụ và thư viện chuyên sâu sau:
@@ -79,9 +88,13 @@ graph TD
 Dự án sở hữu 4 nhóm chức năng cốt lõi:
 
 ### 3.1. Chức năng Tư vấn Khóa học AI Thực Chiến (Vingroup - VinUni)
+- **Vai trò như một Bộ phận Tuyển sinh (Admissions & Student Support Persona)**: AI đóng vai trò như chuyên viên tuyển sinh chuyên nghiệp — **chỉ giải đáp thông tin về khóa học và những thông tin đã được công bố công khai (publicly released)**, tuyệt đối không tiết lộ thông tin nội bộ bảo mật hay vượt thẩm quyền.
+- **Đối tượng phục vụ trọng tâm (Core Target Audience)**:
+  1. *Học sinh/Học viên mới đang tìm hiểu chương trình*: Hỗ trợ tra cứu nhanh điều kiện tuyển sinh, lộ trình đào tạo 3 tháng, chính sách học bổng 100% từ Vingroup để truyền cảm hứng và giúp ứng viên tự tin ứng tuyển.
+  2. *Học viên mới vào học cần thông tin về trường*: Hỗ trợ tận tình và chính xác các thông tin cơ sở vật chất tại trường (VinUni / Tòa Vin) như Căng tin tầng 1, Phòng tự học (07:30 - 21:00), mạng Wifi miễn phí, bãi gửi xe để tân học viên dễ dàng hòa nhập môi trường học tập.
 - **Tư vấn Tuyển sinh & Lộ trình 3 tháng**: Giải đáp chi tiết về đối tượng tuyển sinh, yêu cầu đầu vào (lập trình Python, tư duy logic), học bổng tài trợ 100% học phí từ Vingroup.
 - **Tư vấn Cơ sở vật chất & Tiện ích tại trường (VinUni / Tòa Vin)**: Cung cấp chính xác giờ mở cửa, quy chế sử dụng **Căng tin VinUni (tầng 1)**, **Phòng tự học (07:30 - 21:00)**, **Mạng Wifi miễn phí (VinUni-Guest)** và quyền lợi **Bãi gửi xe miễn phí** cho học viên.
-- **Giải đáp Kỹ thuật & Bài giảng (Facebook QA & VLearn)**: Hỗ trợ sửa lỗi lập trình (Python, pip install, môi trường máy tính), tra cứu nội dung bài giảng từ Day 1, Day 2 và các mốc đồ án.
+- **Giải đáp Thông tin Sự kiện & Học viên (Facebook Group QA & VLearn)**: Cung cấp các thông tin công khai về lịch học, thông báo sự kiện, và các chính sách hỗ trợ học viên đã được BTC công bố.
 
 ### 3.2. Chức năng Kiểm soát An toàn AI (4 Lớp Chỗ Khó — Guardrails Taxonomy)
 - **Chống bịa đặt thông tin (Anti-Hallucination)**: Chỉ trả lời khi có nguồn dữ liệu đối chứng trong hệ thống.
@@ -93,14 +106,37 @@ Dự án sở hữu 4 nhóm chức năng cốt lõi:
   - **Cột Trái (Cửa sổ Chat AI)**: Giao diện mô phỏng hộp thoại thông minh, hiển thị tin nhắn của người dùng và Agent. Nguồn trích dẫn hiển thị dạng thẻ đẹp mắt ngay bên trong bong bóng tin nhắn.
   - **Cột Phải (Lịch Trình Khóa Học & Tiện Ích)**: Danh sách các sự kiện quan trọng (Lễ Khai Giảng, Workshop Prompt Engineering, Khu vực Học tập & Tiện ích VinUni, Checkpoint Thực hành) đi kèm thời gian, địa điểm và các **nút hành động nhanh** (xem lộ trình, vào phòng Meet, mở sổ tay cơ sở vật chất).
 - **Kịch bản Demo Kiểm thử (4 Demo Pills)**:
-  - `1. Happy Path`: Hỏi về thời lượng và lộ trình đào tạo 3 tháng.
-  - `2. Low Confidence`: Hỏi lỗi kỹ thuật cài đặt Python/C++.
-  - `3. Out of Scope`: Kiểm thử khả năng từ chối khi hỏi giá xe VinFast.
-  - `4. Correction`: Hỏi về giờ mở cửa Căng tin VinUni và dịch vụ cá nhân cho học viên.
+  - `1. Tuyển sinh & Lộ trình`: Hỏi về thời lượng khóa học và yêu cầu đầu vào.
+  - `2. Học bổng & Học phí`: Hỏi về học phí và chính sách học bổng 100% từ Vingroup.
+  - `3. Ngoài phạm vi`: Hỏi về giá lăn bánh xe VinFast VF8 (AI từ chối nhẹ nhàng đúng chuẩn nghiệp vụ).
+  - `4. Cơ sở vật chất`: Hỏi về giờ mở cửa Căng tin VinUni và khu vực sinh hoạt cá nhân của học viên.
 
-### 3.4. Chức năng Tự động hóa Dữ liệu & Kiểm thử (Scraping & Evaluation)
+### 3.4. Chức năng Đăng nhập bằng Tài khoản Google Cá nhân & Quản lý Người dùng MongoDB (Google OAuth & Users Collection)
+- **Cổng xác thực Google bắt buộc**: Người dùng bắt buộc phải đăng nhập bằng **Tài khoản Google cá nhân (Gmail)** thì mới vào được giao diện chính của con chat.
+- **Tích hợp xác thực 2 chế độ (Dual-mode Google Authentication)**:
+  1. *Chế độ 1: Đăng nhập Google thật (Real OAuth 2.0)*: Sử dụng thư viện `@react-oauth/google` và `jwt-decode` tích hợp trực tiếp **Google Identity Services SDK**. Khi người dùng bấm nút đăng nhập chính chủ từ Google, hệ thống mở cửa sổ xác thực thật, giải mã JWT token để lấy **Email thật, Họ tên thật, Ảnh đại diện Google thật** và Google ID (`sub`).
+  2. *Chế độ 2: Đăng nhập nhanh (Mô phỏng Gmail)*: Hỗ trợ chọn nhanh các tài khoản mẫu cho ứng viên & tân sinh viên hoặc nhập địa chỉ Gmail cá nhân tùy chọn trong trường hợp kiểm thử offline.
+- **Quản lý Dữ liệu Người dùng trên MongoDB (`users` collection)**:
+  - Khi người dùng đăng nhập, Backend FastAPI (`POST /api/auth/google`) tự động kiểm tra, lưu mới hoặc cập nhật hồ sơ người dùng vào bảng `users` trong MongoDB (`email`, `name`, `picture`, `google_id`, `last_login`).
+  - Dữ liệu người dùng được lưu trữ bền vững trong `localStorage` để duy trì trạng thái đăng nhập và hiển thị huy hiệu người dùng trên Header (kèm nút **Đăng xuất**).
+
+### 3.5. Chức năng Tự động hóa Dữ liệu & Kiểm thử (Scraping & Evaluation)
 - **Scraper tự động (`scraper_fb.py`)**: Thu thập các câu hỏi và câu trả lời đã được Mentor/TA xác thực trên Group Facebook khóa học.
 - **Bộ kiểm thử chuẩn (`run_golden_set.py`)**: Chạy kiểm thử tự động hàng loạt câu hỏi tiêu chuẩn để đảm bảo RAG không bị suy thoái chất lượng khi nâng cấp hệ thống.
+- **Bảng kiểm tra 4 kiểu tình huống khó theo Rubric (4 Scenario Types) — ĐÃ CÓ ĐỦ (≥ 2 câu/kiểu)**:
+  - [x] **Kiểu 1: Câu mà thông tin KHÔNG có trong tài liệu — xem AI có bịa ra không** *(3 câu: Case #21 Hoàng Sa/Trường Sa, #22 World Cup, #23 Công thức nấu phở)* → AI từ chối ngoài phạm vi, không bịa.
+  - [x] **Kiểu 2: Câu mơ hồ, thiếu ngữ cảnh — xem AI hỏi lại hay đoán bừa** *(2 câu: Case #3 Lỗi pip, #4 Bài 2 làm sao)* → AI hỏi lại để làm rõ ngữ cảnh.
+  - [x] **Kiểu 3: Câu đòi thứ sản phẩm không được phép làm** *(3 câu: Case #5 Viết hộ full code CP3, #6 Xin code full CP4, #18 Viết hộ CV)* → AI từ chối viết hộ toàn bộ code, giải thích Vibe-coding rule.
+  - [x] **Kiểu 4: Câu mà trả lời sai gây hậu quả thật cho người dùng (muộn deadline, sai quy chế, mất điểm)** *(4 câu: Case #1 Hạn nộp spec Batch 01, #2 Deadline khóa 2, #11 Hạn nộp spec Batch 03, #20 Khi nào nộp spec)* → AI bảo vệ sự thật, ngăn nhầm deadline khóa cũ.
+
+### 3.5. Chức năng Phân Luồng Ngữ Cảnh & Tăng Cường Sáng Tạo (Intelligent Creativity & Source-Routing Switch)
+Hệ thống tích hợp cơ chế nhận dạng ngữ cảnh để quyết định thông minh khi nào sử dụng dữ liệu chính thức và khi nào tự do sáng tạo:
+- **Nhóm 1 - Sự thật chính thức của chương trình (Official Course Facts - Chuẩn xác 100% & Có Trích dẫn)**:
+  - Khi hỏi về: Quy chế, học bổng 100%, học phí, lộ trình 3 tháng, yêu cầu đầu vào, cơ sở vật chất tại trường (VinUni / Tòa Vin, căng tin, phòng tự học, wifi, bãi xe), lịch trình checkpoint (CP1-CP6), deadline, rubric chấm điểm.
+  - *Hành động*: BẮT BUỘC tra cứu `search_knowledge_base`, lấy chính xác dữ liệu gốc trong hệ thống và đính kèm link nguồn Markdown.
+- **Nhóm 2 - Ngữ cảnh mở rộng & Tư vấn kỹ năng (Creative & General Context - Sáng tạo & Sinh động)**:
+  - Khi hỏi về: Khái niệm AI/LLM/RAG/Agent/HAX/PAIR/JTBD/Vibe-coding, hướng dẫn kỹ năng lập trình (Python, debug code, tư duy giải thuật), tư vấn phương pháp học, ý tưởng đồ án, hoặc các ngữ cảnh bên ngoài bài giảng không có trong quy chế cứng.
+  - *Hành động*: AI PHÁT HUY TỐI ĐA SỰ SÁNG TẠO (`temperature = 0.7`), kiến thức chuyên gia AI, đưa ra ví dụ trực quan, hướng dẫn từng bước (step-by-step reasoning), pseudocode hoặc so sánh thực tế để học viên dễ hiểu nhất mà không bị gò bó máy móc vào câu chữ trong cơ sở dữ liệu.
 
 ---
 

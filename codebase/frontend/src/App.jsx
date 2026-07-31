@@ -3,12 +3,13 @@ import Header from './components/Header';
 import ChatTab from './components/ChatTab';
 import CourseScheduleSidebar from './components/CourseScheduleSidebar';
 import CitationModal from './components/CitationModal';
+import GoogleLoginModal from './components/GoogleLoginModal';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const WELCOME_MSG = {
   sender: 'agent',
-  text: 'Xin chào! Mình là Trợ lý AI Tư vấn Khóa học AI Thực Chiến (Vingroup - VinUni).\n\nMình sẵn sàng giải đáp mọi thắc mắc của bạn về:\n• Thông tin tuyển sinh, lộ trình đào tạo 3 tháng & yêu cầu đầu vào khóa học\n• Thông tin cơ sở vật chất, khu vực học tập & các nơi phục vụ cá nhân khi học tại trường (VinUni / Tòa Vin)\n• Giải đáp thắc mắc chuyên môn, kỹ thuật & quy định từ cơ sở dữ liệu Facebook Group và VLearn (@codebase/data)\n\nHãy chọn kịch bản demo bên dưới hoặc đặt câu hỏi nhé!',
+  text: 'Xin chào! Mình là Trợ lý AI Khóa học AI Thực Chiến (Vingroup - VinUni). Mình có thể giúp gì cho bạn hôm nay?',
   meta: null,
 };
 
@@ -18,6 +19,11 @@ export default function App() {
   const [citations, setCitations] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
   const [kbStatusText, setKbStatusText] = useState('Đang kết nối KB...');
+
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('ai_hackathon_google_user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   useEffect(() => {
     fetch(`${API_BASE}/api/kb/stats`)
@@ -30,6 +36,25 @@ export default function App() {
         setKbStatusText('Knowledge Base: Chế độ offline');
       });
   }, []);
+
+  const handleGoogleLogin = async (account) => {
+    try {
+      await fetch(`${API_BASE}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(account),
+      });
+    } catch (e) {
+      console.warn('Backend sync failed, storing user locally:', e);
+    }
+    localStorage.setItem('ai_hackathon_google_user', JSON.stringify(account));
+    setUser(account);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('ai_hackathon_google_user');
+    setUser(null);
+  };
 
   const sendMessage = async (text) => {
     setMessages((prev) => [...prev, { sender: 'user', text, meta: null }]);
@@ -80,8 +105,14 @@ export default function App() {
       <div className="bg-glow glow-cyan" />
       <div className="bg-glow glow-violet" />
 
+      {!user && <GoogleLoginModal onLogin={handleGoogleLogin} />}
+
       <div className="app-container app-container-mockup">
-        <Header kbStatusText={kbStatusText} />
+        <Header
+          kbStatusText={kbStatusText}
+          user={user}
+          onLogout={handleLogout}
+        />
 
         <div className="mockup-2col-layout">
           <div className="mockup-left-col">

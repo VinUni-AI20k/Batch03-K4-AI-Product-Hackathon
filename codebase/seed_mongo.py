@@ -275,6 +275,51 @@ def seed_database():
             db["handbooks"].bulk_write(ops)
             print(f"[Handbooks] Collection 'handbooks': Seeded/Updated {len(ops)} items.")
 
+    # 5. Seed Users Collection (Bảng dữ liệu người dùng Google cá nhân)
+    sample_users = [
+        {
+            "email": "nguyen.van.a@gmail.com",
+            "name": "Nguyễn Văn A (Học viên mới)",
+            "picture": "https://lh3.googleusercontent.com/a/default-user=s96-c",
+            "google_id": "100000000000000000001",
+            "role": "student",
+            "status": "active",
+            "auth_provider": "google",
+            "created_at": "2026-07-01T08:00:00Z",
+            "last_login": "2026-07-31T10:00:00Z"
+        },
+        {
+            "email": "tran.thu.ha@gmail.com",
+            "name": "Trần Thu Hà (Ứng viên tiềm năng)",
+            "picture": "https://lh3.googleusercontent.com/a/default-user=s96-c",
+            "google_id": "100000000000000000002",
+            "role": "student",
+            "status": "active",
+            "auth_provider": "google",
+            "created_at": "2026-07-10T09:30:00Z",
+            "last_login": "2026-07-31T09:15:00Z"
+        },
+        {
+            "email": "le.hoang.minh@gmail.com",
+            "name": "Lê Hoàng Minh (Tân sinh viên VinUni)",
+            "picture": "https://lh3.googleusercontent.com/a/default-user=s96-c",
+            "google_id": "100000000000000000003",
+            "role": "student",
+            "status": "active",
+            "auth_provider": "google",
+            "created_at": "2026-07-15T14:20:00Z",
+            "last_login": "2026-07-30T16:45:00Z"
+        }
+    ]
+    if db is not None:
+        ops = [
+            ReplaceOne({"email": doc["email"]}, doc, upsert=True)
+            for doc in sample_users
+        ]
+        if ops:
+            db["users"].bulk_write(ops)
+            print(f"[Users] Collection 'users': Seeded/Updated {len(ops)} Google personal accounts.")
+
     print("\n[Complete] Successfully seeded all data into MongoDB!")
 
 if __name__ == "__main__":
