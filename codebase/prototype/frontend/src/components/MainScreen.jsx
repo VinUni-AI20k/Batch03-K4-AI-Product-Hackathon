@@ -4,7 +4,7 @@ import ChatboxPanel from './ChatboxPanel'
 import MindmapPopup from './MindmapPopup'
 import ExercisePopup from './ExercisePopup'
 import { ingestPdf, listPdfs, pdfUrl, explain } from '../api'
-import { scrollToPage } from '../scrollToPage'
+import { scrollToPageAndHighlight } from '../scrollToPage'
 
 const DEFAULT_PDF_FILENAME = 'L11-SVM.pdf'
 
@@ -158,7 +158,7 @@ export default function MainScreen({ sessionId, documentId, setDocumentId, chatH
         onExplainPending={handleExplainPending}
         onAskFreeform={handleAskFreeform}
         onClearPending={() => setPendingSelection(null)}
-        onRelatedPageClick={scrollToPage}
+        onRelatedPageClick={scrollToPageAndHighlight}
       />
 
       {activePopup === 'mindmap' && documentId && (

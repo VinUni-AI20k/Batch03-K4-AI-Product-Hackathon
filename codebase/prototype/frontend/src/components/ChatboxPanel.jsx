@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 function truncate(text, max = 80) {
   return text.length > max ? `${text.slice(0, max)}...` : text
@@ -62,7 +64,9 @@ export default function ChatboxPanel({
           <div key={entry.id} className="chatbox-entry">
             <p className="chatbox-entry-label">{entry.label}</p>
             <div className="chatbox-entry-explanation">
-              <ReactMarkdown>{entry.explanation}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {entry.explanation}
+              </ReactMarkdown>
             </div>
             {entry.relatedPages.length > 0 && (
               <div className="chatbox-related-pages">
@@ -72,7 +76,7 @@ export default function ChatboxPanel({
                     type="button"
                     className="related-page-chip"
                     title={rp.reason}
-                    onClick={() => onRelatedPageClick(rp.page_number)}
+                    onClick={() => onRelatedPageClick(rp.page_number, rp.highlight_term)}
                   >
                     Trang {rp.page_number}
                   </button>

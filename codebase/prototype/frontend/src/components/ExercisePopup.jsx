@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import { createQuiz } from '../api'
 
 export default function ExercisePopup({ documentId, sessionId, onClose }) {
@@ -138,7 +140,9 @@ export default function ExercisePopup({ documentId, sessionId, onClose }) {
                           </button>
                           {revealedExplanations.has(qIndex) && (
                             <div className="quiz-explanation-text">
-                              <ReactMarkdown>{q.explanation}</ReactMarkdown>
+                              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                {q.explanation}
+                              </ReactMarkdown>
                             </div>
                           )}
                         </div>

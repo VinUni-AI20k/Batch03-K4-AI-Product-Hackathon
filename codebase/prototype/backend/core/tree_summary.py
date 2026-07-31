@@ -17,6 +17,11 @@ Create a hierarchical summary tree (maximum 3 levels deep). Each node must conta
 - page_refs (list of specific page numbers)
 - children
 
+Write every "title" and "one_liner" in Vietnamese (tiếng Việt), regardless of what
+language the source pages are in -- this app is for Vietnamese-speaking learners.
+Established English technical terms/proper nouns (Transformer, overfitting, ...) may
+stay in English, but the surrounding words must be Vietnamese.
+
 Return ONLY JSON adhering to this schema, with no additional text:
 {{"tree": [{{"id": "", "title": "", "one_liner": "", "page_refs": [], "children": []}}]}}
 """

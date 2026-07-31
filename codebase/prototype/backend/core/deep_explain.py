@@ -20,9 +20,26 @@ JARGON_INSTRUCTION = (
     "their background indicates. This applies uniformly, not just to hard concepts."
 )
 
+# The app is Vietnamese-audience throughout (onboarding, UI copy, background
+# template), but the lecture PDFs mix in a lot of English technical
+# vocabulary -- without this, the model tends to drift into English on
+# outputs like mindmap node titles that have little other language signal to
+# anchor on. Proper nouns/terms (Transformer, overfitting, ...) staying in
+# English is fine and expected; the surrounding prose must not.
+LANGUAGE_INSTRUCTION = (
+    "Respond in Vietnamese (tiếng Việt), regardless of what language the source "
+    "material or the learner's own question is written in. Keep established "
+    "English technical terms/proper nouns as-is (e.g. Transformer, overfitting) "
+    "rather than forcing an awkward translation, but all surrounding prose -- "
+    "explanations, titles, summaries -- must be in Vietnamese."
+)
+
 
 def _system_prompt(background):
-    return f"You are an AI tutor. The learner's background:\n{background}\n\n{JARGON_INSTRUCTION}"
+    return (
+        f"You are an AI tutor. The learner's background:\n{background}\n\n"
+        f"{LANGUAGE_INSTRUCTION}\n\n{JARGON_INSTRUCTION}"
+    )
 
 
 def _format_page_index(page_index):
@@ -56,6 +73,8 @@ Format your response EXACTLY as:
 QUIZ_SYSTEM_TEMPLATE = """You are an AI tutor writing a multiple-choice quiz. The learner's background:
 {background}
 
+{language}
+
 You produce ONLY valid JSON, no prose before or after, no markdown code fences."""
 
 
@@ -64,7 +83,7 @@ def build_quiz_prompt(background, full_content, user_request, num_questions):
     other builders here this deliberately skips _system_prompt/JARGON_INSTRUCTION:
     quiz options must stay short and unambiguous, so inline jargon glosses (which
     make sense inline in an explanation) would just bloat/confuse the options."""
-    system = QUIZ_SYSTEM_TEMPLATE.format(background=background)
+    system = QUIZ_SYSTEM_TEMPLATE.format(background=background, language=LANGUAGE_INSTRUCTION)
     user = f"""The learner asked for practice questions covering this lecture, with this specific focus: "{user_request or 'toàn bộ nội dung bài giảng'}"
 
 Full lecture content (all slides):
@@ -75,6 +94,7 @@ Write exactly {num_questions} multiple-choice questions testing understanding of
 Return ONLY a JSON array (no other text) of exactly {num_questions} objects, each shaped exactly like:
 {{"question": "...", "options": ["...", "...", "...", "..."], "correct_index": 0, "explanation": "...", "page_number": 12}}
 
+- "question": in Vietnamese.
 - "options": exactly 4 strings, in Vietnamese.
 - "correct_index": 0-based index (0-3) of the correct option in "options".
 - "explanation": 2-4 sentences in Vietnamese, covering why the correct option is right AND briefly why each wrong option is wrong.
@@ -101,7 +121,10 @@ def _parse_explanation_and_related(raw_text):
         # extract each number separately rather than joining all digits into one
         # (which previously corrupted "23, 25" into the single bogus page 2325).
         for num in re.findall(r"\d+", page_part):
-            related_pages.append({"page_number": int(num), "reason": reason})
+            # highlight_term is always None here -- the model free-wrote "reason"
+            # itself rather than us matching a specific keyword, so there's no
+            # single term to point the frontend at for on-page highlighting.
+            related_pages.append({"page_number": int(num), "reason": reason, "highlight_term": None})
     return explanation, related_pages
 
 
@@ -135,6 +158,12 @@ _STOPWORDS = {
     "chúng", "ta", "nó", "ai", "bao", "nhiêu", "vì", "nên", "nếu", "thì", "mà",
     "rồi", "đây", "kia", "trên", "dưới", "ra", "vào", "lên", "xuống", "sau",
     "trước", "còn", "cũng", "hay", "nữa", "phải", "bị", "vậy", "giải", "thích",
+    # Vietnamese meta/connector syllables -- these show up in phrases asking
+    # ABOUT the material ("có liên quan gì đến bài giảng không", "nội dung
+    # này...") rather than naming a term to look up. Left unfiltered, a lone
+    # syllable like "quan" (from "liên quan") matches unrelated words like
+    # "quan sát" elsewhere in the doc and drowns out the real keyword.
+    "liên", "quan", "nội", "dung", "bài", "giảng", "nhắc", "tới", "đề", "cập",
     # English, in case the question is typed in English
     "the", "is", "a", "an", "of", "to", "in", "on", "for", "and", "or", "what",
     "how", "why", "does", "do", "this", "that", "are", "was", "were", "be",
@@ -152,9 +181,12 @@ def _extract_keywords(text):
 
 def find_related_snippets(document_id, query, exclude_page, max_pages=3, radius=80):
     """Rank other pages by keyword-hit count, return a short snippet (matched
-    term bolded) per top page. Empty list if the query has no real keywords
-    or nothing else in the document matches -- callers should treat that as
-    "no cross-references available", not an error."""
+    term bolded) per top page, plus the matched term itself in its original
+    casing -- the frontend uses that to find and highlight the exact spot on
+    the page once the learner clicks through, instead of just landing on the
+    page and making them hunt for it. Empty list if the query has no real
+    keywords or nothing else in the document matches -- callers should treat
+    that as "no cross-references available", not an error."""
     keywords = _extract_keywords(query)
     if not keywords:
         return []
@@ -171,42 +203,79 @@ def find_related_snippets(document_id, query, exclude_page, max_pages=3, radius=
         pos = lower_content.find(first_kw)
         start = max(0, pos - radius)
         end = min(len(content_text), pos + len(first_kw) + radius)
+        matched_term = content_text[pos:pos + len(first_kw)]
         snippet = (
-            content_text[start:pos]
-            + f"**{content_text[pos:pos + len(first_kw)]}**"
-            + content_text[pos + len(first_kw):end]
+            content_text[start:pos] + f"**{matched_term}**" + content_text[pos + len(first_kw):end]
         ).strip()
-        hits.append((count, page_number, snippet))
+        hits.append((count, page_number, snippet, matched_term))
 
     hits.sort(key=lambda h: h[0], reverse=True)
-    return [{"page_number": p, "snippet": s} for _, p, s in hits[:max_pages]]
+    return [{"page_number": p, "snippet": s, "term": t} for _, p, s, t in hits[:max_pages]]
 
 
-def _extract_inline_page_citations(raw_text, document_id):
+def _extract_inline_page_citations(raw_text, document_id, snippets=()):
     """Chat/question-mode replies aren't forced into a '## Related Pages'
     section -- instead the model is told to cite [Page X] inline only when
-    relevant, and we recover the page chips for the UI from those citations."""
+    relevant, and we recover the page chips for the UI from those citations.
+    Only pages the model actually cited make it into the result -- a page
+    merely being in `snippets` (shown to the model as a candidate) doesn't
+    mean it was relevant, and the model was told to ignore irrelevant ones.
+
+    When a cited page matches one of the pre-computed keyword-search
+    `snippets` (see find_related_snippets), its exact matched term is carried
+    through as `highlight_term` -- the frontend uses that to jump straight to
+    and highlight that spot on the page, instead of just landing on the page
+    and making the learner hunt for it. Cited pages we have no snippet for
+    (the model knew about them some other way) fall back to a generic
+    10-word excerpt and no highlight_term."""
     page_numbers = sorted({int(n) for n in re.findall(r"\[Page (\d+)\]", raw_text)})
     if not page_numbers:
         return []
+    snippet_by_page = {s["page_number"]: s for s in snippets}
     all_pages = dict(db.get_pages(document_id))
     related = []
     for p in page_numbers:
+        snippet = snippet_by_page.get(p)
+        if snippet:
+            related.append({"page_number": p, "reason": snippet["snippet"], "highlight_term": snippet["term"]})
+            continue
         words = all_pages.get(p, "").split()
         short = " ".join(words[:10]) + ("..." if len(words) > 10 else "")
-        related.append({"page_number": p, "reason": short})
+        related.append({"page_number": p, "reason": short, "highlight_term": None})
     return related
+
+
+RESOURCES_INSTRUCTION = """If the learner asks for further materials to study this topic, or for a learning
+roadmap/path to understand it:
+- First point to this document's OWN other pages if they already cover the prerequisite or
+  next-step content, citing [Page X] -- prefer this over anything external, since it's
+  content you can actually verify exists.
+- For external resources, name a SPECIFIC well-known book/course/instructor/documentation by
+  title (e.g. "Andrew Ng's Machine Learning course on Coursera", "scikit-learn's
+  documentation") -- never invent a specific article/page URL or claim a specific chapter
+  number, since you cannot reliably know the exact path or contents.
+- Any link you give MUST be a stable SEARCH url on a well-known site (never a guessed direct
+  content URL, which is exactly the part you cannot know is correct), formatted as a proper
+  markdown link with a readable label -- e.g. [Wikipedia: overfitting](https://vi.wikipedia.org/wiki/Special:Search?search=overfitting):
+  - https://vi.wikipedia.org/wiki/Special:Search?search=<topic> (or en.wikipedia.org for English)
+  - https://www.google.com/search?q=<topic>
+  - https://scholar.google.com/scholar?q=<topic>
+  - https://www.youtube.com/results?search_query=<topic>"""
 
 
 CHAT_SYSTEM_TEMPLATE = """You are an AI tutor answering a student's question in a chat. The learner's background:
 {background}
 
 Rules for this chat:
-- Answer ONLY using the lecture content given to you below (the current page, plus any excerpts from other pages). Do not pull in outside knowledge beyond what's needed to explain a term that already appears in this material.
+- Answer ONLY using the lecture content given to you below (the current page, plus any excerpts from other pages). Do not pull in outside knowledge beyond what's needed to explain a term that already appears in this material -- EXCEPT when the learner explicitly asks for further study materials or a learning roadmap (see below).
 - If the question is not related to this lecture's content, reply with exactly one short sentence saying it isn't covered in this material -- do not answer it anyway, and do not apologize at length.
 - Be direct and concise: answer exactly what was asked. Do not describe or summarize the whole page unless that IS the question.
 - Only cite other pages with [Page X] when the learner is asking about a specific term/concept that appears in the excerpts below. Otherwise, do not mention any page numbers at all.
 - Do not use section headers (no "## Explanation", no "## Related Pages") -- answer in plain prose.
+
+{resources}
+
+{language}
 
 {jargon}"""
 
@@ -216,7 +285,12 @@ def build_chat_prompt(background, page_content, page_number, other_snippets, use
     CURRENT turn only. Prior turns are passed separately as real conversation
     messages (see explain_question) so they stay cheap and this injection
     doesn't get repeated for every turn."""
-    system = CHAT_SYSTEM_TEMPLATE.format(background=background, jargon=JARGON_INSTRUCTION)
+    system = CHAT_SYSTEM_TEMPLATE.format(
+        background=background,
+        jargon=JARGON_INSTRUCTION,
+        resources=RESOURCES_INSTRUCTION,
+        language=LANGUAGE_INSTRUCTION,
+    )
 
     snippet_block = ""
     if other_snippets:
@@ -241,6 +315,10 @@ The learner highlighted a piece of text while asking a question. Their QUESTION 
 - You may cite other pages with [Page X] if genuinely relevant to the question.
 - Do not use section headers (no "## Explanation", no "## Related Pages") -- plain prose.
 
+{resources}
+
+{language}
+
 {jargon}"""
 
 
@@ -250,7 +328,12 @@ def build_highlight_question_prompt(
     """Highlight + question -- the question is primary, the highlight is
     context. Contrast with build_explain_prompt, used when there's no
     question and the highlighted content itself is what's being explained."""
-    system = HIGHLIGHT_QUESTION_SYSTEM_TEMPLATE.format(background=background, jargon=JARGON_INSTRUCTION)
+    system = HIGHLIGHT_QUESTION_SYSTEM_TEMPLATE.format(
+        background=background,
+        jargon=JARGON_INSTRUCTION,
+        resources=RESOURCES_INSTRUCTION,
+        language=LANGUAGE_INSTRUCTION,
+    )
 
     snippet_block = ""
     if other_snippets:
@@ -327,7 +410,7 @@ def explain_highlight(document_id, page_number, selected_text, session_id, backg
         )
         raw = call_llm(system, user, max_tokens=1024)
         explanation = raw.strip()
-        related_pages = _extract_inline_page_citations(explanation, document_id)
+        related_pages = _extract_inline_page_citations(explanation, document_id, snippets)
         return explanation, related_pages
 
     text_hash = hashlib.sha256(selected_text.encode("utf-8")).hexdigest()[:16]
@@ -373,7 +456,7 @@ def explain_question(document_id, page_number, background, user_question, chat_h
 
     raw = call_chat(system, messages, max_tokens=1024)
     explanation = raw.strip()
-    related_pages = _extract_inline_page_citations(explanation, document_id)
+    related_pages = _extract_inline_page_citations(explanation, document_id, snippets)
     return explanation, related_pages
 
 
