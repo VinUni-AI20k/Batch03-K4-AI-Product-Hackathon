@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>VLearn v2 Pitch Deck - Team Rau Má</title>
-  
+  <title>VLearn v2 Pitch Deck - Team Rau Ma</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,419 +14,557 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Outfit', 'sans-serif'] },
-          colors: { primary: '#4f46e5', secondary: '#10b981', danger: '#ef4444', dark: '#0f172a' }
+          fontFamily: { sans: ["Outfit", "sans-serif"] },
+          colors: {
+            primary: "#2563eb",
+            ink: "#0f172a",
+            muted: "#64748b",
+            success: "#059669",
+            warning: "#d97706",
+            danger: "#dc2626",
+            violet: "#7c3aed"
+          }
         }
       }
-    }
+    };
   </script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
-  
+
   <style>
-    .reveal {
-      font-family: 'Outfit', sans-serif;
-      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-      color: #0f172a;
-    }
-    .reveal h1, .reveal h2, .reveal h3 {
-      font-family: 'Outfit', sans-serif;
-      text-transform: none;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    .reveal h1 { font-weight: 800; font-size: 4rem; letter-spacing: -0.05em; }
-    .reveal h2 { font-size: 3rem; }
-    
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(255, 255, 255, 1);
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.15);
-      border-radius: 24px;
-      padding: 3.5rem;
-      width: 100%;
-      margin: 0 auto;
+    :root {
+      --card: rgba(255, 255, 255, 0.96);
+      --line: rgba(148, 163, 184, 0.35);
     }
 
-    .reveal section {
-      text-align: left;
+    .reveal {
+      font-family: "Outfit", sans-serif;
+      color: #0f172a;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 20%, rgba(5, 150, 105, 0.12), transparent 30%),
+        linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     }
-    
-    .feature-box {
-      background: white;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-      border-top: 5px solid var(--primary-color, #4f46e5);
-      height: 100%;
+
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: "Outfit", sans-serif;
+      color: #0f172a;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
     }
-    
-    .mermaid-wrapper {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-      position: relative;
-      width: 100%;
-      height: 600px;
-      overflow: hidden;
+
+    .reveal h1 { font-size: 4.4rem; line-height: 0.95; }
+    .reveal h2 { font-size: 3.1rem; line-height: 1.02; }
+    .reveal h3 { font-size: 1.65rem; }
+    .reveal p, .reveal li, .reveal td, .reveal th { font-size: 1.22rem; line-height: 1.38; }
+
+    .deck-card {
+      width: min(1550px, 92vw);
+      margin: 0 auto;
+      padding: 3rem;
+      border-radius: 22px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 32px 70px rgba(15, 23, 42, 0.14);
     }
-    
-    .mermaid-zoom-container {
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      cursor: grab;
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
-    
-    .mermaid-zoom-container:active {
-      cursor: grabbing;
+
+    .metric {
+      border-radius: 18px;
+      padding: 1.35rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
     }
-    
-    .mermaid {
-      transform-origin: top left;
-      transition: transform 0.2s ease;
-      min-width: 1200px;
+
+    .metric strong {
+      display: block;
+      font-size: 2.8rem;
+      line-height: 1;
+      color: #2563eb;
+      font-weight: 900;
+      margin-bottom: 0.45rem;
     }
-    
-    .zoom-controls {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-    
-    .zoom-controls button {
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border-radius: 999px;
+      padding: 0.45rem 0.75rem;
+      font-weight: 800;
+      font-size: 0.9rem;
       background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      font-size: 20px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
       color: #334155;
     }
-    
-    .zoom-controls button:hover { background: #e2e8f0; }
-    
-    .data-stat {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #4f46e5;
+
+    .panel {
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 1.35rem;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.055);
     }
+
+    .danger-panel { background: #fef2f2; border-color: #fecaca; }
+    .success-panel { background: #ecfdf5; border-color: #bbf7d0; }
+    .blue-panel { background: #eff6ff; border-color: #bfdbfe; }
+    .amber-panel { background: #fffbeb; border-color: #fde68a; }
+    .violet-panel { background: #f5f3ff; border-color: #ddd6fe; }
+
+    .flow-step {
+      border: 2px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      text-align: center;
+      font-weight: 800;
+      min-height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 2rem;
+    }
+
+    .small-note {
+      font-size: 0.95rem !important;
+      color: #64748b;
+      line-height: 1.25 !important;
+    }
+
+    table.deck-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+    }
+
+    .deck-table th {
+      background: #0f172a;
+      color: white;
+      font-size: 1rem;
+      padding: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .deck-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    .tag-real { background: #dcfce7; color: #166534; }
+    .tag-mock { background: #ffedd5; color: #9a3412; }
+    .tag-risk { background: #fee2e2; color: #991b1b; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
 
-      <!-- Slide 1: Title -->
       <section>
-        <div class="glass-card text-center max-w-5xl">
-          <i class="ph-fill ph-graduation-cap text-primary text-9xl mb-6"></i>
-          <h1 class="text-primary mb-4">VLearn v2</h1>
-          <h2 class="text-4xl text-gray-600 font-semibold mb-8">Trợ lý Học tập Tương tác & Chống Gian lận</h2>
-          <p class="text-xl text-gray-500 mb-8">Nâng tầm trải nghiệm tự học: Bám sát nguồn, Không giải hộ, Khuyến khích sự tiến bộ.</p>
-          <div class="bg-gray-100 rounded-full py-3 px-8 inline-block text-gray-600 font-bold tracking-widest text-lg">
-            AI HACKATHON K4 · TEAM RAU MÁ · ZONE HÀ NỘI
+        <div class="deck-card text-center">
+          <span class="eyebrow mx-auto mb-8"><i class="ph-fill ph-graduation-cap"></i> AI Product Hackathon K4</span>
+          <h1 class="text-primary mb-5">VLearn Mastery Loop</h1>
+          <h2 class="text-4xl text-slate-600 mb-7">Quiz củng cố cuối buổi + Socratic Agent có guardrails</h2>
+          <p class="text-2xl text-slate-600 max-w-5xl mx-auto mb-8">
+            Giúp học viên biết mình hổng phần nào ngay sau bài học, luyện đúng phần yếu, và nhận credit công bằng dựa trên mức cải thiện thay vì điểm tuyệt đối.
+          </p>
+          <div class="flex justify-center gap-3">
+            <span class="pill"><i class="ph-fill ph-users-three"></i> Team Rau Má · D303</span>
+            <span class="pill"><i class="ph-fill ph-map-pin"></i> Hướng A · VLearn</span>
+            <span class="pill"><i class="ph-fill ph-robot"></i> AI thật ở lõi sinh quiz</span>
           </div>
         </div>
       </section>
 
-      <!-- Slide 2: Vấn đề (Mở rộng từ Spec) -->
       <section>
-        <div class="glass-card max-w-6xl">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-warning-circle text-danger"></i> Job To Be Done (JTBD) & Nỗi đau</h2>
-          
-          <div class="grid grid-cols-2 gap-10">
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-warning-circle"></i> Pain Point</span>
+          <h2 class="mb-6">Học xong nhưng không biết mình đã hiểu thật chưa</h2>
+          <div class="grid grid-cols-2 gap-8">
             <div>
-              <h3 class="text-2xl font-bold mb-4 text-gray-800">Tình trạng hiện tại</h3>
-              <p class="text-gray-700 text-xl leading-relaxed mb-6">
-                Học viên vừa học xong một bài trên VLearn, nhưng <strong>không có công cụ phản hồi nhanh</strong> để biết chính xác lỗ hổng kiến thức của mình (Mastery) trước khi sang bài mới.
+              <p class="text-2xl text-slate-700 mb-6">
+                Job của học viên sau buổi học rất đơn giản: kiểm tra nhanh ý chính, biết phần nào cần ôn, rồi mới chuyển sang bài tiếp theo. Hiện tại feedback loop này chưa đủ ngắn và chưa đủ đáng tin.
               </p>
-              <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="data-stat text-3xl">>50%</div>
-                <div class="text-gray-600 text-lg">Học viên mang lỗ hổng từ bài cũ sang bài mới do ôn tập sai trọng tâm.</div>
-              </div>
-            </div>
-            
-            <div class="space-y-6">
-              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
-                <i class="ph-fill ph-robot text-danger text-4xl mt-1"></i>
-                <div>
-                  <h4 class="font-bold text-danger text-2xl mb-2">Lạm dụng AI (Học vẹt)</h4>
-                  <p class="text-lg text-gray-700">Mang bài tập sang ChatGPT hỏi thẳng kết quả. Sinh viên mất dần tư duy tự giải quyết vấn đề.</p>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="metric">
+                  <strong>6</strong>
+                  <span>transcript bài giảng sạch có source ID trong data pack</span>
                 </div>
-              </div>
-              
-              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
-                <i class="ph-fill ph-shield-warning text-danger text-4xl mt-1"></i>
-                <div>
-                  <h4 class="font-bold text-danger text-2xl mb-2">Gian lận tinh vi</h4>
-                  <p class="text-lg text-gray-700">Dùng tiểu xảo "Jailbreak" lừa AI đọc đáp án, hoặc thoát Quiz giữa chừng để mở slide/Google tra cứu.</p>
+                <div class="metric">
+                  <strong>20</strong>
+                  <span>golden cases ban đầu cho sinh quiz trong `eval/`</span>
                 </div>
               </div>
             </div>
+            <div class="space-y-4">
+              <div class="panel danger-panel">
+                <h3 class="text-danger mb-2"><i class="ph-fill ph-target"></i> Ôn sai trọng tâm</h3>
+                <p>Không có mastery theo chủ đề nên học viên dễ tự đoán mình yếu ở đâu, hoặc ôn lại toàn bộ bài rất tốn thời gian.</p>
+              </div>
+              <div class="panel danger-panel">
+                <h3 class="text-danger mb-2"><i class="ph-fill ph-chat-circle-text"></i> Hỏi AI sai cách</h3>
+                <p>Chatlog có lượt hỏi xin quiz/tóm tắt để chuẩn bị quiz. Nếu tutor trả lời không có cấu trúc đo năng lực, học viên vẫn chưa biết cần cải thiện phần nào.</p>
+              </div>
+              <div class="panel danger-panel">
+                <h3 class="text-danger mb-2"><i class="ph-fill ph-shield-warning"></i> Rủi ro học hộ</h3>
+                <p>Trong quiz, nếu agent nói thẳng đáp án thì kết quả mastery không còn phản ánh hiểu biết thật.</p>
+              </div>
+            </div>
+          </div>
+          <p class="small-note mt-6">Evidence đang dùng: transcript `T02-024`, `T04-092`, `T04-093`; chatlog có turn xin quiz/tóm tắt; survey ≥20 người vẫn cần hoàn tất trước chốt spec cuối.</p>
+        </div>
+      </section>
+
+      <section>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-trend-up"></i> Nếu áp dụng thì được gì?</span>
+          <h2 class="mb-6">Giá trị cho học viên, giảng viên và nhà đầu tư nội bộ</h2>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="panel blue-panel">
+              <h3 class="text-primary mb-3">Học viên</h3>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>Biết phần yếu ngay sau buổi học.</li>
+                <li>Giảm thời gian ôn lan man.</li>
+                <li>Có trợ lý gợi mở nhưng không giải hộ.</li>
+                <li>Credit thưởng cho tiến bộ thật, không chỉ cho người vốn đã giỏi.</li>
+              </ul>
+            </div>
+            <div class="panel success-panel">
+              <h3 class="text-success mb-3">Giảng viên / TA</h3>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>Thấy chủ đề nào nhiều học viên yếu.</li>
+                <li>Có quiz nháp từ AI, vẫn giữ bước verify.</li>
+                <li>Giảm câu hỏi lặp kiểu “em cần ôn gì?”.</li>
+                <li>Dữ liệu mastery giúp chỉnh bài sau.</li>
+              </ul>
+            </div>
+            <div class="panel violet-panel">
+              <h3 class="text-violet mb-3">VLearn / khóa học</h3>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>Tăng engagement sau bài học.</li>
+                <li>Tạo signal học tập có cấu trúc.</li>
+                <li>Tăng niềm tin vào AI tutor vì có nguồn và guardrails.</li>
+                <li>Mở đường cho adaptive learning có kiểm soát.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="panel amber-panel mt-6">
+            <h3 class="text-warning mb-2">Nếu không có giải pháp này</h3>
+            <p>Học viên tiếp tục tự ôn bằng cảm giác, người yếu khó biết mình yếu ở đâu, người giỏi dễ lấy credit hơn, còn tutor có nguy cơ biến thành công cụ đọc đáp án thay vì công cụ học.</p>
           </div>
         </div>
       </section>
 
-      <!-- Slide 3: Phân tích đối thủ -->
       <section>
-        <div class="glass-card max-w-7xl">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-crosshair text-primary"></i> Lợi thế Cạnh tranh (USP)</h2>
-          
-          <table class="w-full text-left border-collapse bg-white rounded-xl overflow-hidden shadow-md text-xl">
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-crosshair"></i> Mục tiêu sản phẩm</span>
+          <h2 class="mb-6">Một lát cắt đủ nhỏ để demo, đủ thật để chấm</h2>
+          <div class="grid grid-cols-12 gap-6 items-stretch">
+            <div class="col-span-7 panel">
+              <h3 class="mb-3">Lát cắt một câu</h3>
+              <p class="text-2xl text-slate-700">
+                Một học viên vừa học xong một bài làm quiz ôn tập; hệ thống ước lượng mastery theo từng chủ đề, tạo vòng củng cố từ transcript cho phần yếu, và cho phép hỏi Socratic Agent bị giới hạn để đạt threshold hiểu bài trước khi sang bài tiếp theo.
+              </p>
+            </div>
+            <div class="col-span-5 grid grid-cols-2 gap-4">
+              <div class="metric"><strong>70%</strong><span>ngưỡng demo để coi một topic đã tạm nắm tốt</span></div>
+              <div class="metric"><strong>15</strong><span>câu quiz cuối bài đã phát hành trong flow demo</span></div>
+              <div class="metric"><strong>5</strong><span>câu củng cố cá nhân hóa theo topic yếu</span></div>
+              <div class="metric"><strong>20</strong><span>cap credit để tránh tích lũy vô hạn</span></div>
+            </div>
+          </div>
+          <table class="deck-table mt-7">
             <thead>
-              <tr class="bg-gray-800 text-white">
-                <th class="p-6 font-semibold w-1/4">Sản phẩm</th>
-                <th class="p-6 font-semibold w-1/3">Hạn chế hiện tại</th>
-                <th class="p-6 font-semibold text-green-300 w-5/12">Khác biệt của VLearn</th>
-              </tr>
+              <tr><th>Không làm</th><th>Làm trong prototype</th><th>Lý do</th></tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr class="hover:bg-gray-50">
-                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-chat-circle text-gray-400 mr-2"></i> ChatGPT Study</td>
-                <td class="p-6 text-gray-600">Hay bịa kiến thức, dễ bị dụ giải hộ bài, đi xa khỏi giáo trình gốc.</td>
-                <td class="p-6 text-primary font-bold bg-indigo-50/30">Chỉ dùng RAG trên Transcript VLearn. Bắt buộc dùng phương pháp hỏi ngược (Socratic).</td>
+            <tbody>
+              <tr>
+                <td>Tính điểm học phần thật</td>
+                <td>Quiz ôn tập, credit mock</td>
+                <td>Giảm cost-of-error, phù hợp demo hackathon</td>
               </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-cards text-blue-400 mr-2"></i> Quizlet</td>
-                <td class="p-6 text-gray-600">Người dùng phải tự biên soạn bộ câu hỏi tốn công sức.</td>
-                <td class="p-6 text-primary font-bold bg-indigo-50/30">AI tự động bóc tách bài học sinh ra bộ 15 câu MCQ đo lường chính xác mục tiêu.</td>
+              <tr>
+                <td>AI tự release quiz cho cả lớp</td>
+                <td>AI draft + validator + giảng viên verify trước khi publish</td>
+                <td>Sai quiz làm học viên học sai kiến thức</td>
               </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-bird text-green-500 mr-2"></i> Duolingo</td>
-                <td class="p-6 text-gray-600">Gamification (chuỗi ngày học) vô tình lấn át mục tiêu học thuật.</td>
-                <td class="p-6 text-primary font-bold bg-indigo-50/30">Credit chỉ thưởng cho "Sự tiến bộ" và dùng làm vốn để nhờ AI gợi ý (Quota).</td>
+              <tr>
+                <td>Agent giải hộ đáp án</td>
+                <td>Socratic hint + validator fail-closed</td>
+                <td>Giữ mastery là tín hiệu học thật</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- Slide 4: Giải pháp Lõi -->
       <section>
-        <div class="glass-card max-w-6xl">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-lightbulb text-yellow-500"></i> HAX/PAIR: Trợ lý Socratic & Guardrails</h2>
-          
-          <div class="grid grid-cols-2 gap-8">
-            <div class="feature-box" style="--primary-color: #3b82f6;">
-              <i class="ph-fill ph-chalkboard-teacher text-blue-500 text-5xl mb-4"></i>
-              <h3 class="text-2xl font-bold mb-4">Socratic Agent (G5)</h3>
-              <p class="text-gray-700 text-xl mb-4">Hoạt động như một giảng viên nghiêm khắc:</p>
-              <ul class="list-disc list-inside text-gray-600 space-y-3 text-lg font-medium">
-                <li>Chỉ đặt câu hỏi mớm lời, <strong>không giải hộ</strong>.</li>
-                <li>Gợi ý công thức, cấm đưa kết quả tính toán.</li>
-                <li>Luôn trích dẫn nguồn (Source ID) minh bạch.</li>
-                <li>Báo trước hậu quả trừ Credit (G16) trước khi hỏi.</li>
-              </ul>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-path"></i> Product Flow</span>
+          <h2 class="mb-8">Từ slide đang học đến vòng củng cố cá nhân hóa</h2>
+          <div class="grid grid-cols-9 gap-4 items-stretch">
+            <div class="flow-step">1. Học xong slide Day03</div>
+            <div class="arrow"><i class="ph-fill ph-arrow-right"></i></div>
+            <div class="flow-step">2. Mở Quiz cuối bài ở sidebar</div>
+            <div class="arrow"><i class="ph-fill ph-arrow-right"></i></div>
+            <div class="flow-step">3. Bắt buộc Fullscreen để bắt đầu</div>
+            <div class="arrow"><i class="ph-fill ph-arrow-right"></i></div>
+            <div class="flow-step">4. Làm 15 câu + hỏi Agent có quota</div>
+            <div class="arrow"><i class="ph-fill ph-arrow-right"></i></div>
+            <div class="flow-step">5. Xem mastery + tạo quiz củng cố</div>
+          </div>
+          <div class="grid grid-cols-2 gap-6 mt-8">
+            <div class="panel blue-panel">
+              <h3 class="mb-2">Happy path demo</h3>
+              <p>Học viên làm quiz, hỏi một câu gợi ý hợp lệ, nộp bài, thấy topic yếu dưới 70%, bấm tạo quiz củng cố từ transcript.</p>
             </div>
-            
-            <div class="feature-box" style="--primary-color: #10b981;">
-              <i class="ph-fill ph-shield-check text-secondary text-5xl mb-4"></i>
-              <h3 class="text-2xl font-bold mb-4">Validator Guardrails (G10)</h3>
-              <p class="text-gray-700 text-xl mb-4">Lưới lọc bảo mật cấp độ 2:</p>
-              <ul class="list-disc list-inside text-gray-600 space-y-3 text-lg font-medium">
-                <li>LLM đóng vai Validator kiểm duyệt tin nhắn Socratic.</li>
-                <li>Đánh chặn 100% rủi ro lộ đáp án (A,B,C,D).</li>
-                <li>Cơ chế Anti-Cheat: Ép Fullscreen trình duyệt.</li>
-                <li>Thu hẹp hành động: Báo lỗi Insuifficient khi nguồn mờ nhạt.</li>
-              </ul>
+            <div class="panel danger-panel">
+              <h3 class="mb-2">Failure path demo</h3>
+              <p>Học viên xin đáp án trực tiếp hoặc thoát fullscreen. Validator/anti-cheat chặn, quiz không cho đi tiếp như thể mọi thứ vẫn ổn.</p>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <!-- Slide 5: Delta Gamification -->
-      <section>
-        <div class="glass-card max-w-6xl">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-trend-up text-purple-500"></i> Đánh giá theo sự tiến bộ (Delta Mastery)</h2>
-          <p class="text-gray-700 text-2xl mb-8 leading-relaxed">
-            Hệ thống giải quyết bài toán "Kẻ giàu càng giàu": Không cộng điểm theo số tuyệt đối (VD: làm đúng 10/10), mà <strong>thưởng Credit cho sự vượt lên chính mình (Delta Mastery >= 10%)</strong>.
-          </p>
-          
-          <div class="bg-purple-50 p-8 rounded-2xl border-2 border-purple-200 flex items-center justify-between shadow-sm">
-            <div class="text-center w-1/3">
-              <div class="text-gray-600 text-xl font-bold mb-2">VÒNG 1 (Baseline)</div>
-              <div class="text-6xl font-black text-gray-400">40%</div>
-              <div class="text-lg text-gray-500 uppercase mt-2 font-medium">Topic Mastery</div>
-            </div>
-            
-            <div class="w-1/3 text-center flex flex-col items-center">
-              <i class="ph-fill ph-arrow-circle-right text-purple-500 text-6xl mb-3"></i>
-              <div class="text-purple-700 font-bold text-xl bg-purple-100 rounded-full px-6 py-2 inline-block border border-purple-300">
-                +20% Delta (Sự cải thiện)
-              </div>
-            </div>
-            
-            <div class="text-center w-1/3">
-              <div class="text-gray-600 text-xl font-bold mb-2">VÒNG 2 (Outcome)</div>
-              <div class="text-6xl font-black text-purple-600">60%</div>
-              <div class="text-lg text-purple-400 uppercase mt-2 font-medium">Topic Mastery</div>
-            </div>
-          </div>
-          
-          <p class="text-center mt-8 text-gray-600 text-2xl font-bold bg-white p-4 rounded-xl shadow-sm border border-gray-100 inline-block mx-auto block w-max">
-            <i class="ph-fill ph-star text-yellow-500 mr-2"></i> Nhận +2 Credit dùng để hỏi AI (Tối đa lưu trữ 20 Credit)
-          </p>
         </div>
       </section>
 
-      <!-- Slide 6: Bốn kiểu lỗi & Kịch bản (Thêm từ Spec) -->
       <section>
-        <div class="glass-card max-w-6xl">
-          <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-bug text-orange-500"></i> Quản lý 4 Lớp Lỗi (Error Handling)</h2>
-          <p class="text-gray-600 text-xl mb-6">Chi phí từ chối trả lời (thận trọng) luôn thấp hơn chi phí lộ đáp án.</p>
-          
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-robot"></i> AI Design</span>
+          <h2 class="mb-6">AI chỉ quyết định ở nơi cần AI; phần còn lại deterministic</h2>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="panel blue-panel">
+              <span class="pill tag-real mb-4">REAL</span>
+              <h3 class="mb-3">Lesson QA Agent</h3>
+              <p>LangGraph truy xuất slide/PDF theo bài đang chọn, trả lời có citation và từ chối khi ngoài nguồn.</p>
+            </div>
+            <div class="panel success-panel">
+              <span class="pill tag-real mb-4">REAL</span>
+              <h3 class="mb-3">Transcript Quiz Agent</h3>
+              <p>`retrieve_transcript → generate_quiz → validate_quiz → retry`. Câu nào thiếu source/schema thì không render.</p>
+            </div>
+            <div class="panel violet-panel">
+              <span class="pill tag-real mb-4">REAL</span>
+              <h3 class="mb-3">Socratic Agent</h3>
+              <p>Gợi mở trong lúc làm quiz, validator kiểm tra trước khi hiển thị để tránh lộ đáp án.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-6 mt-6">
+            <div class="panel">
+              <span class="pill tag-mock mb-4">MOCK</span>
+              <h3 class="mb-3">Điểm/credit thật trong LMS</h3>
+              <p>Prototype chỉ mô phỏng credit trong client RAM. Bước production cần backend session, audit log và quyền duyệt của giảng viên.</p>
+            </div>
+            <div class="panel">
+              <span class="pill tag-mock mb-4">MOCK</span>
+              <h3 class="mb-3">Adaptive dài hạn</h3>
+              <p>Bản demo mới adaptive theo phiên/topic. Chưa chẩn đoán năng lực dài hạn qua nhiều tuần.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-shield-check"></i> Guardrails</span>
+          <h2 class="mb-6">Chỗ khó nhất không phải sinh câu, mà là không làm sai</h2>
           <div class="grid grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h4 class="font-bold text-xl text-gray-800 mb-2">1. Lỗi Nguồn sự thật (Source)</h4>
-              <p class="text-gray-600 text-lg">Thiếu source ID hoặc câu hỏi không được nguồn VLearn hỗ trợ. Hệ thống <strong>Chặn tạo quiz, fallback về câu của giảng viên</strong>.</p>
+            <div class="panel danger-panel">
+              <h3 class="text-danger mb-3">Rủi ro: Agent lộ đáp án</h3>
+              <p>Socratic response phải qua validator. Nếu validator thấy chữ cái đáp án, công thức giải thẳng, hoặc xác nhận đáp án đúng, hệ thống thay bằng fallback an toàn và không trừ quota.</p>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h4 class="font-bold text-xl text-gray-800 mb-2">2. Lỗi Mơ hồ (Ambiguity)</h4>
-              <p class="text-gray-600 text-lg">Kiến thức quá mỏng, User trả lời sai nhưng lý do chưa rõ. Agent <strong>chỉ giải thích đáp án, không tự biên tự diễn (hallucinate) suy đoán</strong>.</p>
+            <div class="panel danger-panel">
+              <h3 class="text-danger mb-3">Rủi ro: Quiz không có nguồn</h3>
+              <p>Mọi câu AI tạo phải có source ID trong transcript đã duyệt. Không đủ nguồn thì trả `INSUFFICIENT_EVIDENCE`, không sinh câu giả.</p>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h4 class="font-bold text-xl text-gray-800 mb-2">3. Lỗi Ngoài phạm vi (Out of Scope)</h4>
-              <p class="text-gray-600 text-lg">Yêu cầu hỏi AI trong bài thi chính thức hoặc đòi tăng Cap Credit. Agent <strong>từ chối can thiệp và nhắc nhở</strong>.</p>
+            <div class="panel danger-panel">
+              <h3 class="text-danger mb-3">Rủi ro: Dùng trong bài thi thật</h3>
+              <p>Official/graded assessment bị từ chối trước AI call. Credit chỉ dùng cho chế độ ôn tập.</p>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h4 class="font-bold text-xl text-gray-800 mb-2">4. Lỗi Domain (Nghiệp vụ)</h4>
-              <p class="text-gray-600 text-lg">Câu hỏi đánh đố, hoặc 2 đáp án cùng đúng. Chức năng <strong>"Report câu sai"</strong> cho phép loại bỏ câu đó khỏi kết quả Mastery.</p>
+            <div class="panel danger-panel">
+              <h3 class="text-danger mb-3">Rủi ro: Gian lận phiên quiz</h3>
+              <p>Fullscreen là điều kiện bắt đầu. Nếu trình duyệt từ chối fullscreen, quiz không mở; thoát fullscreen/chuyển tab thì quay lại màn hình cảnh báo.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Slide 7: Workflow Architecture -->
       <section>
-        <div class="glass-card max-w-[1600px] w-[95vw]">
-          <div class="grid grid-cols-12 gap-8 items-center">
-            
-            <div class="col-span-4 pr-6">
-              <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-git-branch text-primary"></i> Kiến trúc AI</h2>
-              <p class="text-2xl text-gray-700 mb-6 font-medium leading-relaxed">
-                Thiết kế phân lớp (Layered Architecture) với sự cô lập giữa Logic Sinh Đề và Logic Chấm Socratic.
-              </p>
-              <ul class="list-disc list-inside text-gray-600 space-y-4 text-xl">
-                <li>Dữ liệu đầu vào đi qua RAG để sinh câu hỏi.</li>
-                <li>Lưới lọc Anti-cheat bảo vệ lớp Frontend.</li>
-                <li>Validator LLM kiểm duyệt ngầm từng tin nhắn.</li>
-                <li>Cuối cùng thưởng bằng điểm Delta Mastery.</li>
-              </ul>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-scales"></i> Fairness</span>
+          <h2 class="mb-6">Credit thưởng cho tiến bộ, không thưởng cho lợi thế sẵn có</h2>
+          <div class="grid grid-cols-12 gap-6 items-center">
+            <div class="col-span-5 panel violet-panel">
+              <h3 class="mb-3">Vấn đề công bằng</h3>
+              <p>Nếu chỉ cộng credit theo điểm tuyệt đối, học viên vốn giỏi dễ nhận thêm quota hơn, còn học viên yếu vừa cần hỗ trợ nhiều lại càng thiếu credit. Đó là vòng lặp “giỏi càng giỏi”.</p>
             </div>
-            
-            <div class="col-span-8">
-            <div class="col-span-8 flex justify-center items-center h-full">
-              <!-- Custom HTML Flowchart -->
-              <div class="flex flex-col items-center gap-3 w-full max-w-4xl font-semibold text-xl text-gray-700 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                
-                <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Hoàn thành bài học</div>
-                <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                <div class="bg-blue-50 border-2 border-blue-200 py-3 px-6 rounded-xl shadow-sm text-blue-800">Tạo Quiz Động</div>
-                
-                <div class="flex gap-16 w-full justify-center relative mt-2">
-                  
-                  <!-- Nguồn đủ Branch -->
-                  <div class="flex flex-col items-center gap-3">
-                    <div class="text-sm text-blue-600 font-bold bg-white px-2">Nguồn đủ</div>
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-blue-100 border-2 border-blue-400 py-4 px-8 rounded-xl shadow-md text-blue-900 text-2xl font-bold">AI sinh 15 câu MCQ</div>
-                    
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm text-center">Khóa trình duyệt<br><span class="text-sm text-gray-500">(Anti-Cheat Fullscreen)</span></div>
-                    
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm">Làm Quiz & Chat Agent</div>
-                    
-                    <div class="flex gap-10 mt-4">
-                      <!-- Chat Branch -->
-                      <div class="flex flex-col items-center gap-3">
-                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Hỏi xin gợi ý</div>
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-blue-50 border-2 border-blue-300 py-3 px-6 rounded-xl shadow-sm">Socratic Agent (RAG)</div>
-                        
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-yellow-100 border-2 border-yellow-400 py-3 px-6 rounded-xl shadow-md text-yellow-800">Validator LLM</div>
-                        
-                        <div class="flex gap-4 mt-3">
-                           <div class="flex flex-col items-center gap-2">
-                             <div class="text-sm text-green-600 font-bold">Safe</div>
-                             <div class="bg-green-100 border-2 border-green-400 py-2 px-4 rounded-lg text-green-800 text-base">Hiện Gợi ý</div>
-                           </div>
-                           <div class="flex flex-col items-center gap-2">
-                             <div class="text-sm text-red-600 font-bold">Leak</div>
-                             <div class="bg-red-100 border-2 border-red-400 py-2 px-4 rounded-lg text-red-800 text-base">Chặn tin nhắn</div>
-                           </div>
-                        </div>
-                      </div>
-                      
-                      <!-- Submit Branch -->
-                      <div class="flex flex-col items-center gap-3">
-                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Nộp bài</div>
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Tính Delta Mastery</div>
-                        
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-indigo-600 border-2 border-indigo-700 py-4 px-8 rounded-full shadow-lg text-white text-2xl font-bold">Cộng Credit</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Nguồn thiếu Branch -->
-                  <div class="flex flex-col items-center gap-3">
-                    <div class="text-sm text-gray-500 font-bold bg-white px-2">Nguồn thiếu</div>
-                    <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                    <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm text-gray-500 text-center">Fallback:<br>Câu hỏi Giáo viên</div>
-                  </div>
-                  
-                </div>
+            <div class="col-span-7">
+              <div class="grid grid-cols-5 gap-4 items-center">
+                <div class="metric text-center"><strong>40%</strong><span>baseline topic mastery</span></div>
+                <div class="arrow"><i class="ph-fill ph-arrow-right"></i></div>
+                <div class="metric text-center"><strong>60%</strong><span>after reinforcement</span></div>
+                <div class="arrow"><i class="ph-fill ph-equals"></i></div>
+                <div class="metric text-center"><strong>+20%</strong><span>delta được thưởng</span></div>
+              </div>
+              <div class="panel success-panel mt-5">
+                <p><strong>Quyết định thiết kế:</strong> quota nền như nhau cho mọi học viên; credit chỉ là phần cộng thêm, có cap 20, và tính theo delta mastery so với vòng trước.</p>
               </div>
             </div>
-            </div>
-            
           </div>
         </div>
       </section>
 
-      <!-- Slide 8: Eval Quality Bar -->
       <section>
-        <div class="glass-card max-w-6xl">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-chart-bar text-green-500"></i> AI Evals & Bằng chứng thực tế</h2>
-          <p class="text-gray-700 text-2xl mb-10 leading-relaxed">
-            Hệ thống áp dụng phương pháp <strong>Eval-Driven Development</strong> với bộ <em>Golden Set</em> (đánh giá bằng kịch bản khó) để đảm bảo độ an toàn theo tiêu chuẩn HAX/PAIR.
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-flask"></i> Evaluation</span>
+          <h2 class="mb-6">Bộ test được thiết kế để làm khó agent, không chỉ happy path</h2>
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="metric"><strong>89</strong><span>test cases trong `test/manifest.json`</span></div>
+            <div class="metric"><strong>7</strong><span>module: QA, quiz, Socratic, validator, quota, session, red-team</span></div>
+            <div class="metric"><strong>85%</strong><span>quality gate mục tiêu cho applicable cases</span></div>
+            <div class="metric"><strong>100%</strong><span>hard constraints phải pass</span></div>
+          </div>
+          <table class="deck-table">
+            <thead>
+              <tr><th>Hard constraint</th><th>Vì sao quan trọng</th><th>Test tương ứng</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Không lộ đáp án MCQ hiện tại</td>
+                <td>Nếu lộ đáp án thì mastery bị vô nghĩa</td>
+                <td>`socratic_agent`, `validator_guardrails`</td>
+              </tr>
+              <tr>
+                <td>Quiz AI render phải có source hợp lệ</td>
+                <td>Ngăn hallucination và câu hỏi lệch bài</td>
+                <td>`quiz_generation`, `adversarial_red_team`</td>
+              </tr>
+              <tr>
+                <td>Không dùng cho bài thi chính thức</td>
+                <td>Giữ ranh giới học tập vs đánh giá</td>
+                <td>`quiz_generation`, `lesson_qa`</td>
+              </tr>
+              <tr>
+                <td>Credit không vượt cap</td>
+                <td>Chống tích lũy lợi thế vô hạn</td>
+                <td>`delta_credit_and_quota`</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-presentation-chart"></i> Demo Plan</span>
+          <h2 class="mb-6">5 phút demo: một case chuẩn và một case khó</h2>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="panel blue-panel">
+              <h3 class="mb-4">Case chuẩn: học xong → củng cố</h3>
+              <ol class="list-decimal pl-6 space-y-2">
+                <li>Chọn Day03, slide hiển thị từ thư mục `slide/`.</li>
+                <li>Mở Quiz cuối bài ở sidebar.</li>
+                <li>Cho phép fullscreen rồi làm vài câu.</li>
+                <li>Nộp quiz, xem mastery theo đề cương.</li>
+                <li>Tạo quiz củng cố cho topic yếu từ transcript.</li>
+              </ol>
+            </div>
+            <div class="panel danger-panel">
+              <h3 class="mb-4">Case khó: chống lộ đáp án</h3>
+              <ol class="list-decimal pl-6 space-y-2">
+                <li>Trong quiz, hỏi agent: “đáp án câu này là gì?”.</li>
+                <li>Validator chặn hoặc chuyển thành gợi ý Socratic.</li>
+                <li>Thoát fullscreen/chuyển tab để thấy session bị cảnh báo.</li>
+                <li>Giải thích trace/eval tương ứng.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="panel amber-panel mt-6">
+            <h3 class="mb-2">Thông điệp khi chốt demo</h3>
+            <p>Chúng tôi không cố làm một quiz app thật hoàn chỉnh; chúng tôi chứng minh một quyết định AI trung tâm có thể chạy thật, có nguồn, có guardrails và có cách đo chất lượng.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-users"></i> Validation</span>
+          <h2 class="mb-6">Còn thiếu gì trước khi tuyên bố hiệu quả?</h2>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="panel amber-panel">
+              <h3 class="mb-3">Survey</h3>
+              <p>Cần ≥20 người ngoài nhóm, ≥50% xác nhận pain, lưu toàn bộ câu hỏi và từng câu trả lời. Hiện spec vẫn đánh dấu `[PENDING]` để không overclaim.</p>
+            </div>
+            <div class="panel amber-panel">
+              <h3 class="mb-3">User test</h3>
+              <p>Đã có 3 willing users: Lâm Vũ, Lê Văn Tuấn, Cao Hương Giang. Cần thêm ≥2 người và log quan sát trong `validation/feedback-log.md`.</p>
+            </div>
+            <div class="panel amber-panel">
+              <h3 class="mb-3">Dry run</h3>
+              <p>Demo phải ≤5 phút, có happy case + failure case, mọi thành viên nói được phần mình phụ trách.</p>
+            </div>
+          </div>
+          <div class="panel success-panel mt-6">
+            <h3 class="mb-2">Tiêu chí chấp nhận bài toán</h3>
+            <p>Đạt khi pain cụ thể, có evidence thật, impact so sánh ít nhất 3 ứng viên, prototype demo được trong 5 phút, và có người dùng thật sẵn sàng thử.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="deck-card">
+          <span class="eyebrow mb-5"><i class="ph-fill ph-calendar-check"></i> Nếu có thêm 1 tuần</span>
+          <h2 class="mb-6">Từ prototype sang sản phẩm có thể thử thật</h2>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="panel">
+              <h3 class="mb-3">Ưu tiên kỹ thuật</h3>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>Backend session thật cho quiz, credit và audit log.</li>
+                <li>UI báo câu sai và loại câu khỏi mastery sau khi GV verify.</li>
+                <li>CI chạy eval suite trước mỗi lần demo/push.</li>
+                <li>Sanitize toàn bộ output AI trước khi render HTML.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3 class="mb-3">Ưu tiên sản phẩm</h3>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>Hoàn tất survey ≥20 người và validation ≥5 người.</li>
+                <li>Dashboard lớp cho giảng viên: topic yếu nhất, câu bị report nhiều.</li>
+                <li>Thử A/B: credit theo điểm tuyệt đối vs credit theo delta.</li>
+                <li>Chốt policy: credit chỉ dùng trong chế độ ôn tập, không dùng bài thi thật.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="text-2xl text-slate-700 mt-8">
+            Bài học lớn nhất: AI trong giáo dục không nên chỉ “trả lời hay hơn”; nó phải tạo được vòng phản hồi học tập đáng tin, công bằng và có thể kiểm chứng.
           </p>
-          
-          <div class="grid grid-cols-3 gap-8 text-center mb-10">
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-gray-100">
-              <div class="text-5xl font-black text-gray-800 mb-3">20+</div>
-              <div class="text-lg font-bold text-gray-500 uppercase">Test Cases Golden Set</div>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-green-100 bg-green-50/50">
-              <div class="text-5xl font-black text-green-600 mb-3">100%</div>
-              <div class="text-lg font-bold text-green-700 uppercase">Groundedness Pass</div>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-primary/20 bg-indigo-50/50">
-              <div class="text-5xl font-black text-primary mb-3">66.7%</div>
-              <div class="text-lg font-bold text-indigo-700 uppercase">Jailbreak Guardrail Pass</div>
-            </div>
-          </div>
-          
-          <div class="text-center bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h3 class="text-2xl font-bold text-gray-800 mb-2"><i class="ph-fill ph-check-circle text-green-500"></i> Kết luận: Prototype Sẵn sàng</h3>
-            <p class="text-gray-600 text-xl">Validator bắt chặn tốt các ca rủi ro Leak Toán Học và Đoán Mò. Cần tinh chỉnh nhẹ Prompt để vươn tới ngưỡng 85% Evals cho Production.</p>
-          </div>
         </div>
       </section>
 
@@ -434,18 +572,17 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
-  
   <script>
     Reveal.initialize({
       hash: true,
       controls: true,
       progress: true,
       center: true,
-      transition: 'fade',
-      backgroundTransition: 'fade',
+      transition: "fade",
+      backgroundTransition: "fade",
       width: 1920,
       height: 1080,
-      margin: 0.05,
+      margin: 0.05
     });
   </script>
 </body>
