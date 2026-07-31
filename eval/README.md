@@ -8,6 +8,13 @@ Chạy server có API key ở terminal 1, rồi terminal 2:
 uv run python eval/run_eval.py
 ```
 
+Nếu server chạy ở cổng khác 8000, đặt `EVAL_BASE_URL`:
+
+```bash
+EVAL_BASE_URL=http://127.0.0.1:8010 uv run python eval/run_eval.py
+EVAL_BASE_URL=http://127.0.0.1:8010 uv run python eval/run_agent_eval.py
+```
+
 Kết quả máy tự lưu trong `eval/results/`. Hai người phải chấm độc lập `manual_grounded` và `manual_relevance`; không thay đổi quality bar sau 23:59 ngày 1.
 
 ## Đánh giá toàn bộ module
