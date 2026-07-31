@@ -1,0 +1,2 @@
+Placeholder for demo-slides.pdf. 
+Vui lòng xuất slide thuyết trình 6 trang ra file demo-slides.pdf và thay thế/xóa file txt/md này.

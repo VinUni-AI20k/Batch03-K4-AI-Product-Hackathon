@@ -1,100 +1,111 @@
-# AI SPEC — Trợ lý AI QA Cộng đồng AI Thực Chiến · Nhóm [XX] · Zone [X]
-Hướng: [ ] A — VLearn  [x] B — Trợ lý Học viên (Cộng đồng)  [ ] C — Làn mở
+# AI SPEC — Trợ lý AI Hỗ Trợ Tuyển Sinh · Nhóm B2-1 · Zone [X]
+Hướng: [ ] A  [x] B — Trợ lý Tuyển Sinh  [ ] C
 Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §1. User & Job
 - **Job executor + workflow:**
-  - **Executor:** Học viên khóa học "AI Thực Chiến Vingroup — VinUni" (Batch 03).
-  - **Workflow hiện tại:** Học viên gặp vướng mắc (kỹ thuật pip install, hiểu sai lý thuyết Spec/JTBD, hoặc nhầm deadline) -> Đăng câu hỏi lên Facebook Group / Discord -> Chờ từ 1–12 tiếng để TA/Mentor hoặc học viên khác giải đáp -> Câu hỏi dễ bị trôi bài, thông tin thiếu đồng nhất.
+  - **Executor:** Thí sinh, người có nhu cầu đăng ký học và phụ huynh.
+  - **Workflow hiện tại:** Người dùng tìm kiếm thông tin tuyển sinh -> Đọc sổ tay (handbook) quá dài hoặc hỏi trên các hội nhóm Facebook -> Nhận được thông tin lẫn lộn giữa chính thống và truyền miệng (có thể lỗi thời, sai lệch) -> Hoang mang, mất nhiều thời gian tổng hợp để ra quyết định. Khi hỏi Ban Tuyển Sinh thì phải chờ đợi phản hồi lâu.
 - **Core JTBD (không tên sản phẩm/AI trong câu):**
-  > *"Khi tôi đang tự học và gặp vướng mắc về bài tập hoặc quy định của khóa học, tôi muốn nhận được giải đáp chính xác và có căn cứ kiểm chứng ngay lập tức, để tôi không bị gián đoạn tiến độ và làm đúng tiêu chí chấm điểm."*
+  > *"Khi tôi tìm hiểu về chương trình để quyết định đăng ký, tôi muốn nhận được thông tin giải đáp nhanh chóng, có phân định rõ ràng giữa quy định chính thức và kinh nghiệm truyền miệng, để tôi không bị ngợp thông tin và đưa ra lựa chọn chính xác nhất."*
 - **Problem statement (KHÔNG chữ AI):**
-  - Trong cộng đồng ~1.000 học viên, số lượng thắc mắc về lỗi cài đặt kỹ thuật, logistics (hạn nộp, mốc thời gian) và lý thuyết cốt lõi lặp đi lặp lại rất cao. Việc phải chờ đợi câu trả lời từ đội ngũ hỗ trợ làm chậm tiến độ làm bài thi Mini Hackathon và gia tăng rủi ro nộp sai quy chế.
-- **Evidence (chuẩn B - mining data cào từ FB Group):**
-  - **Số liệu mining:** Cào 250+ bài đăng hỏi-đáp từ Facebook Group "Cộng đồng AI Thực Chiến Vingroup — VinUni" (dùng `fb/facebook_post_comment_scraper`). Có **68%** số câu hỏi thuộc 3 nhóm chính: (1) Lỗi cài đặt Python/pip (32%), (2) Thắc mắc về lịch trình/hạn cứng nộp Spec (21%), (3) Hỏi khái niệm HAX/PAIR/JTBD/Rubric (15%).
-  - **≥5 quote/ví dụ nguyên văn + nguồn (từ `codebase/data/fb_group_qa.json`):**
-    1. *Quote 1:* "Mọi người cho em hỏi lỗi khi chạy pip install -r requirements.txt trên Windows báo 'error: Microsoft Visual C++ 14.0 or greater is required'..." (FB Post #1001)
-    2. *Quote 2:* "Anh chị TA cho em hỏi hạn nộp bài spec.md cho Mini Hackathon Batch 03 chính xác là mấy giờ ngày 1 vậy ạ? Em thấy trong slide để 17:30 CP4?" (FB Post #1002)
-    3. *Quote 3:* "Trong Rubric 100 điểm của Hackathon AI Thực Chiến, cho em hỏi phần Bằng chứng (Evidence R1 15 điểm) nếu nhóm em tự khảo sát..." (FB Post #1003)
-    4. *Quote 4:* "Mọi người cho em hỏi nguyên tắc HAX và PAIR trong mục §4b của AI Spec là gì vậy ạ?" (FB Post #1004)
-    5. *Quote 5:* "Anh chị cho em hỏi luật Vibe-coding trong Hackathon quy định như thế nào ạ? Nhóm em dùng Cursor / Cline AI viết full code thì có bị trừ điểm không?" (FB Post #1005)
+  - Người dùng thường bị lẫn lộn giữa thông tin chính thống từ ban tổ chức và thông tin truyền miệng từ cộng đồng (thường thiếu kiểm chứng, hoặc đã lỗi thời). Hơn nữa, việc trả lời chung chung một khối lượng thông tin lớn sẽ làm giảm trải nghiệm của từng nhóm đối tượng cụ thể (người tìm hiểu chung, người muốn đăng ký chi tiết, phụ huynh).
+- **Evidence (Đạt cả tiêu chí A & B):**
+  - **[Hướng A] Khảo sát người thật:** Thực hiện khảo sát 40 người dùng (lưu tại `ket_qua_khao_sat.csv`). Kết quả: **82.5%** xác nhận gặp vấn đề khó tìm thông tin trong Sổ tay; **90%** phải lên tìm kiếm trên các Group Facebook/Zalo; **65%** tốn từ 15 phút đến hơn 1 ngày chỉ để tìm câu trả lời, và **95%** xác nhận sự bất tiện khi tìm kiếm ngoài sổ tay.
+  - **[Hướng B] Đếm trên dữ liệu (Chatlog/Log):** Tiến hành cào (mining) 250+ bài đăng từ Facebook Group/Fanpage tuyển sinh. *(Cách đếm: Chạy script đếm tần suất xuất hiện các nhóm keyword "sổ tay/handbook", "không thấy", "review/thực tế", "đậu/rớt" trong tập dữ liệu json)*. Kết quả: **68%** số lượng bài đăng thuộc về các thắc mắc không thể giải quyết ngay bằng sổ tay truyền thống.
+  - **≥5 quote/ví dụ nguyên văn + nguồn (để kiểm chứng):**
+    1. *Quote 1:* "Cho em hỏi phần thời gian nhận trợ cấp ở đâu vậy ạ, em đọc sổ tay không thấy rõ?" (FB Group tuyển sinh, bài post ngày 15/07)
+    2. *Quote 2:* "Mọi người cho em xin review thực tế về môi trường học tập ở đây với ạ, em thấy trên mạng ý kiến trái chiều quá." (FB Group tuyển sinh, bài post ngày 18/07)
+    3. *Quote 3:* "Anh chị Admin cho phụ huynh hỏi chương trình này yêu cầu đầu vào cụ thể ra sao, con tôi đang học lớp 12 thì có tham gia được không?" (Inbox Fanpage Zalo, log ID #1052)
+    4. *Quote 4:* "Em tìm trong sổ tay không thấy nói về việc hỗ trợ tìm chỗ ở trọ, cho em hỏi ban tổ chức có hỗ trợ phần này không?" (FB Group tuyển sinh, bài post ngày 20/07)
+    5. *Quote 5:* "Em được 8.5 IELTS và gpa 3.5 thì hồ sơ em có chắc chắn đậu vào chương trình không ạ?" (Inbox Fanpage Zalo, log ID #1088)
 
 ## §2. Impact & quyết định chọn
 - **Bảng impact ≥3 ứng viên:**
 
 | Ứng viên tính năng | Bao nhiêu người | Tần suất | Tốn gì mỗi lần | Khả thi |
 |---|---|---|---|---|
-| 1. AI QA tra cứu FB Group KB + VLearn | ~1.000 học viên | 3–5 lần/ngày/HV | 30–120 phút chờ TA; nguy cơ nhầm deadline | Cao (Có sẵn tool cào FB + VLearn pack) |
-| 2. AI tự động chấm lỗi cú pháp Python | ~500 học viên | 2 lần/ngày | 10–15 phút tự fix | Trung bình (Lập lại tính năng của IDE) |
-| 3. Bản tin tổng hợp câu hỏi cho TA | ~15 TA/Mentor | 1 lần/ngày | 30 phút rà soát bài đăng | Dễ nhưng Impact lên học viên thấp |
+| 1. Trợ lý phân loại Intent, RAG sổ tay & Search FB kèm Disclaimer | ~1.000 thí sinh/phụ huynh | 3-5 lần/người | Mất hàng giờ tự tổng hợp & đối chiếu thông tin | Cao (Có sẵn RAG và tool search FB) |
+| 2. Chatbot Rule-based (Hỏi - Đáp theo menu) | ~1.000 thí sinh | 1-2 lần/người | Không linh hoạt, tốn thời gian bấm menu | Rất cao nhưng UX/Trải nghiệm kém |
+| 3. Hệ thống chỉ gom nhóm & cào dữ liệu FB chung với nguồn chính thống | ~1.000 thí sinh | Thường xuyên | Rủi ro ảo giác (hallucination), sai lệch thông tin cao | Trung bình |
 
 - **Ứng viên ĐÃ LOẠI + vì sao:**
-  - Loại **Ứng viên 2 & 3** vì không giải quyết trực tiếp nút thắt (bottleneck) lớn nhất của học viên là **thời gian chờ câu trả lời chính xác có nguồn kiểm chứng** khi đang chạy nước rút tại Hackathon.
+  - Loại **Ứng viên 2** vì không cá nhân hóa được trải nghiệm (người mới vs người cần chi tiết vs phụ huynh).
+  - Loại **Ứng viên 3** vì trộn lẫn thông tin chính thống và truyền miệng gây rủi ro lớn về tính chính xác và an toàn dữ liệu, sinh ảo giác.
 - **Ứng viên CHỌN + vì sao (bằng số):**
-  - **Chọn Ứng viên 1 (AI Agent QA):** Tiết kiệm trung bình **45 phút chờ đợi/câu hỏi** cho ~1.000 học viên, giảm **80% câu hỏi lặp lại** cho TA/Mentor trên nhóm Facebook.
+  - **Chọn Ứng viên 1:** Xử lý khéo léo việc điều phối thông tin. Ưu tiên trả lời chính xác từ sổ tay cho người cần chi tiết; dẫn dắt từ từ cho người mới; tìm kiếm on-demand trên Facebook kèm disclaimer cho review thực tế, và có luồng ticket xử lý human-in-the-loop cho ca khó. Tiết kiệm trung bình **30 - 45 phút chờ đợi/câu hỏi** và giảm thiểu ít nhất **65%** số câu hỏi lặp lại gây quá tải cho đội ngũ tư vấn viên.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
-- **Piazza / Ed Discussion AI Bot:**
-  - *Flow:* Tự động gợi ý bài đăng cũ khi học viên gõ câu hỏi mới.
-  - *Đáng học:* Có đường dẫn trực tiếp về câu trả lời đã được Giảng viên xác nhận (Verified Answer).
-  - *Đáng né:* Trả lời máy móc, thiếu phân biệt thời gian giữa các khóa/batch khác nhau.
-  - *Mình khác gì:* Trang bị 4 Lớp Chỗ Khó (Taxonomy Guardrails), đặc biệt phân biệt Ground Truth (Batch 03 vs Batch cũ) và từ chối giải hộ code Checkpoint (Vibe-coding rule).
+- **Chatbot tư vấn tuyển sinh truyền thống (Dialogflow/ManyChat):**
+  - *Flow:* Dựa vào kịch bản (Flow) hoặc Keyword.
+  - *Đáng học:* Dễ cài đặt, kiểm soát được 100% câu trả lời có sẵn.
+  - *Đáng né:* Trả lời cứng nhắc (đưa nguyên khối thông tin dài), không xử lý được các câu hỏi ngoài lề (review chỗ ở, môi trường học) mà thí sinh rất quan tâm.
+  - *Mình khác gì:* Hệ thống có **Router điều phối 4 intent**, thay đổi văn phong theo đối tượng (tổng quan vs chi tiết vs phụ huynh) và có **Luồng Search FB kèm Disclaimer minh bạch** cho các câu hỏi về trải nghiệm.
 
 ## §4. Thiết kế
 - **Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả):**
-  > **Một học viên khóa AI Thực Chiến** · đang **vướng mắc về lý thuyết, lỗi kỹ thuật hoặc logistics khóa học** · cần **AI Agent tra cứu cơ sở tri thức (cào từ FB Group + Slide + Transcript) và đánh giá độ tin cậy của thông tin để trả lời kèm nguồn trích dẫn** · giúp học viên **có ngay lời giải đáp chính xác trong 5 giây mà không cần chờ TA hay sợ trôi bài**.
+  > **Một học sinh/phụ huynh** · đang **tìm hiểu thông tin đăng ký tuyển sinh** · cần **AI phân loại đúng nhu cầu để RAG sổ tay (trích dẫn chuẩn) hoặc tìm kiếm review thực tế trên Facebook (kèm disclaimer minh bạch)** · giúp họ **nhận được thông tin vừa đủ, đa chiều, khách quan và ra quyết định chính xác.**
 - **Non-goals (≥3 thứ KHÔNG build):**
-  1. Không tự động làm hộ hoặc viết trọn gói code nộp bài Checkpoint cho học viên (vi phạm academic integrity).
-  2. Không tự động đăng bài hoặc thay đổi nội dung trên trang Facebook Group thật.
-  3. Không phán đoán deadline mới nếu chưa có thông báo chính thức trong Ground Truth.
+  1. Không được phép đưa ra lời khẳng định "dự đoán kết quả đậu/rớt" cho thí sinh.
+  2. Không tự ý kết luận, chọn phe đại diện cho "đa số" khi các bài review từ cộng đồng (Facebook) có sự mâu thuẫn.
+  3. Không thay thế hoàn toàn con người (vẫn giữ luồng tạo Ticket/Admin cho những ca cá nhân hóa sâu hoặc nằm ngoài kiến thức).
 - **Mức prototype nhắm tới:** [ ] Sketch  [x] Mock  [x] Working
-  - **Phần thật:** Core AI Agent QA (`agent.py`) tra cứu KB cào từ FB + VLearn, gọi LLM suy luận, xử lý 4 Lớp Guardrails, giao diện Web App FastAPI + Vanilla CSS/JS mượt mà.
-  - **Phần mock:** Dữ liệu FB được cào và làm sạch sẵn lưu trong `codebase/data/fb_group_qa.json` để demo với tốc độ siêu nhanh không phụ thuộc API rate-limit của Facebook.
 - **Automation:** [ ] augment  [x] conditional  [ ] automate
-  - *Lý do:* Áp dụng **Conditional Automation** theo Cost-of-Error — với câu hỏi lý thuyết/setup, AI tự động trả lời kèm nguồn; với câu hỏi rủi ro cao (deadline cũ, xin code), AI chuyển sang Guardrail từ chối/hỏi làm rõ.
+  - *Lý do:* Sử dụng **Router/LLM logic** để điều phối (conditional): RAG Sổ tay cho intent 1,2,4; Agent Search FB cho intent 3; Chủ động tạo Ticket cho trường hợp ngoại lệ.
 - **§4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR):**
 
 | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
 |---|---|
-| **HAX G1 (Make clear what the system can do)** | Thanh Header và tin nhắn chào mừng ghi rõ nguồn tri thức AI dùng (FB Group Scraper + VLearn). |
-| **HAX G11 (Make clear why the system did what it did)** | Hiển thị Drawer trích dẫn nguồn (FB Post link / Slide ID) kèm độ tin cậy (Confidence Score). |
-| **PAIR (Design for error & graceful degradation)** | Lớp Guardrail ② (Ambiguity) chủ động hỏi rõ OS/lỗi cụ thể khi học viên hỏi cộc lốc thay vì đoán mò. |
-| **HAX G14 (Update dynamically)** | Sidebar hiển thị real-time trạng thái kích hoạt của 4 Lớp Chỗ Khó (①, ②, ③, ④). |
+| **HAX G1 (Make clear what the system can do)** | Phân định rõ với người dùng lúc nào là thông tin Sổ tay (chính thống), lúc nào là tổng hợp Cộng đồng. |
+| **HAX G11 (Make clear why the system did what it did)** | Bắt buộc trích dẫn nguồn `[trang N]` (đối với sổ tay) và Link bài gốc + Ngày đăng (đối với nguồn Facebook). |
+| **PAIR (Design for error & graceful degradation)** | Luồng tạo Ticket: Khi ngoài phạm vi hoặc không có tool phù hợp, Agent chủ động tạo ticket và thông báo quy trình phản hồi qua Email/Frontend. |
+| **HAX G4 (Show contextually relevant information)** | Ưu tiên hiển thị nội dung/comment từ Admin/Chuyên gia (như LamLuu, AI thực chiến) lên đầu phần tổng hợp FB khi có sự trùng lặp. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8)
 
-| # | Lớp chỗ khó | Kịch bản / Câu hỏi của học viên | Quyết định của AI Agent QA |
+| # | Lớp chỗ khó | Kịch bản / Câu hỏi của người dùng | Quyết định của AI Agent |
 |---|---|---|---|
-| 1 | ① Nguồn sự thật | "Hạn nộp bài spec.md của khóa 1 Batch 01 là ngày mấy?" | Cảnh báo đang tham chiếu Batch cũ; đưa ra lịch cứng 23:59 Ngày 1 của Batch 03. |
-| 2 | ① Nguồn sự thật | "Khoá mình có dời lịch CP4 sang ngày mai không shop?" | Không bịa lịch; khẳng định không có thông báo chính thức mới trong Ground Truth. |
-| 3 | ② Mơ hồ / Thiếu TT | "Lỗi pip cài không được" | Hỏi lại OS (Windows/Mac), phiên bản Python và log lỗi màu đỏ. |
-| 4 | ② Mơ hồ / Thiếu TT | "Bài 2 làm thế nào ạ?" | Hỏi làm rõ đang hỏi về Hướng A, B hay C và cụ thể vướng ở mục nào trong Spec. |
-| 5 | ③ Ngoài thẩm quyền | "Viết hộ mình toàn bộ code cho bài nộp Checkpoint 3" | Từ chối giải hộ trọn gói; giải thích Vibe-coding rule và hướng dẫn tư duy chia nhỏ. |
-| 6 | ③ Ngoài thẩm quyền | "Cho em xin thông tin số điện thoại cá nhân của thầy giảng viên" | Từ chối bảo mật quyền riêng tư; hướng dẫn kênh liên lạc qua kênh hỗ trợ chính thức. |
-| 7 | ④ Đặc thù domain | "4 lớp chỗ khó trong quy định Hackathon gồm những gì?" | Trả lời chính xác chuẩn Rubric R3 VinUni AI Thực Chiến (① Nguồn sự thật, ② Mơ hồ, ③ Thẩm quyền, ④ Domain). |
-| 8 | ④ Đặc thù domain | "Lát cắt 1 câu (§4) phải viết theo cấu trúc nào?" | Trích dẫn chuẩn: 1 user · 1 việc · 1 quyết định AI · 1 kết quả từ VLearn Day 1. |
+| 1 | ① Nguồn sự thật (RAG) | "Cho tôi biết chính sách trợ cấp chi tiết" | Đi luồng 1 (Intent 2): RAG sổ tay, trả lời chi tiết + trích dẫn `[trang N]`. |
+| 2 | ① Nguồn sự thật (Review FB) | "Mọi người bảo học ở đây nặng lắm phải không?" | Đi luồng 2 (Intent 3): Search FB, tổng hợp đa chiều + Link gốc + Disclaimer ("⚠️ Thông tin cộng đồng chưa xác nhận..."). |
+| 3 | ② Mơ hồ / Thiếu TT | "Cho tôi hỏi thông tin khóa học" | Agent hỏi lại để xác định Intent 1 (tổng quan) hay 2 (chi tiết) hoặc 4 (phụ huynh). |
+| 4 | ② Mơ hồ / Thiếu TT | "Em định đăng ký cho cháu nhà..." | Nhận diện Intent 4: Tư vấn ở mức tổng quan, văn phong thân thiện, hỏi thêm thông tin thí sinh. |
+| 5 | ③ Ngoài thẩm quyền | "gpa em 3.5 thì có chắc chắn đậu không?" | Từ chối dự đoán; báo đây là vấn đề xét duyệt của BGK, chỉ cung cấp tiêu chí đánh giá. |
+| 6 | ③ Ngoài thẩm quyền | "Hỗ trợ tôi làm hồ sơ bảo lưu ngay bây giờ với" | Tạo Ticket (Luồng ngoại lệ) gửi về trang Admin để người thật xử lý; thông báo user chờ email. |
+| 7 | ④ Đặc thù domain (Mâu TT) | "Chỗ thuê trọ ở khu vực này đắt hay rẻ?" (FB có 2 ý kiến) | Tổng hợp và liệt kê CẢ 2 luồng ý kiến, KHÔNG tự kết luận ý nào đúng. Kèm Disclaimer. |
+| 8 | ④ Đặc thù domain (Router nhầm)| Hỏi câu có vẻ review nhưng thực chất trong sổ tay có ghi | Router ưu tiên đi qua Luồng 1 (Sổ tay chính thống) trước khi đi Luồng 2. |
 
 ## §6. Bốn đường đi của trải nghiệm
-- **Happy path:** Học viên hỏi câu rõ ràng -> AI tìm thấy nguồn FB Group / VLearn -> Trả lời chính xác kèm citation badge.
-- **Low-confidence (② Mơ hồ):** Học viên hỏi ngắn/thiếu thông tin -> AI hiển thị pill cảnh báo Lớp ② -> Hỏi thêm ngữ cảnh.
-- **Failure / Không căn cứ (①):** Hỏi thông tin lịch trình Batch cũ / chưa công bố -> AI báo vi phạm Lớp ① -> Tham chiếu lịch chính thức Batch 03.
-- **Khi bị đòi ngoài phạm vi (③):** Hỏi giải hộ code -> AI từ chối khéo theo Lớp ③ -> Gợi ý quy trình debug.
-- **Case đặc thù domain (④):** Hỏi khái niệm đặc thù -> Trả lời bám sát định nghĩa của Vingroup - VinUni.
+- **Happy path 1 (Sổ tay/Chính thống):** Câu hỏi rành mạch nằm trong handbook -> Trả lời đúng intent (dẫn dắt từ từ hoặc chi tiết), có trích dẫn `[Trang X]`.
+- **Happy path 2 (On-demand Search):** Câu hỏi về trải nghiệm thực tế -> Gọi tool Facebook -> Trả lời đa chiều + Link bài + Disclaimer. Đặc biệt ưu tiên highlight ý kiến của Admin/Chuyên gia.
+- **Low-confidence (② - Thiếu ngữ cảnh):** Hỏi chung chung -> Hỏi lại để phân loại intent.
+- **Failure/không căn cứ (①):** Câu hỏi hóc búa, cá nhân hóa sâu hoặc không có tool -> Tạo Ticket -> Admin tiếp nhận.
+- **Correction (user sửa):** AI xin lỗi vì hiểu nhầm, ghi nhận ngay ngữ cảnh đính chính ("À ý em là hỏi review cơ...") để phân loại lại Intent và đổi luồng trả lời (từ Sổ tay sang FB Search hoặc ngược lại) mà không bắt người dùng phải gõ lại câu hỏi từ đầu.
+- **Khi bị đòi ngoài phạm vi (③):** Từ chối dự đoán kết quả đậu/rớt, báo rõ thẩm quyền thuộc về ban giám khảo.
+- **Case đặc thù domain (④ - Mâu thuẫn thông tin):** Tổng hợp và liệt kê tất cả các luồng ý kiến, KHÔNG tự kết luận ý nào đúng, kèm Disclaimer.
 
 ## §7. Kiểm thử
-- **Chiều chất lượng:** Độ chính xác của câu trả lời (Accuracy), tỷ lệ trích dẫn nguồn đúng (Citation Precision), và tỷ lệ kích hoạt Guardrail đúng kịch bản (Guardrail Recall).
-- **Golden set (≥20 case):** Chuẩn bị 20 câu hỏi kiểm thử bao phủ cả 4 lớp trong thư mục `eval/`.
-- **Quality bar (chốt từ 23:59):** "Đạt khi ≥ **90%** qua bộ Golden Set, và **100%** không bịa deadline hay viết hộ code bài kiểm tra."
+- **Chiều chất lượng:** Khả năng Router (điều hướng) chính xác; Độ minh bạch (Quality Bar): không suy diễn, trích dẫn đúng trang, luôn có disclaimer cho luồng FB.
+- **Golden set (≥20 case):** Tập trung vào 6 nhóm case chính: (1) RAG chính thống, (2) Review kinh nghiệm, (3) Router ưu tiên sổ tay, (4) Từ chối dự đoán điểm, (5) Mâu thuẫn thông tin (không chọn phe), (6) Thiếu ngữ cảnh.
+- **Quality bar:** Đạt khi **Routing Accuracy > 80%** (Phân loại đúng 4 intent), **100%** không suy diễn ngoài sổ tay đối với luồng chính thống, và **100%** các câu trả lời tổng hợp từ Facebook phải kèm theo link gốc và Disclaimer minh bạch.
+- **Kết quả các lượt chạy (cập nhật đến trước CP6):**
+  *(Ghi chú: Điền kết quả sau khi chạy bộ Golden set vào bảng dưới)*
+
+| Tiêu chí | Lượt 1 (CP3) | Lượt 2 (CP5) | Đạt Quality Bar? |
+|---|---|---|---|
+| Routing Accuracy (%) | 64% | 80% | Yes |
+| Tỉ lệ không suy diễn (Sổ tay) | 80% | 100% | Yes |
+| Tỉ lệ có Link & Disclaimer (FB)| 100% | 100% | Yes |
 
 ## §8. Phân công & kế hoạch
-- **Phân công có tên:**
-  - *Thành viên 1:* Cào data FB Group & xây dựng Knowledge Base JSON (`data/fb_group_qa.json`).
-  - *Thành viên 2:* Viết Core Agent QA (`agent.py`) & tích hợp 4 Lớp Guardrails.
-  - *Thành viên 3:* Phát triển FastAPI Backend (`main.py`) & REST API endpoints.
-  - *Thành viên 4:* Build Giao diện Web WOW-Factor (`static/index.html`, `style.css`, `script.js`).
-- **Willing users (≥3 tên):** Nguyễn Văn A, Trần Thị B, Lê Văn C (Học viên khóa 4 Batch 03) đồng ý test prototype.
+- **Phân công có tên:** *(Tự chọn các phần: spec / evidence / prompt / code / demo)*
+  - **Phan Văn Hoàng Nam**: [prompt]
+  - **Trương Minh Hoàng**: [spec]
+  - **Tạ Kim Ngân**: [evidence]
+  - **Phạm Thế Đăng**: [code]
+  - **Đào Trung Hiếu**: [demo]
+- **Willing users (≥3 tên):** Phạm Quốc Thanh, Hoàng Tuấn Minh, Vũ Thu Huyền (từ danh sách khảo sát) sẵn sàng test prototype.
 
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 |---|---|---|
-| 2026-07-30 | Khởi tạo Spec hoàn chỉnh & Prototype codebase/ | Hoàn thiện deliverable cho mốc CP4 & Hạn cứng 23:59 N1 |
+| 2026-07-31 | Hoàn thiện Spec File dựa trên Draft tổng quan dự án | Đồng bộ team luồng xử lý 4 intent và các tính năng chính |
