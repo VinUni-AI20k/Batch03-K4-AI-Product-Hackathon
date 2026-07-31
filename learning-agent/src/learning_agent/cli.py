@@ -262,6 +262,52 @@ def _yaml_set(path, key: str, value: str) -> None:
             return
 
 
+def _tg_get(token: str, method: str, timeout: int = 35, **params):
+    import json
+    import urllib.parse
+    import urllib.request
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    with urllib.request.urlopen(url, timeout=timeout) as r:  # noqa: S310 (host cố định telegram)
+        return json.load(r)
+
+
+def _telegram_capture_id(token: str):
+    """Validate token + tự bắt Telegram user ID: hướng dẫn nhắn bot rồi đọc getUpdates."""
+    try:
+        me = _tg_get(token, "getMe", timeout=10)
+    except Exception as e:
+        print(f"  ⚠️ Không gọi được Telegram ({e}). Nhập ID tay nếu biết.")
+        return None
+    if not me.get("ok"):
+        print("  ⚠️ Token không hợp lệ (getMe thất bại).")
+        return None
+    uname = me["result"].get("username", "")
+    print(f"  ✓ Token OK — bot \033[36m@{uname}\033[0m")
+    print(f"  → Mở \033[36mhttps://t.me/{uname}\033[0m, bấm \033[1mSTART\033[0m (hoặc gửi 1 tin nhắn bất kỳ).")
+    try:
+        input("  → Nhắn xong bấm Enter để mình tự lấy ID (bỏ qua: gõ 'skip' rồi Enter)… ")
+    except (EOFError, KeyboardInterrupt):
+        return None
+    try:
+        upd = _tg_get(token, "getUpdates", timeout=30, limit=10)
+    except Exception as e:
+        print(f"  ⚠️ Không đọc được updates ({e}).")
+        return None
+    ids = []
+    for u in upd.get("result", []):
+        frm = ((u.get("message") or u.get("edited_message") or {}).get("from") or {})
+        if frm.get("id") and not frm.get("is_bot"):
+            ids.append((str(frm["id"]), frm.get("first_name", "")))
+    if not ids:
+        print("  ⚠️ Chưa thấy tin nhắn nào tới bot. Nhắn cho bot rồi chạy lại: learning-agent config")
+        return None
+    uid, name = ids[-1]
+    print(f"  ✓ Đã lấy ID: \033[1;32m{uid}\033[0m ({name})")
+    return uid
+
+
 def _config_wizard(cfg) -> None:
     """Wizard tương tác (kiểu `openclaw config`): chọn provider, dán key (mask), model, embedding, kênh."""
     from .config import LLM_PROVIDERS
@@ -337,9 +383,19 @@ def _config_wizard(cfg) -> None:
         if questionary.confirm("Bật kênh Telegram? (chat qua bot Telegram)",
                                default=bool(cfg.telegram_token), style=style, qmark="▸").ask():
             tg = questionary.password("Dán TELEGRAM_BOT_TOKEN (lấy ở @BotFather):", style=style, qmark="▸").ask()
-            tg_allow = questionary.text(
-                "Telegram user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
-                style=style, qmark="▸").ask()
+            auto = _telegram_capture_id(tg.strip()) if tg and tg.strip() else None
+            if auto:
+                if questionary.confirm(f"Chỉ cho phép ID {auto} (bạn) dùng bot?",
+                                       default=True, style=style, qmark="▸").ask():
+                    tg_allow = auto
+                else:
+                    tg_allow = questionary.text(
+                        "Nhập ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                        default=auto, style=style, qmark="▸").ask()
+            else:
+                tg_allow = questionary.text(
+                    "Telegram user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                    style=style, qmark="▸").ask()
         if questionary.confirm("Bật kênh Discord?", default=bool(cfg.discord_token),
                                style=style, qmark="▸").ask():
             dc = questionary.password("Dán DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask()
