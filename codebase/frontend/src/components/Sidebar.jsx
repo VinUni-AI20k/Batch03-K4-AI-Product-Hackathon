@@ -1,86 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
-import moment from "moment";
-import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
 
-  const {
-    chats,
-    setSelectedChat,
-    theme,
-    setTheme,
-    user,
-    navigate,
-    createNewChat,
-    axios,
-    setChats,
-    fetchUsersChats,
-    setToken,
-    token
-  } = useAppContext();
+  const { theme, setTheme } = useAppContext();
 
-  const [search, setSearch] = useState('');
-
-  const logout = () => {
-
-    localStorage.removeItem('token');
-
-    setToken(null);
-
-    toast.success('Logged out successfully');
-
-  };
-
-  const deleteChat = async (e, chatId) => {
-
-    try {
-
-      e.stopPropagation();
-
-      const confirmDelete = window.confirm(
-        'Delete this Chat?'
-      );
-
-      if (!confirmDelete) return;
-
-      const { data } = await axios.post(
-        '/api/chat/delete',
-        { chatId },
-        {
-          headers: {
-            Authorization: token
-          }
-        }
-      );
-
-      if (data.success) {
-
-        setChats(prev =>
-          prev.filter(chat => chat._id !== chatId)
-        );
-
-        await fetchUsersChats();
-
-        toast.success(data.message);
-
-      } else {
-
-        toast.error(data.message);
-
-      }
-
-    } catch (error) {
-
-      toast.error(
-        error.response?.data?.message ||
-        error.message
-      );
-
-    }
-
-  };
+  const navigate = useNavigate();
 
   return (
     <div className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b 
@@ -99,14 +26,16 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
       />
 
       <button
-        onClick={createNewChat}
+        onClick={() => navigate("/")}
         className='flex justify-center items-center w-full py-2 mt-10 text-white bg-gradient-to-r from-[#A456F7] to-[#3D81F6] text-sm rounded-md cursor-pointer'
       >
         <span className='mr-2 text-xl'>+</span>
         New Chat
       </button>
 
+      {/* Search UI giữ nguyên */}
       <div className='flex items-center gap-2 p-3 mt-4 border border-gray-400 dark:border-white/20 rounded-md'>
+
         <img
           src={assets.search_icon}
           className='w-4 not-dark:invert'
@@ -114,101 +43,16 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         />
 
         <input
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          value={search}
           type="text"
           placeholder='Search conversations'
           className='bg-transparent text-xs placeholder:text-gray-400 outline-none w-full'
+          disabled
         />
-      </div>
-
-      {chats.length > 0 &&
-        <p className='mt-4 text-sm'>
-          Recent Chats
-        </p>
-      }
-
-      <div className='flex-1 overflow-y-auto mt-3 text-sm space-y-3'>
-
-        {
-          chats
-            .filter((chat) => {
-
-              const content =
-                chat.messages?.[0]?.content
-                  ?.toLowerCase() || "";
-
-              const name =
-                chat.name?.toLowerCase() || "";
-
-              return (
-                content.includes(
-                  search.toLowerCase()
-                ) ||
-                name.includes(
-                  search.toLowerCase()
-                )
-              );
-
-            })
-            .map((chat) => (
-
-              <div
-                key={chat._id}
-                onClick={() => {
-
-                  navigate('/');
-
-                  setSelectedChat(chat);
-
-                  setIsMenuOpen(false);
-
-                }}
-                className='p-2 px-4 dark:bg-[#57317C]/10 border border-gray-300 dark:border-[#80609F]/15 rounded-md cursor-pointer flex justify-between items-center group'
-              >
-
-                <div>
-
-                  <p className='truncate w-full'>
-                    {
-                      chat.messages?.length > 0
-                        ? chat.messages[0].content.slice(0, 32)
-                        : chat.name
-                    }
-                  </p>
-
-                  <p className='text-xs text-gray-500 dark:text-[#B1A6C0]'>
-                    {moment(chat.updatedAt).fromNow()}
-                  </p>
-
-                </div>
-
-                <img
-                  src={assets.bin_icon}
-                  className='hidden group-hover:block w-4 cursor-pointer not-dark:invert'
-                  alt="Delete"
-                  onClick={(e) => {
-
-                    toast.promise(
-                      deleteChat(e, chat._id),
-                      {
-                        loading: 'Deleting...',
-                        success: 'Chat deleted',
-                        error: 'Delete failed'
-                      }
-                    );
-
-                  }}
-                />
-
-              </div>
-
-            ))
-        }
 
       </div>
+
+      {/* Tạm ẩn Recent Chats cho tới khi có backend */}
+      <div className='flex-1 overflow-y-auto mt-3 text-sm space-y-3'></div>
 
       <div
         onClick={() => {
@@ -307,6 +151,8 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       </div>
 
+      {/* Footer giữ nguyên style */}
+
       <div className='flex items-center gap-3 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer group'>
 
         <img
@@ -316,22 +162,8 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         />
 
         <p className='flex-1 text-sm dark:text-primary truncate'>
-          {
-            user
-              ? user.name
-              : 'Login your account'
-          }
+          AI Learning Assistant
         </p>
-
-        {
-          user &&
-          <img
-            onClick={logout}
-            src={assets.logout_icon}
-            className='h-5 cursor-pointer hidden not-dark:invert group-hover:block'
-            alt="Logout"
-          />
-        }
 
       </div>
 

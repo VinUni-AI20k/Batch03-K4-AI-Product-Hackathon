@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi.testclient import TestClient
 from main import app
 import json
@@ -5,8 +6,10 @@ import time
 
 client = TestClient(app)
 
+
 def test_chat():
-    out_file = open("D:/vinai/qn1304/codebase/backend/test_llm_out.txt", "w", encoding="utf-8")
+    output_path = Path(__file__).with_name("test_llm_out.txt")
+    out_file = open(output_path, "w", encoding="utf-8")
     
     def log(text):
         # Bỏ print(text) để terminal Windows không bị lỗi font chữ
@@ -60,7 +63,7 @@ def test_chat():
         time.sleep(5)
         
     out_file.close()
-    print("\n>>> Đã lưu kết quả LLM vào file: codebase/backend/test_llm_out.txt")
+    print(f"\n>>> Đã lưu kết quả LLM vào file: {output_path}")
 
 
 if __name__ == "__main__":

@@ -7,14 +7,23 @@ const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
 
-    const [chats, setChats] = useState([]);
-    const [selectedChat, setSelectedChat] = useState(null);
-
+    // ===== Theme =====
     const [theme, setTheme] = useState(
         localStorage.getItem("theme") || "light"
     );
 
-    // Theme
+    // ===== Current PDF =====
+    const [currentPdf, setCurrentPdf] = useState(null);
+
+    // ===== Current Page =====
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // ===== Highlighted Text =====
+    const [selectedText, setSelectedText] = useState("");
+
+    // ===== Chat Messages =====
+    const [messages, setMessages] = useState([]);
+
     useEffect(() => {
 
         if (theme === "dark") {
@@ -27,36 +36,24 @@ export const AppContextProvider = ({ children }) => {
 
     }, [theme]);
 
-    // Update local chat
-    const updateChatMessages = (chatId, newMessage) => {
-
-        setChats(prev =>
-            prev.map(chat =>
-                chat.id === chatId
-                    ? {
-                          ...chat,
-                          messages: [...chat.messages, newMessage],
-                      }
-                    : chat
-            )
-        );
-
-    };
-
     const value = {
 
-        chats,
-        setChats,
-
-        selectedChat,
-        setSelectedChat,
+        axios,
 
         theme,
         setTheme,
 
-        updateChatMessages,
+        currentPdf,
+        setCurrentPdf,
 
-        axios,
+        currentPage,
+        setCurrentPage,
+
+        selectedText,
+        setSelectedText,
+
+        messages,
+        setMessages,
 
     };
 

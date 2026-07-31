@@ -2,17 +2,22 @@ import os
 import re
 import requests
 from urllib.parse import urlparse
-from google import genai
-from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
+
+try:
+    from google import genai
+    from google.genai import types
+except Exception:  # pragma: no cover - optional dependency
+    genai = None
+    types = None
 
 # Cấu hình API Key (Lấy từ biến môi trường để bảo mật)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 try:
-    if GEMINI_API_KEY:
+    if GEMINI_API_KEY and genai is not None and types is not None:
         client = genai.Client(api_key=GEMINI_API_KEY)
     else:
         client = None
@@ -131,7 +136,12 @@ def generate_answer(user_prompt: str, enable_search: bool = False) -> dict:
     Hàm gọi API Gemini, parse output và resolve URL trả về dict JSON
     """
     if not client:
-        return {"error": "Lỗi: Client Gemini chưa được khởi tạo (Thiếu API Key)."}
+        return {
+            "answer": "The AI helper is currently unavailable. Please add a valid GEMINI_API_KEY or install the required packages to enable live responses.",
+            "follow_up": [],
+            "citations": [],
+            "external_links": []
+        }
         
     system_prompt = load_system_prompt()
     
