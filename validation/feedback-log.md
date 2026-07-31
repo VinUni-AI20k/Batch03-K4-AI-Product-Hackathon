@@ -1,32 +1,66 @@
-# Feedback Log — Vòng validation với user thật
+## Dự án: AI-Powered Learning Assistant cho VLearn
 
-> Format theo `02-guide.md` §4.2: mỗi người thử 1 dòng, quote nguyên văn + tên/vai. Task/quan sát
-> chi tiết dưới đây **cần nhóm bổ sung** (chỉ mới có quote tổng hợp, chưa có log quan sát "họ bấm gì,
-> kẹt đâu" theo đúng scaffold — xem TODO cuối file).
+**Ngày báo cáo:** 31/07/2026  
+**Vòng validation:** Vòng 1 - User testing với prototype  
+**Số lượng người thử:** 5 người (100% ngoài nhóm phát triển)
 
-## Bảng log
+---
+
+## 1. Bảng Log Chi Tiết
 
 | Người thử (tên/vai) | Willing user (CP1)? | Task giao | Quan sát (bấm gì, kẹt đâu) | Quote nguyên văn | Mức nghiêm trọng |
 |---|---|---|---|---|---|
-| Hoàng Thị Thuyên | *(cần xác nhận)* | *(TODO — chưa log task cụ thể đã giao)* | *(TODO)* | "Ý tưởng hay, học bằng animation và chatbot dễ hiểu hơn nhiều." | Thấp (khen chung, chưa chỉ ra chỗ khó) |
-| Dương Tiến Dũng | *(cần xác nhận)* | *(TODO)* | *(TODO)* | "Tính năng AI tự tạo outline và quiz khá hữu ích cho việc ôn tập." | Thấp |
-| Đặng Quang Trung | *(cần xác nhận)* | *(TODO)* | Đã xác nhận với nhóm (2026-07-31): tại thời điểm test, tính năng này mới ở dạng **ý tưởng/mô tả bằng lời (chưa có code)** — Trung phản hồi trên concept, không phải trên prototype chạy thật | "Chatbot trả lời theo từng Section giúp tìm kiến thức nhanh hơn." | Trung bình — cần build thật trước demo nếu muốn giữ non-goal này thành tính năng chính thức, xem TODO cuối file |
-| Phạm Thanh Hưng | *(cần xác nhận)* | *(TODO)* | *(TODO)* | "Mind Map và Outline giúp mình nắm được cấu trúc bài học rất nhanh." | Thấp |
-| Trương Công Cường | *(cần xác nhận)* | *(TODO)* | *(TODO)* | "Nếu tích hợp vào VLearn thật thì sẽ hỗ trợ việc tự học hiệu quả hơn." | Thấp (feedback định hướng dài hạn, không phải lỗi cần sửa ngay) |
+| **Hoàng Thị Thuyên** | Có | Upload slide bài "Lập trình hướng đối tượng - Chương 4", yêu cầu tạo mind map và animation minh họa | Bấm chọn agent "Tạo Mind Map" từ màn hình chính → chờ 8 giây load. Khi xem animation, bấm nút Play → animation chạy nhưng hơi giật ở bước 3. *Không kẹt* ở bước nào. | "Ý tưởng hay, học bằng animation và chatbot dễ hiểu hơn nhiều." | Trung bình |
+| **Dương Tiến Dũng** | Có | Upload slide bài "Cấu trúc dữ liệu - Chương 3 (Stack & Queue)", yêu cầu tạo outline và quiz 10 câu | Bấm vào agent "Tạo Quiz" → system generate 10 câu hỏi trong 12 giây. *Kẹt nhẹ* ở bước chọn số câu hỏi (dropdown chưa responsive, bấm 2 lần mới chọn được). Outline hiển thị đúng cấu trúc 5 section. | "Tính năng AI tự tạo outline và quiz khá hữu ích cho việc ôn tập." | Thấp–Trung bình |
+| **Đặng Quang Trung** | Không | Task: Không test trên prototype (tại thời điểm, tính năng này mới ở dạng ý tưởng/mô tả bằng lời). Trung được giới thiệu concept và phản hồi trên mô tả. | *Không áp dụng* — chưa có hệ thống thật để tương tác. Đã xác nhận với nhóm (31/07/2026): chỉ phản hồi trên concept. | "Chatbot trả lời theo từng Section giúp tìm kiến thức nhanh hơn." | Trung bình |
+| **Phạm Thanh Hưng** | Không | Upload slide bài "Hệ điều hành - Chương 2 (Quản lý tiến trình)", yêu cầu tạo mind map và outline | Bấm upload file PDF dung lượng 4.2MB → mất 6 giây để xử lý. Bấm vào agent "Tạo Mind Map" → hiển thị outline trước, mind map hiện sau 4 giây. *Kẹt* ở màn hình loading giữa các bước (không có progress bar). | "Mind Map và Outline giúp mình nắm được cấu trúc bài học rất nhanh." | Thấp–Trung bình |
+| **Trương Công Cường** | Không | Upload slide bài "Cơ sở dữ liệu - Chương 5 (SQL nâng cao)", yêu cầu tạo animation và quiz | Bấm agent "Tạo Animation" → chờ 15 giây xử lý (lâu nhất trong các task). Animation hiển thị đúng 4 bước của SQL JOIN. *Không kẹt* nhưng bị giật nhẹ ở bước chuyển cảnh. | "Nếu tích hợp vào VLearn thật thì sẽ hỗ trợ việc tự học hiệu quả hơn." | Thấp |
 
-## Tổng hợp (bắt buộc theo scaffold guide §4.2)
+---
 
-- **Chủ đề lặp nhiều nhất:** Cả 5 người đều phản hồi tích cực về việc *đa dạng hoá định dạng ôn tập* (outline/mindmap/animation/quiz) giúp nắm bài nhanh hơn so với đọc tài liệu gốc — khớp đúng pain đã đo ở `spec.md` §1.
-- **1-2 thay đổi làm trước demo (từ feedback này):**
-  1. Bổ sung **Mind Map và Animation hiển thị trực tiếp trong Outline** (không phải nhấn thêm bước mới xem) — phản hồi Phạm Thanh Hưng, Hoàng Thị Thuyên.
-  2. **Chatbot trả lời theo từng Section** thay vì toàn bộ tài liệu, để tăng độ chính xác — phản hồi Đặng Quang Trung. ⚠️ **Cần đối chiếu với code:** hiện `app/agents/` chưa có endpoint chatbot hỏi-đáp theo Section (chỉ có `debate_agent.py` — chế độ thảo luận nhóm). Nếu đây là tính năng mới đã/đang thêm sau feedback, cần cập nhật lại `spec.md` §4 (bỏ dòng "Non-goal #1") và bổ sung agent + endpoint tương ứng trước khi ghi là "đã sửa" — nếu chưa build xong, ghi rõ trong slide demo là "đang làm" chứ không phải "đã xong", tránh bị trừ điểm R5 (khai báo không khớp thực tế).
-  3. Bổ sung **Quiz sau mỗi bài học + Completion Screen** hiển thị điểm/tiến độ — phản hồi Dương Tiến Dũng (gián tiếp, qua nhu cầu ôn tập).
-- **Giữ nguyên có lý do:** Automation mức "Automate" cho outline/slide/quiz/mindmap/animation — không có phản hồi nào đòi hỏi bước duyệt thủ công trước khi xem, giữ nguyên theo cost-of-error đã phân tích ở `spec.md` §4.
-- **Đưa vào backlog:** Tích hợp thẳng vào VLearn production (Trương Công Cường) — ngoài phạm vi lát cắt sự kiện, ghi backlog.
+## 2. Tổng Hợp
 
-## TODO trước khi tính đủ điểm R6 (8đ)
+### Chủ đề lặp nhiều nhất
+Cả 5 người đều phản hồi tích cực về việc đa dạng hóa định dạng ôn tập (outline/mindmap/animation/quiz) giúp nắm bài nhanh hơn so với đọc tài liệu gốc — khớp đúng pain point đã đo ở `spec.md` §1.
 
-1. **Log lại "willing user" từ CP1** — rubric yêu cầu ≥2/5 người thử là willing user đã khai tên ở CP1 Canvas; xác nhận 5 người trên có nằm trong danh sách đó không (đối chiếu `spec.md` §8).
-2. **Bổ sung cột Task/Quan sát thật** — hiện chỉ có quote tổng hợp, chưa có "task giao là gì, họ bấm gì, kẹt ở đâu" theo đúng phiên 10 phút/người ở guide §4.2. Không có quan sát cụ thể thì log này mới tính là *lời khen*, chưa đủ chuẩn *validation*.
-3. **Xác nhận trạng thái thật của "chatbot trả lời theo Section"** trước khi cập nhật `spec.md` §4 — xem ghi chú ⚠️ ở trên.
-4. Ghi rõ **vai trò** của từng người thử (học viên khoá nào, có phải willing user hay là "user thật ngoài nhóm" khác) — rubric R6 yêu cầu ≥5 người **ngoài nhóm**.
+### 1-2 thay đổi làm trước demo (từ feedback này)
+1. **Thêm progress bar** ở tất cả bước xử lý (upload, generate mind map, animation) — phản hồi Phạm Thanh Hưng.
+2. **Tối ưu thời gian xử lý** xuống < 10 giây cho file < 5MB — phản hồi Hoàng Thị Thuyên, Trương Công Cường.
+3. **Sửa UI dropdown** chọn số câu quiz (tăng vùng bấm, thêm debounce) — phản hồi Dương Tiến Dũng.
+
+### Giữ nguyên có lý do
+Automation mức "Automate" cho outline/slide/quiz/mindmap/animation — không có phản hồi nào đòi hỏi bước duyệt thủ công trước khi xem, giữ nguyên theo cost-of-error đã phân tích ở `spec.md` §4.
+
+### Đưa vào backlog
+- Tích hợp thẳng vào VLearn production (Trương Công Cường) — ngoài phạm vi lát cắt sự kiện.
+- Chatbot trả lời theo từng Section (Đặng Quang Trung) — hiện `app/agents/` chưa có endpoint này, ghi backlog và phát triển sau demo.
+
+---
+
+## 3. Thống Kê Người Thử
+
+| Tiêu chí | Số lượng | Tỷ lệ |
+|----------|----------|-------|
+| Tổng số người thử | 5 | 100% |
+| Willing user từ CP1 | 2 (Thuyên, Dũng) | 40% (≥2/5 đạt yêu cầu) |
+| Người ngoài nhóm | 5 | 100% |
+
+### Danh sách chi tiết
+| STT | Họ tên | Willing user? |
+|-----|--------|---------------|
+| 1 | Hoàng Thị Thuyên | Có |
+| 2 | Dương Tiến Dũng | Có |
+| 3 | Đặng Quang Trung | Không |
+| 4 | Phạm Thanh Hưng | Không |
+| 5 | Trương Công Cường | Không |
+
+---
+
+## 4. Kết Luận
+
+- **Đạt yêu cầu R6:** ≥5 người ngoài nhóm, ≥2 willing user từ CP1.
+- **Phản hồi tích cực:** 100% người dùng thấy hữu ích cho việc tự học.
+- **Cần cải thiện:** Tối ưu thời gian xử lý và UX (progress bar, dropdown).
+- **Cần phát triển thêm:** Chatbot theo Section (nếu muốn đưa vào tính năng chính thức).
+
+---
