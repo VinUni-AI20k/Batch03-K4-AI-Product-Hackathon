@@ -187,7 +187,7 @@
         </div>
       </div>
 
-      <!-- PANEL 2: GHI CHÚ BÀI GIẢNG -->
+        <!-- PANEL 2: GHI CHÚ BÀI GIẢNG -->
       <div class="sidebar-panel active" id="panel-notes">
         <div class="sidebar-top-header" style="display:flex;align-items:center;justify-content:space-between;">
           <div>
@@ -202,8 +202,30 @@
           </div>
         </div>
 
+        <!-- Mini Format Toolbar -->
+        <div class="note-format-toolbar">
+          <button class="note-fmt-btn" onclick="noteFormatCmd('h1')" title="Tiêu đề lớn (H1)">H1</button>
+          <button class="note-fmt-btn" onclick="noteFormatCmd('h2')" title="Tiêu đề nhỏ (H2)">H2</button>
+          <button class="note-fmt-btn" onclick="noteFormatCmd('bold')" title="In đậm"><b>B</b></button>
+          <button class="note-fmt-btn" onclick="noteFormatCmd('italic')" title="In nghiêng"><i>I</i></button>
+          <div class="note-fmt-divider"></div>
+          <button class="note-fmt-btn" onclick="noteFormatCmd('ul')" title="Danh sách gạch đầu dòng">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <button class="note-fmt-btn" onclick="noteFormatCmd('hr')" title="Đường kẻ ngang phân cách">—</button>
+          <div style="flex:1"></div>
+          <span class="note-saved-status" id="note-saved-status">Đã tự động lưu</span>
+        </div>
+
         <div class="notes-editor-box">
-          <textarea class="note-textarea" id="note-textarea-input" placeholder="Nhập ghi chú cá nhân cho trang slide này..." oninput="autoSaveCurrentNote()"></textarea>
+          <!-- contenteditable thay thế textarea để hỗ trợ format HTML -->
+          <div
+            class="note-content-editable"
+            id="note-textarea-input"
+            contenteditable="true"
+            data-placeholder="Nhập ghi chú cá nhân cho trang slide này..."
+            oninput="autoSaveCurrentNote()"
+          ></div>
           <div class="notes-editor-footer">
             <button class="btn-ask-ai-note" onclick="generateAINoteForCurrentPage()" title="Tự động tạo ghi chú cho trang này bằng AI">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a9.96 9.96 0 0 1-4.587-1.112l-3.826 1.07a1 1 0 0 1-1.235-1.236l1.07-3.825A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2z"/></svg>
@@ -213,6 +235,7 @@
         </div>
       </div>
     </aside>
+
 
     <!-- CENTER SLIDE CANVAS VIEW -->
     <main class="slide-main-canvas">

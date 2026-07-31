@@ -275,9 +275,11 @@ function updateNotesPanelUI() {
   const pageNumEl = document.getElementById('note-editor-page-num');
   if (pageNumEl) pageNumEl.textContent = currentPage;
 
-  const textareaInput = document.getElementById('note-textarea-input');
-  if (textareaInput) {
-    textareaInput.value = pageTextNotes[currentPage] || '';
+  const noteEl = document.getElementById('note-textarea-input');
+  if (noteEl) {
+    const savedContent = pageTextNotes[currentPage] || '';
+    if (noteEl.tagName === 'TEXTAREA') noteEl.value = savedContent;
+    else noteEl.innerHTML = savedContent;
   }
 
   const chipSpan = document.querySelector('#note-ai-chip span');
@@ -289,12 +291,13 @@ function updateNotesPanelUI() {
 }
 
 function autoSaveCurrentNote() {
-  const textareaInput = document.getElementById('note-textarea-input');
-  if (!textareaInput) return;
+  const noteEl = document.getElementById('note-textarea-input');
+  if (!noteEl) return;
 
-  const text = textareaInput.value.trim();
-  if (text) {
-    pageTextNotes[currentPage] = text;
+  // Hỗ trợ cả contenteditable (innerHTML) và textarea (value)
+  const content = noteEl.tagName === 'TEXTAREA' ? noteEl.value.trim() : noteEl.innerHTML.trim();
+  if (content && content !== '<br>') {
+    pageTextNotes[currentPage] = content;
   } else {
     delete pageTextNotes[currentPage];
   }
@@ -312,8 +315,11 @@ function autoSaveCurrentNote() {
 
 function clearCurrentPageNote() {
   delete pageTextNotes[currentPage];
-  const textareaInput = document.getElementById('note-textarea-input');
-  if (textareaInput) textareaInput.value = '';
+  const noteEl = document.getElementById('note-textarea-input');
+  if (noteEl) {
+    if (noteEl.tagName === 'TEXTAREA') noteEl.value = '';
+    else noteEl.innerHTML = '';
+  }
   renderSavedNotesList();
 }
 
@@ -391,38 +397,113 @@ function stripMarkdownForNote(text) {
 
 let noteTypewriterInterval = null;
 
+// Chuyển Markdown text đơn giản thành HTML cho note editor
+function markdownToNoteHtml(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+  let inUl = false;
+
+  lines.forEach(line => {
+    const t = line.trimEnd();
+    if (!t) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      html += '<br>';
+      return;
+    }
+    if (/^#{1}\s+(.+)/.test(t)) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      html += `<h1>${t.replace(/^#{1}\s+/, '')}</h1>`;
+    } else if (/^#{2,}\s+(.+)/.test(t)) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      html += `<h2>${t.replace(/^#{2,}\s+/, '')}</h2>`;
+    } else if (/^[-*•]\s+(.+)/.test(t)) {
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      const content = t.replace(/^[-*•]\s+/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html += `<li>${content}</li>`;
+    } else {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      const content = t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html += `<p>${content}</p>`;
+    }
+  });
+  if (inUl) html += '</ul>';
+  return html;
+}
+
 function typewriterEffectOnNote(fullText, onComplete) {
-  const textareaInput = document.getElementById('note-textarea-input');
-  if (!textareaInput) return;
+  const noteEl = document.getElementById('note-textarea-input');
+  if (!noteEl) return;
 
   if (noteTypewriterInterval) {
     clearInterval(noteTypewriterInterval);
     noteTypewriterInterval = null;
   }
 
-  // Tự động chuyển sang tab Ghi chú bên trái để người dùng quan sát hiệu ứng chữ chạy
+  // Tự động chuyển sang tab Ghi chú bên trái
   const notesTabBtn = document.querySelector('.sidebar-tab-btn[data-tab="notes"]');
   if (notesTabBtn && !notesTabBtn.classList.contains('active')) {
     switchSidebarTab('notes');
   }
 
-  textareaInput.value = '';
-  let index = 0;
-  const speed = 18; // Hiệu ứng chữ chạy mượt mà 18ms / ký tự
+  if (noteEl.tagName === 'TEXTAREA') {
+    // Fallback textarea mode
+    noteEl.value = '';
+    let index = 0;
+    noteTypewriterInterval = setInterval(() => {
+      if (index < fullText.length) {
+        noteEl.value += fullText.charAt(index++);
+        pageTextNotes[currentPage] = noteEl.value;
+        noteEl.scrollTop = noteEl.scrollHeight;
+        autoSaveCurrentNote();
+      } else {
+        clearInterval(noteTypewriterInterval);
+        noteTypewriterInterval = null;
+        if (typeof onComplete === 'function') onComplete();
+      }
+    }, 18);
+  } else {
+    // contenteditable mode: render từng dòng lần lượt tạo hiệu ứng
+    noteEl.innerHTML = '';
+    const lines = fullText.split('\n').filter(l => l.trim());
+    let lineIndex = 0;
+    noteTypewriterInterval = setInterval(() => {
+      if (lineIndex < lines.length) {
+        const partialText = lines.slice(0, lineIndex + 1).join('\n');
+        noteEl.innerHTML = markdownToNoteHtml(partialText);
+        pageTextNotes[currentPage] = noteEl.innerHTML;
+        noteEl.scrollTop = noteEl.scrollHeight;
+        autoSaveCurrentNote();
+        lineIndex++;
+      } else {
+        clearInterval(noteTypewriterInterval);
+        noteTypewriterInterval = null;
+        if (typeof onComplete === 'function') onComplete();
+      }
+    }, 120);
+  }
+}
 
-  noteTypewriterInterval = setInterval(() => {
-    if (index < fullText.length) {
-      textareaInput.value += fullText.charAt(index);
-      index++;
-      pageTextNotes[currentPage] = textareaInput.value;
-      textareaInput.scrollTop = textareaInput.scrollHeight;
-      if (typeof autoSaveCurrentNote === 'function') autoSaveCurrentNote();
-    } else {
-      clearInterval(noteTypewriterInterval);
-      noteTypewriterInterval = null;
-      if (typeof onComplete === 'function') onComplete();
-    }
-  }, speed);
+// Mini format toolbar commands
+function noteFormatCmd(cmd) {
+  const noteEl = document.getElementById('note-textarea-input');
+  if (!noteEl) return;
+  noteEl.focus();
+
+  if (cmd === 'h1') {
+    document.execCommand('formatBlock', false, 'h1');
+  } else if (cmd === 'h2') {
+    document.execCommand('formatBlock', false, 'h2');
+  } else if (cmd === 'bold') {
+    document.execCommand('bold', false, null);
+  } else if (cmd === 'italic') {
+    document.execCommand('italic', false, null);
+  } else if (cmd === 'ul') {
+    document.execCommand('insertUnorderedList', false, null);
+  } else if (cmd === 'hr') {
+    document.execCommand('insertHTML', false, '<hr>');
+  }
+  autoSaveCurrentNote();
 }
 
 function removeAINoteChip() {
@@ -1190,6 +1271,7 @@ window.autoSaveCurrentNote = autoSaveCurrentNote;
 window.clearCurrentPageNote = clearCurrentPageNote;
 window.askTutorAboutNote = askTutorAboutNote;
 window.generateAINoteForCurrentPage = generateAINoteForCurrentPage;
+window.noteFormatCmd = noteFormatCmd;
 
 // ============================================
 // Initial Load

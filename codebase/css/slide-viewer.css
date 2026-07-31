@@ -252,37 +252,132 @@ button {
   display: flex;
 }
 
-/* Edge-to-Edge Full-Bleed Notebook Paper Styling */
-.notes-editor-box {
-  flex: 1;
-  padding: 0;
-  border-bottom: none;
-  background: #ffffff;
+/* Mini Format Toolbar */
+.note-format-toolbar {
   display: flex;
-  flex-direction: column;
-  position: relative;
-  min-height: 0;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
 }
 
-/* Notebook Ruled Paper Styling */
-.note-textarea {
+.note-fmt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 5px;
+  border: none;
+  background: transparent;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.note-fmt-btn:hover {
+  background: rgba(18, 79, 140, 0.1);
+  color: #124f8c;
+}
+
+.note-fmt-divider {
+  width: 1px;
+  height: 18px;
+  background: #cbd5e1;
+  margin: 0 4px;
+}
+
+/* Note Content Editable — thay thế textarea */
+.note-content-editable {
   flex: 1;
   width: 100%;
-  height: 100%;
   min-height: 200px;
-  padding: 6px 20px;
-  border-radius: 0;
+  padding: 14px 20px;
   border: none;
+  outline: none;
   background: #ffffff;
-  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(226, 232, 240, 0.75) 28px);
+  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(226, 232, 240, 0.6) 28px);
   line-height: 28px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.875rem;
   color: #0f172a;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  resize: none;
+  overflow-y: auto;
+  word-break: break-word;
+  cursor: text;
+}
+
+/* Placeholder cho contenteditable */
+.note-content-editable:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Heading styles trong note */
+.note-content-editable h1 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #124f8c;
+  margin: 6px 0 4px;
+  line-height: 1.35;
+  border-bottom: 2px solid rgba(18, 79, 140, 0.15);
+  padding-bottom: 4px;
+}
+
+.note-content-editable h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 8px 0 3px;
+  line-height: 1.35;
+}
+
+.note-content-editable p {
+  margin: 4px 0;
+  font-size: 0.875rem;
+  line-height: 28px;
+  color: #0f172a;
+}
+
+.note-content-editable strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.note-content-editable em {
+  font-style: italic;
+  color: #334155;
+}
+
+.note-content-editable ul {
+  margin: 4px 0 4px 18px;
+  padding: 0;
+  list-style: disc;
+}
+
+.note-content-editable ul li {
+  font-size: 0.875rem;
+  line-height: 28px;
+  color: #0f172a;
+  margin: 1px 0;
+}
+
+.note-content-editable hr {
+  border: none;
+  border-top: 1.5px dashed #cbd5e1;
+  margin: 8px 0;
+}
+
+.note-content-editable:focus {
   outline: none;
-  box-shadow: none;
 }
 
 .note-textarea:focus {
@@ -290,6 +385,7 @@ button {
   box-shadow: none;
   background-color: #ffffff;
 }
+
 
 .notes-editor-footer {
   display: flex;
