@@ -16,8 +16,8 @@
 | A — Diagnosis | Đạt | Classify transcript, outline extraction, quiz gen (câu MCQ + câu mở), retest gen | Không đụng vào rewrite/citation (B), không đụng UI (C), không đụng orchestration (E) |
 | B — Alignment + Rewrite | Mai Anh | Alignment (section ↔ segment), grounded rewrite + citation | Không tự sinh quiz (A), không đụng weakness scoring logic (D) |
 | C — Frontend | Trà | Toàn bộ UI: upload, dropdown, quiz UI, study note render, retest UI, result screen, (P1) chat UI | Không viết prompt AI, không tự nối API (chỉ gọi API do E định nghĩa) |
-| D — Data & Weakness | Anh Tuấn | Chuẩn bị/làm sạch data demo, 3 kịch bản test, fixture JSON, weakness analysis module, chấm quiz + retest (rule-based) | Không đụng orchestration/backend routes (E), không chạy cache demo cuối (E) |
-| E — Tích hợp & Vận hành | Linh | Backend/API orchestration, nối pipeline ở 2 checkpoint, đo latency, error handling (retry+fallback), chạy & lưu cache demo, test fallback | Không viết prompt AI, không tự sửa logic weakness (chỉ báo bug cho D) |
+| D — Data & Weakness | Linh | Chuẩn bị/làm sạch data demo, 3 kịch bản test, fixture JSON, weakness analysis module, chấm quiz + retest (rule-based) | Không đụng orchestration/backend routes (E), không chạy cache demo cuối (E) |
+| E — Tích hợp & Vận hành | Anh Tuấn | Backend/API orchestration, nối pipeline ở 2 checkpoint, đo latency, error handling (retry+fallback), chạy & lưu cache demo, test fallback | Không viết prompt AI, không tự sửa logic weakness (chỉ báo bug cho D) |
 
 ## 2. Data contracts (chốt ở Kickoff, không đổi)
 
