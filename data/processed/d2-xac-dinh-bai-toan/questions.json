@@ -1,0 +1,1562 @@
+[
+  {
+    "stem": "Mô hình Double Diamond gồm mấy giai đoạn, tên là gì?",
+    "options": [
+      "4 giai đoạn: Discover, Define, Develop, Deliver (2 kim cương: tìm đúng vấn đề, tìm đúng giải pháp).",
+      "3 giai đoạn: Discover, Design, Deliver.",
+      "2 giai đoạn: Problem, Solution.",
+      "5 giai đoạn, bao gồm cả Evaluate ở cuối."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 3: Diamond 1 (Discover/Define) — tìm đúng vấn đề; Diamond 2 (Develop/Deliver) — tìm đúng giải pháp.",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "\"Diamond 1\" trong Double Diamond tập trung vào điều gì?",
+    "options": [
+      "Tìm đúng giải pháp và triển khai.",
+      "Tìm đúng vấn đề (Discover: mở rộng khảo sát; Define: thu hẹp, xác định đúng bài toán gốc).",
+      "Chọn công nghệ AI phù hợp nhất.",
+      "Viết Problem Statement hoàn chỉnh."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 3: \"DIAMOND 1 — TÌM ĐÚNG VẤN ĐỀ: Discover… Define…\".",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Theo trích dẫn trong bài, sự khác biệt giữa kỹ sư/doanh nhân và nhà thiết kế là gì?",
+    "options": [
+      "Kỹ sư luôn giỏi thiết kế hơn nhà thiết kế chuyên nghiệp.",
+      "Nhà thiết kế không cần hiểu vấn đề, chỉ cần tạo ra giải pháp đẹp.",
+      "Kỹ sư/doanh nhân được đào tạo để giải vấn đề; nhà thiết kế được đào tạo để khám phá vấn đề thật.",
+      "Cả hai đều được đào tạo giống hệt nhau về tư duy giải quyết vấn đề."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 3: \"Kỹ sư và doanh nhân được đào tạo để giải vấn đề. Nhà thiết kế được đào tạo để khám phá vấn đề thật.\"",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Công cụ nào thuộc giai đoạn \"Discover\" (phân kỳ, khám phá) theo bài giảng?",
+    "options": [
+      "Affinity Mapping, 5 Whys, Dot Voting.",
+      "Problem Statement, Impact-Effort Matrix.",
+      "Reward function, Precision/Recall.",
+      "Phỏng vấn người dùng (User Interview), Quan sát thực tế, Khảo sát, Diary Study."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 4: \"DISCOVER · PHÂN KỲ\" liệt kê Observation, User Interview, Survey, Diary Study...",
+    "source_slide": 4,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Công cụ nào thuộc giai đoạn \"Define\" (hội tụ) theo bài giảng?",
+    "options": [
+      "Affinity Mapping, kỹ thuật 5 Whys, Impact-Effort Matrix, Dot Voting, How Might We, Problem Statement.",
+      "User Interview, Observation, Survey, Diary Study.",
+      "Reward function và Precision/Recall.",
+      "Rule, Workflow, Agent."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 4: \"DEFINE · HỘI TỤ\" liệt kê Affinity Mapping, 5 Whys, Impact-Effort, Dot Voting, HMW, Problem Statement.",
+    "source_slide": 4,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "\"Giải pháp xuất sắc cho sai vấn đề\" theo bài giảng có hệ quả gì?",
+    "options": [
+      "Vẫn luôn mang lại giá trị tích cực cho người dùng.",
+      "Có thể còn tệ hơn không có giải pháp.",
+      "Không có hệ quả gì đáng kể.",
+      "Giúp tiết kiệm chi phí phát triển hơn giải pháp đúng vấn đề."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 3: \"Giải pháp xuất sắc cho sai vấn đề có thể còn tệ hơn không có giải pháp.\"",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Double Diamond do ai/tổ chức nào đề xuất theo bài giảng?",
+    "options": [
+      "Google PAIR.",
+      "Anthropic.",
+      "Don Norman / British Design Council (2005).",
+      "OpenAI."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 3: \"Mô hình Double Diamond — Don Norman / British Design Council (2005)\".",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Trình tự đúng của 4 giai đoạn Double Diamond là gì?",
+    "options": [
+      "Define → Discover → Deliver → Develop.",
+      "Develop → Deliver → Discover → Define.",
+      "Deliver → Develop → Define → Discover.",
+      "Discover → Define → Develop → Deliver."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 3: Diamond 1 = Discover → Define; Diamond 2 = Develop → Deliver.",
+    "source_slide": 3,
+    "concept_id": "d2-c01"
+  },
+  {
+    "stem": "Bài học từ Cursor theo bài giảng là gì?",
+    "options": [
+      "\"Lệch năng lực cốt lõi\" — từ bỏ mảng AI thiết kế cơ khí (CAD) để tập trung vào AI code editor, nơi đội ngũ am hiểu sâu.",
+      "\"Sản phẩm tốt nhưng thị trường quá hẹp\".",
+      "\"Định vị đúng điểm đau\" bằng trích dẫn nguồn.",
+      "Cursor thất bại vì thiếu vốn đầu tư."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 5: \"CURSOR — 'Lệch năng lực cốt lõi': Từ bỏ mảng AI thiết kế cơ khí (CAD)…\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Bài học từ Artifact theo bài giảng là gì?",
+    "options": [
+      "\"Lệch năng lực cốt lõi\" giống Cursor.",
+      "\"Sản phẩm tốt ≠ Thị trường lớn\" — ứng dụng đọc tin tích hợp AI xuất sắc nhưng thị trường quá hẹp, phải đóng cửa.",
+      "Thành công nhờ định vị đúng điểm đau.",
+      "Thất bại vì không sử dụng LLM."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 5: \"ARTIFACT — 'Sản phẩm tốt ≠ Thị trường lớn'… đóng cửa 1/2024\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "NotebookLM được nêu ra như một ví dụ về điều gì?",
+    "options": [
+      "\"Lệch năng lực cốt lõi\" như Cursor.",
+      "\"Sản phẩm tốt nhưng thị trường hẹp\" như Artifact.",
+      "\"Định vị đúng điểm đau\" — tập trung giải quyết nhu cầu hỏi đáp, tóm tắt tài liệu cá nhân và đối chiếu nguồn bằng trích dẫn.",
+      "Một sản phẩm đã đóng cửa vì thất bại thương mại."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 5: \"NOTEBOOKLM — 'Định vị đúng điểm đau'\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Lộ trình chung được rút ra từ 3 case study Cursor/Artifact/NotebookLM là gì?",
+    "options": [
+      "Giải pháp AI → Bài toán → Chỉ số đo lường → Quy trình.",
+      "AI → Model → Deploy → User.",
+      "Ý tưởng → Gọi vốn → Xây sản phẩm → Ra mắt.",
+      "Bài toán → Quy trình vận hành → Chỉ số đo lường → Giải pháp AI."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 5: \"Lộ trình: Bài toán → Quy trình vận hành → Chỉ số đo lường → Giải pháp AI\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Thông điệp chung (\"Khởi nguồn từ...\") của cả 3 case study là gì?",
+    "options": [
+      "Khởi nguồn từ bài toán, không bắt đầu từ AI.",
+      "Khởi nguồn từ công nghệ mới nhất trên thị trường.",
+      "Khởi nguồn từ đối thủ cạnh tranh.",
+      "Khởi nguồn từ nguồn vốn đầu tư có sẵn."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 5: \"Khởi nguồn từ bài toán, không bắt đầu từ AI\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Artifact đóng cửa vào thời gian nào theo bài giảng?",
+    "options": [
+      "1/2022.",
+      "1/2024.",
+      "1/2026.",
+      "Chưa đóng cửa, vẫn đang hoạt động."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 5: \"(đóng cửa 1/2024)\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Case study nào minh họa rủi ro \"quy mô thị trường quá hẹp\"?",
+    "options": [
+      "Cursor.",
+      "NotebookLM.",
+      "Artifact.",
+      "Cả ba case study đều gặp vấn đề này như nhau."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 5 gắn trực tiếp Artifact với \"Sản phẩm tốt ≠ Thị trường lớn\".",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "Vì sao Cursor được xem là bài học về \"lệch năng lực cốt lõi\" chứ không phải thất bại sản phẩm?",
+    "options": [
+      "Vì họ thiếu tiền để duy trì mảng CAD.",
+      "Vì thị trường CAD đã bão hòa hoàn toàn.",
+      "Vì đối thủ cạnh tranh sao chép ý tưởng của họ.",
+      "Vì họ chủ động từ bỏ một mảng (CAD) mà đội ngũ không am hiểu sâu, để tập trung vào mảng họ mạnh (code editor)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 5: \"nơi đội ngũ am hiểu sâu sắc quy trình nghiệp vụ\" — nhấn mạnh việc chọn đúng mảng thế mạnh.",
+    "source_slide": 5,
+    "concept_id": "d2-c02"
+  },
+  {
+    "stem": "4 lăng kính (lens) để tìm bài toán AI theo bài giảng là gì?",
+    "options": [
+      "Repetitive (tác vụ lặp lại), Time-consuming (tiêu tốn thời gian), AI Advantage (lợi thế của AI), User Pain Points (điểm đau người dùng).",
+      "Automate, Augment, Rule, Agent.",
+      "Discover, Define, Develop, Deliver.",
+      "Precision, Recall, F1, Accuracy."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 6: bốn lăng kính REPETITIVE, TIME-CONSUMING, AI ADVANTAGE, USER PAIN POINTS.",
+    "source_slide": 6,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Anti-pattern \"Solution-first\" là gì?",
+    "options": [
+      "Không lượng hóa tổn thất hiện tại.",
+      "Xây chatbot/agent trước khi làm rõ quy trình vận hành và điểm nghẽn thực tế.",
+      "Không thiết lập kịch bản kiểm thử.",
+      "Không rõ ranh giới tự chủ của AI."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 7: \"Ưu tiên giải pháp (Solution-first)… trước khi làm rõ quy trình vận hành và điểm nghẽn thực tế\".",
+    "source_slide": 7,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Anti-pattern \"No baseline\" gây ra hậu quả gì?",
+    "options": [
+      "Xây giải pháp trước khi hiểu vấn đề.",
+      "Không có kịch bản kiểm thử.",
+      "Mất căn cứ đánh giá hiệu quả cải tiến vì không lượng hóa tổn thất hiện tại.",
+      "Không rõ khi nào cần con người phê duyệt."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 7: \"Mơ hồ hiện trạng (No baseline)… dẫn đến mất căn cứ đánh giá hiệu quả cải tiến\".",
+    "source_slide": 7,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Anti-pattern \"No boundary\" liên quan đến vấn đề gì?",
+    "options": [
+      "Không đo lường được chỉ số thành công.",
+      "Xây giải pháp trước khi hiểu vấn đề.",
+      "Thiếu dữ liệu huấn luyện chất lượng cao.",
+      "Không rõ phạm vi tự chủ của AI và thời điểm cần con người phê duyệt (Human-in-the-loop)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 7: \"Mập mờ ranh giới (No boundary)… thời điểm cần con người phê duyệt\".",
+    "source_slide": 7,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Lăng kính \"AI Advantage\" tập trung vào loại tác vụ nào?",
+    "options": [
+      "Tác vụ đòi hỏi phân tích ngữ cảnh, xử lý ngôn ngữ tự nhiên, tổng hợp đa nguồn.",
+      "Tác vụ đơn giản, lặp đi lặp lại giống hệt nhau.",
+      "Tác vụ chỉ cần tính toán số học cơ bản.",
+      "Tác vụ không cần bất kỳ dữ liệu đầu vào nào."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 6: \"AI ADVANTAGE — Tác vụ đòi hỏi phân tích ngữ cảnh, xử lý ngôn ngữ tự nhiên, tổng hợp đa nguồn\".",
+    "source_slide": 6,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Khi phát hiện đang mắc các anti-pattern, bài giảng khuyên nên làm gì?",
+    "options": [
+      "Tiếp tục triển khai và sửa lỗi sau khi ra mắt.",
+      "Quay lại làm rõ Problem Statement trước khi chọn công nghệ.",
+      "Chuyển ngay sang dùng Agent thay vì Rule.",
+      "Tăng ngân sách cho dự án."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 7: \"Nếu phát hiện mắc các sai lầm trên, hãy quay lại làm rõ Problem Statement trước khi chọn công nghệ\".",
+    "source_slide": 7,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "\"No evaluation\" (bỏ qua đánh giá) là anti-pattern như thế nào?",
+    "options": [
+      "Xây giải pháp trước khi hiểu vấn đề.",
+      "Không lượng hóa tổn thất hiện tại.",
+      "Không thiết lập kịch bản kiểm thử, chỉ số đo lường hoặc phương án đối chứng.",
+      "Không rõ ranh giới tự chủ của AI."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 7: \"Bỏ qua đánh giá (No evaluation)… Không thiết lập kịch bản kiểm thử, chỉ số đo lường hoặc phương án đối chứng\".",
+    "source_slide": 7,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Việc tìm bài toán AI (4 lăng kính) nên xảy ra ở giai đoạn nào so với việc chọn giải pháp?",
+    "options": [
+      "Chọn giải pháp trước rồi mới đi tìm bài toán phù hợp.",
+      "Làm đồng thời cả hai, không phân biệt thứ tự.",
+      "Không cần tìm bài toán nếu đã có sẵn giải pháp AI.",
+      "Tập trung nhận diện vấn đề trước; sàng lọc và chọn giải pháp diễn ra sau."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 6: \"Tập trung nhận diện vấn đề; chưa vội đề xuất giải pháp. Sàng lọc bài toán sẽ diễn ra vào buổi chiều.\"",
+    "source_slide": 6,
+    "concept_id": "d2-c03"
+  },
+  {
+    "stem": "Theo PAIR, câu hỏi \"Can we use AI to ______?\" nên được đổi thành câu hỏi nào?",
+    "options": [
+      "\"How might we solve ______?\" và \"Can AI solve this problem in a unique way?\"",
+      "\"Which AI model is the best for us?\"",
+      "\"How much does AI cost per month?\"",
+      "\"Can AI replace all our staff eventually?\""
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 8: \"'Can we use AI to ______?' ↓ thay bằng hai câu hỏi ↓ 'How might we solve ______?' 'Can AI solve this problem in a unique way?'\"",
+    "source_slide": 8,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "Vì sao cần reframe câu hỏi trước khi nghĩ đến AI?",
+    "options": [
+      "Vì AI luôn là giải pháp tốt nhất nên không cần hỏi gì thêm.",
+      "Vì hỏi về bài toán trước, về AI sau — AI chỉ là một phương án trong nhiều phương án khả dĩ.",
+      "Vì câu hỏi ban đầu \"Can we use AI\" đã đủ rõ ràng.",
+      "Vì việc reframe giúp giảm chi phí token khi gọi API."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 8: \"Hỏi về bài toán trước, về AI sau — AI chỉ là một phương án trong nhiều phương án khả dĩ\".",
+    "source_slide": 8,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "6 trường của Quick Problem Card là gì?",
+    "options": [
+      "Model, Context, Planning, Tools.",
+      "Discover, Define, Develop, Deliver.",
+      "Bài toán (problem), Đối tượng ảnh hưởng (actor), Quy trình hiện tại (workflow), Nút thắt & Tác động, Chỉ số đo thành công, Định hướng giải pháp.",
+      "Precision, Recall, TP, FP."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 9 liệt kê đủ 6 trường của Quick Problem Card.",
+    "source_slide": 9,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "Trường \"Định hướng giải pháp\" trong Quick Problem Card có các lựa chọn nào?",
+    "options": [
+      "Cao / Trung bình / Thấp.",
+      "Go / Not Yet / No-Go.",
+      "Automate / Augment.",
+      "No AI / Rule / Workflow / Agent / Chưa xác định."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 9: \"Định hướng giải pháp — direction: No AI / Rule / Workflow / Agent / Chưa xác định\".",
+    "source_slide": 9,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "Trường \"Quy trình hiện tại\" (workflow) trong Quick Problem Card mô tả gì?",
+    "options": [
+      "Các bước vận hành thủ công hoặc tự động hiện tại, gồm 3–7 bước.",
+      "Chỉ số đo lường thành công của giải pháp.",
+      "Đối tượng chịu tác động trực tiếp từ vấn đề.",
+      "Danh sách công nghệ AI có thể áp dụng."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 9: \"Quy trình hiện tại — workflow: Các bước vận hành thủ công hoặc tự động hiện tại (gồm 3–7 bước)\".",
+    "source_slide": 9,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "\"Bài toán\" (problem) trong Quick Problem Card được định nghĩa thế nào?",
+    "options": [
+      "Mô tả chi tiết giải pháp AI dự kiến triển khai.",
+      "Vấn đề cụ thể cần giải quyết, KHÔNG bao gồm giải pháp.",
+      "Tên gọi chính thức của dự án.",
+      "Ngân sách dự kiến dành cho dự án."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 9: \"Bài toán (1 câu) — problem: Vấn đề cụ thể cần giải quyết (không bao gồm giải pháp)\".",
+    "source_slide": 9,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "Câu hỏi đúng theo PAIR quyết định điều gì?",
+    "options": [
+      "Quyết định chi phí token của mô hình.",
+      "Quyết định model cụ thể nào sẽ được dùng.",
+      "Quyết định bài toán bạn giải và giải pháp bạn chọn.",
+      "Không ảnh hưởng gì đến kết quả cuối cùng."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 8: \"Câu hỏi đúng quyết định bài toán bạn giải — và giải pháp bạn chọn\".",
+    "source_slide": 8,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "Trường \"Nút thắt & Tác động\" trong Quick Problem Card mô tả điều gì?",
+    "options": [
+      "Định hướng công nghệ sẽ được áp dụng.",
+      "Đối tượng ảnh hưởng trực tiếp từ vấn đề.",
+      "Chỉ số đo lường thành công của giải pháp.",
+      "Khâu gây chậm trễ, sai sót hoặc lặp lại; hệ quả hay tổn thất cụ thể."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 9: \"Nút thắt & Tác động — bottleneck + impact: Khâu gây chậm trễ, sai sót hoặc lặp lại; hệ quả hay tổn thất cụ thể\".",
+    "source_slide": 9,
+    "concept_id": "d2-c04"
+  },
+  {
+    "stem": "6 câu hỏi khai thác bài toán theo bài giảng bao gồm những gì?",
+    "options": [
+      "Quy trình hiện tại thế nào? Nút thắt ở đâu? Hao phí bao nhiêu? Tiêu chí thành công đo bằng gì? Hậu quả khi sai sót? Có giải pháp phi AI đơn giản hơn?",
+      "Model nào tốt nhất? Chi phí bao nhiêu? Ai sẽ code? Khi nào ra mắt?",
+      "Actor, Workflow, Bottleneck, Impact, Metric, Boundary.",
+      "Discover, Define, Develop, Deliver, Evaluate, Launch."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 10 liệt kê đủ 6 câu hỏi từ 01 đến 06.",
+    "source_slide": 10,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Ba yếu tố của việc \"định lượng hóa\" bài toán là gì?",
+    "options": [
+      "Actor, Workflow, Boundary.",
+      "Baseline (hiện trạng), Target (mục tiêu), Measurement (đo lường).",
+      "Precision, Recall, F1.",
+      "Automate, Augment, Rule."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 11: \"01 · BASELINE, 02 · TARGET, 03 · MEASUREMENT\".",
+    "source_slide": 11,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "\"Baseline\" trong định lượng hóa bài toán trả lời câu hỏi nào?",
+    "options": [
+      "Kỳ vọng cải thiện ở mức độ nào (đó là Target).",
+      "Chỉ số nào chứng minh hiệu quả (đó là Measurement).",
+      "Mức hao phí hiện tại là bao nhiêu, bằng con số cụ thể (where we are).",
+      "AI có nên được sử dụng cho bài toán này hay không."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 11: \"01 · BASELINE — Hiện trạng / where we are: Mức hao phí hiện tại là bao nhiêu?\".",
+    "source_slide": 11,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Ví dụ \"rút ngắn từ 90 phút xuống dưới 30 phút\" thuộc loại chỉ số nào?",
+    "options": [
+      "Chất lượng công việc.",
+      "Tải trọng vận hành.",
+      "Chi phí đầu tư ban đầu.",
+      "Thời gian hoàn thành."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 11: \"THỜI GIAN HOÀN THÀNH — Rút ngắn từ 90 phút xuống dưới 30 phút\".",
+    "source_slide": 11,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Vì sao \"điểm đau chưa được định lượng thì không thể xác định giá trị thực tế của AI\"?",
+    "options": [
+      "Vì không có con số baseline/target để so sánh trước-sau, không chứng minh được cải tiến.",
+      "Vì AI luôn cần dữ liệu định lượng để huấn luyện mô hình.",
+      "Vì định lượng giúp giảm chi phí gọi API.",
+      "Vì đây là yêu cầu pháp lý bắt buộc với mọi dự án AI."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 11: \"Điểm đau chưa được định lượng thì không thể xác định giá trị thực tế của AI\".",
+    "source_slide": 11,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Câu hỏi \"Có giải pháp phi AI đơn giản hơn?\" trong bộ 6 câu hỏi gợi ý điều gì?",
+    "options": [
+      "Luôn phải dùng AI dù có giải pháp đơn giản hơn.",
+      "Xem xét quy tắc, checklist, quy trình hay tài liệu hướng dẫn trước khi nhảy vào AI.",
+      "Bỏ qua câu hỏi này nếu đã quyết định dùng AI từ trước.",
+      "Chỉ áp dụng cho các bài toán không quan trọng."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 10: \"Có giải pháp phi AI đơn giản hơn? Quy tắc, checklist, quy trình hay tài liệu hướng dẫn?\".",
+    "source_slide": 10,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "\"Giảm tỷ lệ lỗi phân loại từ 20% xuống dưới 5%\" là ví dụ cho loại chỉ số nào?",
+    "options": [
+      "Thời gian hoàn thành.",
+      "Tải trọng vận hành.",
+      "Chất lượng công việc.",
+      "Chi phí nhân sự."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 11: \"CHẤT LƯỢNG CÔNG VIỆC — Giảm tỷ lệ lỗi phân loại từ 20% xuống dưới 5%\".",
+    "source_slide": 11,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Câu hỏi \"Hậu quả khi xảy ra sai sót?\" trong bộ 6 câu hỏi liên quan trực tiếp đến yếu tố nào của Problem Statement sau này?",
+    "options": [
+      "Actor (đối tượng ảnh hưởng).",
+      "Workflow (quy trình hiện tại).",
+      "Success Metric (chỉ số thành công).",
+      "Boundary (ranh giới) và Human-in-the-loop."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 10: \"Hậu quả khi xảy ra sai sót? Phạm vi tự quyết của AI; điểm cần con người phê duyệt?\" — chính là Boundary/HITL.",
+    "source_slide": 10,
+    "concept_id": "d2-c05"
+  },
+  {
+    "stem": "Output metric là gì theo bài giảng?",
+    "options": [
+      "Kết quả cuối cùng (what we optimize) — VD thời lượng hoàn tất quy trình, tỷ lệ sai sót, giá trị người dùng nhận được.",
+      "Các đòn bẩy có thể tác động trực tiếp (đó là input metric).",
+      "Chi phí phát triển ban đầu của dự án.",
+      "Số lượng nhân sự tham gia dự án."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 12: \"OUTPUT METRIC — Kết quả cuối cùng / what we optimize\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Input metric là gì theo bài giảng?",
+    "options": [
+      "Kết quả cuối cùng cần tối ưu.",
+      "Các đòn bẩy có thể tác động (what we can move) — VD tỷ lệ câu hỏi phân loại chính xác, thời gian TA hiệu chỉnh bản nháp.",
+      "Ngân sách tổng của dự án.",
+      "Số lượng người dùng cuối sử dụng hệ thống."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 12: \"INPUT METRICS — Các đòn bẩy / what we can move\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Mối quan hệ giữa input metric và output metric là gì?",
+    "options": [
+      "Hai chỉ số này độc lập hoàn toàn, không liên quan gì đến nhau.",
+      "Input metric luôn quan trọng hơn output metric.",
+      "Tăng input metric (đòn bẩy) để đo được sự thay đổi ở output metric (kết quả cuối).",
+      "Output metric quyết định input metric phải bằng 100%."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 12: \"tăng cái này → đo cái kia\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Vì sao \"Nâng cao hiệu suất\" không được xem là một chỉ số tốt theo bài giảng?",
+    "options": [
+      "Vì \"hiệu suất\" không thể đo lường được trong bất kỳ hệ thống nào.",
+      "Vì cụm từ này chỉ dùng cho hệ thống non-AI.",
+      "Vì đây là thuật ngữ độc quyền của một công ty cụ thể.",
+      "Vì nó không phải chỉ số — cần gắn với hiện trạng (baseline), mục tiêu (target) và phương pháp đo (measurement) cụ thể."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 12: \"'Nâng cao hiệu suất' không phải chỉ số — cần gắn với hiện trạng, mục tiêu và phương pháp đo\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Ví dụ \"Tỷ lệ yêu cầu được chuyển tiếp hỗ trợ kịp thời\" thuộc loại chỉ số nào?",
+    "options": [
+      "Input metric (đòn bẩy có thể tác động).",
+      "Output metric (kết quả cuối cùng).",
+      "Baseline.",
+      "Boundary."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 12: đây là một trong các ví dụ liệt kê dưới mục \"INPUT METRICS\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Nguồn tham khảo nào được trích dẫn cho phần thiết lập chỉ số Output/Input?",
+    "options": [
+      "Anthropic — Building effective agents.",
+      "Amplitude — North Star Playbook, Lenny Rachitsky — Choosing Your North Star Metric.",
+      "Google — Rules of ML.",
+      "Chip Huyen — AI Engineering."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 12: \"NGUỒN — Amplitude — North Star Playbook · Lenny Rachitsky — Choosing Your North Star Metric\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "\"Giá trị thực tế người dùng nhận được rõ nét hơn\" là câu hỏi thuộc loại chỉ số nào?",
+    "options": [
+      "Input metric.",
+      "Baseline.",
+      "Output metric.",
+      "Boundary."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 12: câu hỏi này nằm dưới mục \"OUTPUT METRIC\".",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Vì sao cần tách riêng Output metric và Input metric thay vì gộp chung một chỉ số duy nhất?",
+    "options": [
+      "Vì quy định pháp lý yêu cầu tách riêng hai loại chỉ số.",
+      "Vì input và output metric luôn phải có giá trị bằng nhau.",
+      "Vì output metric không thể đo lường được nếu không tách input riêng.",
+      "Để biết đòn bẩy nào (input) cần tác động nhằm cải thiện kết quả cuối (output)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 12: \"tăng cái này → đo cái kia\" — tách để biết đòn bẩy nào cần tác động.",
+    "source_slide": 12,
+    "concept_id": "d2-c06"
+  },
+  {
+    "stem": "Bước 1 trong 3 bước quyết định AI theo PAIR là gì?",
+    "options": [
+      "Giao điểm nhu cầu × thế mạnh AI — bài toán có nằm trong nhóm việc AI làm tốt hơn hẳn rule/heuristic không.",
+      "Automate hay Augment.",
+      "Reward function & tiêu chí thành công.",
+      "Go / Not Yet / No-Go."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 13: \"BƯỚC ① — Giao điểm: nhu cầu × thế mạnh AI\".",
+    "source_slide": 13,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Trường hợp nào sau đây được liệt kê là \"AI probably better\"?",
+    "options": [
+      "Cần duy trì tính dự đoán được (predictability).",
+      "Cá nhân hóa (personalization) — trải nghiệm tự điều chỉnh theo từng người.",
+      "Thông tin tĩnh, ít thay đổi.",
+      "Lỗi quá tốn kém."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 14: \"Cá nhân hóa · personalization — Trải nghiệm tự điều chỉnh theo từng người\" nằm trong 8 trường hợp AI probably better.",
+    "source_slide": 14,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Trường hợp nào sau đây được liệt kê là \"AI probably NOT better\"?",
+    "options": [
+      "Dự đoán tương lai (prediction).",
+      "Hiểu ngôn ngữ tự nhiên (natural language).",
+      "Yêu cầu minh bạch tuyệt đối — mọi quyết định phải giải thích và truy vết được từng bước.",
+      "Cá nhân hóa (personalization)."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 15: \"Yêu cầu minh bạch tuyệt đối — Mọi quyết định phải giải thích được từng bước, truy vết được\".",
+    "source_slide": 15,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Vì sao \"Cần duy trì tính dự đoán được\" lại thuộc nhóm AI KHÔNG tốt hơn?",
+    "options": [
+      "Vì AI không thể xử lý các yếu tố cố định trong giao diện.",
+      "Vì AI luôn tốn chi phí cao hơn giải pháp tĩnh trong mọi trường hợp.",
+      "Vì AI không hoạt động được với bất kỳ giao diện người dùng nào.",
+      "Vì nút Home/Cancel phải luôn nằm ở chỗ quen thuộc, người dùng không phải đoán mỗi lần — AI sinh nội dung động có thể phá vỡ sự nhất quán đó."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 15: \"Cần duy trì tính dự đoán được — Nút Home / Cancel phải luôn nằm ở một chỗ quen thuộc\".",
+    "source_slide": 15,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "\"Nhận diện cả một lớp thực thể\" (VD mọi khuôn mặt) là ví dụ cho lợi thế nào của AI?",
+    "options": [
+      "AI probably better — nhận diện cả một lớp thực thể cùng loại.",
+      "AI probably NOT better.",
+      "Automate (bước 2 của PAIR).",
+      "Reward function (bước 3 của PAIR)."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 14: \"Nhận diện cả một lớp thực thể — Nhận ra mọi đối tượng cùng loại — VD mọi khuôn mặt\".",
+    "source_slide": 14,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Bước 1 của PAIR trả lời câu hỏi trọng tâm nào trong 4 câu hỏi của ngày?",
+    "options": [
+      "\"Cấp độ nào (Automate/Augment)?\"",
+      "\"Có thực sự cần AI?\"",
+      "\"PS đã đủ rõ để đo?\"",
+      "\"Go, Not Yet hay No-Go?\""
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 13: \"→ trả lời câu hỏi 1: có thực sự cần AI?\" gắn với Bước ①.",
+    "source_slide": 13,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Rule/heuristic được ưu tiên hơn AI khi nào theo bài giảng?",
+    "options": [
+      "Khi công ty không đủ ngân sách để mua AI.",
+      "Khi AI vẫn chưa được phát minh ra.",
+      "Khi rule/heuristic dễ build, dễ giải thích, dễ debug và bảo trì hơn mà vẫn giải quyết được bài toán.",
+      "Luôn luôn ưu tiên rule hơn AI trong mọi trường hợp, không có ngoại lệ."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 15: \"Rule/heuristic dễ build, dễ giải thích, dễ debug và bảo trì hơn — nếu nó giải quyết được, đó là lựa chọn tối ưu\".",
+    "source_slide": 15,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "\"Tối ưu tốc độ & chi phí thấp\" (time-to-market nhanh) thuộc nhóm nào?",
+    "options": [
+      "AI probably better.",
+      "Automate (bước 2 của PAIR).",
+      "Reward function (bước 3 của PAIR).",
+      "AI probably NOT better — AI chỉ thêm độ trễ và chi phí trong trường hợp này."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 15: \"Tối ưu tốc độ & chi phí thấp — Cần ra thị trường nhanh… AI chỉ thêm độ trễ và chi phí\".",
+    "source_slide": 15,
+    "concept_id": "d2-c07"
+  },
+  {
+    "stem": "Hệ thống AI theo bài giảng gồm 4 thành phần nào?",
+    "options": [
+      "Model, Context, Planning, Tools.",
+      "Actor, Workflow, Bottleneck, Impact.",
+      "Discover, Define, Develop, Deliver.",
+      "Baseline, Target, Measurement, Metric."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 16: \"Hệ thống AI = Model + Context + Planning + Tools\".",
+    "source_slide": 16,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "\"Context\" trong kiến trúc hệ thống AI (Model+Context+Planning+Tools) đóng vai trò gì?",
+    "options": [
+      "Xử lý đọc hiểu, soạn thảo, tổng hợp (đó là Model).",
+      "Tri thức chuyên biệt — cơ sở dữ liệu, tài liệu nghiệp vụ, hồ sơ lịch sử giúp AI phản hồi chính xác theo bối cảnh.",
+      "Tự động phân rã tác vụ phức tạp (đó là Planning).",
+      "Tích hợp CRM, database, API bên thứ ba (đó là Tools)."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 16: \"CONTEXT — Tri thức chuyên biệt: Cơ sở dữ liệu, tài liệu nghiệp vụ, hồ sơ lịch sử…\".",
+    "source_slide": 16,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "Câu \"Giải pháp AI là một HỆ THỐNG — model chỉ là một thành phần\" nghĩa là gì?",
+    "options": [
+      "Model là thành phần duy nhất quan trọng, các thành phần khác chỉ là phụ trợ.",
+      "Hệ thống AI không cần context nếu model đủ mạnh.",
+      "Một giải pháp AI thực tế cần nhiều thành phần phối hợp (Model, Context, Planning, Tools), không chỉ dừng ở việc chọn LLM nào.",
+      "Planning và Tools chỉ cần thiết cho Agent, không cần cho giải pháp AI khác."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 16: \"Giải pháp AI là một HỆ THỐNG — model chỉ là một thành phần\".",
+    "source_slide": 16,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "Automate (AI làm thay) nên được chọn khi nào?",
+    "options": [
+      "Người dùng thích tự làm việc đó.",
+      "Stakes cao về tiền bạc/pháp lý/sức khỏe.",
+      "Sở thích khó diễn đạt thành lời.",
+      "Việc khó/nhàm chán/nguy hiểm hoặc cần scale, người dùng thiếu kiến thức, có \"đáp án đúng\" mọi người đồng thuận."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 17: \"AUTOMATE — Chọn khi: Việc khó, nhàm chán, nguy hiểm hoặc cần scale…\".",
+    "source_slide": 17,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "Augment (AI hỗ trợ con người) nên được chọn khi nào?",
+    "options": [
+      "Khi stakes cao (tiền bạc, pháp lý, sức khỏe) hoặc kết quả cần trách nhiệm cá nhân/social capital.",
+      "Việc nhàm chán cần scale lớn.",
+      "Có đáp án đúng mà mọi người đồng thuận.",
+      "Người dùng thiếu kiến thức để tự làm việc đó."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 17: \"AUGMENT — Chọn khi: … Stakes cao: tiền bạc, pháp lý, sức khỏe…\".",
+    "source_slide": 17,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "Đo thành công của Automate khác Augment như thế nào?",
+    "options": [
+      "Cả hai đo giống hệt nhau bằng độ chính xác (accuracy).",
+      "Automate đo bằng hiệu quả tăng/an toàn hơn/giảm việc tẻ nhạt; Augment đo bằng mức độ thích thú/cảm giác kiểm soát/sáng tạo tăng.",
+      "Automate đo bằng cảm xúc, Augment đo bằng tốc độ.",
+      "Chỉ Automate có thể đo lường được, Augment thì không."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 17: Automate \"Đo thành công bằng: hiệu quả tăng · an toàn hơn · giảm việc tẻ nhạt\"; Augment \"Đo bằng: mức độ thích thú · cảm giác kiểm soát · sáng tạo tăng\".",
+    "source_slide": 17,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "\"Việc đã automate vẫn gần như luôn cần human oversight\" nghĩa là gì?",
+    "options": [
+      "Automate nghĩa là loại bỏ hoàn toàn sự tham gia của con người.",
+      "Oversight chỉ cần thiết cho Augment, không cần cho Automate.",
+      "Ngay cả khi đã tự động hóa, vẫn cần preview, edit, undo — con người vẫn giám sát được.",
+      "Human oversight chỉ áp dụng trong giai đoạn thử nghiệm ban đầu."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 17: \"Việc đã automate vẫn gần như luôn cần human oversight — preview, edit, undo\".",
+    "source_slide": 17,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "Bước 2 của PAIR (Automate/Augment) trả lời câu hỏi trọng tâm nào?",
+    "options": [
+      "\"Có thực sự cần AI?\"",
+      "\"PS đã đủ rõ để đo?\"",
+      "\"Go, Not Yet hay No-Go?\"",
+      "\"Giải pháp ở cấp độ nào?\" — AI thay thế hay hỗ trợ con người."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 13: \"→ trả lời câu hỏi 2: giải pháp ở cấp độ nào?\" gắn với bước Automate/Augment.",
+    "source_slide": 17,
+    "concept_id": "d2-c08"
+  },
+  {
+    "stem": "3 cấp độ giải pháp kỹ thuật theo bài giảng là gì?",
+    "options": [
+      "Rule/Script, LLM Feature/Workflow, Agent.",
+      "Automate, Augment, Hybrid.",
+      "Discover, Develop, Deliver.",
+      "Baseline, Target, Measurement."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 18: \"CẤP ĐỘ 1 — Rule/Script; CẤP ĐỘ 2 — LLM Feature/Workflow; CẤP ĐỘ 3 — Agent\".",
+    "source_slide": 18,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Cấp độ \"Rule/Script\" phù hợp khi nào?",
+    "options": [
+      "Đầu vào đa dạng, không viết hết rule được.",
+      "Đầu vào ổn định ít thay đổi, logic viết được thành if/else, cần kết quả luôn đúng 100%, quy định pháp lý chặt.",
+      "Tình huống thay đổi liên tục, cần nhiều bước.",
+      "Cần tự ra quyết định giữa các bước."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 18: \"CẤP ĐỘ 1 — Rule/Script: Đầu vào ổn định, ít thay đổi · Logic viết được thành if/else · Cần kết quả luôn đúng 100%\".",
+    "source_slide": 18,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Cấp độ \"Agent\" phù hợp khi nào?",
+    "options": [
+      "Đầu vào ổn định, logic if/else đơn giản.",
+      "Chỉ cần tóm tắt hoặc phân loại đơn lẻ.",
+      "Nhiều bước, dùng nhiều công cụ, tình huống thay đổi liên tục, cần tự ra quyết định giữa các bước, có kiểm soát rủi ro rõ ràng.",
+      "Cần kết quả luôn đúng 100% tuyệt đối."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 18: \"CẤP ĐỘ 3 — Agent: Nhiều bước, dùng nhiều công cụ · Tình huống thay đổi liên tục…\".",
+    "source_slide": 18,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Nguyên tắc ưu tiên khi chọn cấp độ giải pháp là gì?",
+    "options": [
+      "Luôn bắt đầu từ Agent vì đây là giải pháp linh hoạt nhất.",
+      "Luôn chọn Workflow làm mặc định cho mọi bài toán.",
+      "Chọn ngẫu nhiên tùy sở thích của đội ngũ phát triển.",
+      "Bắt đầu từ bên trái (Rule), chỉ đi sang bên phải (Workflow, Agent) khi giá trị tăng hơn độ phức tạp."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 18: \"Thứ tự ưu tiên thực dụng: bắt đầu từ bên trái, chỉ đi sang bên phải khi giá trị tăng hơn độ phức tạp\".",
+    "source_slide": 18,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Trong ví dụ minh họa (trả lời tự động FAQ, gửi link thời khóa biểu), cấp độ nào được áp dụng?",
+    "options": [
+      "Rule (luật tĩnh) — logic tường minh, kết quả cố định.",
+      "Workflow (quy trình).",
+      "Agent (tác nhân).",
+      "Không thuộc cấp độ kỹ thuật nào trong 3 cấp độ."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 19: \"CẤP ĐỘ 1 — RULE: Tự động trả lời FAQ, gửi link thời khóa biểu… Khi nào? Logic tường minh, kết quả cố định\".",
+    "source_slide": 19,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Ví dụ \"AI kiểm tra độ đầy đủ của Problem Card, yêu cầu bổ sung nếu thiếu\" thuộc cấp độ nào?",
+    "options": [
+      "Rule (luật tĩnh).",
+      "Workflow (quy trình) — có quy trình rõ, AI hỗ trợ từng bước.",
+      "Agent (tác nhân).",
+      "Không cần công nghệ AI nào để làm việc này."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 19: \"CẤP ĐỘ 2 — WORKFLOW: Duyệt Problem Card… Khi nào? Có quy trình rõ, AI hỗ trợ từng bước\".",
+    "source_slide": 19,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Ví dụ \"tự động theo dõi tiến độ, phát hiện nhóm học viên bị kẹt lâu, chủ động đề xuất can thiệp\" thuộc cấp độ nào?",
+    "options": [
+      "Rule (luật tĩnh).",
+      "Workflow (quy trình).",
+      "Agent (tác nhân) — tình huống động, đa công cụ.",
+      "Không cần công nghệ AI nào để làm việc này."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 19: \"CẤP ĐỘ 3 — AGENT: Đề xuất can thiệp chủ động… Khi nào? Tình huống động, đa công cụ\".",
+    "source_slide": 19,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "Có bắt buộc phải nâng cấp tuần tự từ Rule lên Agent không?",
+    "options": [
+      "Có, mọi giải pháp AI đều phải đi qua đủ 3 cấp độ.",
+      "Có, đây là quy định bắt buộc của khung PAIR.",
+      "Không liên quan, thứ tự cấp độ chỉ mang tính tham khảo lý thuyết, không áp dụng thực tế.",
+      "Không — dừng ở cấp tối giản nhất nếu đã đáp ứng mục tiêu đề ra."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 19: \"Không bắt buộc nâng cấp tuần tự từ Rule lên Agent → dừng ở cấp tối giản nhất nếu đã đáp ứng mục tiêu đề ra\".",
+    "source_slide": 19,
+    "concept_id": "d2-c09"
+  },
+  {
+    "stem": "3 workflow pattern cơ bản theo Anthropic là gì?",
+    "options": [
+      "Prompt Chaining, Routing, Parallelization.",
+      "Automate, Augment, Hybrid.",
+      "Rule, Workflow, Agent.",
+      "Discover, Define, Develop."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 20 liệt kê đúng 3 mô hình: Prompt Chaining, Routing, Parallelization.",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Prompt Chaining hoạt động theo cơ chế nào?",
+    "options": [
+      "Phân loại input rồi đưa vào nhánh chuyên biệt.",
+      "Chia task thành chuỗi bước tuần tự, có gate kiểm tra giữa các bước (VD viết outline → check → viết bài).",
+      "Chạy song song nhiều lời gọi rồi tổng hợp.",
+      "Chạy độc lập không có bất kỳ gate kiểm tra nào."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 20: \"1. Prompt Chaining — Chia task thành chuỗi bước tuần tự, có gate kiểm tra giữa các bước\".",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Routing hoạt động theo cơ chế nào?",
+    "options": [
+      "Chia thành chuỗi bước tuần tự có gate kiểm tra.",
+      "Chạy song song rồi tổng hợp hoặc vote.",
+      "Phân loại input rồi đưa vào nhánh chuyên biệt, tối ưu từng loại riêng (VD câu dễ đi model rẻ, câu khó đi model mạnh).",
+      "Luôn dùng một model duy nhất cho mọi loại input."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 20: \"2. Routing — Phân loại input → đưa vào nhánh chuyên biệt, tối ưu từng loại riêng\".",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Parallelization mang lại ý nghĩa quyết định gì?",
+    "options": [
+      "Đổi độ trễ lấy độ chính xác (đó là Prompt Chaining).",
+      "Câu dễ đi model rẻ, câu khó đi model mạnh (đó là Routing).",
+      "Giảm chi phí bằng cách chỉ gọi model đúng một lần duy nhất.",
+      "Vote để giảm rủi ro một đầu ra sai (chạy song song rồi tổng hợp)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 20: \"3. Parallelization… Ý nghĩa quyết định: vote để giảm rủi ro một đầu ra sai\".",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Nguyên tắc Anthropic được nhắc lại ở phần workflow patterns là gì?",
+    "options": [
+      "Luôn ưu tiên giải pháp đơn giản nhất; chỉ tăng độ phức tạp khi thực sự cần thiết.",
+      "Luôn dùng cả 3 pattern cùng lúc trong mọi hệ thống.",
+      "Ưu tiên pattern phức tạp nhất để đảm bảo độ chính xác.",
+      "Bỏ qua workflow pattern nếu đã chọn cấp độ Agent."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 20: \"NGUYÊN TẮC ANTHROPIC → Luôn ưu tiên giải pháp đơn giản nhất; chỉ tăng độ phức tạp khi thực sự cần thiết\".",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Cây quyết định chọn cấp độ giải pháp (Rule/Workflow/Agent) đi theo hướng nào?",
+    "options": [
+      "Từ dưới lên, ưu tiên Agent trước tiên.",
+      "Từ trên xuống, mỗi nhánh \"KHÔNG\" là một lần tránh được độ phức tạp không cần thiết.",
+      "Ngẫu nhiên, không theo thứ tự cụ thể.",
+      "Luôn dẫn đến Agent bất kể câu trả lời ở mỗi nhánh."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 21: \"Đi từ trên xuống — mỗi nhánh 'KHÔNG' là một lần tránh được độ phức tạp không cần thiết\".",
+    "source_slide": 21,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Ý nghĩa quyết định của Prompt Chaining là gì?",
+    "options": [
+      "Đổi độ chính xác lấy tốc độ xử lý.",
+      "Giảm chi phí bằng cách bỏ qua mọi bước kiểm tra.",
+      "Đổi độ trễ (latency) lấy độ chính xác, nhờ có bước gate kiểm tra giữa chừng.",
+      "Luôn chạy nhanh hơn Routing trong mọi trường hợp."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 20: \"Ý nghĩa quyết định: đổi độ trễ lấy độ chính xác\" (Prompt Chaining).",
+    "source_slide": 20,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "Nguồn tham khảo cho phần workflow patterns và cây quyết định là gì?",
+    "options": [
+      "Google PAIR — Ch.1 User Needs.",
+      "Don Norman — Double Diamond.",
+      "Chip Huyen — AI Engineering.",
+      "Anthropic — Building Effective Agents (2024) và Google — Rules of ML."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 20-21: \"NGUỒN — Anthropic — Building effective agents · Google — Rules of ML\".",
+    "source_slide": 21,
+    "concept_id": "d2-c10"
+  },
+  {
+    "stem": "True Positive (TP) trong ví dụ \"AI gợi ý câu trả lời cho học viên\" nghĩa là gì?",
+    "options": [
+      "Câu hỏi nghẽn thật → AI gợi ý đúng câu trả lời, học viên được giải tỏa, TA đỡ tải.",
+      "Câu hỏi đã có tài liệu sẵn → AI không can thiệp.",
+      "AI gợi ý câu trả lời sai và gửi thẳng cho học viên.",
+      "AI bỏ sót học viên đang kẹt thật, không gợi ý gì."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 22: \"TP — TRUE POSITIVE · ĐÚNG-TÍCH CỰC: Câu hỏi nghẽn thật → AI gợi ý đúng câu trả lời\".",
+    "source_slide": 22,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "False Positive (FP) trong ví dụ này là gì?",
+    "options": [
+      "AI gợi ý đúng câu trả lời cho câu hỏi nghẽn thật.",
+      "AI gợi ý câu trả lời SAI (hallucination) và gửi thẳng cho học viên → học viên đi sai hướng.",
+      "AI không can thiệp khi câu hỏi đã có tài liệu.",
+      "AI bỏ sót học viên đang kẹt thật, không gợi ý gì."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 22: \"FP — FALSE POSITIVE · BÁO ĐỘNG GIẢ: AI gợi ý câu trả lời SAI (hallucination)…\".",
+    "source_slide": 22,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "False Negative (FN) trong ví dụ này là gì?",
+    "options": [
+      "AI gợi ý sai và gây hiểu lầm cho học viên.",
+      "AI gợi ý đúng và giải tỏa cho học viên.",
+      "Học viên đang kẹt thật nhưng AI bỏ sót, không gợi ý → học viên vẫn chờ lâu như cũ.",
+      "AI không can thiệp đúng vì câu hỏi đã có sẵn tài liệu."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 22: \"FN — FALSE NEGATIVE · BỎ SÓT: Học viên đang kẹt thật nhưng AI bỏ sót, không gợi ý\".",
+    "source_slide": 22,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Vì sao \"chi phí của FP và FN không đối xứng\" theo bài giảng?",
+    "options": [
+      "Vì FP và FN luôn có xác suất xảy ra bằng nhau trong thực tế.",
+      "Vì FP chỉ xảy ra với model nhỏ, FN chỉ xảy ra với model lớn.",
+      "Vì FP và FN không liên quan gì đến thiết kế hệ thống.",
+      "Vì báo động giả (FP) khác bản chất với bỏ sót thật (FN) — như ví dụ \"báo cháy giả ≠ bỏ sót đám cháy\"."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 22: \"Chi phí của FP và FN KHÔNG đối xứng — báo cháy giả ≠ bỏ sót đám cháy\".",
+    "source_slide": 22,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Precision cao dẫn đến hệ quả gì?",
+    "options": [
+      "Ít gợi ý nhưng chắc đúng — hệ quả là nhiều False Negative (bỏ sót học viên cần giúp).",
+      "Bao trọn mọi trường hợp cần giúp, không ai bị bỏ sót.",
+      "Nhiều False Positive hơn.",
+      "Không có bất kỳ đánh đổi nào xảy ra."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 23: \"PRECISION CAO… Ít gợi ý — nhưng gợi ý nào cũng chắc đúng… Hệ quả: Nhiều False Negative\".",
+    "source_slide": 23,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Recall cao dẫn đến hệ quả gì?",
+    "options": [
+      "Ít gợi ý nhưng chắc đúng, không có False Positive nào.",
+      "Bao trọn mọi trường hợp cần giúp nhưng hệ quả là nhiều False Positive (gợi ý sai, TA phải lọc lại thủ công).",
+      "Nhiều False Negative hơn.",
+      "Loại bỏ hoàn toàn nhu cầu TA can thiệp."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 23: \"RECALL CAO… Bao trọn mọi trường hợp cần giúp… Hệ quả: Nhiều False Positive\".",
+    "source_slide": 23,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Công thức tính Precision là gì?",
+    "options": [
+      "TP / (TP + FN).",
+      "(TP + TN) / (TP + TN + FP + FN).",
+      "TP / (TP + FP).",
+      "FP / (FP + TN)."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 23: \"PRECISION CAO — TP / (TP + FP)\".",
+    "source_slide": 23,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Ai nên tham gia thiết kế reward function theo bài giảng?",
+    "options": [
+      "Chỉ đội Engineering vì đây là vấn đề kỹ thuật thuần túy.",
+      "Chỉ đội UX vì đây là vấn đề trải nghiệm người dùng.",
+      "Chỉ cấp quản lý cấp cao quyết định, không cần đội ngũ kỹ thuật.",
+      "Tối thiểu UX × Product × Engineering cùng ngồi lại, vì reward function định hình trải nghiệm người dùng cuối."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 22: \"nó phải được thiết kế liên chức năng: tối thiểu UX × Product × Engineering cùng ngồi lại\".",
+    "source_slide": 22,
+    "concept_id": "d2-c11"
+  },
+  {
+    "stem": "Template viết tiêu chí thành công của PAIR có dạng gì?",
+    "options": [
+      "\"If {chỉ số cụ thể} for {tính năng AI} {drops below/goes above} {ngưỡng có nghĩa}, we will {hành động cụ thể}.\"",
+      "\"AI sẽ luôn đúng 100% trong mọi trường hợp.\"",
+      "\"Model tốt nhất sẽ tự động được chọn.\"",
+      "\"Success = người dùng cảm thấy hài lòng.\""
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 24: \"TEMPLATE CỦA PAIR — If {chỉ số cụ thể} for {tính năng AI} {drops below / goes above} {ngưỡng có nghĩa}, we will {hành động cụ thể}\".",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Trong ví dụ \"nếu tỷ lệ câu trả lời AI bị TA sửa > 30% trong 2 tuần\", hành động cụ thể được đề xuất là gì?",
+    "options": [
+      "Tăng mức tự động hóa lên pha cao hơn ngay lập tức.",
+      "Hạ mức tự động về pha 1 (chỉ gợi ý, không gửi thẳng cho học viên).",
+      "Dừng hoàn toàn dự án ngay lập tức.",
+      "Không làm gì cả, tiếp tục theo dõi thêm vô thời hạn."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 24: \"Nếu tỷ lệ câu trả lời AI gợi ý bị TA sửa > 30% trong 2 tuần, ta sẽ hạ mức tự động về pha 1\".",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Checklist trước khi chốt metric gồm những câu hỏi nào?",
+    "options": [
+      "Model nào rẻ nhất? Ai sẽ code tính năng? Ngân sách còn lại bao nhiêu?",
+      "Actor là ai? Workflow gồm mấy bước? Boundary là gì?",
+      "Metric có ý nghĩa với MỌI người dùng không? Có nhóm nào bị ảnh hưởng tiêu cực không? Đây là thành công ngày 1, còn ngày 1000 thì sao?",
+      "Precision hay Recall quan trọng hơn trong mọi trường hợp?"
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 24 liệt kê đúng 3 câu hỏi trong \"CHECKLIST TRƯỚC KHI CHỐT METRIC\".",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Vì sao cần \"lên lịch review metric định kỳ\"?",
+    "options": [
+      "Vì metric luôn sai ngay từ đầu và cần sửa gấp.",
+      "Vì quy định pháp lý yêu cầu review metric hàng tuần.",
+      "Vì model sẽ tự động thay đổi metric theo thời gian.",
+      "Vì tiêu chí thành công cũng cần được bảo trì theo thời gian, không phải thiết lập một lần là xong mãi mãi."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 24: \"đừng quên: lên lịch review metric định kỳ — tiêu chí thành công cũng cần được bảo trì theo thời gian\".",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Metric tốt theo PAIR cần có những thành phần nào?",
+    "options": [
+      "Chỉ số cụ thể + ngưỡng có nghĩa + hành động cụ thể.",
+      "Chỉ cần một con số duy nhất, không cần hành động kèm theo.",
+      "Chỉ cần mô tả định tính, không cần con số cụ thể.",
+      "Chỉ cần được phê duyệt bởi cấp quản lý cao nhất."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 24: \"Metric tốt = chỉ số cụ thể + ngưỡng có nghĩa + hành động cụ thể\".",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Câu hỏi \"Đây là thành công của ngày 1 — còn ngày 1000 thì sao?\" trong checklist nhằm mục đích gì?",
+    "options": [
+      "Tính số lượng người dùng dự kiến sau 1000 ngày.",
+      "Kiểm tra tính bền vững lâu dài của metric, tránh chỉ tối ưu cho giai đoạn ra mắt ban đầu.",
+      "Ước tính chi phí vận hành sau 1000 ngày.",
+      "Đây chỉ là câu hỏi tu từ, không có mục đích cụ thể."
+    ],
+    "answer_idx": 1,
+    "explanation": "Câu hỏi này nằm trong checklist ở slide 24, kiểm tra tính bền vững dài hạn của metric.",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "\"Có nhóm nào bị ảnh hưởng tiêu cực không?\" trong checklist kiểm tra điều gì?",
+    "options": [
+      "Kiểm tra chi phí vận hành có tăng lên không.",
+      "Kiểm tra tốc độ phản hồi của hệ thống.",
+      "Đảm bảo metric không gây bất công hoặc gây hại cho một nhóm người dùng cụ thể nào đó.",
+      "Kiểm tra số lượng token tiêu thụ mỗi ngày."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 24: một trong ba mục checklist trước khi chốt metric.",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "Việc viết tiêu chí thành công thuộc bước nào trong 3 bước PAIR?",
+    "options": [
+      "Bước 1 — Có cần AI?",
+      "Bước 2 — Automate hay Augment?",
+      "Không thuộc bước nào trong 3 bước PAIR.",
+      "Bước 3 — Reward function & tiêu chí thành công."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 24 đánh dấu breadcrumb \"① Nhu cầu ② Auto/Augment ③ Reward function\" với bước 3 được tô đậm.",
+    "source_slide": 24,
+    "concept_id": "d2-c12"
+  },
+  {
+    "stem": "4 yếu tố trong \"khoảng cách Demo đến Production\" là gì?",
+    "options": [
+      "Baseline (đối chứng), Evaluation (kiểm thử), Controls (kiểm soát), Operations (vận hành liên tục).",
+      "Model, Context, Planning, Tools.",
+      "Actor, Workflow, Bottleneck, Impact.",
+      "Precision, Recall, F1, Accuracy."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 25: \"01 · BASELINE, 02 · EVALUATION, 03 · CONTROLS, 04 · OPERATIONS\".",
+    "source_slide": 25,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "\"Controls\" trong khoảng cách Demo-Production bao gồm điều gì?",
+    "options": [
+      "Bộ dữ liệu kiểm thử và kịch bản biên.",
+      "Logging, fallback, rollback và nhân sự chịu trách nhiệm.",
+      "Đối chiếu hiệu quả với quy trình hiện tại.",
+      "Ai giám sát lỗi và tối ưu hệ thống liên tục."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 25: \"03 · CONTROLS — Cơ chế kiểm soát: Logging, fallback, rollback và nhân sự chịu trách nhiệm?\".",
+    "source_slide": 25,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "Vì sao \"phản hồi chính xác trong vài lần thử chưa đủ cơ sở để triển khai\" theo bài giảng?",
+    "options": [
+      "Vì demo luôn dùng model khác hẳn với production.",
+      "Vì demo không sử dụng dữ liệu thật.",
+      "Vì demo chưa kiểm chứng được độ ổn định, kiểm soát rủi ro và vận hành liên tục như một hệ thống production thật.",
+      "Vì demo luôn chạy chậm hơn production."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 25: \"Phản hồi chính xác trong vài lần thử chưa đủ cơ sở để triển khai hệ thống thực tế\".",
+    "source_slide": 25,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "Mục tiêu của Day 02 theo bài giảng là gì (liên quan đến khoảng cách Demo/Production)?",
+    "options": [
+      "Triển khai sản phẩm AI hoàn chỉnh ngay trong ngày học.",
+      "Chọn model cụ thể để dùng cho production.",
+      "Viết code hoàn chỉnh cho hệ thống production.",
+      "Xác định tính khả thi để tiếp tục nghiên cứu — chưa phải quyết định triển khai ngay."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 25: \"Mục tiêu Day 02 là xác định tính khả thi để tiếp tục nghiên cứu — chưa phải quyết định triển khai ngay\".",
+    "source_slide": 25,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "3 phần input của Eval Plan bắt nguồn từ đâu?",
+    "options": [
+      "Từ Problem Statement (9 trường đã hoàn chỉnh: Actor, Workflow, Bottleneck… đến Boundary & HITL).",
+      "Từ báo cáo tài chính của dự án.",
+      "Từ phản hồi trên mạng xã hội.",
+      "Từ benchmark công khai của các model AI."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 26: \"01 · INPUT — Problem Statement: 9 trường đã hoàn chỉnh — từ Actor, Workflow, Bottleneck đến Boundary & HITL\".",
+    "source_slide": 26,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "\"Rủi ro & sai số\" trong Eval Plan kiểm tra điều gì?",
+    "options": [
+      "Tốc độ phản hồi trung bình của hệ thống.",
+      "Hệ thống có phản hồi sai lệch mà không chuyển tiếp cho người phụ trách (VD Lab Coach) phê duyệt hay không.",
+      "Chi phí token tiêu thụ mỗi ngày.",
+      "Số lượng người dùng đăng ký mới."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 26: \"RỦI RO & SAI SỐ — Hệ thống có phản hồi sai lệch mà không chuyển tiếp cho Lab Coach phê duyệt không?\".",
+    "source_slide": 26,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "\"Hiệu năng quy trình\" trong Eval Plan đo lường điều gì?",
+    "options": [
+      "Tốc độ inference của model tính bằng mili-giây.",
+      "Số lượng tham số của model đang dùng.",
+      "Nhóm học viên có hoàn thành bài lab nhanh hơn và ít bị kẹt hơn không.",
+      "Độ dài trung bình của context window."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 26: \"HIỆU NĂNG QUY TRÌNH — Nhóm học viên có hoàn thành bài lab nhanh hơn và ít kẹt hơn không?\".",
+    "source_slide": 26,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "Test case (kịch bản kiểm thử) trong Eval Plan nên bao gồm gì?",
+    "options": [
+      "Chỉ dữ liệu lý tưởng, không có trường hợp biên.",
+      "Chỉ dữ liệu do chính model AI tự sinh ra.",
+      "Chỉ các câu hỏi đã có sẵn đáp án đúng 100%.",
+      "Dữ liệu thực tế và các trường hợp biên (edge cases)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 26: \"02 · TEST CASES — Kịch bản kiểm thử: Dữ liệu thực tế và các trường hợp biên (edge cases)\".",
+    "source_slide": 26,
+    "concept_id": "d2-c13"
+  },
+  {
+    "stem": "6 yếu tố bài toán cốt lõi trong Problem Statement là gì?",
+    "options": [
+      "Actor, Workflow, Bottleneck, Impact, Success Metric, Boundary.",
+      "Model, Context, Planning, Tools, Baseline, Target.",
+      "Discover, Define, Develop, Deliver, Evaluate, Launch.",
+      "TP, TN, FP, FN, Precision, Recall."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 27: \"6 YẾU TỐ BÀI TOÁN CỐT LÕI — Actor, Workflow, Bottleneck, Impact, Success Metric, Boundary\".",
+    "source_slide": 27,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "3 yếu tố quyết định AI trong Problem Statement là gì?",
+    "options": [
+      "Actor, Workflow, Bottleneck.",
+      "Điểm AI can thiệp (entry), Mức chọn (level: Rule/Workflow/Agent), Rủi ro & HITL (safety).",
+      "Baseline, Target, Measurement.",
+      "Discover, Define, Develop."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 27: \"3 YẾU TỐ QUYẾT ĐỊNH AI — Điểm AI can thiệp, Mức chọn, Rủi ro & HITL\".",
+    "source_slide": 27,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "\"Go\" trong khung ra quyết định nghĩa là gì?",
+    "options": [
+      "Tạm hoãn, cần bổ sung thêm dữ liệu thực tế.",
+      "Không triển khai vì AI không mang giá trị vượt trội.",
+      "Đủ điều kiện thực hiện — bài toán rõ ràng, chỉ số đo lường khả thi, điểm can thiệp AI phù hợp, kiểm soát được rủi ro.",
+      "Chưa xác định, cần thêm thời gian nghiên cứu."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 28: \"✓ Go — thực hiện — ĐỦ ĐIỀU KIỆN: Bài toán rõ ràng — Chỉ số đo lường khả thi…\".",
+    "source_slide": 28,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "\"Not Yet\" trong khung ra quyết định nghĩa là gì?",
+    "options": [
+      "Đủ điều kiện để triển khai ngay lập tức.",
+      "Hoàn toàn không phù hợp, dừng dự án ngay.",
+      "Không có ý nghĩa cụ thể, chỉ là một placeholder tạm thời.",
+      "Có triển vọng nhưng cần bổ sung dữ liệu thực tế, chuẩn hóa quy trình, thiết lập chỉ số, xác định ranh giới."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 28: \"⏸ Not Yet — tạm hoãn — CÓ TRIỂN VỌNG: Cần bổ sung dữ liệu thực tế…\".",
+    "source_slide": 28,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "Vì sao bài giảng nói \"Not Yet thể hiện sự chín chắn, không phải thất bại\"?",
+    "options": [
+      "Vì quyết định hoãn có căn cứ (cần thêm dữ liệu/chuẩn hóa) là lập luận thiết kế sản phẩm cẩn trọng, không phải dấu hiệu yếu kém.",
+      "Vì Not Yet luôn tự động chuyển thành Go trong tương lai gần.",
+      "Vì Not Yet có ý nghĩa hoàn toàn giống với No-Go.",
+      "Vì Not Yet chỉ được chọn khi dự án thiếu ngân sách."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 28: \"Quyết định 'Not Yet' thể hiện sự chín chắn trong tư duy thiết kế sản phẩm, không phải sự thất bại\".",
+    "source_slide": 28,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "\"Boundary\" (ranh giới) trong 6 yếu tố cốt lõi mô tả điều gì?",
+    "options": [
+      "Chỉ số đo lường cụ thể để xác định cải thiện.",
+      "AI không được làm gì; khâu nào bắt buộc phải có con người.",
+      "Đối tượng trực tiếp chịu ảnh hưởng bởi vấn đề.",
+      "Tổn thất được lượng hóa bằng thời gian/chi phí."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 27: \"Boundary — ranh giới: AI không được làm gì; khâu nào bắt buộc có con người\".",
+    "source_slide": 27,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "Khung Go/Not Yet/No-Go nên dựa trên cơ sở nào để quyết định?",
+    "options": [
+      "Xu hướng công nghệ đang được truyền thông nhắc đến nhiều nhất.",
+      "Sở thích cá nhân của người ra quyết định.",
+      "Lập luận dựa trên tính khả thi của Problem Statement, tránh thiên kiến công nghệ.",
+      "Model AI nào đang rẻ nhất tại thời điểm quyết định."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 28: \"Lập luận dựa trên tính khả thi của Problem Statement, tránh thiên kiến công nghệ\".",
+    "source_slide": 28,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "\"No-Go\" xảy ra khi nào theo bài giảng?",
+    "options": [
+      "Khi chỉ số đo lường khả thi và rủi ro đã kiểm soát được (đó là Go).",
+      "Khi cần bổ sung thêm dữ liệu thực tế (đó là Not Yet).",
+      "Khi ngân sách công ty vẫn còn dư dả.",
+      "AI không mang giá trị vượt trội, rủi ro vận hành quá cao, hoặc có giải pháp không dùng AI tối ưu hơn."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 28: \"✕ No-Go — không triển khai — KHÔNG PHÙ HỢP: AI không mang giá trị vượt trội…\".",
+    "source_slide": 28,
+    "concept_id": "d2-c14"
+  },
+  {
+    "stem": "Nguyên tắc đầu tiên trong 6 nguyên tắc recap Day 02 là gì?",
+    "options": [
+      "Brief mơ hồ không thay thế Problem Statement hoàn chỉnh.",
+      "Phức tạp luôn đồng nghĩa với hiệu quả.",
+      "AI luôn tốt hơn Rule/Workflow trong mọi trường hợp.",
+      "Reward function chỉ cần đo bằng accuracy."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 29: \"01 — Brief mơ hồ không thay thế Problem Statement\".",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Nguyên tắc nào nói về việc mô hình hóa quy trình?",
+    "options": [
+      "Pain point không cần lượng hóa nếu đội ngũ đủ kinh nghiệm.",
+      "Bắt buộc phải mô hình hóa workflow trước khi xem xét tích hợp AI.",
+      "AI nên được tích hợp ngay từ đầu quy trình thiết kế.",
+      "Chỉ cần mô hình hóa workflow sau khi đã triển khai AI."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 29: \"02 — Mô hình hóa workflow trước khi tích hợp AI. Bắt buộc phải mô hình hóa quy trình trước khi xem xét tích hợp giải pháp AI.\"",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Nguyên tắc \"Phức tạp không đồng nghĩa với hiệu quả\" liên quan đến điều gì?",
+    "options": [
+      "Chỉ Agent mới được xem là giải pháp thật sự hiệu quả.",
+      "Độ phức tạp luôn tỷ lệ thuận với chất lượng đầu ra.",
+      "Rule, Workflow và Agent là ba cấp độ khác nhau; độ phức tạp kỹ thuật không đồng nghĩa với hiệu quả tối ưu.",
+      "Rule luôn kém hiệu quả hơn Agent trong mọi trường hợp."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 29: \"04 — Phức tạp không đồng nghĩa với hiệu quả. Rule, Workflow và Agent là ba cấp độ khác nhau…\"",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Nguyên tắc thứ 6 (mới, liên quan PAIR) nói về điều gì?",
+    "options": [
+      "Chỉ cần đo bằng độ chính xác kỹ thuật (accuracy) là đủ.",
+      "Không cần kiểm chứng với người dùng thật nếu accuracy đã cao.",
+      "Reward function chỉ áp dụng cho hệ thống Rule-based.",
+      "Đo reward function bằng trải nghiệm người dùng, không chỉ accuracy — thiết kế đánh đổi precision/recall theo lợi ích và kiểm chứng với người dùng thật."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 29: \"06 — Đo reward function bằng trải nghiệm người dùng, không chỉ accuracy… Thiết kế đánh đổi precision ↔ recall theo lợi ích người dùng\".",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Nguyên tắc \"Pain point phải được lượng hóa\" yêu cầu điều gì?",
+    "options": [
+      "Mọi điểm đau cần được lượng hóa bằng baseline và chỉ số đo lường cụ thể.",
+      "Chỉ cần mô tả định tính về điểm đau, không cần con số.",
+      "Pain point chỉ cần được xác nhận bởi một người dùng duy nhất.",
+      "Pain point không cần đo lường nếu dự án có deadline gấp."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 29: \"03 — Pain point phải được lượng hóa. Mọi điểm đau cần được lượng hóa bằng baseline và chỉ số đo lường cụ thể.\"",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Nguyên tắc \"Quyết định dựa trên lập luận thực tế\" áp dụng cho quyết định nào?",
+    "options": [
+      "Chỉ áp dụng cho việc chọn model AI cụ thể để sử dụng.",
+      "Quyết định Go/Not Yet/No-Go phải dựa trên lập luận thực tế và số liệu kiểm thử rõ ràng.",
+      "Chỉ áp dụng cho việc phân bổ ngân sách dự án.",
+      "Không áp dụng cho quyết định Go/Not Yet/No-Go mà cho quyết định khác."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 29: \"05 — Quyết định dựa trên lập luận thực tế. Quyết định Go / Not Yet / No-Go phải được thiết lập dựa trên lập luận thực tế và số liệu kiểm thử rõ ràng.\"",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "6 nguyên tắc recap Day 02 được mô tả với vai trò gì?",
+    "options": [
+      "Quy định pháp lý bắt buộc cho mọi dự án AI.",
+      "Checklist kỹ thuật để triển khai production.",
+      "Kim chỉ nam để thẩm định mọi đề xuất ứng dụng AI.",
+      "Tiêu chí chấm điểm bài thi cuối khóa."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 29: \"Sáu nguyên tắc cốt lõi sau Day 02 — Kim chỉ nam để thẩm định mọi đề xuất ứng dụng AI\".",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  },
+  {
+    "stem": "Theo nguyên tắc \"Brief mơ hồ không thay thế Problem Statement\", một bản tóm tắt yêu cầu ngắn gọn có đủ để bắt đầu triển khai AI không?",
+    "options": [
+      "Có, miễn là được lãnh đạo phê duyệt nhanh.",
+      "Có, nếu đội ngũ kỹ thuật đủ kinh nghiệm.",
+      "Có, nếu deadline gấp thì có thể bỏ qua Problem Statement.",
+      "Không — một bản tóm tắt mơ hồ không thể thay thế cho một Problem Statement hoàn chỉnh."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 29: \"01 — Brief mơ hồ không thay thế Problem Statement. Một bản tóm tắt mơ hồ không thể thay thế cho một Problem Statement hoàn chỉnh.\"",
+    "source_slide": 29,
+    "concept_id": "d2-c15"
+  }
+]
