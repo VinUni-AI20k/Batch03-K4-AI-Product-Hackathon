@@ -2,7 +2,9 @@
 TEMPLATE — docs/CODELAB.md
 Xoá toàn bộ comment HTML này và mọi comment <!-- --> khác trước khi giao.
 Thay <...> bằng nội dung thật. Không để lại <...> nào.
-Luật đầy đủ: SKILL.md — Phase 3 (frontmatter), Phase 4 (thân bài), Phase 6-7 (anti-slop, tự kiểm)
+Luật đầy đủ: references/render-contract.md (frontmatter + directive), references/writing-steps.md
+(bộ xương step), references/anti-slop.md (lượt cắt cuối).
+Xong thì chạy: python3 scripts/validate_codelab.py docs/CODELAB.md --repo-root .
 -->
 ---
 id: "day<N>-<kind>-<topic>"
@@ -41,6 +43,16 @@ Câu hỏi trọng tâm xuyên suốt Lab:
 > - <mâu thuẫn 1 — nguồn A nói gì, nguồn B nói gì, guide này chọn gì và vì sao>
 > - <mâu thuẫn 2>
 
+<!-- Bảng timeline — BẮT BUỘC. Đây là thứ cho learner biết mình đang ở đâu trên đồng hồ.
+     Cột cuối viết bằng artifact quan sát được, không viết bằng chủ đề.
+     Cột "Mốc" cộng lại phải khớp `duration` trong frontmatter. -->
+
+| Mốc | Step | Xong sẽ có gì |
+|---:|---|---|
+| 0–<a> | 1. <cụm động từ> | <artifact quan sát được> |
+| <a>–<b> | 2. <cụm động từ> | <artifact quan sát được> |
+| <b>–<c> | 3. <cụm động từ> | <artifact quan sát được> |
+
 <!-- Bảng định hướng hoặc mermaid kiến trúc — tuỳ chọn, chỉ khi nó thay được prose dài. -->
 
 | <Thành phần> | <Vai trò> | <File phụ trách> |
@@ -49,7 +61,10 @@ Câu hỏi trọng tâm xuyên suốt Lab:
 
 ---
 
-## 1. <Cụm động từ — việc learner làm> (<N>phút)
+## 1. <Cụm động từ — việc learner làm>
+
+<!-- Dòng thời lượng — BẮT BUỘC ở mọi step, ngay dưới heading. `mốc` là phút thứ mấy của buổi. -->
+**<N> phút · mốc <a>–<b>.**
 
 :::goal{title="<Trạng thái đạt được, không phải hoạt động>"}
 <1-2 câu: xong step này learner có gì chạy được.>
@@ -77,7 +92,8 @@ Kết quả đúng:
 ```
 
 <!-- Ô điền: chỉ khi learner phải viết câu trả lời. `target` bắt buộc — file trong repo mà nội dung này
-     cuối cùng phải nằm. Xem references/interactive-blocks.md -->
+     cuối cùng phải nằm. Bài có :::input thì step cuối phải có :::export.
+     Xem references/render-contract.md -->
 :::input{id="<kebab-case-duy-nhat>" target="<path>#<anchor>" lines="3"}
 <Câu hỏi hoàn chỉnh, đọc được cả khi renderer chưa xử lý block này.>
 :::
@@ -115,7 +131,9 @@ Kết quả đúng:
 
 ---
 
-## 2. <Cụm động từ> (<N>phút)
+## 2. <Cụm động từ>
+
+**<N> phút · mốc <b>–<c>.**
 
 <!-- Lặp lại đúng bộ xương của step 1. 4-8 step tổng. -->
 
@@ -148,7 +166,9 @@ Kết quả đúng:
 
 ---
 
-## <N>. Evaluation, report và nộp bài (<N>phút)
+## <N>. Evaluation, report và nộp bài
+
+**<N> phút · mốc <y>–<duration>.**
 
 <!-- Step này bắt buộc khi requiresSubmission: true -->
 

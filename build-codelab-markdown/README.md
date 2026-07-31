@@ -1,98 +1,104 @@
 # build-codelab-markdown
 
-Skill cho AI (Claude Code / Codex / Cursor). Lab coach dùng skill này để viết hướng dẫn lab từ repo của mình. Output là markdown đúng format, gửi thẳng cho team codelabs đưa lên `codelabs.vlearn.dev` mà không ai phải sửa format lại.
+Skill (định dạng Anthropic Agent Skills) để một AI agent biến repo lab thành codelab Markdown chuẩn cho web VLearn codelabs.
 
-Bảy thứ skill giải quyết:
-
-- Mỗi coach ra một format khác nhau → một frontmatter schema 19 field, một vocabulary directive đóng, một bộ xương mặc định.
-- Muốn markdown điền được và tương tác được trên web → chốt Markdown + frontmatter + `remark-directive` (không MDX), có `:::input` khai file đích, `:::export` dựng file để commit, `<details>` cho gợi ý ẩn.
-- Markdown đọc mệt, học viên không track được mình đang ở đâu → 7 điều bất biến; phần còn lại là default kèm lý do để LLM tự cân theo repo.
-- Lab trong khoá không cùng một dạng, và lab mới sẽ thêm về sau → Phase 2 phân loại bằng ba câu hỏi về chính repo trước mắt (deliverable được chấm là gì · có lệnh nào tự kiểm được không · cá nhân hay nhóm) rồi mới chọn xương. Không hardcode tên repo nào, nên lab mới không cần sửa skill.
-- Học viên là người mới, nhóm có thể yếu lập trình → skill có section riêng về đối tượng: định nghĩa jargon tại chỗ, dán nguyên văn lỗi, cho khung code thay vì đề bài rộng, và bảo đảm người không code vẫn có artifact mang tên mình.
-- Đọc ra mùi AI viết → Phase 6 là anti-slop pass riêng, có luật cắt và lệnh grep kiểm.
-- Không biết viết xong đã đủ chưa → Phase 7 tự kiểm hết rồi mới đổi `published: true`, không có bước chờ người review.
+Người dùng là **lab coach sở hữu repo**. Coach chạy skill trên repo của mình, nhận về `docs/CODELAB.md` đúng format, team codelabs đưa thẳng lên web — không ai phải sửa lại format.
 
 ```
-coach + skill → Phase 0-6 viết → Phase 7 tự kiểm, tự sửa, tự chốt published: true
-              → team codelabs nhận file, đưa lên web
+coach + skill → Phase 0-6 viết → Phase 7 chạy validator, tự sửa tới 0 error, tự chốt published
+              → team codelabs nhận file, sync vào frontend/content/
 ```
 
-## Cài
+## Bảy thứ skill giải quyết
 
-Dùng cho mọi project: `cp -r build-codelab-markdown ~/.claude/skills/`
+- **Mỗi coach ra một format khác nhau** → một frontmatter schema 19 field, một vocabulary directive đóng, một bộ xương mặc định.
+- **Markdown phải điền được và tương tác được trên web** → Markdown + frontmatter + `remark-directive` (không MDX), `:::input` khai file đích, `:::export` dựng file để commit, `<details>` cho gợi ý ẩn.
+- **Học viên không track được mình đang ở đâu** → guide chạy theo đồng hồ: bảng timeline đầu bài, mỗi step khai `**<N> phút · mốc <a>–<b>.**`, tổng khớp `duration`.
+- **Lab trong khoá không cùng một dạng, và lab mới sẽ thêm về sau** → Phase 2 phân loại bằng ba câu hỏi về chính repo trước mắt (deliverable được chấm là gì · có lệnh nào tự kiểm được không · cá nhân hay nhóm) rồi mới chọn xương. Không hardcode tên repo nào.
+- **Học viên là người mới, nhóm có thể yếu lập trình** → một step một khái niệm mới, tối đa 2 jargon mới mỗi step có định nghĩa tại chỗ, khái niệm khó thì một câu ví dụ đời thường trước cơ chế, cho khung code thay vì đề bài rộng, và người không code vẫn có artifact mang tên mình.
+- **Đọc ra mùi AI viết** → Phase 6 là một lượt cắt slop riêng, có ba test và bảng sửa cụ thể.
+- **Không biết viết xong đã đủ chưa** → Phase 7 chạy validator tới 0 error rồi mới đổi `published: true`. Không có bước chờ người review.
 
-Chỉ trong một repo: `mkdir -p .claude/skills && cp -r build-codelab-markdown .claude/skills/`
+## Cài và dùng
+
+```bash
+# dùng cho mọi project
+cp -r build-codelab-markdown ~/.claude/skills/
+
+# chỉ trong một repo
+mkdir -p .claude/skills && cp -r build-codelab-markdown .claude/skills/
+```
 
 Codex hoặc công cụ khác: trỏ vào `build-codelab-markdown/SKILL.md`. Markdown thuần, không phụ thuộc runtime.
 
-## Dùng
-
-Mở terminal ở repo lab, rồi:
+Mở terminal ở repo lab, rồi một trong ba cách:
 
 ```
 Dùng skill build-codelab-markdown, sinh docs/CODELAB.md cho repo này. Lab 4 tiếng, nhóm 5 người.
-```
 
-Đã có notes hoặc guide cũ:
-
-```
 Dùng skill build-codelab-markdown: chuyển LAB_GUIDE.md của tôi sang docs/CODELAB.md đúng format.
 Đối chiếu với repo, chỗ nào không verify được thì đưa vào khối "Mâu thuẫn trong repo" kèm cách
 bạn chọn, đừng đoán.
-```
 
-Kiểm lại một bản đã có:
-
-```
 Chạy Phase 7 của skill build-codelab-markdown trên docs/CODELAB.md, sửa mọi chỗ fail.
 ```
 
+Tự kiểm bất cứ lúc nào:
+
+```bash
+python3 scripts/validate_codelab.py docs/CODELAB.md --repo-root .
+```
+
+Exit 0 là sạch. Còn ERROR thì chưa giao được. WARN thì đọc rồi tự quyết.
+
 ## Cấu trúc
 
-Theo chuẩn Agent Skills: `SKILL.md` lean, phần còn lại load khi cần, có pointer rõ trong SKILL.md.
-
 ```
-SKILL.md                        435 dòng — luôn load. Đối tượng, 7 bất biến, default có lý do, Phase 0-7
-references/
-  interactive-blocks.md         135 dòng — Phase 4, khi cần điền/tương tác. Vocabulary + spec cho frontend
-  team-roles.md                  93 dòng — Phase 5, chỉ khi lab nhóm
-  pedagogy.md                    55 dòng — Phase 2, khi không chắc dạy thứ gì trước
-  worked-example.md              79 dòng — khi chưa rõ "đúng format" trông thế nào
-templates/
-  CODELAB.template.md           bản publish lên web
-  README.template.md            README repo: bài toán, setup, chấm điểm, nộp bài
-  REPORT.template.md            báo cáo nhóm + reflection cá nhân
-  PHAN_CONG.template.md         phân vai + checklist theo mốc
+build-codelab-markdown/
+├── SKILL.md                  184 dòng — router: 8 phase, 7 bất biến, chỗ tự quyết
+├── references/                          đọc theo phase, mỗi file một lần
+│   ├── render-contract.md    Phase 3-4 · hợp đồng cứng với web: 19 field, 7 directive, ô điền
+│   ├── repo-audit.md         Phase 1-2 · evidence ledger, 6 loại lệnh, 7 dạng lab, dựng timeline
+│   ├── writing-steps.md      Phase 4   · tiết lộ tới đâu, bộ xương step, code/bảng/mermaid
+│   ├── anti-slop.md          Phase 6   · ba test cắt slop, bảng sửa
+│   ├── team-roles.md         Phase 5   · 14 role, handoff, integration gate, commit đề xuất
+│   ├── pedagogy.md           Phase 2   · vì sao thứ tự trong step là thứ tự đó
+│   └── worked-example.md     tuỳ lúc   · một step viết sai và viết đúng, cạnh nhau
+├── scripts/
+│   └── validate_codelab.py              gate deterministic, thay cho một loạt lệnh grep
+└── templates/
+    ├── CODELAB.template.md              bản publish lên web
+    ├── README.template.md               README repo: bài toán, setup, chấm điểm, nộp bài
+    ├── REPORT.template.md               báo cáo nhóm + reflection cá nhân
+    └── PHAN_CONG.template.md            phân vai + checklist theo mốc
 ```
 
-Anthropic quy định SKILL.md dưới 500 dòng, chạm mốc thì thêm một tầng hierarchy có pointer. 435 dòng còn 65 dòng headroom; thêm luật mới thì cân nhắc đẩy sang `references/`.
+Theo progressive disclosure của Agent Skills: metadata (`name` + `description`) luôn ở trong context, `SKILL.md` đọc khi skill kích hoạt, `references/` chỉ đọc khi tới đúng phase. Anthropic quy định SKILL.md dưới 500 dòng; bản này 184 dòng, phần chi tiết nằm ở references.
 
-Coach muốn xem nhanh "đúng format" là thế nào: đọc `references/worked-example.md`.
+Mọi reference link **trực tiếp** từ SKILL.md, không lồng nhau — file lồng nhau hay bị đọc thiếu vì agent chỉ preview một phần.
+
+## Web render bằng gì
+
+`react-markdown` + `remark-gfm` + `remark-directive` + một plugin nhỏ đổi directive thành React component (namespace `d-*`) + `rehype-raw` + `rehype-slug`. Frontmatter parse bằng `gray-matter`. Mermaid render client-side.
+
+**Không MDX** — vì file này còn nằm ở `docs/CODELAB.md` trong repo lab và learner mở nó trên GitHub, nơi directive vẫn đọc được còn JSX thì thành rác. Và pipeline nhận file từ nhiều lab coach thì vocabulary đóng an toàn hơn React tuỳ ý.
+
+Web đọc content từ `frontend/content/<id>.md`, sync bằng `npm run sync:content`. Hợp đồng đầy đủ: `references/render-contract.md`.
 
 ## Nguồn của format
 
-Schema và directive không tự đặt ra, lấy từ các bản đang publish thật tại thời điểm viết skill. Danh sách này là provenance để người sau truy được, không phải dependency — `SKILL.md` không trỏ vào path nào trong đây:
+Schema và directive không tự đặt ra, lấy từ các bản đang publish thật tại thời điểm viết skill. Đây là provenance để người sau truy được, không phải dependency — `SKILL.md` không trỏ vào path nào trong đây:
 
 - `repos/K4-Day03-Lab-Chatbot-vs-react-agent-E403/docs/CODELAB.md` — frontmatter 19 field, `:::goal/:::checkpoint/:::caution`, glossary tooltip, mermaid
 - `repos/K4-Day01-LLM-API-Exploration/{README,LAB_GUIDE}.md` — mốc giờ và checkpoint theo block, luồng thay thế khi không có API key
 - `repos/K4-Day03-.../docs/PHAN_CONG_CONG_VIEC.md` — quy tắc 1 role = 1 file, integrator giữ entrypoint
-- `repos/Day04-C401-.../starter_v0/artifacts/REPORT.md` — report chia phần A/B theo deadline, mỗi ô trỏ về evidence file
+- `repos/Day04-C401-.../starter_v0/artifacts/REPORT.md` — report chia phần theo deadline, mỗi ô trỏ về evidence file
 - `repos/K4-Day02-AI-Product-Labs/README.md` — rubric trỏ về từng file, worked example trước task độc lập
 - `repos/Day04-Assignment-AgentTriage/README.md` — "ba điều dễ mất điểm nhất", dạy bằng failure mode
-- `Spiderman/build-repo-lab-guide/SKILL.md` — bốn khối mỗi task, thứ tự thẩm quyền, 5 loại lệnh
+- `Spiderman/build-repo-lab-guide/SKILL.md` (skill của đồng đội) — bốn khối mỗi task, thứ tự thẩm quyền cho evidence, taxonomy loại lệnh, ranh giới tiết lộ, handoff bắt buộc, và ý tưởng dùng script làm gate thay vì để agent tự kiểm bằng mắt
+- Google Codelabs `claat` — convention khai thời lượng ngay dưới mỗi step title
 
-## Ba thứ đo được sau khi áp
+## Còn để ngỏ
 
-1. Diff giữa hai codelab của hai coach đọc được, vì frontmatter cố định 19 field đúng thứ tự và directive chỉ có 3 loại. Xương step thì tuỳ dạng lab — cái được thống nhất là hợp đồng, không phải khuôn.
-2. Học viên tự biết mình đúng hay sai, vì mọi lệnh có output kỳ vọng và mọi step có checkpoint verify được.
-3. Không có bước chờ người: Phase 7 chạy grep, chạy step 1 trên môi trường sạch, map rubric về step, rồi tự chốt.
-
-## Quyết định kiến trúc đã chốt
-
-Định dạng output: **Markdown + YAML frontmatter + `remark-directive`**, render qua registry component đóng. Không MDX, vì file này còn nằm ở `docs/CODELAB.md` trong repo lab và learner mở nó trên GitHub — directive ở đó vẫn đọc được, JSX thì thành rác; và pipeline nhận file từ nhiều labcoach thì vocabulary đóng an toàn hơn React tuỳ ý.
-
-Thứ tự implement đề xuất cho frontend, chi tiết trong `references/interactive-blocks.md`: (1) bật `rehype-raw` cho `<details>` — rẻ nhất, mở ngay gợi ý và đáp án ẩn; (2) `:::input` + `:::export` cùng lúc, vì `:::input` không có đường ra file nếu thiếu `:::export`; (3) `:::os` cho lớp ba hệ điều hành; (4) `:::quiz`.
-
-## Còn cần xác nhận
-
-Trang listing Next.js `Spiderman/frontend/src/data/codelabs.ts` đang dùng `slug` khác `id` trong frontmatter (`lab-01-nen-tang-llm-api` so với `day1-lab-llm-api-foundation`). Cần team codelabs chốt: hai giá trị phải trùng, hay map qua bảng riêng. Skill để ngỏ và không tự suy, vì đoán sai thì card listing trỏ vào 404.
+- Ô điền lưu state ở `localStorage` hay theo tài khoản VLearn. Theo tài khoản thì learner đổi máy không mất bài, nhưng phải trả lời được câu nội dung có đi lên server không.
+- Trang listing từng dùng `slug` khác `id` trong frontmatter. Hiện web quét `frontend/content/` nên `id` là nguồn duy nhất, nhưng cách làm chính thức vẫn cần team codelabs chốt.
