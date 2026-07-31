@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --ink: #17211c;
+      --muted: #5f6f66;
+      --line: #dce6e0;
+      --paper: #f6f8f6;
+      --card: #ffffff;
+      --green: #14785d;
+      --green-soft: #e7f7f0;
+      --blue: #315dcc;
+      --blue-soft: #edf2ff;
+      --amber: #845600;
+      --amber-soft: #fff4d9;
+      --violet: #6947b2;
+      --violet-soft: #f3edff;
+      --danger: #a23d48;
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); line-height: 1.55; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    code, pre { font-family: "SFMono-Regular", Consolas, monospace; }
+    code { overflow-wrap: anywhere; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid #73a6ff; outline-offset: 2px; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: .8rem clamp(1rem, 4vw, 3rem); border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.94); backdrop-filter: blur(12px);
+    }
+    .brand { min-width: 0; }
+    .brand strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand small { color: var(--muted); }
+    .top-actions { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+    .timer { min-width: 7.2rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+    .button {
+      border: 1px solid var(--line); border-radius: .65rem; padding: .48rem .7rem;
+      background: white; color: var(--ink); font-weight: 700;
+    }
+    .button:hover { border-color: #aabbb1; }
+    .button.danger { color: var(--danger); }
+    .layout {
+      width: min(1460px, 100%); margin: 0 auto; padding: 1.2rem clamp(1rem, 3vw, 2.2rem);
+      display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1.5rem;
+    }
+    .sidebar { position: sticky; top: 5.2rem; align-self: start; display: grid; gap: 1rem; }
+    .side-card, .section, .hero {
+      background: var(--card); border: 1px solid var(--line); border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(30,55,42,.05);
+    }
+    .side-card { padding: 1rem; }
+    .progress-row { display: flex; justify-content: space-between; gap: .8rem; font-weight: 800; }
+    .progress-track { height: .55rem; margin-top: .6rem; border-radius: 99px; background: #e7ece9; overflow: hidden; }
+    .progress-fill { width: 0; height: 100%; background: var(--green); transition: width .2s ease; }
+    .phase-nav { display: grid; gap: .35rem; margin-top: .9rem; }
+    .phase-nav a { padding: .45rem .55rem; border-radius: .55rem; text-decoration: none; color: var(--muted); }
+    .phase-nav a:hover { background: var(--green-soft); color: var(--ink); }
+    .legend { display: grid; gap: .45rem; font-size: .85rem; }
+    .legend span::before { content: ""; display: inline-block; width: .65rem; height: .65rem; margin-right: .45rem; border-radius: .2rem; }
+    .legend .k::before { background: var(--amber); }
+    .legend .g::before { background: var(--blue); }
+    .legend .o::before { background: var(--green); }
+    .legend .d::before { background: var(--violet); }
+    main { min-width: 0; display: grid; gap: 1.2rem; }
+    .hero { padding: clamp(1.3rem, 4vw, 3rem); background: linear-gradient(145deg, #143d31, #1f614b); color: white; }
+    .eyebrow { margin: 0 0 .4rem; text-transform: uppercase; letter-spacing: .09em; font-size: .76rem; font-weight: 900; opacity: .78; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.04; letter-spacing: -.04em; }
+    .hero p { max-width: 72ch; color: #dcefe7; }
+    .meta, .chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .chip { display: inline-flex; padding: .3rem .58rem; border-radius: 99px; background: rgba(255,255,255,.14); font-size: .82rem; }
+    .section { padding: clamp(1rem, 3vw, 1.6rem); }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+    .section-head h2 { margin: 0; font-size: clamp(1.3rem, 3vw, 2rem); }
+    .section-head p { margin: .25rem 0 0; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .85rem; }
+    .info-card { padding: 1rem; border: 1px solid var(--line); border-radius: .8rem; background: #fff; }
+    .info-card h3 { margin: 0 0 .4rem; font-size: 1rem; }
+    .info-card p, .info-card ul { margin: .35rem 0; color: var(--muted); }
+    .role-card input { width: 100%; margin-top: .6rem; padding: .5rem; border: 1px solid var(--line); border-radius: .55rem; }
+    .os-tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .8rem; }
+    .os-tabs button[aria-pressed="true"] { color: white; border-color: var(--green); background: var(--green); }
+    .command-list { display: grid; gap: .8rem; }
+    .command { border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; background: #101713; color: #e8f3ed; }
+    .command-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .55rem .7rem; background: #1d2b24; }
+    .command-head button { border: 1px solid #50645a; border-radius: .45rem; background: transparent; color: white; }
+    .command pre { margin: 0; padding: .8rem; overflow: auto; white-space: pre-wrap; }
+    .command .expected { padding: .7rem .8rem; border-top: 1px solid #2c4036; color: #a9dbc7; }
+    .phase { position: relative; padding: 1.15rem; border: 1px solid var(--line); border-radius: .9rem; background: #fff; }
+    .phase + .phase { margin-top: 1rem; }
+    .phase-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+    .phase-head h3 { margin: .15rem 0; font-size: 1.35rem; }
+    .phase-meta { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: flex-end; }
+    .tag { padding: .25rem .48rem; border: 1px solid var(--line); border-radius: 99px; background: #f8faf9; font-size: .78rem; font-weight: 800; }
+    .task { margin-top: 1rem; border: 1px solid var(--line); border-radius: .85rem; overflow: hidden; }
+    .task.done { opacity: .62; }
+    .task-head { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: .7rem; padding: .8rem; border-bottom: 1px solid var(--line); }
+    .task-head h4 { margin: 0; }
+    .owner { color: var(--muted); font-size: .84rem; }
+    .task-panels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .panel { padding: .85rem; min-width: 0; border-right: 1px solid var(--line); }
+    .panel:last-child { border-right: 0; }
+    .panel h5 { margin: 0 0 .55rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; }
+    .panel ul { padding-left: 1.15rem; margin: 0; }
+    .panel li + li { margin-top: .35rem; }
+    .panel.knowledge { background: var(--amber-soft); }
+    .panel.guidance { background: var(--blue-soft); }
+    .panel.outcome { background: var(--green-soft); }
+    .panel.deliverables { background: var(--violet-soft); }
+    .paths { margin: 0 0 .5rem; color: var(--blue); font-size: .86rem; }
+    .task-commands { padding: .8rem; border-top: 1px solid var(--line); }
+    .workflow { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .7rem; margin-top: 1rem; }
+    .workflow > div { padding: .75rem; border: 1px dashed #aebfb6; border-radius: .7rem; }
+    .workflow strong { display: block; margin-bottom: .3rem; }
+    .checkpoint { margin-top: .8rem; padding: .75rem; border-left: 4px solid var(--green); background: var(--green-soft); }
+    .commit { margin-top: .65rem; padding: .75rem; border: 1px solid var(--line); border-radius: .7rem; }
+    .commit code { display: block; color: var(--violet); font-weight: 800; }
+    .file-status { font-size: .76rem; font-weight: 900; color: var(--violet); }
+    .checklist { display: grid; gap: .55rem; }
+    .focus-mode .supporting { display: none; }
+    .focus-mode .task.done { display: none; }
+    footer { padding: 1rem; color: var(--muted); font-size: .86rem; }
+    .empty { color: var(--muted); font-style: italic; }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; grid-template-columns: 1fr 1fr; }
+      .task-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .panel:nth-child(2) { border-right: 0; }
+      .panel:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    }
+    @media (max-width: 650px) {
+      .topbar, .section-head, .phase-head { align-items: stretch; flex-direction: column; }
+      .sidebar { grid-template-columns: 1fr; }
+      .task-panels { grid-template-columns: 1fr; }
+      .panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .panel:last-child { border-bottom: 0; }
+      .task-head { grid-template-columns: auto 1fr; }
+      .owner { grid-column: 2; }
+    }
+    @media print {
+      .topbar, .sidebar, .button, .os-tabs { display: none !important; }
+      .layout { display: block; padding: 0; }
+      .hero, .section { box-shadow: none; break-inside: avoid; }
+      .task { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong id="brandTitle"></strong>
+      <small id="brandSubtitle"></small>
+    </div>
+    <div class="top-actions">
+      <span class="timer" id="timer" aria-live="polite">00:00:00</span>
+      <button class="button" id="timerToggle" type="button"></button>
+      <button class="button" id="focusToggle" type="button" aria-pressed="false"></button>
+      <button class="button" type="button" onclick="window.print()" id="printButton"></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar supporting">
+      <section class="side-card">
+        <div class="progress-row"><span id="progressLabel"></span><span id="progressCount">0/0</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <nav class="phase-nav" id="phaseNav"></nav>
+      </section>
+      <section class="side-card legend" id="legend"></section>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow" id="heroEyebrow"></p>
+        <h1 id="heroTitle"></h1>
+        <p id="heroAudience"></p>
+        <div class="meta" id="heroMeta"></div>
+      </section>
+
+      <section class="section supporting" id="auditSection">
+        <div class="section-head"><div><h2 id="auditTitle"></h2><p id="auditSubtitle"></p></div></div>
+        <div class="grid" id="auditGrid"></div>
+      </section>
+
+      <section class="section supporting" id="setupSection">
+        <div class="section-head"><div><h2 id="setupTitle"></h2><p id="setupSubtitle"></p></div></div>
+        <div class="grid" id="setupNotes"></div>
+        <div class="os-tabs" id="osTabs"></div>
+        <div class="command-list" id="setupCommands"></div>
+      </section>
+
+      <section class="section supporting" id="rolesSection">
+        <div class="section-head"><div><h2 id="rolesTitle"></h2><p id="rolesSubtitle"></p></div></div>
+        <div class="grid" id="rolesGrid"></div>
+      </section>
+
+      <section class="section supporting" id="filesSection">
+        <div class="section-head"><div><h2 id="filesTitle"></h2><p id="filesSubtitle"></p></div></div>
+        <div class="grid" id="filesGrid"></div>
+      </section>
+
+      <section class="section" id="phasesSection">
+        <div class="section-head">
+          <div><h2 id="phasesTitle"></h2><p id="phasesSubtitle"></p></div>
+          <button class="button danger" id="resetButton" type="button"></button>
+        </div>
+        <div id="phases"></div>
+      </section>
+
+      <section class="section supporting" id="validationsSection">
+        <div class="section-head"><div><h2 id="validationsTitle"></h2><p id="validationsSubtitle"></p></div></div>
+        <div class="grid" id="validationsGrid"></div>
+      </section>
+
+      <section class="section supporting" id="doneSection">
+        <div class="section-head"><div><h2 id="doneTitle"></h2><p id="doneSubtitle"></p></div></div>
+        <div class="checklist" id="doneList"></div>
+      </section>
+
+      <footer id="sources"></footer>
+    </main>
+  </div>
+
+  <script id="lab-model" type="application/json">__LAB_MODEL_JSON__</script>
+  <script id="lab-labels" type="application/json">__LABELS_JSON__</script>
+  <script>
+    const MODEL = JSON.parse(document.getElementById("lab-model").textContent);
+    const T = JSON.parse(document.getElementById("lab-labels").textContent);
+    const storageKey = `repo-lab-guide:${MODEL.meta.repository}:${MODEL.meta.commit || "working"}`;
+    const totalSeconds = Math.max(0, Number(MODEL.meta.total_minutes || 0) * 60);
+    const taskIds = MODEL.phases.flatMap(phase => phase.tasks.map(task => task.id));
+    let timerId = null;
+    let state = loadState();
+
+    function loadState() {
+      const fallback = { os: "windows", done: {}, doneCriteria: {}, roleNames: {}, focus: false, remaining: totalSeconds, running: false };
+      try { return { ...fallback, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; }
+      catch { return fallback; }
+    }
+    function saveState() { localStorage.setItem(storageKey, JSON.stringify(state)); }
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+    function list(items) {
+      return items?.length ? `<ul>${items.map(item => `<li>${esc(item)}</li>`).join("")}</ul>` : `<p class="empty">${esc(T.none)}</p>`;
+    }
+    function commandCard(item) {
+      return `<article class="command">
+        <div class="command-head"><strong>${esc(item.label)}</strong><button type="button" data-copy="${esc(item.command)}">${esc(T.copy)}</button></div>
+        <pre><code>${esc(item.command)}</code></pre>
+        ${item.expected ? `<div class="expected"><strong>${esc(T.expected)}:</strong> ${esc(item.expected)}</div>` : ""}
+      </article>`;
+    }
+    function roleName(id) { return MODEL.roles.find(role => role.id === id)?.title || id; }
+    function modeLabel(mode) { return T.modes[mode] || mode; }
+
+    function renderStatic() {
+      document.documentElement.lang = MODEL.meta.language || "vi";
+      document.getElementById("brandTitle").textContent = MODEL.meta.title;
+      document.getElementById("brandSubtitle").textContent = `${MODEL.meta.repository} · ${MODEL.meta.team_size} ${T.people}`;
+      document.getElementById("heroEyebrow").textContent = T.labGuide;
+      document.getElementById("heroTitle").textContent = MODEL.meta.title;
+      document.getElementById("heroAudience").textContent = MODEL.meta.audience;
+      document.getElementById("heroMeta").innerHTML = [
+        `${MODEL.meta.total_minutes} ${T.minutes}`,
+        `${T.branch}: ${MODEL.meta.branch || "—"}`,
+        `${T.revision}: ${MODEL.meta.commit || "—"}`,
+        `${T.auditDate}: ${MODEL.meta.audit_date || "—"}`
+      ].map(item => `<span class="chip">${esc(item)}</span>`).join("");
+
+      setText("progressLabel", T.progress);
+      setText("timerToggle", T.start);
+      setText("focusToggle", T.focus);
+      setText("printButton", T.print);
+      setText("auditTitle", T.audit);
+      setText("auditSubtitle", T.auditSubtitle);
+      setText("setupTitle", T.setup);
+      setText("setupSubtitle", T.setupSubtitle);
+      setText("rolesTitle", T.roles);
+      setText("rolesSubtitle", T.rolesSubtitle);
+      setText("filesTitle", T.files);
+      setText("filesSubtitle", T.filesSubtitle);
+      setText("phasesTitle", T.phases);
+      setText("phasesSubtitle", T.phasesSubtitle);
+      setText("resetButton", T.reset);
+      setText("validationsTitle", T.validations);
+      setText("validationsSubtitle", T.validationsSubtitle);
+      setText("doneTitle", T.done);
+      setText("doneSubtitle", T.doneSubtitle);
+
+      document.getElementById("legend").innerHTML = `
+        <span class="k">${esc(T.knowledge)}</span>
+        <span class="g">${esc(T.guidance)}</span>
+        <span class="o">${esc(T.outcome)}</span>
+        <span class="d">${esc(T.deliverables)}</span>`;
+
+      const findings = MODEL.audit?.findings || [];
+      document.getElementById("auditGrid").innerHTML = findings.length
+        ? findings.map(item => `<article class="info-card"><h3>${esc(item.title)}</h3><p>${esc(item.evidence)}</p><p><strong>${esc(T.impact)}:</strong> ${esc(item.impact)}</p><p><strong>${esc(T.decision)}:</strong> ${esc(item.decision)}</p></article>`).join("")
+        : `<p class="empty">${esc(T.noFindings)}</p>`;
+
+      const notes = [
+        { title: T.prerequisites, items: MODEL.setup.prerequisites || [] },
+        { title: T.conflictPrevention, items: MODEL.setup.conflict_prevention || [] }
+      ];
+      document.getElementById("setupNotes").innerHTML = notes.map(note => `<article class="info-card"><h3>${esc(note.title)}</h3>${list(note.items)}</article>`).join("");
+      renderOsTabs();
+      renderSetupCommands();
+      renderRoles();
+      renderFiles();
+      renderPhases();
+      renderValidations();
+      renderDone();
+      document.getElementById("sources").innerHTML = `<strong>${esc(T.sources)}:</strong> ${esc((MODEL.audit?.sources || []).join(" · "))}`;
+    }
+    function setText(id, value) { document.getElementById(id).textContent = value; }
+
+    function renderOsTabs() {
+      document.getElementById("osTabs").innerHTML = ["windows", "macos", "linux"].map(os =>
+        `<button class="button" type="button" data-os="${os}" aria-pressed="${state.os === os}">${esc(T.os[os])}</button>`
+      ).join("");
+    }
+    function renderSetupCommands() {
+      const commands = MODEL.setup.commands?.[state.os] || [];
+      document.getElementById("setupCommands").innerHTML = commands.length
+        ? commands.map(commandCard).join("")
+        : `<p class="empty">${esc(T.noCommands)}</p>`;
+    }
+    function renderRoles() {
+      document.getElementById("rolesGrid").innerHTML = MODEL.roles.map(role => `<article class="info-card role-card">
+        <h3>${esc(role.title)}</h3>
+        <p>${esc(role.ownership)}</p>
+        ${list(role.files || [])}
+        <label>${esc(T.learnerName)}<input data-role="${esc(role.id)}" value="${esc(state.roleNames[role.id] || "")}"></label>
+      </article>`).join("");
+    }
+    function renderFiles() {
+      const files = MODEL.files || [];
+      document.getElementById("filesGrid").innerHTML = files.length ? files.map(file => {
+        const creation = file.creation_commands?.[state.os];
+        const validation = file.validation || {};
+        return `<article class="info-card">
+          <span class="file-status">${esc(T.fileStatus[file.status] || file.status)}</span>
+          <h3><code>${esc(file.path)}</code></h3>
+          <p>${esc(file.purpose)}</p>
+          <p><strong>${esc(T.format)}:</strong> ${esc(file.format || "—")}</p>
+          ${file.parent_directory ? `<p><strong>${esc(T.parentDirectory)}:</strong> <code>${esc(file.parent_directory)}</code> · <strong>${esc(T.parentStatus)}:</strong> ${esc(T.parentStatuses[file.parent_status] || file.parent_status)}</p>` : ""}
+          ${file.consumers?.length ? `<p><strong>${esc(T.consumers)}:</strong> ${esc(file.consumers.join(", "))}</p>` : ""}
+          ${list(file.required_contract || [])}
+          ${creation ? `<div class="command-list">${commandCard({ label: T.createFile, command: creation })}</div>` : ""}
+          ${validation.command ? `<div class="command-list">${commandCard({ label: T.validateFile, command: validation.command, expected: validation.expected })}</div>` : ""}
+        </article>`;
+      }).join("") : `<p class="empty">${esc(T.noFiles)}</p>`;
+    }
+    function renderTask(task) {
+      const validation = task.validation || {};
+      const commands = [...(task.commands || [])];
+      if (validation.command && !commands.some(item => item.command === validation.command)) {
+        commands.push({
+          label: T.taskValidation,
+          command: validation.command,
+          expected: validation.expected
+        });
+      }
+      return `<article class="task ${state.done[task.id] ? "done" : ""}" data-task-card="${esc(task.id)}">
+        <div class="task-head">
+          <input type="checkbox" data-task="${esc(task.id)}" ${state.done[task.id] ? "checked" : ""} aria-label="${esc(T.markDone)}">
+          <h4>${esc(task.title)}</h4>
+          <span class="owner">${esc(T.owner)}: ${esc(roleName(task.owner))}</span>
+        </div>
+        <div class="task-panels">
+          <section class="panel knowledge"><h5>${esc(T.knowledge)}</h5>${list(task.knowledge)}</section>
+          <section class="panel guidance"><h5>${esc(T.guidance)}</h5>
+            ${task.paths?.length ? `<p class="paths">${task.paths.map(path => `<code>${esc(path)}</code>`).join(" · ")}</p>` : ""}
+            ${list(task.guidance)}
+          </section>
+          <section class="panel outcome"><h5>${esc(T.outcome)}</h5>${list(task.expected_outcomes)}</section>
+          <section class="panel deliverables"><h5>${esc(T.deliverables)}</h5>${list(task.deliverables)}</section>
+        </div>
+        ${commands.length || validation.manual?.length ? `<div class="task-commands">
+          ${commands.map(commandCard).join("")}
+          ${validation.manual?.length ? `<article class="info-card"><strong>${esc(T.manualValidation)}</strong>${list(validation.manual)}<p><strong>${esc(T.expected)}:</strong> ${esc(validation.expected)}</p></article>` : ""}
+        </div>` : ""}
+      </article>`;
+    }
+    function renderPhases() {
+      document.getElementById("phaseNav").innerHTML = MODEL.phases.map((phase, index) =>
+        `<a href="#${esc(phase.id)}">${index + 1}. ${esc(phase.title)}</a>`).join("");
+      document.getElementById("phases").innerHTML = MODEL.phases.map((phase, index) => {
+        const c = phase.collaboration || {};
+        const shared = (c.shared_files || []).map(item => `${item.path} — ${roleName(item.owner)}`);
+        const handoffs = (c.handoffs || []).map(item => `${roleName(item.from)} → ${roleName(item.to)}: ${item.output}`);
+        return `<article class="phase" id="${esc(phase.id)}">
+          <div class="phase-head">
+            <div><p class="eyebrow">${esc(T.phase)} ${index + 1}</p><h3>${esc(phase.title)}</h3></div>
+            <div class="phase-meta"><span class="tag">${esc(modeLabel(phase.mode))}</span><span class="tag">${esc(phase.minutes)} ${esc(T.minutes)}</span></div>
+          </div>
+          <p><strong>${esc(T.entryCondition)}:</strong> ${esc(phase.entry_condition)}</p>
+          ${phase.tasks.map(renderTask).join("")}
+          <div class="workflow">
+            <div><strong>${esc(T.parallelWork)}</strong>${list(c.parallel_work || [])}</div>
+            <div><strong>${esc(T.sharedFiles)}</strong>${list(shared)}</div>
+            <div><strong>${esc(T.handoffs)}</strong>${list(handoffs)}</div>
+            <div><strong>${esc(T.integrationOwner)}</strong><p>${esc(roleName(c.integration_owner))}</p></div>
+          </div>
+          ${(phase.suggested_commits || []).map(commit => `<div class="commit">
+            <strong>${esc(T.suggestedCommit)}</strong><code>${esc(commit.message)}</code>
+            <p>${esc(T.owner)}: ${esc(roleName(commit.owner))}</p>
+            <p>${esc(T.files)}: ${esc((commit.files || []).join(", ") || T.none)}</p>
+            <p>${esc(T.requiredCheckpoint)}: ${esc(commit.checkpoint)}</p>
+          </div>`).join("")}
+          <div class="checkpoint"><strong>${esc(T.checkpoint)}:</strong> ${esc(phase.checkpoint)}</div>
+        </article>`;
+      }).join("");
+      updateProgress();
+    }
+    function renderValidations() {
+      const items = MODEL.validations || [];
+      document.getElementById("validationsGrid").innerHTML = items.length ? items.map(item => `<article class="info-card">
+        <h3>${esc(item.title)}</h3><p>${esc(item.type || "")}</p>
+        ${item.command ? `<div class="command-list">${commandCard({ label: item.label || item.title, command: item.command, expected: item.expected })}</div>` : ""}
+        ${list(item.manual || [])}
+      </article>`).join("") : `<p class="empty">${esc(T.noValidations)}</p>`;
+    }
+    function renderDone() {
+      document.getElementById("doneList").innerHTML = (MODEL.definition_of_done || []).map((item, index) =>
+        `<label><input type="checkbox" data-done-check="${index}" ${state.doneCriteria[index] ? "checked" : ""}> ${esc(item)}</label>`).join("");
+    }
+    function updateProgress() {
+      const completed = taskIds.filter(id => state.done[id]).length;
+      document.getElementById("progressCount").textContent = `${completed}/${taskIds.length}`;
+      document.getElementById("progressFill").style.width = `${taskIds.length ? completed / taskIds.length * 100 : 0}%`;
+    }
+    function renderTimer() {
+      const value = Math.max(0, Number(state.remaining || 0));
+      const h = Math.floor(value / 3600);
+      const m = Math.floor((value % 3600) / 60);
+      const s = value % 60;
+      document.getElementById("timer").textContent = [h,m,s].map(n => String(n).padStart(2, "0")).join(":");
+      document.getElementById("timerToggle").textContent = state.running ? T.pause : T.start;
+      if (value === 0) stopTimer();
+    }
+    function startTimer() {
+      state.running = true; saveState(); renderTimer();
+      timerId = setInterval(() => { state.remaining = Math.max(0, state.remaining - 1); saveState(); renderTimer(); }, 1000);
+    }
+    function stopTimer() {
+      state.running = false; saveState(); clearInterval(timerId); timerId = null; renderTimer();
+    }
+
+    document.addEventListener("click", async event => {
+      const os = event.target.closest("[data-os]");
+      if (os) { state.os = os.dataset.os; saveState(); renderOsTabs(); renderSetupCommands(); renderFiles(); return; }
+      const copy = event.target.closest("[data-copy]");
+      if (copy) { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = T.copied; setTimeout(() => copy.textContent = T.copy, 1200); }
+    });
+    document.addEventListener("change", event => {
+      if (event.target.matches("[data-task]")) {
+        state.done[event.target.dataset.task] = event.target.checked; saveState(); renderPhases();
+      }
+      if (event.target.matches("[data-done-check]")) {
+        state.doneCriteria[event.target.dataset.doneCheck] = event.target.checked; saveState();
+      }
+    });
+    document.addEventListener("input", event => {
+      if (event.target.matches("[data-role]")) { state.roleNames[event.target.dataset.role] = event.target.value; saveState(); }
+    });
+    document.getElementById("timerToggle").addEventListener("click", () => state.running ? stopTimer() : startTimer());
+    document.getElementById("focusToggle").addEventListener("click", event => {
+      state.focus = !state.focus; saveState(); document.body.classList.toggle("focus-mode", state.focus);
+      event.currentTarget.setAttribute("aria-pressed", String(state.focus));
+    });
+    document.getElementById("resetButton").addEventListener("click", () => {
+      if (!confirm(T.resetConfirm)) return;
+      state = { os: state.os, done: {}, doneCriteria: {}, roleNames: {}, focus: false, remaining: totalSeconds, running: false };
+      saveState(); stopTimer(); document.body.classList.remove("focus-mode"); renderRoles(); renderPhases(); renderDone();
+    });
+
+    renderStatic();
+    renderTimer();
+    document.body.classList.toggle("focus-mode", state.focus);
+    document.getElementById("focusToggle").setAttribute("aria-pressed", String(state.focus));
+    if (state.running) startTimer();
+  </script>
+</body>
+</html>

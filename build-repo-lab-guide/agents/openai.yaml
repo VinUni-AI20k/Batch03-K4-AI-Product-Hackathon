@@ -1,0 +1,14 @@
+interface:
+  display_name: Build Repo Lab Guide
+  short_description: Turn cloned repos into executable lab guides
+  default_prompt: Use $build-repo-lab-guide to analyze this cloned repo and generate
+    an interactive lab guide.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

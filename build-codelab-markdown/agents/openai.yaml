@@ -1,0 +1,6 @@
+interface:
+  display_name: "Build Codelab Markdown"
+  short_description: "Build VLearn codelab Markdown from lab repos"
+  default_prompt: "Use $build-codelab-markdown to analyze this lab repo and generate docs/CODELAB.md in the VLearn codelab format."
+policy:
+  allow_implicit_invocation: true
