@@ -8,893 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --vlearn-bg: #f4f5f8;
-            --sidebar-bg: #f8fafc;
-            --border-color: #e2e8f0;
-            --primary-blue: #2563eb;
-            --primary-red: #ea580c;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --card-cream: #fffdf9;
-            --card-border: #f1e9db;
-            --accent-cyan: #0891b2;
-            --accent-purple: #7c3aed;
-            --accent-rose: #e11d48;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--vlearn-bg);
-            color: var(--text-dark);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Top Header */
-        header {
-            height: 56px;
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .btn-back {
-            border: 1px solid var(--border-color);
-            background: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        .vlearn-logo {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 800;
-            font-size: 22px;
-        }
-
-        .logo-v { color: #dc2626; }
-        .logo-learn { color: #1d4ed8; }
-
-        .doc-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 1px solid var(--border-color);
-            padding-left: 16px;
-        }
-
-        .doc-title-main {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .doc-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .pill-btn {
-            border: 1px solid var(--border-color);
-            background: #fff;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        /* Main Workspace */
-        .workspace {
-            display: flex;
-            flex-grow: 1;
-            height: calc(100vh - 56px);
-            position: relative;
-        }
-
-        /* Left Sidebar */
-        .sidebar {
-            width: 300px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 16px;
-            gap: 16px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-
-        .sidebar-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .sidebar-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .day-group {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background: #fff;
-            overflow: hidden;
-        }
-
-        .day-header {
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            background: #fafafa;
-        }
-
-        .day-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .badge-studying {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        .file-list {
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .file-item {
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .file-item.active {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: var(--primary-blue);
-            font-weight: 600;
-        }
-
-        /* Center Content Area */
-        .content-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background: #eef2f6;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Floating PDF Toolbar */
-        .pdf-toolbar {
-            height: 48px;
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            z-index: 10;
-        }
-
-        .toolbar-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tb-btn {
-            border: 1px solid var(--border-color);
-            background: #fff;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dark);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tb-btn.active {
-            background: #eff6ff;
-            color: var(--primary-blue);
-            border-color: #bfdbfe;
-        }
-
-        /* Drawing Sub-Toolbar */
-        .draw-sub-toolbar {
-            display: none;
-            align-items: center;
-            gap: 6px;
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 4px 10px;
-        }
-
-        .color-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.1s;
-        }
-
-        .color-dot:hover { transform: scale(1.15); }
-        .color-dot.active { border-color: #0f172a; transform: scale(1.15); }
-
-        /* Slide Frame Overlay Canvas */
-        .slide-frame {
-            position: relative;
-        }
-
-        .draw-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-            border-radius: 12px;
-        }
-
-        /* Custom Text Highlight Container */
-        .custom-text-highlight {
-            cursor: pointer;
-            position: relative;
-            display: inline;
-            transition: all 0.2s ease;
-        }
-
-        .custom-text-highlight:hover {
-            box-shadow: 0 0 0 2px #3b82f6;
-            border-radius: 4px;
-        }
-
-        /* Hover Action Badge Container at Top-Right Corner */
-        .hl-actions-badge {
-            position: absolute;
-            top: -12px;
-            right: -6px;
-            display: none;
-            align-items: center;
-            gap: 3px;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            padding: 2px 5px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            z-index: 25;
-            pointer-events: auto;
-        }
-
-        .custom-text-highlight:hover > .hl-actions-badge {
-            display: inline-flex;
-        }
-
-        .hl-color-btn {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.15s;
-            display: inline-block;
-        }
-
-        .hl-color-btn:hover {
-            transform: scale(1.3);
-        }
-
-        .hl-delete-btn {
-            width: 12px;
-            height: 12px;
-            background: #ef4444;
-            color: #ffffff;
-            font-size: 9px;
-            font-weight: bold;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            cursor: pointer;
-            margin-left: 2px;
-            transition: transform 0.15s;
-        }
-
-        .hl-delete-btn:hover {
-            transform: scale(1.2);
-            background: #dc2626;
-        }
-
-        /* Document Scroll Viewer */
-        .doc-scroll-viewer {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 32px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-            scroll-behavior: smooth;
-        }
-
-        /* Vertical Slide Frame */
-        .slide-frame {
-            width: 820px;
-            min-height: 480px;
-            background: var(--card-cream);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            padding: 36px 44px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .watermark {
-            position: absolute;
-            top: 16px;
-            right: 24px;
-            font-size: 11px;
-            font-family: 'JetBrains Mono', monospace;
-            color: #cbd5e1;
-        }
-
-        .slide-page-num {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-
-        .slide-heading {
-            font-size: 26px;
-            font-weight: 800;
-            color: #1e293b;
-            line-height: 1.3;
-        }
-
-        .slide-subheading {
-            font-size: 16px;
-            color: #2563eb;
-            font-weight: 600;
-            margin-top: 6px;
-        }
-
-        .slide-content-box {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #334155;
-        }
-
-        .doc-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-        }
-
-        .slide-bullets {
-            margin: 0;
-            padding-left: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .slide-takeaway {
-            background: #eff6ff;
-            border-left: 3px solid #2563eb;
-            color: #1d4ed8;
-            font-weight: 600;
-            font-size: 13px;
-            padding: 10px 14px;
-            border-radius: 0 8px 8px 0;
-            margin-top: 16px;
-            line-height: 1.5;
-        }
-
-        .slide-source {
-            font-size: 11px;
-            color: #94a3b8;
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .attention-demo {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .token {
-            padding: 6px 12px;
-            border-radius: 6px;
-            background: #f1f5f9;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        .token.highlight {
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-weight: 700;
-            border: 1px solid #93c5fd;
-        }
-
-        .token.target {
-            background: #ffe4e6;
-            color: #e11d48;
-            font-weight: 700;
-            border: 1px solid #fda4af;
-        }
-
-        /* ------------------------------------------------------------- */
-        /* END OF DOCUMENT: ACTIVE RECALL QUIZ SECTION */
-        /* ------------------------------------------------------------- */
-        .active-recall-section {
-            width: 820px;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            border: 2px solid #3b82f6;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.12);
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-
-        .quiz-section-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            border-bottom: 2px solid #eff6ff;
-            padding-bottom: 20px;
-        }
-
-        .quiz-header-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        .quiz-header-title h3 {
-            font-size: 20px;
-            font-weight: 800;
-            color: #0f172a;
-        }
-
-        .quiz-header-title p {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .quiz-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        }
-
-        .quiz-card-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1.5;
-        }
-
-        .quiz-textarea {
-            width: 100%;
-            height: 100px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 14px;
-            font-family: inherit;
-            font-size: 13px;
-            outline: none;
-            resize: vertical;
-            transition: border-color 0.2s;
-        }
-
-        .quiz-textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* Multiple Choice Options Styling */
-        .mc-options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .mc-option-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .mc-option-card:hover {
-            border-color: #94a3b8;
-            background: #f1f5f9;
-        }
-
-        .mc-option-card.selected {
-            border-color: #2563eb;
-            background: #eff6ff;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-
-        .mc-option-card.explain-selected {
-            border-color: #8b5cf6;
-            background: #f5f3ff;
-        }
-
-        .mc-radio {
-            margin-top: 3px;
-            width: 16px;
-            height: 16px;
-            accent-color: #2563eb;
-            cursor: pointer;
-        }
-
-        .mc-option-text {
-            font-size: 13px;
-            color: #334155;
-            line-height: 1.5;
-        }
-
-        .btn-submit-quiz {
-            align-self: flex-start;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-submit-quiz:hover { background: #1d4ed8; }
-
-        /* Misconception Result Box */
-        .result-box {
-            display: none;
-            background: #fff5f5;
-            border-left: 4px solid #f43f5e;
-            border-radius: 0 10px 10px 0;
-            padding: 16px;
-            flex-direction: column;
-            gap: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .result-tag {
-            font-size: 12px;
-            font-weight: 700;
-            color: #e11d48;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .result-text {
-            font-size: 13px;
-            color: #334155;
-            line-height: 1.6;
-        }
-
-        .citation-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #f1f5f9;
-            color: #475569;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .escalate-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8fafc;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-top: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .btn-escalate-ta {
-            background: #fff7ed;
-            color: #c2410c;
-            border: 1px solid #ffedd5;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-escalate-ta:hover { background: #ffedd5; }
-
-        /* ------------------------------------------------------------- */
-        /* AI CHAT PANEL (right-side Q&A over the real slide content)     */
-        /* ------------------------------------------------------------- */
-        .ai-chat-panel {
-            position: fixed;
-            top: 56px;
-            right: 0;
-            bottom: 0;
-            width: 380px;
-            max-width: 92vw;
-            background: #ffffff;
-            border-left: 1px solid var(--border-color);
-            box-shadow: -8px 0 24px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            transform: translateX(100%);
-            transition: transform 0.25s ease;
-            z-index: 200;
-        }
-
-        .ai-chat-panel.open { transform: translateX(0); }
-
-        .ai-chat-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-shrink: 0;
-        }
-
-        .ai-chat-header-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .ai-chat-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .ai-chat-close-btn {
-            background: transparent;
-            border: none;
-            font-size: 16px;
-            color: var(--text-muted);
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .ai-chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            background: #f8fafc;
-        }
-
-        .chat-bubble {
-            max-width: 90%;
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 13px;
-            line-height: 1.55;
-        }
-
-        .chat-bubble.user {
-            align-self: flex-end;
-            background: #2563eb;
-            color: #ffffff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-bubble.ai {
-            align-self: flex-start;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        }
-
-        .chat-bubble.ai .citation-badge { cursor: pointer; }
-        .chat-bubble.ai .citation-badge:hover { background: #e2e8f0; }
-
-        .chat-typing {
-            align-self: flex-start;
-            display: flex;
-            gap: 4px;
-            padding: 12px 14px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-typing span {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #94a3b8;
-            animation: chatTypingBlink 1.2s infinite ease-in-out;
-        }
-
-        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
-        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes chatTypingBlink {
-            0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
-            40% { opacity: 1; transform: translateY(-3px); }
-        }
-
-        .ai-chat-suggest {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 0 16px 12px;
-            flex-shrink: 0;
-        }
-
-        .chat-suggest-chip {
-            font-size: 11px;
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
-            padding: 5px 10px;
-            border-radius: 14px;
-            cursor: pointer;
-        }
-
-        .chat-suggest-chip:hover { background: #dbeafe; }
-
-        .ai-chat-input-row {
-            padding: 12px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-            flex-shrink: 0;
-        }
-
-        .ai-chat-textarea {
-            flex-grow: 1;
-            resize: none;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 10px 12px;
-            font-family: inherit;
-            font-size: 13px;
-            max-height: 100px;
-            outline: none;
-        }
-
-        .ai-chat-textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .ai-chat-send-btn {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-
-        .ai-chat-send-btn:hover { background: #1d4ed8; }
-        .ai-chat-send-btn:disabled { background: #93c5fd; cursor: not-allowed; }
-    </style>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="public/pdf.min.js"></script>
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = (window.location.protocol === 'file:')
+                ? 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+                : (window.location.origin + '/public/pdf.worker.min.js');
+        }
+    </script>
 </head>
 
 <body>
@@ -1031,211 +153,6 @@
                      the next section only appears after the current section's quiz is passed. -->
                 <div id="docD1Container" class="doc-container"></div>
                 <div id="docD2Container" class="doc-container" style="display:none;"></div>
-                <!-- SLIDE PAGE 1 -->
-                <div class="slide-frame">
-                    <canvas class="draw-canvas"></canvas>
-                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
-                    <div>
-                        <div class="slide-page-num">Trang 1 / 32</div>
-                        <div class="slide-heading" style="color: #2563eb; font-size: 36px; margin-top: 20px;">Day 01
-                        </div>
-                        <div class="slide-heading" style="font-size: 42px; margin-top: 10px;">AI & LLM Foundation</div>
-                        <div class="slide-subheading" style="color: #dc2626; margin-top: 14px;">Vibe Coding 1: Setup &
-                            Foundation + LAB 1: LLM API Exploration</div>
-                    </div>
-                    <div style="font-size: 12px; color: #94a3b8;">Ha Noi 23.07.2026 - @ Vin University</div>
-                </div>
-
-                <!-- SLIDE PAGE 2 -->
-                <div class="slide-frame">
-                    <canvas class="draw-canvas"></canvas>
-                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
-                    <div>
-                        <div class="slide-page-num">Trang 2 / 32</div>
-                        <div class="slide-heading">Instructor: Mai Anh Nguyen (Blue)</div>
-                        <div class="slide-subheading">Generalist Product Builder</div>
-                        <div class="slide-content-box">
-                            • 2026: FPT Long Châu (PM · Healthcare Product)<br>
-                            • 2025: Thongtincuuho.org (Co-founder)<br>
-                            • 2025: FPT Software AI Center (PM · AI Agent)<br>
-                            • 2021 - 2025: Xantus (PM · On-chain Analytics, AI Agent)
-                        </div>
-                    </div>
-                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-002]</div>
-                </div>
-
-                <!-- SLIDE PAGE 3: ATTENTION MECHANISM -->
-                <div class="slide-frame" id="slideAttention">
-                    <canvas class="draw-canvas"></canvas>
-                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
-                    <div>
-                        <div class="slide-page-num">Trang 22 / 32</div>
-                        <div class="slide-heading">Minh họa Khái niệm: Token "nó" cần Attention tới token nào?</div>
-                        <div class="slide-content-box">
-                            Ví dụ: <em>"Lan bỏ quyển sách vào túi vì <strong>nó</strong> quá dày"</em>
-                            <div class="attention-demo">
-                                <span class="token">Lan</span>
-                                <span class="token">bỏ</span>
-                                <span class="token highlight">quyển (0.28)</span>
-                                <span class="token highlight">sách (0.32)</span>
-                                <span class="token">vào</span>
-                                <span class="token">túi (0.09)</span>
-                                <span class="token">vì</span>
-                                <span class="token target">nó</span>
-                                <span class="token">quá</span>
-                                <span class="token">dày</span>
-                            </div>
-                            <div style="font-size: 12px; color: #0284c7; margin-top: 12px; text-align: center;">
-                                Trọng số Attention mạnh nhất hướng về <strong>"quyển sách"</strong> thay vì "cái túi".
-                            </div>
-                        </div>
-                    </div>
-                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-022]</div>
-                </div>
-
-                <!-- SLIDE PAGE 4: THREE AXES OF MODEL SCALING -->
-                <div class="slide-frame">
-                    <canvas class="draw-canvas"></canvas>
-                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
-                    <div>
-                        <div class="slide-page-num">Trang 23 / 32</div>
-                        <div class="slide-heading">Ba trục làm model "giỏi hơn"</div>
-                        <div class="slide-subheading">Số tham số chỉ là MỘT trong ba trục, không phải trục mạnh nhất
-                        </div>
-                        <div class="slide-content-box">
-                            <strong>1. Pretraining scale:</strong> Cùng ngân sách tính toán, Chinchilla 70B thắng Gopher
-                            280B.<br>
-                            <strong>2. Post-training:</strong> RLHF giúp câu trả lời được yêu thích 85% so với bản
-                            gốc.<br>
-                            <strong>3. Test-time / Agentic compute:</strong> Cùng 1 model Claude Opus 4.8, điểm lệch 19%
-                            khi dùng harness.
-                        </div>
-                    </div>
-                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-023]</div>
-                </div>
-
-                <!-- ============================================================= -->
-                <!-- END OF LESSON: ACTIVE RECALL SURVEY / QUIZ SECTION            -->
-                <!-- ============================================================= -->
-                <div class="active-recall-section" id="activeRecallQuiz">
-                    <div class="quiz-section-header">
-                        <div class="quiz-header-icon">🎯</div>
-                        <div class="quiz-header-title">
-                            <h3>BÀI KIỂM TRA MỨC ĐỘ HIỂU BÀI (VLEARN ACTIVE RECALL)</h3>
-                            <p>Bạn đã cuộn hết slide Day 01! Hãy hoàn thành 3 câu hỏi tình huống bên dưới để AI kiểm tra
-                                xem bạn có bị hổng kiến thức cốt lõi nào không trước khi làm bài tập lớn.</p>
-                        </div>
-                    </div>
-
-                    <!-- QUESTION 1 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 1 (Cơ chế Attention — Trang 22):</strong> Trong câu <em>"Lan bỏ quyển sách
-                                vào túi vì <strong>nó</strong> quá dày"</em>, tại sao từ <strong>"nó"</strong> lại tự
-                            động chú ý (Attention) tới <strong>"quyển sách"</strong> chứ không phải <strong>"cái
-                                túi"</strong>?
-                        </div>
-                        <div class="mc-options-list" id="mcOptions1">
-                            <label class="mc-option-card" onclick="selectMc(1, 'A', this)">
-                                <input type="radio" name="q1" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Self-Attention tính toán trọng số tương
-                                    quan xác suất giữa các vector token; cụm "sách quá dày" có trọng số (0.32) cao hơn
-                                    hẳn "túi quá dày" (0.09).</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'B', this)">
-                                <input type="radio" name="q1" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Do từ "túi" đứng sát từ "nó" hơn trong
-                                    câu nên mô hình luôn chọn từ đứng gần nhất.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'C', this)">
-                                <input type="radio" name="q1" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Do AI hiểu được ý nghĩa thực tế bên
-                                    ngoài đời thực là chỉ có sách mới dày còn túi thì không.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'D', this)">
-                                <input type="radio" name="q1" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Do trọng số Attention được khởi tạo
-                                    ngẫu nhiên mỗi lần chạy mô hình.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(1)">Nộp đáp án & AI Phân tích Hiểu lầm
-                            🚀</button>
-
-                        <div id="res1" class="result-box"></div>
-                    </div>
-
-                    <!-- QUESTION 2 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 2 (3 Trục Scaling Model — Trang 23):</strong> Tại sao mô hình
-                            <strong>Chinchilla 70B</strong> lại chiến thắng mô hình <strong>Gopher 280B</strong> dù số
-                            lượng tham số nhỏ hơn tới 4 lần?
-                        </div>
-                        <div class="mc-options-list" id="mcOptions2">
-                            <label class="mc-option-card" onclick="selectMc(2, 'A', this)">
-                                <input type="radio" name="q2" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Do Chinchilla 70B có số lượng tham số
-                                    được nén lại thông minh hơn nên luôn mạnh hơn.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'B', this)">
-                                <input type="radio" name="q2" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Do Chinchilla được huấn luyện trên
-                                    lượng dữ liệu (Tokens) gấp 4 lần, đạt tỷ lệ tối ưu giữa Data và Parameters
-                                    (Chinchilla Scaling Law).</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'C', this)">
-                                <input type="radio" name="q2" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Do Gopher 280B chạy quá chậm nên bị
-                                    tính điểm phạt khi chấm benchmark.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'D', this)">
-                                <input type="radio" name="q2" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Do Chinchilla được áp dụng RLHF còn
-                                    Gopher thì không.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(2)">Nộp đáp án & AI Phân tích 🚀</button>
-
-                        <div id="res2" class="result-box"></div>
-                    </div>
-
-                    <!-- QUESTION 3 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 3 (Cost of Error & Automation Level — Trang 14):</strong> Một nhóm định thiết
-                            kế AI tự động chấm bài tập lớn của học viên mà không cần giảng viên duyệt. Hãy đánh giá
-                            Cost-of-Error và đề xuất mức Automation phù hợp.
-                        </div>
-                        <div class="mc-options-list" id="mcOptions3">
-                            <label class="mc-option-card" onclick="selectMc(3, 'A', this)">
-                                <input type="radio" name="q3" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Chọn Full Automate 100% để tiết kiệm
-                                    tối đa thời gian cho giảng viên.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'B', this)">
-                                <input type="radio" name="q3" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Chấm bài tập lớn có Cost-of-Error rất
-                                    cao (AI chấm sai gây bức xúc/mất điểm); bắt buộc dùng Conditional Automation /
-                                    Augment (AI chấm nháp + Giảng viên/TA duyệt).</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'C', this)">
-                                <input type="radio" name="q3" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Tuyệt đối không ứng dụng AI vì AI luôn
-                                    luôn chấm sai bài tập.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'D', this)">
-                                <input type="radio" name="q3" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Chuyển cho các học viên tự chấm chéo
-                                    lẫn nhau.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(3)">Nộp đáp án & AI Phân tích 🚀</button>
-
-                        <div id="res3" class="result-box"></div>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
@@ -1307,7 +224,9 @@
         </div>
         <div class="ai-chat-messages" id="aiChatMessages">
             <div class="chat-bubble ai">
-                Chào bạn 👋 Mình là trợ lý AI của VLearn. Hỏi mình bất cứ điều gì trong nội dung Day 01 (AI & LLM Foundation) hoặc Day 02 (Xác định bài toán cho AI) — câu trả lời sẽ luôn kèm mã trích dẫn trang slide, bấm vào để nhảy thẳng tới đúng slide.
+                Chào bạn 👋 Mình là trợ lý AI của VLearn. Hỏi mình bất cứ điều gì trong nội dung Day 01 (AI & LLM
+                Foundation) hoặc Day 02 (Xác định bài toán cho AI) — câu trả lời sẽ luôn kèm mã trích dẫn trang slide,
+                bấm vào để nhảy thẳng tới đúng slide.
             </div>
         </div>
         <div class="ai-chat-suggest" id="aiChatSuggest">
@@ -1316,7 +235,9 @@
             <span class="chat-suggest-chip" onclick="askSuggested(this)">MoE khác gì dense model?</span>
         </div>
         <div class="ai-chat-input-row">
-            <textarea class="ai-chat-textarea" id="aiChatInput" rows="1" placeholder="Nhập câu hỏi về nội dung bài học..." onkeydown="handleChatKeydown(event)" oninput="autoGrowChatInput(this)"></textarea>
+            <textarea class="ai-chat-textarea" id="aiChatInput" rows="1"
+                placeholder="Nhập câu hỏi về nội dung bài học..." onkeydown="handleChatKeydown(event)"
+                oninput="autoGrowChatInput(this)"></textarea>
             <button class="ai-chat-send-btn" id="aiChatSendBtn" onclick="sendChatMessage()">➤</button>
         </div>
     </div>
@@ -1345,8 +266,8 @@
         const PASS_THRESHOLD = 0.6; // ngưỡng % đúng để mở khoá phần tiếp theo
 
         const progress = {
-            d1: { unlocked: 1, results: {}, quiz: {}, answers: {} },
-            d2: { unlocked: 1, results: {}, quiz: {}, answers: {} }
+            d1: { unlocked: 5, results: {}, quiz: {}, answers: {} },
+            d2: { unlocked: 4, results: {}, quiz: {}, answers: {} }
         };
 
         function getSection(doc, sectionId) {
@@ -1521,8 +442,8 @@
                 <div class="active-recall-section" style="padding:20px; margin-top:0;">
                     <div style="font-weight:700; font-size:14px;">${passed ? '✅' : '⚠️'} Kết quả phần này: ${correct}/${total} câu đúng (${pct}%)</div>
                     ${passed
-                        ? `<button class="btn-submit-quiz" style="margin-top:10px;" onclick="advanceSection('${doc}')">Mở khoá phần tiếp theo →</button>`
-                        : `<div style="font-size:13px; color:#64748b; margin-top:8px;">Bạn cần ≥60% đúng để mở khoá phần tiếp theo. Xem lại các nhận xét ở trên rồi làm lại bộ câu hỏi khác cho phần này.</div>
+                    ? `<button class="btn-submit-quiz" style="margin-top:10px;" onclick="advanceSection('${doc}')">Mở khoá phần tiếp theo →</button>`
+                    : `<div style="font-size:13px; color:#64748b; margin-top:8px;">Bạn cần ≥60% đúng để mở khoá phần tiếp theo. Xem lại các nhận xét ở trên rồi làm lại bộ câu hỏi khác cho phần này.</div>
                            <button class="btn-submit-quiz" style="margin-top:10px; background:#ea580c;" onclick="retrySection('${doc}','${sectionId}')">🔁 Làm lại phần này</button>`}
                 </div>
             `;
@@ -1572,29 +493,135 @@
             </div>`;
         }
 
+        const pdfCache = {};
+
+        async function getPdfDoc(docKey) {
+            if (pdfCache[docKey]) return pdfCache[docKey];
+            const pdfUrl = docKey === 'd1' ? 'public/slides/d1-slide-hackathon.pdf' : 'public/slides/d2-slide-hackathon.pdf';
+            if (typeof pdfjsLib === 'undefined') return null;
+            try {
+                const loadingTask = pdfjsLib.getDocument(pdfUrl);
+                const pdf = await loadingTask.promise;
+                pdfCache[docKey] = pdf;
+                return pdf;
+            } catch (err) {
+                console.warn('PDF load attempt 1 failed:', err);
+                try {
+                    if (pdfjsLib.GlobalWorkerOptions) {
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    }
+                    const fallbackTask = pdfjsLib.getDocument(pdfUrl);
+                    const pdf = await fallbackTask.promise;
+                    pdfCache[docKey] = pdf;
+                    return pdf;
+                } catch (err2) {
+                    console.warn('PDF load attempt 2 (CDN worker) failed:', err2);
+                    return null;
+                }
+            }
+        }
+
+        async function renderPdfPageCanvas(docKey, pageNum) {
+            const canvas = document.getElementById(`pdf-canvas-${docKey}-${pageNum}`);
+            const loader = document.getElementById(`pdf-loading-${docKey}-${pageNum}`);
+            const wrapper = canvas ? canvas.parentElement : null;
+            if (!canvas || canvas.dataset.rendered === 'true') return;
+
+            const pdf = await getPdfDoc(docKey);
+            if (!pdf) {
+                if (loader) {
+                    loader.innerHTML = `⚠️ <span style="color: #64748b;">Không thể nạp bản xem trước PDF trực tiếp. Bạn vẫn có thể xem tóm tắt nội dung slide bên dưới hoặc <a href="${docKey === 'd1' ? 'public/slides/d1-slide-hackathon.pdf' : 'public/slides/d2-slide-hackathon.pdf'}" target="_blank" style="color:#2563eb; text-decoration: underline;">mở file PDF gốc ↗</a></span>`;
+                }
+                if (canvas) canvas.style.display = 'none';
+                if (wrapper) {
+                    wrapper.style.minHeight = 'auto';
+                    wrapper.style.padding = '12px 16px';
+                }
+                return;
+            }
+
+            try {
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 1.4 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                canvas.dataset.rendered = 'true';
+                if (loader) loader.style.display = 'none';
+                if (wrapper) wrapper.style.minHeight = 'auto';
+            } catch (e) {
+                console.warn(`Render PDF page ${pageNum} error:`, e);
+                if (loader) {
+                    loader.innerHTML = `⚠️ <span style="color: #64748b;">Không thể hiển thị hình ảnh slide trang ${pageNum}.</span>`;
+                }
+                if (canvas) canvas.style.display = 'none';
+                if (wrapper) wrapper.style.minHeight = 'auto';
+            }
+        }
+
         function renderSlideHtml(s, idx, fileLabel, citationPrefix, docKey, total) {
-            // Shows the ORIGINAL slide page (rasterized from data/vlearn-pack/slides/*.pdf
-            // by codebase/scripts/pdf-to-images.mjs into codebase/assets/${docKey}/).
-            // The text summary in d1Slides/d2Slides is intentionally NOT rendered here —
-            // it stays backend-only, used just to ground the AI quiz (see codebase/server).
             const page = idx + 1;
             const citation = `${citationPrefix}-${String(page).padStart(3, '0')}`;
-            const imgSrc = `assets/${docKey}/page-${String(page).padStart(3, '0')}.png`;
+
+            const heading = s ? escapeHtml(s.heading || '') : `Trang ${page}`;
+            const subheading = s && s.subheading ? `<div class="slide-subheading" style="color: #2563eb; margin-top: 6px; font-size: 15px; font-weight: 600;">${escapeHtml(s.subheading)}</div>` : '';
+            const bodyItems = s && s.body && s.body.length ? `<div class="slide-content-box" style="margin-top: 14px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13.5px;"><ul style="padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 6px;">${s.body.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : '';
+            
+            const isAttention = s && s.heading && s.heading.toLowerCase().includes('attention');
+            const attentionDemo = isAttention ? `
+                <div style="margin-top: 14px; padding: 14px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; font-size: 12.5px;">
+                    <div style="font-weight: 600; color: #0f172a;">Minh họa Khái niệm: <em>"Lan bỏ quyển sách vào túi vì <strong style="color: #e11d48;">nó</strong> quá dày"</em></div>
+                    <div class="attention-demo" style="display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace;">
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">Lan</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">bỏ</span>
+                        <span class="token highlight" style="background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd; padding: 3px 8px; border-radius: 4px;">quyển (0.28)</span>
+                        <span class="token highlight" style="background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd; padding: 3px 8px; border-radius: 4px;">sách (0.32)</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">vào</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">túi (0.09)</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">vì</span>
+                        <span class="token target" style="background: #ffe4e6; color: #9f1239; font-weight: 700; border: 1px solid #fecdd3; padding: 3px 8px; border-radius: 4px;">nó</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">quá</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">dày</span>
+                    </div>
+                    <div style="font-size: 11px; color: #0369a1; text-align: center; margin-top: 8px;">👉 Trọng số Attention mạnh nhất hướng về <strong>"quyển sách"</strong> (0.32) thay vì "cái túi" (0.09).</div>
+                </div>
+            ` : '';
+
+            const takeaway = s && s.takeaway ? `<div class="slide-takeaway" style="margin-top: 12px; padding: 10px 14px; background: #eff6ff; border-left: 3px solid #2563eb; color: #1d4ed8; font-weight: 600; font-size: 12.5px; border-radius: 0 8px 8px 0;">💡 Takeaway: ${escapeHtml(s.takeaway)}</div>` : '';
+
             return `
-                <div class="slide-frame" id="${docKey}-slide-${page}" style="padding: 0; overflow: hidden;">
+                <div class="slide-frame" id="${docKey}-slide-${page}" style="position: relative; border-radius: 16px; background: #fffdf9; border: 1px solid #f1e9db; box-shadow: 0 8px 20px rgba(0,0,0,0.04); padding: 24px 32px; display: flex; flex-direction: column; justify-content: space-between; min-height: 440px; margin-bottom: 24px;">
                     <canvas class="draw-canvas"></canvas>
-                    <img src="${imgSrc}" alt="${fileLabel} — trang ${page}" style="width: 100%; display: block;" loading="lazy">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-top: 1px solid var(--card-border);">
-                        <span style="font-size: 12px; color: #94a3b8;">Trang ${page} / ${total}</span>
-                        <span style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [${citation}]</span>
+                    <div class="watermark" style="position: absolute; top: 14px; right: 20px; font-size: 11px; color: #cbd5e1; font-family: monospace;">${fileLabel}</div>
+
+                    <div>
+                        <div class="slide-page-num" style="font-size: 12px; color: #94a3b8; font-weight: 600; margin-bottom: 10px;">Trang ${page} / ${total}</div>
+                        
+                        <!-- REAL PDF SLIDE RENDERED VIA PDF.JS CANVAS -->
+                        <div class="pdf-canvas-wrapper" style="position: relative; width: 100%; text-align: center; border-radius: 10px; overflow: hidden; background: #ffffff; border: 1px solid #e2e8f0; margin-bottom: 14px; min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                            <canvas id="pdf-canvas-${docKey}-${page}" class="pdf-render-canvas" style="width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
+                            <div id="pdf-loading-${docKey}-${page}" style="position: absolute; font-size: 12px; color: #64748b;">⏳ Đang render slide PDF trang ${page}...</div>
+                        </div>
+
+
+                        <!-- SLIDE SUMMARY CONTENT CARD -->
+                        <div id="text-fallback-${docKey}-${page}" style="display: block;">
+                            <div class="slide-heading" style="font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1.3;">${heading}</div>
+                            ${subheading}
+                            ${bodyItems}
+                            ${attentionDemo}
+                            ${takeaway}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 16px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; font-family: monospace;">
+                        <span>Mã đoạn trích dẫn: <strong style="color: #475569;">[${citation}]</strong></span>
+                        <a href="public/slides/${fileLabel}" target="_blank" style="color: #2563eb; text-decoration: none;">📄 File PDF gốc ↗</a>
                     </div>
                 </div>`;
         }
 
-        // Pages in the original PDF that sit past the last defined section — content
-        // never transcribed into d1Slides/d2Slides (e.g. d2 pages 25-29, a recap section
-        // found only after rasterizing the source PDF). Shown for completeness, ungated,
-        // no quiz — the AI has no grounding text for them so it can't quiz on them anyway.
         const extras = {
             d2: { slideStart: 24, slideEnd: 28, title: 'Phụ lục — nội dung bổ sung (không có trong quiz)' }
         };
@@ -1603,6 +630,7 @@
         function extraSlidesHtml(doc, fileLabel, citationPrefix) {
             const extra = extras[doc];
             if (!extra) return '';
+            const slidesList = doc === 'd1' ? d1Slides : d2Slides;
             let html = `
             <div style="width: 820px; display:flex; align-items:center; gap:10px; margin-top: 4px; color:#94a3b8; font-size:12px; font-weight:700; letter-spacing:0.02em;">
                 <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
@@ -1610,7 +638,7 @@
                 <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
             </div>`;
             for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
-                html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+                html += renderSlideHtml(slidesList[idx], idx, fileLabel, citationPrefix, doc, totalPages[doc]);
             }
             return html;
         }
@@ -1621,12 +649,13 @@
             const container = document.getElementById(doc === 'd1' ? 'docD1Container' : 'docD2Container');
             const list = sections[doc];
             const unlockedCount = Math.min(progress[doc].unlocked, list.length);
+            const slidesList = doc === 'd1' ? d1Slides : d2Slides;
 
             let html = '';
             for (let i = 0; i < unlockedCount; i++) {
                 const section = list[i];
                 for (let idx = section.slideStart; idx <= section.slideEnd; idx++) {
-                    html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+                    html += renderSlideHtml(slidesList[idx], idx, fileLabel, citationPrefix, doc, totalPages[doc]);
                 }
                 html += sectionPassed(doc, section.id)
                     ? `<div class="active-recall-section" style="padding:18px 24px;">
@@ -1644,17 +673,34 @@
 
             container.innerHTML = html;
 
+            // Trigger PDF rendering & quiz loading with slight stagger to prevent Gemini rate limit concurrency
+            let quizDelay = 0;
             for (let i = 0; i < unlockedCount; i++) {
                 const section = list[i];
-                if (sectionPassed(doc, section.id)) continue;
-                if (progress[doc].quiz[section.id]) {
-                    renderQuizQuestions(doc, section.id);
-                } else {
-                    loadQuizInto(doc, section.id);
+                for (let idx = section.slideStart; idx <= section.slideEnd; idx++) {
+                    const page = idx + 1;
+                    renderPdfPageCanvas(doc, page);
+                }
+                if (!sectionPassed(doc, section.id)) {
+                    if (!progress[doc].quiz[section.id]) {
+                        const secId = section.id;
+                        const delay = quizDelay;
+                        setTimeout(() => loadQuizInto(doc, secId), delay);
+                        quizDelay += 350;
+                    } else {
+                        renderQuizQuestions(doc, section.id);
+                    }
                 }
             }
-
-            initDrawCanvases();
+            if (unlockedCount >= list.length && extraSlidesHtml(doc, fileLabel, citationPrefix)) {
+                const extra = extras[doc];
+                if (extra) {
+                    for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
+                        renderPdfPageCanvas(doc, idx + 1);
+                    }
+                }
+            }
+            setTimeout(initDrawCanvases, 60);
         }
 
         function escalateTA(citation) {
@@ -1730,7 +776,7 @@
             document.querySelectorAll('.slide-frame').forEach(frame => {
                 const canvas = frame.querySelector('.draw-canvas');
                 if (!canvas) return;
-                
+
                 canvas.width = frame.offsetWidth || 800;
                 canvas.height = frame.offsetHeight || 450;
 
@@ -1822,31 +868,31 @@
         }
 
         function initTextHighlight() {
-            document.addEventListener('mouseup', function() {
+            document.addEventListener('mouseup', function () {
                 if (currentToolMode !== 'highlight') return;
-                
+
                 const selection = window.getSelection();
                 if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
-                
+
                 const selectedText = selection.toString().trim();
                 if (selectedText.length === 0) return;
 
                 const range = selection.getRangeAt(0);
                 let container = range.commonAncestorContainer;
                 if (container.nodeType === 3) container = container.parentNode;
-                
+
                 if (!container.closest('.slide-frame')) return;
 
                 const mark = document.createElement('mark');
                 mark.className = 'custom-text-highlight';
-                
+
                 let bgMap = {
                     '#f43f5e': 'rgba(253, 164, 175, 0.7)',
                     '#2563eb': 'rgba(147, 197, 253, 0.7)',
                     '#f59e0b': 'rgba(253, 224, 71, 0.8)',
                     '#10b981': 'rgba(110, 231, 183, 0.7)'
                 };
-                
+
                 mark.style.backgroundColor = bgMap[currentDrawColor] || 'rgba(253, 224, 71, 0.8)';
                 mark.style.color = '#0f172a';
                 mark.style.padding = '2px 4px';
@@ -1958,7 +1004,7 @@
             setTimeout(initDrawCanvases, 50);
         }
 
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             renderDocProgressive('d1');
             renderDocProgressive('d2');
             initDrawCanvases();
@@ -1971,9 +1017,9 @@
         /* AI CHAT — simple keyword retrieval over d1Slides/d2Slides so every  */
         /* answer stays grounded in a real, citable slide (demo, no live API) */
         /* ================================================================= */
-        const CHAT_STOPWORDS = new Set(['la','gi','sao','tai','khi','nao','co','khong','va','cua','cho','trong',
-            'mot','cac','de','nen','a','oi','giup','minh','ban','hay','lam','the','nhu','neu','se','duoc','nay',
-            'do','voi','ve','tu','ra','vi','no','nhung','vay','sao','ai','hon']);
+        const CHAT_STOPWORDS = new Set(['la', 'gi', 'sao', 'tai', 'khi', 'nao', 'co', 'khong', 'va', 'cua', 'cho', 'trong',
+            'mot', 'cac', 'de', 'nen', 'a', 'oi', 'giup', 'minh', 'ban', 'hay', 'lam', 'the', 'nhu', 'neu', 'se', 'duoc', 'nay',
+            'do', 'voi', 've', 'tu', 'ra', 'vi', 'no', 'nhung', 'vay', 'sao', 'ai', 'hon']);
 
         function stripDiacritics(str) {
             return str.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
@@ -2106,6 +1152,13 @@
                 sendBtn.disabled = false;
             }, 650 + Math.random() * 500);
         }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            renderDocProgressive('d1');
+            renderDocProgressive('d2');
+            initDrawCanvases();
+            initTextHighlight();
+        });
     </script>
 </body>
 
