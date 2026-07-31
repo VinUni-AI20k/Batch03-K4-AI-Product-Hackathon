@@ -43,7 +43,8 @@ flowchart TD
 - Core JTBD (không tên sản phẩm/AI trong câu): Tìm đúng thủ tục, chuẩn bị đủ thông tin và hoàn tất một lượt khai hồ sơ có thể kiểm tra được mà không phải tự nối nhiều trang và biểu mẫu.
 - Problem statement: Người ít kỹ năng công nghệ phải chuyển qua lại giữa trang tra cứu, hướng dẫn và biểu mẫu; họ dễ chọn sai thủ tục, thiếu trường bắt buộc hoặc không biết bước tiếp theo, dẫn tới mất thời gian và phải làm lại hồ sơ.
 - Evidence (dự kiến nộp theo chuẩn A — khảo sát người thật):
-  - Spec hiện ghi nhận **20/35 người (57%)** gặp khó khăn khi tìm đúng thủ tục và **12/35 người (34%)** gặp khó khăn khi hiểu quy trình/danh mục giấy tờ. Trước khi nộp CP4, nhóm phải bổ sung vào repo câu hỏi khảo sát, toàn bộ 35 câu trả lời đã khử định danh và cách đếm; các trích dẫn dưới đây chưa thay thế được artifact gốc.
+  - Google Forms ghi nhận **45 phản hồi**. Bằng chứng mạnh nhất gắn với sản phẩm: **26/45 người (57,8%)** chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót”; **25/45 (55,6%)** xem quy trình/giấy tờ rườm rà, chồng chéo là khó khăn tổng quan lớn nhất; **24/45 (53,3%)** gặp khó khi tìm tên thủ tục phức tạp.
+  - Câu hỏi, bảng đếm, cách kiểm chứng và sáu biểu đồ không chứa PII nằm tại [`evidence/cp4-survey/`](evidence/cp4-survey/). Trước khi tích chuẩn A, nhóm vẫn phải bổ sung đủ 45 hàng phản hồi đã khử định danh và xác nhận người trả lời đều ở ngoài nhóm.
   - Ví dụ nguyên văn từ khảo sát — Thực hiện thủ tục trực tuyến
 ```text
 - “Thông tin giữa các trang web không đồng nhất, thiếu kênh hỗ trợ chatbot tư vấn trực tuyến.”  
@@ -71,15 +72,12 @@ flowchart TD
 ## §2. Impact & quyết định chọn
 | Ứng viên | Bao nhiêu người gặp | Tần suất | Tốn gì mỗi lần | Khả thi trong prototype |
 |---|---:|---|---|---|
-| Tìm đúng thủ tục bằng ngôn ngữ đời thường và hướng dẫn giấy tờ | **20/35 người (57%)** | Mỗi lần phát sinh thủ tục mới | Thời gian tìm kiếm; nguy cơ chọn sai thủ tục | Cao |
-| Giải thích quy trình và danh mục giấy tờ | **12/35 người (34%)** | Mỗi lần chuẩn bị hồ sơ | Thời gian đọc hiểu; nguy cơ chuẩn bị thiếu giấy tờ | Cao |
-| Hỗ trợ trọn luồng: tìm thủ tục → điền/rà soát form → PDF → nộp mô phỏng | Kết hợp hai nhu cầu trên; **không cộng tỷ lệ vì có thể trùng người** | Mỗi lần chuẩn bị và kiểm tra hồ sơ | Giảm chuyển trang, bỏ sót field và làm lại | Cao trong phạm vi mô phỏng |
+| Tìm đúng thủ tục bằng ngôn ngữ đời thường | **24/45 người (53,3%)** khó tìm tên thủ tục | Mỗi lần phát sinh thủ tục mới | Thời gian tìm kiếm; nguy cơ chọn sai thủ tục | Cao |
+| Rà soát hồ sơ trước khi gửi | **26/45 người (57,8%)** từng phải đi lại do hồ sơ thiếu/sai | Mỗi lần chuẩn bị hồ sơ | Thời gian đi lại; nguy cơ hồ sơ bị trả lại | Cao |
+| Giải thích quy trình/giấy tờ và hỗ trợ hội thoại | **17/45 người (37,8%)** thấy danh mục hồ sơ chưa rõ; **17/45 (37,8%)** thiếu chatbot | Mỗi lần đọc hướng dẫn/điền form | Thời gian đọc hiểu; nguy cơ thiếu giấy tờ | Cao |
 
-- Ứng viên ĐÃ LOẠI + vì sao: Chỉ giải thích quy trình: người dùng vẫn phải tự tìm form và tự kiểm tra dữ liệu.
-- Ứng viên CHỌN + vì sao (bằng số): Trợ lý hỗ trợ chuẩn bị hồ sơ trước khi nộp.
-Lý do chọn bằng số:
-
-20/35 người (57%) gặp khó khăn khi tìm thủ tục; 12/35 người (34%) gặp khó khăn khi hiểu quy trình hoặc danh mục giấy tờ. Nhóm chọn trợ lý trọn luồng để xử lý cả hai điểm đau, nhưng không cộng hai tỷ lệ vì hai nhóm người có thể giao nhau.
+- Ứng viên ĐÃ LOẠI + vì sao: Chỉ cải thiện thái độ/năng lực cán bộ dù 21/45 người (46,7%) phản ánh giải thích chưa rõ; đây là vấn đề có thật nhưng prototype phần mềm không kiểm soát trực tiếp được hành vi và quy trình nhân sự.
+- Ứng viên CHỌN + vì sao (bằng số): Trợ lý trọn luồng tìm thủ tục → giải thích có nguồn → điền/rà soát form → PDF → nộp mô phỏng. Lát cắt này đồng thời tác động vào ba pain đo được: 24/45 khó tìm thủ tục, 17/45 thấy hướng dẫn hồ sơ chưa rõ và 26/45 phải đi lại do hồ sơ thiếu/sai. Không cộng các tỷ lệ vì người trả lời có thể trùng nhau.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 ## 3.1. Cổng Dịch vụ công Quốc gia

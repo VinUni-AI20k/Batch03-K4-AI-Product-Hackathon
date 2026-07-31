@@ -8,19 +8,17 @@
 
 ## Loại bằng chứng
 
-**Chỉ chọn A — Đã khảo sát người thật sau khi đã commit file chứa câu hỏi và toàn bộ 35 câu trả lời đã khử định danh. Không chọn B:** repo hiện chưa có một phép mining chatlog chứng minh pain theo chuẩn B.
+**Chỉ chọn A — Đã khảo sát người thật sau khi đã commit file chứa toàn bộ 45 câu trả lời đã khử định danh và xác nhận họ đều ở ngoài nhóm. Không chọn B:** repo hiện chưa có một phép mining chatlog chứng minh pain theo chuẩn B.
 
-> Trạng thái hiện tại: `spec.md` có số tổng hợp và 7 trích dẫn, nhưng chưa có câu hỏi khảo sát và đủ 35 câu trả lời. Vì vậy chưa đủ bằng chứng để tích A một cách kiểm chứng được.
+> Trạng thái hiện tại: câu hỏi, cách đếm và sáu biểu đồ tổng hợp 45 phản hồi đã có trong `evidence/cp4-survey/`; còn thiếu bản xuất đủ 45 hàng đã khử định danh và xác nhận người trả lời ở ngoài nhóm.
 
 ## Con số bằng chứng mạnh nhất
 
-**20/35 người được khảo sát (57%) cho biết gặp khó khăn khi tìm đúng thủ tục dịch vụ công. Cách đo: dùng câu hỏi “[DÁN NGUYÊN VĂN CÂU HỎI KHẢO SÁT]”, đếm các câu trả lời xác nhận khó tìm tên thủ tục, kết quả tìm kiếm không chính xác hoặc thông tin phân tán; lưu câu hỏi, quy tắc gán nhãn và toàn bộ 35 câu trả lời đã khử định danh tại `[ĐƯỜNG DẪN FILE]`.**
-
-Không nộp nguyên văn hai chỗ trong ngoặc vuông; phải thay bằng dữ liệu khảo sát thật.
+**26/45 người được khảo sát (57,8%) chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót” trong câu hỏi “Về việc Bất tiện di chuyển & Tương tác trực tiếp”. Cách đo: lấy số 26 trên thanh lựa chọn trong Google Forms, chia cho tổng 45 phản hồi và làm tròn một chữ số thập phân. Kết quả được đối chiếu bằng biểu đồ `evidence/cp4-survey/04-travel-pain-points.png`; 25/45 người (55,6%) cũng chọn quy trình, giấy tờ rườm rà/chồng chéo là khó khăn tổng quan lớn nhất.**
 
 ## Các ý tưởng đã cân nhắc và lý do chọn
 
-**Nhóm cân nhắc: (1) chỉ tìm đúng thủ tục; (2) chỉ giải thích quy trình/giấy tờ; (3) trợ lý trọn luồng hỏi đáp → điền/rà soát form → PDF → nộp mô phỏng. Nhóm chọn (3) vì 20/35 người (57%) khó tìm thủ tục và 12/35 người (34%) khó hiểu quy trình/giấy tờ; hai phương án đầu vẫn buộc người dùng tự chuyển trang và tự kiểm tra biểu mẫu. Phạm vi nộp được giữ ở mức mô phỏng để không tạo kỳ vọng sai.**
+**Nhóm cân nhắc: (1) chỉ tìm đúng thủ tục; (2) chỉ giải thích quy trình/giấy tờ; (3) chỉ cải thiện khâu phục vụ trực tiếp; (4) trợ lý trọn luồng hỏi đáp → điền/rà soát form → PDF → nộp mô phỏng. Nhóm chọn (4) vì 24/45 người khó tìm thủ tục, 17/45 thấy danh mục hồ sơ chưa rõ và 26/45 phải đi lại do hồ sơ thiếu/sai. Phương án (3) bị loại vì prototype không kiểm soát hành vi cán bộ; hai phương án đầu không giải quyết trọn hành trình.**
 
 ## Bốn kiểu tình huống khó
 
@@ -32,15 +30,14 @@ Không nộp nguyên văn hai chỗ trong ngoặc vuông; phải thay bằng d�
 
 ## Nhóm còn thiếu gì, cần hỗ trợ gì
 
-**Nhóm còn thiếu artifact khảo sát gồm câu hỏi, toàn bộ 35 câu trả lời đã khử định danh và quy tắc đếm để kiểm chứng số 20/35; cần TA xác nhận định dạng khử định danh phù hợp. Nhóm cũng cần BTC/TA cung cấp mã Zone của SPDVC vì repo/data pack không có bảng phân zone. Về kỹ thuật, nhóm muốn TA review ngưỡng abstain/retrieval để hệ thống không chọn một thủ tục gần giống khi nguồn hiện có không đủ.**
+**Nhóm còn thiếu bản xuất đủ 45 hàng khảo sát đã xóa tên/email và xác nhận người trả lời đều ngoài nhóm; cần TA xác nhận cách khử định danh có đạt chuẩn A hay không. Nhóm cũng cần BTC/TA cung cấp mã Zone của SPDVC vì repo không có bảng phân zone. Về kỹ thuật, nhóm muốn TA review ngưỡng abstain/retrieval để hệ thống không chọn thủ tục gần giống khi nguồn hiện có không đủ.**
 
 ## Trạng thái checklist CP4
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Evidence chuẩn A/B có log | **Chưa đạt** — thiếu raw survey và câu hỏi |
+| Evidence chuẩn A/B có log | **Gần đạt** — đã có câu hỏi, bảng đếm và biểu đồ; thiếu đủ 45 hàng đã khử định danh và xác nhận ngoài nhóm |
 | Bảng impact + ứng viên bị loại | **Đạt về cấu trúc** — 3 ứng viên, có phương án loại và lý do |
 | 4 lớp tình huống cụ thể | **Đạt** — mỗi lớp có ít nhất 2 ví dụ |
 | ≥4 nguyên tắc có nơi áp dụng | **Đạt** |
 | Quality bar bằng số | **Đạt** — ≥75% = 19/25 và hard gate bằng 0 |
-
