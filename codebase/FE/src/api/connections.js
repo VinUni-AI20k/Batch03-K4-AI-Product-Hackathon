@@ -23,3 +23,15 @@ export async function getDiscordInviteUrl() {
 export async function disconnectDiscord(guildId) {
   return apiPost("/connections/discord/disconnect", { guild_id: guildId });
 }
+
+export async function startOutlookConnect() {
+  return apiPost("/connections/outlook/start");
+}
+
+export async function getOutlookConnectStatus() {
+  return apiGet("/connections/outlook/connect-status");
+}
+
+export async function disconnectOutlook() {
+  return apiPost("/connections/outlook/disconnect");
+}

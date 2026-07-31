@@ -17,6 +17,9 @@ from .discord_server_info.tool import discord_server_info
 from .discord_list_channels.tool import discord_list_channels
 from .calendar_list_events.tool import calendar_list_events
 from .calendar_create_event.tool import calendar_create_event
+from .outlook_mail_search.tool import outlook_mail_search
+from .outlook_mail_read.tool import outlook_mail_read
+from .outlook_calendar_list_events.tool import outlook_calendar_list_events
 
 # Tool names here MUST stay in sync with artifacts/tools.yaml. If a tool is
 # renamed, update both this dict and the matching entry in tools.yaml.
@@ -33,6 +36,9 @@ TOOL_FUNCTIONS = {
     "discord_list_channels": discord_list_channels,
     "calendar_list_events": calendar_list_events,
     "calendar_create_event": calendar_create_event,
+    "outlook_mail_search": outlook_mail_search,
+    "outlook_mail_read": outlook_mail_read,
+    "outlook_calendar_list_events": outlook_calendar_list_events,
 }
 
 

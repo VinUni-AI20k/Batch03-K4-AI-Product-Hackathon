@@ -24,6 +24,7 @@ from pydantic import BaseModel
 
 import discord_connection
 import google_connection
+import outlook_connection
 from agent import run_model_tool_loop
 from env_loader import load_backend_env
 from providers import make_provider
@@ -111,10 +112,14 @@ def _sources_cited(tool_events: list[dict[str, Any]]) -> list[dict[str, str]]:
                 "label": "Email gốc",
                 "url": f"https://mail.google.com/mail/u/0/#all/{thread_id}" if thread_id else "",
             })
+        elif name == "outlook_mail_read":
+            sources.append({"label": "Email Outlook gốc", "url": ""})
         elif name == "discord_read_messages":
             sources.append({"label": "Tin nhắn Discord", "url": ""})
         elif name == "calendar_list_events":
             sources.append({"label": "Google Calendar", "url": ""})
+        elif name == "outlook_calendar_list_events":
+            sources.append({"label": "Outlook Calendar", "url": ""})
     return sources
 
 
@@ -244,15 +249,18 @@ def confirm_calendar(item_id: str, request: CalendarConfirmRequest) -> dict[str,
 @app.get("/api/v1/connections")
 def get_connections() -> dict[str, Any]:
     """Status of the connections the backend actually knows how to manage.
-    One Google connection (shared by Gmail + Calendar) and one Discord
-    connection (shared bot, one server); other platforms in the FE's
-    connection list remain client-side only for now."""
+    One Google connection (shared by Gmail + Calendar), one Discord
+    connection (shared bot, one server), and one Outlook connection (its own
+    account registry inside outlook-local-mcp's Docker container/volume —
+    see outlook_connection.py); other platforms in the FE's connection list
+    remain client-side only for now."""
     try:
         google_status = google_connection.get_status()
     except google_connection.GoogleConnectionError:
         google_status = {"connected": False, "email": None, "scopes": []}
     discord_status = discord_connection.get_status()
-    return envelope(data={"google": google_status, "discord": discord_status})
+    outlook_status = outlook_connection.get_status()
+    return envelope(data={"google": google_status, "discord": discord_status, "outlook": outlook_status})
 
 
 @app.get("/api/v1/connections/google/start")
@@ -310,3 +318,27 @@ def disconnect_discord_connection(request: DiscordDisconnectRequest) -> dict[str
     except Exception as exc:
         raise error_response(502, "DISCORD_DISCONNECT_FAILED", str(exc)) from exc
     return envelope(data={"guild_id": request.guild_id})
+
+
+@app.post("/api/v1/connections/outlook/start")
+def start_outlook_connection() -> dict[str, Any]:
+    """Trigger (or check on) Outlook device-code sign-in — see
+    outlook_connection.start_connect() for why this can't just be a fresh
+    tool call per click. Returns quickly with either 'connected' (a cached
+    token already worked) or 'pending' plus the device-code text to show the
+    user; the FE then polls /connections/outlook/connect-status."""
+    return envelope(data=outlook_connection.start_connect())
+
+
+@app.get("/api/v1/connections/outlook/connect-status")
+def get_outlook_connect_status() -> dict[str, Any]:
+    return envelope(data=outlook_connection.get_connect_status())
+
+
+@app.post("/api/v1/connections/outlook/disconnect")
+def disconnect_outlook_connection() -> dict[str, Any]:
+    try:
+        outlook_connection.disconnect()
+    except Exception as exc:
+        raise error_response(502, "OUTLOOK_DISCONNECT_FAILED", str(exc)) from exc
+    return envelope(data={"connected": False})

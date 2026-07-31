@@ -68,7 +68,45 @@ OUTLOOK_MCP_LOG_LEVEL=warn
 
 The token cache lives in the named Docker volume `outlook-mcp-auth` (created
 automatically), not a host path — it survives across runs without any host
-directory bookkeeping.
+directory bookkeeping, **provided `docker_run_args()` also sets `HOME` and
+`--hostname` as it does below** (see next section — without these, sign-in
+appears to succeed but silently has to repeat on every fresh container).
+
+### 4) Why `HOME` and `--hostname` are required (a gap in upstream's own Docker docs)
+
+`config.docker_run_args()` sets two things beyond the obvious `-v .../data/auth`
+that are easy to miss and that upstream's own `docs/quickstart.md` Docker
+config snippet is missing too:
+
+```bash
+--hostname outlook-local-mcp
+-e HOME=/data/auth
+```
+
+Without them, every fresh `docker run` re-triggers device-code sign-in even
+though a previous one already completed successfully, because of two things
+found by reading `example/outlook-local-mcp/internal/auth/filecache.go`:
+
+1. **The real token cache isn't under `/data/auth` by default.** Only
+   `OUTLOOK_MCP_AUTH_RECORD_PATH` (a small identity pointer, containing no
+   tokens) is redirected there by the image's baked-in `ENV`. The actual
+   encrypted token cache lives at `$HOME/.outlook-local-mcp/`, and `HOME`
+   is never set by a plain `docker run` — so it lands in the container's
+   throwaway filesystem and is gone the moment `--rm` removes the container.
+   Setting `HOME=/data/auth` puts it inside the mounted volume too.
+2. **The cache file's encryption key isn't stable across containers either.**
+   It's derived from `hostname + username + machine-id`
+   (`deriveMachineKey`), and Docker assigns a random hostname to every
+   container by default. Even if the encrypted file *did* persist, a new
+   container with a new random hostname couldn't decrypt it — it would look
+   exactly like "sign-in didn't take effect" from the outside. A fixed
+   `--hostname` keeps that part of the key stable.
+
+This is a real gap in `outlook-local-mcp`'s own documented Docker deployment
+(their `docs/quickstart.md` "Claude Desktop / generic MCP client config"
+JSON snippet has the same omission), not something specific to this
+project's setup — so if you ever copy that snippet directly, add both of
+these back in.
 
 ## Usage from Python
 

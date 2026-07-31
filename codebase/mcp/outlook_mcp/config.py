@@ -30,11 +30,26 @@ def docker_run_args() -> list[str]:
     -i keeps stdin open (required: that's the MCP transport). No -t (no TTY)
     since this runs unattended from Python, not a terminal — device-code
     auth doesn't need one, it just prints to stderr and polls.
+
+    --hostname and HOME are required for the cached token to actually survive
+    across separate `docker run` invocations. The Go binary only redirects
+    OUTLOOK_MCP_AUTH_RECORD_PATH (a small identity pointer, no tokens) into
+    /data/auth by default — the real encrypted token cache lives at
+    $HOME/.outlook-local-mcp/, so HOME must point inside the mounted volume
+    too. And that cache file is encrypted with a key derived from
+    hostname+username+machine-id (internal/auth/filecache.go
+    deriveMachineKey) — Docker assigns a random hostname per container
+    otherwise, so a fresh container couldn't decrypt a previous one's cache
+    even if the file itself persisted.
     """
     return [
         "run",
         "--rm",
         "-i",
+        "--hostname",
+        "outlook-local-mcp",
+        "-e",
+        "HOME=/data/auth",
         "-v",
         f"{OUTLOOK_MCP_VOLUME}:/data/auth",
         "-e",

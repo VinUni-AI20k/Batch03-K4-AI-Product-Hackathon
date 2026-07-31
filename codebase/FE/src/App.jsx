@@ -7,9 +7,18 @@ import { initialMessages, initialPlatforms, quickActions } from "./data.js";
 import { ApiError } from "./api/client.js";
 import { sendChatMessage } from "./api/chat.js";
 import { TIMELINE_KEY, confirmCalendar, flagTimelineItem, getTimeline, patchTimelineItem } from "./api/timeline.js";
-import { disconnectDiscord, disconnectGoogle, getConnections, getDiscordInviteUrl, getGoogleAuthUrl } from "./api/connections.js";
+import {
+  disconnectDiscord,
+  disconnectGoogle,
+  disconnectOutlook,
+  getConnections,
+  getDiscordInviteUrl,
+  getGoogleAuthUrl,
+  getOutlookConnectStatus,
+  startOutlookConnect,
+} from "./api/connections.js";
 
-const REVOCABLE_PLATFORM_IDS = new Set(["gmail"]);
+const REVOCABLE_PLATFORM_IDS = new Set(["gmail", "outlook"]);
 
 const QUICK_ACTION_QUERIES = {
   important: "Kiểm tra giúp mình email quan trọng gần đây trên Gmail.",
@@ -20,6 +29,15 @@ const QUICK_ACTION_QUERIES = {
 
 function formatTime() {
   return new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date());
+}
+
+// outlook-local-mcp's device-code message reads e.g. "To sign in, use a web
+// browser to open the page https://microsoft.com/devicelogin and enter the
+// code ABCD1234 to authenticate." — pull out the URL + code so the UI can
+// open the tab itself and show a copyable code instead of raw prose.
+function parseOutlookDeviceCode(message) {
+  const match = /open the page (\S+) and enter the code (\S+) to authenticate/.exec(message ?? "");
+  return match ? { url: match[1], code: match[2] } : null;
 }
 
 const Icon = ({ children, className = "" }) => (
@@ -387,7 +405,7 @@ function EventCard({ event, onCalendar, onEdit, onFlag, isBusy }) {
   );
 }
 
-function Connections({ platforms, onToggle, onDisconnectGuild }) {
+function Connections({ platforms, onToggle, onDisconnectGuild, outlookConnecting }) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-panel">
       <div className="flex items-start justify-between gap-3">
@@ -401,7 +419,17 @@ function Connections({ platforms, onToggle, onDisconnectGuild }) {
       <div className="mt-6 divide-y divide-slate-100">
         {platforms.map((platform) => {
           const isDiscord = platform.id === "discord";
-          const buttonLabel = platform.connected ? (isDiscord ? "Kết nối" : REVOCABLE_PLATFORM_IDS.has(platform.id) ? "Hủy kết nối" : "Quản lý") : "Kết nối";
+          const isOutlook = platform.id === "outlook";
+          const buttonLabel =
+            isOutlook && outlookConnecting
+              ? "Đang chờ đăng nhập…"
+              : platform.connected
+                ? isDiscord
+                  ? "Kết nối"
+                  : REVOCABLE_PLATFORM_IDS.has(platform.id)
+                    ? "Hủy kết nối"
+                    : "Quản lý"
+                : "Kết nối";
           const isDanger = platform.connected && !isDiscord && REVOCABLE_PLATFORM_IDS.has(platform.id);
           return (
             <div key={platform.id} className="py-4">
@@ -418,7 +446,7 @@ function Connections({ platforms, onToggle, onDisconnectGuild }) {
                 </div>
                 <button
                   onClick={() => onToggle(platform.id)}
-                  disabled={platform.id === "zalo"}
+                  disabled={platform.id === "zalo" || (isOutlook && outlookConnecting)}
                   className={`rounded-xl px-3 py-2 text-xs font-bold transition-colors ${
                     isDanger
                       ? "bg-red-50 text-red-600 hover:bg-red-100"
@@ -503,6 +531,7 @@ function Dashboard({
   onFlag,
   onTogglePlatform,
   onDisconnectGuild,
+  outlookConnecting,
   showConnections,
   setShowConnections,
 }) {
@@ -537,7 +566,7 @@ function Dashboard({
         </div>
 
         {showConnections ? (
-          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} onDisconnectGuild={onDisconnectGuild} /></div>
+          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} onDisconnectGuild={onDisconnectGuild} outlookConnecting={outlookConnecting} /></div>
         ) : (
           <>
             <div className="mt-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -627,6 +656,65 @@ function EditDialog({ event, onClose, onSave }) {
   );
 }
 
+function OutlookDeviceCodeDialog({ deviceCode, onClose }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [deviceCode]);
+
+  if (!deviceCode) return null;
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(deviceCode.code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable (e.g. insecure context) — the code is
+      // still shown on screen for the user to type manually.
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="outlook-device-code-title">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-wider text-blue-600">Đăng nhập Outlook</p>
+            <h2 id="outlook-device-code-title" className="mt-1 text-xl font-extrabold text-ink">Nhập mã xác thực</h2>
+          </div>
+          <button type="button" onClick={onClose} className="grid size-9 place-items-center rounded-full hover:bg-slate-100" aria-label="Đóng"><Icon>close</Icon></button>
+        </div>
+        <p className="mt-4 text-sm leading-6 text-slate-500">
+          Mình đã mở trang đăng nhập Microsoft ở một tab mới. Dán mã dưới đây vào đó rồi đăng nhập bằng tài khoản Outlook của bạn:
+        </p>
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 p-4">
+          <p className="flex-1 text-center font-mono text-2xl font-extrabold tracking-[0.2em] text-ink">{deviceCode.code}</p>
+          <button
+            type="button"
+            onClick={copyCode}
+            className={`shrink-0 rounded-xl px-3 py-2 text-xs font-bold transition-colors ${copied ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+          >
+            {copied ? "Đã copy" : "Copy mã"}
+          </button>
+        </div>
+        <a
+          href={deviceCode.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 block text-center text-xs font-bold text-blue-600 hover:underline"
+        >
+          Tab không tự mở? Bấm vào đây: {deviceCode.url}
+        </a>
+        <div className="mt-5 flex items-center justify-center gap-2 text-xs font-semibold text-slate-400">
+          <Icon className="animate-spin text-base">progress_activity</Icon>Đang chờ bạn đăng nhập xong…
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Toast({ text }) {
   return (
     <div className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-2xl">
@@ -646,6 +734,8 @@ export default function App() {
   const [mobileView, setMobileView] = useState("dashboard");
   const [seededActions, setSeededActions] = useState(() => new Set());
   const [busyItemId, setBusyItemId] = useState(null);
+  const [outlookConnecting, setOutlookConnecting] = useState(false);
+  const [outlookDeviceCode, setOutlookDeviceCode] = useState(null);
 
   const {
     data: events = [],
@@ -668,11 +758,55 @@ export default function App() {
         current.map((platform) => {
           if (platform.id === "gmail") return { ...platform, connected: data.google.connected };
           if (platform.id === "discord") return { ...platform, connected: data.discord.connected, guilds: data.discord.guilds };
+          if (platform.id === "outlook") return { ...platform, connected: data.outlook.connected };
           return platform;
         }),
       );
     } catch {
       // Backend may be offline; leave platforms as-is (mock state).
+    }
+  };
+
+  // "pending"/"starting" mean the backend still has the sign-in container
+  // open, waiting on the device-code login to finish — anything else is terminal.
+  const applyOutlookConnectResult = (result) => {
+    if (result.status === "connected") {
+      setPlatforms((current) => current.map((platform) => (platform.id === "outlook" ? { ...platform, connected: true } : platform)));
+      notify(result.message || "Outlook đã kết nối.");
+      setOutlookConnecting(false);
+      setOutlookDeviceCode(null);
+    } else if (result.status === "failed" || result.status === "timeout") {
+      notify(result.message || "Kết nối Outlook thất bại, thử lại sau.");
+      setOutlookConnecting(false);
+      setOutlookDeviceCode(null);
+    } else if (result.status === "pending") {
+      setOutlookConnecting(true);
+      const parsed = parseOutlookDeviceCode(result.message);
+      if (parsed) {
+        setOutlookDeviceCode((current) => {
+          if (current?.code === parsed.code) return current; // same code already shown/opened
+          window.open(parsed.url, "_blank", "noopener,noreferrer");
+          return parsed;
+        });
+      } else {
+        notify(result.message || "Cần đăng nhập Outlook.");
+      }
+    } else {
+      setOutlookConnecting(true);
+    }
+  };
+
+  const pollOutlookConnectStatus = async () => {
+    for (;;) {
+      await new Promise((resolve) => window.setTimeout(resolve, 4000));
+      let result;
+      try {
+        result = await getOutlookConnectStatus();
+      } catch {
+        continue; // backend hiccup mid-poll — keep trying, don't give up the wait
+      }
+      applyOutlookConnectResult(result);
+      if (result.status !== "pending" && result.status !== "starting") return;
     }
   };
 
@@ -779,6 +913,41 @@ export default function App() {
       return;
     }
 
+    if (id === "outlook") {
+      const outlook = platforms.find((platform) => platform.id === "outlook");
+      if (outlook?.connected) {
+        const confirmed = window.confirm(
+          "Hủy kết nối Outlook?\n\nStudyPulse sẽ không thể đọc email hoặc lịch Outlook của bạn cho đến khi bạn kết nối lại.",
+        );
+        if (!confirmed) return;
+        try {
+          await disconnectOutlook();
+          setPlatforms((current) => current.map((platform) => (platform.id === "outlook" ? { ...platform, connected: false } : platform)));
+          notify("Đã hủy kết nối Outlook");
+        } catch (err) {
+          notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.");
+        }
+        return;
+      }
+
+      // No browser-redirect OAuth here — outlook-local-mcp's Docker container
+      // owns its own device-code sign-in. Clicking this actually triggers
+      // that sign-in (backend keeps one container open across the wait, see
+      // outlook_connection.py) rather than just checking a cached status.
+      setOutlookConnecting(true);
+      try {
+        const initial = await startOutlookConnect();
+        applyOutlookConnectResult(initial);
+        if (initial.status === "pending" || initial.status === "starting") {
+          await pollOutlookConnectStatus();
+        }
+      } catch (err) {
+        notify(err instanceof ApiError ? err.message : "Không thể bắt đầu đăng nhập Outlook, kiểm tra backend.");
+        setOutlookConnecting(false);
+      }
+      return;
+    }
+
     if (id === "discord") {
       // Bots can be in several servers at once, so the row's main button
       // always opens the invite flow (to add another one) — disconnecting a
@@ -868,6 +1037,7 @@ export default function App() {
     onFlag: flagEvent,
     onTogglePlatform: togglePlatform,
     onDisconnectGuild: disconnectDiscordGuild,
+    outlookConnecting,
     showConnections,
     setShowConnections,
   };
@@ -891,6 +1061,7 @@ export default function App() {
         <button onClick={() => setMobileView("chat")} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${mobileView === "chat" ? "text-blue-600" : "text-slate-400"}`}><Icon>smart_toy</Icon>Trợ lý AI</button>
       </nav>
       <EditDialog event={editingEvent} onClose={() => setEditingEvent(null)} onSave={saveEvent} />
+      <OutlookDeviceCodeDialog deviceCode={outlookDeviceCode} onClose={() => setOutlookDeviceCode(null)} />
       {toast ? <Toast text={toast} /> : null}
     </main>
   );
