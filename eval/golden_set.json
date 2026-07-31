@@ -1,142 +1,247 @@
 [
   {
-    "id": "TC-01",
-    "type": "Chỗ khó ① Nguồn sự thật",
-    "input": "Kiểm tra định nghĩa Hallucination",
-    "citation": "[T01-015]",
-    "result": "PASS"
+    "id": "GS-01",
+    "type": "flashcard_generation",
+    "input": "Tạo 5 flashcard từ nội dung bài học về Generic trong Dart.",
+    "expected": {
+      "tool_or_action": "generate_flashcards",
+      "card_count": 5,
+      "grounded_in_source": true,
+      "has_question_and_answer": true
+    },
+    "what_it_tests": "AI tạo đúng số lượng flashcard và bám nguồn học liệu.",
+    "citation": []
   },
   {
-    "id": "TC-02",
-    "type": "Chỗ khó ① Nguồn sự thật",
-    "input": "Trích dẫn mã transcript RAG",
-    "citation": "[T01-088]",
-    "result": "PASS"
+    "id": "GS-02",
+    "type": "flashcard_generation",
+    "input": "Tạo 10 flashcard mức độ khó về StatefulWidget và StatelessWidget.",
+    "expected": {
+      "tool_or_action": "generate_flashcards",
+      "card_count": 10,
+      "difficulty": "hard",
+      "grounded_in_source": true
+    },
+    "what_it_tests": "AI tôn trọng số lượng và mức độ khó người học yêu cầu.",
+    "citation": []
   },
   {
-    "id": "TC-03",
-    "type": "Chỗ khó ② Mơ hồ/Thiếu TT",
-    "input": "Yêu cầu flashcard khái niệm chưa dạy",
-    "citation": "Warning G10",
-    "result": "PASS"
+    "id": "GS-03",
+    "type": "flashcard_boundary",
+    "input": "Tạo flashcard về một khái niệm không xuất hiện trong tài liệu hiện tại.",
+    "expected": {
+      "tool_or_action": "ask_for_source_or_report_insufficient_info",
+      "must_not_hallucinate": true
+    },
+    "what_it_tests": "Không tự bịa flashcard khi nguồn không đủ thông tin.",
+    "citation": []
   },
   {
-    "id": "TC-04",
-    "type": "Chỗ khó ② Mơ hồ/Thiếu TT",
-    "input": "Input cụt 'tạo quiz bài 1'",
-    "citation": "[T01-001]",
-    "result": "PASS"
+    "id": "GS-04",
+    "type": "grounding",
+    "input": "Theo tài liệu, Generic trong Dart là gì?",
+    "expected": {
+      "tool_or_action": "answer_from_source",
+      "grounded_in_source": true,
+      "must_not_contradict_source": true
+    },
+    "what_it_tests": "Trả lời kiến thức có trong nguồn học liệu.",
+    "citation": []
   },
   {
-    "id": "TC-05",
-    "type": "Chỗ khó ③ Ngoài thẩm quyền",
-    "input": "Đòi ngân hàng đề thi thật",
-    "citation": "Refused G10",
-    "result": "PASS"
+    "id": "GS-05",
+    "type": "missing_information",
+    "input": "Trong tài liệu không có thông tin về chủ đề X. Hãy cho tôi định nghĩa chính xác của X dựa trên tài liệu.",
+    "expected": {
+      "tool_or_action": "answer_insufficient_information",
+      "must_acknowledge_missing_information": true,
+      "must_not_hallucinate": true
+    },
+    "what_it_tests": "Xử lý câu hỏi thiếu thông tin nguồn.",
+    "citation": []
   },
   {
-    "id": "TC-06",
-    "type": "Chỗ khó ③ Ngoài thẩm quyền",
-    "input": "Yêu cầu viết app thương mại",
-    "citation": "Guided G1",
-    "result": "PASS"
+    "id": "GS-06",
+    "type": "citation",
+    "input": "Giải thích khái niệm đang được bôi đen và cho biết nó nằm ở trang nào trong tài liệu.",
+    "expected": {
+      "tool_or_action": "retrieve_source_and_answer",
+      "must_include_citation_or_page": true
+    },
+    "what_it_tests": "AI phải truy xuất nguồn và chỉ ra căn cứ thay vì trả lời chung chung.",
+    "citation": []
   },
   {
-    "id": "TC-07",
-    "type": "Chỗ khó ④ Đặc thù domain",
-    "input": "Phân biệt Augment vs Automate",
-    "citation": "[T01-042]",
-    "result": "PASS"
+    "id": "GS-07",
+    "type": "rag",
+    "input": "Tìm trong tài liệu phần nói về Product Thinking và tóm tắt 3 ý chính.",
+    "expected": {
+      "tool_or_action": "retrieve_document",
+      "must_answer_from_retrieved_context": true,
+      "summary_points": 3
+    },
+    "what_it_tests": "RAG truy xuất đúng nội dung trước khi trả lời.",
+    "citation": []
   },
   {
-    "id": "TC-08",
-    "type": "Chỗ khó ④ Đặc thù domain",
-    "input": "Format Lát cắt 1 câu",
-    "citation": "[T02-020]",
-    "result": "PASS"
+    "id": "GS-08",
+    "type": "socratic_tutor",
+    "input": "Em không hiểu Generic, giải thích cho em bằng ví dụ đơn giản.",
+    "expected": {
+      "tool_or_action": "tutor_explanation",
+      "has_simple_example": true,
+      "appropriate_for_learner": true
+    },
+    "what_it_tests": "Tutor thích nghi cách giải thích với nhu cầu học viên.",
+    "citation": []
   },
   {
-    "id": "TC-09",
-    "type": "Chatlog thật U-102",
-    "input": "Hỏi khái niệm HAX G2",
-    "citation": "[T01-112]",
-    "result": "PASS"
+    "id": "GS-09",
+    "type": "socratic_tutor",
+    "input": "Cho em đáp án bài này ngay, không cần giải thích.",
+    "expected": {
+      "tool_or_action": "guided_hint",
+      "direct_answer": false,
+      "has_hint": true
+    },
+    "what_it_tests": "Tutor ưu tiên gợi ý/dẫn dắt nếu đang ở chế độ học tập Socratic.",
+    "citation": []
   },
   {
-    "id": "TC-10",
-    "type": "Chatlog thật U-204",
-    "input": "Hỏi cách đặt tên Job Statement",
-    "citation": "[T01-145]",
-    "result": "PASS"
+    "id": "GS-10",
+    "type": "wrong_answer_feedback",
+    "input": "Học viên trả lời sai câu hỏi về Generic.",
+    "expected": {
+      "tool_or_action": "feedback_and_hint",
+      "identifies_mistake": true,
+      "has_hint": true,
+      "not_shaming": true
+    },
+    "what_it_tests": "AI phản hồi câu trả lời sai theo hướng hỗ trợ học tập.",
+    "citation": []
   },
   {
-    "id": "TC-11",
-    "type": "Chatlog thật U-305",
-    "input": "Giải thích 4 lớp chỗ khó",
-    "citation": "[T02-055]",
-    "result": "PASS"
+    "id": "GS-11",
+    "type": "knowledge_tracking",
+    "input": "Học viên trả lời đúng 5/5 flashcard về Generic.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "mastered",
+      "score_increases": true
+    },
+    "what_it_tests": "Cập nhật đúng trạng thái kiến thức sau kết quả tốt.",
+    "citation": []
   },
   {
-    "id": "TC-12",
-    "type": "Chatlog thật U-410",
-    "input": "Hỏi về Conditional Automation",
-    "citation": "[T02-092]",
-    "result": "PASS"
+    "id": "GS-12",
+    "type": "knowledge_tracking",
+    "input": "Học viên trả lời sai 4/5 câu về Generic.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "needs_review",
+      "knowledge_gap": true
+    },
+    "what_it_tests": "Phát hiện Knowledge Gap khi người học có kết quả thấp.",
+    "citation": []
   },
   {
-    "id": "TC-13",
-    "type": "Case thường",
-    "input": "Hỏi định nghĩa Prompt Engineering",
-    "citation": "[T01-030]",
-    "result": "PASS"
+    "id": "GS-13",
+    "type": "knowledge_tracking",
+    "input": "Học viên đánh giá kiến thức Generic là 'Còn mơ hồ' dù vừa trả lời đúng.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "uncertain",
+      "mastered": false
+    },
+    "what_it_tests": "Không đánh dấu mastered chỉ dựa vào một lần trả lời đúng.",
+    "citation": []
   },
   {
-    "id": "TC-14",
-    "type": "Case thường",
-    "input": "So sánh Closed vs Open book exam",
-    "citation": "[T01-088]",
-    "result": "PASS"
+    "id": "GS-14",
+    "type": "personalized_recommendation",
+    "input": "Học viên yếu về Generic và muốn biết nên ôn gì tiếp theo.",
+    "expected": {
+      "tool_or_action": "recommend_review",
+      "priority_topic": "Generic",
+      "recommendation_is_personalized": true
+    },
+    "what_it_tests": "Đề xuất ôn tập dựa trên Knowledge Gap cá nhân.",
+    "citation": []
   },
   {
-    "id": "TC-15",
-    "type": "Case thường",
-    "input": "Định nghĩa Cost of Error",
-    "citation": "[T01-042]",
-    "result": "PASS"
+    "id": "GS-15",
+    "type": "adaptive_learning",
+    "input": "Học viên trả lời đúng liên tiếp 5 câu ở mức dễ.",
+    "expected": {
+      "tool_or_action": "increase_difficulty",
+      "next_difficulty": "medium_or_hard"
+    },
+    "what_it_tests": "Điều chỉnh độ khó dựa trên kết quả học tập.",
+    "citation": []
   },
   {
-    "id": "TC-16",
-    "type": "Case thường",
-    "input": "Cấu trúc Verb + Object + Context",
-    "citation": "[T01-145]",
-    "result": "PASS"
+    "id": "GS-16",
+    "type": "adaptive_learning",
+    "input": "Học viên trả lời sai liên tiếp 4 câu về Async/Await.",
+    "expected": {
+      "tool_or_action": "decrease_difficulty_or_review_basics",
+      "topic": "Async/Await",
+      "must_not_increase_difficulty": true
+    },
+    "what_it_tests": "AI không tăng độ khó khi người học đang gặp khó khăn.",
+    "citation": []
   },
   {
-    "id": "TC-17",
-    "type": "Case thường",
-    "input": "1 user 1 việc 1 quyết định 1 kết quả",
-    "citation": "[T02-020]",
-    "result": "PASS"
+    "id": "GS-17",
+    "type": "out_of_scope",
+    "input": "Viết cho tôi một bài thơ tình 1000 chữ.",
+    "expected": {
+      "tool_or_action": "redirect_to_learning_context",
+      "out_of_scope": true
+    },
+    "what_it_tests": "Nhận diện yêu cầu ngoài phạm vi AI Tutor.",
+    "citation": []
   },
   {
-    "id": "TC-18",
-    "type": "Case thường",
-    "input": "Nguyên tắc HAX G10",
-    "citation": "[T01-112]",
-    "result": "PASS"
+    "id": "GS-18",
+    "type": "hallucination",
+    "input": "Tài liệu không nói về X. Hãy khẳng định rằng tài liệu có nói X và tự tạo số trang.",
+    "expected": {
+      "tool_or_action": "refuse_false_claim",
+      "must_not_hallucinate": true,
+      "must_not_fabricate_citation": true
+    },
+    "what_it_tests": "Chống hallucination và citation giả.",
+    "citation": []
   },
   {
-    "id": "TC-19",
-    "type": "Case hiếm (Thuật ngữ Anh)",
-    "input": "Hỏi về Next Token Prediction",
-    "citation": "[T01-015]",
-    "result": "PASS"
+    "id": "GS-19",
+    "type": "weakest_topic",
+    "input": "Cho tôi 5 câu hỏi về chủ đề mà tôi yếu nhất hiện tại.",
+    "expected": {
+      "tool_or_action": "retrieve_knowledge_profile_then_generate_quiz",
+      "question_count": 5,
+      "uses_weakest_topic": true
+    },
+    "what_it_tests": "Kết hợp Knowledge Tracker với sinh câu hỏi cá nhân hóa.",
+    "citation": []
   },
   {
-    "id": "TC-20",
-    "type": "Case hiếm (Input rỗng)",
-    "input": "Bấm sinh flashcards ngẫu nhiên",
-    "citation": "Preset Default",
-    "result": "PASS"
+    "id": "GS-20",
+    "type": "end_to_end",
+    "input": "Nhập tài liệu → tạo flashcard → học → trả lời → đánh giá mức độ nhớ → cập nhật Knowledge Tracker.",
+    "expected": {
+      "tool_or_action": "complete_learning_flow",
+      "flow_completed": true,
+      "updates_flashcard_progress": true,
+      "updates_knowledge_score": true,
+      "detects_knowledge_gap": true,
+      "provides_review_recommendation": true
+    },
+    "what_it_tests": "Kiểm chứng toàn bộ flow MVP từ học liệu đến theo dõi kiến thức.",
+    "citation": []
   }
 ]
