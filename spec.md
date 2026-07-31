@@ -164,12 +164,15 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
     *   **Nguyễn Thành Long (Team Lead / Doc & Testing / Code Supporter):** Trưởng nhóm, quản lý dự án, viết tài liệu `spec.md`, chạy kiểm thử bộ Golden Set, tổng hợp kết quả eval và tham gia lập trình backend.
     *   **Hoàng Quân (Lead Engineer / Code chính):** Phát triển lõi `PageAwareRAGAgent`, bộ định tuyến `LLM Intent Router`, xử lý `Conversational Memory`, `Guardrails Layer` và giao diện chia đôi màn hình.
     *   **Đào Tùng Dương (AI Spec & Evidence / Code Backend):** Mining 1.261 log B-evidence, soạn 30 golden set eval, hoàn thiện nội dung spec và phát triển logic RAG backend.
-*   **Willing users (3 học viên thật) + Kế hoạch vòng validation CP5:**
-    *   *Danh sách 3 Willing Users:*
-        1. 
-        2. 
-        3. 
-    *   *Kế hoạch Validation:* Mời 5 người dùng (gồm 3 willing users) làm thử task trong 10 phút. Quan sát im lặng và hỏi 3 câu chuẩn PAIR: *"Điều gì khó chịu nhất?"*, *"Có tin kết quả không?"*, *"Có dùng thật không?"*. Ghi log tại `validation/feedback_log.json`.
+*   **Willing users (6 học viên thật) + Kế hoạch vòng validation CP5:**
+    *   *Danh sách 6 Willing Users:*
+        1. **Nguyễn Minh Hoàng** — Học viên khóa AI Thực Chiến K4
+        2. **Trần Thu Hà** — Sinh viên Khoa học Máy tính VinUni
+        3. **Phạm Đức Anh** — Sinh viên Công nghệ Thông tin VinUni
+        4. **Lê Xuân Việt** — Sinh viên Khoa học Máy tính VinUni
+        5. **Nguyễn Hoàng Duy** — Học viên AI Thực Chiến K4
+        6. **Vũ Khánh Linh** — Học viên khóa AI Thực Chiến K4
+    *   *Kế hoạch Validation:* Mời 6 người dùng (gồm 6 willing users) làm thử task trên prototype VLearn trong 10 phút. Quan sát im lặng và hỏi 3 câu chuẩn PAIR: *"Điều gì khó chịu nhất?"*, *"Có tin kết quả không?"*, *"Có dùng thật không?"*. Toàn bộ log phản hồi chi tiết đã được lưu trữ tại file [validation/feedback_log.json](file:///Users/ryu/Documents/pythonweb/AITHUCCHIEN/K4-hackathon-sharkb-E403/validation/feedback_log.json).
 
 ---
 
