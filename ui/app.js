@@ -718,10 +718,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // 10. AI CHATBOT INTERACTION
     // ==========================================================================
+    // ui/app.js (Tìm hàm sendChatMessage và cập nhật lại đoạn fetch như dưới đây)
     async function sendChatMessage(text) {
         if (!text.trim()) return;
 
-        // User message bubble
+        // Vẽ tin nhắn của học viên
         const userBubble = document.createElement('div');
         userBubble.className = 'user-card';
         userBubble.textContent = text;
@@ -729,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawerUserInput.value = '';
         drawerChatMessages.scrollTop = drawerChatMessages.scrollHeight;
 
-        // Bot loading bubble
+        // Vẽ tin nhắn chờ của AI
         const botBubble = document.createElement('div');
         botBubble.className = 'bot-card';
         botBubble.innerHTML = '⏳ <em>VLearn Tutor đang suy luận từ slide...</em>';
@@ -751,6 +752,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
+                // Hiển thị câu trả lời thật từ Python Backend Agent
                 botBubble.innerHTML = data.reply || data.response;
                 drawerChatMessages.scrollTop = drawerChatMessages.scrollHeight;
                 return;
@@ -759,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Backend API connection attempted:', err);
         }
 
-        // Fallback response
+        // Khung fallback dự phòng (chỉ chạy khi mất kết nối backend)
         setTimeout(() => {
             let replyText = `Cảm ơn bạn đã đặt câu hỏi: <strong>"${escapeHtml(text)}"</strong>.<br>Trong Slide ${currentSlide} của <em>${currentDocFile}</em>, nội dung này phân tích nguyên lý hoạt động của mô hình ngôn ngữ lớn (LLM).`;
             

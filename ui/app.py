@@ -1,14 +1,16 @@
-# ui/app.py - Streamlit AI Slide Tutor Demo App (Dark Slide Viewer View)
+# ui/app.py - Streamlit AI Slide Tutor Demo App (Bản Kết Nối Backend Thật)
 """
 VLearn AI Tutor - Streamlit Application for AI Slide Reading & Context Learning.
 Matched 100% to Latest Dark Slide Viewer Screenshot with 100% Interactive Buttons.
-Run command: streamlit run Space/ui/app.py
+Run command: streamlit run ui/app.py
 """
 
 import os
 import sys
 import json
+import threading
 from pathlib import Path
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -21,10 +23,9 @@ SLIDES_DIR = PROJECT_ROOT / "data" / "vlearn-pack" / "slides"
 if str(CODEBASE_DIR) not in sys.path:
     sys.path.insert(0, str(CODEBASE_DIR))
 
-# Attempt to load AI agent & PDF processor from codebase/core
+# Nạp AI agent từ codebase/core của nhóm
 try:
     from core.agent import run_agent
-    from core.pdf_processor import read_slide_page_real
     HAS_AI_CORE = True
 except Exception as err:
     HAS_AI_CORE = False
