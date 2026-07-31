@@ -100,7 +100,7 @@ export default function Home() {
   };
 
   const handleOpenTrace = (qNum: number, selectedOptText: string, evalStatus: string) => {
-    const citations: { [key: number]: string } = { 1: '[T01-015]', 2: '[T01-017]', 3: '[T02-017]' };
+    const citations: { [key: number]: string } = { 1: '[T01-022]', 2: '[T01-023]', 3: '[T02-014]' };
     setTraceState({
       isOpen: true,
       qNum,

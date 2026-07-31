@@ -11,56 +11,56 @@ export interface QuizQuestion {
 export const quizQuestions: QuizQuestion[] = [
   {
     id: 1,
-    title: "Câu 1 (Day 01 — Cơ chế Attention): Trong kiến trúc Transformer, cơ chế Attention giải quyết điểm nghẽn lớn nhất nào của các mô hình truyền thống (RNN/LSTM)?",
+    title: 'Câu 1 (Cơ chế Attention — Trang 22): Trong câu "Lan bỏ quyển sách vào túi vì nó quá dày", tại sao từ "nó" lại tự động chú ý (Attention) tới "quyển sách" chứ không phải "cái túi"?',
     options: {
-      A: 'A. Giúp mô hình tự động gán trọng số liên quan giữa các token trong câu mà không bị giới hạn bởi khoảng cách vị trí hay chuỗi tuần tự.',
-      B: 'B. Giúp mô hình đọc toàn bộ tài liệu theo trình tự thời gian giống hệt cách con người đọc sách.',
-      C: 'C. Giúp mô hình nén dữ liệu văn bản xuống 0 token để giảm chi phí API.',
-      D: 'D. Giúp mô hình hiểu chính xác 100% ngữ nghĩa đời thực như trí tuệ con người.'
+      A: 'A. Self-Attention tính toán trọng số tương quan xác suất giữa các vector token; cụm "sách quá dày" có trọng số (0.32) cao hơn hẳn "túi quá dày" (0.09).',
+      B: 'B. Do từ "túi" đứng sát từ "nó" hơn trong câu nên mô hình luôn chọn từ đứng gần nhất.',
+      C: 'C. Do AI hiểu được ý nghĩa thực tế bên ngoài đời thực là chỉ có sách mới dày còn túi thì không.',
+      D: 'D. Do trọng số Attention được khởi tạo ngẫu nhiên mỗi lần chạy mô hình.'
     },
     correctOption: 'A',
-    citation: '[T01-015]',
-    correctExplanation: 'Attention cho phép mỗi token chủ động "quay đầu" nhìn lại các token trước, chấm điểm mức độ liên quan rồi khóa nghĩa theo ngữ cảnh — đây là lý do model hiểu ngữ cảnh tốt hơn hẳn các thế hệ trước (slide "Attention", d1 trang 15).',
+    citation: '[T01-022]',
+    correctExplanation: 'Self-Attention tính toán trọng số tương quan xác suất giữa các vector token ("nó" & "quyển sách" = 0.32) chứ không phụ thuộc vào vị trí đứng gần (0.09).',
     misconceptionExplanations: {
-      B: 'Slide nói rõ: "Thay vì đọc tuần tự từng chữ" — attention không xử lý theo trình tự đọc như con người.',
-      C: 'Attention không dựa vào khoảng cách vị trí giữa các từ hay nén về 0 token mà dựa trên trọng số liên quan được tính toán qua ngữ cảnh.',
-      D: 'Model không "hiểu" thực tế đời thực như người; nó tính điểm mức độ liên quan giữa các token dựa trên dữ liệu training.'
+      B: 'Self-Attention không chọn từ dựa vào vị trí đứng sát nhau mà dựa trên trọng số xác suất toán học của ngữ cảnh.',
+      C: 'AI không "hiểu" thực tế đời thực như người; nó tính toán xác suất thống kê vector token dựa trên dữ liệu training.',
+      D: 'Trọng số Attention được tính toán cố định thông qua Ma trận Query, Key, Value chứ không phải ngẫu nhiên.'
     }
   },
   {
     id: 2,
-    title: "Câu 2 (Day 01 — Kiến trúc MoE vs Dense): Vì sao Kimi K3 có 2.800 tỷ tham số nhưng chi phí mỗi ca inference lại không tăng tuyến tính gấp 16 lần so với GPT-3 (175 tỷ tham số)?",
+    title: 'Câu 2 (3 Trục Scaling Model — Trang 23): Tại sao mô hình Chinchilla 70B lại chiến thắng mô hình Gopher 280B dù số lượng tham số nhỏ hơn tới 4 lần?',
     options: {
-      A: 'A. Kimi K3 dùng kiến trúc MoE ("bệnh viện đa khoa") — mỗi token chỉ gọi vài chuyên gia thay vì đi qua toàn bộ mạng như model dense (GPT-3), nên chi phí mỗi lần suy luận gần như không đổi dù tổng tham số lớn hơn nhiều.',
-      B: 'B. Vì Kimi K3 nén dữ liệu thông minh hơn nên luôn chạy nhanh hơn bất kể kiến trúc.',
-      C: 'C. Vì phần lớn 2.800 tỷ tham số của Kimi K3 không thực sự được dùng, chỉ để "trưng bày" quy mô.',
-      D: 'D. Vì Kimi K3 chạy trên phần cứng mạnh hơn hẳn nên bù lại số tham số lớn.'
+      A: 'A. Do Chinchilla 70B có số lượng tham số được nén lại thông minh hơn nên luôn mạnh hơn.',
+      B: 'B. Do Chinchilla được huấn luyện trên lượng dữ liệu (Tokens) gấp 4 lần, đạt tỷ lệ tối ưu giữa Data và Parameters (Chinchilla Scaling Law).',
+      C: 'C. Do Gopher 280B chạy quá chậm nên bị tính điểm phạt khi chấm benchmark.',
+      D: 'D. Do Chinchilla được áp dụng RLHF còn Gopher thì không.'
     },
-    correctOption: 'A',
-    citation: '[T01-017]',
-    correctExplanation: 'Kimi K3 dùng kiến trúc MoE — "một bệnh viện đa khoa" — mỗi token chỉ gọi vài chuyên gia, khác với GPT-3 dense ("một bác sĩ đa năng") nơi mọi token đều đi qua toàn bộ khớp nối. Nhờ vậy "bệnh viện" lớn gấp 16 lần mà chi phí mỗi ca khám gần như không đổi (slide "Tham số", d1 trang 17).',
+    correctOption: 'B',
+    citation: '[T01-023]',
+    correctExplanation: 'Chinchilla 70B thắng Gopher 280B nhờ tỷ lệ tối ưu giữa Data (Tokens) và Parameters (Chinchilla Scaling Law). Lượng Tokens huấn luyện gấp 4 lần mới là yếu tố quyết định.',
     misconceptionExplanations: {
-      B: 'Slide không nói về nén dữ liệu; khác biệt cốt lõi nằm ở kiến trúc MoE so với dense.',
-      C: 'Tham số trong MoE vẫn được dùng — chỉ khác là mỗi token chỉ đi qua một phần nhỏ (vài chuyên gia) thay vì toàn bộ mạng.',
-      D: 'Slide không đề cập đến phần cứng; lý do chi phí không tăng tương ứng nằm ở kiến trúc MoE.'
+      A: 'Số lượng tham số lớn không đồng nghĩa với thông minh hơn nếu thiếu Data huấn luyện tương ứng.',
+      C: 'Benchmark đánh giá chất lượng đầu ra chứ không phạt điểm tốc độ chạy.',
+      D: 'Cả hai mô hình đều là pretraining model, sự khác biệt cốt lõi ở Slide 23 nằm ở Pretraining Data Scaling.'
     }
   },
   {
     id: 3,
-    title: "Câu 3 (Day 02 — PAIR Automate vs Augment): Khi thiết kế tính năng AI chấm điểm bài tập lớn cho học viên khóa AI, nhóm nên chọn cấp độ Automate (tự động 100%) hay Augment (hỗ trợ con người)?",
+    title: 'Câu 3 (Cost of Error & Automation Level — Trang 14): Một nhóm định thiết kế AI tự động chấm bài tập lớn của học viên mà không cần giảng viên duyệt. Hãy đánh giá Cost-of-Error và đề xuất mức Automation phù hợp.',
     options: {
-      A: 'A. Chọn Automate hoàn toàn vì AI luôn khách quan và nhanh hơn con người.',
-      B: 'B. Chấm bài tập lớn là việc stakes cao (điểm số, trách nhiệm cá nhân) — theo PAIR nên chọn Augment: AI soạn nháp, con người (giảng viên/TA) duyệt trước khi trả kết quả.',
+      A: 'A. Chọn Full Automate 100% để tiết kiệm tối đa thời gian cho giảng viên.',
+      B: 'B. Chấm bài tập lớn có Cost-of-Error rất cao (AI chấm sai gây bức xúc/mất điểm); bắt buộc dùng Conditional Automation / Augment (AI chấm nháp + Giảng viên/TA duyệt).',
       C: 'C. Tuyệt đối không ứng dụng AI vì AI luôn luôn chấm sai bài tập.',
-      D: 'D. Chuyển cho các học viên tự chấm chéo lẫn nhau thay vì dùng AI.'
+      D: 'D. Chuyển cho các học viên tự chấm chéo lẫn nhau.'
     },
     correctOption: 'B',
-    citation: '[T02-017]',
-    correctExplanation: 'Theo PAIR (d2 trang 17): Augment được chọn khi stakes cao (tiền bạc, pháp lý, sức khỏe — ở đây là điểm số/trách nhiệm cá nhân) và kết quả cần trách nhiệm cá nhân. Việc automate hoàn toàn vẫn cần human oversight (preview, edit, undo).',
+    citation: '[T02-014]',
+    correctExplanation: 'Chấm bài tập lớn có Cost-of-Error rất cao (AI chấm sai làm học viên bức xúc). Bắt buộc phải áp dụng Conditional Automation hoặc Augment (AI chấm nháp + Giảng viên/TA duyệt cuối).',
     misconceptionExplanations: {
-      A: 'PAIR chỉ ra Automate phù hợp khi có "đáp án đúng" mọi người đồng thuận và rủi ro thấp — chấm bài tập lớn không thỏa điều kiện này.',
-      C: 'AI hoàn toàn có thể hỗ trợ ở vai trò Augment (soạn nháp), chỉ là không nên Automate hoàn toàn khi chưa có người duyệt.',
-      D: 'Học viên chấm chéo không giải quyết được vấn đề thiếu chuẩn mực đánh giá chuyên môn và trách nhiệm cá nhân.'
+      A: 'Bài toán Cost-of-Error cao không thể tự động hóa 100% khi chưa có con người kiểm duyệt.',
+      C: 'AI hoàn toàn có thể hỗ trợ chấm nháp (Augment) giúp giảng viên tiết kiệm 70% thời gian.',
+      D: 'Học viên chấm chéo không đảm bảo được chuẩn mực đánh giá chuyên môn.'
     }
   }
 ];
