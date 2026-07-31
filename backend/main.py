@@ -35,7 +35,12 @@ def get_question_embedding(question: str):
 from .graph import app as graph_app
 from langchain_core.messages import HumanMessage
 
-@app.post("/chat", response_model=ChatResponse)
+from fastapi.responses import StreamingResponse
+import requests
+import json
+from langchain_core.messages import AIMessage
+
+@app.post("/chat")
 def chat_with_slide(
     request: ChatRequest, 
     user_id: str = Header(None),
@@ -44,30 +49,95 @@ def chat_with_slide(
     if not user_id:
         raise HTTPException(status_code=401, detail="Missing user_id in headers")
 
-    # Cấu hình memory bằng user_id làm thread_id để chat nhớ được hội thoại
-    config = {"configurable": {"thread_id": user_id}}
+    # Cấu hình memory bằng user_id + lecture_id làm thread_id để refresh memory khi đổi slide/ngày
+    thread_id = f"{user_id}_{request.lecture_id}"
+    config = {"configurable": {"thread_id": thread_id}}
     
     try:
-        # Chạy luồng LangGraph đồng bộ
-        try:
-            state = graph_app.invoke(
-                {"messages": [HumanMessage(content=request.question)], "lecture_id": request.lecture_id},
-                config=config
-            )
-        except Exception as e:
-            if "Server disconnected without sending a response" in str(e):
-                print("Retrying due to server disconnect...")
-                state = graph_app.invoke(
-                    {"messages": [HumanMessage(content=request.question)], "lecture_id": request.lecture_id},
-                    config=config
-                )
-            else:
-                raise e
+        # Chạy luồng LangGraph đồng bộ (chỉ đánh giá và truy xuất ngữ cảnh)
+        state = graph_app.invoke(
+            {"messages": [HumanMessage(content=request.question)], "lecture_id": request.lecture_id},
+            config=config
+        )
         
-        # Lấy nội dung tin nhắn cuối cùng (có thể từ evaluate hoặc generate)
-        final_message = state["messages"][-1].content
+        # Nếu câu hỏi không liên quan, trả về câu từ chối luôn
+        if not state.get("is_relevant", True):
+            final_message = state["messages"][-1].content
+            def generate_rejection():
+                yield f"data: {json.dumps({'answer': final_message})}\n\n"
+            return StreamingResponse(generate_rejection(), media_type="text/event-stream")
+            
+        # Nếu liên quan, lấy ngữ cảnh và gọi API FPTCloud dạng stream
+        context = state.get("context", "")
+        lecture_id = state.get("lecture_id", request.lecture_id)
         
-        return ChatResponse(answer=final_message)
+        sys_prompt = f"""Bạn là VLearn Tutor, trợ lý AI giải đáp thắc mắc về bài giảng.
+Bạn đang hỗ trợ học viên trong bài học {lecture_id}.
+
+[CÁC ĐOẠN NỘI DUNG LIÊN QUAN TRONG BÀI GIẢNG]:
+{context}
+
+Nhiệm vụ của bạn:
+1. CHỈ TRẢ LỜI các câu hỏi tập trung vào kiến thức của bài học và lĩnh vực chuyên môn.
+2. KHÔNG ĐƯỢC trả lời những vấn đề không liên quan đến đề tài. Nếu học viên hỏi ngoài lề, hãy lịch sự từ chối và hướng họ quay lại với nội dung bài học.
+3. Dựa vào các nội dung trên và lịch sử hội thoại, hãy trả lời ngắn gọn, súc tích, dễ hiểu. KHÔNG bịa đặt thông tin nếu không có trong ngữ cảnh.
+4. Nếu câu hỏi không rõ ràng về bài giảng, hãy hỏi lại học viên để làm rõ ý và hướng họ về việc hỏi đáp kiến thức bài học."""
+        
+        formatted_msgs = [{"role": "system", "content": sys_prompt}]
+        for msg in state["messages"]:
+            role = "user"
+            if msg.type == "ai":
+                role = "assistant"
+            # Bỏ qua system prompt cũ nếu có trong state
+            if msg.type != "system":
+                formatted_msgs.append({"role": role, "content": msg.content})
+                
+        def generate():
+            url = "https://mkp-api.fptcloud.com/chat/completions"
+            token = "sk-H_YuLOl4y2dueOyIMJUFcq4X0FFF8MZg4-5u1QHlswQ="
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}"
+            }
+            data = {
+                "model": "GLM-5.2",
+                "messages": formatted_msgs,
+                "stream": True,
+                "temperature": 0.1
+            }
+            
+            response = requests.post(url, headers=headers, json=data, stream=True)
+            if not response.ok:
+                yield f"data: {json.dumps({'answer': f'Lỗi gọi API: {response.text}'})}\n\n"
+                return
+                
+            full_answer = ""
+            for line in response.iter_lines():
+                if line:
+                    line_text = line.decode('utf-8')
+                    if line_text.startswith('data: '):
+                        line_text = line_text[6:]
+                    if line_text == "[DONE]":
+                        break
+                    try:
+                        chunk_data = json.loads(line_text)
+                        choices = chunk_data.get("choices", [])
+                        if choices:
+                            delta = choices[0]["delta"]
+                            content = delta.get("content", "")
+                            reasoning = delta.get("reasoning_content", "")
+                            if content or reasoning:
+                                if content:
+                                    full_answer += content
+                                yield f"data: {json.dumps({'answer': content, 'reasoning': reasoning})}\n\n"
+                    except json.JSONDecodeError:
+                        pass
+                        
+            # Sau khi stream xong, lưu câu trả lời vào memory để nhớ cho lần sau
+            graph_app.update_state(config, {"messages": [AIMessage(content=full_answer)]})
+            
+        return StreamingResponse(generate(), media_type="text/event-stream")
+
     except Exception as e:
         print(f"Error in graph: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -108,7 +178,13 @@ class QuizGenerateRequest(BaseModel):
 
 @app.get("/concepts/{lecture_id}")
 def get_concepts(lecture_id: str, db: Session = Depends(get_db)):
-    real_lecture_id = "d1-ai-llm-foundation" if lecture_id == "day01" else lecture_id
+    if lecture_id == "day01":
+        real_lecture_id = "d1-ai-llm-foundation"
+    elif lecture_id == "day02":
+        real_lecture_id = "d2-xac-dinh-bai-toan"
+    else:
+        real_lecture_id = lecture_id
+        
     concepts = db.query(Concept).filter(Concept.lecture_id == real_lecture_id).all()
     return [{"id": c.concept_id, "name": c.name, "elo": 1500, "slides": [1]} for c in concepts]
 

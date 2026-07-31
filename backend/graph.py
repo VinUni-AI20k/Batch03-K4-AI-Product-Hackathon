@@ -4,13 +4,50 @@ from dotenv import load_dotenv
 
 from langchain_core.messages import BaseMessage, AIMessage, SystemMessage
 from langgraph.graph.message import add_messages
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
+import requests
+import json
+
+class CustomFPTChat:
+    def __init__(self, temperature=0):
+        self.token = "sk-H_YuLOl4y2dueOyIMJUFcq4X0FFF8MZg4-5u1QHlswQ="
+        self.url = "https://mkp-api.fptcloud.com/chat/completions"
+        self.model = "GLM-5.2"
+        self.temperature = temperature
+
+    def invoke(self, messages):
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.token}"
+        }
+        
+        formatted_msgs = []
+        for msg in messages:
+            role = "user"
+            if msg.type == "system":
+                role = "system"
+            elif msg.type == "ai":
+                role = "assistant"
+            formatted_msgs.append({"role": role, "content": msg.content})
+            
+        data = {
+            "model": self.model,
+            "messages": formatted_msgs,
+            "stream": False,
+            "temperature": self.temperature
+        }
+        
+        response = requests.post(self.url, headers=headers, json=data)
+        if not response.ok:
+            raise Exception(f"FPT API Error: {response.text}")
+            
+        answer = response.json()["choices"][0]["message"]["content"]
+        return AIMessage(content=answer)
+
 from sqlalchemy import text
 from .database import SessionLocal
-from .main import get_question_embedding
 
 load_dotenv()
 
@@ -26,21 +63,24 @@ def evaluate_node(state: AgentState):
     Evaluates if the question is relevant. If yes, generates a search query.
     If no, sets is_relevant to False and responds.
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
+    llm = CustomFPTChat(temperature=0)
     
-    sys_prompt = """You are a routing agent for an educational chatbot answering questions about a lecture.
+    lecture_id = state.get("lecture_id", "day01")
+    sys_prompt = f"""You are a routing agent for an educational chatbot answering questions about a lecture.
+The current lecture the user is learning is: {lecture_id}.
 Your STRICT goal is to ensure users only ask questions related to the lesson and its academic domain.
 Read the user's latest question and the conversation history.
 Determine if the user's question is:
-1. RELEVANT: Clearly asking about the lecture, academic concepts, explanations, or follow-up questions to your previous answers.
-2. IRRELEVANT: Small talk, outside the domain (e.g. weather, politics, unrelated topics), gibberish, or the question is too vague/unclear to understand what part of the lesson they mean.
+1. RELEVANT: Asking about the lecture, academic concepts, explanations, follow-up questions, or asking to summarize information/lesson/this. ASSUME ALL VAGUE REQUESTS FOR SUMMARIES OR HELP ARE RELEVANT TO THE CURRENT LECTURE ({lecture_id}).
+2. IRRELEVANT: ONLY use this for CLEARLY out-of-domain topics (weather, politics, sports) or pure gibberish.
 
 Output EXACTLY in one of these two formats:
 Format 1 (If relevant):
 RELEVANT: <a highly optimized search query capturing the core concepts to search in a vector database>
+(If they ask for a general summary, output: RELEVANT: tổng quát nội dung bài giảng {lecture_id})
 
-Format 2 (If irrelevant or unclear):
-IRRELEVANT: <a polite response in Vietnamese. If outside the domain, decline to answer and steer them back to the lesson. If unclear, ask them to clarify what part of the lecture they are referring to.>
+Format 2 (If irrelevant):
+IRRELEVANT: <a polite response in Vietnamese declining to answer out-of-domain topics.>
 """
     
     # We pass the system prompt and the messages
@@ -69,6 +109,8 @@ IRRELEVANT: <a polite response in Vietnamese. If outside the domain, decline to 
 
 def retrieve_node(state: AgentState):
     """Retrieves context from pgvector based on search_query."""
+    from .main import get_question_embedding
+    
     query = state["search_query"]
     lecture_id = state.get("lecture_id", "day01")
     
@@ -99,31 +141,6 @@ def retrieve_node(state: AgentState):
     finally:
         db.close()
 
-def generate_node(state: AgentState):
-    """Generates the final answer using retrieved context."""
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.1)
-    
-    context = state.get("context", "")
-    lecture_id = state.get("lecture_id", "day01")
-    
-    sys_prompt = f"""Bạn là VLearn Tutor, trợ lý AI giải đáp thắc mắc về bài giảng.
-Bạn đang hỗ trợ học viên trong bài học {lecture_id}.
-
-[CÁC ĐOẠN NỘI DUNG LIÊN QUAN TRONG BÀI GIẢNG]:
-{context}
-
-Nhiệm vụ của bạn:
-1. CHỈ TRẢ LỜI các câu hỏi tập trung vào kiến thức của bài học và lĩnh vực chuyên môn.
-2. KHÔNG ĐƯỢC trả lời những vấn đề không liên quan đến đề tài. Nếu học viên hỏi ngoài lề, hãy lịch sự từ chối và hướng họ quay lại với nội dung bài học.
-3. Dựa vào các nội dung trên và lịch sử hội thoại, hãy trả lời ngắn gọn, súc tích, dễ hiểu. KHÔNG bịa đặt thông tin nếu không có trong ngữ cảnh.
-4. Nếu câu hỏi không rõ ràng về bài giảng, hãy hỏi lại học viên để làm rõ ý và hướng họ về việc hỏi đáp kiến thức bài học.
-"""
-    
-    messages = [SystemMessage(content=sys_prompt)] + state["messages"]
-    
-    response = llm.invoke(messages)
-    return {"messages": [response]}
-
 def route_after_evaluation(state: AgentState) -> Literal["retrieve", "__end__"]:
     if state.get("is_relevant", False):
         return "retrieve"
@@ -133,12 +150,10 @@ def route_after_evaluation(state: AgentState) -> Literal["retrieve", "__end__"]:
 workflow = StateGraph(AgentState)
 workflow.add_node("evaluate", evaluate_node)
 workflow.add_node("retrieve", retrieve_node)
-workflow.add_node("generate", generate_node)
 
 workflow.add_edge(START, "evaluate")
 workflow.add_conditional_edges("evaluate", route_after_evaluation)
-workflow.add_edge("retrieve", "generate")
-workflow.add_edge("generate", END)
+workflow.add_edge("retrieve", END)
 
 memory = MemorySaver()
 app = workflow.compile(checkpointer=memory)
