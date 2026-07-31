@@ -56,7 +56,7 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
   3. KHÔNG build công cụ chỉnh sửa/vẽ trực tiếp sơ đồ đồ họa phức tạp trên slide.
 - Mức prototype nhắm tới: [x] Mock
   * **Phần Mock:** Dữ liệu slide bài giảng giả lập (Slide 5, Slide 12), khung khoanh chọn ảnh giả lập và giao diện ứng dụng (UI Framework).
-  * **Phần Thật (Thực hiện ở CP3 - N2):** Lời gọi Gemini API thật xử lý Tóm tắt Slide, giải thích bối cảnh bôi đen text/ảnh sơ đồ và sinh Micro-Quiz ôn tập.
+  * **Phần Thật (Thực hiện ở CP3 - N2):** Lời gọi model `openai/gpt-4o-mini` qua OpenRouter xử lý Tóm tắt Slide, giải thích bối cảnh bôi đen text/ảnh sơ đồ và sinh Micro-Quiz ôn tập.
 - Automation: [x] augment — Lý do theo cost-of-error: Kiến thức chuyên ngành nếu AI tự quyết định thay hoặc trả lời sai sẽ khiến học viên tiếp thu sai bản chất (Cost-of-error đắt). Do đó, AI chỉ đóng vai trò **Augment** (gợi ý tóm tắt, giải thích hình ảnh, đặt câu hỏi ôn tập, đưa Card đề xuất), quyền bấm chuyển slide hay chọn đáp án hoàn toàn do học viên quyết định.
 
 - §4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR):
@@ -110,8 +110,8 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
   * **Đào Chí Hiển (2A202601066):** Leader & chịu trách nhiệm file `spec.md`, thiết kế kiến trúc hệ thống tổng quan.
   * **Nguyễn Việt Anh (2A202601144):** Thu thập dữ liệu khảo sát HV Khóa 3 & 4, phụ trách mảng Evidence & Validation Log.
   * **Nguyễn Bùi Anh Tuấn (2A202601208):** Xây dựng bộ Golden Set (`eval/`), tối ưu Prompt AI Tutor & chạy đánh giá Evals.
-  * **Nguyễn Ngọc Chi (2A202602024):** Lập trình Frontend Prototype (React/Tailwind), nối Gemini API & xử lý luồng chat AI.
-  * **Trần Thanh Bình (2A202601174):** Xử lý sự kiện Text Selection (Bôi đen), tính năng chuyển Slide tự động (Slide Jump) & chuẩn bị Demo Script.
+  * **Nguyễn Ngọc Chi (2A202602024):** Phụ trách giao diện React/Tailwind và các component Slide Viewer, AI Tutor Chat Panel.
+  * **Trần Thanh Bình (2A202601174):** Full-stack & Demo Lead — xây dựng backend Express kết nối `openai/gpt-4o-mini` qua OpenRouter; tích hợp Text Selection, Micro-Quiz, Slide Jump và chuẩn bị Demo Script.
 - Willing users (≥3 tên) + kế hoạch vòng validation CP5:
   * *Danh sách HV thử nghiệm:* Nguyễn Quang Minh (Học viên Khóa 3), Trịnh Hải Đăng (Học viên Khóa 4), Nguyễn Minh Công (Học viên Khóa 4).
   * *Kế hoạch CP5:* Cho học viên thực hiện task "Học Slide 12 và trả lời Quiz", quan sát im lặng, hỏi 3 câu hỏi trải nghiệm và ghi log nguyên văn vào folder `validation/`.

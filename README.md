@@ -14,15 +14,16 @@
 | **2A202601066** | **Đào Chí Hiển**       | Team Leader & Product Spec | • Chịu trách nhiệm chính file `spec.md` (§1 - §9) • Thiết kế kiến trúc tổng quan & Lát cắt trải nghiệm (§4) |
 | **2A202601144** | **Nguyễn Việt Anh**      | Evidence & User Research   | • Thu thập & mining dữ liệu khảo sát Học viên Khóa 3 & 4 • Phụ trách `validation/` (Feedback log & User testing) |
 | **2A202601208** | **Nguyễn Bùi Anh Tuấn** | Prompt Engineer & Evals    | • Xây dựng bộ Golden Set 20 cases trong `eval/` • Thiết kế Prompt AI Tutor & chạy đo lường Quality Bar (§7) |
-| **2A202602024** | **Nguyễn Ngọc Chi**      | Frontend Developer         | • Lập trình UI Prototype trên React/Tailwind trong `codebase/` • Tích hợp luồng chat & nối Gemini API thật |
-| **2A202601174** | **Trần Thanh Bình**      | Interaction & Demo Lead    | • Xử lý sự kiện Text Selection (Bôi đen), nút bấm nổi & Slide Jump • Chuẩn bị `demo-slides.pdf` & kịch bản Demo Live |
+| **2A202602024** | **Nguyễn Ngọc Chi**      | Frontend Developer         | • Phụ trách giao diện React/Tailwind và các component Slide Viewer, AI Tutor Chat Panel |
+| **2A202601174** | **Trần Thanh Bình**      | Full-stack & Demo Lead     | • Xây dựng backend Express kết nối `openai/gpt-4o-mini` qua OpenRouter • Tích hợp Select-to-Ask, Micro-Quiz, Slide Jump và chuẩn bị Demo Live |
 
 ---
 
 ## 📂 Cấu trúc Repository
 
 * **`spec.md`**: Bản AI Spec chi tiết theo khung `03-template-ai-spec.md` (chốt Quality Bar 80% trước 23:59 N1).
-* **`codebase/`**: Source code ứng dụng Web Prototype (React, Tailwind CSS, Gemini API).
+* **`codebase/`**: Web Prototype gồm frontend React/Tailwind và backend Express kết nối OpenRouter.
+* **`data/mock-slides.json`**: Mock data cho Slide 5, Slide 12, Micro-Quiz và luồng lấp lỗ hổng kiến thức.
 * **`eval/`**: File `golden-set.json` (20 test cases) và bảng ghi nhận kết quả đo lường qua các lượt chạy.
 * **`validation/`**: Log ghi nhận ý kiến phản hồi thực tế từ học viên Khóa 3 & 4.
 * **`demo-slides.pdf`**: Slide thuyết trình 6 trang chuẩn bị cho CP6 Demo.
@@ -39,9 +40,29 @@ cd codebase
 # Cài đặt thư viện
 npm install
 
+# Tạo file môi trường và thêm OpenRouter API key
+cp .env.example .env
+
 # Chạy ứng dụng ở môi trường Local
 npm run dev
 ```
+
+Mở `http://localhost:5173`. Backend chạy tại `http://localhost:3001`.
+
+```env
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_MODEL=openai/gpt-4o-mini
+DEMO_FALLBACK=true
+```
+
+`DEMO_FALLBACK=true` cho phép dùng câu trả lời mock khi OpenRouter chưa được cấu hình hoặc tạm thời mất kết nối. Không commit file `.env` hoặc API key.
+
+### Luồng demo
+
+1. Mở Slide 12 và bôi đen từ **Microservices**.
+2. Bấm **Hỏi AI Tutor** để nhận giải thích theo ngữ cảnh và một Micro-Quiz.
+3. Chọn đáp án sai **Có** để hiện card gợi ý ôn lại Slide 5.
+4. Bấm **Open Slide 5** để chuyển slide và nhận phần tóm tắt kiến thức nền.
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 

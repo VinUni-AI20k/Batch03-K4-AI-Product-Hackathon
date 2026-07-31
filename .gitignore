@@ -1,3 +1,18 @@
 .DS_Store
 node_modules/
 *.env
+
+# Frontend build output
+dist/
+codebase/dist/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Logs and editor files
+*.log
+npm-debug.log*
+.idea/
+.vscode/

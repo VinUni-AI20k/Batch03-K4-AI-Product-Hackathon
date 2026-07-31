@@ -1,0 +1,160 @@
+{
+  "course": {
+    "id": "SWD392",
+    "title": "Software Architecture and Design",
+    "chapter": "Architecture Fundamentals"
+  },
+  "slides": [
+    {
+      "id": 5,
+      "title": "Tight Coupling vs. Loose Coupling",
+      "contextLabel": "Foundation Concepts",
+      "learningObjective": "Phân biệt mức độ phụ thuộc giữa các thành phần trong hệ thống.",
+      "summary": [
+        "Tight Coupling: các thành phần phụ thuộc trực tiếp vào cách triển khai của nhau.",
+        "Loose Coupling: các thành phần giao tiếp qua interface hoặc contract ổn định.",
+        "Loose Coupling giúp hệ thống dễ thay đổi, kiểm thử và triển khai độc lập hơn."
+      ],
+      "content": {
+        "tightCoupling": {
+          "definition": "Một thay đổi ở thành phần A thường buộc thành phần B phải sửa theo.",
+          "example": "Orders gọi trực tiếp hàm và dùng chung database schema nội bộ của Payments.",
+          "risk": "Khó bảo trì; lỗi hoặc thay đổi dễ lan sang thành phần khác."
+        },
+        "looseCoupling": {
+          "definition": "Các thành phần chỉ phụ thuộc vào contract chung, không phụ thuộc chi tiết triển khai.",
+          "example": "Orders gửi yêu cầu thanh toán qua Payments API với request/response đã định nghĩa.",
+          "benefit": "Có thể thay đổi hoặc triển khai từng thành phần với ít ảnh hưởng hơn."
+        },
+        "cohesion": {
+          "definition": "Các chức năng bên trong một thành phần cùng phục vụ một trách nhiệm rõ ràng.",
+          "principle": "Ưu tiên High Cohesion và Loose Coupling."
+        }
+      },
+      "selectableTerms": {
+        "Tight Coupling": "Các thành phần phụ thuộc mạnh vào chi tiết triển khai của nhau.",
+        "Loose Coupling": "Các thành phần giao tiếp qua contract ổn định và hạn chế phụ thuộc trực tiếp.",
+        "High Cohesion": "Một thành phần tập trung vào một nhóm trách nhiệm liên quan chặt chẽ."
+      },
+      "tutorRecap": "Slide 5 nhắc lại rằng Loose Coupling giúp các service ít phụ thuộc trực tiếp vào nhau. Chúng giao tiếp qua contract, nên thay đổi hoặc sự cố ở một service không mặc định khiến toàn bộ hệ thống dừng.",
+      "quiz": {
+        "id": "slide-5-quiz",
+        "type": "multiple_choice",
+        "question": "Thiết kế nào thể hiện Loose Coupling tốt hơn?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Orders truy cập trực tiếp database nội bộ của Payments."
+          },
+          {
+            "id": "B",
+            "text": "Orders gọi Payments qua một API contract ổn định."
+          }
+        ],
+        "correctOptionId": "B",
+        "correctFeedback": "Đúng. API contract giúp Orders không phụ thuộc vào chi tiết triển khai bên trong Payments.",
+        "incorrectFeedback": "Chưa đúng. Truy cập trực tiếp database nội bộ tạo phụ thuộc chặt giữa hai service."
+      }
+    },
+    {
+      "id": 12,
+      "title": "Microservices Architecture",
+      "contextLabel": "Applying Loose Coupling",
+      "learningObjective": "Hiểu cách Loose Coupling hỗ trợ các service phát triển và triển khai độc lập.",
+      "summary": [
+        "Ứng dụng được chia thành các service nhỏ theo năng lực nghiệp vụ.",
+        "Mỗi service có trách nhiệm và vòng đời triển khai riêng.",
+        "Các service giao tiếp qua API hoặc message contract."
+      ],
+      "content": {
+        "definition": "Microservices là kiểu kiến trúc chia ứng dụng thành các service nhỏ, tập trung vào từng năng lực nghiệp vụ và có thể triển khai tương đối độc lập.",
+        "services": [
+          {
+            "id": "auth",
+            "name": "Auth Service",
+            "responsibility": "Xác thực người dùng"
+          },
+          {
+            "id": "orders",
+            "name": "Orders Service",
+            "responsibility": "Quản lý đơn hàng"
+          },
+          {
+            "id": "payments",
+            "name": "Payments Service",
+            "responsibility": "Xử lý thanh toán"
+          }
+        ],
+        "communication": "Các service giao tiếp qua API contract; không truy cập trực tiếp code hoặc database nội bộ của nhau.",
+        "note": "Độc lập không có nghĩa là không bao giờ ảnh hưởng nhau. Hệ thống vẫn cần timeout, retry và fallback để hạn chế lỗi lan truyền."
+      },
+      "diagram": {
+        "nodes": [
+          {
+            "id": "auth",
+            "label": "Auth Service"
+          },
+          {
+            "id": "orders",
+            "label": "Orders Service"
+          },
+          {
+            "id": "payments",
+            "label": "Payments Service"
+          }
+        ],
+        "edges": [
+          {
+            "from": "orders",
+            "to": "auth",
+            "label": "Auth API"
+          },
+          {
+            "from": "orders",
+            "to": "payments",
+            "label": "Payment API"
+          }
+        ]
+      },
+      "selectableTerms": {
+        "Microservices": "Kiến trúc chia ứng dụng thành các service nhỏ theo năng lực nghiệp vụ, có thể phát triển và triển khai tương đối độc lập.",
+        "independently deployable": "Mỗi service có thể được cập nhật và triển khai riêng nếu contract với service khác vẫn được giữ ổn định.",
+        "API contract": "Quy ước request, response và hành vi mà các service dùng để giao tiếp."
+      },
+      "demoSelection": {
+        "text": "Microservices",
+        "tutorAnswer": "Theo Slide 12, Microservices chia ứng dụng thành các service nhỏ như Auth, Orders và Payments. Mỗi service phụ trách một năng lực nghiệp vụ và giao tiếp qua API contract để giảm phụ thuộc trực tiếp."
+      },
+      "quiz": {
+        "id": "slide-12-quiz",
+        "type": "true_false",
+        "question": "Nếu Auth Service tạm dừng, Orders và Payments có bắt buộc phải dừng theo không?",
+        "options": [
+          {
+            "id": "yes",
+            "text": "Có"
+          },
+          {
+            "id": "no",
+            "text": "Không"
+          }
+        ],
+        "correctOptionId": "no",
+        "correctFeedback": "Đúng. Với Loose Coupling và cơ chế xử lý lỗi phù hợp, một service gặp sự cố không mặc định làm mọi service khác dừng theo.",
+        "incorrectFeedback": "Chưa đúng. Bạn đang nhầm Microservices với thiết kế phụ thuộc chặt. Các service giao tiếp qua contract để hạn chế lỗi lan truyền.",
+        "remediation": {
+          "reason": "Bạn có thể đang nhầm giữa Tight Coupling và Loose Coupling.",
+          "targetSlideId": 5,
+          "cardTitle": "Open Slide 5",
+          "cardSubtitle": "Ôn lại Tight Coupling vs. Loose Coupling"
+        }
+      }
+    }
+  ],
+  "demoFlow": {
+    "startSlideId": 12,
+    "highlightText": "Microservices",
+    "answerToDemonstrate": "yes",
+    "expectedTargetSlideId": 5
+  }
+}
