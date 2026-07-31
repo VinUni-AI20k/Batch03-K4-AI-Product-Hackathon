@@ -1,0 +1,19 @@
+from .system_prompts import SLIDE_AGENT_SYSTEM_PROMPT
+from .slide_prompts import (
+    SLIDE_SINGLE_PASS_PROMPT,
+    SLIDE_MAP_PROMPT,
+    SLIDE_REDUCE_PROMPT
+)
+from .rag_prompts import (
+    RAG_PAGE_SUMMARY_PROMPT,
+    RAG_GROUNDED_QA_PROMPT
+)
+
+__all__ = [
+    "SLIDE_AGENT_SYSTEM_PROMPT",
+    "SLIDE_SINGLE_PASS_PROMPT",
+    "SLIDE_MAP_PROMPT",
+    "SLIDE_REDUCE_PROMPT",
+    "RAG_PAGE_SUMMARY_PROMPT",
+    "RAG_GROUNDED_QA_PROMPT"
+]

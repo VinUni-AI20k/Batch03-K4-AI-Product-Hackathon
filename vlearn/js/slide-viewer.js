@@ -699,8 +699,86 @@ function sendTutorMsg(e) {
   input.value = '';
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  // Simulate Tutor response with extracted page content
-  setTimeout(() => {
+  // Hiển thị trạng thái đang trả lời (loading)
+  const loadingTag = document.createElement('div');
+  loadingTag.className = 'chat-context-tag';
+  loadingTag.textContent = `VLearn AI Tutor đang xử lý...`;
+  chatBody.appendChild(loadingTag);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  // Gọi REST API tới Python RAG Backend hoặc Fallback Direct API
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: text,
+      page_number: currentPage,
+      slide_file: currentPdfPath
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Backend offline");
+    return res.json();
+  })
+  .then(data => {
+    renderBotResponse(data.answer);
+  })
+  .catch(async () => {
+    // Fallback: Gọi trực tiếp Endpoint https://api.xah.io/v1/chat/completions từ Frontend JS
+    try {
+      const pageContext = currentPageTextContent ? currentPageTextContent.substring(0, 1500) : '';
+      const fullUserPrompt = `Bạn là VLearn AI Tutor. Học viên đang xem Trang ${currentPage} với nội dung slide:\n${pageContext}\n\nCâu hỏi: ${text}`;
+      
+      let apiKey = localStorage.getItem('VLEARN_API_KEY');
+      if (!apiKey || apiKey.startsWith('sk-proj-NDMpJ')) {
+        apiKey = window.prompt("Vui lòng nhập API Key cho server https://api.xah.io/v1:");
+        if (apiKey) {
+          localStorage.setItem('VLEARN_API_KEY', apiKey.trim());
+        } else {
+          renderBotResponse("⚠️ Bạn chưa nhập API Key. Vui lòng bấm F5 và nhập API Key để sử dụng AI Tutor.");
+          return;
+        }
+      }
+      
+      const resApi = await fetch('https://api.xah.io/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey.trim()}`
+        },
+        body: JSON.stringify({
+          model: 'phatchau036/gpt-5.4',
+          messages: [
+            { role: 'system', content: 'Bạn là VLearn AI Tutor định vị trang slide. Trả lời súc tích tiếng Việt kèm [Trang N].' },
+            { role: 'user', content: fullUserPrompt }
+          ]
+        })
+      });
+
+      
+      const dataApi = await resApi.json();
+      if (dataApi.error) {
+        if (dataApi.error.message && dataApi.error.message.includes("API key")) {
+          localStorage.removeItem('VLEARN_API_KEY');
+        }
+        renderBotResponse(`⚠️ Lỗi từ AI Server (api.xah.io): ${dataApi.error.message}`);
+        return;
+      }
+      const ans = dataApi.choices?.[0]?.message?.content || 'Không nhận được phản hồi từ AI.';
+
+      renderBotResponse(ans);
+    } catch (err) {
+      loadingTag.remove();
+      const botMsg = document.createElement('div');
+      botMsg.className = 'tutor-msg assistant';
+      botMsg.innerHTML = `⚠️ Lỗi kết nối AI: ${err.message}`;
+      chatBody.appendChild(botMsg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  });
+
+  function renderBotResponse(answerText) {
+    loadingTag.remove();
     const contextTag = document.createElement('div');
     contextTag.className = 'chat-context-tag';
     contextTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
@@ -708,18 +786,19 @@ function sendTutorMsg(e) {
 
     const botMsg = document.createElement('div');
     botMsg.className = 'tutor-msg assistant';
-
-    // Use extracted page text for smarter mock response
-    const pagePreview = currentPageTextContent.substring(0, 200);
-    botMsg.innerHTML = `<strong>📄 Dựa trên nội dung trang ${currentPage}:</strong><br><br>` +
-      `<em>"${pagePreview}..."</em><br><br>` +
-      `VLearn Tutor đã nhận được câu hỏi: "<strong>${text}</strong>". ` +
-      `Nội dung trang này đã được trích xuất thành công qua PDF.js và sẵn sàng để AI phân tích chi tiết.`;
-
+    
+    let formattedText = (answerText || '')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+    botMsg.innerHTML = formattedText;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
-  }, 800);
+  }
 }
+
+
 
 function sendTutorMsgWithText(text) {
   const panel = document.querySelector('.tutor-panel');
