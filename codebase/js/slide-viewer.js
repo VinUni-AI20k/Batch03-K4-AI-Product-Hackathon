@@ -302,14 +302,6 @@ function autoSaveCurrentNote() {
     delete pageTextNotes[currentPage];
   }
 
-  const statusEl = document.getElementById('note-saved-status');
-  if (statusEl) {
-    statusEl.textContent = 'Đã lưu';
-    setTimeout(() => {
-      statusEl.textContent = 'Đã tự động lưu';
-    }, 1200);
-  }
-
   renderSavedNotesList();
 }
 
