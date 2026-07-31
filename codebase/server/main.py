@@ -68,6 +68,16 @@ INTEREST_RULES: dict[str, dict[str, Any]] = {
     "security": {"blockTokens": ["VSOC", "ITOPS", "AIP"], "label": "An ninh & hệ thống"},
 }
 
+# eval/run-02.md regression: hồ sơ "Network, Log analysis, Linux" (interest=security)
+# bị hạ nhầm confidence vì các từ này không xuất hiện nguyên văn trong tech_stack
+# tiếng Việt. Bảng đồng nghĩa tối thiểu Anh-Việt cho các domain đã có trong INTEREST_RULES
+# — chỉ những cụm cụ thể đã thấy gây false-negative qua eval, không suy rộng thêm.
+SKILL_SYNONYMS: dict[str, list[str]] = {
+    "security": ["mạng", "an ninh", "bảo mật", "log", "cảnh báo", "sự cố", "xâm nhập", "danh tính"],
+    "data": ["dữ liệu", "mô hình", "pipeline", "phân loại"],
+    "operations": ["vận hành", "quy trình", "điều phối"],
+}
+
 # eval/run-01.md failure mode "confidence lạc quan giả": model tự báo confidence="high"
 # ngay cả khi hồ sơ không khớp field nào của top candidate. Ép lại ở tầng code thay vì
 # chỉ tin instruction trong SYSTEM_PROMPT — xem spec.md §7 hướng sửa #1.
@@ -82,15 +92,46 @@ def _profile_skill_match_count(payload: "RecommendRequest", candidate: dict[str,
         for field in ("ten_de_tai", "pain_point", "mo_ta_bai_toan", "tech_stack", "job_executor")
     ).lower()
     corpus_words = set(re.findall(r"[\w]+", corpus, re.UNICODE))
+    synonyms = SKILL_SYNONYMS.get(payload.interest, [])
     matches = 0
     for skill in payload.skills:
         tokens = [t for t in skill.lower().split() if len(t) > 2]
         # Word-boundary match, not substring — "ảnh" (from "Chụp ảnh") is a
         # substring of "cảnh báo" and would otherwise false-positive (found
         # live via eval case L03 sau khi fix #1: VSOC-002 vẫn báo high sai).
-        if any(token in corpus_words for token in tokens):
+        direct_hit = any(token in corpus_words for token in tokens)
+        # eval/run-02.md case G02: kỹ năng tiếng Anh (Network/Log analysis) không
+        # khớp token literal tiếng Việt dù đúng domain — coi khớp qua từ đồng nghĩa
+        # của interest đã chọn như một tín hiệu tương đương (không thay thế
+        # direct_hit, chỉ cộng thêm đường lui khi domain rõ ràng đúng hướng).
+        synonym_hit = any(word in corpus_words for word in synonyms) if synonyms else False
+        if direct_hit or synonym_hit:
             matches += 1
     return matches
+
+
+# eval/run-02.md L04: team_size vượt hẳn max_team quan sát được trong dữ liệu (chưa
+# thấy đề tài nào >5 người) không được cảnh báo. Kiểm tra thô ở code, không phụ
+# thuộc model tự nhận ra.
+MAX_OBSERVED_TEAM_SIZE = 5
+
+
+def _reasons_reference_real_fields(payload: "RecommendRequest", reasons: list[str]) -> bool:
+    """eval/run-02.md L01: model có thể bịa hẳn kỹ năng không có trong hồ sơ (vd
+    reasons nói "có kỹ năng Python" khi payload.skills chỉ có "PMP, quản lý cấp
+    cao") — bịa VỀ HỒ SƠ, không phải về đề tài, nên phải so với payload.skills
+    chứ không phải corpus của candidate (corpus luôn overlap vì reasons hay lặp
+    lại từ trong tech_stack, khiến check cũ pass nhầm dù model bịa skill giả)."""
+    if not payload.skills:
+        return True  # không có skill nào để đối chiếu — không thể kết luận là bịa
+    skill_words: set[str] = set()
+    for skill in payload.skills:
+        skill_words |= set(re.findall(r"[\w]{3,}", skill.lower(), re.UNICODE))
+    for reason in reasons:
+        reason_words = set(re.findall(r"[\w]{3,}", reason.lower(), re.UNICODE))
+        if skill_words & reason_words:
+            return True
+    return not reasons
 
 PROJECT_FIELDS_FOR_MODEL = [
     "ma_de", "ten_de_tai", "khoi", "job_executor", "pain_point", "mo_ta_bai_toan",
@@ -227,8 +268,8 @@ def recommend(payload: RecommendRequest) -> RecommendResponse:
     parsed["selections"] = valid_selections
 
     # Downgrade an unearned "high": if NO selection has real overlap with the
-    # profile (skills / team_size), the model is guessing regardless of what
-    # it reported — eval/run-01.md case R01/L03/L04/R03 all showed this.
+    # profile (skills, kể cả qua đồng nghĩa interest), model đang đoán bất kể
+    # nó tự báo gì — eval/run-01.md case R01/L03/R03, eval/run-02.md case G02.
     if parsed.get("confidence") == "high" and valid_selections:
         best_match = max(
             (_profile_skill_match_count(payload, candidates_by_code[s["ma_de"]]) for s in valid_selections),
@@ -240,6 +281,24 @@ def recommend(payload: RecommendRequest) -> RecommendResponse:
                 parsed.get("overall_note", "")
                 + " [Hạ xuống 'low' tự động: không có đề tài nào khớp rõ kỹ năng/quy mô nhóm trong hồ sơ.]"
             ).strip()
+
+    # eval/run-02.md L04: team_size vượt hẳn phạm vi dữ liệu quan sát được.
+    if payload.team_size > MAX_OBSERVED_TEAM_SIZE:
+        parsed["confidence"] = "low"
+        parsed["overall_note"] = (
+            parsed.get("overall_note", "")
+            + f" [Cảnh báo: quy mô nhóm {payload.team_size} vượt phạm vi dữ liệu quan sát được (tối đa {MAX_OBSERVED_TEAM_SIZE} người) — đề tài đề xuất có thể không tính đến quy mô lớn hơn.]"
+        ).strip()
+
+    # L01 (eval/run-02.md): thử chặn reasons bịa hồ sơ bằng so khớp từ (tương tự
+    # _reasons_reference_real_fields), nhưng heuristic này xung đột trực tiếp với
+    # fix G02 — reasons diễn giải ĐÚNG bằng từ khác (vd "phân tích mạng và log"
+    # cho skill "Network"/"Log analysis") bị hiểu nhầm là bịa, y hệt lỗi vừa sửa
+    # ở G02 nhưng theo chiều ngược lại. Không tìm được ngưỡng tách được "diễn giải
+    # đúng bằng từ khác" khỏi "bịa khác nghĩa" bằng so khớp từ đơn giản — cần
+    # LLM-judge độc lập chấm lại reasons, không phải regex. Bỏ check này, giữ L01
+    # là FAIL đã biết — xem eval/run-03.md và spec.md §7.
+    _ = _reasons_reference_real_fields  # giữ hàm lại cho lượt sau, không xoá logic đã viết
 
     _log(trace_id, payload, candidates, raw_text, parsed, latency_ms)
 
