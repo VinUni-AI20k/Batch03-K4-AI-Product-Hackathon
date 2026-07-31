@@ -4,7 +4,7 @@
  * Flow:
  *  - Panel mở/đóng qua nút "AI Co-Pilot" trên header hoặc FAB
  *  - Chips nhanh → tự điền câu hỏi và gửi
- *  - Gemini API call thật khi có key; fallback Mock từ KNOWLEDGE_BASE
+ *  - OpenRouter Gemini call thật khi có key; fallback Mock từ KNOWLEDGE_BASE
  *  - Citation cards hiển thị trích dẫn [Txx-NNN] từ transcript khoá học
  */
 
@@ -16,19 +16,41 @@
 // ============================================================
 // SYSTEM PROMPT
 // ============================================================
-const SYSTEM_PROMPT = `Bạn là AI Co-Pilot tích hợp trong trang học tập Codelab của khoá "AI Thực Chiến".
+const SYSTEM_PROMPT = `Bạn là **Codelab AI Co-Pilot** — Trợ lý AI được tích hợp trực tiếp trên giao diện Codelab để hỗ trợ học viên thực hành bài tập lập trình vào buổi chiều cho khóa học AI Thực Chiến.
 
-Nhiệm vụ: Giúp học viên hiểu nội dung bước học hiện tại, trả lời câu hỏi về khoá học và trích dẫn lý thuyết từ transcript bài giảng kèm mã [Txx-NNN].
+Mục tiêu chính của bạn là hỗ trợ học viên giải quyết kẹt lỗi/logic bằng cách đối chiếu với kiến thức bài giảng lý thuyết buổi sáng, giúp học viên không phải rời màn hình Codelab để lật tìm lại slide/transcript.
 
-Quy tắc:
-1. Câu trả lời ngắn gọn, đúng điểm (tối đa 4-5 câu)
-2. Luôn kèm 1 trích dẫn liên quan từ khoá học với mã [Txx-NNN]
-3. Giọng thân thiện như TA, không cứng nhắc
-4. Nếu câu hỏi ngoài phạm vi khoá học → nói thẳng và gợi ý hỏi TA
+---
 
-Mã trích dẫn ví dụ: [T01-001], [T02-008], [T03-005]...
+## QUY TẮC BẮT BỘC (GUARDRAILS)
 
-Ngữ cảnh hiện tại: Học viên đang ở Bước 3 — Khai thác dữ liệu và chốt Problem Canvas.`;
+### 1. Trích dẫn nguồn bắt buộc (Grounding - Lớp ①)
+- Mọi giải thích nguyên lý/lý thuyết PHẢI được đối chiếu với bài giảng buổi sáng và bắt buộc đính kèm mã trích dẫn đoạn bài giảng dạng [Txx-NNN] (Ví dụ: [T02-045] hoặc [T01-012]).
+- Tuyệt đối không bịa đặt kiến thức ngoài phạm vi tài liệu được cấp.
+
+### 2. Định hướng, không viết hộ (Augment Mode - Lớp ③)
+- Bạn đóng vai trò hướng dẫn (Augment).
+- KHÔNG ĐƯỢC viết sẵn 100% đoạn code sửa hoàn chỉnh cho học viên.
+- Chỉ chỉ ra nguyên lý sai, logic thiếu sót và gợi ý hướng sửa để học viên tự gõ code.
+
+### 3. Xử lý câu hỏi mơ hồ / Thiếu bối cảnh (G10 - Clarification - Lớp ②)
+- Nếu câu hỏi của học viên quá ngắn, chung chung (VD: "lỗi này sửa sao", "bị lỗi 500", "code không chạy") hoặc thiếu đoạn code/log lỗi, KHÔNG ĐƯỢC đoán mò.
+- Bắt buộc phải đặt lại ĐÚNG 1 CÂU HỎI ngắn gọn để yêu cầu học viên làm rõ bối cảnh.
+
+### 4. Văn phong & Độ dài
+- Trả lời ngắn gọn, súc tích (tối đa 3 - 4 câu).
+- Giọng văn thân thiện, đúng vai trò đồng hành hỗ trợ học viên.
+
+---
+
+## CẤU TRÚC KẾT QUẢ TRẢ VỀ (OUTPUT FORMAT)
+
+Mỗi phản hồi của bạn nên đi theo cấu trúc 3 phần ngắn gọn:
+1. **Nhận diện nguyên lý sai:** (1 câu chỉ ra điểm kẹt logic)
+2. **Căn cứ bài giảng:** (1 câu tóm tắt nguyên lý + Mã trích dẫn [Txx-NNN])
+3. **Gợi ý hành động:** (1 câu hướng dẫn học viên tự sửa code)
+
+*(Lưu ý: Nếu nhận được ngữ cảnh cảnh báo thời gian Checkpoint, hãy thêm 1 dòng nhắc nhở đếm ngược ngắn ở cuối).*`;
 
 // ============================================================
 // STATE
@@ -76,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
   dom.modalBackdrop.classList.remove('hidden');
 
   // Restore key
-  const saved = sessionStorage.getItem('vlearn_gemini_key');
+  const saved = sessionStorage.getItem('vlearn_openrouter_key');
   if (saved) {
     state.apiKey = saved;
     dom.modalBackdrop.classList.add('hidden');
@@ -147,15 +169,15 @@ function initCountdown() {
 function initModal() {
   dom.btnSaveKey.addEventListener('click', () => {
     const key = dom.apiKeyInput.value.trim();
-    if (!key.startsWith('AIza')) {
-      showToast('⚠️ Key không hợp lệ (phải bắt đầu bằng "AIza")');
+    if (!key.startsWith('sk-or-v1-')) {
+      showToast('⚠️ Key không hợp lệ (phải bắt đầu bằng "sk-or-v1-")');
       return;
     }
     state.apiKey = key;
-    sessionStorage.setItem('vlearn_gemini_key', key);
+    sessionStorage.setItem('vlearn_openrouter_key', key);
     dom.modalBackdrop.classList.add('hidden');
     setSourceTag(true);
-    showToast('✅ Đã kết nối Gemini — AI thật đã sẵn sàng!');
+    showToast('✅ Đã kết nối OpenRouter Gemini — AI thật đã sẵn sàng!');
   });
 
   dom.btnMock.addEventListener('click', () => {
@@ -170,7 +192,7 @@ function setSourceTag(real) {
   const el = document.querySelector('.ai-source-tag');
   if (!el) return;
   el.innerHTML = real
-    ? `<span style="color:var(--success)">●</span>&nbsp;Gemini 2.5 Flash`
+    ? `<span style="color:var(--success)">●</span>&nbsp;Gemini 2.5 Flash · OpenRouter`
     : `<span style="color:var(--warning)">●</span>&nbsp;Mock mode`;
 }
 
@@ -219,7 +241,7 @@ async function handleSend() {
     if (state.useMock || !state.apiKey) {
       resp = await mockResponse(text);
     } else {
-      resp = await geminiCall(text);
+      resp = await openrouterGeminiCall();
     }
     typingEl.remove();
     appendAssistantMsg(resp);
@@ -235,23 +257,30 @@ async function handleSend() {
 }
 
 // ============================================================
-// GEMINI API
+// OPENROUTER GEMINI API
 // ============================================================
-async function geminiCall(text) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
+async function openrouterGeminiCall() {
+  const url = 'https://openrouter.ai/api/v1/chat/completions';
 
-  const contents = state.history.slice(-6).map(h => ({
-    role: h.role,
-    parts: [{ text: h.content }]
-  }));
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...state.history.slice(-6).map(h => ({ role: h.role === 'model' ? 'assistant' : 'user', content: h.content }))
+  ];
 
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${state.apiKey}`,
+      'HTTP-Referer': location.origin,
+      'X-Title': 'K4-hackathon-HiHi-E403'
+    },
     body: JSON.stringify({
-      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents,
-      generationConfig: { temperature: 0.4, maxOutputTokens: 600, topP: 0.9 }
+      model: 'google/gemini-2.5-flash',
+      messages,
+      temperature: 0.4,
+      max_tokens: 600,
+      top_p: 0.9
     })
   });
 
@@ -261,7 +290,7 @@ async function geminiCall(text) {
   }
 
   const data = await res.json();
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '(Không có phản hồi)';
+  const raw = data.choices?.[0]?.message?.content || '(Không có phản hồi)';
   return parseResp(raw);
 }
 

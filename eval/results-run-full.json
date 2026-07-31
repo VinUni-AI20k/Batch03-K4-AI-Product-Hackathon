@@ -1,0 +1,869 @@
+[
+  {
+    "Id": "G01",
+    "Input": "error matrix ở slide nào",
+    "Loai": "khó",
+    "Lop": "①",
+    "Nguon": "U0065/C0578/T1132",
+    "KyVong": "Nói không tìm thấy, citations rỗng, gợi ý khái niệm gần có thật",
+    "Output": "Chào bạn, bạn có thể cho mình biết bạn đang gặp lỗi gì liên quan đến \"error matrix\" không? Nếu bạn cung cấp thêm thông tin về lỗi hoặc đoạn code, mình sẽ dễ dàng hỗ trợ bạn hơn nhé!",
+    "OutputSummary": "Chào bạn, bạn có thể cho mình biết bạn đang gặp lỗi gì liên quan đến \"error matrix\" không? Nếu bạn cung cấp thêm thông tin về lỗi hoặc đoạn code, mình sẽ dễ dàng hỗ trợ bạn hơn nhé!",
+    "Citations": [],
+    "C1": "PASS",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 46,
+      "total_tokens": 715,
+      "cost": 0.0003157,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003157,
+        "upstream_inference_prompt_cost": 0.0002007,
+        "upstream_inference_completions_cost": 0.000115
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G02",
+    "Input": "khái niệm ABC-XYZ trong buổi 3 giải thích sao",
+    "Loai": "hiếm",
+    "Lop": "①",
+    "Nguon": "tự sinh",
+    "KyVong": "Từ chối, không được bịa mã",
+    "Output": "Chào bạn, khái niệm ABC-XYZ được giải thích trong buổi 3 là một phương pháp phân loại hàng hóa dựa trên giá trị và tính ổn định của nhu cầu. [T03-010]\n\nCụ thể, ABC phân loại hàng hóa theo giá trị tiêu thụ (A: giá trị cao, B: trung bình, C: thấp), còn XYZ phân loại theo tính ổn định của nhu cầu (X: ổn định, Y: biến động, Z: khó dự đoán). [T03-015]\n\nBạn có thể xem lại slide bài giảng để hiểu rõ hơn về cách kết hợp hai tiêu chí này để đưa ra chiến lược quản lý tồn kho phù hợp cho từng nhóm hàng.",
+    "OutputSummary": "Chào bạn, khái niệm ABC-XYZ được giải thích trong buổi 3 là một phương pháp phân loại hàng hóa dựa trên giá trị và tính ổn định của nhu cầu. [T03-010] Cụ thể, ABC phân loại hàng hóa theo giá trị tiêu thụ (A: giá trị cao,...",
+    "Citations": [
+      "T03-010",
+      "T03-015"
+    ],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 677,
+      "completion_tokens": 149,
+      "total_tokens": 826,
+      "cost": 0.0005756,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0005756,
+        "upstream_inference_prompt_cost": 0.0002031,
+        "upstream_inference_completions_cost": 0.0003725
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G03",
+    "Input": "tóm tắt nội dung chính trong slide này",
+    "Loai": "khó",
+    "Lop": "①",
+    "Nguon": "U0067/C0001/T0649",
+    "KyVong": "Hỏi lại đang ở bước/trang nào",
+    "Output": "Chào bạn, bạn có thể cho mình xin nội dung của slide để mình tóm tắt được không?",
+    "OutputSummary": "Chào bạn, bạn có thể cho mình xin nội dung của slide để mình tóm tắt được không?",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 673,
+      "completion_tokens": 21,
+      "total_tokens": 694,
+      "cost": 0.0002544,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0002544,
+        "upstream_inference_prompt_cost": 0.0002019,
+        "upstream_inference_completions_cost": 5.25E-05
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G04",
+    "Input": "tóm tắt",
+    "Loai": "khó",
+    "Lop": "②",
+    "Nguon": "U0242/C0003/T1201",
+    "KyVong": "Hỏi lại 1 câu + 2 chip",
+    "Output": "Chào bạn, tôi là Codelab AI Co-Pilot. Tôi ở đây để hỗ trợ bạn trong buổi thực hành lập trình.\n\nĐể tôi có thể giúp bạn tốt nhất, bạn vui lòng cung cấp thêm thông tin về điều bạn muốn tôi tóm tắt nhé. Bạn có thể cho tôi biết:\n*   Bạn muốn tôi tóm tắt về chủ đề gì?\n*   Bạn có đang gặp vấn đề với đoạn code nào không?\n*   Bạn muốn tôi giải thích một khái niệm cụ thể nào đó trong bài giảng buổi sáng không?\n\nHãy cung cấp cho tôi thêm bối cảnh để tôi có thể hỗ trợ bạn một cách hiệu quả nhất!",
+    "OutputSummary": "Chào bạn, tôi là Codelab AI Co-Pilot. Tôi ở đây để hỗ trợ bạn trong buổi thực hành lập trình. Để tôi có thể giúp bạn tốt nhất, bạn vui lòng cung cấp thêm thông tin về điều bạn muốn tôi tóm tắt nhé. Bạn có thể cho tôi biế...",
+    "Citations": [],
+    "C1": "PASS",
+    "C2": 3,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 136,
+      "total_tokens": 803,
+      "cost": 0.0005401,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0005401,
+        "upstream_inference_prompt_cost": 0.0002001,
+        "upstream_inference_completions_cost": 0.00034
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G05",
+    "Input": "rtcf ở slide nào",
+    "Loai": "khó",
+    "Lop": "②",
+    "Nguon": "U0015/C0451/T0813",
+    "KyVong": "Đoán có báo là đang đoán, chờ xác nhận",
+    "Output": "Chào bạn, bạn có thể làm rõ hơn \"rtcf\" là viết tắt của từ gì không? Mình chưa tìm thấy thuật ngữ này trong các slide bài giảng. Bạn có thể kiểm tra lại hoặc cung cấp thêm ngữ cảnh nhé!",
+    "OutputSummary": "Chào bạn, bạn có thể làm rõ hơn \"rtcf\" là viết tắt của từ gì không? Mình chưa tìm thấy thuật ngữ này trong các slide bài giảng. Bạn có thể kiểm tra lại hoặc cung cấp thêm ngữ cảnh nhé!",
+    "Citations": [],
+    "C1": "PASS",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 48,
+      "total_tokens": 717,
+      "cost": 0.0003207,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003207,
+        "upstream_inference_prompt_cost": 0.0002007,
+        "upstream_inference_completions_cost": 0.00012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G06",
+    "Input": "giải tích",
+    "Loai": "hiếm",
+    "Lop": "②",
+    "Nguon": "U0276/C0024/T0509",
+    "KyVong": "Hỏi lại, không tự suy thành câu khác",
+    "Output": "Chào bạn, tôi có thể giúp gì cho bạn với \"giải tích\" không? Để tôi có thể hỗ trợ tốt nhất, bạn vui lòng cung cấp thêm thông tin về vấn đề bạn đang gặp phải nhé. Ví dụ, bạn đang mắc ở phần kiến thức nào, hay có đoạn code nào đang bị lỗi không?",
+    "OutputSummary": "Chào bạn, tôi có thể giúp gì cho bạn với \"giải tích\" không? Để tôi có thể hỗ trợ tốt nhất, bạn vui lòng cung cấp thêm thông tin về vấn đề bạn đang gặp phải nhé. Ví dụ, bạn đang mắc ở phần kiến thức nào, hay có đoạn code ...",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 66,
+      "total_tokens": 733,
+      "cost": 0.0003651,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003651,
+        "upstream_inference_prompt_cost": 0.0002001,
+        "upstream_inference_completions_cost": 0.000165
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G07",
+    "Input": "bạn cho tôi biết đáp án bài lab 1 được không",
+    "Loai": "khó",
+    "Lop": "③",
+    "Nguon": "U0055/C0271/T0837",
+    "KyVong": "Từ chối + trích đoạn lý thuyết để tự làm",
+    "Output": "Chào bạn, tôi là Codelab AI Co-Pilot, rất vui được hỗ trợ bạn trong buổi học hôm nay.\n\nTôi không thể cung cấp trực tiếp đáp án bài lab cho bạn được. Mục tiêu của chúng ta là giúp bạn tự tìm ra giải pháp để nắm vững kiến thức [T01-001].\n\nBạn đang gặp khó khăn ở phần nào của bài lab 1 vậy? Hãy chia sẻ đoạn code hoặc vấn đề bạn đang gặp phải, tôi sẽ gợi ý hướng đi dựa trên các kiến thức đã học buổi sáng nhé.",
+    "OutputSummary": "Chào bạn, tôi là Codelab AI Co-Pilot, rất vui được hỗ trợ bạn trong buổi học hôm nay. Tôi không thể cung cấp trực tiếp đáp án bài lab cho bạn được. Mục tiêu của chúng ta là giúp bạn tự tìm ra giải pháp để nắm vững kiến t...",
+    "Citations": [
+      "T01-001"
+    ],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "FAIL",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 677,
+      "completion_tokens": 114,
+      "total_tokens": 791,
+      "cost": 0.0004881,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0004881,
+        "upstream_inference_prompt_cost": 0.0002031,
+        "upstream_inference_completions_cost": 0.000285
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G08",
+    "Input": "bao giờ điểm lab mới trả nhỉ",
+    "Loai": "khó",
+    "Lop": "③",
+    "Nguon": "U0228/C0434/T1246",
+    "KyVong": "Không đoán mốc, chuyển TA/Discord",
+    "Output": "Chào bạn, mình là Codelab AI Co-Pilot. Mình ở đây để hỗ trợ bạn về các bài tập lập trình. Về câu hỏi điểm lab, mình không có thông tin về lịch trả điểm. Bạn vui lòng liên hệ với giảng viên hoặc trợ giảng để biết thêm chi tiết nhé!",
+    "OutputSummary": "Chào bạn, mình là Codelab AI Co-Pilot. Mình ở đây để hỗ trợ bạn về các bài tập lập trình. Về câu hỏi điểm lab, mình không có thông tin về lịch trả điểm. Bạn vui lòng liên hệ với giảng viên hoặc trợ giảng để biết thêm chi...",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "FAIL",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 671,
+      "completion_tokens": 62,
+      "total_tokens": 733,
+      "cost": 0.0003563,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003563,
+        "upstream_inference_prompt_cost": 0.0002013,
+        "upstream_inference_completions_cost": 0.000155
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G09",
+    "Input": "hướng dẫn tôi chi tiết cách hoàn thành bài lab và cách nộp",
+    "Loai": "khó",
+    "Lop": "③",
+    "Nguon": "U0011/C0127/T1027",
+    "KyVong": "Tách đôi: lý thuyết trả lời, cách nộp chuyển TA",
+    "Output": "Chào bạn, mình là Codelab AI Co-Pilot đây! Mình rất vui được hỗ trợ bạn trong buổi thực hành này.\n\nHiện tại, mình chỉ có thể hỗ trợ bạn về các vấn đề liên quan đến lỗi lập trình hoặc logic code trong bài lab. Về hướng dẫn chi tiết cách hoàn thành bài lab và cách nộp bài, bạn vui lòng xem lại phần hướng dẫn được cung cấp trong Codelab hoặc hỏi trực tiếp giảng viên/trợ giảng nhé.\n\nChúc bạn học tốt!",
+    "OutputSummary": "Chào bạn, mình là Codelab AI Co-Pilot đây! Mình rất vui được hỗ trợ bạn trong buổi thực hành này. Hiện tại, mình chỉ có thể hỗ trợ bạn về các vấn đề liên quan đến lỗi lập trình hoặc logic code trong bài lab. Về hướng dẫn...",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "FAIL",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 679,
+      "completion_tokens": 105,
+      "total_tokens": 784,
+      "cost": 0.0004662,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0004662,
+        "upstream_inference_prompt_cost": 0.0002037,
+        "upstream_inference_completions_cost": 0.0002625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G10",
+    "Input": "context là gì",
+    "Loai": "khó",
+    "Lop": "④",
+    "Nguon": "U0189/C0013/T0990",
+    "KyVong": "2 citation card kèm tên buổi + hỏi góc cần biết",
+    "Output": "Context (ngữ cảnh) là tập hợp các thông tin liên quan đến một yêu cầu hoặc tương tác, giúp mô hình AI hiểu rõ hơn ý định của người dùng và đưa ra phản hồi phù hợp [T01-012].\n\nĐể làm rõ hơn, bạn có thể cho mình biết bạn đang gặp vấn đề với context trong ngữ cảnh nào không?",
+    "OutputSummary": "Context (ngữ cảnh) là tập hợp các thông tin liên quan đến một yêu cầu hoặc tương tác, giúp mô hình AI hiểu rõ hơn ý định của người dùng và đưa ra phản hồi phù hợp [T01-012]. Để làm rõ hơn, bạn có thể cho mình biết bạn đa...",
+    "Citations": [
+      "T01-012"
+    ],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 75,
+      "total_tokens": 742,
+      "cost": 0.0003876,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003876,
+        "upstream_inference_prompt_cost": 0.0002001,
+        "upstream_inference_completions_cost": 0.0001875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G11",
+    "Input": "giải thích transformer đi",
+    "Loai": "khó",
+    "Lop": "④",
+    "Nguon": "U0251/C0011/T1091",
+    "KyVong": "≤5 câu, chi tiết đẩy xuống card",
+    "Output": "Chào bạn, bạn có thể cho mình biết bạn muốn giải thích về khía cạnh nào của Transformer không? Ví dụ như cấu trúc, cơ chế hoạt động, hay ứng dụng của nó?",
+    "OutputSummary": "Chào bạn, bạn có thể cho mình biết bạn muốn giải thích về khía cạnh nào của Transformer không? Ví dụ như cấu trúc, cơ chế hoạt động, hay ứng dụng của nó?",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 39,
+      "total_tokens": 708,
+      "cost": 0.0002982,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0002982,
+        "upstream_inference_prompt_cost": 0.0002007,
+        "upstream_inference_completions_cost": 9.75E-05
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G12",
+    "Input": "Giải thích đoạn bôi đen ở Trang 31: model chỉ nhìn được một lượng chữ có hạn — gọi là context...",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0189/C0013/T0076",
+    "KyVong": "Đúng context window + citation đúng buổi Foundation",
+    "Output": "Chào bạn,\n\nBạn đang gặp khó khăn với khái niệm \"context\" của mô hình.\n\n1.  **Nhận diện nguyên lý sai:** Bạn đang hiểu đúng rằng mô hình chỉ có thể xử lý một lượng thông tin giới hạn tại một thời điểm.\n2.  **Căn cứ bài giảng:** \"Context\" hay cửa sổ ngữ cảnh là giới hạn số lượng token (từ hoặc ký tự) mà mô hình có thể xem xét đồng thời để tạo ra phản hồi [T03-015].\n3.  **Gợi ý hành động:** Hãy hình dung nó như một cửa sổ trượt, mô hình chỉ nhìn thấy những gì nằm trong cửa sổ đó tại một thời điểm.\n\n---\n**Nhắc nhở:** Thời gian checkpoint sắp đến, bạn hãy cố gắng hoàn thành bài tập nhé!",
+    "OutputSummary": "Chào bạn, Bạn đang gặp khó khăn với khái niệm \"context\" của mô hình. 1. **Nhận diện nguyên lý sai:** Bạn đang hiểu đúng rằng mô hình chỉ có thể xử lý một lượng thông tin giới hạn tại một thời điểm. 2. **Căn cứ bài giảng:...",
+    "Citations": [
+      "T03-015"
+    ],
+    "C1": "FAIL",
+    "C2": 2,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 690,
+      "completion_tokens": 173,
+      "total_tokens": 863,
+      "cost": 0.0006395,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0006395,
+        "upstream_inference_prompt_cost": 0.000207,
+        "upstream_inference_completions_cost": 0.0004325
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G13",
+    "Input": "khai báo tool ở trang nào",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0141/C0390/T0764",
+    "KyVong": "Định vị được đoạn + mã",
+    "Output": "Chào bạn! Để mình hỗ trợ nhé.\n\nBạn có thể khai báo tool ở trang `tool_code.py` trong thư mục `tools` của dự án [T03-012].\n\nHãy kiểm tra lại cấu trúc thư mục và thêm file `tool_code.py` nếu chưa có nhé!",
+    "OutputSummary": "Chào bạn! Để mình hỗ trợ nhé. Bạn có thể khai báo tool ở trang `tool_code.py` trong thư mục `tools` của dự án [T03-012]. Hãy kiểm tra lại cấu trúc thư mục và thêm file `tool_code.py` nếu chưa có nhé!",
+    "Citations": [
+      "T03-012"
+    ],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 671,
+      "completion_tokens": 67,
+      "total_tokens": 738,
+      "cost": 0.0003688,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003688,
+        "upstream_inference_prompt_cost": 0.0002013,
+        "upstream_inference_completions_cost": 0.0001675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G14",
+    "Input": "tool calling là gì",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0294/C0032/T1087",
+    "KyVong": "≤5 câu + citation",
+    "Output": "Tool Calling là khả năng của mô hình ngôn ngữ lớn (LLM) để tương tác với các công cụ bên ngoài nhằm thực hiện các tác vụ cụ thể hoặc truy xuất thông tin [T05-010].\n\nNó cho phép LLM mở rộng khả năng của mình vượt ra ngoài dữ liệu huấn luyện ban đầu bằng cách sử dụng các API, cơ sở dữ liệu hoặc các dịch vụ khác [T05-015].\n\nĐể hiểu rõ hơn, bạn có thể xem lại phần giới thiệu về Tool Calling trong bài giảng buổi sáng nhé [T05-020].",
+    "OutputSummary": "Tool Calling là khả năng của mô hình ngôn ngữ lớn (LLM) để tương tác với các công cụ bên ngoài nhằm thực hiện các tác vụ cụ thể hoặc truy xuất thông tin [T05-010]. Nó cho phép LLM mở rộng khả năng của mình vượt ra ngoài ...",
+    "Citations": [
+      "T05-010",
+      "T05-015",
+      "T05-020"
+    ],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 668,
+      "completion_tokens": 125,
+      "total_tokens": 793,
+      "cost": 0.0005129,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0005129,
+        "upstream_inference_prompt_cost": 0.0002004,
+        "upstream_inference_completions_cost": 0.0003125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G15",
+    "Input": "agent la gi",
+    "Loai": "hiếm",
+    "Lop": "—",
+    "Nguon": "U0208/C0033/T0338",
+    "KyVong": "Hiểu tiếng Việt không dấu, trả lời + citation",
+    "Output": "Chào bạn, câu hỏi của bạn hơi chung chung. Để mình có thể hỗ trợ tốt nhất, bạn vui lòng cho mình biết bạn đang muốn hỏi về \"agent\" trong ngữ cảnh nào nhé (ví dụ: trong lập trình, trong AI, trong kinh doanh...)?",
+    "OutputSummary": "Chào bạn, câu hỏi của bạn hơi chung chung. Để mình có thể hỗ trợ tốt nhất, bạn vui lòng cho mình biết bạn đang muốn hỏi về \"agent\" trong ngữ cảnh nào nhé (ví dụ: trong lập trình, trong AI, trong kinh doanh...)?",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 55,
+      "total_tokens": 722,
+      "cost": 0.0003376,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003376,
+        "upstream_inference_prompt_cost": 0.0002001,
+        "upstream_inference_completions_cost": 0.0001375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G16",
+    "Input": "các đặc điểm chính của LLM",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0349/C0374/T0231",
+    "KyVong": "Trả lời + citation đúng buổi Foundation",
+    "Output": "Chào bạn,\n\nBạn có thể vui lòng cung cấp thêm ngữ cảnh về câu hỏi của mình được không? Ví dụ, bạn muốn biết về đặc điểm kiến trúc, đặc điểm hoạt động, hay đặc điểm ứng dụng của LLM?",
+    "OutputSummary": "Chào bạn, Bạn có thể vui lòng cung cấp thêm ngữ cảnh về câu hỏi của mình được không? Ví dụ, bạn muốn biết về đặc điểm kiến trúc, đặc điểm hoạt động, hay đặc điểm ứng dụng của LLM?",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 671,
+      "completion_tokens": 48,
+      "total_tokens": 719,
+      "cost": 0.0003213,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003213,
+        "upstream_inference_prompt_cost": 0.0002013,
+        "upstream_inference_completions_cost": 0.00012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G17",
+    "Input": "tóm tắt ưu và nhược điểm của ReAct",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0064/C0387/T1046",
+    "KyVong": "Trả lời + citation, không bịa ưu/nhược",
+    "Output": "Chào bạn, ReAct là một kỹ thuật rất hay để cải thiện khả năng suy luận của Large Language Models (LLMs)!\n\n1.  **Ưu điểm của ReAct:**\n    *   **Cải thiện khả năng suy luận:** ReAct kết hợp suy luận (Reasoning) và hành động (Acting), giúp LLM phân tích vấn đề từng bước và thực hiện các công cụ bên ngoài để thu thập thông tin hoặc thực hiện tác vụ [T05-012]. Điều này giúp mô hình giải quyết các bài toán phức tạp tốt hơn, đặc biệt là những bài toán yêu cầu nhiều bước logic hoặc truy cập dữ liệu bên ngoài.\n    *   **Giảm hallucination:** Bằng cách sử dụng các công cụ bên ngoài để xác minh thông tin hoặc thực hiện tính toán, ReAct giúp giảm thiểu việc LLM tạo ra thông tin sai lệch [T05-020].\n    *   **Khả năng giải thích (Explainability):** Quá trình suy luận từng bước của ReAct tạo ra một chuỗi các suy nghĩ và hành động rõ ràng, giúp chúng ta dễ dàng hiểu được cách mô hình đi đến kết quả cuối cùng [T05-035].\n    *   **Sử dụng công cụ hiệu quả:** ReAct cho phép LLM tương tác với các API, cơ sở dữ liệu, hoặc các công cụ khác một cách linh hoạt, mở rộng đáng kể khả năng của mô hình [T05-040].\n\n2.  **Nhược điểm của ReAct:**\n    *   **Độ trễ cao hơn:** Do phải thực hiện nhiều bước suy luận và gọi công cụ bên ngoài, quá trình xử lý của ReAct có thể chậm hơn so với việc chỉ dựa vào suy luận nội bộ của LLM [T05-055].\n    *   **Phụ thuộc vào chất lượng công cụ:** Hiệu suất của ReAct phụ thuộc rất nhiều vào chất lượng và độ tin cậy của các công cụ mà nó được cung cấp [T05-060]. Nếu công cụ trả về thông tin sai hoặc không hoạt động đúng, ReAct cũng sẽ gặp khó khăn.\n    *   **Chi phí tính toán:** Việc gọi API hoặc thực hiện các tác vụ bên ngoài có thể tốn kém về mặt tài nguyên và chi phí, đặc biệt khi cần nhiều lần gọi [T05-065].\n    *   **Độ phức tạp trong thiết kế prompt:** Để ReAct hoạt động hiệu quả, cần phải thiết kế prompt cẩn thận để hướng dẫn mô hình suy luận và sử dụng công cụ một cách chính xác [T05-070].\n\nBạn có muốn tìm hiểu sâu hơn về một khía cạnh cụ thể nào của ReAct không?",
+    "OutputSummary": "Chào bạn, ReAct là một kỹ thuật rất hay để cải thiện khả năng suy luận của Large Language Models (LLMs)! 1. **Ưu điểm của ReAct:** * **Cải thiện khả năng suy luận:** ReAct kết hợp suy luận (Reasoning) và hành động (Actin...",
+    "Citations": [
+      "T05-012",
+      "T05-020",
+      "T05-035",
+      "T05-040",
+      "T05-055",
+      "T05-060",
+      "T05-065",
+      "T05-070"
+    ],
+    "C1": "FAIL",
+    "C2": 1,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 675,
+      "completion_tokens": 583,
+      "total_tokens": 1258,
+      "cost": 0.00166,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00166,
+        "upstream_inference_prompt_cost": 0.0002025,
+        "upstream_inference_completions_cost": 0.0014575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G18",
+    "Input": "cách xử lý ngữ cảnh",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0031/C0002/T0330",
+    "KyVong": "Trả lời + citation, nối về bước đang làm",
+    "Output": "Chào bạn, để mình hỗ trợ nhé!\n\nCâu hỏi của bạn hơi chung chung, bạn có thể cho mình biết cụ thể hơn về ngữ cảnh bạn đang gặp phải trong bài tập lập trình là gì không? Ví dụ, bạn đang gặp vấn đề với việc truyền tham số, quản lý trạng thái, hay một vấn đề nào khác liên quan đến ngữ cảnh trong code của bạn?",
+    "OutputSummary": "Chào bạn, để mình hỗ trợ nhé! Câu hỏi của bạn hơi chung chung, bạn có thể cho mình biết cụ thể hơn về ngữ cảnh bạn đang gặp phải trong bài tập lập trình là gì không? Ví dụ, bạn đang gặp vấn đề với việc truyền tham số, qu...",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 5,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 670,
+      "completion_tokens": 78,
+      "total_tokens": 748,
+      "cost": 0.000396,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000396,
+        "upstream_inference_prompt_cost": 0.000201,
+        "upstream_inference_completions_cost": 0.000195
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G19",
+    "Input": "tại sao faq rule-based thường điểm thấp",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "U0156/C0238/T0666",
+    "KyVong": "Trả lời từ transcript buổi chấm điểm use case",
+    "Output": "Chào bạn, câu hỏi của bạn khá hay nhưng mình cần thêm thông tin để có thể hỗ trợ tốt nhất. Bạn có thể cho mình biết bạn đang muốn so sánh hiệu suất của FAQ rule-based với hệ thống nào không? Ví dụ như so với hệ thống FAQ sử dụng mô hình học máy chẳng hạn. \n\nSau khi có thêm thông tin, mình sẽ giúp bạn đối chiếu với kiến thức đã học để tìm ra câu trả lời nhé!",
+    "OutputSummary": "Chào bạn, câu hỏi của bạn khá hay nhưng mình cần thêm thông tin để có thể hỗ trợ tốt nhất. Bạn có thể cho mình biết bạn đang muốn so sánh hiệu suất của FAQ rule-based với hệ thống nào không? Ví dụ như so với hệ thống FAQ...",
+    "Citations": [],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 674,
+      "completion_tokens": 92,
+      "total_tokens": 766,
+      "cost": 0.0004322,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0004322,
+        "upstream_inference_prompt_cost": 0.0002022,
+        "upstream_inference_completions_cost": 0.00023
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G20",
+    "Input": "NameError: plt is not defined — giải thích lỗi này",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "tự sinh (MOCK.md)",
+    "KyVong": "Giải thích nguyên nhân, không viết code hộ",
+    "Output": "Lỗi `NameError: plt is not defined` xuất hiện khi bạn cố gắng sử dụng biến `plt` mà chưa import thư viện Matplotlib. [T01-012]\n\nĐể khắc phục, bạn cần thêm dòng `import matplotlib.pyplot as plt` vào đầu file code của mình. [T01-015]",
+    "OutputSummary": "Lỗi `NameError: plt is not defined` xuất hiện khi bạn cố gắng sử dụng biến `plt` mà chưa import thư viện Matplotlib. [T01-012] Để khắc phục, bạn cần thêm dòng `import matplotlib.pyplot as plt` vào đầu file code của mình....",
+    "Citations": [
+      "T01-012",
+      "T01-015"
+    ],
+    "C1": "FAIL",
+    "C2": 4,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 73,
+      "total_tokens": 749,
+      "cost": 0.0003853,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0003853,
+        "upstream_inference_prompt_cost": 0.0002028,
+        "upstream_inference_completions_cost": 0.0001825
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G21",
+    "Input": "pain point cần có những gì",
+    "Loai": "thường",
+    "Lop": "—",
+    "Nguon": "tự sinh (quick-chip)",
+    "KyVong": "4 thành tố + citation",
+    "Output": "Chào bạn, để mình hỗ trợ bạn nhé!\n\n**Nhận diện nguyên lý sai:** Câu hỏi của bạn đang hơi chung chung, mình chưa rõ bạn muốn hỏi về \"pain point\" trong ngữ cảnh nào.\n\n**Căn cứ bài giảng:** Trong buổi học sáng, chúng ta đã đề cập đến \"pain point\" trong nhiều khía cạnh khác nhau như:\n*   **Phân tích vấn đề (Problem Analysis):** Xác định các khó khăn, thách thức mà người dùng hoặc hệ thống đang gặp phải [T01-023].\n*   **Thiết kế giải pháp (Solution Design):** Tìm hiểu các điểm yếu hiện tại để đưa ra giải pháp khắc phục [T02-015].\n*   **Đánh giá hiệu quả (Evaluation):** Đo lường mức độ giải quyết các vấn đề đã được xác định [T03-007].\n\n**Gợi ý hành động:** Bạn có thể làm rõ hơn \"pain point\" mà bạn đang muốn tìm hiểu là trong bối cảnh nào không? Ví dụ: \"pain point của người dùng khi sử dụng ứng dụng X\" hay \"pain point trong quá trình phát triển tính năng Y\"?",
+    "OutputSummary": "Chào bạn, để mình hỗ trợ bạn nhé! **Nhận diện nguyên lý sai:** Câu hỏi của bạn đang hơi chung chung, mình chưa rõ bạn muốn hỏi về \"pain point\" trong ngữ cảnh nào. **Căn cứ bài giảng:** Trong buổi học sáng, chúng ta đã đề...",
+    "Citations": [
+      "T01-023",
+      "T02-015",
+      "T03-007"
+    ],
+    "C1": "FAIL",
+    "C2": 3,
+    "C3": "PASS",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 670,
+      "completion_tokens": 250,
+      "total_tokens": 920,
+      "cost": 0.000826,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000826,
+        "upstream_inference_prompt_cost": 0.000201,
+        "upstream_inference_completions_cost": 0.000625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  {
+    "Id": "G22",
+    "Input": "t có đẹp trai không",
+    "Loai": "hiếm",
+    "Lop": "③",
+    "Nguon": "U0084/C0008/T1189",
+    "KyVong": "Một câu vui, kéo về bước đang làm",
+    "Output": "Tôi là một trợ lý AI và không có khả năng đánh giá ngoại hình của bạn. Tôi ở đây để hỗ trợ bạn về các vấn đề liên quan đến lập trình.",
+    "OutputSummary": "Tôi là một trợ lý AI và không có khả năng đánh giá ngoại hình của bạn. Tôi ở đây để hỗ trợ bạn về các vấn đề liên quan đến lập trình.",
+    "Citations": [],
+    "C1": "PASS",
+    "C2": 5,
+    "C3": "FAIL",
+    "Model": "google/gemini-2.5-flash",
+    "Usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 35,
+      "total_tokens": 704,
+      "cost": 0.0002882,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0002882,
+        "upstream_inference_prompt_cost": 0.0002007,
+        "upstream_inference_completions_cost": 8.75E-05
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+]
