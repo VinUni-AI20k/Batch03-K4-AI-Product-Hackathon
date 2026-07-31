@@ -17,6 +17,6 @@ Mở `http://localhost:4173/codebase/frontend/vlearn-course/`. Chạy từ root 
 - Click một Day để mở các hành động.
 - Day01 → **Chuẩn bị trước buổi học** dẫn tới `../warmup-ai/index.html`.
 - **Đọc slide** sổ ngăn tài liệu bên dưới; PDF/transcript trỏ tới file hiện có trong `data/vlearn-pack/`.
-- **Câu hỏi sau buổi học** lưu câu hỏi mock vào `localStorage` của trình duyệt.
+- Day01 → **Kiểm tra sau bài** dẫn tới phần tự đánh giá và quiz tại `../quizzcuoi/index.html`.
 
-Day02–Day06 giữ cùng cấu trúc để thêm warm-up riêng khi nội dung từng ngày sẵn sàng.
+Day02–Day06 giữ cùng cấu trúc và hiển thị trạng thái đang biên soạn cho các hoạt động chưa có nội dung.

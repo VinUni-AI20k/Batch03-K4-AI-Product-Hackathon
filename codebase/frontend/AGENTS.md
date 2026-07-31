@@ -33,7 +33,14 @@ Source of truth: `vlearn-course/styles.css` và `vlearn-course/README.md`.
 - Đây là cổng khóa học tĩnh mô phỏng VLearn: header trắng/navy, trạng thái active đỏ, canvas xanh xám rất nhạt và accordion khóa học trắng.
 - Không dùng mascot, màu xanh lá CTA, card đáy cứng hoặc hiệu ứng "game lesson" của `warmup-ai/` ở trang này.
 - Các Day là accordion; hành động và tài liệu phải xổ ngay dưới đúng Day đang chọn, không điều hướng người học lạc khỏi danh sách trừ link đi vào warm-up/tài liệu.
-- Duy trì ba hành động trong mỗi Day: chuẩn bị trước buổi học, đọc slide và câu hỏi sau buổi học. Chỉ Day đã có nội dung mới được link sang warm-up thật.
+- Duy trì ba hành động trong mỗi Day: chuẩn bị trước buổi học, đọc slide và kiểm tra sau bài. Chỉ Day đã có nội dung mới được link sang warm-up/quiz thật.
+
+### `quizzcuoi/`
+
+- Đây là kiểm tra sau Bài 1: được phép dùng trạng thái đúng/sai vì khác với warm-up thu thập quan điểm.
+- Giữ font tròn, xanh trời cho thông tin và xanh lá cho hành động chính để liên hệ với warm-up; không dùng mascot.
+- Container tối đa radius 16px, footer/hành động luôn nhìn thấy và nội dung dài phải cuộn bên trong.
+- Nút đóng ở màn tự đánh giá quay về `vlearn-course/`; màn câu hỏi quay lại phần tự đánh giá.
 
 ## 3. Bố cục và hành vi của `warmup-ai/`
 

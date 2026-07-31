@@ -6,11 +6,11 @@ product
 
 ## Users
 
-Sinh viên COMP2010 dùng laptop hoặc máy chiếu trước và sau buổi học. Họ cần đi từ cổng khóa học VLearn tới hoạt động warm-up, xem quan điểm mô phỏng của lớp, thảo luận và quay lại tài liệu mà không bị lạc luồng.
+Sinh viên COMP2010 dùng laptop hoặc máy chiếu trước và sau buổi học. Họ cần đi từ cổng khóa học VLearn tới hoạt động warm-up hoặc kiểm tra sau bài, xem phản hồi phù hợp và quay lại tài liệu mà không bị lạc luồng.
 
 ## Product Purpose
 
-Tạo một luồng học tập hai chiều giữa cổng khóa học và warm-up Bài 1. Thành công nghĩa là sinh viên hiểu mình đang ở đâu, hoàn thành được hoạt động ngắn, xem lại key moments và luôn có đường quay về khóa học.
+Tạo một luồng học tập hai chiều giữa cổng khóa học, warm-up và kiểm tra sau Bài 1. Thành công nghĩa là sinh viên hiểu mình đang ở đâu, hoàn thành được hoạt động ngắn, xem lại key moments hoặc lời giải và luôn có đường quay về khóa học.
 
 ## Brand Personality
 
