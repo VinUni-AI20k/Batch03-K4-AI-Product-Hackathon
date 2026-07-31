@@ -9,9 +9,18 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.llm_client_openai import call_json
-from app.core.schemas import AlignmentItem, ClassifiedSegment, OutlineSection
+from app.core.schemas import (
+    AlignmentItem,
+    ClassifiedSegment,
+    GradingResult,
+    WeaknessAnalysis,
+)
 from app.pipeline.align import align_weak_sections
-from app.pipeline.weakness import WeaknessResultInput
+from app.pipeline.weakness import (
+    LearningAction,
+    DiagnosisResult,
+    diagnose_learning,
+)
 from app.prompts.weakness_prompt import SYSTEM_PROMPT
 
 
@@ -93,22 +102,80 @@ def refine_weaknesses(payload: WeaknessRefinementRequest) -> WeaknessRefinementR
     return response
 
 
-# D-owned contract: consumes C's output verbatim and produces E's input.
+# D-owned canonical contract: GradingResult -> WeaknessAnalysis -> AlignmentItem[].
+class DiagnosisRequest(BaseModel):
+    grading: GradingResult
+    open_answer_text: str = ""
+    mastery_threshold: float = Field(default=0.8, ge=0, le=1)
+    max_sections: int = Field(default=3, ge=1, le=3)
+
+
 class AlignmentRequest(BaseModel):
-    weaknesses: List[WeaknessResultInput] = Field(..., min_length=1, max_length=3)
-    outline: List[OutlineSection] = Field(..., min_length=1)
+    weakness: WeaknessAnalysis
     transcript: List[ClassifiedSegment] = Field(..., min_length=1)
     max_segments_per_section: int = Field(default=3, ge=1, le=10)
+
+
+class DiagnosisPipelineRequest(DiagnosisRequest):
+    transcript: List[ClassifiedSegment] = Field(..., min_length=1)
+    max_segments_per_section: int = Field(default=3, ge=1, le=10)
+
+
+class DiagnosisPipelineResponse(BaseModel):
+    diagnosis: DiagnosisResult
+    alignment: List[AlignmentItem] = Field(default_factory=list)
+
+
+@router.post("/analyze", response_model=DiagnosisResult)
+def analyze(payload: DiagnosisRequest) -> DiagnosisResult:
+    """Create weak sections and the reteach/retest decision from C's result."""
+    try:
+        return diagnose_learning(
+            payload.grading,
+            payload.open_answer_text,
+            mastery_threshold=payload.mastery_threshold,
+            max_sections=payload.max_sections,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @router.post("/alignment", response_model=List[AlignmentItem])
 def align(payload: AlignmentRequest) -> List[AlignmentItem]:
     try:
         return align_weak_sections(
-            payload.weaknesses,
-            payload.outline,
+            payload.weakness,
             payload.transcript,
             max_segments_per_section=payload.max_segments_per_section,
         )
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.post("/run", response_model=DiagnosisPipelineResponse)
+def run_diagnosis(payload: DiagnosisPipelineRequest) -> DiagnosisPipelineResponse:
+    """Decide the path and align evidence only when reteaching is required."""
+    try:
+        diagnosis = diagnose_learning(
+            payload.grading,
+            payload.open_answer_text,
+            mastery_threshold=payload.mastery_threshold,
+            max_sections=payload.max_sections,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    if diagnosis.action is LearningAction.RETEST:
+        return DiagnosisPipelineResponse(diagnosis=diagnosis, alignment=[])
+
+    weakness = diagnosis.weakness
+    if weakness is None:  # Defensive guard for the response invariant.
+        raise HTTPException(status_code=500, detail="Reteach decision has no weakness analysis.")
+    try:
+        alignment = align_weak_sections(
+            weakness,
+            payload.transcript,
+            max_segments_per_section=payload.max_segments_per_section,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return DiagnosisPipelineResponse(diagnosis=diagnosis, alignment=alignment)

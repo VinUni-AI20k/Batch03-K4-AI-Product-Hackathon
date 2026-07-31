@@ -1,18 +1,18 @@
-"""Align C's weakness results with grounded transcript segments."""
+"""Align D's weak sections with grounded transcript segments."""
 
 from __future__ import annotations
 
 import re
 import unicodedata
 
-from app.core.schemas import AlignmentItem, ClassifiedSegment, OutlineSection
-from app.pipeline.weakness import WeaknessResultInput, validate_weakness_results
+from app.core.schemas import AlignmentItem, ClassifiedSegment, WeaknessAnalysis
 
 
 TOKEN_RE = re.compile(r"[a-zA-Z0-9_]+")
+SEGMENT_NUMBER_RE = re.compile(r"(\d+)$")
 STOP_WORDS = {
-    "cau", "cho", "cua", "co", "khong", "la", "phan", "section", "trong",
-    "tu", "va", "ve", "nguoi", "hoc", "danh", "gia", "rule", "based",
+    "cau", "cho", "cua", "co", "khong", "la", "phan", "sai", "section",
+    "thuoc", "trong", "tu", "va", "ve", "nguoi", "hoc", "danh", "gia",
 }
 IMPORTANT_TERMS = {"inner", "left", "right", "full", "join", "null", "key"}
 
@@ -26,51 +26,62 @@ def _tokens(text: str) -> set[str]:
     }
 
 
+def _segment_number(segment_id: str) -> int | None:
+    match = SEGMENT_NUMBER_RE.search(segment_id)
+    return int(match.group(1)) if match else None
+
+
 def align_weak_sections(
-    weaknesses: list[WeaknessResultInput],
-    outline: list[OutlineSection],
+    weakness: WeaknessAnalysis,
     transcript: list[ClassifiedSegment],
     *,
     max_segments_per_section: int = 3,
 ) -> list[AlignmentItem]:
-    """Find real transcript evidence for each weakness selected by C.
+    """Map each selected weak section to real teaching-content IDs.
 
-    Outline title and key points provide the subject vocabulary, so alignment
-    does not depend on the learner writing an optional open answer.
+    The strongest lexical match is the anchor. Immediately consecutive
+    relevant segments are included to preserve explanation context.
     """
     if max_segments_per_section < 1:
         raise ValueError("max_segments_per_section must be positive")
 
-    outline_by_id = {section.section_id: section for section in outline}
-    validate_weakness_results(weaknesses, set(outline_by_id))
     teaching = [item for item in transcript if item.label.value == "TEACHING_CONTENT"]
     if not teaching:
         raise ValueError("Transcript contains no TEACHING_CONTENT segment")
+    reasons = {item.section_id: item.reason for item in weakness.weakness_ranking}
 
     result: list[AlignmentItem] = []
-    for weakness in weaknesses:
-        section = outline_by_id[weakness.outline_section_id]
-        query = " ".join([section.title, *section.key_points, weakness.reasoning])
-        query_tokens = _tokens(query)
-        scored: list[tuple[int, int, str]] = []
-        for order, segment in enumerate(teaching):
+    for section_id in weakness.sections_to_reteach:
+        reason = reasons.get(section_id, "")
+        query_tokens = _tokens(reason)
+        scored: list[tuple[int, int]] = []
+        for index, segment in enumerate(teaching):
             overlap = query_tokens & _tokens(segment.text)
             score = sum(2 if token in IMPORTANT_TERMS else 1 for token in overlap)
-            if score > 0:
-                scored.append((score, order, segment.segment_id))
+            if score:
+                scored.append((score, index))
+        if not scored:
+            raise ValueError(f"No grounded transcript segment found for {section_id}")
 
         scored.sort(key=lambda row: (-row[0], row[1]))
-        segment_ids = [row[2] for row in scored[:max_segments_per_section]]
-        if not segment_ids:
-            raise ValueError(
-                f"No grounded transcript segment found for {weakness.outline_section_id}"
-            )
+        anchor_index = scored[0][1]
+        selected = [teaching[anchor_index].segment_id]
+        previous_number = _segment_number(selected[0])
+        for segment in teaching[anchor_index + 1 :]:
+            if len(selected) >= max_segments_per_section:
+                break
+            number = _segment_number(segment.segment_id)
+            if previous_number is None or number != previous_number + 1:
+                break
+            if not (query_tokens & _tokens(segment.text)):
+                break
+            selected.append(segment.segment_id)
+            previous_number = number
+
         result.append(
-            AlignmentItem(
-                section_id=weakness.outline_section_id,
-                related_segment_ids=segment_ids,
-            )
+            AlignmentItem(section_id=section_id, related_segment_ids=selected)
         )
+    validate_alignment(result, transcript)
     return result
 
 

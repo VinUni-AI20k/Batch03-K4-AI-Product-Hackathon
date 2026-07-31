@@ -1,35 +1,115 @@
-"""Adapter between C's weakness output and D's alignment pipeline.
+"""Learning diagnosis owned by D.
 
-D deliberately does not grade answers or recalculate weakness.  The canonical
-input is the ``WeaknessResult[]`` produced by C's ``analyzeWeakness`` function.
+Input is C's canonical ``GradingResult``.  Diagnosis is deterministic: a
+section is weak when its own accuracy is below the mastery threshold.
 """
 
 from __future__ import annotations
 
+from collections import defaultdict
+from enum import Enum
+
 from pydantic import BaseModel, Field
 
-
-class WeaknessResultInput(BaseModel):
-    """Python mirror of C's frontend WeaknessResult type."""
-
-    outline_section_id: str = Field(..., pattern=r"^s\d+$")
-    confidence: float = Field(..., ge=0, le=1)
-    reasoning: str = Field(..., min_length=1)
+from app.core.schemas import GradingResult, WeaknessAnalysis, WeaknessRankingItem
 
 
-def validate_weakness_results(
-    weaknesses: list[WeaknessResultInput],
-    valid_section_ids: set[str],
-) -> list[WeaknessResultInput]:
-    """Validate C's result without changing its score, order, or reasoning."""
-    if not 1 <= len(weaknesses) <= 3:
-        raise ValueError("C must return between 1 and 3 weakness results")
+MASTERY_THRESHOLD = 0.8
+MAX_SECTIONS_TO_RETEACH = 3
 
-    seen: set[str] = set()
-    for item in weaknesses:
-        if item.outline_section_id not in valid_section_ids:
-            raise ValueError(f"Unknown outline section: {item.outline_section_id}")
-        if item.outline_section_id in seen:
-            raise ValueError(f"Duplicate outline section: {item.outline_section_id}")
-        seen.add(item.outline_section_id)
-    return weaknesses
+
+class LearningAction(str, Enum):
+    RETEACH = "reteach"
+    RETEST = "retest"
+
+
+class DiagnosisResult(BaseModel):
+    action: LearningAction
+    score: float = Field(..., ge=0, le=1)
+    mastery_threshold: float = Field(..., ge=0, le=1)
+    weakness: WeaknessAnalysis | None = None
+
+
+def diagnose_learning(
+    grading: GradingResult,
+    open_answer_text: str = "",
+    *,
+    mastery_threshold: float = MASTERY_THRESHOLD,
+    max_sections: int = MAX_SECTIONS_TO_RETEACH,
+) -> DiagnosisResult:
+    """Create weak-section ranking and choose reteach or retest.
+
+    ``retest`` means all sections reached mastery. ``reteach`` means at least
+    one section is below mastery; at most three weakest sections are selected.
+    """
+    if not 0 <= mastery_threshold <= 1:
+        raise ValueError("mastery_threshold must be between 0 and 1")
+    if not 1 <= max_sections <= MAX_SECTIONS_TO_RETEACH:
+        raise ValueError("max_sections must be between 1 and 3")
+    if not grading.items:
+        raise ValueError("grading result must contain at least one item")
+
+    totals: dict[str, int] = defaultdict(int)
+    correct: dict[str, int] = defaultdict(int)
+    for item in grading.items:
+        totals[item.section_id] += 1
+        if item.correct:
+            correct[item.section_id] += 1
+
+    ranking: list[WeaknessRankingItem] = []
+    for section_id, total in totals.items():
+        correct_count = correct[section_id]
+        section_accuracy = correct_count / total
+        if section_accuracy >= mastery_threshold:
+            continue
+        weak_score = 1 - section_accuracy
+        ranking.append(
+            WeaknessRankingItem(
+                section_id=section_id,
+                weak_score=round(weak_score, 4),
+                reason=(
+                    f"Độ chính xác {section_accuracy:.0%} "
+                    f"({correct_count}/{total} câu đúng), thấp hơn ngưỡng "
+                    f"mastery {mastery_threshold:.0%}."
+                ),
+            )
+        )
+
+    ranking.sort(key=lambda item: (-item.weak_score, item.section_id))
+    if not ranking:
+        return DiagnosisResult(
+            action=LearningAction.RETEST,
+            score=grading.score,
+            mastery_threshold=mastery_threshold,
+        )
+
+    selected = [item.section_id for item in ranking[:max_sections]]
+    weakness = WeaknessAnalysis(
+        quiz_result=grading.items,
+        open_answer_text=open_answer_text,
+        weakness_ranking=ranking,
+        sections_to_reteach=selected,
+    )
+    return DiagnosisResult(
+        action=LearningAction.RETEACH,
+        score=grading.score,
+        mastery_threshold=mastery_threshold,
+        weakness=weakness,
+    )
+
+
+def analyze_weakness(
+    grading: GradingResult,
+    open_answer_text: str = "",
+    *,
+    mastery_threshold: float = MASTERY_THRESHOLD,
+) -> WeaknessAnalysis:
+    """Return just WeaknessAnalysis for callers that already chose reteach."""
+    result = diagnose_learning(
+        grading,
+        open_answer_text,
+        mastery_threshold=mastery_threshold,
+    )
+    if result.weakness is None:
+        raise ValueError("No weak section found; learner should proceed to retest")
+    return result.weakness
