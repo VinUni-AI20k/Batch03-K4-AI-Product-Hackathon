@@ -30,7 +30,9 @@ llm:
   max_tool_rounds: 8
 
 asr:
-  model: vinai/PhoWhisper-large   # đổi sang đường dẫn bản CTranslate2 khi convert xong
+  # faster-whisper cần model CTranslate2. Dùng bản chuẩn: large-v3 (chất lượng cao, chậm)
+  # hoặc medium (nhanh ~0.5x realtime, tiếng Việt vẫn tốt). PhoWhisper phải convert CT2 trước khi dùng.
+  model: medium
   language: vi
 
 discord:
