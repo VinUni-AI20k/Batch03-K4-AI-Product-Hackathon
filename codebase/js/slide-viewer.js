@@ -884,7 +884,7 @@ function sendTutorMsg(e) {
   const studentName = currentUser ? currentUser.name : "Unknown";
 
   // Gọi REST API tới Python RAG Backend hoặc Fallback Direct API
-  const apiBase = window.location.origin.includes('localhost:8080') ? '' : 'http://localhost:8080';
+  const apiBase = window.location.protocol.startsWith('http') ? '' : 'http://localhost:8080';
   fetch(`${apiBase}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
