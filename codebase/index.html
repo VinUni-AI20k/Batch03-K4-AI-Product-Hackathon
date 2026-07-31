@@ -1013,107 +1013,12 @@
             <!-- Document Scroll Viewer (Vertical Scroll) -->
             <div class="doc-scroll-viewer" id="scrollViewer">
 
-                <!-- Slides are rendered dynamically from real PDF content: see renderDoc, d1Slides, d2Slides in the script block below -->
+                <!-- Slides + per-section quiz gates are rendered progressively: see
+                     renderDocProgressive, sections, d1Slides, d2Slides below.
+                     Each section's quiz is generated live by codebase/server (Gemini) —
+                     the next section only appears after the current section's quiz is passed. -->
                 <div id="docD1Container" class="doc-container"></div>
                 <div id="docD2Container" class="doc-container" style="display:none;"></div>
-
-                <!-- ============================================================= -->
-                <!-- END OF LESSON: ACTIVE RECALL SURVEY / QUIZ SECTION            -->
-                <!-- ============================================================= -->
-                <div class="active-recall-section" id="activeRecallQuiz">
-                    <div class="quiz-section-header">
-                        <div class="quiz-header-icon">🎯</div>
-                        <div class="quiz-header-title">
-                            <h3>BÀI KIỂM TRA MỨC ĐỘ HIỂU BÀI (VLEARN ACTIVE RECALL)</h3>
-                            <p>Bạn đã cuộn hết slide Day 01 & Day 02! Hãy hoàn thành 3 câu hỏi tình huống bên dưới để AI kiểm tra xem bạn có bị hổng kiến thức cốt lõi nào không trước khi làm bài tập lớn.</p>
-                        </div>
-                    </div>
-
-                    <!-- QUESTION 1 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 1 (Cơ chế Attention — d1, Trang 15):</strong> Vì sao cơ chế Attention giúp mô hình khóa đúng nghĩa của một từ theo ngữ cảnh (VD: "nó" chỉ quyển sách hay cái túi), thay vì chỉ đọc tuần tự từng chữ?
-                        </div>
-                        <div class="mc-options-list" id="mcOptions1">
-                            <label class="mc-option-card" onclick="selectMc(1, 'A', this)">
-                                <input type="radio" name="q1" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Mỗi token chủ động "nhìn lại" các token trước đó, chấm điểm mức độ liên quan của từng token với nghĩa của mình rồi khóa nghĩa theo ngữ cảnh — đây chính là chữ T trong GPT.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'B', this)">
-                                <input type="radio" name="q1" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Model đọc tuần tự từng chữ theo đúng thứ tự xuất hiện, giống hệt cách con người đọc một câu.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'C', this)">
-                                <input type="radio" name="q1" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Model luôn ưu tiên từ đứng gần "nó" nhất về mặt vị trí trong câu.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(1, 'D', this)">
-                                <input type="radio" name="q1" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Model hiểu ý nghĩa thực tế ngoài đời như con người, biết chắc chắn sách thì dày còn túi thì không.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(1)">Nộp đáp án & AI Phân tích Hiểu lầm 🚀</button>
-
-                        <div id="res1" class="result-box"></div>
-                    </div>
-
-                    <!-- QUESTION 2 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 2 (Dense vs MoE — d1, Trang 17):</strong> Kimi K3 có 2.800 tỷ tham số — gấp 16 lần GPT-3 (175 tỷ) — nhưng theo slide, vì sao chi phí mỗi lần suy luận của Kimi K3 KHÔNG tăng tương ứng?
-                        </div>
-                        <div class="mc-options-list" id="mcOptions2">
-                            <label class="mc-option-card" onclick="selectMc(2, 'A', this)">
-                                <input type="radio" name="q2" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Kimi K3 dùng kiến trúc MoE ("bệnh viện đa khoa") — mỗi token chỉ gọi vài chuyên gia thay vì đi qua toàn bộ mạng như model dense (GPT-3, "bác sĩ đa năng"), nên chi phí mỗi lần suy luận gần như không đổi dù tổng tham số lớn hơn nhiều.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'B', this)">
-                                <input type="radio" name="q2" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Vì Kimi K3 nén dữ liệu thông minh hơn nên luôn chạy nhanh hơn bất kể kiến trúc.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'C', this)">
-                                <input type="radio" name="q2" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Vì phần lớn 2.800 tỷ tham số của Kimi K3 không thực sự được dùng, chỉ để "trưng bày" quy mô.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(2, 'D', this)">
-                                <input type="radio" name="q2" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Vì Kimi K3 chạy trên phần cứng mạnh hơn hẳn nên bù lại số tham số lớn.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(2)">Nộp đáp án & AI Phân tích 🚀</button>
-
-                        <div id="res2" class="result-box"></div>
-                    </div>
-
-                    <!-- QUESTION 3 -->
-                    <div class="quiz-card">
-                        <div class="quiz-card-title">
-                            📌 <strong>Câu 3 (Automate vs Augment — d2, Trang 17):</strong> Một nhóm định thiết kế AI tự động chấm bài tập lớn của học viên mà không cần giảng viên/TA duyệt. Theo khung PAIR (Automate vs Augment), đề xuất nào phù hợp?
-                        </div>
-                        <div class="mc-options-list" id="mcOptions3">
-                            <label class="mc-option-card" onclick="selectMc(3, 'A', this)">
-                                <input type="radio" name="q3" value="A" class="mc-radio">
-                                <span class="mc-option-text"><strong>A.</strong> Chọn Automate hoàn toàn vì AI luôn khách quan và nhanh hơn con người.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'B', this)">
-                                <input type="radio" name="q3" value="B" class="mc-radio">
-                                <span class="mc-option-text"><strong>B.</strong> Chấm bài tập lớn là việc stakes cao (điểm số, trách nhiệm cá nhân) — theo PAIR nên chọn Augment: AI soạn nháp, con người (giảng viên/TA) duyệt trước khi trả kết quả.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'C', this)">
-                                <input type="radio" name="q3" value="C" class="mc-radio">
-                                <span class="mc-option-text"><strong>C.</strong> Tuyệt đối không ứng dụng AI vì AI luôn luôn chấm sai bài tập.</span>
-                            </label>
-                            <label class="mc-option-card" onclick="selectMc(3, 'D', this)">
-                                <input type="radio" name="q3" value="D" class="mc-radio">
-                                <span class="mc-option-text"><strong>D.</strong> Chuyển cho các học viên tự chấm chéo lẫn nhau thay vì dùng AI.</span>
-                            </label>
-                        </div>
-                        <button class="btn-submit-quiz" onclick="checkMcAns(3)">Nộp đáp án & AI Phân tích 🚀</button>
-
-                        <div id="res3" class="result-box"></div>
-                    </div>
-
-                </div>
 
             </div>
 
@@ -1182,228 +1087,343 @@
     </div>
 
     <script>
-        const selectedAnswers = { 1: null, 2: null, 3: null };
-        const wrongAttempts = { 1: 0, 2: 0, 3: 0 };
-        const lastSubmittedOption = { 1: null, 2: null, 3: null };
-        const isQuestionPassed = { 1: false, 2: false, 3: false };
+        /* ============================================================= */
+        /* SECTION-GATED ACTIVE RECALL QUIZ — calls codebase/server (Gemini) */
+        /* Each "phần kiến thức" must be passed (>=60% đúng) before the next */
+        /* section's slides are revealed. Real AI call: POST /api/generate-quiz */
+        /* ============================================================= */
+        const sections = {
+            d1: [
+                { id: "d1-s1", title: "Bức tranh AI & các tầng của AI", slideStart: 0, slideEnd: 3 },
+                { id: "d1-s2", title: "Lịch sử AI 70 năm", slideStart: 4, slideEnd: 8 },
+                { id: "d1-s3", title: "Bên trong LLM: cơ chế vận hành", slideStart: 9, slideEnd: 21 },
+                { id: "d1-s4", title: "Từ LLM đến AI Agent", slideStart: 22, slideEnd: 23 },
+                { id: "d1-s5", title: "Chọn model & chi phí token", slideStart: 24, slideEnd: 28 }
+            ],
+            d2: [
+                { id: "d2-s1", title: "Problem Discovery", slideStart: 0, slideEnd: 6 },
+                { id: "d2-s2", title: "Problem Statement & định lượng hoá", slideStart: 7, slideEnd: 11 },
+                { id: "d2-s3", title: "PAIR ①② — Automate/Augment & mức giải pháp", slideStart: 12, slideEnd: 19 },
+                { id: "d2-s4", title: "Reward function & tiêu chí thành công", slideStart: 20, slideEnd: 23 }
+            ]
+        };
+        const PASS_THRESHOLD = 0.6; // ngưỡng % đúng để mở khoá phần tiếp theo
 
-        const correctAnswers = { 1: 'A', 2: 'A', 3: 'B' };
-
-        const optionTexts = {
-            1: {
-                A: 'A. Mỗi token chủ động "nhìn lại" các token trước đó, chấm điểm mức độ liên quan của từng token với nghĩa của mình rồi khóa nghĩa theo ngữ cảnh — đây chính là chữ T trong GPT.',
-                B: 'B. Model đọc tuần tự từng chữ theo đúng thứ tự xuất hiện, giống hệt cách con người đọc một câu.',
-                C: 'C. Model luôn ưu tiên từ đứng gần "nó" nhất về mặt vị trí trong câu.',
-                D: 'D. Model hiểu ý nghĩa thực tế ngoài đời như con người, biết chắc chắn sách thì dày còn túi thì không.'
-            },
-            2: {
-                A: 'A. Kimi K3 dùng kiến trúc MoE ("bệnh viện đa khoa") — mỗi token chỉ gọi vài chuyên gia thay vì đi qua toàn bộ mạng như model dense (GPT-3), nên chi phí mỗi lần suy luận gần như không đổi dù tổng tham số lớn hơn nhiều.',
-                B: 'B. Vì Kimi K3 nén dữ liệu thông minh hơn nên luôn chạy nhanh hơn bất kể kiến trúc.',
-                C: 'C. Vì phần lớn 2.800 tỷ tham số của Kimi K3 không thực sự được dùng, chỉ để "trưng bày" quy mô.',
-                D: 'D. Vì Kimi K3 chạy trên phần cứng mạnh hơn hẳn nên bù lại số tham số lớn.'
-            },
-            3: {
-                A: 'A. Chọn Automate hoàn toàn vì AI luôn khách quan và nhanh hơn con người.',
-                B: 'B. Chấm bài tập lớn là việc stakes cao (điểm số, trách nhiệm cá nhân) — theo PAIR nên chọn Augment: AI soạn nháp, con người (giảng viên/TA) duyệt trước khi trả kết quả.',
-                C: 'C. Tuyệt đối không ứng dụng AI vì AI luôn luôn chấm sai bài tập.',
-                D: 'D. Chuyển cho các học viên tự chấm chéo lẫn nhau thay vì dùng AI.'
-            }
+        const progress = {
+            d1: { unlocked: 1, results: {}, quiz: {}, answers: {} },
+            d2: { unlocked: 1, results: {}, quiz: {}, answers: {} }
         };
 
-        const conceptExplanations = {
-            1: {
-                correct: 'Attention cho phép mỗi token chủ động "quay đầu" nhìn lại các token trước, chấm điểm mức độ liên quan rồi khóa nghĩa theo ngữ cảnh — đây là lý do model hiểu ngữ cảnh tốt hơn hẳn các thế hệ trước (slide "Attention", d1 trang 15).',
-                misconception: {
-                    B: 'Slide nói rõ: "Thay vì đọc tuần tự từng chữ" — attention không xử lý theo trình tự đọc như con người.',
-                    C: 'Attention không dựa vào khoảng cách vị trí giữa các từ mà dựa trên trọng số liên quan được tính toán qua ngữ cảnh.',
-                    D: 'Model không "hiểu" thực tế đời thực như người; nó tính điểm mức độ liên quan giữa các token dựa trên dữ liệu training.'
-                }
-            },
-            2: {
-                correct: 'Kimi K3 dùng kiến trúc MoE — "một bệnh viện đa khoa" — mỗi token chỉ gọi vài chuyên gia, khác với GPT-3 dense ("một bác sĩ đa năng") nơi mọi token đều đi qua toàn bộ khớp nối. Nhờ vậy "bệnh viện" lớn gấp 16 lần mà chi phí mỗi ca khám gần như không đổi (slide "Tham số", d1 trang 17).',
-                misconception: {
-                    B: 'Slide không nói về nén dữ liệu; khác biệt cốt lõi nằm ở kiến trúc MoE so với dense.',
-                    C: 'Tham số trong MoE vẫn được dùng — chỉ khác là mỗi token chỉ đi qua một phần nhỏ (vài chuyên gia) thay vì toàn bộ mạng.',
-                    D: 'Slide không đề cập đến phần cứng; lý do chi phí không tăng tương ứng nằm ở kiến trúc MoE.'
-                }
-            },
-            3: {
-                correct: 'Theo PAIR (d2 trang 17): Augment được chọn khi stakes cao (tiền bạc, pháp lý, sức khỏe — ở đây là điểm số/trách nhiệm cá nhân) và kết quả cần trách nhiệm cá nhân. Việc automate hoàn toàn vẫn cần human oversight (preview, edit, undo).',
-                misconception: {
-                    A: 'PAIR chỉ ra Automate phù hợp khi có "đáp án đúng" mọi người đồng thuận và rủi ro thấp — chấm bài tập lớn không thỏa điều kiện này.',
-                    C: 'AI hoàn toàn có thể hỗ trợ ở vai trò Augment (soạn nháp), chỉ là không nên Automate hoàn toàn khi chưa có người duyệt.',
-                    D: 'Học viên chấm chéo không giải quyết được vấn đề thiếu chuẩn mực đánh giá chuyên môn và trách nhiệm cá nhân.'
-                }
-            }
-        };
-
-        function scrollToQuiz() {
-            document.getElementById('activeRecallQuiz').scrollIntoView({ behavior: 'smooth' });
+        function getSection(doc, sectionId) {
+            return sections[doc].find(s => s.id === sectionId);
         }
 
-        function selectMc(qNum, optionKey, el) {
-            if (isQuestionPassed[qNum] || wrongAttempts[qNum] >= 2) return;
-            selectedAnswers[qNum] = optionKey;
-            const container = document.getElementById('mcOptions' + qNum);
-            container.querySelectorAll('.mc-option-card').forEach(card => card.classList.remove('selected'));
+        function sectionPassed(doc, sectionId) {
+            const r = progress[doc].results[sectionId];
+            return !!r && (r.correct / r.total) >= PASS_THRESHOLD;
+        }
+
+        function citationToPage(citation) {
+            const m = /(\d+)\s*$/.exec(citation || '');
+            return m ? parseInt(m[1], 10) : 1;
+        }
+
+        function scrollToQuiz() {
+            const doc = document.getElementById('docD1Container').style.display !== 'none' ? 'd1' : 'd2';
+            const list = sections[doc];
+            const idx = Math.min(progress[doc].unlocked, list.length) - 1;
+            const target = document.getElementById(idx >= 0 && !sectionPassed(doc, list[idx].id)
+                ? 'quizGate-' + doc + '-' + list[idx].id
+                : 'finalScore-' + doc);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function fetchQuiz(doc, sectionId, regenerate) {
+            const res = await fetch('/api/generate-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ day: doc, sectionId, regenerate: !!regenerate })
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body.error || ('HTTP ' + res.status));
+            }
+            return res.json();
+        }
+
+        function quizGateHtml(doc, section) {
+            return `
+            <div class="active-recall-section" id="quizGate-${doc}-${section.id}">
+                <div class="quiz-section-header">
+                    <div class="quiz-header-icon">🎯</div>
+                    <div class="quiz-header-title">
+                        <h3>KIỂM TRA HIỂU BÀI — ${escapeHtml(section.title)}</h3>
+                        <p>Trả lời đúng ≥60% để mở khoá phần tiếp theo. AI đọc đúng nội dung phần này và sẽ chỉ ra bạn đang hiểu lầm điều gì kèm trích dẫn slide.</p>
+                    </div>
+                </div>
+                <div id="quizBody-${doc}-${section.id}">
+                    <div style="font-size: 13px; color: #64748b;">⏳ Đang tạo câu hỏi từ AI (Gemini)...</div>
+                </div>
+            </div>`;
+        }
+
+        async function loadQuizInto(doc, sectionId) {
+            const bodyEl = document.getElementById('quizBody-' + doc + '-' + sectionId);
+            try {
+                const data = await fetchQuiz(doc, sectionId, false);
+                progress[doc].quiz[sectionId] = data;
+                progress[doc].answers[sectionId] = {};
+                renderQuizQuestions(doc, sectionId);
+            } catch (err) {
+                bodyEl.innerHTML = `
+                    <div style="font-size: 13px; color: #dc2626;">⚠️ Không tạo được câu hỏi (lỗi kết nối AI: ${escapeHtml(String(err.message || err))}). Kiểm tra codebase/server đã chạy (node server.js) và GEMINI_API_KEY hợp lệ chưa.</div>
+                    <button class="btn-submit-quiz" style="margin-top:10px;" onclick="loadQuizInto('${doc}', '${sectionId}')">🔄 Thử lại</button>
+                `;
+            }
+        }
+
+        function renderQuizQuestions(doc, sectionId) {
+            const data = progress[doc].quiz[sectionId];
+            const bodyEl = document.getElementById('quizBody-' + doc + '-' + sectionId);
+            const cardsHtml = data.questions.map((q, qIdx) => `
+                <div class="quiz-card" id="quizCard-${doc}-${sectionId}-${qIdx}">
+                    <div class="quiz-card-title">📌 <strong>Câu ${qIdx + 1}:</strong> ${escapeHtml(q.question)}</div>
+                    <div class="mc-options-list" id="mcOptions-${doc}-${sectionId}-${qIdx}">
+                        ${q.options.map(o => `
+                            <label class="mc-option-card" onclick="selectQuizOption('${doc}','${sectionId}',${qIdx},'${o.key}',this)">
+                                <input type="radio" name="q-${doc}-${sectionId}-${qIdx}" value="${o.key}" class="mc-radio">
+                                <span class="mc-option-text"><strong>${o.key}.</strong> ${escapeHtml(o.text)}</span>
+                            </label>`).join('')}
+                    </div>
+                    <button class="btn-submit-quiz" id="btnSubmit-${doc}-${sectionId}-${qIdx}" onclick="submitQuizAnswer('${doc}','${sectionId}',${qIdx})">Nộp đáp án & AI phân tích 🚀</button>
+                    <div id="res-${doc}-${sectionId}-${qIdx}" class="result-box"></div>
+                </div>
+            `).join('');
+            bodyEl.innerHTML = cardsHtml + `<div id="sectionSummary-${doc}-${sectionId}" style="display:none; margin-top: 4px;"></div>`;
+        }
+
+        function selectQuizOption(doc, sectionId, qIdx, optionKey, el) {
+            const existing = progress[doc].answers[sectionId][qIdx];
+            if (existing && existing.locked) return;
+            const container = document.getElementById(`mcOptions-${doc}-${sectionId}-${qIdx}`);
+            container.querySelectorAll('.mc-option-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
             const radio = el.querySelector('input[type="radio"]');
             if (radio) radio.checked = true;
-
-            // Enable submit button ONLY IF the user selected a DIFFERENT option from the last submitted wrong option
-            const btnSubmit = container.parentNode.querySelector('.btn-submit-quiz');
-            if (btnSubmit && optionKey !== lastSubmittedOption[qNum]) {
-                btnSubmit.disabled = false;
-                btnSubmit.style.opacity = '1.0';
-                btnSubmit.style.cursor = 'pointer';
-                btnSubmit.innerText = 'Nộp đáp án & AI Phân tích Hiểu lầm 🚀';
-            }
+            progress[doc].answers[sectionId][qIdx] = { selected: optionKey, locked: false };
         }
 
-        function checkMcAns(qNum) {
-            if (isQuestionPassed[qNum] || wrongAttempts[qNum] >= 2) return;
+        function submitQuizAnswer(doc, sectionId, qIdx) {
+            const ans = progress[doc].answers[sectionId][qIdx];
+            if (!ans || !ans.selected) { alert('⚠️ Vui lòng chọn một đáp án trước khi bấm Nộp!'); return; }
+            if (ans.locked) return;
 
-            const opt = selectedAnswers[qNum];
-            const resBox = document.getElementById('res' + qNum);
-            const container = document.getElementById('mcOptions' + qNum);
-            const btnSubmit = container.parentNode.querySelector('.btn-submit-quiz');
+            const q = progress[doc].quiz[sectionId].questions[qIdx];
+            const chosen = q.options.find(o => o.key === ans.selected);
+            const correctOpt = q.options.find(o => o.correct);
+            const isCorrect = !!(chosen && chosen.correct);
 
-            if (!opt) {
-                alert("⚠️ Vui lòng chọn một đáp án trắc nghiệm trước khi bấm Nộp!");
-                return;
-            }
+            ans.locked = true;
+            ans.correct = isCorrect;
 
+            const container = document.getElementById(`mcOptions-${doc}-${sectionId}-${qIdx}`);
+            container.style.pointerEvents = 'none';
+            container.style.opacity = '0.85';
+            const btn = document.getElementById(`btnSubmit-${doc}-${sectionId}-${qIdx}`);
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.innerText = isCorrect ? '🎉 Đã hoàn thành (Đáp án chính xác)' : '🔒 Đã nộp (Đáp án chưa đúng)';
+
+            const resBox = document.getElementById(`res-${doc}-${sectionId}-${qIdx}`);
             resBox.className = 'result-box';
-            let citation = { 1: '[T01-015]', 2: '[T01-017]', 3: '[T02-017]' }[qNum];
-            let correctOpt = correctAnswers[qNum];
-            let isCorrect = (opt === correctOpt);
-
-            // CASE 1: CORRECT ANSWER -> Lock question and disable submit button completely!
-            if (isCorrect) {
-                isQuestionPassed[qNum] = true;
-                container.style.pointerEvents = 'none';
-                container.style.opacity = '0.85';
-
-                if (btnSubmit) {
-                    btnSubmit.disabled = true;
-                    btnSubmit.style.opacity = '0.5';
-                    btnSubmit.style.cursor = 'not-allowed';
-                    btnSubmit.innerText = '🎉 Đã hoàn thành (Đáp án chính xác)';
-                }
-
-                resBox.style.borderLeftColor = '#10b981';
-                resBox.style.background = '#ecfdf5';
-
-                let diagHTML = `<strong>🟢 Chính xác! (Correct Concept):</strong><br>${conceptExplanations[qNum].correct}`;
-                resBox.innerHTML = `
-                    <div class="result-tag" style="color: #059669; font-weight: 700;">🟢 CHÍNH XÁC! BẠN ĐÃ NẮM VỮNG KIẾN THỨC CỐT LÕI</div>
-                    <div class="result-text">${diagHTML}</div>
-                    <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <span class="citation-badge">📌 Trích dẫn: ${citation}</span>
-                        <button style="background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="showTrace(${qNum}, 'Option ${opt}', 'PASS')">🔍 Xem AI Execution Trace Log</button>
-                    </div>
-                `;
-                resBox.style.display = 'flex';
-                resBox.scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            // CASE 2: INCORRECT ANSWER -> Save lastSubmittedOption and disable submit button until user changes choice!
-            lastSubmittedOption[qNum] = opt;
-            wrongAttempts[qNum]++;
-
-            if (wrongAttempts[qNum] < 2) {
-                // FIRST WRONG ATTEMPT: Disable submit button until user picks a different option!
-                if (btnSubmit) {
-                    btnSubmit.disabled = true;
-                    btnSubmit.style.opacity = '0.5';
-                    btnSubmit.style.cursor = 'not-allowed';
-                    btnSubmit.innerText = '⚠️ Vui lòng chọn đáp án khác trước khi nộp lại';
-                }
-
-                resBox.style.borderLeftColor = '#f43f5e';
-                resBox.style.background = '#fff5f5';
-
-                let misconceptionText = conceptExplanations[qNum].misconception[opt] || 'Bạn đang hiểu sai bản chất khái niệm.';
-                resBox.innerHTML = `
-                    <div class="result-tag" style="color: #e11d48; font-weight: 700;">🔴 LẦN THỬ 1/2 SAI — PHÁT HIỆN LỖI NHẦM LẪN (MISCONCEPTION DIAGNOSIS)</div>
-                    <div class="result-text">
-                        <strong>❌ Đáp án đã chọn (Option ${opt}):</strong> ${optionTexts[qNum][opt]}<br>
-                        <strong>👉 Phân tích lỗi sai:</strong> ${misconceptionText}
-                    </div>
-                    <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <span class="citation-badge">📌 Trích dẫn: ${citation}</span>
-                        <button style="background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="showTrace(${qNum}, 'Option ${opt}', 'MISCONCEPTION_ATTEMPT_1')">🔍 Xem AI Trace Log</button>
-                    </div>
-                    <div class="escalate-bar">
-                        <span style="font-size: 12px; color: #64748b;">Chưa rõ nhận xét?</span>
-                        <button class="btn-escalate-ta" onclick="escalateTA(${qNum})">📩 Chuyển vùng slide ${citation} cho TA hỗ trợ</button>
-                    </div>
-                `;
-            } else {
-                // SECOND WRONG ATTEMPT: Lock question completely!
-                container.style.pointerEvents = 'none';
-                container.style.opacity = '0.6';
-
-                if (btnSubmit) {
-                    btnSubmit.disabled = true;
-                    btnSubmit.style.opacity = '0.5';
-                    btnSubmit.style.cursor = 'not-allowed';
-                    btnSubmit.innerText = '🔒 Đã hết 2 lần thử (Đã khóa câu hỏi)';
-                }
-
-                resBox.style.borderLeftColor = '#dc2626';
-                resBox.style.background = '#fef2f2';
-
-                let userOptText = optionTexts[qNum][opt];
-                let correctOptText = optionTexts[qNum][correctOpt];
-                let userMisconception = conceptExplanations[qNum].misconception[opt] || 'Lỗi nhầm lẫn khái niệm.';
-                let correctConcept = conceptExplanations[qNum].correct;
-
-                resBox.innerHTML = `
-                    <div class="result-tag" style="color: #dc2626; font-weight: 700;">🔒 ĐÃ HẾT 2 LẦN THỬ — BẢNG PHÂN TÍCH SO SÁNH ĐÁP ÁN ĐÚNG & SAI</div>
-                    
-                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-top: 10px;">
-                        <div style="font-weight: 700; color: #e11d48; font-size: 13px;">❌ Đáp án bạn đã chọn (Option ${opt} — SAI):</div>
-                        <div style="font-size: 13px; color: #334155; margin-top: 4px;">${userOptText}</div>
-                        <div style="font-size: 12px; color: #9f1239; margin-top: 6px; font-style: italic;">👉 Nguyên nhân hiểu sai: ${userMisconception}</div>
-                    </div>
-
-                    <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 12px; margin-top: 10px;">
-                        <div style="font-weight: 700; color: #059669; font-size: 13px;">✅ Đáp án đúng (Option ${correctOpt} — CHÍNH XÁC):</div>
-                        <div style="font-size: 13px; color: #065f46; margin-top: 4px; font-weight: 600;">${correctOptText}</div>
-                        <div style="font-size: 12px; color: #047857; margin-top: 6px;">👉 Bản chất kiến thức đúng: ${correctConcept}</div>
-                    </div>
-
-                    <div style="margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <span class="citation-badge">📌 Trích dẫn: ${citation}</span>
-                        <button style="background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="showTrace(${qNum}, 'Option ${opt}', 'FAILED_MAX_ATTEMPTS')">🔍 Xem AI Execution Trace Log</button>
-                    </div>
-
-                    <div class="escalate-bar">
-                        <span style="font-size: 12px; color: #64748b;">Bạn muốn được Giảng viên/TA giải thích chi tiết hơn?</span>
-                        <button class="btn-escalate-ta" onclick="escalateTA(${qNum})">📩 Chuyển vùng slide ${citation} cho TA hỗ trợ</button>
-                    </div>
-                `;
-            }
-
             resBox.style.display = 'flex';
-            resBox.scrollIntoView({ behavior: 'smooth' });
+            resBox.style.borderLeftColor = isCorrect ? '#10b981' : '#f43f5e';
+            resBox.style.background = isCorrect ? '#ecfdf5' : '#fff5f5';
+
+            const tagHtml = isCorrect
+                ? `<div class="result-tag" style="color: #059669; font-weight: 700;">🟢 CHÍNH XÁC</div>`
+                : `<div class="result-tag" style="color: #e11d48; font-weight: 700;">🔴 CHƯA ĐÚNG — PHÁT HIỆN HIỂU LẦM</div>`;
+            const correctBlockHtml = isCorrect ? '' : `
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 10px; margin-top: 8px;">
+                    <div style="font-weight: 700; color: #059669; font-size: 12px;">✅ Đáp án đúng (${correctOpt.key}):</div>
+                    <div style="font-size: 13px; color: #065f46; margin-top: 4px;">${escapeHtml(correctOpt.text)}</div>
+                </div>`;
+
+            resBox.innerHTML = `
+                ${tagHtml}
+                <div class="result-text">${escapeHtml(chosen.feedback)}</div>
+                ${correctBlockHtml}
+                <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="citation-badge" onclick="jumpToCitation('${doc}', ${citationToPage(q.citation)})">📌 Trích dẫn: ${escapeHtml(q.citation)} — nhảy tới slide</span>
+                    <button style="background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="showTrace('${doc}','${sectionId}',${qIdx},'${chosen.key}','${q.citation}',${isCorrect})">🔍 Xem AI Execution Trace Log</button>
+                </div>
+                ${isCorrect ? '' : `<div class="escalate-bar">
+                    <span style="font-size: 12px; color: #64748b;">Chưa rõ nhận xét?</span>
+                    <button class="btn-escalate-ta" onclick="escalateTA('${q.citation}')">📩 Chuyển vùng slide ${escapeHtml(q.citation)} cho TA hỗ trợ</button>
+                </div>`}
+            `;
+            resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            maybeFinishSection(doc, sectionId);
         }
 
-        function resetMcQuestion(qNum) {
-            if (isQuestionPassed[qNum] || wrongAttempts[qNum] >= 2) return;
-            selectedAnswers[qNum] = null;
-            const container = document.getElementById('mcOptions' + qNum);
-            container.querySelectorAll('.mc-option-card').forEach(card => card.classList.remove('selected'));
-            container.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
-            const resBox = document.getElementById('res' + qNum);
-            resBox.style.display = 'none';
+        function maybeFinishSection(doc, sectionId) {
+            const data = progress[doc].quiz[sectionId];
+            const answers = progress[doc].answers[sectionId];
+            const total = data.questions.length;
+            const answeredCount = Object.keys(answers).filter(k => answers[k].locked).length;
+            if (answeredCount < total) return;
+
+            const correct = Object.values(answers).filter(a => a.correct).length;
+            progress[doc].results[sectionId] = { correct, total };
+
+            const passed = (correct / total) >= PASS_THRESHOLD;
+            const pct = Math.round((correct / total) * 100);
+            const summaryEl = document.getElementById(`sectionSummary-${doc}-${sectionId}`);
+            summaryEl.style.display = 'block';
+            summaryEl.innerHTML = `
+                <div class="active-recall-section" style="padding:20px; margin-top:0;">
+                    <div style="font-weight:700; font-size:14px;">${passed ? '✅' : '⚠️'} Kết quả phần này: ${correct}/${total} câu đúng (${pct}%)</div>
+                    ${passed
+                        ? `<button class="btn-submit-quiz" style="margin-top:10px;" onclick="advanceSection('${doc}')">Mở khoá phần tiếp theo →</button>`
+                        : `<div style="font-size:13px; color:#64748b; margin-top:8px;">Bạn cần ≥60% đúng để mở khoá phần tiếp theo. Xem lại các nhận xét ở trên rồi làm lại bộ câu hỏi khác cho phần này.</div>
+                           <button class="btn-submit-quiz" style="margin-top:10px; background:#ea580c;" onclick="retrySection('${doc}','${sectionId}')">🔁 Làm lại phần này</button>`}
+                </div>
+            `;
         }
 
-        function escalateTA(qNum) {
-            const citations = { 1: '[T01-015]', 2: '[T01-017]', 3: '[T02-017]' };
-            document.getElementById('taCitationTag').innerText = citations[qNum];
+        async function retrySection(doc, sectionId) {
+            delete progress[doc].results[sectionId];
+            progress[doc].answers[sectionId] = {};
+            const bodyEl = document.getElementById('quizBody-' + doc + '-' + sectionId);
+            bodyEl.innerHTML = `<div style="font-size: 13px; color: #64748b;">⏳ Đang tạo bộ câu hỏi mới...</div>`;
+            try {
+                const data = await fetchQuiz(doc, sectionId, true);
+                progress[doc].quiz[sectionId] = data;
+                renderQuizQuestions(doc, sectionId);
+            } catch (err) {
+                bodyEl.innerHTML = `<div style="font-size:13px;color:#dc2626;">⚠️ Lỗi tạo lại câu hỏi: ${escapeHtml(String(err.message || err))}. <button class="btn-submit-quiz" onclick="retrySection('${doc}','${sectionId}')">Thử lại</button></div>`;
+            }
+        }
+
+        function advanceSection(doc) {
+            progress[doc].unlocked = Math.min(progress[doc].unlocked + 1, sections[doc].length);
+            renderDocProgressive(doc);
+            setTimeout(scrollToQuiz, 80);
+        }
+
+        function finalScoreHtml(doc) {
+            const list = sections[doc];
+            let correct = 0, total = 0;
+            const rows = list.map(s => {
+                const r = progress[doc].results[s.id] || { correct: 0, total: 0 };
+                correct += r.correct; total += r.total;
+                return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:13px;">
+                    <span>${escapeHtml(s.title)}</span><span style="font-weight:700;">${r.correct}/${r.total}</span>
+                </div>`;
+            }).join('');
+            const pct = total ? Math.round((correct / total) * 100) : 0;
+            return `
+            <div class="active-recall-section" id="finalScore-${doc}" style="border-color:#10b981;">
+                <div class="quiz-section-header">
+                    <div class="quiz-header-icon" style="background: linear-gradient(135deg,#059669,#10b981);">🏁</div>
+                    <div class="quiz-header-title">
+                        <h3>HOÀN THÀNH BÀI HỌC — ĐIỂM HIỂU BÀI: ${pct}%</h3>
+                        <p>${correct}/${total} câu đúng trên toàn bộ ${list.length} phần kiến thức của ${doc === 'd1' ? 'Day 01' : 'Day 02'}.</p>
+                    </div>
+                </div>
+                ${rows}
+            </div>`;
+        }
+
+        function renderSlideHtml(s, idx, fileLabel, citationPrefix, docKey, total) {
+            // Shows the ORIGINAL slide page (rasterized from data/vlearn-pack/slides/*.pdf
+            // by codebase/scripts/pdf-to-images.mjs into codebase/assets/${docKey}/).
+            // The text summary in d1Slides/d2Slides is intentionally NOT rendered here —
+            // it stays backend-only, used just to ground the AI quiz (see codebase/server).
+            const page = idx + 1;
+            const citation = `${citationPrefix}-${String(page).padStart(3, '0')}`;
+            const imgSrc = `assets/${docKey}/page-${String(page).padStart(3, '0')}.png`;
+            return `
+                <div class="slide-frame" id="${docKey}-slide-${page}" style="padding: 0; overflow: hidden;">
+                    <canvas class="draw-canvas"></canvas>
+                    <img src="${imgSrc}" alt="${fileLabel} — trang ${page}" style="width: 100%; display: block;" loading="lazy">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-top: 1px solid var(--card-border);">
+                        <span style="font-size: 12px; color: #94a3b8;">Trang ${page} / ${total}</span>
+                        <span style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [${citation}]</span>
+                    </div>
+                </div>`;
+        }
+
+        // Pages in the original PDF that sit past the last defined section — content
+        // never transcribed into d1Slides/d2Slides (e.g. d2 pages 25-29, a recap section
+        // found only after rasterizing the source PDF). Shown for completeness, ungated,
+        // no quiz — the AI has no grounding text for them so it can't quiz on them anyway.
+        const extras = {
+            d2: { slideStart: 24, slideEnd: 28, title: 'Phụ lục — nội dung bổ sung (không có trong quiz)' }
+        };
+        const totalPages = { d1: 29, d2: 29 };
+
+        function extraSlidesHtml(doc, fileLabel, citationPrefix) {
+            const extra = extras[doc];
+            if (!extra) return '';
+            let html = `
+            <div style="width: 820px; display:flex; align-items:center; gap:10px; margin-top: 4px; color:#94a3b8; font-size:12px; font-weight:700; letter-spacing:0.02em;">
+                <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
+                <span>📎 ${escapeHtml(extra.title)}</span>
+                <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
+            </div>`;
+            for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
+                html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+            }
+            return html;
+        }
+
+        function renderDocProgressive(doc) {
+            const fileLabel = doc === 'd1' ? 'd1-slide-hackathon.pdf' : 'd2-slide-hackathon.pdf';
+            const citationPrefix = doc === 'd1' ? 'T01' : 'T02';
+            const container = document.getElementById(doc === 'd1' ? 'docD1Container' : 'docD2Container');
+            const list = sections[doc];
+            const unlockedCount = Math.min(progress[doc].unlocked, list.length);
+
+            let html = '';
+            for (let i = 0; i < unlockedCount; i++) {
+                const section = list[i];
+                for (let idx = section.slideStart; idx <= section.slideEnd; idx++) {
+                    html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+                }
+                html += sectionPassed(doc, section.id)
+                    ? `<div class="active-recall-section" style="padding:18px 24px;">
+                           <div style="font-weight:700; font-size:13px; color:#059669;">✅ ${escapeHtml(section.title)} — đã qua quiz (${progress[doc].results[section.id].correct}/${progress[doc].results[section.id].total} đúng)</div>
+                       </div>`
+                    : quizGateHtml(doc, section);
+            }
+
+            if (unlockedCount >= list.length) {
+                if (sectionPassed(doc, list[list.length - 1].id)) {
+                    html += finalScoreHtml(doc);
+                }
+                html += extraSlidesHtml(doc, fileLabel, citationPrefix);
+            }
+
+            container.innerHTML = html;
+
+            for (let i = 0; i < unlockedCount; i++) {
+                const section = list[i];
+                if (sectionPassed(doc, section.id)) continue;
+                if (progress[doc].quiz[section.id]) {
+                    renderQuizQuestions(doc, section.id);
+                } else {
+                    loadQuizInto(doc, section.id);
+                }
+            }
+
+            initDrawCanvases();
+        }
+
+        function escalateTA(citation) {
+            document.getElementById('taCitationTag').innerText = citation;
             document.getElementById('taModal').style.display = 'flex';
         }
 
@@ -1416,22 +1436,19 @@
             alert(`✅ [PAIR Control] Đã gửi thành công câu hỏi và vị trí slide ${document.getElementById('taCitationTag').innerText} tới TA trực ban! TA sẽ phản hồi bạn trong 15 phút.`);
         }
 
-        function showTrace(qNum, selectedOptionText, evalStatus) {
-            const citations = { 1: '[T01-015]', 2: '[T01-017]', 3: '[T02-017]' };
+        function showTrace(doc, sectionId, qIdx, selectedKey, citation, isCorrect) {
             document.getElementById('traceContent').innerHTML = `
 <strong>[REQUEST METADATA]</strong>
 - Timestamp: ${new Date().toISOString()}
-- Endpoint: /v1/chat/completions (Model: gemini-1.5-flash-evaluator)
-- System Prompt: "You are VLearn Active Recall Evaluator. Dynamically evaluate selected Multiple Choice Option, detect misconceptions, output exact transcript citation [Txx-xxx], or track 2-attempt limit."
+- Endpoint: POST /api/generate-quiz (codebase/server → Gemini, model gemini-flash-latest)
+- Section: ${doc}/${sectionId}, Question ${qIdx + 1}
 
 <strong>[USER INPUT EVALUATED]</strong>
-- Question ID: Q${qNum}
-- Selected MC Option: "${selectedOptionText}"
-- Wrong Attempts Count: ${wrongAttempts[qNum]}/2
+- Selected MC Option: "${selectedKey}"
 
-<strong>[SEMANTIC EVALUATION RESULT]</strong>
-- Evaluation Status: ${evalStatus}
-- Grounding Citation: ${citations[qNum]}
+<strong>[GRADING RESULT — matched locally against the answer key returned by the same generation call, no second AI call]</strong>
+- Evaluation Status: ${isCorrect ? 'CORRECT' : 'INCORRECT'}
+- Grounding Citation: ${citation}
 - HAX Guidelines Applied: ["G2_Explicit_Confidence", "G10_Scope_Services", "G11_Explain_Why"]
             `;
             document.getElementById('traceModal').style.display = 'flex';
@@ -1688,35 +1705,6 @@
             { heading: "Viết tiêu chí thành công mà hành động được", body: ["Template PAIR: “If {chỉ số cụ thể} for {tính năng AI} {drops below/goes above} {ngưỡng có nghĩa}, we will {hành động cụ thể}.”", "Ví dụ (case TA 1000 học viên): nếu tỷ lệ câu trả lời AI gợi ý bị TA sửa > 30% trong 2 tuần, ta sẽ hạ mức tự động về pha 1 (chỉ gợi ý, không gửi thẳng cho học viên).", "Checklist trước khi chốt metric: metric có ý nghĩa với mọi người dùng? có nhóm nào bị ảnh hưởng tiêu cực? đây là thành công ngày 1 — còn ngày 1000 thì sao?"], takeaway: "Đừng quên lên lịch review metric định kỳ — tiêu chí thành công cũng cần được bảo trì theo thời gian.", source: "PAIR Worksheet — User Needs" }
         ];
 
-        function renderDoc(containerId, slides, fileLabel, citationPrefix, docKey) {
-            const container = document.getElementById(containerId);
-            const total = slides.length;
-            container.innerHTML = slides.map((s, idx) => {
-                const page = idx + 1;
-                const citation = `${citationPrefix}-${String(page).padStart(3, '0')}`;
-                const subheadingHtml = s.subheading ? `<div class="slide-subheading">${s.subheading}</div>` : '';
-                const bulletsHtml = s.body && s.body.length
-                    ? `<div class="slide-content-box"><ul class="slide-bullets">${s.body.map(b => `<li>${b}</li>`).join('')}</ul></div>`
-                    : '';
-                const takeawayHtml = s.takeaway ? `<div class="slide-takeaway">${s.takeaway}</div>` : '';
-                const sourceHtml = s.source ? `<div class="slide-source">Nguồn: ${s.source}</div>` : '';
-                return `
-                <div class="slide-frame" id="${docKey}-slide-${page}">
-                    <canvas class="draw-canvas"></canvas>
-                    <div class="watermark">${fileLabel}</div>
-                    <div>
-                        <div class="slide-page-num">Trang ${page} / ${total}</div>
-                        <div class="slide-heading">${s.heading}</div>
-                        ${subheadingHtml}
-                        ${bulletsHtml}
-                        ${takeawayHtml}
-                        ${sourceHtml}
-                    </div>
-                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [${citation}]</div>
-                </div>`;
-            }).join('');
-        }
-
         function switchDoc(doc) {
             const isD1 = doc === 'd1';
             document.getElementById('docD1Container').style.display = isD1 ? 'flex' : 'none';
@@ -1736,8 +1724,8 @@
         }
 
         window.addEventListener('load', function() {
-            renderDoc('docD1Container', d1Slides, 'd1-slide-hackathon.pdf', 'T01', 'd1');
-            renderDoc('docD2Container', d2Slides, 'd2-slide-hackathon.pdf', 'T02', 'd2');
+            renderDocProgressive('d1');
+            renderDocProgressive('d2');
             initDrawCanvases();
             initTextHighlight();
         });
