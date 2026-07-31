@@ -37,3 +37,22 @@ user query
 Snapshot mẫu nằm tại `codebase/data/discord_snapshot_sample.json`.
 
 Lưu ý: không đưa dữ liệu thật/nhạy cảm vào repo public. Chỉ dùng post/thread được phép và có thể redact.
+
+### Tạo snapshot mới (crawl thủ công)
+
+Không dùng bot/token Discord (tránh vi phạm ToS). Thay vào đó, điền tay nội dung
+post/thread vào template rồi chạy script parse/validate:
+
+1. Copy `codebase/data/snapshot_input/template.txt`, điền 1 khối `=== ENTRY ===`
+   cho mỗi post/thread trong đúng 2 kênh whitelist (`thong-bao`, `chia-se`).
+2. Chạy:
+   ```
+   python codebase/src/snapshot_crawler.py \
+     --input codebase/data/snapshot_input/template.txt \
+     --output codebase/data/discord_snapshot.json
+   ```
+3. Thêm entry mới sau này (không đánh số lại entry cũ): thêm `--append`.
+   Kiểm tra lỗi trước khi ghi file: thêm `--validate-only`.
+
+Whitelist kênh và mapping `source_type` nằm ở `CHANNEL_SOURCE_TYPE` đầu file
+`codebase/src/snapshot_crawler.py` — sửa ở đó nếu nhóm thêm/bớt kênh được phép crawl.

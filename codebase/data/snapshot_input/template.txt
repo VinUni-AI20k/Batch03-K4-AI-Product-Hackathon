@@ -1,0 +1,533 @@
+# =============================================================================
+# Template điền tay để tạo Discord snapshot JSON — Discord Knowledge Finder
+# =============================================================================
+# Cách dùng:
+#   1. Copy cả khối "=== ENTRY ===" ... "=== END ===" bên dưới cho MỖI post/thread
+#      bạn muốn crawl (1 khối = 1 post/thread trong "Thông báo" hoặc "Chia sẻ").
+#   2. Điền tay nội dung — copy trực tiếp text từ Discord, không cần escape gì.
+#   3. Lấy url bằng cách right-click message gốc trên Discord -> "Copy Message Link".
+#   4. Chạy: python codebase/src/snapshot_crawler.py --input codebase/data/snapshot_input/template.txt --output codebase/data/discord_snapshot.json
+#
+# Field trong header (trước "--- CONTENT ---"):
+#   channel       (bắt buộc) - slug kênh. Chỉ chấp nhận kênh đã whitelist trong
+#                  script (mặc định: thong-bao, chia-se). Thêm kênh mới thì sửa
+#                  CHANNEL_SOURCE_TYPE trong snapshot_crawler.py.
+#   title         (tùy chọn) - tên thread. Nếu để trống, script tự lấy dòng đầu
+#                  tiên có chữ trong content làm title.
+#   url           (bắt buộc, nhưng để trống được nếu chưa có) - link "Copy
+#                  Message Link" từ Discord. Nếu cố tình để trống, script tự
+#                  BỎ QUA cả entry đó (không tính là lỗi) — dùng khi bạn muốn
+#                  soạn tay nội dung trước, chưa kịp lấy link.
+#   created_at    (TÙY CHỌN, nên để trống) - nếu bỏ trống, script tự giải mã
+#                  chính xác tới giây từ message ID trong url (Discord snowflake),
+#                  không cần đọc tooltip hover (chỉ hiện tới phút, không có giây).
+#                  Chỉ điền tay nếu url không phải link message thật (hiếm khi
+#                  cần). Format nếu điền tay: 2026-07-30T09:00:00+07:00.
+#   tags          (tùy chọn) - phân cách bằng dấu phẩy.
+#   source_id     (tùy chọn) - để trống thì script tự sinh D001, D002...
+#   source_type   (tùy chọn) - để trống thì script tự suy ra từ channel.
+#
+# --- CONTENT ---   : nội dung chính, có thể nhiều dòng/nhiều đoạn.
+# --- COMMENTS ---   : mỗi reply là 1 dòng bắt đầu bằng "- ". Để trống nếu
+#                      không có comment nào cần giữ lại. Dòng tiếp theo không
+#                      có "- " sẽ được nối vào comment ngay phía trên (comment
+#                      dài nhiều dòng).
+#
+# Dòng bắt đầu bằng "#" ở NGOÀI khối ENTRY sẽ bị bỏ qua (dùng để ghi chú).
+# =============================================================================
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1530052039449510028
+created_at:
+tags: 
+--- CONTENT ---
+🚀 CHÀO MỪNG CÁC BẠN ĐẾN VỚI AI20K — BUILD PHASE
+
+Chào mừng tất cả các bạn đã đến với Chương trình AI20K — Build Phase. Trong 6 tuần tới, chương trình sẽ đồng hành cùng các bạn trong hành trình học — build — hoàn thiện sản phẩm AI thực chiến cùng team của mình.
+
+Để giúp tất cả các bạn nắm rõ quy trình làm việc, cách phối hợp trong team và các nội dung hỗ trợ trong suốt chương trình, BTC sẽ tổ chức:
+
+🎯 WORKSHOP 1: KICK-OFF
+
+🕗 Thời gian: 20:00 — tối nay, ngày 24/07
+📍 Hình thức: Online qua Zoom
+🔗 Link tham gia: 
+
+> Join Zoom Meeting
+> https://zoom.us/j/92862242782?pwd=9TkBzI58DeQCuzGbBJifDPYCY8VYMf.1
+> 
+> Meeting ID: 928 6224 2782
+> Passcode: 232439
+
+ 💻 Quy định khi vào Zoom
+
+> Thời gian: Vui lòng vào sớm 10 phút (19:50) để ổn định kỹ thuật.
+
+
+📝 CÚ PHÁP ĐẶT TÊN CHUẨN:
+
+Mã nhóm — Mã đội — Họ và tên 
+
+💡 Ví dụ cụ thể:
+
+Nếu bạn là Nguyễn Văn An, thuộc mã team 001, thuộc mã nhóm G01
+ ➡️ Bạn đặt tên là: `G01 — T001 — Nguyễn Văn An`
+
+Trong trường hợp buổi các buổi đầu tiên chưa có mã nhóm / team các bạn có thể dùng : TÊN - 5 chữ số cuối mssv  
+
+Đây là quy định bắt buộc, các bạn vui lòng tuân thủ để không gặp vấn đề phát sinh khi tính điểm danh chuyên cần
+
+👉 Nội dung chính của buổi Kick-off
+
+✅ Tổng quan chương trình AI20K Build Phase
+✅ Quy trình hình thành team và chọn đề tài
+✅ Hướng dẫn sử dụng Project Bank
+✅ Quy ước đặt tên GitHub Repo, Discord Channel, Deploy URL
+✅ Cách làm việc với Coach, Bot, Ticket và Peer Support
+✅ Cơ chế XP, Standup hằng ngày và các mốc Gate
+✅ Các deliverables bắt buộc trong chương trình
+✅ Hướng dẫn khởi tạo repo và bắt đầu Sprint đầu tiên
+
+
+🔥 Đây là buổi mở đầu rất quan trọng để các bạn hiểu cách chương trình vận hành và bắt đầu build sản phẩm cùng team một cách hiệu quả.
+
+Hẹn gặp tất cả các bạn lúc 20:00 tối nay.
+Cùng nhau bắt đầu hành trình 6 tuần Sprint thật bùng nổ nhé! 🚀
+  
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1530394185805467778
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO OFFICE HOURS 01 
+
+Chào các bạn như có chia sẻ ở buổi WS hôm qua, nhằm hỗ trợ kịp thời các vấn đề cũng như thắc mắc mà các bạn gặp phải trong quá trình tham gia chương trình, BTC sẽ tổ chức 1 buổi OH đặc biệt với sự tham gia của : 
+ - Thầy <@737910285309837423>  - Giám đốc chương trình 
+- Admin/ mentor <@695948705278197781> 
+
+Các bạn còn những thắc mắc hay băn khoăn về các hoạt động cũng như thông tin về chương trình thì đừng bỏ lỡ buổi tối hôm nay nhé. 
+
+Thời gian : 20h ( tối nay, ngày 25/07/2026) 
+Địa điểm :  https://discord.com/channels/1526532830627102781/1527920248689528902
+
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1530756846887899206
+created_at:
+tags: 
+--- CONTENT ---
+🚀 THÔNG BÁO WORKSHOP 02 
+
+Theo như thông báo trước đó, thì định kì tối thứ 5 và chủ nhật hàng tuần sẽ là các Buổi WS, vào tối 26/7 ( hôm nay ) chúng ta sẽ đi vào Buổi WS 2 với chủ đề : **Problem → MVP Canvas**
+
+Diễn giả : Diễn giả: ThS Lê Anh Tiến @Jimmy Lee   : Founder, CEO - Bot bán hàng, Gương Mặt Trẻ Việt Nam Tiêu Biểu 2020.
+
+> 🕗 Thời gian: 20:00 — tối nay, ngày 26/07
+> 📍 Hình thức: Online qua Zoom
+> 
+> Join Zoom Meeting
+> https://zoom.us/j/92862242782?pwd=9TkBzI58DeQCuzGbBJifDPYCY8VYMf.1
+> 
+> Meeting ID: 928 6224 2782
+> Passcode: 232439
+
+   💻 Quy định khi vào Zoom
+
+Thời gian: Vui lòng vào sớm 10 phút (19:50) để ổn định kỹ thuật.
+
+
+📝 CÚ PHÁP ĐẶT TÊN CHUẨN:
+
+Mã nhóm — Mã đội — Họ và tên 
+
+💡 Ví dụ cụ thể:
+
+Nếu bạn là Nguyễn Văn An, thuộc mã team 001, thuộc mã nhóm G01
+>  ➡️ Bạn đặt tên là: G01 — T001 — Nguyễn Văn An
+
+Trong trường hợp buổi các buổi đầu tiên chưa có mã nhóm / team các bạn có thể dùng : TÊN - 5 chữ số cuối mssv
+
+Đây là quy định bắt buộc, các bạn vui lòng tuân thủ để không gặp vấn đề phát sinh khi tính điểm danh chuyên cần
+
+Các bạn lưu ý lịch để tham gia nhé <@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1530817900787666976
+created_at:
+tags: 
+--- CONTENT ---
+**📢 THÔNG BÁO LỰA CHỌN ĐỀ TÀI**
+
+BTC đã hoàn tất việc sắp xếp thành viên và danh sách các team. Ngân hàng đề tài chính thức sẽ được công khai lúc 14h00 hôm nay, Chủ Nhật, ngày 26/07/2026.
+
+Sau khi ngân hàng đề được công bố, các team cần chủ động tổ chức trao đổi nội bộ và thống nhất với đầy đủ thành viên trước khi đăng ký. Không nên để một cá nhân tự lựa chọn khi team chưa thảo luận kỹ.
+
+**Khi đánh giá đề tài, team cần cân nhắc:**
+
+> - Mức độ phù hợp với năng lực và định hướng của các thành viên.
+> - Khả năng xây dựng sản phẩm có thể triển khai và demo trong thời gian khóa học.
+> - Khả năng tiếp cận dữ liệu, tài liệu, công cụ và hạ tầng.
+> - Yêu cầu về AI Agent, human-in-the-loop, đánh giá chất lượng và an toàn.
+> - Phạm vi công việc và phương án phân công giữa các thành viên.
+
+**Quy định đăng ký:**
+
+> - Đọc kỹ các thông tin trong sheet đề tài
+> - Nội dung trong ngân hàng là gợi ý để nhóm lựa chọn và tinh chỉnh theo tình hình thực tế khi khảo sát, trao đổi trực tiếp với người dùng trong quá trình phát triển sản phẩm. 
+> - Mỗi đề tài chỉ nhận tối đa 2 team đăng ký.
+> - Team cần thống nhất thứ tự ưu tiên giữa các đề tài.
+> - Trường hợp team muốn đề xuất đề tài mới, cần được BTC duyệt bằng việc tạo ticket.
+
+
+**Các mốc thời gian quan trọng:**
+
+- 14h00 Chủ Nhật, ngày 26/07/2026: Công khai ngân hàng đề tài.
+- Thứ Năm, ngày 30/07/2026: Hạn cuối lựa chọn và đăng ký đề tài.
+- Đến hết tối Thứ Bảy, ngày 01/08/2026: BTC hỗ trợ xử lý yêu cầu đổi đề tài.
+- Sau ngày 01/08/2026: BTC sẽ không tiếp nhận hoặc hỗ trợ thêm các yêu cầu liên quan đến việc lựa chọn, thay đổi hoặc điều chỉnh đề tài.
+
+Các team vui lòng chủ động sắp xếp thời gian thảo luận, lựa chọn nghiêm túc và hoàn tất đăng ký đúng thời hạn.
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1530899605502427317
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO NHĂC LẠI VỀ NGÂN HÀNG ĐỀ 
+
+Chào các bạn, BTC nhắc lại thông tin về ngân hàng đề, mọi người truy cập tại :
+- Link : https://docs.google.com/spreadsheets/d/1eEoK4IKW73ElAs4TohERp8EL8ocn5RHXo7FcII2Qrfk/edit?usp=sharing
+
+Các bạn vui lòng xem lại thông báo phía trên để nắm các mốc thời gian cũng như cân nhắc kỹ trước khi chọn đề tài nhé. Nếu có thắc mắc hay khó khăn nào thì vui lòng tạo ticket để được BTC hỗ trợ. 
+
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1531222239100407918
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO LỊCH HOẠT ĐỘNG TRONG TUẦN
+
+Chào các bạn,
+
+BTC xin gửi đến các team lịch hoạt động dự kiến trong tuần này để các bạn chủ động sắp xếp thời gian tham gia đầy đủ các buổi sinh hoạt, hỗ trợ và workshop của chương trình.
+
+Lịch hoạt động trong tuần
+
+Thứ 2 | 20:00
+OFFICE HOURS 02
+Địa điểm: Kênh OFFICE HOURS - KÊNH 01
+Nội dung: BTC hỗ trợ giải đáp các thắc mắc của các team trong quá trình triển khai
+
+Thứ 4 | 20:00
+Mentor Duty
+Hình thức: Sinh hoạt theo nhóm trong Zoom
+Nội dung: Các team làm việc trực tiếp với mentor để nhận góp ý, rà soát tiến độ và điều chỉnh hướng triển khai sản phẩm.
+
+Thứ 5 | 20:00
+Workshop 3
+Nội dung chi tiết, thông tin diễn giả và link tham gia sẽ được BTC thông báo trước buổi workshop.
+
+Thứ 6 | 20:00
+OFFICE HOURS 03
+Địa điểm: Kênh OFFICE HOURS - KÊNH 01 ⁠OFFICE HOURS - KÊNH 01
+Nội dung:  Q&A cùng với diễn giả , đồng thời hỗ trợ định hướng và tháo gỡ các vấn đề phát sinh.
+
+Thứ 7 | 20:00
+Mentor Duty
+Hình thức: Sinh hoạt theo nhóm trong Zoom
+Nội dung: Các team tiếp tục làm việc với mentor để cập nhật tiến độ, nhận phản hồi và chuẩn bị cho các mốc tiếp theo của chương trình.
+
+Chủ Nhật | 20:00
+Workshop 4
+Nội dung chi tiết, thông tin diễn giả và link tham gia sẽ được BTC thông báo trước buổi workshop.
+
+**  Lưu ý quan trọng**
+
+> Thông tin chi tiết về diễn giả, nội dung từng buổi workshop, link Zoom và các hướng dẫn tham gia sẽ được BTC cập nhật trong các thông báo riêng theo từng ngày.
+> 
+> Trong trường hợp có bất kỳ điều chỉnh nào so với lịch dự kiến, BTC sẽ thông báo sớm trên các kênh chính thức của chương trình. Các bạn vui lòng theo dõi thông báo thường xuyên để không bỏ lỡ các nội dung quan trọng.
+
+Rất mong các team tham gia đầy đủ, đúng giờ và chủ động chuẩn bị câu hỏi/vấn đề cần hỗ trợ trước mỗi buổi để buổi làm việc đạt hiệu quả tốt nhất.
+
+Trân trọng,
+BTC AI20K
+ <@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1531250789933256846
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO NHẮC LẠI LỊCH OFFICE HOURS 02
+
+Chào các bạn, theo như các thông báo trước đó, tối thứ 2 hàng tuần vào lúc 20h trên kênh  https://discord.com/channels/1526532830627102781/1527920248689528902 chúng ta sẽ có buổi OH để hỗ trợ các bạn các vấn đề liên quan đến tiến độ xây dựng sản phẩm. 
+
+Tuần này các bạn đang trong giai đoạn nước rút chọn đề tài, tối nay bên cạnh hỗ trợ trả lời các câu hỏi, BTC cũng sẽ hỗ trợ thêm các vấn đề xunh quanh việc chọn đề tài như thế nào là phù hợp. 
+
+Hẹn gặp các bạn nhé <@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: 
+created_at:
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1531941813676544041
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO NHẮC LẠI  LỊCH : MENTOR DUTY 
+
+Chào các bạn, như lịch định kỳ thì tối thứ 4 hàng tuần chúng ta sẽ có lịch mentor duty, các bạn đừng quên lịch vào lúc **20h00 **nhé. 
+
+***Yêu cầu: Các team vui lòng tham gia đúng giờ và chuẩn bị trước các nội dung cần trao đổi với Mentor.***
+
+
+> 🕗 Thời gian: 20:00 — tối nay, ngày 26/07
+> 📍 Hình thức: Online qua Zoom
+> 
+> Join Zoom Meeting
+> https://zoom.us/j/92862242782?pwd=9TkBzI58DeQCuzGbBJifDPYCY8VYMf.1
+> 
+> Meeting ID: 928 6224 2782
+> Passcode: 232439
+
+**   💻 Quy định khi vào Zoom**
+
+> Thời gian: Vui lòng vào sớm 10 phút (19:50) để ổn định kỹ thuật.
+> 
+> 📝 CÚ PHÁP ĐẶT TÊN CHUẨN:
+> 
+> Mã nhóm — Mã đội — Họ và tên 
+> 
+> 💡 Ví dụ cụ thể:
+> 
+> Nếu bạn là Nguyễn Văn An, thuộc mã team 001, thuộc mã nhóm G01
+> 
+> *** ➡️ Bạn đặt tên là: G01 — T001 — Nguyễn Văn An***
+
+🆘  ĐẶC BIỆT LƯU Ý : CẦN ĐĂNG NHẬP VÀO ZOOM BẰNG EMAIL ĐÃ  DÙNG ĐỂ ĐĂNG NHẬP TRÊN https://phoenix.note.transformerlabs.ai/
+
+Đây là quy định bắt buộc, các bạn vui lòng tuân thủ để không gặp vấn đề phát sinh khi tham gia mentor duty. 
+
+Các team kiểm tra đã gửi báo cáo cho mentor chưa, nếu chưa thì vui lòng gửi bổ sung để đảm bảo buổi làm việc tối nay được diễn ra nhanh chóng, hiệu quả nhất. 
+
+Trân trọng,
+BTC AI20K 
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: https://discord.com/channels/1526532830627102781/1527920171963125953/1532294151415136307
+created_at:
+tags: 
+--- CONTENT ---
+THÔNG BÁO NHẮC LẠI LỊCH WORKSHOP 3
+
+Chào các bạn,
+
+BTC xin nhắc lại lịch Workshop 3 sẽ diễn ra vào 20:00 tối nay, ngày 30/07.
+
+**Chủ đề của buổi workshop là:**
+
+***Kinh nghiệm quản lý dự án  và duy trì năng suất phát triển sản phẩm***
+
+Đây là buổi workshop quan trọng nhằm giúp các team hiểu rõ hơn về cách phát triển một sản phẩm AI từ bài toán thực tế đến hướng triển khai, đồng thời bổ sung các kỹ năng cần thiết trong quản lý dự án, phân chia công việc, theo dõi tiến độ và phối hợp hiệu quả trong team.
+
+Thông tin buổi Workshop 3
+
+Thời gian: 20:00 tối nay, ngày 04/06
+Hình thức: Online trên Zoom
+Diễn giả: Anh Lộc Đặng — Founder Mindmaid & CTO, AIV Group <@920263967518122004> 
+
+> 
+> 🕗 Thời gian: 20:00 — tối nay, ngày 30/07
+> 📍 Hình thức: Online qua Zoom
+> 
+> Join Zoom Meeting
+> https://zoom.us/j/92862242782?pwd=9TkBzI58DeQCuzGbBJifDPYCY8VYMf.1
+> 
+> Meeting ID: 928 6224 2782
+> Passcode: 232439
+> 
+**   💻 Quy định khi vào Zoom**
+
+Thời gian: Vui lòng vào sớm 10 phút (19:50) để ổn định kỹ thuật.
+
+📝 CÚ PHÁP ĐẶT TÊN CHUẨN:
+
+Mã nhóm — Mã đội — Họ và tên 
+
+💡 Ví dụ cụ thể:
+
+Nếu bạn là Nguyễn Văn An, thuộc mã team 001, thuộc mã nhóm G01
+
+ ➡️ Bạn đặt tên là: G01 — T001 — Nguyễn Văn An
+
+Trân trọng,
+BTC AI20K 
+<@&1527648657325690961>
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: thong-bao
+title: 
+url: 
+created_at:
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: https://discord.com/channels/1526532830627102781/1532434771446075472
+created_at: 
+tags: 
+--- CONTENT ---
+Trước đây mình từng làm nghiên cứu với đề tài "Xây dựng mô hình Data Lake cho hệ thống RAG trong tìm kiếm và phân tích bài báo học thuật". Trong quá trình tìm hiểu, mình đã tổng hợp khá nhiều tài liệu về Data Lake và nhờ AI hỗ trợ hệ thống hóa lại kiến thức. Thấy nội dung khá hữu ích nên mình chia sẻ lại để mọi người cùng tham khảo.
+
+Một điều mình nhận ra là khi nhắc đến AI, nhiều người sẽ nghĩ ngay đến LLM, RAG hay Agent. Tuy nhiên, nếu muốn xây dựng một hệ thống AI có thể khai thác hàng triệu tài liệu nghiên cứu thì Data Lake lại là nền tảng rất quan trọng.
+
+Data Lake là nơi lưu trữ toàn bộ dữ liệu gốc như PDF, dataset, hình ảnh, mã nguồn, metadata... mà không cần chuẩn hóa ngay từ đầu. Sau đó dữ liệu sẽ được đưa qua các bước như OCR, parsing, chunking, tạo embedding rồi mới lưu vào Vector Database để phục vụ RAG.
+
+Một kiến trúc phổ biến sẽ có dạng:
+Nguồn dữ liệu → Data Lake → Tiền xử lý → Vector Database → LLM/Agent → Người dùng
+
+Việc tách Data Lake khỏi Vector Database mang lại nhiều lợi ích:
+Lưu trữ dữ liệu gốc lâu dài.
+Dễ bổ sung nguồn dữ liệu mới.
+Có thể tạo lại embedding khi đổi model mà không phải thu thập dữ liệu từ đầu.
+Hỗ trợ phân tích dữ liệu ngoài bài toán RAG.
+
+Nếu đang xây dựng AI hỏi đáp tài liệu, chatbot nội bộ hay hệ thống hỗ trợ nghiên cứu khoa học thì mình nghĩ đây là một kiến trúc đáng để tìm hiểu.
+
+Tài liệu tham khảo:
+Agarwal, S., Laradji, I.H., Charlin, L. and Pal, C. (2024), ‘LitLLM: A Toolkit for
+Scientific Literature Review’, arXiv, từ <https://arxiv.org/abs/2402.01788>.
+ Chang, Y., Wang, X., Wang, J., Wu, Y., Zhu, K., Chen, H., Yang, L., Yi, X., Wang, C.,Wang, Y., Ye, W., Zhang, Y., Chang, Y., Yu, P.S., Yang, Q. and Xie, X. (2023), ‘ASurvey on Evaluation of Large Language Models’, ACM Transactions on Intelligent Systems and Technology, tập 15, tr. 1–45.
+
+Hy vọng những tài liệu này sẽ hữu ích với mọi người. Nếu anh/chị/em nào đã từng triển khai Data Lake hoặc có kinh nghiệm xây dựng pipeline dữ liệu cho AI thì rất mong được trao đổi thêm.
+--- COMMENTS ---
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: 
+created_at: 
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: 
+created_at: 
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: 
+created_at: 
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: 
+created_at: 
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+
+=== END ===
+
+=== ENTRY ===
+channel: chia-se
+title: 
+url: 
+created_at: 
+tags: 
+--- CONTENT ---
+
+--- COMMENTS ---
+
+=== END ===
+
+# Copy khối trống bên dưới để thêm entry mới:
+#
+# === ENTRY ===
+# channel:
+# title:
+# url:
+# created_at:
+# tags:
+# --- CONTENT ---
+#
+# --- COMMENTS ---
+# === END ===
