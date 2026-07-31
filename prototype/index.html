@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tư Vấn - Khóa AI Thực Chiến Vin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F8FAFC;
+            --chat-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --user-msg: linear-gradient(135deg, #6366F1, #4F46E5);
+            --bot-msg: rgba(241, 245, 249, 0.9);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.25) 0px, transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1350px;
+            gap: 24px;
+            height: 90vh;
+            padding: 0 20px;
+        }
+
+        .chat-container {
+            flex: 2;
+            height: 100%;
+            background: var(--chat-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .schedule-container {
+            flex: 1.2;
+            height: 100%;
+            background: var(--chat-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .schedule-list {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .schedule-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .schedule-item:hover {
+            background: rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .schedule-item .time-loc {
+            font-size: 0.85rem;
+            color: #4338CA;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .schedule-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .schedule-item .content-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .schedule-item .action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.2s;
+        }
+
+        .schedule-item .action-link:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-hover);
+        }
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        .header-info h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .header-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message-wrapper {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-wrapper.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .user .message {
+            background: var(--user-msg);
+            color: white; /* Giữ màu trắng cho tin nhắn của người dùng vì nền gradient đậm */
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .bot .message {
+            background: var(--bot-msg);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .citation {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-left: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .citation:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .warning-box {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--warning);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #FCD34D;
+            display: flex;
+            gap: 8px;
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+        }
+
+        .action-btn.report:hover {
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        .demo-controls {
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.4);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .demo-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366F1;
+            color: var(--primary);
+        }
+
+        .chat-input {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .chat-input input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 14px 20px;
+            border-radius: 24px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .send-btn:hover { background: var(--primary-hover); }
+        .send-btn:active { transform: scale(0.95); }
+        .send-btn svg { fill: white; width: 20px; height: 20px; }
+
+        .human-fallback {
+            margin-top: 10px;
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            color: #A5B4FC;
+            border: 1px solid #6366F1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .human-fallback:hover {
+            background: rgba(99, 102, 241, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="chat-container">
+            <div class="chat-header">
+            <div class="header-title">
+                <div class="bot-avatar">AI</div>
+                <div class="header-info">
+                    <h2>Khóa AI Thực Chiến - Vin</h2>
+                    <p><span class="status-dot"></span> Đang trực tuyến</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-box">
+            <div class="message-wrapper bot">
+                <div class="bot-avatar" style="width:32px;height:32px;font-size:0.9rem;">AI</div>
+                <div>
+                    <div class="message">
+                        Chào bạn! Mình là Trợ lý AI hỗ trợ tuyển sinh của Khóa AI Thực Chiến (Vin). Mình có thể giúp bạn giải đáp về lộ trình học, học phí, và yêu cầu đầu vào.<br>
+                        <em>Mình đang trong quá trình học hỏi, hãy kiểm tra lại các thông tin quan trọng nhé!</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Các nút Demo 4 đường đi (ẩn đi nếu làm bản thật, đây là để demo trong 5 phút) -->
+        <div class="demo-controls">
+            <span style="font-size: 0.8rem; color: #94A3B8; display: flex; align-items: center; margin-right: 10px;">Kịch bản demo:</span>
+            <button class="demo-btn" onclick="triggerScenario('happy')">1. Happy Path</button>
+            <button class="demo-btn" onclick="triggerScenario('low-confidence')">2. Low Confidence</button>
+            <button class="demo-btn" onclick="triggerScenario('failure')">3. Out of Scope (Failure)</button>
+            <button class="demo-btn" onclick="triggerScenario('correction')">4. Correction</button>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="handleSend()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+    </div> <!-- Hết phần chat -->
+
+    <!-- Bắt đầu phần Thời Gian Biểu -->
+    <div class="schedule-container">
+        <div class="chat-header">
+            <div class="header-title">
+                <div class="header-info">
+                    <h2>📅 Lịch Trình Khóa Học</h2>
+                    <p>Cập nhật sự kiện & thời gian biểu</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="schedule-list">
+            
+            <div class="schedule-item" style="border-left: 4px solid #10B981;">
+                <div class="time-loc">
+                    <span>🕒 20/08/2024 - 19:00</span>
+                    <span style="color: rgba(255,255,255,0.2);">|</span>
+                    <span>📍 Hội trường A, Tòa Vin</span>
+                </div>
+                <h3>Lễ Khai Giảng Khóa AI K4</h3>
+                <div class="content-text">
+                    Nội dung: Phổ biến quy chế học tập, giới thiệu lộ trình 3 tháng và tiến hành chia nhóm dự án cuối khóa. Khách mời: Bác Vượng (dự kiến).
+                </div>
+                <a href="https://zoom.us/j/123456789" target="_blank" class="action-link">
+                    🔗 Link tham dự (Zoom)
+                </a>
+            </div>
+
+            <div class="schedule-item" style="border-left: 4px solid #F59E0B;">
+                <div class="time-loc">
+                    <span>🕒 25/08/2024 - 19:00</span>
+                    <span style="color: rgba(255,255,255,0.2);">|</span>
+                    <span>📍 Online (Google Meet)</span>
+                </div>
+                <h3>Workshop: Nghệ thuật viết Prompt</h3>
+                <div class="content-text">
+                    Nội dung: Hướng dẫn kỹ thuật viết prompt (Prompt Engineering) nâng cao để khai thác tối đa sức mạnh của mô hình ngôn ngữ lớn (LLMs).
+                </div>
+                <a href="https://meet.google.com/abc-xyz-def" target="_blank" class="action-link">
+                    🔗 Vào phòng Meet
+                </a>
+            </div>
+
+            <div class="schedule-item" style="border-left: 4px solid #6366F1;">
+                <div class="time-loc">
+                    <span>🕒 15/09/2024 - Cả ngày</span>
+                    <span style="color: rgba(255,255,255,0.2);">|</span>
+                    <span>📍 Nền tảng E-Learning</span>
+                </div>
+                <h3>Checkpoint 1: Nộp ý tưởng dự án</h3>
+                <div class="content-text">
+                    Nội dung: Các nhóm phải chốt tên đề tài, phân tích pain-point của khách hàng và nộp bản phác thảo (Sketch) UI.
+                </div>
+                <a href="https://lms.vinedu.com" target="_blank" class="action-link">
+                    📁 Cổng nộp bài tập
+                </a>
+            </div>
+
+        </div>
+    </div> <!-- Hết phần thời gian biểu -->
+    
+    </div> <!-- Hết main-wrapper -->
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+
+        function appendUserMessage(text) {
+            const html = `
+                <div class="message-wrapper user">
+                    <div class="message">${text}</div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        function appendBotMessage(content, type = 'normal') {
+            let feedbackBtns = `
+                <div class="feedback-actions">
+                    <button class="action-btn" onclick="this.style.color='#10B981'; this.style.borderColor='#10B981'">👍 Hữu ích</button>
+                    <button class="action-btn report" onclick="triggerCorrection(this)">⚠️ Báo sai / Sửa lỗi</button>
+                </div>
+            `;
+
+            const html = `
+                <div class="message-wrapper bot">
+                    <div class="bot-avatar" style="width:32px;height:32px;font-size:0.9rem;">AI</div>
+                    <div>
+                        <div class="message">
+                            ${content}
+                        </div>
+                        ${type !== 'error' ? feedbackBtns : ''}
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        function triggerCorrection(btn) {
+            const parentMsg = btn.closest('.message-wrapper');
+            const correctionHtml = `
+                <div class="warning-box" style="background: rgba(16, 185, 129, 0.1); border-color: #10B981; color: #34D399; flex-direction: column; gap: 4px; margin-top: 8px;">
+                    <strong>Cảm ơn bạn đã báo cáo!</strong>
+                    <input type="text" placeholder="Theo bạn, câu trả lời đúng là gì?" style="background: rgba(0,0,0,0.2); border: 1px solid #10B981; padding: 6px; color: white; border-radius: 4px; font-size: 0.8rem; margin-top: 4px;">
+                    <button class="action-btn" style="align-self: flex-end; background: #10B981; color: white; border: none; margin-top: 4px;" onclick="this.parentElement.innerHTML = 'Đã ghi nhận đóng góp để train lại AI!'">Gửi đóng góp</button>
+                </div>
+            `;
+            btn.parentElement.insertAdjacentHTML('afterend', correctionHtml);
+            btn.remove();
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if(!text) return;
+            appendUserMessage(text);
+            userInput.value = '';
+            
+            // Hiển thị trạng thái đang gõ/suy nghĩ
+            const loadingId = 'loading-' + Date.now();
+            chatBox.insertAdjacentHTML('beforeend', `<div id="${loadingId}" class="message-wrapper bot"><div class="bot-avatar" style="width:32px;height:32px;font-size:0.9rem;">AI</div><div><div class="message">Đang suy nghĩ...</div></div></div>`);
+            scrollToBottom();
+
+            try {
+                // Gọi API thực tế
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                // Xóa trạng thái loading
+                document.getElementById(loadingId).remove();
+                
+                if(response.ok) {
+                    const data = await response.json();
+                    
+                    // Xử lý các loại tin nhắn trả về
+                    if (data.type === "low-confidence") {
+                        // Thêm giao diện khuyên chuyển tư vấn viên nếu AI không tự tin
+                        const msg = data.reply + `
+                        <div class="warning-box" style="flex-direction: column; align-items: flex-start;">
+                            <span>⚠️ AI không chắc chắn 100%. Thông tin có thể thay đổi.</span>
+                            <a href="#" class="human-fallback" onclick="alert('Đã ping Tư vấn viên')" style="margin-top: 5px;">👤 Chuyển cho HR / Tư vấn viên để xác nhận</a>
+                        </div>`;
+                        appendBotMessage(msg);
+                    } else if (data.type === "error") {
+                        appendBotMessage(data.reply, 'error');
+                    } else {
+                        // Tin nhắn bình thường
+                        appendBotMessage(data.reply);
+                    }
+                } else {
+                    appendBotMessage(`Xin lỗi, máy chủ Backend báo lỗi HTTP ${response.status}.<br><br><a href="#" class="human-fallback" onclick="alert('Đã ping Tư vấn viên')">👤 Nhấn vào đây để chuyển cho tư vấn viên hỗ trợ nhé</a>`, 'error');
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                appendBotMessage(`Xin lỗi, không thể kết nối tới Backend. Đảm bảo bạn đã chạy server Python.<br><br>
+                <a href="#" class="human-fallback" onclick="alert('Đã ping Tư vấn viên')">👤 Nhấn vào đây để chuyển cho tư vấn viên hỗ trợ nhé</a>`, 'error');
+            }
+        }
+
+        function handleKeyPress(e) {
+            if(e.key === 'Enter') handleSend();
+        }
+
+        // --- Demo Scenarios ---
+        function triggerScenario(type) {
+            if(type === 'happy') {
+                appendUserMessage("Khóa học AI Thực Chiến này kéo dài bao lâu?");
+                setTimeout(() => {
+                    appendBotMessage(`
+                        Khóa học AI Thực Chiến kéo dài trong <strong>3 tháng</strong>, với 80% thời lượng là thực hành thực tế trên các dự án AI nội bộ. 
+                        <span class="citation" onclick="alert('Đã mở tài liệu Trích dẫn 1')">[Nguồn: Brochure khóa học - Trang 2]</span>
+                    `);
+                }, 600);
+            } 
+            else if(type === 'low-confidence') {
+                appendUserMessage("Có được Vin nhận vào làm sau khi học xong không?");
+                setTimeout(() => {
+                    appendBotMessage(`
+                        Theo thông tin chung, các học viên xuất sắc nhất sẽ có cơ hội được phỏng vấn vào các dự án AI của Vin. Tuy nhiên, việc nhận chính thức còn phụ thuộc vào đợt tuyển dụng và kết quả phỏng vấn cuối cùng.
+                        <div class="warning-box" style="flex-direction: column; align-items: flex-start;">
+                            <span>⚠️ AI không chắc chắn 100%. Chính sách tuyển dụng có thể thay đổi.</span>
+                            <a href="#" class="human-fallback" onclick="alert('Đã ping Tư vấn viên')" style="margin-top: 5px;">👤 Chuyển cho HR / Tư vấn viên để xác nhận</a>
+                        </div>
+                    `);
+                }, 600);
+            }
+            else if(type === 'failure') {
+                appendUserMessage("Xe VinFast VF8 bản Plus bây giờ giá lăn bánh bao nhiêu?");
+                setTimeout(() => {
+                    appendBotMessage(`
+                        Rất xin lỗi bạn, mình là AI Tư vấn Khóa học AI Thực Chiến nên <strong>không có thông tin về sản phẩm xe VinFast</strong>. Mình chỉ có thể hỗ trợ các thông tin liên quan đến Lộ trình học, Học phí, Yêu cầu đầu vào...<br><br>
+                        <a href="#" class="human-fallback" onclick="alert('Đã ping Tư vấn viên')">👤 Chuyển cho tư vấn viên để được giải đáp đúng nhu cầu</a>
+                    `, 'error');
+                }, 600);
+            }
+            else if(type === 'correction') {
+                appendUserMessage("Đầu vào khóa AI này yêu cầu tiếng Anh IELTS bao nhiêu?");
+                setTimeout(() => {
+                    appendBotMessage(`
+                        Yêu cầu đầu vào bắt buộc phải có IELTS tối thiểu 6.5 bạn nhé.
+                        <span class="citation">[Nguồn: Yêu cầu tuyển sinh]</span>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-style: italic;">
+                            (Trong demo này, giả sử thông tin này bị SAI - thực tế không yêu cầu IELTS. Hãy bấm nút "Báo sai / Sửa lỗi" bên dưới để xem flow Correction)
+                        </div>
+                    `);
+                }, 600);
+            }
+        }
+    </script>
+</body>
+</html>

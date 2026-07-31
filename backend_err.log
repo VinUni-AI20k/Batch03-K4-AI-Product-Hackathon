@@ -1,0 +1,154 @@
+INFO:     Will watch for changes in these directories: ['D:\\Lap5\\Batch03-K4-AI-Product-Hackathon\\codebase']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [3932] using WatchFiles
+INFO:     Started server process [12332]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12332]
+INFO:     Started server process [24452]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24452]
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
+INFO:     Started server process [18524]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [18524]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py:139: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\Asus Win 11\.cache\huggingface\hub\models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 131, in _main
+    prepare(preparation_data)
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Lap5\Batch03-K4-AI-Product-Hackathon\codebase\main.py", line 27, in <module>
+    qa_agent = AIQAAgent()
+               ^^^^^^^^^^^
+  File "D:\Lap5\Batch03-K4-AI-Product-Hackathon\codebase\agent.py", line 53, in __init__
+    self._init_hybrid_search()
+  File "D:\Lap5\Batch03-K4-AI-Product-Hackathon\codebase\agent.py", line 113, in _init_hybrid_search
+    corpus_texts = [d["search_text"] for d in self.all_docs]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\util\decorators.py", line 41, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\sentence_transformer\model.py", line 188, in __init__
+    super().__init__(
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\model.py", line 216, in __init__
+    modules, self.module_kwargs = self._load_modules(
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\model.py", line 1002, in _load_modules
+    return self._load_config_modules(model_name_or_path, **load_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\model.py", line 1208, in _load_config_modules
+    module = module_class.load(
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\modules\transformer.py", line 2045, in load
+    return cls(model_name_or_path=model_name_or_path, **init_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\util\decorators.py", line 87, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\modules\transformer.py", line 654, in __init__
+    self.model = self._load_model(
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\sentence_transformers\base\modules\transformer.py", line 1751, in _load_model
+    return model_cls.from_pretrained(model_name_or_path, config=config, **model_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\transformers\models\auto\auto_factory.py", line 402, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\transformers\modeling_utils.py", line 4355, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\transformers\modeling_utils.py", line 695, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\transformers\utils\hub.py", line 293, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\transformers\utils\hub.py", line 437, in cached_files
+    hf_hub_download(
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\utils\_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py", line 1013, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py", line 1236, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py", line 1920, in _download_to_tmp_and_move
+    xet_get(
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py", line 563, in xet_get
+    with session.new_file_download_group(
+KeyboardInterrupt
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 131, in _main
+    prepare(preparation_data)
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Lap5\Batch03-K4-AI-Product-Hackathon\codebase\main.py", line 8, in <module>
+    from agent import AIQAAgent
+  File "D:\Lap5\Batch03-K4-AI-Product-Hackathon\codebase\agent.py", line 6, in <module>
+    import numpy as np
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\__init__.py", line 125, in <module>
+    from numpy.__config__ import show_config
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\__config__.py", line 4, in <module>
+    from numpy._core._multiarray_umath import (
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\_core\__init__.py", line 22, in <module>
+    from . import multiarray
+  File "C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\_core\multiarray.py", line 11, in <module>
+    from . import _multiarray_umath, overrides
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 991, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1087, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1186, in get_data
+KeyboardInterrupt
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+C:\Users\Asus Win 11\AppData\Local\Programs\Python\Python312\Lib\site-packages\huggingface_hub\file_download.py:139: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\Asus Win 11\.cache\huggingface\hub\models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6898.07it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 3055.98it/s]
+INFO:     Started server process [24580]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'agent.py'. Reloading...
