@@ -15,20 +15,45 @@
                           └─ scheduler (nhắc hẹn · báo cáo hằng ngày) ─┘
 ```
 
-## ⚡ Quickstart
+## ⚡ Cài đặt 1 dòng
 
-Toàn bộ mã nguồn nằm trong thư mục **[`learning-agent/`](learning-agent/)**.
+Dán vào Terminal — tự tải mã nguồn, tạo môi trường, cài thư viện, **index sẵn kho kiến thức** để dùng ngay:
+
+**macOS / Linux / WSL**
+```bash
+curl -fsSL https://raw.githubusercontent.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304/main/get.sh | bash
+```
+
+**Windows (PowerShell)**
+```powershell
+irm https://raw.githubusercontent.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304/main/get.ps1 | iex
+```
+
+Cài về `~/vlearn-agent`. Xong thì mở `.env` điền **LLM key** (token Telegram/Discord nếu dùng bot), rồi:
+
+```bash
+cd ~/vlearn-agent/learning-agent
+source .venv/bin/activate
+learning-agent ui
+```
+
+Dashboard chat mở ở **http://127.0.0.1:8321** — hỏi được ngay vì kho kiến thức đã index sẵn.
+Muốn xử lý PDF/PPTX/video nặng: thêm `bash -s -- --ingest` vào cuối lệnh cài.
+
+<details><summary>Cài thủ công (nếu không muốn dùng script)</summary>
 
 ```bash
 git clone https://github.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304.git
 cd K4-hackathon-VLAgent-D304/learning-agent
-bash install.sh            # Linux/macOS (Windows: .\install.ps1 · hoặc: docker compose up -d)
-cp .env.example .env       # điền LLM key + token bot
-learning-agent bot         # bật Telegram/Discord + scheduler
-learning-agent ui          # dashboard http://127.0.0.1:8321
+bash install.sh
 ```
+```bash
+# Windows: .\install.ps1  ·  hoặc chạy Docker: docker compose up -d
+```
+Sau đó điền `.env`, kích hoạt venv (`source .venv/bin/activate`) rồi `learning-agent ui` (dashboard) hoặc `learning-agent bot` (Telegram/Discord).
+</details>
 
-📖 **Hướng dẫn đầy đủ** (cài đặt, cách học viên dùng, dashboard, CLI, bảo mật): **[learning-agent/README.md](learning-agent/README.md)**
+📖 **Hướng dẫn đầy đủ** (cách học viên dùng, dashboard, CLI, bảo mật): **[learning-agent/README.md](learning-agent/README.md)**
 
 ## ✨ Điểm nổi bật
 
