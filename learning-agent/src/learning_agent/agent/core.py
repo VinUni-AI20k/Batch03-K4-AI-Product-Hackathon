@@ -283,6 +283,12 @@ class TutorAgent:
         trace: list | None = None,   # truyền list vào để nhận lại các bước: thought + tool calls
     ) -> str:
         """history: [{'role': 'user'|'assistant', 'content': ...}] các lượt gần nhất."""
+        # Gộp danh tính: 1 người chat qua nhiều kênh (Telegram/Discord/dashboard local)
+        # -> 1 hồ sơ. Resolve NGAY ĐẦU, TRƯỚC khi đụng bất kỳ tầng memory nào, để hồ sơ/
+        # mastery/flashcard/sessions log đều nhất quán dùng chung 1 ID gốc. KHÔNG áp cho
+        # user public (chat-public) — mỗi khách vẫn phải cô lập, không được gộp về chủ agent.
+        if not _is_public(user_id):
+            user_id = self.cfg.identity_aliases.get(str(user_id), user_id)
         agent_memory = (
             self.memory_path.read_text(encoding="utf-8")[:3000]
             if self.memory_path.exists() else "(trống — chưa có ghi nhớ chung)"
