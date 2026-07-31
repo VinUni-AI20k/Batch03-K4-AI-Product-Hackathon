@@ -13,8 +13,9 @@ if str(BASE_DIR) not in sys.path:
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    env_path = BASE_DIR / ".env"
-    load_dotenv(dotenv_path=env_path)
+    for env_p in [BASE_DIR / ".env", BASE_DIR / "codebase" / ".env", BACKEND_DIR / ".env"]:
+        if env_p.exists():
+            load_dotenv(dotenv_path=env_p, override=True)
 except ImportError:
     pass
 
