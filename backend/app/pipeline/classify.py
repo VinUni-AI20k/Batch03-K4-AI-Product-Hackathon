@@ -145,7 +145,8 @@ def classify_with_fallback(segments: list[dict[str, str]]) -> list[dict[str, str
 
 def classify_with_llm(segments: list[dict[str, str]]) -> list[dict[str, str]]:
     """Classify with Gemini and reject malformed or mismatched model output."""
-    from app.core.llm_client import llm_client
+    from app.core.config import CLASSIFY_MODEL
+    from app.core.llm_provider import generate_text
     from app.prompts.classify_prompt import CLASSIFY_PROMPT
 
     results = []
@@ -153,7 +154,13 @@ def classify_with_llm(segments: list[dict[str, str]]) -> list[dict[str, str]]:
         prompt = CLASSIFY_PROMPT.format(
             input_segment=f"[{segment['segment_id']}] {segment['text']}"
         )
-        response_text = llm_client.generate_text(prompt)
+        response_text = generate_text(
+            "You classify transcript segments and return only the requested JSON object.",
+            prompt,
+            model=CLASSIFY_MODEL,
+            max_tokens=250,
+            temperature=0.0,
+        )
         match = re.search(r"\{.*?\}", response_text, re.DOTALL)
         if not match:
             raise ValueError(f"No JSON returned for {segment['segment_id']}")

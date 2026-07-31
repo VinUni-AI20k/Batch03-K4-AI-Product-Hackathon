@@ -2,7 +2,9 @@
 lọc (chỉ lời giảng viên), gắn section_id + segment_id để trích dẫn được.
 
 Đây là lời gọi AI thật duy nhất bắt buộc cho CP3 — không hardcode."""
-from app.core.llm_client_openai import call_json
+import re
+
+from app.core.llm_provider import generate_json
 from app.pipeline.outline import Section
 from app.prompts.quiz_bank_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 
@@ -31,6 +33,13 @@ def _validate(questions: list[dict], sections: list[Section]) -> tuple[list[dict
         if not isinstance(q.get("correct_index"), int) or not (0 <= q["correct_index"] < 4):
             reasons.append(f"invalid_correct_index: {q.get('question', '?')[:50]}")
             continue
+        misconception_tag = q.get("misconception_tag")
+        if misconception_tag is not None and (
+            not isinstance(misconception_tag, str)
+            or not re.fullmatch(r"[a-z][a-z0-9_]*", misconception_tag)
+        ):
+            reasons.append(f"invalid_misconception_tag: {q.get('question', '?')[:50]}")
+            continue
         checked.append(q)
     return checked, reasons
 
@@ -42,7 +51,7 @@ def call_llm_for_quiz(sections: list[Section], n_questions: int = 20) -> list[di
     )
     user_prompt = USER_PROMPT_TEMPLATE.format(n_questions=n_questions, content=content)
     try:
-        result = call_json(SYSTEM_PROMPT, user_prompt)
+        result = generate_json(SYSTEM_PROMPT, user_prompt)
     except Exception as exc:  # noqa: BLE001 — surface as a domain error, no silent fallback
         raise QuizGenerationError(f"AI call failed: {exc}") from exc
     questions = result.get("questions")

@@ -1,5 +1,12 @@
+import os
+
+import google.generativeai as genai
+
+from app.core.config import GEMINI_MODEL
+
+
 class LLMClient:
-    def __init__(self, model_name="gemini-1.5-flash"):
+    def __init__(self, model_name=GEMINI_MODEL):
         self.model_name = model_name
         self._model = None
 

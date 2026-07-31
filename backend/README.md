@@ -31,10 +31,22 @@ cp .env.example .env                               # rồi điền OPENAI_API_KE
 Frontend (`frontend/`, chạy ở `localhost:5173`) đã cấu hình gọi thẳng `http://127.0.0.1:8000` —
 CORS đã mở sẵn cho origin đó trong `app/main.py`.
 
+## Multiple OpenAI keys
+
+The client accepts the existing `OPENAI_API_KEY` plus a stack in
+`OPENAI_API_KEYS` (comma- or newline-separated), or numbered variables such as
+`OPENAI_API_KEY_1`, `OPENAI_API_KEY_2`. Calls rotate through the keys and retry
+the next key on rate limits (429), provider outages (5xx), timeouts, or network
+errors. Set matching `OPENAI_BASE_URLS` / `OPENAI_BASE_URL_1` variables when
+using OpenAI-compatible providers such as OpenRouter or Groq. Non-retryable
+errors are returned immediately.
+
 ## Endpoints
 
 - `GET /api/health` — kiểm tra server sống
 - `GET /api/outline?transcript_file=transcript-01-clean.md` — outline parse từ transcript thật
+- `POST /api/outline/pdf` — upload PDF slide và trích xuất outline theo từng trang
+- `POST /api/quiz/generate/pdf` — sinh quiz trực tiếp từ outline của PDF slide
 - `POST /api/quiz/generate?transcript_file=...&n_questions=20` — **quyết định AI trung tâm**, gọi
   OpenAI thật, trả về `{outline, questions}`
 
