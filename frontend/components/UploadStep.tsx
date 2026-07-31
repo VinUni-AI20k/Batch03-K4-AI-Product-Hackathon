@@ -86,7 +86,7 @@ export default function UploadStep() {
         >
           <div style={{ fontSize: 40 }}>📎</div>
           <p style={{ fontWeight: 800, fontFamily: 'var(--font-display)', marginTop: 8 }}>
-            Drop PDF slides or transcript here
+            Drop PDF slides and/or transcript here
           </p>
           <p className="text-soft" style={{ fontSize: 13, marginTop: 4 }}>
             or click to browse — .pdf, .md, .txt, .vtt, .srt
