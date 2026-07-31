@@ -1499,17 +1499,132 @@ body,
 
 .community-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 0.78fr) minmax(430px, 1.22fr);
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.composer-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 390px;
+}
+
+.composer-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 2px solid var(--sky);
+  border-radius: 14px;
+  background: var(--sky-soft);
+  animation: composer-slide-in 240ms var(--ease-out) both;
+}
+
+.composer-typing-indicator--inline {
+  margin-top: 12px;
+}
+
+.composer-typing-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--sky);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.composer-typing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.composer-typing-label {
+  overflow: hidden;
+  color: var(--sky-deep);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-typing-label strong {
+  color: var(--ink);
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dots span {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sky-deep);
+  opacity: 0.35;
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@keyframes composer-slide-in {
+  from {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .comment-composer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
   padding: 18px;
   border: 2px solid var(--line-strong);
   border-bottom-width: 4px;
   border-radius: 16px;
   background: var(--surface);
+  transition: border-color 200ms ease;
+}
+
+.comment-composer--reply {
+  border-color: var(--sky);
+  animation: composer-slide-in 200ms var(--ease-out) both;
 }
 
 .comment-composer label {
@@ -1517,6 +1632,10 @@ body,
   color: var(--ink);
   font-size: 18px;
   font-weight: 700;
+}
+
+.reply-target-name {
+  color: var(--sky-deep);
 }
 
 .comment-composer > p {
@@ -1529,8 +1648,9 @@ body,
 
 .comment-composer textarea {
   display: block;
+  flex: 1;
   width: 100%;
-  min-height: 112px;
+  min-height: 220px;
   resize: vertical;
   padding: 13px 14px;
   border: 2px solid var(--line-strong);
@@ -1566,7 +1686,13 @@ body,
   font-weight: 600;
 }
 
-.composer-actions button {
+.composer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.composer-buttons button[type="submit"] {
   min-height: 40px;
   padding: 0 15px;
   border: 0;
@@ -1577,13 +1703,50 @@ body,
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition:
+    filter 160ms ease,
+    transform 80ms ease;
 }
 
-.composer-actions button:disabled {
+.composer-buttons button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.composer-buttons button[type="submit"]:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.composer-buttons button[type="submit"]:disabled {
   border-bottom-color: var(--line-strong);
   background: var(--line);
   color: var(--muted);
   cursor: not-allowed;
+}
+
+.composer-cancel-btn {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 2px solid var(--line-strong);
+  border-bottom-width: 3px;
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 80ms ease;
+}
+
+.composer-cancel-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.composer-cancel-btn:active {
+  transform: translateY(2px);
 }
 
 .community-feed {
