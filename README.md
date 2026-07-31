@@ -6,6 +6,7 @@ Sản phẩm trong repo là **Trợ lý chuẩn bị và kiểm tra hồ sơ d�
 
 - [AI Spec](spec.md)
 - [Golden set và kết quả CP3](eval/README.md)
+- [Hồ sơ dự án và bằng chứng checkpoint](docs/project-evidence.md)
 - [Kiến trúc Agent và phòng thủ nhiều lớp](docs/agent-security.md)
 - [Hướng dẫn chạy backend](be/README.md)
 - [Hướng dẫn chạy frontend](frontend/README.md)
