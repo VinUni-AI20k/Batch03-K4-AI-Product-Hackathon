@@ -12,7 +12,9 @@ let currentSpeed = 1.0;
 let currentUtterance = null;
 let currentSlideFile = "";
 let currentSentences = [];
+let currentPhoneticSentences = [];
 let currentSentenceIndex = 0;
+
 
 
 // Recording state
@@ -246,7 +248,7 @@ function playSlide(index) {
   
   // Start speaking the narration
   const slide = slidesData[index];
-  speakText(slide.narration);
+  speakText(slide.narration, slide.narration_phonetic);
 }
 
 function vplayTogglePlay() {
@@ -371,82 +373,6 @@ function showSubtitles(text, duration = null) {
 // Speech Synthesis Engine (TTS)
 // --------------------------------------------
 
-// --------------------------------------------
-// Pronunciation Dictionary for English AI Terms
-// --------------------------------------------
-const PRONUNCIATION_DICT = {
-  "RAG Agent": "rác ây-giơnt",
-  "RAG": "rác",
-  "LLM": "eo eo em",
-  "Double Diamond": "đắp-bồ đai-mơn",
-  "Problem Statement": "próp-lơm xtết-mơnt",
-  "Problem": "próp-lơm",
-  "Statement": "xtết-mơnt",
-  "Agentic": "ây-giên-tích",
-  "Agent": "ây-giơnt",
-  "Fine-tuning": "phai tun-ning",
-  "Fine-tune": "phai tun",
-  "Precision": "pri-xí-giưn",
-  "Recall": "ri-côn",
-  "False Positive": "phôn pó-gi-típ",
-  "False Negative": "phôn ne-gơ-típ",
-  "Model": "mô-đen",
-  "Production": "prờ-đắc-sơn",
-  "Heuristic": "hưu-rít-tích",
-  "Rule": "run",
-  "Workflow": "uốc-phơ-lô",
-  "Prompt chaining": "próm-chên-ninh",
-  "Prompt": "próm",
-  "Routing": "rau-tinh",
-  "Parallelization": "pa-ra-le-lai-zê-sơn",
-  "Human-in-the-loop": "hưu-mơn in dơ lúp",
-  "Reward function": "ri-uốc phăng-sơn",
-  "Reward": "ri-uốc",
-  "Function": "phăng-sơn",
-  "Success criteria": "sấc-sét crai-ti-ri-a",
-  "Criteria": "crai-ti-ri-a",
-  "Not Yet": "nót-ét",
-  "No-Go": "nô-gô",
-  "Baseline": "bết-lai",
-  "Target": "ta-gét",
-  "Measurement": "me-giơ-mơnt",
-  "Metric": "mét-trích",
-  "Metrics": "mét-trích",
-  "Output": "ao-pút",
-  "Input": "in-pút",
-  "Token": "tô-kừn",
-  "Tokens": "tô-kừn",
-  "Affinity Mapping": "a-phi-ni-ti máp-pinh",
-  "Affinity": "a-phi-ni-ti",
-  "Mapping": "máp-pinh",
-  "5 Whys": "phai uai",
-  "Impact-Effort": "im-pắc ép-phớt",
-  "Impact": "im-pắc",
-  "Effort": "ép-phớt",
-  "How Might We": "hao mai ui",
-  "Boundary": "baun-đa-ri",
-  "Fallback": "phôn-bắc",
-  "Demo": "đê-mô",
-  "Dataset": "đê-ta-sét",
-  "AI": "ây ai",
-  "Go": "gô"
-};
-
-function getPhoneticText(text) {
-  if (!text) return "";
-  let phoneticText = text;
-  
-  const sortedKeys = Object.keys(PRONUNCIATION_DICT).sort((a, b) => b.length - a.length);
-  
-  for (const key of sortedKeys) {
-    const value = PRONUNCIATION_DICT[key];
-    const regex = new RegExp(`\\b${key}\\b`, "gi");
-    phoneticText = phoneticText.replace(regex, value);
-  }
-  
-  return phoneticText;
-}
-
 function getWords(text) {
   if (!text) return [];
   return text.split(/\s+/).filter(w => w.length > 0);
@@ -467,13 +393,17 @@ function getWordIndexAtChar(words, charIndex) {
   return words.length - 1;
 }
 
-function speakText(text) {
+function speakText(text, phoneticText) {
   if (!window.speechSynthesis) {
     showSubtitles("⚠️ Trình duyệt của bạn không hỗ trợ đọc giọng nói (SpeechSynthesis).");
     return;
   }
   
   currentSentences = splitIntoSentences(text);
+  
+  const phonetic = phoneticText || text;
+  currentPhoneticSentences = splitIntoSentences(phonetic);
+  
   currentSentenceIndex = 0;
   
   if (currentSentences.length === 0) {
@@ -503,12 +433,10 @@ function speakCurrentSentence() {
   }
   
   const sentence = currentSentences[currentSentenceIndex];
+  const phoneticSentence = currentPhoneticSentences[currentSentenceIndex] || sentence;
   
   // Show clean subtitles initially
   showSubtitles(sentence);
-  
-  // Phonetic text for TTS voice
-  const phoneticSentence = getPhoneticText(sentence);
   
   currentUtterance = new SpeechSynthesisUtterance(phoneticSentence);
   currentUtterance.rate = currentSpeed;
@@ -527,12 +455,24 @@ function speakCurrentSentence() {
   }
   
   const originalWords = getWords(sentence);
-  const phoneticWords = getWords(phoneticSentence);
   
   currentUtterance.onboundary = (event) => {
     if (event.name === "word") {
       const charIndex = event.charIndex;
-      const wordIdx = getWordIndexAtChar(phoneticWords, charIndex);
+      
+      // Calculate progress ratio in the phonetic sentence
+      const ratio = charIndex / phoneticSentence.length;
+      
+      // Map to the equivalent character position in the original sentence
+      const originalCharPos = Math.floor(ratio * sentence.length);
+      
+      // Count spaces before this position in the original sentence to get word index
+      let wordIdx = 0;
+      for (let i = 0; i < Math.min(originalCharPos, sentence.length); i++) {
+        if (sentence[i] === ' ') {
+          wordIdx++;
+        }
+      }
       
       if (wordIdx >= 0 && wordIdx < originalWords.length) {
         const before = originalWords.slice(0, wordIdx).join(" ");
@@ -540,10 +480,7 @@ function speakCurrentSentence() {
         const after = originalWords.slice(wordIdx + 1).join(" ");
         
         if (isSubtitlesEnabled && subtitlesDiv) {
-          const spokenText = before ? before + " " + currentWord : currentWord;
-          const remainingText = after ? " " + after : "";
-          
-          subtitlesDiv.innerHTML = `<span style="color: #ffffff; font-weight: 600;">${before ? before + " " : ""}<span style="color: #3b82f6; font-weight: 700; text-decoration: underline;">${currentWord}</span></span><span style="color: rgba(255,255,255,0.4);">${remainingText}</span>`;
+          subtitlesDiv.innerHTML = `<span style="color: #ffffff; font-weight: 600;">${before ? before + " " : ""}<span style="color: #3b82f6; font-weight: 700; text-decoration: underline;">${currentWord}</span></span><span style="color: rgba(255,255,255,0.4);">${after ? " " + after : ""}</span>`;
         }
       }
     }
@@ -576,6 +513,7 @@ function stopSpeech() {
     currentUtterance.onboundary = null;
   }
   currentSentences = [];
+  currentPhoneticSentences = [];
   currentSentenceIndex = 0;
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
