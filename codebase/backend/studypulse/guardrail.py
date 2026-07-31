@@ -67,6 +67,8 @@ _INJECTION_PATTERNS = [
     re.compile(r"(?i)(reveal|show|print|display|output)\s+(your\s+)?(system\s+prompt|instructions|rules|configuration)"),
     # Data exfiltration
     re.compile(r"(?i)(export|dump|leak|extract)\s+(all\s+)?(user\s+data|database|student\s+records|passwords)"),
+    # Non-goals (sending messages, auto-submitting, solving/writing essays)
+    re.compile(r"(?i)(gửi\s+tin\s+nhắn|soạn\s+và\s+gửi|nộp\s+lên\s+lms|nộp\s+bài\s+giúp|giải\s+bài|viết\s+luận|viết\s+bài\s+luận)"),
 ]
 
 _REJECTION_MESSAGES_VI = {
@@ -101,7 +103,9 @@ def _fast_regex_check(text: str) -> str | None:
         if pattern.search(text):
             # Classify the threat type
             pattern_str = pattern.pattern.lower()
-            if "drop" in pattern_str or "delete" in pattern_str or "union" in pattern_str:
+            if "gửi" in pattern_str or "nộp" in pattern_str or "giải" in pattern_str or "viết" in pattern_str:
+                return "off_topic_abuse"
+            elif "drop" in pattern_str or "delete" in pattern_str or "union" in pattern_str:
                 return "prompt_injection"
             elif "ignore" in pattern_str:
                 return "prompt_injection"
