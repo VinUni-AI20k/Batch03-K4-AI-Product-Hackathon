@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from timlai import render  # noqa: E402
 from timlai.index import TinNhan, boc_url  # noqa: E402
-from timlai.tra_cuu import GO_BO_URL, KetQua, neo  # noqa: E402
+from timlai.tra_cuu import GO_BO_URL, KetQua, LinkChon, neo  # noqa: E402
 
 
 def _kq(**doi) -> KetQua:
@@ -132,16 +132,30 @@ def test_g8_chi_hien_link_da_chon():
     Bug 31/07: render đổ 3 link ĐẦU TIÊN của tin rồi cắt — mất đúng link CP5 mà
     user cần, dù model đã nói đúng "đây là link CP5" trong câu trả lời.
     """
-    kq = _kq(message_ids=["3001"], link_chon=[LINK_CP5],
-             cau_tra_loi="Đây là link nộp Checkpoint 5.")
+    kq = _kq(message_ids=["3001"], cau_tra_loi="Đây là link nộp Checkpoint 5.",
+             link_chon=[LinkChon(nhan="CP5 — Mốc cuối trước khi Demo", url=LINK_CP5)])
     text = render.thanh_text(kq, [CP])
     assert LINK_CP5 in text
     assert LINK_CP1 not in text
-    assert text.count("🔗") == 1
+
+
+def test_g8_link_di_kem_nhan_de_phan_biet():
+    """Nhiều link cùng trả về thì phải biết cái nào là cái nào.
+
+    Bug 31/07: hỏi "link chấm chéo K3 và K4" -> hai URL trần dài 90 ký tự, chỉ
+    khác nhau ở đoạn giữa. User không có cách nào biết bấm cái nào.
+    """
+    kq = _kq(message_ids=["3001"], link_chon=[
+        LinkChon(nhan="CP1 — Team và chủ đề", url=LINK_CP1),
+        LinkChon(nhan="CP5 — Mốc cuối trước khi Demo", url=LINK_CP5),
+    ])
+    text = render.thanh_text(kq, [CP])
+    assert f"**CP1 — Team và chủ đề**\n{LINK_CP1}" in text
+    assert f"**CP5 — Mốc cuối trước khi Demo**\n{LINK_CP5}" in text
 
 
 def test_g8_van_bao_tin_goc_con_link_khac():
-    kq = _kq(message_ids=["3001"], link_chon=[LINK_CP5])
+    kq = _kq(message_ids=["3001"], link_chon=[LinkChon(nhan="CP5", url=LINK_CP5)])
     assert "còn 4 link khác" in render.thanh_text(kq, [CP])
 
 
@@ -154,27 +168,66 @@ def test_g8_khong_chon_duoc_thi_do_ra_co_tran():
 
 def test_g8_link_chon_bia_bi_go():
     # Model "chọn" một link không có trong tin -> gỡ, đếm vào số đo bịa.
+    bia = "https://forms.gle/KHONG-CO-THAT"
     kq, bo_di = neo(
-        _kq(message_ids=["3001"], link_chon=["https://forms.gle/KHONG-CO-THAT"]), [CP]
+        _kq(message_ids=["3001"], link_chon=[LinkChon(nhan="CP5", url=bia)]), [CP]
     )
     assert kq.link_chon == []
-    assert "https://forms.gle/KHONG-CO-THAT" in bo_di
+    assert bia in bo_di
 
 
 def test_g8_link_chon_dung_thi_giu():
-    kq, bo_di = neo(_kq(message_ids=["3001"], link_chon=[LINK_CP5]), [CP])
-    assert kq.link_chon == [LINK_CP5]
+    kq, bo_di = neo(
+        _kq(message_ids=["3001"], link_chon=[LinkChon(nhan="CP5", url=LINK_CP5)]), [CP]
+    )
+    assert [lc.url for lc in kq.link_chon] == [LINK_CP5]
     assert bo_di == []
 
 
 def test_g8_link_thuoc_tin_khong_duoc_neo_thi_go(tin_mau):
     # Link có thật, nhưng nằm ở tin KHÁC với tin đã neo -> vẫn gỡ.
+    lab2 = "https://codelabs.aithucchien.vn/lab2"
     kq, bo_di = neo(
-        _kq(message_ids=["1001"], link_chon=["https://codelabs.aithucchien.vn/lab2"]),
-        tin_mau,
+        _kq(message_ids=["1001"], link_chon=[LinkChon(nhan="Lab 2", url=lab2)]), tin_mau
     )
     assert kq.link_chon == []
-    assert bo_di == ["https://codelabs.aithucchien.vn/lab2"]
+    assert bo_di == [lab2]
+
+
+def test_g8_nhan_qua_dai_bi_cat():
+    kq, _ = neo(
+        _kq(message_ids=["3001"], link_chon=[LinkChon(nhan="x" * 300, url=LINK_CP5)]),
+        [CP],
+    )
+    assert len(kq.link_chon[0].nhan) == 80
+
+
+def test_g8_model_liet_ke_trung_thi_chi_hien_mot_lan():
+    kq, bo_di = neo(_kq(message_ids=["3001"], link_chon=[
+        LinkChon(nhan="CP5", url=LINK_CP5),
+        LinkChon(nhan="CP5 lần nữa", url=LINK_CP5),
+    ]), [CP])
+    assert len(kq.link_chon) == 1
+    assert bo_di == []          # trùng lặp không phải bịa, đừng đếm nhầm
+
+
+# ── G9 · link không được lặp đôi vì embed preview ─────────────────────
+
+
+def test_g9_url_trung_trong_noi_dung_chi_tinh_mot_lan():
+    """Bug 31/07: mỗi link hiện HAI dòng y hệt nhau.
+
+    `tu_discord()` ghép m.content + embed.url, mà Discord tự sinh embed preview
+    cho chính link nằm trong content -> URL vào index hai lần.
+    """
+    tin = TinNhan(
+        id="4001", kenh="lab-k3", tac_gia="Thao Nguyen", thoi_diem="2026-07-30T10:00",
+        url="https://discord.com/channels/1/2/4001",
+        # đúng dạng noi_dung mà tu_discord() dựng ra: content rồi tới embed.url
+        noi_dung="Link chấm chéo: https://forms.gle/abc123 https://forms.gle/abc123",
+    )
+    assert tin.cac_link() == ["https://forms.gle/abc123"]
+    assert render.thanh_text(_kq(message_ids=["4001"]), [tin]).count("forms.gle") == 1
 
 
 # ── G7 · gọi AI hỏng thì nói ra, không im lặng ────────────────────────

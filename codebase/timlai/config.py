@@ -26,6 +26,12 @@ DB_PATH = CODEBASE / "index.db"          # .gitignore đã chặn — chứa tin
 GOLDEN_SET = REPO / "eval" / "golden-set.yaml"
 KET_QUA_DIR = REPO / "eval" / "ket-qua"
 
+# Slide lý thuyết KHÔNG được đăng trong Discord — nơi chính thức của nó là VLearn.
+# Đây là hằng số do người viết ra, không phải link model sinh: nó không đi qua neo()
+# nên phải nằm trong code, phải hiện kèm nhãn "link cố định", và phải khác hẳn về mặt
+# hình thức với các link bóc từ tin nhắn thật (render.py, mục "Slide lý thuyết").
+LINK_VLEARN = "https://vlearn.dev/course/comp2010/study-overview"
+
 # Đo tay 30/07 trên đúng shape request của _goi_gemini (xem §4.3 codebase/README.md):
 #   gemini-3.6-flash      4.6s — sát mốc <5s ở spec §7, và KHÔNG tắt được thinking
 #   gemini-3.5-flash      3.6s — chọn đúng bản slide mới nhất  <- chọn lúc đầu

@@ -75,6 +75,7 @@ def kiem(mong_doi: dict, kq: tra_cuu.KetQua) -> list[str]:
         "ngoai_pham_vi": kq.ngoai_pham_vi,
         "can_lam_ro": bool(kq.can_lam_ro),
         "do_tin_cay": kq.do_tin_cay,
+        "gioi_thieu": kq.gioi_thieu,
     }
     for chieu, cho_doi in mong_doi.items():
         if chieu in thuc_te and thuc_te[chieu] != cho_doi:

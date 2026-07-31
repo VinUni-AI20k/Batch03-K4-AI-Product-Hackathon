@@ -23,12 +23,16 @@ _RAC_CUOI = ".,;:!?)]}>*_”’"      # dấu câu dính vào đuôi URL khi ng�
 
 
 def boc_url(van_ban: str) -> list[str]:
-    """Bóc mọi URL ra khỏi một đoạn text, bỏ dấu câu dính ở đuôi.
+    """Bóc mọi URL ra khỏi một đoạn text, bỏ dấu câu dính ở đuôi. KHÔNG trùng lặp.
 
     Đây là NGUỒN SỰ THẬT DUY NHẤT cho link mà bot trả về: link phải bóc ra từ nội
     dung tin nhắn có thật trong index, không bao giờ lấy từ chữ mà model viết ra.
+
+    Bỏ trùng là bắt buộc chứ không phải cho đẹp: `tu_discord()` ghép `m.content`
+    với `embed.url`, mà Discord tự sinh embed preview cho chính link trong content
+    -> mỗi URL vào index hai lần, và bot trả ra hai dòng y hệt nhau.
     """
-    return [u.rstrip(_RAC_CUOI) for u in _URL.findall(van_ban)]
+    return list(dict.fromkeys(u.rstrip(_RAC_CUOI) for u in _URL.findall(van_ban)))
 
 
 @dataclass

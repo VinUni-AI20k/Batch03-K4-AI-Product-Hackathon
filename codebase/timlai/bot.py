@@ -10,6 +10,7 @@ BA ĐƯỜNG VÀO, cùng một hàm xử lý (`hoi`):
   2. @mention bot             — gõ tự nhiên trong kênh, không cần nhớ lệnh
   3. reply vào tin của bot    — đường "correction" ở spec §6, hỏi lại không cần gõ lệnh
 Thêm chế độ opt-in: mọi tin trong kênh thuộc KENH_TU_DONG đều được coi là câu hỏi.
+Thêm `/gioithieu` — bot tự giới thiệu; cùng nội dung với khi bị hỏi "bạn làm được gì".
 
 Câu trả lời hiện **công khai** (ai trong kênh cũng thấy), không còn ephemeral.
 """
@@ -82,7 +83,10 @@ class Bot(discord.Client):
         vừa đốt hạn mức (free tier chỉ 20 lời gọi/ngày/model).
         """
         if self.user in msg.mentions:
-            return _bo_mention(msg.content, self.user.id) or None
+            # Trả cả chuỗi RỖNG (mention trống, "@Spidey" một mình): trước đây bot
+            # im lặng, mà im lặng thì người mới không biết bot còn sống hay không.
+            # Chuỗi rỗng đi tiếp và ra phần giới thiệu — vẫn không tốn lời gọi AI.
+            return _bo_mention(msg.content, self.user.id)
 
         tra_loi_cho = msg.reference.resolved if msg.reference else None
         if isinstance(tra_loi_cho, discord.Message) and tra_loi_cho.author.id == self.user.id:
@@ -90,6 +94,8 @@ class Bot(discord.Client):
 
         if msg.channel.name in config.KENH_TU_DONG:
             noi_dung = msg.content.strip()
+            if tra_cuu.la_hoi_ve_bot(noi_dung) and noi_dung:
+                return noi_dung          # "hi", "help" — trả lời được mà không tốn AI
             # Chặn "ok", "vâng", ":D"... — mỗi tin lọt qua đây là một lời gọi AI.
             return noi_dung if len(noi_dung) >= 5 else None
 
@@ -130,7 +136,9 @@ async def hoi(db, cau_hoi: str) -> discord.Embed:
     except Exception as e:                      # G7: hết hạn mức / mạng chết
         print(f"[loi] {type(e).__name__}: {e}")
         return render.embed_loi(e)
-    return render.thanh_embed(kq, render.chon_nguon(kq, ung_vien), bo_di)
+    # dem() chỉ chạy khi thật sự cần in ra — nó quét cả bảng FTS5.
+    so_tin = index.dem(db) if kq.gioi_thieu else None
+    return render.thanh_embed(kq, render.chon_nguon(kq, ung_vien), bo_di, so_tin=so_tin)
 
 
 bot = Bot()
@@ -165,6 +173,18 @@ async def timlai(itx: discord.Interaction, cau_hoi: str) -> None:
     await itx.response.defer(ephemeral=False)   # ★ AI call > 3s, không defer là fail
     embed = await hoi(bot.db, cau_hoi)
     await itx.followup.send(embed=embed, ephemeral=False, allowed_mentions=KHONG_PING)
+
+
+@bot.tree.command(name="gioithieu", description="Spidey là ai, làm được gì, và hỏi thế nào")
+async def gioithieu(itx: discord.Interaction) -> None:
+    """Cửa vào cho người CHƯA biết hỏi gì — thứ mà `/timlai` không giúp được.
+
+    Không defer: câu trả lời là hằng số, không gọi AI, không đụng index nào ngoài
+    một lần đếm. Trả lời công khai để cả kênh cùng biết bot làm được gì.
+    """
+    kq = tra_cuu.ket_qua_gioi_thieu()
+    embed = render.thanh_embed(kq, [], [], so_tin=index.dem(bot.db))
+    await itx.response.send_message(embed=embed, ephemeral=False, allowed_mentions=KHONG_PING)
 
 
 if __name__ == "__main__":

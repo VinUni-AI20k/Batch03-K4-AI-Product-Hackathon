@@ -37,7 +37,8 @@ def test_giu_nguyen_mention_cua_nguoi_khac():
 
 
 def test_chi_mention_khong_co_chu_nao():
-    # "@bot" trống -> cau_hoi_cho_bot() phải trả None chứ không gọi AI với chuỗi rỗng.
+    # "@bot" trống -> chuỗi rỗng. Nó KHÔNG bị chặn ở cau_hoi_cho_bot() nữa: chuỗi
+    # rỗng đi tiếp và ra phần giới thiệu (test_gioi_thieu.py), vẫn không gọi AI.
     assert _bo_mention(f"<@{UID}>", UID) == ""
 
 
