@@ -23,9 +23,31 @@ export function Dashboard({
   outlookConnecting,
   showConnections,
   setShowConnections,
+  googleUser,
 }) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+
+  const greetingTitle = useMemo(() => {
+    if (!googleUser?.connected) {
+      return "Chào mừng bạn đến với StudyPulse AI 👋";
+    }
+    const name = googleUser.email ? googleUser.email.split("@")[0] : "bạn";
+    const hour = new Date().getHours();
+    let timeStr = "buổi sáng";
+    if (hour >= 11 && hour < 14) timeStr = "buổi trưa";
+    else if (hour >= 14 && hour < 18) timeStr = "buổi chiều";
+    else if (hour >= 18 || hour < 5) timeStr = "buổi tối";
+    return `Chào ${timeStr}, ${name} 👋`;
+  }, [googleUser]);
+
+  const greetingSubtitle = useMemo(() => {
+    if (!googleUser?.connected) {
+      return "Vui lòng đăng nhập bằng Google ở góc trên bên phải để bắt đầu tổng hợp deadline và lịch học.";
+    }
+    return "Hỏi StudyPulse ở khung chat để bắt đầu tổng hợp deadline và lịch học thật.";
+  }, [googleUser]);
+
   const filteredEvents = useMemo(() => {
     const normalized = deferredQuery.trim().toLocaleLowerCase("vi");
     let list = events;
@@ -36,14 +58,18 @@ export function Dashboard({
     return list.filter((event) => `${event.title} ${event.course} ${event.source}`.toLocaleLowerCase("vi").includes(normalized));
   }, [activeAction, deferredQuery, events]);
 
+  const todayStr = useMemo(() => {
+    return new Date().toLocaleDateString("vi-VN", { weekday: "long", day: "numeric", month: "long" });
+  }, []);
+
   return (
     <section className="dashboard-scroll min-h-0 flex-1 overflow-y-auto bg-canvas px-4 py-5 md:px-6 lg:px-7" aria-label="Dashboard học tập">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <p className="text-sm font-semibold text-slate-500">Thứ Năm, 30 tháng 7</p>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-ink md:text-3xl">Chào buổi chiều, Minh 👋</h2>
-            <p className="mt-2 text-sm text-slate-500">Hỏi StudyPulse ở khung chat để bắt đầu tổng hợp deadline và lịch học thật.</p>
+            <p className="text-sm font-semibold text-slate-500 capitalize">{todayStr}</p>
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-ink md:text-3xl">{greetingTitle}</h2>
+            <p className="mt-2 text-sm text-slate-500">{greetingSubtitle}</p>
           </div>
           <button onClick={() => setShowConnections(!showConnections)} className="flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-colors hover:border-blue-300">
             <Icon className="text-lg">settings_input_component</Icon>Quản lý kết nối

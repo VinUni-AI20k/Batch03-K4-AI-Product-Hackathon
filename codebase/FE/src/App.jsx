@@ -141,6 +141,10 @@ export default function App() {
   }, [showConnections]);
 
   const sendMessage = async (text) => {
+    if (!googleUser.connected) {
+      notify("Vui lòng đăng nhập Google trước khi trò chuyện với AI.", "error");
+      return;
+    }
     const userMessageId = generateUUID();
     const loadingMessageId = generateUUID();
     setMessages((current) => [
@@ -349,6 +353,7 @@ export default function App() {
     outlookConnecting,
     showConnections,
     setShowConnections,
+    googleUser,
   };
 
   const handleGoogleLogin = async () => {

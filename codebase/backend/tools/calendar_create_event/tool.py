@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import re
+from datetime import date, timedelta
 from typing import Any
 
 from mcp_bridge.google_calendar_client import call
@@ -9,6 +10,21 @@ from tools._calendar_format import attachments_arg, format_event
 from tools._shared import err
 
 _DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _all_day_range(start: str, end: str) -> tuple[str, str]:
+    """Widen a bare "YYYY-MM-DD" pair into the ISO 8601 timestamps Google wants
+    alongside allDay=True.
+
+    Google treats an all-day `endTime` as EXCLUSIVE, so a single-day event
+    spanning 2026-08-01 ends on 2026-08-02. Callers here routinely pass
+    start == end for a one-day deadline (see server.py's confirm_calendar,
+    which has no end date to work with), which would otherwise describe an
+    empty range and be rejected — so bump the end to the next day.
+    """
+    if end <= start:
+        end = (date.fromisoformat(start) + timedelta(days=1)).isoformat()
+    return f"{start}T00:00:00", f"{end}T00:00:00"
 
 
 def calendar_create_event(
@@ -40,14 +56,13 @@ def calendar_create_event(
             "message": "Restate the event (summary/start/end) and get explicit yes/no confirmation via clarify before calling this again with confirmed=true.",
         }
     try:
+        start, end = start.strip(), end.strip()
         args: dict[str, Any] = {"summary": summary, "startTime": start, "endTime": end}
         # Google takes ISO 8601 timestamps plus an explicit allDay flag, where
         # this tool's contract accepts a bare "YYYY-MM-DD" to mean all-day.
-        # Widen those to midnight timestamps so both ends stay valid ISO 8601.
-        if _DATE_ONLY_RE.fullmatch(start.strip()) and _DATE_ONLY_RE.fullmatch(end.strip()):
+        if _DATE_ONLY_RE.fullmatch(start) and _DATE_ONLY_RE.fullmatch(end):
             args["allDay"] = True
-            args["startTime"] = f"{start.strip()}T00:00:00"
-            args["endTime"] = f"{end.strip()}T00:00:00"
+            args["startTime"], args["endTime"] = _all_day_range(start, end)
         if description:
             args["description"] = description
         if location:
