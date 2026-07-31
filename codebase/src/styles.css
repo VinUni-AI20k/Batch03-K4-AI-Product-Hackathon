@@ -71,6 +71,19 @@ button {
   animation: message-in 220ms ease-out both;
 }
 
+.welcome-grid::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(59, 130, 246, 0.12), transparent 34%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

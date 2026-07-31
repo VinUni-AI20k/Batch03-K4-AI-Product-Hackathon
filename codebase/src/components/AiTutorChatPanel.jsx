@@ -101,10 +101,12 @@ export default function AiTutorChatPanel({
   serviceMode,
   onSend,
   onQuizAnswer,
-  onOpenSlide
+  onOpenSlide,
+  onCollapse
 }) {
   const [input, setInput] = useState("");
   const endRef = useRef(null);
+  const hasDocument = Boolean(slide);
   const quickReplies = [
     "Tóm tắt trang này",
     "Giải thích ý chính",
@@ -118,23 +120,36 @@ export default function AiTutorChatPanel({
   function submit(event) {
     event.preventDefault();
     const value = input.trim();
-    if (!value || isTyping) return;
+    if (!value || isTyping || !hasDocument) return;
     setInput("");
     onSend(value);
   }
 
   return (
-    <aside className="flex h-screen min-h-0 w-[420px] shrink-0 flex-col border-l border-white/[0.075] bg-[#0F1420]">
+    <aside className="relative flex h-screen min-h-0 w-[420px] shrink-0 flex-col border-l border-white/[0.075] bg-[#0F1420]">
+      <button
+        type="button"
+        onClick={onCollapse}
+        title="Thu gọn AI Tutor"
+        aria-label="Thu gọn AI Tutor"
+        className="absolute -left-10 top-1/2 z-50 grid h-16 w-10 -translate-y-1/2 place-items-center rounded-l-2xl border border-r-0 border-white/10 bg-[#171E2C] text-slate-500 shadow-xl shadow-black/25 transition hover:border-blue-400/25 hover:bg-blue-500/10 hover:text-blue-200"
+      >
+        <Icon name="arrowRight" className="h-4 w-4" />
+      </button>
+
       <div className="border-b border-white/[0.07] px-5 py-[17px]">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-950/40">
-            <Icon name="bot" className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 className="text-[15px] font-bold text-white">AI Tutor</h2>
-            <p className="mt-0.5 text-[10px] text-slate-500">
-              Powered by {serviceMode === "mock" ? "demo fallback" : "OpenRouter"}
-            </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-950/40">
+              <Icon name="bot" className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-[15px] font-bold text-white">AI Tutor</h2>
+              <p className="mt-0.5 text-[10px] text-slate-500">
+                Powered by{" "}
+                {serviceMode === "mock" ? "demo fallback" : "OpenRouter"}
+              </p>
+            </div>
           </div>
         </div>
         <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/10 bg-emerald-500/[0.06] px-3 py-1.5 text-[11px] text-slate-300">
@@ -142,7 +157,9 @@ export default function AiTutorChatPanel({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Context Synced: {slide.contextLabel} · Trang {slide.id}
+          {hasDocument
+            ? `Context Synced: ${slide.contextLabel} · Trang ${slide.id}`
+            : "Đang chờ tài liệu"}
         </div>
       </div>
 
@@ -164,7 +181,7 @@ export default function AiTutorChatPanel({
           {quickReplies.map((reply) => (
             <button
               key={reply}
-              disabled={isTyping}
+              disabled={isTyping || !hasDocument}
               onClick={() => onSend(reply)}
               className="rounded-full border border-white/[0.08] bg-white/[0.025] px-2.5 py-1.5 text-[10px] text-slate-300 transition hover:border-blue-400/35 hover:bg-blue-500/10 hover:text-white disabled:opacity-50"
             >
@@ -180,12 +197,17 @@ export default function AiTutorChatPanel({
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Hỏi về nội dung slide..."
+            disabled={!hasDocument}
+            placeholder={
+              hasDocument
+                ? "Hỏi về nội dung tài liệu..."
+                : "Thêm tài liệu để bắt đầu..."
+            }
             className="min-w-0 flex-1 bg-transparent px-2 text-[13px] text-white outline-none placeholder:text-slate-600"
           />
           <button
             type="submit"
-            disabled={!input.trim() || isTyping}
+            disabled={!input.trim() || isTyping || !hasDocument}
             className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
           >
             <Icon name="send" className="h-4 w-4" />

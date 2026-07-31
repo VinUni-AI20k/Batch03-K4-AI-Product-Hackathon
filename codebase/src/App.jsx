@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "./components/Header";
 import SlideViewer from "./components/SlideViewer";
 import AiTutorChatPanel from "./components/AiTutorChatPanel";
+import DocumentWelcome from "./components/DocumentWelcome";
+import { Icon } from "./components/Icons";
 
 let messageCounter = 0;
 function createMessage(role, content, extra = {}) {
@@ -16,7 +18,7 @@ function createMessage(role, content, extra = {}) {
 
 export default function App() {
   const [deckData, setDeckData] = useState(null);
-  const [currentDeckId, setCurrentDeckId] = useState("day-1");
+  const [currentDeckId, setCurrentDeckId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageCounts, setPageCounts] = useState({});
   const [pageText, setPageText] = useState("");
@@ -25,11 +27,12 @@ export default function App() {
   const [messages, setMessages] = useState([
     createMessage(
       "assistant",
-      "Chào Minh Anh! Mình đã đồng bộ với tài liệu Day 1.\n\n📌 Hãy bôi đen một đoạn trên PDF và chọn “Hỏi AI Tutor”, hoặc nhập câu hỏi vào ô chat."
+      "Chào Minh Anh! Hãy thêm tài liệu PDF của nhóm hoặc mở một tài liệu có sẵn để bắt đầu.\n\n📌 Sau đó, bạn có thể bôi đen nội dung trên trang để hỏi mình."
     )
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [serviceMode, setServiceMode] = useState("openrouter");
+  const [isTutorOpen, setIsTutorOpen] = useState(true);
 
   useEffect(() => {
     fetch("/api/decks")
@@ -211,7 +214,7 @@ export default function App() {
     }, 550);
   }
 
-  if (!deck || !slide) {
+  if (!deckData) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#0B0F1A] text-sm text-slate-400">
         Đang tải không gian học tập…
@@ -220,48 +223,70 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen min-w-[1180px] overflow-hidden bg-[#0B0F1A] text-slate-100">
+    <div className="relative flex h-screen min-w-[1180px] overflow-hidden bg-[#0B0F1A] text-slate-100">
       <div className="flex min-w-0 flex-1 flex-col">
         <Header slide={slide} />
-        <SlideViewer
-          deck={deck}
-          decks={decks}
-          pageNumber={currentPage}
-          totalPages={totalPages}
-          onDeckChange={changeDeck}
-          onPageChange={changePage}
-          onDocumentLoad={(numPages) =>
-            setPageCounts((current) => ({
-              ...current,
-              [deck.id]: numPages
-            }))
-          }
-          onPageText={setPageText}
-          onUpload={uploadDeck}
-          isUploading={isUploading}
-          uploadError={uploadError}
-          onAskSelection={(selectedText) =>
-            sendMessage(`Giải thích đoạn được chọn: “${selectedText}”`, {
-              selectedText,
-              includeQuiz: true
-            })
-          }
-          onPrev={() => changePage(currentPage - 1)}
-          onNext={() => changePage(currentPage + 1)}
-          canPrev={currentPage > 1}
-          canNext={currentPage < totalPages}
-        />
+        {deck ? (
+          <SlideViewer
+            deck={deck}
+            decks={decks}
+            pageNumber={currentPage}
+            totalPages={totalPages}
+            onDeckChange={changeDeck}
+            onPageChange={changePage}
+            onDocumentLoad={(numPages) =>
+              setPageCounts((current) => ({
+                ...current,
+                [deck.id]: numPages
+              }))
+            }
+            onPageText={setPageText}
+            onUpload={uploadDeck}
+            isUploading={isUploading}
+            uploadError={uploadError}
+            onAskSelection={(selectedText) => {
+              setIsTutorOpen(true);
+              sendMessage(`Giải thích đoạn được chọn: “${selectedText}”`, {
+                selectedText,
+                includeQuiz: true
+              });
+            }}
+          />
+        ) : (
+          <DocumentWelcome
+            decks={decks}
+            onOpenDeck={changeDeck}
+            onUpload={uploadDeck}
+            isUploading={isUploading}
+            uploadError={uploadError}
+          />
+        )}
       </div>
 
-      <AiTutorChatPanel
-        slide={slide}
-        messages={messages}
-        isTyping={isTyping}
-        serviceMode={serviceMode}
-        onSend={sendMessage}
-        onQuizAnswer={answerQuiz}
-        onOpenSlide={(page) => changePage(page, true)}
-      />
+      {isTutorOpen ? (
+        <AiTutorChatPanel
+          slide={slide}
+          messages={messages}
+          isTyping={isTyping}
+          serviceMode={serviceMode}
+          onSend={sendMessage}
+          onQuizAnswer={answerQuiz}
+          onOpenSlide={(page) => changePage(page, true)}
+          onCollapse={() => setIsTutorOpen(false)}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsTutorOpen(true)}
+          className="group absolute right-0 top-1/2 z-50 flex h-16 w-12 -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-l-2xl border border-r-0 border-blue-400/20 bg-[#171E2C]/95 text-blue-200 shadow-xl shadow-black/35 backdrop-blur transition hover:w-14 hover:border-blue-400/40 hover:bg-blue-500/15 hover:text-white"
+          aria-label="Mở AI Tutor"
+          title="Mở AI Tutor"
+        >
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-950/35">
+            <Icon name="bot" className="h-4 w-4" />
+          </span>
+        </button>
+      )}
     </div>
   );
 }

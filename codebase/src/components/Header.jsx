@@ -1,7 +1,9 @@
 import { Icon } from "./Icons";
 
 export default function Header({ slide }) {
-  const progress = Math.round((slide.id / slide.totalPages) * 100);
+  const progress = slide
+    ? Math.round((slide.id / slide.totalPages) * 100)
+    : 0;
 
   return (
     <header className="flex h-[82px] items-center justify-between border-b border-white/[0.07] bg-[#0D121E] px-8">
@@ -23,13 +25,13 @@ export default function Header({ slide }) {
           </a>
           <span className="text-slate-600">/</span>
           <span className="truncate font-medium text-slate-200">
-            {slide.contextLabel}
+            {slide?.contextLabel || "Thư viện tài liệu"}
           </span>
         </nav>
       </div>
 
       <div className="flex shrink-0 items-center gap-7">
-        <div className="w-36">
+        {slide ? <div className="w-36">
           <div className="mb-2 flex items-center justify-between text-[11px] font-medium text-slate-400">
             <span>Trang {slide.id} / {slide.totalPages}</span>
             <span>{progress}%</span>
@@ -40,7 +42,7 @@ export default function Header({ slide }) {
               style={{ width: `${progress}%` }}
             />
           </div>
-        </div>
+        </div> : null}
 
         <div className="flex items-center gap-3 border-l border-white/10 pl-6">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-950/30">
