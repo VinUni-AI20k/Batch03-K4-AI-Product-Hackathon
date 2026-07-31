@@ -531,7 +531,8 @@ async function askLesson(question) {
 
 document.querySelector("#side-end-quiz").addEventListener("click", openQuiz);
 document.querySelector("#close-quiz").addEventListener("click", () => {
-  if (state.fullscreenActive && !document.getElementById("quiz-start-screen").classList.contains("hidden")) {
+  const isQuizActive = !document.getElementById("quiz-layout-main").classList.contains("hidden");
+  if (isQuizActive) {
     handleCheat("Chủ động đóng cửa sổ làm bài");
   } else {
     if (document.fullscreenElement) {
@@ -542,8 +543,9 @@ document.querySelector("#close-quiz").addEventListener("click", () => {
 });
 modal.addEventListener("click", (event) => { 
   if (event.target === modal) {
-    if (state.fullscreenActive && !document.getElementById("quiz-start-screen").classList.contains("hidden")) {
-      handleCheat("Chủ động thoát khỏi vùng làm bài");
+    const isQuizActive = !document.getElementById("quiz-layout-main").classList.contains("hidden");
+    if (isQuizActive) {
+      handleCheat("Chủ động click ra ngoài vùng làm bài");
     } else {
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(err => console.log(err));
@@ -597,17 +599,22 @@ function handleCheat(reason) {
 
   // Log warning to cheat-log inside start screen
   const cheatLog = document.getElementById("cheat-log");
-  cheatLog.classList.remove("hidden");
-  const remaining = MAX_CHEAT_WARNINGS - state.cheatCount;
-  cheatLog.innerHTML += `<div><i class="ph-fill ph-warning"></i> Cảnh báo ${state.cheatCount}/${MAX_CHEAT_WARNINGS}: ${reason} - Lúc ${new Date().toLocaleTimeString()}. ${remaining > 0 ? `Còn ${remaining} lần cảnh báo.` : "Vi phạm thêm một lần sẽ kết thúc bài."}</div>`;
+  if (cheatLog) {
+    cheatLog.classList.remove("hidden");
+    const remaining = MAX_CHEAT_WARNINGS - state.cheatCount;
+    cheatLog.innerHTML += `<div><i class="ph-fill ph-warning"></i> Cảnh báo ${state.cheatCount}/${MAX_CHEAT_WARNINGS}: ${reason} - Lúc ${new Date().toLocaleTimeString()}. ${remaining > 0 ? `Còn ${remaining} lần cảnh báo.` : "Vi phạm thêm một lần sẽ kết thúc bài."}</div>`;
+  }
 
-  // Exceeded max warnings
+  // Vi phạm QUÁ 3 LẦN (> 3) -> Kết thúc bài thi, dis ra ngoài
   if (state.cheatCount > MAX_CHEAT_WARNINGS) {
     state.terminatedForIntegrity = true;
     if (state.outTimer) {
       clearTimeout(state.outTimer);
       state.outTimer = null;
     }
+    if (cheatIntervalTimer) clearInterval(cheatIntervalTimer);
+    cheatWarningModal.classList.add("hidden");
+
     state.fullscreenActive = false;
     if (document.fullscreenElement) {
       document.exitFullscreen().catch((error) => console.log(error));
@@ -616,25 +623,21 @@ function handleCheat(reason) {
     document.getElementById("quiz-layout-main").classList.remove("hidden");
     renderResults({ terminatedForIntegrity: true });
     modal.classList.remove("hidden");
-    showToast("Bài kiểm tra đã bị hủy do vi phạm quy chế quá số lần cho phép!", "danger");
+    showToast("Bài kiểm tra đã bị hủy do vi phạm quy chế quá 3 lần cảnh báo!", "danger");
     return;
   }
 
-  // Let them out: suspend fullscreenActive check, exit fullscreen, and close modal
-  state.fullscreenActive = false;
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch((error) => console.log(error));
-  }
-  modal.classList.add("hidden");
+  // CẢNH BÁO (Lần 1, 2, 3): Chỉ cảnh báo, KHÔNG dis ra ngoài hay đóng modal quiz
+  state.fullscreenActive = false; // Tạm ngắt fullscreen active để tránh event lặp khi đang ngoài màn hình
+  showToast(`⚠️ CẢNH BÁO OUT MÀN HÌNH (${state.cheatCount}/${MAX_CHEAT_WARNINGS}): ${reason}! Vui lòng tập trung làm bài. Quá 3 lần sẽ bị hủy bài!`, "danger");
 
-  // Show Modal Warning
+  // Hiển thị modal cảnh báo đè lên bài làm để nhắc nhở người dùng
   cheatWarningModal.classList.remove("hidden");
-  cheatWarningCount.textContent = `Bạn đã vi phạm ${state.cheatCount}/${MAX_CHEAT_WARNINGS} lần`;
+  cheatWarningCount.textContent = `Bạn đã vi phạm ${state.cheatCount}/${MAX_CHEAT_WARNINGS} lần cảnh báo`;
 
   let timeLeft = 10;
   cheatCountdownSpan.textContent = timeLeft;
 
-  // Start 10-second timer to invalidate quiz
   if (state.outTimer) clearTimeout(state.outTimer);
   if (cheatIntervalTimer) clearInterval(cheatIntervalTimer);
   
@@ -650,36 +653,43 @@ function handleCheat(reason) {
   state.outTimer = setTimeout(() => {
     state.terminatedForIntegrity = true;
     state.outTimer = null;
-    clearInterval(cheatIntervalTimer);
+    if (cheatIntervalTimer) clearInterval(cheatIntervalTimer);
     
     cheatWarningModal.classList.add("hidden");
+    state.fullscreenActive = false;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch((error) => console.log(error));
+    }
     
-    // Invalidate and show results
+    // Invalidate and show results if user leaves for > 10 seconds without returning
     document.getElementById("quiz-start-screen").classList.add("hidden");
     document.getElementById("quiz-layout-main").classList.remove("hidden");
     renderResults({ terminatedForIntegrity: true, timeout: true });
     modal.classList.remove("hidden");
-    showToast("Bài kiểm tra đã bị hủy do thoát quá 10 giây!", "danger");
+    showToast("Bài kiểm tra đã bị hủy do thoát khỏi bài làm quá 10 giây!", "danger");
   }, 10000);
 
   document.getElementById("start-fullscreen-btn").innerHTML = '<i class="ph ph-arrows-out"></i> Trở lại Fullscreen và tiếp tục';
 }
 
 document.addEventListener("fullscreenchange", () => {
-  if (state.fullscreenActive && !document.fullscreenElement && !modal.classList.contains("hidden")) {
+  const isQuizActive = !document.getElementById("quiz-layout-main").classList.contains("hidden");
+  if (state.fullscreenActive && !document.fullscreenElement && isQuizActive && !modal.classList.contains("hidden")) {
     handleCheat("Thoát chế độ Toàn màn hình");
   }
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (state.fullscreenActive && document.visibilityState === "hidden" && !modal.classList.contains("hidden")) {
+  const isQuizActive = !document.getElementById("quiz-layout-main").classList.contains("hidden");
+  if (document.visibilityState === "hidden" && isQuizActive && !modal.classList.contains("hidden")) {
     handleCheat("Chuyển Tab / Ẩn trình duyệt");
   }
 });
 
-document.documentElement.addEventListener("mouseleave", () => {
-  if (state.fullscreenActive && document.fullscreenElement && !modal.classList.contains("hidden")) {
-    handleCheat("Di chuột ra khỏi vùng làm bài");
+window.addEventListener("blur", () => {
+  const isQuizActive = !document.getElementById("quiz-layout-main").classList.contains("hidden");
+  if (isQuizActive && !modal.classList.contains("hidden")) {
+    handleCheat("Rời khỏi cửa sổ trình duyệt");
   }
 });
 
