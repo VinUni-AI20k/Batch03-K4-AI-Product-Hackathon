@@ -20,3 +20,111 @@ INFO:     127.0.0.1:59196 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
 [09:26:09] INFO     HTTP Request: POST                          _client.py:1740
                     https://api.openai.com/v1/chat/completions                 
                     "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:50717 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:51022 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51022 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60789 - "OPTIONS /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51022 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+[10:12:15] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+[10:12:16] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:51022 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60188 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60188 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60188 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50900 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60707 - "OPTIONS /api/v1/sessions/current HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "DELETE /api/v1/sessions/current HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:52362 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:52362 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50900 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50900 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52362 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60188 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65333 - "GET /api/v1/forms/PERMANENT_RESIDENCE_CT01_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50900 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55707 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64303 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+[10:21:58] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+[10:22:03] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:54127 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61277 - "OPTIONS /api/v1/sessions/current HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49405 - "DELETE /api/v1/sessions/current HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49405 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49405 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51944 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54623 - "OPTIONS /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64982 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64982 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64982 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51691 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51691 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51691 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51691 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+[10:23:06] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+[10:23:08] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:51691 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65049 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51691 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65049 - "GET /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55346 - "OPTIONS /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/draft HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54962 - "PUT /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/draft HTTP/1.1" 200 OK
+[10:23:32] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          
+INFO:     127.0.0.1:54962 - "POST /api/v1/forms/CONSTRUCTION_PERMIT_REQUEST_FORM/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63149 - "DELETE /api/v1/sessions/current HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:63149 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:63149 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63149 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64907 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64295 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63523 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63523 - "DELETE /api/v1/sessions/current HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:63523 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:63523 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63523 - "GET /api/v1/voice/status HTTP/1.1" 200 OK
