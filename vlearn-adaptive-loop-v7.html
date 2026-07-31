@@ -532,15 +532,72 @@ async function sendChat(){
     });
     
     if(!res.ok) throw new Error("API error");
-    const data = await res.json();
+    
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
     
     document.getElementById(loadingId).remove();
-    // format response to handle basic newlines
-    const formattedAns = data.answer.replace(/\n/g, "<br>");
-    log.insertAdjacentHTML("beforeend", `<div class="chatmsg">${formattedAns}<div class="fb"><span onclick="fb(this,1)">👍</span><span onclick="fb(this,0)">👎</span></div></div>`);
+    
+    const msgId = "msg" + Date.now();
+    const reasonId = "reason" + Date.now();
+    log.insertAdjacentHTML("beforeend", `<div class="chatmsg"><details id="${reasonId}" style="color:var(--gray); font-size:0.9em; margin-bottom:8px; display:none"><summary style="cursor:pointer; outline:none; font-weight:500;">🧠 Đang suy nghĩ...</summary><div style="white-space: pre-wrap; margin-top:5px; padding-left:10px; border-left:2px solid var(--gray);"></div></details><div id="${msgId}"></div></div>`);
+    const msgEl = document.getElementById(msgId);
+    const reasonDetails = document.getElementById(reasonId);
+    const reasonDiv = reasonDetails.querySelector("div");
+    
+    let fullText = "";
+    let fullReason = "";
+    let isAnswering = false;
+    let buffer = "";
+    
+    while(true) {
+        const {done, value} = await reader.read();
+        if(done) break;
+        
+        buffer += decoder.decode(value, {stream: true});
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); // Giữ lại phần chưa hoàn chỉnh
+        
+        for(let line of lines) {
+            if(line.startsWith("data: ")) {
+                const jsonStr = line.substring(6).trim();
+                if(!jsonStr || jsonStr === "[DONE]") continue;
+                try {
+                    const data = JSON.parse(jsonStr);
+                    
+                    if (data.reasoning) {
+                        if (!fullReason) reasonDetails.style.display = "block";
+                        fullReason += data.reasoning;
+                        reasonDiv.textContent = fullReason;
+                        if (!isAnswering) {
+                            reasonDetails.open = true;
+                            log.scrollTop = log.scrollHeight;
+                        }
+                    }
+                    
+                    if (data.answer) {
+                        if (!isAnswering && fullReason) {
+                            reasonDetails.open = false; // collapse thinking when answer starts
+                            reasonDetails.querySelector("summary").textContent = "💡 Đã suy nghĩ xong";
+                        }
+                        isAnswering = true;
+                        fullText += data.answer;
+                        msgEl.innerHTML = fullText.replace(/\n/g, "<br>");
+                        log.scrollTop = log.scrollHeight;
+                    }
+                } catch(e) {
+                    console.error("Lỗi parse JSON:", e, jsonStr);
+                }
+            }
+        }
+    }
+    
+    msgEl.innerHTML = fullText.replace(/\n/g, "<br>") + `<div class="fb"><span onclick="fb(this,1)">👍</span><span onclick="fb(this,0)">👎</span></div>`;
+    
   } catch(e) {
-    document.getElementById(loadingId).remove();
-    log.insertAdjacentHTML("beforeend", `<div class="chatmsg" style="color:var(--red)">Lỗi kết nối Backend. Hãy chắc chắn server đang chạy tại cổng 8000.</div>`);
+    const loader = document.getElementById(loadingId);
+    if (loader) loader.remove();
+    log.insertAdjacentHTML("beforeend", `<div class="chatmsg" style="color:var(--red)">Lỗi kết nối Backend. Khởi động lại Server hoặc thử lại.</div>`);
   }
   log.scrollTop = log.scrollHeight;
 }
