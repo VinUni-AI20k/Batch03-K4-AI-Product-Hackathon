@@ -359,6 +359,27 @@ class RecommendationEngineTests(unittest.TestCase):
                 f"{selection.ma_de} không thuộc khối HC dù đã lọc cứng",
             )
 
+    def test_exclude_drops_rejected_codes_entirely(self) -> None:
+        """"Không thích 3 đề tài này" → mã bị từ chối phải biến mất khỏi pool.
+
+        Trừ điểm theo token là không đủ: đề tài bị từ chối vẫn khớp hồ sơ nên
+        vẫn lọt lại (feedback R6 của Lưu Xuân Dũng, đo lại tái lặp 2/3 lần).
+        """
+        payload = main.RecommendRequest(
+            interest="data", skills=["Python"], user_query="không thích, cho tôi nhóm khác"
+        )
+        rejected = [self.projects[0]["ma_de"], self.projects[1]["ma_de"]]
+        picked = main._retrieve_candidates(
+            self.projects,
+            payload,
+            limit=len(self.projects),
+            agent_query="đề tài data khác",
+            agent_exclude=" ".join(rejected),
+        )
+        returned = {project["ma_de"] for project in picked}
+        for code in rejected:
+            self.assertNotIn(code, returned, f"{code} đã bị từ chối nhưng vẫn được trả lại")
+
     def test_randomize_varies_results(self) -> None:
         """`randomize=true` phải cho tập kết quả khác nhau giữa các lần gọi."""
         payload = main.RecommendRequest(

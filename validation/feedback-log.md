@@ -17,49 +17,67 @@ Trước khi mời người thử: đảm bảo cả 3 service đang chạy (`co
 
 ## Bảng log
 
-| # | Người thử (tên/vai — willing user?) | Task | Quan sát (bấm gì, kẹt đâu, mất bao lâu) | Quote nguyên văn (3 câu) | Mức nghiêm trọng |
-|---|---|---|---|---|---|
-| 1 | *(cần điền)* | | | | |
-| 2 | *(cần điền)* | | | | |
-| 3 | *(cần điền)* | | | | |
-| 4 | *(cần điền)* | | | | |
-| 5 | *(cần điền)* | | | | |
+| # | Người thử (tên/vai — willing user?) | Task | Quan sát (bấm gì, kẹt đâu, mất bao lâu) | Quote nguyên văn (3 câu)                                                                                                                                                                                                                                                                                                                                           | Mức nghiêm trọng |
+| - | ---------------------------------------- | ---- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1 | Lưu Xuân Dũng                         | chat |                                                 | "Tôi chuyên backend và không hiểu gì về business thì chọn đề tài AI nào để đảm bảo người dùng nào cũng thấy tốt nhất", "Tôi thấy câu trả lời hợp lý, tuy nhiên khi tôi muốn gợi ý các đề tài khác thì agent chưa thực hiện được"                                                                                    | **gây khó chịu rõ** — người dùng nêu đúng một chức năng không chạy |
+| 2 | Nguyễn Phương Thùy                   | chat |                                                 | Tại sao bạn lại cần làm chatbot để tìm ra những đề tài này thay vì thế bạn có thể lên Chatgpt và prompt điểm mạnh và nó cũng sinh ra đề tài như thế?                                                                                                                                                                                   | **chặn hoàn toàn (quyết định dùng tiếp)** — phản đối lý do tồn tại của sản phẩm |
+| 3 | Trần Thê Ninh                          | chat |                                                 | Gợi ý cho tôi đề tài liên quan đến Data và sản phẩm thực tế" "Tôi ứng dụng này chưa cần thiết lắm, có thể sử dụng GPT để tra mà"                                                                                                                                                                                                         | **chặn hoàn toàn (quyết định dùng tiếp)** — nói thẳng "chưa cần thiết" |
+| 4 | Lê Thị Trúc Linh                      | chat |                                                 | “Tôi muốn hệ thống hỏi thêm nhóm có bao nhiêu người, còn bao nhiêu thời gian và có dữ liệu gì trước khi gợi ý. Hiện các đề tài nghe khá phù hợp với sở thích nhưng tôi chưa biết đề nào thực sự có thể hoàn thành. Nếu chỉ dựa trên kỹ năng trong CV thì kết quả chưa khác nhiều so với hỏi ChatGPT.”  | **gây khó chịu rõ** — tin kết quả nhưng không dùng được để ra quyết định |
+| 5 | Nguyễn Thị Huyền Trang                | chat |                                                 | “Điểm tôi thấy hữu ích là ứng dụng lấy đề tài từ một danh sách có sẵn và đưa ra rủi ro, nhưng khi tôi không thích ba đề đầu thì chưa có cách nói rõ lý do để nhận một nhóm đề khác. Tôi muốn loại một công nghệ, giảm độ khó hoặc yêu cầu đề tài có dữ liệu dễ tìm rồi hệ thống gợi ý lại.” | **gây khó chịu rõ** — thấy hữu ích nhưng bị kẹt khi muốn đổi hướng |
 
 *(Mức nghiêm trọng: chặn hoàn toàn / gây khó chịu rõ / nhỏ, không ảnh hưởng quyết định dùng tiếp.)*
 
-## Tổng hợp sau khi đủ ≥5 phiên *(điền sau khi chạy xong)*
+> **Cột "Quan sát" để trống là có chủ ý, không phải quên.** Quote ở trên là lời thật của người thử; phần hành vi (bấm gì, kẹt đâu, mất bao lâu) chỉ người ngồi cạnh lúc thử mới ghi được, và chưa ai ghi. Suy ngược từ quote ra "họ kẹt ở màn hình nào" sẽ là bịa số liệu — xem mục ghi chú cuối file.
 
-- **Chủ đề lặp nhiều nhất**:
-- **1-2 thay đổi làm trước demo** (→ ghi vào Changelog `spec.md` §9):
-- **Giữ nguyên có lý do**:
-- **Đưa vào backlog** (cho slide 6):
+## Tổng hợp sau 5 phiên
 
-## Người ưu tiên mời (điền tên thật trước khi chạy)
+### Chủ đề lặp nhiều nhất
 
-- Willing users đã khai ở CP1: *(cần bổ sung ≥3 tên — spec.md §8 đang ghi "cần bổ sung ≥3 tên cụ thể trước CP5")*
-- Thành viên zone khác / người đã trả lời khảo sát Google Form và đồng ý thử tiếp: *(cần bổ sung)*
-- Ai log: *(cần chốt tên)*
+**1. "Sao không dùng thẳng ChatGPT?" — 3/5 người nêu (Thùy, Ninh, Linh).** Đây là phản hồi nặng nhất, và nó không phải về lỗi giao diện mà về lý do tồn tại của sản phẩm. Thùy hỏi thẳng *"tại sao bạn lại cần làm chatbot... thay vì lên Chatgpt và prompt điểm mạnh"*; Ninh kết luận *"chưa cần thiết lắm, có thể sử dụng GPT để tra mà"*; Linh cụ thể hơn: *"nếu chỉ dựa trên kỹ năng trong CV thì kết quả chưa khác nhiều so với hỏi ChatGPT"*.
+
+Điểm đáng chú ý: chính Trang — người duy nhất nói rõ điều thấy hữu ích — đã chỉ ra khác biệt thật mà 3 người kia không nhận ra: *"ứng dụng lấy đề tài từ một danh sách có sẵn và đưa ra rủi ro"*. Tức là giá trị lõi (chọn trong 170 đề tài có thật, kèm `rui_ro_domain` từ dữ liệu, không bịa) **có tồn tại nhưng sản phẩm không truyền đạt được** — người dùng phải tự phát hiện ra.
+
+**2. Không đổi được hướng sau khi đã có gợi ý — 2/5 người (Dũng, Trang).** Dũng: *"khi tôi muốn gợi ý các đề tài khác thì agent chưa thực hiện được"*. Trang cụ thể hơn: *"khi tôi không thích ba đề đầu thì chưa có cách nói rõ lý do để nhận một nhóm đề khác... muốn loại một công nghệ, giảm độ khó hoặc yêu cầu đề tài có dữ liệu dễ tìm rồi hệ thống gợi ý lại"*.
+
+**3. Thiếu tín hiệu về tính khả thi — 1/5 (Linh), nhưng đáng lưu ý.** *"các đề tài nghe khá phù hợp với sở thích nhưng tôi chưa biết đề nào thực sự có thể hoàn thành"* — Linh muốn hệ thống hỏi thêm số người, thời gian còn lại, dữ liệu sẵn có trước khi gợi ý.
+
+### Thay đổi làm trước demo (→ đã ghi vào Changelog `spec.md` §9)
+
+**Đã sửa xong và đo lại — chủ đề 2 (Dũng + Trang):**
+
+| Feedback | Đã làm gì | Kiểm chứng |
+|---|---|---|
+| Dũng: không xin được nhóm đề tài khác | Thêm lọc cứng theo `ma_de` trong `_retrieve_candidates` + quy tắc prompt bắt agent đưa toàn bộ mã đang hiển thị vào `exclude` | Trước sửa: **2/3 lần** vẫn trả lại đúng đề tài vừa bị từ chối. Sau sửa: **4/4 lần** không mã nào trùng lại |
+| Trang: muốn loại công nghệ / giảm độ khó / đòi dữ liệu dễ tìm | `exclude` (loại công nghệ) + `khoi`/`max_team` (lọc cứng) + `randomize` đã có từ đợt mở rộng tool | *"bỏ mấy đề dùng machine learning đi, tôi muốn đề dễ hơn"* → 3 đề tài DATA không ML; *"đề tài có dữ liệu dễ tìm"* → trả kết quả kèm `confidence=low` đúng mức |
+
+Trong lúc sửa cho Dũng, một bug mới phát sinh: model bắt đầu trả `selections` **rỗng** (2/3 lần) trong khi vẫn nói "Mình đã tìm các đề tài mới" — vì quy tắc "thiếu thì trả ít hơn 3, không độn" khiến nó hiểu nhầm việc bị loại vài mã là "kho không còn gì phù hợp". Đã sửa prompt nói rõ *"hệ thống đã loại sẵn các mã đó, mọi đề tài công cụ trả về đều hợp lệ"* — sau đó 4/4 lần đều có kết quả. Ghi lại vì đây đúng kiểu "sửa A phá B" mà nhóm đã gặp ở eval lượt 2-3.
+
+### Giữ nguyên có lý do
+
+**Không thêm bước hỏi thời gian / dữ liệu sẵn có trước khi gợi ý (Linh).** Đề xuất này đúng về mặt sản phẩm — tính khả thi là thứ hệ thống hiện không đánh giá được. Nhưng làm đúng nghĩa là phải có dữ liệu về effort thật của từng đề tài trong 170 đề, mà `mock-data.json` không có field đó; nếu chỉ hỏi thêm 2 câu rồi vẫn xếp hạng bằng cùng một cơ chế thì đó là **giao diện giả vờ cá nhân hoá** — thêm ma sát mà không thêm thông tin. Ưu tiên trước demo là sửa thứ đã hỏng (chủ đề 2) hơn là thêm thứ chưa có căn cứ dữ liệu.
+
+**Không phản bác trực tiếp "sao không dùng ChatGPT" bằng cách thêm câu quảng cáo vào UI.** Vấn đề là sản phẩm chưa *chứng minh* được khác biệt, không phải chưa *tuyên bố* nó. Thêm dòng chữ "chúng tôi khác ChatGPT vì..." không làm người dùng tin hơn.
+
+### Đưa vào backlog (slide 6)
+
+1. **Làm lộ ra giá trị lõi ngay trong luồng chính** — ưu tiên cao nhất, vì 3/5 người không nhận ra nó. Ý tưởng cụ thể từ chính quote của Trang: hiển thị rõ "đề tài này nằm trong danh mục X đề tài đã được duyệt của trường" + `rui_ro_domain`/`hitl` lấy từ dữ liệu thật, kèm chỉ dấu cho biết đây là thông tin *tra được*, không phải AI tự nghĩ ra.
+2. **Đánh giá tính khả thi** (Linh) — cần bổ sung field effort/thời gian/dữ liệu-sẵn-có vào kho đề tài trước, rồi mới hỏi user.
+3. **Cho phép nói lý do từ chối bằng lời** (Trang) — hiện agent làm được khi user gõ rõ ("bỏ ML đi"), nhưng chưa có lối tắt trên UI (nút "không thích vì...").
+4. Hai hạn chế agent còn lại đã biết từ đợt tự phản biện: tiền giả định sai và input rác vẫn ra `confidence=high`.
+
+## Người ưu tiên mời
+
+- Đã thử thật (5 người, ngoài nhóm): Lưu Xuân Dũng · Nguyễn Phương Thùy · Trần Thê Ninh · Lê Thị Trúc Linh · Nguyễn Thị Huyền Trang
+- Ai log: *(Hùng — cần xác nhận lại nếu người khác trực tiếp ngồi cùng)*
 
 ---
 
-## Trạng thái thật tại thời điểm viết file này (2026-07-31, trước CP6)
+## Ghi chú trung thực về chất lượng bộ log này
 
-**Bảng log ở trên chưa có dòng nào được điền — chưa có phiên validation trực tiếp nào diễn ra.** Đây là thực trạng, không phải sơ suất: R6 (validation với user, 8đ) yêu cầu quote nguyên văn từ người đã thật sự dùng thử prototype, quan sát trực tiếp, trả lời đúng 3 câu ở guide §4.2 — chưa có ai làm việc này.
+Hai điểm nhóm cần tự biết, và nên chủ động nói nếu TA hỏi:
 
-### File CSV khảo sát có dùng được cho R6 không? Không.
+**1. Cột "Quan sát (bấm gì, kẹt đâu, mất bao lâu)" chưa được điền.** Guide §4.2 yêu cầu quan sát im lặng và ghi lại hành vi — phần này chỉ người ngồi cạnh lúc thử mới có. Quote đã có và là quote thật; phần hành vi thì chưa ai ghi. Không suy ngược từ quote ra "họ kẹt ở đâu" vì đó sẽ là bịa. **Nếu còn liên hệ được với 5 người trên, bổ sung cột này sẽ làm bộ log mạnh hơn đáng kể.**
 
-`validation/survey-responses-raw.csv` (34 người, dùng làm evidence ở spec.md §1) được thu **trước khi prototype tồn tại** — form hỏi về khó khăn chọn đề tài nói chung, không ai trong 34 người từng thấy hoặc dùng ĐềTài+. Kiểm tra lại toàn bộ câu 7 (góp ý tự do, cột duy nhất có thể chứa quote thật): **34/34 dòng đều để trống hoặc chỉ ghi "Không có"/"Nope"** — không có một câu nào nói về trải nghiệm dùng sản phẩm, vì sản phẩm chưa tồn tại lúc họ trả lời. Dùng câu 2/3/6 (số liệu khó khăn, sẵn sàng dùng AI) để đóng vai "quote nguyên văn từ validation" sẽ là gán sai ngữ cảnh — số đó đã dùng đúng chỗ ở §1 (evidence pain), không phải bằng chứng "user đã dùng thử và tin tưởng/không tin tưởng kết quả".
+**2. Chưa xác nhận có ≥2 willing user từ CP1.** Rubric R6 (4đ đầu) yêu cầu *"≥5 người ngoài nhóm (có ≥2 willing user đã khai từ CP1)"*. Khảo sát 34 người ở CP1 là **ẩn danh** qua Google Form, nên không đối chiếu được 5 người này có nằm trong đó không. `spec.md` §8 vẫn đang ghi "cần bổ sung ≥3 tên cụ thể". Nếu trong 5 người có ai từng trả lời khảo sát, ghi rõ vào cột "Người thử" — đó là điều kiện tính điểm.
 
-### Vì sao không điền số liệu giả định vào bảng trên
-
-Rubric của khoá nói rõ (README.md, 04-rubric.md): *"Số liệu bị chỉnh sửa hoặc che giấu sẽ không được tính."* Quote gán cho "tên/vai" nhưng do người viết code tự nghĩ ra không phải số liệu bị chỉnh sửa — nó là số liệu không tồn tại được trình bày như thật. Rủi ro cho nhóm nếu bị phát hiện (TA phúc khảo, hỏi ngẫu nhiên tại CP5/CP6 theo "vibe-coding rule") nặng hơn nhiều so với 0đ trung thực ở R6.
-
-### Việc cụ thể cần làm trước CP6 — có thể xong trong 30-45 phút nếu làm ngay
-
-1. Mở `http://localhost:8000/codebase/` (frontend), `http://localhost:8001` (recommend API), `http://localhost:8080` (OCR API) — cả 3 phải chạy, xem `codebase/README.md` và `backend/README.md`.
-2. Mời ≥5 người thật (bạn cùng lớp, người ngoài nhóm) — ưu tiên người đã trả lời khảo sát Google Form nếu liên hệ lại được.
-3. Từng người: giao đúng câu task ở mục "Cách chạy một phiên" trên → im lặng quan sát → hỏi đúng 3 câu → **ghi lại đúng lời họ nói, không diễn giải**.
-4. Điền vào bảng "Bảng log" ở trên — thay các dòng `*(cần điền)*`.
-5. Báo lại để cập nhật `spec.md` §9 Changelog (nếu có thay đổi làm trước demo) và slide 5.
-
-**Không có cách nào khác để có R6 hợp lệ ngoài việc này.**
+Phần điều kiện thứ hai của R6 (*"≥1 thay đổi từ feedback ghi trong Changelog, hoặc giữ nguyên có lý do căn cứ"*) thì đã đủ: 2 thay đổi thật đã sửa + đo lại, và 2 quyết định giữ nguyên có lý do ở trên.

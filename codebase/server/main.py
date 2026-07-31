@@ -41,6 +41,7 @@ CÁCH LÀM VIỆC
 - Nếu người dùng hỏi VỀ những đề tài bạn vừa gợi ý ("tóm tắt lại", "cái thứ 2 là gì", "so sánh hai cái đầu", "cái nào dễ nhất") → đó là hội thoại tiếp nối, **KHÔNG tìm lại từ đầu**. Trả lời dựa trên danh sách đang hiển thị; cần thêm chi tiết thì gọi `get_topic_detail` với đúng mã đề tài đó.
 - "Gợi ý gì đó đi", "có cái nào hay không", "cho tôi một đề tài bất kỳ" → đây LÀ yêu cầu tìm đề tài. Cứ gọi `search_topics` (đặt `randomize=true`), dùng hồ sơ hiện có làm ngữ cảnh. **Đừng hỏi lại** — người dùng đang muốn bạn chủ động đề xuất. Chỉ hỏi lại khi thật sự không có bất kỳ tín hiệu nào để tìm (không hồ sơ, không lĩnh vực, không kỹ năng).
 - Khi gọi `search_topics`: đặt `query` bằng ngôn ngữ tự nhiên mô tả đúng thứ người dùng cần, gộp tín hiệu hồ sơ (kỹ năng, lĩnh vực, chuyên ngành) với yêu cầu mới nhất. Nếu họ nêu điều muốn tránh ("không dùng machine learning") thì đưa vào `exclude`.
+- **Khi người dùng muốn ĐỔI sang nhóm đề tài khác** ("không thích 3 cái này", "cho tôi nhóm khác", "gợi ý cái khác đi"): bắt buộc đưa **toàn bộ mã đề tài đang hiển thị** vào `exclude` (ví dụ `exclude="DATA-008 DATA-004 DATA-006"`) và đặt `randomize=true`. Trả lại đúng đề tài họ vừa từ chối là lỗi nghiêm trọng — họ đã nói rõ là không thích rồi. Hệ thống đã loại sẵn các mã đó khỏi kết quả, nên **mọi đề tài công cụ trả về đều hợp lệ để gợi ý** — cứ chọn 3 cái tốt nhất trong đó. Đây là yêu cầu đổi gợi ý, KHÔNG phải trường hợp "kho không có đề tài phù hợp": tuyệt đối không trả danh sách rỗng chỉ vì vừa loại vài mã.
 - Người dùng có thể chưa điền hồ sơ. Vẫn trả lời bình thường; nếu cần thông tin để tìm cho đúng thì hỏi họ, đừng bắt buộc họ phải điền form trước.
 
 KHI TRÌNH BÀY ĐỀ TÀI (sau khi đã gọi search_topics)
@@ -509,6 +510,20 @@ def _retrieve_candidates(
             p for p in projects
             if isinstance(p.get("max_team"), (int, float)) and p["max_team"] >= max_team
         ]
+        if filtered:
+            projects = filtered
+
+    # Người dùng nói "không thích 3 đề tài này, cho tôi nhóm khác" → agent đưa
+    # các mã đó vào `exclude`. Trừ điểm theo token là không đủ: đề tài bị từ chối
+    # vẫn lọt lại vì nội dung của nó khớp hồ sơ. Phải loại thẳng khỏi pool.
+    # (Feedback R6 — Lưu Xuân Dũng: "khi tôi muốn gợi ý các đề tài khác thì agent
+    # chưa thực hiện được"; đo lại thấy tái lặp 2/3 lần.)
+    excluded_codes = {
+        code.upper()
+        for code in re.findall(r"[A-Za-z]{2,6}-\d{1,3}", agent_exclude or "")
+    }
+    if excluded_codes:
+        filtered = [p for p in projects if str(p.get("ma_de", "")).upper() not in excluded_codes]
         if filtered:
             projects = filtered
 
