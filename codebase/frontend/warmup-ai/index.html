@@ -27,6 +27,10 @@
         </div>
 
         <div class="header-actions">
+          <a class="soundless-badge soundless-badge--course" id="courseBackLink" href="../vlearn-course/index.html">
+            <span aria-hidden="true">←</span>
+            Về khóa học
+          </a>
           <button class="soundless-badge soundless-badge--exit" id="exitButton" type="button" hidden>
             <span aria-hidden="true">×</span>
             Thoát
@@ -80,9 +84,9 @@
       <form method="dialog">
         <div class="exit-dialog-icon" aria-hidden="true">!</div>
         <h2 id="exitDialogTitle">Thoát khỏi warm-up?</h2>
-        <p>Tiến độ của lượt làm hiện tại sẽ bị xoá. Bạn có thể bắt đầu lại từ sảnh chờ.</p>
+        <p id="exitDialogMessage">Tiến độ của lượt làm hiện tại sẽ bị xoá. Bạn có thể bắt đầu lại từ sảnh chờ.</p>
         <div class="exit-dialog-actions">
-          <button class="dialog-button dialog-button--secondary" value="cancel">Tiếp tục làm bài</button>
+          <button class="dialog-button dialog-button--secondary" id="cancelExitButton" value="cancel">Tiếp tục làm bài</button>
           <button class="dialog-button dialog-button--danger" id="confirmExitButton" value="confirm">Thoát về sảnh chờ</button>
         </div>
       </form>

@@ -2,6 +2,8 @@
 
 Đọc file này trước khi tạo hoặc sửa giao diện trong `codebase/frontend/`.
 
+Ngữ cảnh sản phẩm và nguyên tắc chiến lược nằm tại [`../../PRODUCT.md`](../../PRODUCT.md).
+
 ## 1. Cấu trúc và phạm vi
 
 - Mỗi giao diện là một thư mục độc lập: `codebase/frontend/<ten-kebab-case>/`.
@@ -39,6 +41,7 @@ Source of truth: `vlearn-course/styles.css` và `vlearn-course/README.md`.
 - Header và footer CTA là khung cố định; trung tâm màn hình chỉ giải quyết một quyết định chính.
 - Hội thoại: mỗi nhân vật chỉ có một balloon cho trọn lượt nói. Text có thể gõ dần; Space/CTA phải cho phép hiện ngay toàn bộ câu.
 - Trong lượt làm, nút Thoát bắt buộc mở cảnh báo trước khi xoá tiến độ.
+- Luồng điều hướng phải khép kín: `vlearn-course/` dẫn vào `warmup-ai/`, và warm-up luôn có đường quay về khóa học; nếu đang làm bài thì phải cảnh báo trước khi rời.
 - Discussion dùng interaction quen thuộc: form đăng bình luận, reaction toggle, reply inline. Nếu chưa có backend, nói rõ dữ liệu là mock/local.
 - Dialog/confirmation dùng native `<dialog>` khi phù hợp; không tự dựng overlay thiếu focus handling.
 

@@ -144,6 +144,8 @@ button:focus-visible {
   color: var(--muted);
   font-size: 14px;
   font-weight: 850;
+  text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 180ms ease,
@@ -167,6 +169,10 @@ button:focus-visible {
 .soundless-badge--exit:hover {
   border-color: var(--danger);
   color: var(--danger);
+}
+
+.soundless-badge--course {
+  color: var(--sky-deep);
 }
 
 .screen {
