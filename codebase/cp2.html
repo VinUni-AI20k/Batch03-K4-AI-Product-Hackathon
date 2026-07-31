@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMP2010 - Khoá 3 + 4 Phase 1 | VLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F52BA;
+            --primary-hover: #0a3f91;
+            --secondary: #eef2f9;
+            --accent-red: #E53935;
+            --text-main: #1E293B;
+            --text-sub: #64748B;
+            --bg-page: #F3F6F9;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 25px -5px rgba(15, 82, 186, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px fill #E2E8F0;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 22px;
+            color: #0F2C59;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            fill: #0F52BA;
+        }
+
+        .logo span {
+            color: #E53935;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-sub);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 20px 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--accent-red);
+            border-bottom-color: var(--accent-red);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-codelabs {
+            border: 1px dashed #CBD5E1;
+            background: #F8FAFC;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-codelabs:hover {
+            background: #F1F5F9;
+            border-color: #94A3B8;
+        }
+
+        .lang-switch, .theme-switch {
+            background: #F1F5F9;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #F1F5F9;
+            padding: 4px 12px 4px 6px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .avatar-badge {
+            width: 24px;
+            height: 24px;
+            background: #3B82F6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+            width: 100%;
+        }
+
+        /* BREADCRUMB & HEADER */
+        .course-header {
+            margin-bottom: 24px;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-red);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .course-title-group h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+
+        .course-subtitle {
+            font-size: 13px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid #E2E8F0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .progress-bar-bg {
+            width: 120px;
+            height: 6px;
+            background: #E2E8F0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: #10B981;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .btn-start {
+            background: #0F52BA;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 82, 186, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-start:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* DAY CARDS LIST */
+        .days-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .day-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .day-card:hover {
+            border-color: #CBD5E1;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .day-card-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .day-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .day-icon-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #F1F5F9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #334155;
+            flex-shrink: 0;
+            border: 1px solid #E2E8F0;
+        }
+
+        .day-icon-badge .lbl {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #64748B;
+        }
+
+        .day-icon-badge .num {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .day-details h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+
+        .day-details p {
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .expand-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+            transition: transform 0.3s ease;
+        }
+
+        .day-card.active .expand-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* EXPANDED ACTIONS CONTAINER */
+        .day-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0, 1, 0, 1);
+            background: #FAFBFD;
+            border-top: 1px solid #F1F5F9;
+        }
+
+        .day-card.active .day-card-body {
+            max-height: 300px;
+            transition: max-height 0.35s ease-in-out;
+        }
+
+        .action-buttons-group {
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            background: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .btn-action.btn-slide {
+            border-left: 4px solid #3B82F6;
+        }
+        .btn-action.btn-slide:hover {
+            background: #EFF6FF;
+            border-color: #3B82F6;
+        }
+
+        .btn-action.btn-warmup {
+            border-left: 4px solid #F59E0B;
+            background: #FFFBEB;
+        }
+        .btn-action.btn-warmup:hover {
+            background: #FEF3C7;
+            border-color: #D97706;
+        }
+
+        .btn-action.btn-quiz {
+            border-left: 4px solid #10B981;
+        }
+        .btn-action.btn-quiz:hover {
+            background: #ECFDF5;
+            border-color: #10B981;
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .btn-slide .action-icon { background: #DBEAFE; color: #1D4ED8; }
+        .btn-warmup .action-icon { background: #FDE68A; color: #B45309; }
+        .btn-quiz .action-icon { background: #D1FAE5; color: #047857; }
+
+        .action-text h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .action-text span {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        /* MODAL OVERLAY FOR GAME & SLIDE & QUIZ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .game-modal {
+            background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 100%);
+            width: 90%;
+            max-width: 720px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 4px solid #FFFFFF;
+        }
+
+        .modal-overlay.active .game-modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #FFFFFF;
+            transform: scale(1.1);
+        }
+
+        /* GAME HEADER & CANVAS AREA */
+        .game-header {
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0369A1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-status-badge {
+            background: #0284C7;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ANIMATED STAGE AREA */
+        .game-stage {
+            height: 230px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #38BDF8 0%, #0284C7 60%, #0369A1 100%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        /* SVG ANIMATIONS & MASCOT */
+        .water-waves {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+        }
+
+        .wave-back {
+            animation: floatWave 4s ease-in-out infinite alternate;
+            fill: rgba(14, 165, 233, 0.7);
+        }
+
+        .wave-front {
+            animation: floatWave 2.5s ease-in-out infinite alternate-reverse;
+            fill: #0284C7;
+            opacity: 0.8;
+        }
+
+        @keyframes floatWave {
+            0% { transform: translateY(0) scaleY(1); }
+            100% { transform: translateY(8px) scaleY(1.15); }
+        }
+
+        /* ICEBERG CONTAINER */
+        .iceberg-container {
+            position: absolute;
+            bottom: 25px;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* PENGUIN MASCOT */
+        .penguin-svg {
+            width: 110px;
+            height: 110px;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        /* DROWNING ANIMATION */
+        .penguin-sinking {
+            animation: sinkAnimation 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes sinkAnimation {
+            0% { transform: translateY(0) rotate(-3deg); }
+            100% { transform: translateY(18px) rotate(4deg); }
+        }
+
+        /* CHEERING ANIMATION */
+        .penguin-happy {
+            animation: happyJump 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes happyJump {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-16px) scale(1.05); }
+        }
+
+        /* GAME QUESTION CARD */
+        .game-body {
+            padding: 24px;
+            background: #FFFFFF;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .question-box {
+            margin-bottom: 16px;
+        }
+
+        .question-meta {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0284C7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-option:hover {
+            border-color: #38BDF8;
+            background: #F0F9FF;
+            color: #0369A1;
+        }
+
+        .opt-letter {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: #E2E8F0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .btn-option:hover .opt-letter {
+            background: #0284C7;
+            color: white;
+        }
+
+        /* RESULT VIEW */
+        .result-view {
+            text-align: center;
+            padding: 20px 10px;
+            display: none;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .result-title.win { color: #16A34A; }
+        .result-title.lose { color: #DC2626; }
+
+        .btn-restart {
+            margin-top: 16px;
+            background: #0284C7;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: #0369A1;
+        }
+
+        /* GENERIC MODAL FOR SLIDE & QUIZ */
+        .simple-modal {
+            background: white;
+            width: 90%;
+            max-width: 650px;
+            border-radius: 20px;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        /* Toast message */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0F172A;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 0 16px;
+            }
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                V<span>Learn</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-item">🏠 Trang chủ</a></li>
+                <li><a href="#" class="nav-item active">📖 Khóa học của tôi</a></li>
+                <li><a href="#" class="nav-item">📓 Sổ tay học tập</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <button class="btn-codelabs">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                Mở Codelabs
+            </button>
+            <button class="lang-switch">VI</button>
+            <button class="theme-switch">🌙</button>
+            <div class="user-profile">
+                <div class="avatar-badge">M</div>
+                <span>24ai.mnhht@vinuni....</span>
+                <small>▼</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- BREADCRUMB & COURSE TITLE -->
+        <div class="course-header">
+            <div class="breadcrumb">VLEARN · VINUNI AI THỰC CHIẾN</div>
+            <div class="header-main">
+                <div class="course-title-group">
+                    <h1>COMP2010 - Khoá 3 + 4 Phase 1</h1>
+                    <div class="course-subtitle">1074 học viên cùng lớp</div>
+                </div>
+                <div class="header-actions">
+                    <div class="progress-box">
+                        <div class="progress-text">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Đã đọc <span id="progress-days">0</span>/6 ngày
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-bar"></div>
+                        </div>
+                        <span style="font-size:12px; font-weight:700; color:#10B981;" id="progress-percent">0%</span>
+                    </div>
+                    <button class="btn-start" onclick="openDay(1)">Bắt đầu đọc</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAYS LIST -->
+        <div class="days-list" id="days-container">
+            <!-- Dynamically populated or rendered -->
+        </div>
+    </div>
+
+    <!-- WARM UP GAME MODAL (MASCOT: PENGUIN MINH) -->
+    <div class="modal-overlay" id="warmup-modal">
+        <div class="game-modal">
+            <button class="modal-close" onclick="closeModal('warmup-modal')">&times;</button>
+            
+            <div class="game-header">
+                <div class="game-title">
+                    <span>🐧</span> Cứu Chim Cánh Cụt Minh!
+                </div>
+                <div class="game-status-badge" id="game-step-badge">Câu 1/3</div>
+            </div>
+
+            <!-- ANIMATED STAGE AREA -->
+            <div class="game-stage">
+                <!-- SVG WATER WAVES -->
+                <svg class="water-waves" viewBox="0 0 500 150" preserveAspectRatio="none">
+                    <path class="wave-back" d="M0,40 C150,90 350,-10 500,40 L500,150 L0,150 Z"></path>
+                    <path class="wave-front" d="M0,60 C200,10 300,80 500,50 L500,150 L0,150 Z"></path>
+                </svg>
+
+                <!-- ICEBERG & PENGUIN CONTAINER -->
+                <div class="iceberg-container" id="iceberg-box">
+                    <!-- PENGUIN VECTOR -->
+                    <svg class="penguin-svg penguin-sinking" id="penguin-mascot" viewBox="0 0 100 100">
+                        <!-- Lifebuoy ring if needed or Iceberg -->
+                        <g id="penguin-body">
+                            <!-- Body -->
+                            <ellipse cx="50" cy="55" rx="30" ry="35" fill="#1E293B"/>
+                            <ellipse cx="50" cy="58" rx="22" ry="28" fill="#FFFFFF"/>
+                            <!-- Eyes -->
+                            <circle cx="42" cy="38" r="4" fill="#000"/>
+                            <circle cx="58" cy="38" r="4" fill="#000"/>
+                            <circle cx="43" cy="37" r="1.5" fill="#FFF"/>
+                            <circle cx="59" cy="37" r="1.5" fill="#FFF"/>
+                            <!-- Beak -->
+                            <polygon points="50,42 44,48 56,48" fill="#F59E0B"/>
+                            <!-- Cheeks -->
+                            <ellipse cx="36" cy="44" rx="4" ry="2.5" fill="#FDA4AF" opacity="0.8"/>
+                            <ellipse cx="64" cy="44" rx="4" ry="2.5" fill="#FDA4AF" opacity="0.8"/>
+                            <!-- Flippers / Arms -->
+                            <path class="flipper-left" d="M20,50 Q10,60 18,70" stroke="#1E293B" stroke-width="8" stroke-linecap="round" fill="none"/>
+                            <path class="flipper-right" d="M80,50 Q90,60 82,70" stroke="#1E293B" stroke-width="8" stroke-linecap="round" fill="none"/>
+                            <!-- Scarf (Cute Detail) -->
+                            <path d="M30,50 Q50,56 70,50 L68,54 Q50,60 32,54 Z" fill="#E53935"/>
+                            <rect x="58" y="52" width="8" height="16" rx="2" fill="#E53935" transform="rotate(15 58 52)"/>
+                        </g>
+                    </svg>
+
+                    <!-- ICEBERG SVG -->
+                    <svg id="iceberg-svg" width="160" height="50" viewBox="0 0 160 50">
+                        <path d="M10,15 L30,5 L130,5 L150,15 L140,40 C100,50 60,50 20,40 Z" fill="#E0F2FE" stroke="#38BDF8" stroke-width="3"/>
+                        <path d="M30,5 L50,25 L110,25 L130,5" fill="none" stroke="#BAE6FD" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- QUESTION AREA -->
+            <div class="game-body">
+                <div id="quiz-active-view">
+                    <div class="question-box">
+                        <div class="question-meta" id="q-topic">Chủ đề: Python Basics</div>
+                        <div class="question-text" id="q-text">Hàm nào trong Python dùng để xuất dữ liệu ra màn hình?</div>
+                    </div>
+                    <div class="options-grid" id="q-options">
+                        <!-- Dynamic Options -->
+                    </div>
+                </div>
+
+                <!-- WIN/LOSE RESULT VIEW -->
+                <div class="result-view" id="quiz-result-view">
+                    <div id="result-icon" style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+                    <div class="result-title" id="result-title">BẠN ĐÃ CỨU SỐNG CHIM CÁNH CỤT MINH!</div>
+                    <p id="result-desc" style="color: #64748B; font-size: 14px;">Minh đã an toàn lên bờ băng khô ráo nhờ sự thông thái của bạn!</p>
+                    <button class="btn-restart" onclick="restartGame()">Thử lại Warm Up 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GENERIC SLIDE MODAL -->
+    <div class="modal-overlay" id="slide-modal">
+        <div class="simple-modal">
+            <button class="modal-close" onclick="closeModal('slide-modal')">&times;</button>
+            <div style="font-size:40px; margin-bottom:12px;">📚</div>
+            <h2 id="slide-modal-title" style="color:#0F172A; margin-bottom:10px;">Đang mở Slide bài học...</h2>
+            <p style="color:#64748B; font-size:14px; margin-bottom:20px;">Tài liệu slide cho ngày học này đã sẵn sàng. Bạn có thể xem trực tiếp hoặc tải về.</p>
+            <div style="background:#F1F5F9; padding:20px; border-radius:12px; font-weight:600; color:#334155; margin-bottom:20px;">
+                📄 COMP2010_Slide_Lecture_Notes.pdf
+            </div>
+            <button class="btn-start" onclick="closeModal('slide-modal'); showToast('Đã đánh dấu hoàn thành đọc Slide!');">Xem Slide thành công</button>
+        </div>
+    </div>
+
+    <!-- GENERIC QUIZ MODAL -->
+    <div class="modal-overlay" id="quiz-modal">
+        <div class="simple-modal">
+            <button class="modal-close" onclick="closeModal('quiz-modal')">&times;</button>
+            <div style="font-size:40px; margin-bottom:12px;">📝</div>
+            <h2 id="quiz-modal-title" style="color:#0F172A; margin-bottom:10px;">Kiểm tra kiến thức cuối buổi</h2>
+            <p style="color:#64748B; font-size:14px; margin-bottom:20px;">Bài kiểm tra gồm 5 câu hỏi trắc nghiệm đánh giá mức độ hiểu bài của bạn trong ngày học này.</p>
+            <button class="btn-start" style="background:#10B981;" onclick="closeModal('quiz-modal'); showToast('Đã hoàn thành bài kiểm tra cuối buổi!');">Bắt đầu làm bài</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast">
+        <span>✅</span>
+        <span id="toast-text">Thông báo</span>
+    </div>
+
+    <script>
+        // DATA STRUCTURE FOR DAYS
+        const daysData = [
+            { id: 1, title: 'Day01', sub: 'Chưa hoàn thành ngày học · 2 slide', slides: 2 },
+            { id: 2, title: 'Day02', sub: 'Chưa hoàn thành ngày học · 1 slide', slides: 1 },
+            { id: 3, title: 'Day03', sub: 'Chưa hoàn thành ngày học · 2 slide', slides: 2 },
+            { id: 4, title: 'Day04', sub: 'Chưa hoàn thành ngày học · 3 slide', slides: 3 },
+            { id: 5, title: 'Day05', sub: 'Chưa hoàn thành ngày học · 2 slide', slides: 2 },
+            { id: 6, title: 'Day06', sub: 'Chưa hoàn thành ngày học · 4 slide', slides: 4 }
+        ];
+
+        let completedDays = new Set();
+
+        // RENDER DAYS LIST
+        function renderDays() {
+            const container = document.getElementById('days-container');
+            container.innerHTML = daysData.map(day => `
+                <div class="day-card" id="day-card-${day.id}">
+                    <div class="day-card-header" onclick="toggleDay(${day.id})">
+                        <div class="day-info">
+                            <div class="day-icon-badge">
+                                <span class="lbl">DAY</span>
+                                <span class="num">${day.id < 10 ? '0' + day.id : day.id}</span>
+                            </div>
+                            <div class="day-details">
+                                <h3>${day.title}</h3>
+                                <p id="day-status-${day.id}">${day.sub}</p>
+                            </div>
+                        </div>
+                        <div class="expand-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="day-card-body">
+                        <div class="action-buttons-group">
+                            <button class="btn-action btn-slide" onclick="openSlideModal(${day.id})">
+                                <div class="action-icon">📖</div>
+                                <div class="action-text">
+                                    <h4>Đọc Slide</h4>
+                                    <span>Tài liệu bài giảng</span>
+                                </div>
+                            </button>
+
+                            <button class="btn-action btn-warmup" onclick="startWarmupGame(${day.id})">
+                                <div class="action-icon">🔥</div>
+                                <div class="action-text">
+                                    <h4>Warm Up</h4>
+                                    <span>Cứu chim cánh cụt Minh</span>
+                                </div>
+                            </button>
+
+                            <button class="btn-action btn-quiz" onclick="openQuizModal(${day.id})">
+                                <div class="action-icon">📝</div>
+                                <div class="action-text">
+                                    <h4>Kiểm Tra Kiến Thức</h4>
+                                    <span>Đánh giá cuối buổi</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // TOGGLE ACCORDION
+        function toggleDay(dayId) {
+            const card = document.getElementById(`day-card-${dayId}`);
+            const isActive = card.classList.contains('active');
+            
+            // Close all
+            document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+
+            if (!isActive) {
+                card.classList.add('active');
+            }
+        }
+
+        function openDay(dayId) {
+            toggleDay(dayId);
+            const card = document.getElementById(`day-card-${dayId}`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // UPDATE PROGRESS
+        function markDayCompleted(dayId) {
+            completedDays.add(dayId);
+            const count = completedDays.size;
+            const percent = Math.round((count / daysData.length) * 100);
+
+            document.getElementById('progress-days').innerText = count;
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-percent').innerText = percent + '%';
+
+            const statusEl = document.getElementById(`day-status-${dayId}`);
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color:#10B981; font-weight:700;">✓ Đã hoàn thành ngày học</span>`;
+            }
+        }
+
+        // WARM UP GAME LOGIC (MASCOT: PENGUIN MINH)
+        const warmupQuestions = [
+            {
+                topic: 'Warm Up - Câu 1/3',
+                text: 'Mã nguồn mở nào của Python được dùng phổ biến để xử lý và phân tích dữ liệu?',
+                options: ['Pandas & NumPy', 'HTML & CSS', 'Photoshop', 'MS Word'],
+                answer: 0
+            },
+            {
+                topic: 'Warm Up - Câu 2/3',
+                text: 'Trong Machine Learning, thuật ngữ "Overfitting" nghĩa là gì?',
+                options: [
+                    'Mô hình học quá tốt tập Train nhưng kém ở tập Test',
+                    'Mô hình chạy quá nhanh',
+                    'Dữ liệu bị thiếu quá nhiều',
+                    'Mô hình đoán chính xác 100% mọi lúc'
+                ],
+                answer: 0
+            },
+            {
+                topic: 'Warm Up - Câu 3/3',
+                text: 'Đâu là thư viện hàng đầu để dựng mô hình Deep Learning trong Python?',
+                options: ['PyTorch / TensorFlow', 'Bootstrap', 'jQuery', 'Laravel'],
+                answer: 0
+            }
+        ];
+
+        let currentQIndex = 0;
+        let gameScore = 0;
+        let currentDayPlaying = 1;
+
+        function startWarmupGame(dayId) {
+            currentDayPlaying = dayId;
+            currentQIndex = 0;
+            gameScore = 0;
+
+            document.getElementById('quiz-active-view').style.display = 'block';
+            document.getElementById('quiz-result-view').style.display = 'none';
+
+            updateMascotPosition(0);
+            loadQuestion();
+            
+            document.getElementById('warmup-modal').classList.add('active');
+        }
+
+        function loadQuestion() {
+            const q = warmupQuestions[currentQIndex];
+            document.getElementById('game-step-badge').innerText = `Câu ${currentQIndex + 1}/3`;
+            document.getElementById('q-topic').innerText = q.topic;
+            document.getElementById('q-text').innerText = q.text;
+
+            const optsContainer = document.getElementById('q-options');
+            optsContainer.innerHTML = q.options.map((opt, idx) => `
+                <button class="btn-option" onclick="handleAnswer(${idx})">
+                    <span class="opt-letter">${String.fromCharCode(65 + idx)}</span>
+                    <span>${opt}</span>
+                </button>
+            `).join('');
+        }
+
+        function handleAnswer(selectedIndex) {
+            const q = warmupQuestions[currentQIndex];
+            if (selectedIndex === q.answer) {
+                gameScore++;
+                showToast("Chính xác! Băng nổi cao hơn rồi!");
+            } else {
+                showToast("Chưa đúng rồi! Minh suýt chìm!");
+            }
+
+            currentQIndex++;
+            updateMascotPosition(currentQIndex);
+
+            if (currentQIndex < warmupQuestions.length) {
+                loadQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function updateMascotPosition(step) {
+            const iceberg = document.getElementById('iceberg-box');
+            const mascot = document.getElementById('penguin-mascot');
+
+            // Level 0: drowning in water (low iceberg)
+            // Level 3: safe high up
+            if (step === 0) {
+                iceberg.style.transform = 'translateY(40px)';
+                mascot.className = 'penguin-svg penguin-sinking';
+            } else if (step === 1) {
+                iceberg.style.transform = 'translateY(20px)';
+                mascot.className = 'penguin-svg';
+            } else if (step === 2) {
+                iceberg.style.transform = 'translateY(0px)';
+                mascot.className = 'penguin-svg';
+            } else {
+                // Game finished
+                if (gameScore >= 2) {
+                    iceberg.style.transform = 'translateY(-20px)';
+                    mascot.className = 'penguin-svg penguin-happy';
+                } else {
+                    iceberg.style.transform = 'translateY(60px)';
+                    mascot.className = 'penguin-svg penguin-sinking';
+                }
+            }
+        }
+
+        function finishGame() {
+            document.getElementById('quiz-active-view').style.display = 'none';
+            document.getElementById('quiz-result-view').style.display = 'block';
+
+            const resTitle = document.getElementById('result-title');
+            const resDesc = document.getElementById('result-desc');
+            const resIcon = document.getElementById('result-icon');
+
+            if (gameScore >= 2) {
+                resIcon.innerText = "🎉🐧";
+                resTitle.innerText = "BẠN ĐÃ CỨU SỐNG CHIM CÁNH CỤT MINH!";
+                resTitle.className = "result-title win";
+                resDesc.innerText = `Bạn đã trả lời đúng ${gameScore}/3 câu. Minh đã lên tảng băng an toàn!`;
+                markDayCompleted(currentDayPlaying);
+            } else {
+                resIcon.innerText = "🧊🌊";
+                resTitle.innerText = "ÔI KHÔNG! MINH ĐÃ BỊ CHÌM!";
+                resTitle.className = "result-title lose";
+                resDesc.innerText = `Bạn chỉ đúng ${gameScore}/3 câu. Hãy thử lại để giải cứu Minh nhé!`;
+            }
+        }
+
+        function restartGame() {
+            startWarmupGame(currentDayPlaying);
+        }
+
+        // MODAL HELPERS
+        function openSlideModal(dayId) {
+            document.getElementById('slide-modal-title').innerText = `Đang mở Slide Day 0${dayId}`;
+            document.getElementById('slide-modal').classList.add('active');
+        }
+
+        function openQuizModal(dayId) {
+            document.getElementById('quiz-modal-title').innerText = `Kiểm tra kiến thức Day 0${dayId}`;
+            document.getElementById('quiz-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => {
+                t.classList.remove('show');
+            }, 3000);
+        }
+
+        // INITIALIZE
+        renderDays();
+    </script>
+</body>
+</html>
