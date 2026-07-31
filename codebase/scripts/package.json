@@ -1,0 +1,10 @@
+{
+  "name": "vlearn-pdf-to-images",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "One-off build tool: rasterizes the original slide PDFs (data/vlearn-pack/slides) into per-page PNGs so the student-facing viewer shows the real slides instead of a text summary.",
+  "dependencies": {
+    "pdf-to-img": "^4.4.0"
+  }
+}
