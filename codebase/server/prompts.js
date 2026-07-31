@@ -24,7 +24,14 @@ Yêu cầu cho mỗi câu hỏi:
    phổ biến, feedback nêu rõ tên hiểu lầm đó.
 4. Trường "citation" của mỗi câu PHẢI là một trong các mã [T0x-NNN] xuất hiện trong
    PHẦN KIẾN THỨC được cấp — không suy đoán số trang không có trong danh sách.
-5. Nếu PHẦN KIẾN THỨC không đủ nội dung cho ${questionCount} câu có ý nghĩa, sinh ít hơn
+5. Trường "sourcePages" là mảng SỐ TRANG (chỉ lấy phần số, ví dụ mã "[T01-006]" ->
+   6) của TẤT CẢ các trang trong PHẦN KIẾN THỨC mà câu hỏi này thực sự dựa vào — có
+   thể nhiều hơn 1 trang nếu câu hỏi kết hợp kiến thức từ nhiều đoạn.
+6. Trường "reviewSummary" là một đoạn văn ngắn (3-5 câu) do bạn tự viết lại, tổng hợp
+   đúng nội dung của các trang trong "sourcePages" — dùng để học viên đọc lại khi trả
+   lời sai câu này. Chỉ tổng hợp đúng nội dung đã có trong PHẦN KIẾN THỨC, không thêm
+   thông tin ngoài, không lặp nguyên văn câu hỏi.
+7. Nếu PHẦN KIẾN THỨC không đủ nội dung cho ${questionCount} câu có ý nghĩa, sinh ít hơn
    thay vì bịa thêm.
 
 PHẦN KIẾN THỨC:

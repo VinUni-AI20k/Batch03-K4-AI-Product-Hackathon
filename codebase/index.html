@@ -1045,22 +1045,6 @@
         </div>
     </div>
 
-    <!-- AI Trace Modal (Rubric R5: Log/Trace AI Call) -->
-    <div id="traceModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: #0f172a; color: #f8fafc; border-radius: 14px; width: 600px; max-height: 80vh; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 14px; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                <div style="font-size: 15px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
-                    ⚡ AI Execution Trace Log (Gemini 1.5 Flash Call)
-                </div>
-                <button style="background: transparent; color: #94a3b8; border: none; font-size: 18px; cursor: pointer;" onclick="closeTraceModal()">✕</button>
-            </div>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);" id="traceContent">
-                <!-- Dynamic trace content -->
-            </div>
-            <button style="align-self: flex-end; background: #38bdf8; color: #0f172a; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;" onclick="closeTraceModal()">Đóng Log</button>
-        </div>
-    </div>
-
     <!-- AI Chat Panel: Q&A grounded on the real d1/d2 slide content, right-side drawer -->
     <div class="ai-chat-panel" id="aiChatPanel">
         <div class="ai-chat-header">
@@ -1107,22 +1091,19 @@
                 { id: "d2-s4", title: "Reward function & tiêu chí thành công", slideStart: 20, slideEnd: 23 }
             ]
         };
-        const PASS_THRESHOLD = 0.6; // ngưỡng % đúng để mở khoá phần tiếp theo
 
+        // No more section locking: every slide + its quiz is visible from the start.
+        // progress just tracks what's been answered, for the running score summary.
         const progress = {
-            d1: { unlocked: 1, results: {}, quiz: {}, answers: {} },
-            d2: { unlocked: 1, results: {}, quiz: {}, answers: {} }
+            d1: { results: {}, quiz: {}, answers: {} },
+            d2: { results: {}, quiz: {}, answers: {} }
         };
 
         function getSection(doc, sectionId) {
             return sections[doc].find(s => s.id === sectionId);
         }
 
-        function sectionPassed(doc, sectionId) {
-            const r = progress[doc].results[sectionId];
-            return !!r && (r.correct / r.total) >= PASS_THRESHOLD;
-        }
-
+        // Fallback only: used if the AI ever omits sourcePages for a question.
         function citationToPage(citation) {
             const m = /(\d+)\s*$/.exec(citation || '');
             return m ? parseInt(m[1], 10) : 1;
@@ -1130,12 +1111,9 @@
 
         function scrollToQuiz() {
             const doc = document.getElementById('docD1Container').style.display !== 'none' ? 'd1' : 'd2';
-            const list = sections[doc];
-            const idx = Math.min(progress[doc].unlocked, list.length) - 1;
-            const target = document.getElementById(idx >= 0 && !sectionPassed(doc, list[idx].id)
-                ? 'quizGate-' + doc + '-' + list[idx].id
-                : 'finalScore-' + doc);
-            if (target) target.scrollIntoView({ behavior: 'smooth' });
+            const container = document.getElementById(doc === 'd1' ? 'docD1Container' : 'docD2Container');
+            const firstGate = container.querySelector('.active-recall-section');
+            if (firstGate) firstGate.scrollIntoView({ behavior: 'smooth' });
         }
 
         async function fetchQuiz(doc, sectionId, regenerate) {
@@ -1158,7 +1136,7 @@
                     <div class="quiz-header-icon">🎯</div>
                     <div class="quiz-header-title">
                         <h3>KIỂM TRA HIỂU BÀI — ${escapeHtml(section.title)}</h3>
-                        <p>Trả lời đúng ≥60% để mở khoá phần tiếp theo. AI đọc đúng nội dung phần này và sẽ chỉ ra bạn đang hiểu lầm điều gì kèm trích dẫn slide.</p>
+                        <p>Trắc nghiệm bám sát đúng nội dung phần slide phía trên — trả lời bất cứ lúc nào, không cần đúng mới đọc tiếp được.</p>
                     </div>
                 </div>
                 <div id="quizBody-${doc}-${section.id}">
@@ -1233,7 +1211,7 @@
             btn.disabled = true;
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
-            btn.innerText = isCorrect ? '🎉 Đã hoàn thành (Đáp án chính xác)' : '🔒 Đã nộp (Đáp án chưa đúng)';
+            btn.innerText = isCorrect ? '🎉 Chính xác' : '🔒 Đã nộp (chưa đúng)';
 
             const resBox = document.getElementById(`res-${doc}-${sectionId}-${qIdx}`);
             resBox.className = 'result-box';
@@ -1250,17 +1228,28 @@
                     <div style="font-size: 13px; color: #065f46; margin-top: 4px;">${escapeHtml(correctOpt.text)}</div>
                 </div>`;
 
+            // Wrong answer: no more single "best-match citation" jump link — instead the AI
+            // tutor re-teaches using every page in this section it actually drew on for this
+            // question (q.reviewSummary / q.sourcePages, generated in the same AI call as the quiz).
+            const reviewHtml = isCorrect ? '' : `
+                <div id="review-${doc}-${sectionId}-${qIdx}" style="margin-top: 10px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <div style="font-weight: 700; font-size: 12px; color: #334155; margin-bottom: 6px;">📖 AI tutor tổng hợp lại kiến thức để bạn đọc:</div>
+                    <div class="result-text">${escapeHtml(q.reviewSummary || 'AI chưa tổng hợp được nội dung cho câu này.')}</div>
+                    <div style="margin-top: 8px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size: 12px; color: #64748b;">
+                        <span style="font-weight:600;">Xem lại slide:</span>
+                        ${(Array.isArray(q.sourcePages) && q.sourcePages.length ? q.sourcePages : [citationToPage(q.citation)])
+                            .map(p => `<span class="citation-badge" style="cursor:pointer;" onclick="jumpToCitation('${doc}', ${p})">Trang ${p}</span>`).join(' ')}
+                    </div>
+                </div>`;
+
             resBox.innerHTML = `
                 ${tagHtml}
                 <div class="result-text">${escapeHtml(chosen.feedback)}</div>
                 ${correctBlockHtml}
-                <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="citation-badge" onclick="jumpToCitation('${doc}', ${citationToPage(q.citation)})">📌 Trích dẫn: ${escapeHtml(q.citation)} — nhảy tới slide</span>
-                    <button style="background: #38bdf8; color: #0f172a; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="showTrace('${doc}','${sectionId}',${qIdx},'${chosen.key}','${q.citation}',${isCorrect})">🔍 Xem AI Execution Trace Log</button>
-                </div>
+                ${reviewHtml}
                 ${isCorrect ? '' : `<div class="escalate-bar">
                     <span style="font-size: 12px; color: #64748b;">Chưa rõ nhận xét?</span>
-                    <button class="btn-escalate-ta" onclick="escalateTA('${q.citation}')">📩 Chuyển vùng slide ${escapeHtml(q.citation)} cho TA hỗ trợ</button>
+                    <button class="btn-escalate-ta" onclick="escalateTA('${doc}','${sectionId}',${qIdx})">📩 Chuyển cho TA hỗ trợ</button>
                 </div>`}
             `;
             resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1277,18 +1266,15 @@
 
             const correct = Object.values(answers).filter(a => a.correct).length;
             progress[doc].results[sectionId] = { correct, total };
+            updateFinalScore(doc);
 
-            const passed = (correct / total) >= PASS_THRESHOLD;
             const pct = Math.round((correct / total) * 100);
             const summaryEl = document.getElementById(`sectionSummary-${doc}-${sectionId}`);
             summaryEl.style.display = 'block';
             summaryEl.innerHTML = `
                 <div class="active-recall-section" style="padding:20px; margin-top:0;">
-                    <div style="font-weight:700; font-size:14px;">${passed ? '✅' : '⚠️'} Kết quả phần này: ${correct}/${total} câu đúng (${pct}%)</div>
-                    ${passed
-                        ? `<button class="btn-submit-quiz" style="margin-top:10px;" onclick="advanceSection('${doc}')">Mở khoá phần tiếp theo →</button>`
-                        : `<div style="font-size:13px; color:#64748b; margin-top:8px;">Bạn cần ≥60% đúng để mở khoá phần tiếp theo. Xem lại các nhận xét ở trên rồi làm lại bộ câu hỏi khác cho phần này.</div>
-                           <button class="btn-submit-quiz" style="margin-top:10px; background:#ea580c;" onclick="retrySection('${doc}','${sectionId}')">🔁 Làm lại phần này</button>`}
+                    <div style="font-weight:700; font-size:14px;">${pct >= 60 ? '✅' : '⚠️'} Kết quả phần này: ${correct}/${total} câu đúng (${pct}%)</div>
+                    <button class="btn-submit-quiz" style="margin-top:10px; background:#64748b;" onclick="retrySection('${doc}','${sectionId}')">🔁 Làm bộ câu hỏi khác cho phần này</button>
                 </div>
             `;
         }
@@ -1296,6 +1282,7 @@
         async function retrySection(doc, sectionId) {
             delete progress[doc].results[sectionId];
             progress[doc].answers[sectionId] = {};
+            updateFinalScore(doc);
             const bodyEl = document.getElementById('quizBody-' + doc + '-' + sectionId);
             bodyEl.innerHTML = `<div style="font-size: 13px; color: #64748b;">⏳ Đang tạo bộ câu hỏi mới...</div>`;
             try {
@@ -1307,34 +1294,34 @@
             }
         }
 
-        function advanceSection(doc) {
-            progress[doc].unlocked = Math.min(progress[doc].unlocked + 1, sections[doc].length);
-            renderDocProgressive(doc);
-            setTimeout(scrollToQuiz, 80);
-        }
-
-        function finalScoreHtml(doc) {
+        function finalScoreBodyHtml(doc) {
             const list = sections[doc];
-            let correct = 0, total = 0;
+            let correct = 0, total = 0, answeredSections = 0;
             const rows = list.map(s => {
-                const r = progress[doc].results[s.id] || { correct: 0, total: 0 };
-                correct += r.correct; total += r.total;
+                const r = progress[doc].results[s.id];
+                if (r) { correct += r.correct; total += r.total; answeredSections++; }
                 return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:13px;">
-                    <span>${escapeHtml(s.title)}</span><span style="font-weight:700;">${r.correct}/${r.total}</span>
+                    <span>${escapeHtml(s.title)}</span><span style="font-weight:700;">${r ? r.correct + '/' + r.total : '— chưa làm —'}</span>
                 </div>`;
             }).join('');
             const pct = total ? Math.round((correct / total) * 100) : 0;
+            const statusText = answeredSections === list.length
+                ? `Đã hoàn thành cả ${list.length} phần — điểm hiểu bài: <strong>${pct}%</strong> (${correct}/${total} câu đúng).`
+                : `Đã làm ${answeredSections}/${list.length} phần. Điểm hiện tại: <strong>${pct}%</strong> (${correct}/${total} câu đúng) — làm tiếp các phần còn lại để có điểm đầy đủ.`;
             return `
-            <div class="active-recall-section" id="finalScore-${doc}" style="border-color:#10b981;">
                 <div class="quiz-section-header">
                     <div class="quiz-header-icon" style="background: linear-gradient(135deg,#059669,#10b981);">🏁</div>
                     <div class="quiz-header-title">
-                        <h3>HOÀN THÀNH BÀI HỌC — ĐIỂM HIỂU BÀI: ${pct}%</h3>
-                        <p>${correct}/${total} câu đúng trên toàn bộ ${list.length} phần kiến thức của ${doc === 'd1' ? 'Day 01' : 'Day 02'}.</p>
+                        <h3>TỔNG KẾT ĐỘ HIỂU BÀI — ${doc === 'd1' ? 'Day 01' : 'Day 02'}</h3>
+                        <p>${statusText}</p>
                     </div>
                 </div>
-                ${rows}
-            </div>`;
+                ${rows}`;
+        }
+
+        function updateFinalScore(doc) {
+            const el = document.getElementById('finalScore-' + doc);
+            if (el) el.innerHTML = finalScoreBodyHtml(doc);
         }
 
         function renderSlideHtml(s, idx, fileLabel, citationPrefix, docKey, total) {
@@ -1358,8 +1345,8 @@
 
         // Pages in the original PDF that sit past the last defined section — content
         // never transcribed into d1Slides/d2Slides (e.g. d2 pages 25-29, a recap section
-        // found only after rasterizing the source PDF). Shown for completeness, ungated,
-        // no quiz — the AI has no grounding text for them so it can't quiz on them anyway.
+        // found only after rasterizing the source PDF). Shown for completeness, no quiz —
+        // the AI has no grounding text for them so it can't quiz on them anyway.
         const extras = {
             d2: { slideStart: 24, slideEnd: 28, title: 'Phụ lục — nội dung bổ sung (không có trong quiz)' }
         };
@@ -1380,38 +1367,31 @@
             return html;
         }
 
+        // Renders the WHOLE document at once: every slide, with each section's quiz
+        // placed right after that section's slides. Nothing is locked — students can
+        // scroll through and answer quizzes in any order.
         function renderDocProgressive(doc) {
             const fileLabel = doc === 'd1' ? 'd1-slide-hackathon.pdf' : 'd2-slide-hackathon.pdf';
             const citationPrefix = doc === 'd1' ? 'T01' : 'T02';
             const container = document.getElementById(doc === 'd1' ? 'docD1Container' : 'docD2Container');
             const list = sections[doc];
-            const unlockedCount = Math.min(progress[doc].unlocked, list.length);
 
             let html = '';
-            for (let i = 0; i < unlockedCount; i++) {
+            for (let i = 0; i < list.length; i++) {
                 const section = list[i];
                 for (let idx = section.slideStart; idx <= section.slideEnd; idx++) {
                     html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
                 }
-                html += sectionPassed(doc, section.id)
-                    ? `<div class="active-recall-section" style="padding:18px 24px;">
-                           <div style="font-weight:700; font-size:13px; color:#059669;">✅ ${escapeHtml(section.title)} — đã qua quiz (${progress[doc].results[section.id].correct}/${progress[doc].results[section.id].total} đúng)</div>
-                       </div>`
-                    : quizGateHtml(doc, section);
+                html += quizGateHtml(doc, section);
             }
 
-            if (unlockedCount >= list.length) {
-                if (sectionPassed(doc, list[list.length - 1].id)) {
-                    html += finalScoreHtml(doc);
-                }
-                html += extraSlidesHtml(doc, fileLabel, citationPrefix);
-            }
+            html += `<div class="active-recall-section" id="finalScore-${doc}" style="border-color:#10b981;">${finalScoreBodyHtml(doc)}</div>`;
+            html += extraSlidesHtml(doc, fileLabel, citationPrefix);
 
             container.innerHTML = html;
 
-            for (let i = 0; i < unlockedCount; i++) {
+            for (let i = 0; i < list.length; i++) {
                 const section = list[i];
-                if (sectionPassed(doc, section.id)) continue;
                 if (progress[doc].quiz[section.id]) {
                     renderQuizQuestions(doc, section.id);
                 } else {
@@ -1422,8 +1402,9 @@
             initDrawCanvases();
         }
 
-        function escalateTA(citation) {
-            document.getElementById('taCitationTag').innerText = citation;
+        function escalateTA(doc, sectionId, qIdx) {
+            const q = progress[doc].quiz[sectionId].questions[qIdx];
+            document.getElementById('taCitationTag').innerText = q.citation || `Câu ${qIdx + 1}`;
             document.getElementById('taModal').style.display = 'flex';
         }
 
@@ -1436,26 +1417,25 @@
             alert(`✅ [PAIR Control] Đã gửi thành công câu hỏi và vị trí slide ${document.getElementById('taCitationTag').innerText} tới TA trực ban! TA sẽ phản hồi bạn trong 15 phút.`);
         }
 
-        function showTrace(doc, sectionId, qIdx, selectedKey, citation, isCorrect) {
-            document.getElementById('traceContent').innerHTML = `
-<strong>[REQUEST METADATA]</strong>
-- Timestamp: ${new Date().toISOString()}
-- Endpoint: POST /api/generate-quiz (codebase/server → Gemini, model gemini-flash-latest)
-- Section: ${doc}/${sectionId}, Question ${qIdx + 1}
-
-<strong>[USER INPUT EVALUATED]</strong>
-- Selected MC Option: "${selectedKey}"
-
-<strong>[GRADING RESULT — matched locally against the answer key returned by the same generation call, no second AI call]</strong>
-- Evaluation Status: ${isCorrect ? 'CORRECT' : 'INCORRECT'}
-- Grounding Citation: ${citation}
-- HAX Guidelines Applied: ["G2_Explicit_Confidence", "G10_Scope_Services", "G11_Explain_Why"]
-            `;
-            document.getElementById('traceModal').style.display = 'flex';
-        }
-
-        function closeTraceModal() {
-            document.getElementById('traceModal').style.display = 'none';
+        // Page counter: with every slide visible at once, track which slide is actually
+        // in view while scrolling instead of a static "Trang 1 / N" that never updates.
+        let pageObserver = null;
+        function initPageObserver() {
+            if (pageObserver) pageObserver.disconnect();
+            pageObserver = new IntersectionObserver((entries) => {
+                let best = null, bestRatio = 0;
+                entries.forEach(e => {
+                    if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+                        bestRatio = e.intersectionRatio;
+                        best = e.target;
+                    }
+                });
+                if (!best) return;
+                const m = /^(d\d)-slide-(\d+)$/.exec(best.id);
+                if (!m) return;
+                document.getElementById('pageCounter').innerText = `Trang ${m[2]} / ${totalPages[m[1]]}`;
+            }, { root: document.getElementById('scrollViewer'), threshold: [0.5] });
+            document.querySelectorAll('.slide-frame').forEach(f => pageObserver.observe(f));
         }
 
         /* Interactive Drawing Engine for Pen & Text Selection Highlight Tools */
@@ -1717,7 +1697,7 @@
 
             document.getElementById('docTitleMain').innerText = isD1 ? 'd1-slide-hackathon.pdf' : 'd2-slide-hackathon.pdf';
             document.getElementById('docSub').innerText = isD1 ? 'AI IN ACTION · Day 1 — AI & LLM Foundation' : 'AI IN ACTION · Day 2 — Xác định bài toán cho AI';
-            document.getElementById('pageCounter').innerText = isD1 ? 'Trang 1 / 29' : 'Trang 1 / 24';
+            document.getElementById('pageCounter').innerText = `Trang 1 / ${totalPages[doc]}`;
 
             document.getElementById('scrollViewer').scrollTop = 0;
             setTimeout(initDrawCanvases, 50);
@@ -1728,6 +1708,7 @@
             renderDocProgressive('d2');
             initDrawCanvases();
             initTextHighlight();
+            initPageObserver();
         });
         window.addEventListener('resize', initDrawCanvases);
         setTimeout(initDrawCanvases, 500);

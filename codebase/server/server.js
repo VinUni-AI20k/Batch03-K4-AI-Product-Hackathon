@@ -26,6 +26,8 @@ const quizResponseSchema = {
                 properties: {
                     question: { type: Type.STRING },
                     citation: { type: Type.STRING },
+                    sourcePages: { type: Type.ARRAY, items: { type: Type.INTEGER } },
+                    reviewSummary: { type: Type.STRING },
                     options: {
                         type: Type.ARRAY,
                         items: {
@@ -40,7 +42,7 @@ const quizResponseSchema = {
                         }
                     }
                 },
-                required: ["question", "citation", "options"]
+                required: ["question", "citation", "sourcePages", "reviewSummary", "options"]
             }
         }
     },
