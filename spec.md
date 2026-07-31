@@ -23,7 +23,7 @@ Khi học viên hỏi về trang đang mở hoặc xin tổng quan cả bộ sli
 
 ### Evidence — đường B: mining
 
-> 🔎 **CẦN XÁC NHẬN LẠI:** `cp1/impact-table.md` mô tả có script kiểm lại bộ đếm, nhưng repo hiện không có script đó. Trước khi nộp, cần chạy lại phép đếm từ chatlog hoặc thêm script/bản ghi kết quả tái lập được.
+> ✅ **ĐÃ TÁI LẬP:** Chạy `python cp1/scripts/verify.py` trên data pack tái tạo các số liệu mining trong §1 và §2, bao gồm 1.252/1.261 context trang, 171/1.261 failure bộ hẹp, 160/757 so với 10/495, các hàng impact và các tỷ lệ rating. `verify.py` là căn cứ tính toán duy nhất cho các số liệu mining trong spec này.
 
 **Tập dữ liệu:** 1.261 lượt hỏi–đáp, 369 học viên, 585 hội thoại trong 8 ngày (22–29/07/2026).
 
@@ -42,11 +42,11 @@ Khi học viên hỏi về trang đang mở hoặc xin tổng quan cả bộ sli
 | `T0408` | “tóm tắt các chủ đề chính của slide day05...pdf” | “...không thể tìm thấy tệp tin hoặc nội dung chi tiết của day05-lecture-slides-batch03.pdf...” |
 | `C0001` | “tóm tắt nội dung chính trong slide này” ở trang 37 | “...không tìm thấy nội dung cụ thể cho slide 37... Bạn có thể cung cấp thêm thông tin hoặc tiêu đề của slide đó...” |
 
-**Phương pháp đếm:** đếm các lượt hỏi–đáp mà câu trả lời tutor khớp `không tìm thấy`, `không thể tìm thấy`, `chưa tìm thấy`, `không thể truy cập`, hoặc `không tìm được`; ưu tiên phân loại theo regex, rồi citation rỗng, rồi citation không chứa trang học viên đang xem. Quy tắc phân biệt bôi đen: nếu text được chọn trùng câu gõ là UI echo lại câu hỏi; nếu khác, nội dung slide đã được truyền vào context. Chi tiết, giới hạn và script kiểm lại được lưu tại `cp1/impact-table.md`.
+**Phương pháp đếm:** `cp1/scripts/verify.py` đếm các lượt hỏi–đáp mà câu trả lời tutor khớp `không tìm thấy`, `không thể tìm thấy`, `chưa tìm thấy`, `không thể truy cập`, hoặc `không tìm được`. Quy tắc phân biệt bôi đen: nếu text được chọn trùng câu gõ là UI echo lại câu hỏi; nếu khác, nội dung slide đã được truyền vào context. Chạy `python cp1/scripts/verify.py` để tái lập toàn bộ các số liệu mining được dùng ở §1 và §2.
 
 ## §2. Impact & quyết định chọn
 
-> 🔎 **CẦN XÁC NHẬN LẠI:** Ứng viên ④ được loại vì lúc phân tích chưa kiểm được mapping tới slide gốc. Data pack hiện có slide hackathon rút gọn; trước demo cần kiểm lại rằng mapping trang gốc–trang rút gọn vẫn chưa đủ để đánh giá ứng viên này, hoặc cập nhật quyết định nếu đã kiểm được.
+> 🔎 **CẦN XÁC NHẬN LẠI:** Ứng viên ④ được loại vì lúc phân tích chưa kiểm được mapping tới slide gốc. Data pack hiện có slide hackathon rút gọn; trước demo cần kiểm lại rằng mapping trang gốc–trang rút gọn vẫn chưa đủ để đánh giá ứng viên này, hoặc cập nhật quyết định nếu đã kiểm được. Các tỷ lệ trong bảng dưới đã được tái lập bằng `cp1/scripts/verify.py`.
 
 | Ứng viên | Bao nhiêu người gặp | Tần suất | Tốn gì mỗi lần | Rating | Quyết định |
 |---|---:|---:|---|---|---|
