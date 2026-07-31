@@ -195,7 +195,7 @@ async def ask_gemini(payload: TutorRequest, api_key: str) -> TutorResponse:
         item.strip()
         for item in os.getenv(
             "GEMINI_MODELS",
-            "gemini-2.5-flash,gemini-2.0-flash",
+            "gemini-flash-lite-latest,gemini-3.6-flash",
         ).split(",")
         if item.strip()
     ]
