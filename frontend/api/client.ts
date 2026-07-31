@@ -85,8 +85,10 @@ async function readError(res: Response): Promise<string> {
 }
 
 /**
- * Phase 1 — upload slides + transcript, get back a generated 20Q quiz.
- * Uses /api/knowledge/upload (real classify + align, session-persisted) then
+ * Phase 1 — upload whatever the user actually provided (a PDF slide, a
+ * transcript, or both) and get back a generated 20Q quiz.
+ * Uses /api/knowledge/upload (real classify + align, session-persisted — the
+ * backend fills in a sensible default when only one file type is given) then
  * /api/quiz/generate/pdf (the central AI decision — quiz_bank.py).
  */
 export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> {
@@ -95,7 +97,7 @@ export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> 
     const name = f.name.toLowerCase();
     return name.endsWith('.md') || name.endsWith('.txt') || name.endsWith('.vtt') || name.endsWith('.srt');
   });
-  if (!slides || !transcript) throw new Error('A PDF slide file and a transcript file are required.');
+  if (!slides && !transcript) throw new Error('Upload at least a PDF slide or a transcript file.');
 
   const sessionRes = await fetch(`${API_BASE}/api/sessions`, {
     method: 'POST',
@@ -106,8 +108,8 @@ export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> 
   const session = (await sessionRes.json()) as { session_id: string };
 
   const uploadForm = new FormData();
-  uploadForm.append('slides', slides);
-  uploadForm.append('transcript', transcript);
+  if (slides) uploadForm.append('slides', slides);
+  if (transcript) uploadForm.append('transcript', transcript);
   uploadForm.append('session_id', session.session_id);
   const uploadRes = await fetch(`${API_BASE}/api/knowledge/upload`, { method: 'POST', body: uploadForm });
   if (!uploadRes.ok) throw new Error(`Could not process the uploaded materials: ${await readError(uploadRes)}`);

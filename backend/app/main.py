@@ -196,34 +196,83 @@ async def get_outline_from_pdf(
 
 @app.post("/api/knowledge/upload")
 async def upload_knowledge(
-    slides: UploadFile = File(...),
-    transcript: UploadFile = File(...),
+    slides: UploadFile | None = File(None),
+    transcript: UploadFile | None = File(None),
     session_id: str = Form(...),
 ):
-    """Persist the user's slide + transcript pair before quiz generation."""
-    if not slides.filename or not slides.filename.lower().endswith(".pdf"):
+    """Persist whatever the user actually uploaded before quiz generation.
+
+    Accepts a PDF slide, a transcript, or both:
+    - Both -> full pipeline (classify + align the given transcript against the slides).
+    - PDF only -> slides drive the outline; alignment falls back to the bundled
+      demo transcript (transcript-01-clean.md) so grounding still works.
+    - Transcript only -> the transcript itself becomes the outline source (its
+      sections/segments are used directly, no slide alignment needed).
+    """
+    if slides is None and transcript is None:
+        raise HTTPException(status_code=400, detail="Upload at least a PDF slide or a transcript file")
+    if slides is not None and (not slides.filename or not slides.filename.lower().endswith(".pdf")):
         raise HTTPException(status_code=415, detail="Slides must be a PDF file")
-    if not transcript.filename or not transcript.filename.lower().endswith((".md", ".txt", ".vtt", ".srt")):
+    if transcript is not None and (
+        not transcript.filename or not transcript.filename.lower().endswith((".md", ".txt", ".vtt", ".srt"))
+    ):
         raise HTTPException(status_code=415, detail="Transcript must be .md, .txt, .vtt, or .srt")
 
-    pdf_bytes = await slides.read()
-    transcript_bytes = await transcript.read()
-    try:
-        transcript_text = transcript_bytes.decode("utf-8-sig")
-    except UnicodeDecodeError as exc:
-        raise HTTPException(status_code=415, detail="Transcript must be UTF-8 text") from exc
+    session = _require_session(session_id)
 
-    sections = parse_slide_outline(pdf_bytes)
-    if not sections:
-        raise HTTPException(status_code=422, detail="Could not extract text from PDF slides")
-    _persist_pdf_context(session_id, pdf_bytes, sections, transcript_text)
+    if transcript is not None:
+        transcript_bytes = await transcript.read()
+        try:
+            transcript_text = transcript_bytes.decode("utf-8-sig")
+        except UnicodeDecodeError as exc:
+            raise HTTPException(status_code=415, detail="Transcript must be UTF-8 text") from exc
+    else:
+        transcript_text = None
+
+    if slides is not None:
+        pdf_bytes = await slides.read()
+        sections = parse_slide_outline(pdf_bytes)
+        if not sections:
+            raise HTTPException(status_code=422, detail="Could not extract text from PDF slides")
+        # No transcript of their own -> ground against the bundled demo transcript
+        # rather than failing the whole upload.
+        effective_transcript_text = transcript_text or (TRANSCRIPT_DIR / "transcript-01-clean.md").read_text(encoding="utf-8")
+        _persist_pdf_context(session_id, pdf_bytes, sections, effective_transcript_text)
+        source = "uploaded_slides_and_transcript" if transcript is not None else "uploaded_slides_only"
+    else:
+        # Transcript-only: its own sections/segments ARE the outline, no PDF/alignment needed.
+        transcript_sections = parse_transcript(transcript_text)
+        if not transcript_sections:
+            raise HTTPException(
+                status_code=422,
+                detail="Could not extract sections from the transcript. Use Markdown with [Txx-NNN] segment markers.",
+            )
+        session.raw_transcript = [
+            TranscriptSegment(segment_id=seg.segment_id, text=seg.text)
+            for section in transcript_sections for seg in section.segments
+        ]
+        session.outline = [OutlineSection(**item) for item in outline_json(transcript_sections)]
+        session.slides = []
+        session.alignment = [
+            AlignmentItem(
+                section_id=section.section_id,
+                related_segment_ids=[seg.segment_id for seg in section.segments],
+                matched=True,
+                method="direct_transcript",
+            )
+            for section in transcript_sections
+        ]
+        session.source = "uploaded_transcript_only"
+        save_session(session)
+        source = "uploaded_transcript_only"
+
     session = _require_session(session_id)
     return {
         "session_id": session_id,
         "outline": session.outline or [],
         "alignment": session.alignment or [],
         "slides": session.slides or [],
-        "source": "uploaded_slides_and_transcript",
+        "source": source,
     }
 
 

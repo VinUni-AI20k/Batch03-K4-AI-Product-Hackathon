@@ -21,7 +21,7 @@ export default function UploadStep() {
     const name = file.name.toLowerCase();
     return name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.vtt') || name.endsWith('.srt');
   });
-  const readyToGenerate = hasSlides && hasTranscript;
+  const readyToGenerate = hasSlides || hasTranscript;
 
   // Auto-trigger: once files are added, processing starts on its own after a
   // short debounce (so adding several files doesn't fire the pipeline early).
@@ -146,7 +146,7 @@ export default function UploadStep() {
             )}
             {!readyToGenerate && (
               <span className="clay-badge" style={{ color: 'var(--clay-orange-dark)' }}>
-                Import đủ 1 file slide (.pdf) và 1 file transcript (.md, .txt, .vtt hoặc .srt) để Generate MCQ.
+                Import ít nhất 1 file slide (.pdf) hoặc 1 file transcript (.md, .txt, .vtt, .srt) để Generate MCQ.
               </span>
             )}
           </div>
