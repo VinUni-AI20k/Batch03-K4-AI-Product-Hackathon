@@ -16,7 +16,7 @@
 >
 > Bài dự thi của **team VLagent** — VinUni AI20K. Đề bài & rubric hackathon: [HACKATHON.md](HACKATHON.md).
 
-```
+``` 
  Slide/Video/Ghi âm ─► ingest ─► vault/ (markdown kiểu Obsidian) ─► index (Voyage AI + Chroma)
  • folder / GỬI FILE qua chat        │ courses · concepts · students · MEMORY   │
                                                                                  ▼
@@ -52,12 +52,11 @@ learning-agent ui          # dashboard http://127.0.0.1:8321
 
 ## 🗂️ Cấu trúc repo
 
-| Thư mục / file | Nội dung |
-|---|---|
-| **[`learning-agent/`](learning-agent/)** | Toàn bộ mã nguồn Vlearn Agent (README, cài đặt, tests) |
-| [`HACKATHON.md`](HACKATHON.md) | Đề bài & thể lệ Mini Hackathon AI — Batch 03 |
-| `01-de-bai.md` · `04-rubric.md` | Đề bài 3 hướng · rubric chấm điểm |
-| `data/` · `tham-khao/` | Dữ liệu hackathon (chatlog ẩn danh, transcript, slide) · tài liệu tham khảo |
+1. Prototype có 3 mức **Sketch / Mock / Working** — mức nào cũng bắt buộc **≥1 lời gọi AI chạy thật**.
+2. **Vibe-coding rule:** dùng AI để build thoải mái, nhưng không giải thích được phần có tên mình thì phần đó 0 điểm (kiểm tra tại CP5).
+3. **Quality bar** chốt tại hạn chốt spec của khoá mình (K3: 23:59 ngày 1 · K4: 12:00 ngày 2) và giữ nguyên sau đó.
+4. Chỉ dùng dữ liệu trong `data/` hoặc dữ liệu giả tự sinh — không dùng dữ liệu thật của người thật. Không commit API key.
+5. Tuân thủ **quy định bảo mật dữ liệu** bên dưới — đây là điều kiện để được cấp data.
 
 ## 💬 Feedback & Issues
 
