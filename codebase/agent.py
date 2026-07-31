@@ -1,12 +1,18 @@
 """
 AIQAAgent – Agentic RAG with Multi-Tool Support
 ================================================
-Tools:
-  - search_knowledge_base  : Hybrid BM25 + Semantic search trong KB nội bộ
-  - search_internet         : DuckDuckGo web search cho thông tin mới
-  - calculate               : Máy tính toán học an toàn
-  - get_current_time        : Trả về ngày giờ hiện tại
-  - get_kb_stats            : Thống kê tổng quan Knowledge Base
+Tools (từ codebase/tools/):
+  1.  search_knowledge_base  : Hybrid BM25 + Semantic search trong KB nội bộ
+  2.  search_internet        : DuckDuckGo web search cho thông tin mới
+  3.  calculate              : Máy tính toán học an toàn
+  4.  get_current_time       : Trả về ngày giờ hiện tại (UTC+7)
+  5.  summarize_doc          : Tóm tắt extractive tài liệu dài
+  6.  translate              : Dịch Việt ↔ Anh
+  7.  explain_concept        : Từ điển AI/ML/LLM nội bộ
+  8.  check_deadline         : Tra cứu lịch/deadline Hackathon Batch 03
+  9.  recommend_path         : Gợi ý lộ trình học AI/ML theo trình độ
+  10. format_code            : Kiểm tra syntax + gợi ý sửa code Python
+  11. get_kb_stats           : Thống kê tổng quan Knowledge Base
 
 Provider:
   - OpenAI  (Function Calling / Tool Use) → ưu tiên
@@ -69,99 +75,16 @@ PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 load_dotenv(os.path.join(BASE_DIR, ".env"), override=True)
 
-
 # ---------------------------------------------------------------------------
-# TOOL DEFINITIONS (OpenAI Function Calling schema)
+# Import tools package
 # ---------------------------------------------------------------------------
-
-TOOL_SCHEMAS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "search_knowledge_base",
-            "description": (
-                "Tìm kiếm thông tin trong Knowledge Base nội bộ, bao gồm: "
-                "các bài đăng Facebook Group AI Thực Chiến đã được TA xác nhận, "
-                "sổ tay chương trình, rubric, guide, spec, deadline, và tài liệu VLearn. "
-                "Dùng tool này cho mọi câu hỏi liên quan đến khoá học, bài tập, lỗi kỹ thuật, deadline."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Câu truy vấn để tìm trong KB, viết ngắn gọn và đúng trọng tâm."
-                    },
-                    "top_k": {
-                        "type": "integer",
-                        "description": "Số tài liệu muốn lấy (mặc định 5).",
-                        "default": 5
-                    }
-                },
-                "required": ["query"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "search_internet",
-            "description": (
-                "Tìm kiếm thông tin trên Internet qua DuckDuckGo. "
-                "Dùng khi câu hỏi không thuộc phạm vi khoá học, "
-                "cần thông tin cập nhật, hoặc KB nội bộ không đủ. "
-                "Ví dụ: lỗi thư viện mới, tài liệu kỹ thuật, tin tức AI."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Truy vấn tìm kiếm bằng tiếng Anh hoặc tiếng Việt."
-                    },
-                    "max_results": {
-                        "type": "integer",
-                        "description": "Số kết quả tối đa (mặc định 4).",
-                        "default": 4
-                    }
-                },
-                "required": ["query"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "calculate",
-            "description": (
-                "Thực hiện phép tính toán học an toàn. "
-                "Hỗ trợ: +, -, *, /, **, sqrt, sin, cos, tan, log, ceil, floor, round, abs, pi, e. "
-                "Ví dụ: '2 ** 10', 'math.sqrt(144)', '(3 + 4) * 2'."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "expression": {
-                        "type": "string",
-                        "description": "Biểu thức toán học cần tính, viết theo cú pháp Python."
-                    }
-                },
-                "required": ["expression"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_current_time",
-            "description": "Trả về ngày giờ hiện tại theo múi giờ Việt Nam (UTC+7). Dùng khi hỏi về thời gian.",
-            "parameters": {
-                "type": "object",
-                "properties": {}
-            }
-        }
-    },
-]
+try:
+    from tools import ALL_SCHEMAS as TOOL_SCHEMAS, TOOL_REGISTRY
+    print(f"[Tools] Loaded {len(TOOL_SCHEMAS)} tools từ tools/ package.")
+except ImportError as _e:
+    print(f"[Warning] Không load được tools/ package: {_e}. Dùng inline tools fallback.")
+    TOOL_SCHEMAS = []
+    TOOL_REGISTRY = {}
 
 
 class AIQAAgent:
@@ -269,13 +192,20 @@ class AIQAAgent:
             })
 
         for doc in self.handbook_kb:
+            # PDF chunks dùng 'source_url', handbook files dùng 'url' — thử cả hai
+            url = doc.get("url", "") or doc.get("source_url", "") or ""
+            source_name = doc.get("source_name", "")
+            title = doc.get("title", "")
+            # Thêm source_name vào search_text để tăng khả năng tìm kiếm theo tên tài liệu
+            search_text = f"{title} {source_name} {doc.get('content', '')}"
             self.all_docs.append({
                 "source_type": "handbook",
                 "id": doc.get("id"),
-                "title": doc.get("title", ""),
-                "search_text": f"{doc.get('title', '')} {doc.get('content', '')}",
+                "title": title,
+                "search_text": search_text,
                 "content": doc.get("content", ""),
-                "url": doc.get("url", ""),
+                "url": url,
+                "source_name": source_name,
                 "original_doc": doc
             })
 
@@ -424,93 +354,25 @@ class AIQAAgent:
         return chunks
 
     # ------------------------------------------------------------------
-    # TOOLS implementation
+    # TOOLS dispatch — dùng TOOL_REGISTRY từ tools/ package
     # ------------------------------------------------------------------
 
-    def tool_search_knowledge_base(self, query: str, top_k: int = 5) -> str:
-        """Tìm kiếm trong KB nội bộ, trả về JSON string."""
-        results = self._retrieve_relevant_docs(query, top_k=top_k)
-        if not results:
-            return json.dumps({"found": 0, "results": [], "message": "Không tìm thấy tài liệu liên quan trong KB."}, ensure_ascii=False)
-        
-        output = []
-        for i, doc in enumerate(results, 1):
-            output.append({
-                "rank": i,
-                "title": doc.get("title", ""),
-                "source_type": doc.get("source_type", ""),
-                "url": doc.get("url", ""),
-                "score": round(doc.get("score", 0), 3),
-                "content": doc.get("content", "")[:1500]
-            })
-        return json.dumps({"found": len(output), "results": output}, ensure_ascii=False, indent=2)
-
-    def tool_search_internet(self, query: str, max_results: int = 4) -> str:
-        """Tìm kiếm DuckDuckGo, trả về JSON string."""
-        if not DDGS:
-            return json.dumps({"error": "duckduckgo-search chưa được cài. Chạy: pip install duckduckgo-search"}, ensure_ascii=False)
-        try:
-            results = []
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                with DDGS() as ddgs:
-                    for r in ddgs.text(query, max_results=max_results):
-                        results.append({
-                            "title": r.get("title", ""),
-                            "url": r.get("href", ""),
-                            "snippet": r.get("body", "")[:400]
-                        })
-            if not results:
-                return json.dumps({"found": 0, "results": [], "message": "Không tìm thấy kết quả."}, ensure_ascii=False)
-            return json.dumps({"found": len(results), "results": results}, ensure_ascii=False, indent=2)
-        except Exception as e:
-            return json.dumps({"error": f"Lỗi tìm kiếm: {str(e)}"}, ensure_ascii=False)
-
-    def tool_calculate(self, expression: str) -> str:
-        """Tính biểu thức toán học an toàn."""
-        allowed_names = {
-            k: v for k, v in math.__dict__.items() if not k.startswith("_")
-        }
-        allowed_names.update({"abs": abs, "round": round, "int": int, "float": float})
-        try:
-            # Bảo mật: chỉ cho phép ký tự số và toán học
-            safe_expr = re.sub(r"[^0-9+\-*/().,%\s\w]", "", expression)
-            result = eval(safe_expr, {"__builtins__": {}}, allowed_names)  # noqa: S307
-            return json.dumps({"expression": expression, "result": result}, ensure_ascii=False)
-        except Exception as e:
-            return json.dumps({"expression": expression, "error": str(e)}, ensure_ascii=False)
-
-    def tool_get_current_time(self) -> str:
-        """Trả về thời gian hiện tại UTC+7."""
-        from datetime import timezone, timedelta
-        tz_vn = timezone(timedelta(hours=7))
-        now = datetime.now(tz_vn)
-        return json.dumps({
-            "datetime": now.strftime("%Y-%m-%d %H:%M:%S"),
-            "date": now.strftime("%d/%m/%Y"),
-            "time": now.strftime("%H:%M:%S"),
-            "weekday": ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"][now.weekday()],
-            "timezone": "Asia/Ho_Chi_Minh (UTC+7)"
-        }, ensure_ascii=False)
-
     def _dispatch_tool(self, tool_name: str, tool_args: Dict) -> str:
-        """Gọi đúng tool dựa trên tên."""
-        if tool_name == "search_knowledge_base":
-            return self.tool_search_knowledge_base(
-                query=tool_args.get("query", ""),
-                top_k=int(tool_args.get("top_k", 5))
-            )
-        elif tool_name == "search_internet":
-            return self.tool_search_internet(
-                query=tool_args.get("query", ""),
-                max_results=int(tool_args.get("max_results", 4))
-            )
-        elif tool_name == "calculate":
-            return self.tool_calculate(expression=tool_args.get("expression", ""))
-        elif tool_name == "get_current_time":
-            return self.tool_get_current_time()
-        else:
+        """Gọi tool từ TOOL_REGISTRY, inject dependencies cần thiết."""
+        fn = TOOL_REGISTRY.get(tool_name)
+        if fn is None:
             return json.dumps({"error": f"Tool '{tool_name}' không tồn tại."})
+
+        kwargs = dict(tool_args)
+        if tool_name == "search_knowledge_base":
+            kwargs["kb_searcher"] = self._retrieve_relevant_docs
+        elif tool_name == "get_kb_stats":
+            kwargs["stats_provider"] = self.get_kb_stats
+
+        try:
+            return fn(**kwargs)
+        except Exception as e:
+            return json.dumps({"error": f"Tool '{tool_name}' lỗi: {str(e)}"}, ensure_ascii=False)
 
     # ------------------------------------------------------------------
     # Hybrid search (used by search_knowledge_base tool)
@@ -939,11 +801,33 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
     def _build_citations(self, retrieved_docs: List[Dict]) -> List[Dict]:
         return self._build_tool_citations_from_docs(retrieved_docs)
 
+    def _build_smart_citations(self, retrieved_docs: List[Dict]) -> List[Dict]:
+        """Chỉ trả về citations có giá trị thực sự: có URL hợp lệ và score cao, tối đa 5 cái."""
+        smart = []
+        for d in retrieved_docs:
+            url = str(d.get("url", "") or "").strip()
+            score = d.get("score", 0)
+            # Chỉ đưa vào citations nếu: có URL thực sự và score đủ cao
+            if url and score >= 0.20:
+                smart.append({
+                    "title": d.get("title", ""),
+                    "url": url,
+                    "snippet": d.get("content", "")[:180] + ("..." if len(d.get("content", "")) > 180 else ""),
+                    "type": d.get("source_type", ""),
+                    "score": round(score, 3),
+                })
+        # Sắp xếp theo score giảm dần, tối đa 5 citations
+        smart.sort(key=lambda x: x.get("score", 0), reverse=True)
+        return smart[:5]
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
     def ask(self, query: str) -> Dict[str, Any]:
+        # 0. Phát hiện câu hỏi giao tiếp đơn giản (chào hỏi, cảm ơn...) → KHÔNG gửi citations
+        is_conversational = bool(self._CONVERSATIONAL_KW.search(query.strip()))
+
         # 1. Guardrails check
         triggered_layers, override_msg, conf_mod = self._check_guardrails(query)
 
@@ -956,6 +840,7 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
                 "confidence_score": conf_mod,
                 "citations": [],
                 "retrieved_docs": [],
+                "tool_calls": [],
             }
 
         if "layer1_ground_truth" in triggered_layers:
@@ -980,6 +865,7 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
                 "confidence_score": conf_mod,
                 "citations": self._build_citations(retrieved),
                 "retrieved_docs": retrieved,
+                "tool_calls": [],
             }
 
         # 2. Run agent loop
@@ -995,11 +881,17 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
             print(f"[Error] Agent loop failed: {e}")
             answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix)
 
-        # 3. Build citations from KB docs (for sidebar display) — top_k=15 để học từ nhiều MongoDB docs
-        retrieved_docs = self._retrieve_relevant_docs(query, top_k=15)
-        citations = self._build_citations(retrieved_docs)
+        # 3. Chỉ gửi citations khi câu hỏi cần thông tin thực sự, không gửi cho câu giao tiếp
+        if is_conversational:
+            retrieved_docs = []
+            citations = []
+        else:
+            retrieved_docs = self._retrieve_relevant_docs(query, top_k=15)
+            citations = self._build_smart_citations(retrieved_docs)
 
         base_conf = 0.96 if self.client and retrieved_docs else 0.90 if retrieved_docs else 0.70
+        if is_conversational:
+            base_conf = 1.0
         final_conf = round(base_conf * conf_mod, 2)
 
         return {
@@ -1009,6 +901,7 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
             "confidence_score": final_conf,
             "citations": citations,
             "retrieved_docs": retrieved_docs,
+            "tool_calls": tool_citations,
         }
 
     def get_kb_stats(self) -> Dict[str, Any]:

@@ -1,5 +1,144 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Send, ThumbsUp, AlertTriangle, UserCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { Send, ThumbsUp, AlertTriangle, UserCheck, FileText, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+const MAP_KEYWORDS = [
+  'bản đồ', 'sơ đồ', 'campus', 'trường', 'tòa', 'toà', 'địa điểm', 'vị trí',
+  'đường đi', 'cổng', 'khu vực', 'phòng', 'tầng', 'building', 'map',
+  'vinuni', 'vin uni', 'cơ sở', 'campus tour', 'bãi gửi xe', 'gửi xe',
+  'căng tin', 'canteen', 'lab', 'thư viện', 'hội trường', 'trung tâm',
+];
+
+function shouldShowMap(text) {
+  const lower = text.toLowerCase();
+  return MAP_KEYWORDS.some(kw => lower.includes(kw));
+}
+
+const TOOL_META = {
+  search_knowledge_base: { icon: '🗄️', label: 'Tìm KB nội bộ', color: '#6366F1' },
+  search_internet:       { icon: '🌐', label: 'Tìm Internet',   color: '#0EA5E9' },
+  calculate:             { icon: '🧮', label: 'Tính toán',      color: '#10B981' },
+  get_current_time:      { icon: '🕐', label: 'Lấy thời gian',  color: '#F59E0B' },
+};
+
+function ToolCallsPanel({ toolCalls }) {
+  const [open, setOpen] = useState(false);
+  if (!toolCalls || toolCalls.length === 0) return null;
+
+  return (
+    <div className="tool-calls-panel">
+      <button className="tool-calls-toggle" onClick={() => setOpen(o => !o)}>
+        <span className="tool-calls-badge">{toolCalls.length}</span>
+        <span className="tool-calls-toggle-label">Tool calls</span>
+        <span className="tool-calls-tools-used">
+          {[...new Set(toolCalls.map(t => TOOL_META[t.tool]?.icon || '🔧'))].join(' ')}
+        </span>
+        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+      </button>
+
+      {open && (
+        <div className="tool-calls-list">
+          {toolCalls.map((tc, i) => {
+            const meta = TOOL_META[tc.tool] || { icon: '🔧', label: tc.tool, color: '#94A3B8' };
+            return (
+              <div key={i} className="tool-call-item">
+                <div className="tool-call-header" style={{ borderLeftColor: meta.color }}>
+                  <span className="tool-call-icon">{meta.icon}</span>
+                  <span className="tool-call-name" style={{ color: meta.color }}>{meta.label}</span>
+                  <code className="tool-call-fn">{tc.tool}()</code>
+                </div>
+                {tc.args && Object.keys(tc.args).length > 0 && (
+                  <div className="tool-call-args">
+                    {Object.entries(tc.args).map(([k, v]) => (
+                      <div key={k} className="tool-call-arg-row">
+                        <span className="tool-call-arg-key">{k}:</span>
+                        <span className="tool-call-arg-val">{String(v)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {tc.result_preview && (
+                  <div className="tool-call-result">
+                    <span className="tool-call-result-label">Kết quả:</span>
+                    <span className="tool-call-result-text">{tc.result_preview}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CampusMap() {
+  const [enlarged, setEnlarged] = useState(false);
+  return (
+    <div className="campus-map-wrapper">
+      <div className="campus-map-label">🗺️ Sơ đồ khuôn viên VinUni</div>
+      <img
+        src="/campus-map.jpg"
+        alt="Sơ đồ khuôn viên VinUni"
+        className={`campus-map-img ${enlarged ? 'enlarged' : ''}`}
+        onClick={() => setEnlarged(e => !e)}
+        title={enlarged ? 'Thu nhỏ' : 'Phóng to'}
+      />
+      <div className="campus-map-hint">
+        {enlarged ? 'Nhấp để thu nhỏ' : 'Nhấp để phóng to · C401 = Tòa C, Tầng 4, Phòng 01'}
+      </div>
+      {enlarged && (
+        <div className="campus-map-overlay" onClick={() => setEnlarged(false)}>
+          <img src="/campus-map.jpg" alt="Sơ đồ khuôn viên VinUni phóng to" className="campus-map-full" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Component hiển thị nguồn tài liệu thông minh — chỉ khi thực sự có giá trị
+function CitationList({ citations }) {
+  const [expanded, setExpanded] = useState(false);
+  const SHOW_MAX = 2;
+  const visible = expanded ? citations : citations.slice(0, SHOW_MAX);
+  const hasMore = citations.length > SHOW_MAX;
+
+  return (
+    <div className="inline-chat-citations">
+      <div className="citations-header">📚 Nguồn tham khảo:</div>
+      {visible.map((cit, citIdx) => {
+        const cleanTitle = (cit.title || `Nguồn ${citIdx + 1}`)
+          .replace(/^Sổ tay chương trình -\s*/i, '')
+          .replace(/^VLearn\s+[\w-]+\s+-\s*/i, '')
+          .slice(0, 70);
+        const isExternal = cit.url?.startsWith('http');
+        return (
+          <div key={citIdx} className="citation-inline-card">
+            <div className="cit-title-row">
+              <span className="cit-title">• {cleanTitle}</span>
+              {isExternal && (
+                <a href={cit.url} target="_blank" rel="noopener noreferrer" className="cit-link">
+                  🔗 Nguồn
+                </a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+      {hasMore && (
+        <button
+          className="cit-expand-btn"
+          onClick={() => setExpanded(e => !e)}
+        >
+          {expanded
+            ? <><ChevronUp size={12} /> Ẩn bớt</>
+            : <><ChevronDown size={12} /> Xem thêm {citations.length - SHOW_MAX} nguồn...</>}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function ChatTab({
   messages,
@@ -101,41 +240,55 @@ export default function ChatTab({
 
               <div className="message-content-wrapper">
                 <div className={`message-bubble-mockup ${isAgent ? 'agent-bubble' : 'user-bubble'}`}>
-                  {msg.text.split('\n').map((line, i) => (
-                    <p key={i}>{line || '\u00A0'}</p>
-                  ))}
-
-                  {/* Nguồn trích dẫn hiển thị trực tiếp bên trong đoạn chat */}
-                  {msgCitations && msgCitations.length > 0 && !isOutOfScope && (
-                    <div className="inline-chat-citations">
-                      <div className="citations-header">📚 Nguồn tài liệu tham khảo:</div>
-                      {msgCitations.map((cit, citIdx) => (
-                        <div key={citIdx} className="citation-inline-card">
-                          <div className="cit-title-row">
-                            <span className="cit-title">
-                              • {cit.title ? cit.title.replace(/^Sổ tay chương trình -\s*/i, '') : `Nguồn ${citIdx + 1}`}
-                            </span>
-                            {cit.url && (
-                              <a
-                                href={cit.url.startsWith('http') ? cit.url : `file:///${cit.url}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="cit-link"
-                              >
-                                🔗 Xem link nguồn
-                              </a>
-                            )}
-                          </div>
-                          {cit.content && (
-                            <div className="cit-snippet">
-                              "{cit.content.slice(0, 220)}..."
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                  {isAgent ? (
+                    <div className="markdown-body">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          a: ({ href, children }) => (
+                            <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+                          ),
+                          code: ({ inline, children }) =>
+                            inline
+                              ? <code className="inline-code">{children}</code>
+                              : <pre className="code-block"><code>{children}</code></pre>,
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
                     </div>
+                  ) : (
+                    <p>{msg.text}</p>
                   )}
+
+                  {/* Bản đồ campus: hiển thị khi câu hỏi hoặc trả lời liên quan địa điểm */}
+                  {isAgent && (() => {
+                    const prevMsg = messages[idx - 1];
+                    const userAsked = prevMsg?.sender === 'user' && shouldShowMap(prevMsg.text);
+                    const agentMentioned = shouldShowMap(msg.text);
+                    return (userAsked || agentMentioned) ? <CampusMap /> : null;
+                  })()}
+
+                  {/* Nguồn trích dẫn */}
+                  {(() => {
+                    // Lọc chỉ citations có URL thực sự
+                    const validCits = (msgCitations || []).filter(
+                      c => c.url && c.url.trim() && c.url !== '#' && c.title
+                    );
+                    // Không hiện citations nếu câu trả lời quá ngắn (chat chào hỏi)
+                    const answerIsSubstantive = msg.text.length > 80;
+                    if (!validCits.length || isOutOfScope || !answerIsSubstantive) return null;
+
+                    return (
+                      <CitationList citations={validCits} />
+                    );
+                  })()}
                 </div>
+
+                {/* Tool calls panel — hiển thị bên dưới bubble */}
+                {isAgent && msg.meta?.tool_calls?.length > 0 && (
+                  <ToolCallsPanel toolCalls={msg.meta.tool_calls} />
+                )}
 
                 {/* Nút hành động phía dưới bubble Agent */}
                 {isAgent && (

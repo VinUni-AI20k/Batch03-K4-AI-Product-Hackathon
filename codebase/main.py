@@ -44,6 +44,7 @@ class ChatResponse(BaseModel):
     guardrails_triggered: List[str]
     confidence_score: float
     citations: List[Dict[str, Any]]
+    tool_calls: List[Dict[str, Any]] = []
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_with_agent(request: ChatRequest):

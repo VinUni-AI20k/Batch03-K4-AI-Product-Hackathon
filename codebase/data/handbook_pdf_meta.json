@@ -1,0 +1,9 @@
+{
+  "source": "https://vinuni.edu.vn/wp-content/uploads/2025/04/20K-AI-Handbook_final.pdf",
+  "local_path": "D:\\Lap5\\Batch03-K4-AI-Product-Hackathon\\codebase\\data\\20K-AI-Handbook_final.pdf",
+  "total_pages": 17,
+  "total_chunks": 25,
+  "ingested_at": "2026-07-31T04:22:08.910599",
+  "mongo_db": "ai_hackathon_kb",
+  "mongo_collection": "handbooks"
+}
