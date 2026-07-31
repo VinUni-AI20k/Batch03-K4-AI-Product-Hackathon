@@ -7,25 +7,32 @@ export default function DiagnosisView() {
   const { state, dispatch } = useSession();
   const diagnosis = state.diagnosis;
   const [loadingRetest, setLoadingRetest] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!diagnosis) return null;
 
   async function startRetest() {
     setLoadingRetest(true);
-    const focusSections = diagnosis!.weakSections.length
-      ? diagnosis!.weakSections
-      : Array.from(
-          new Map(
-            (state.knowledgePackage?.quiz ?? []).map((question) => [question.sectionId, {
-              sectionId: question.sectionId,
-              sectionTitle: question.sectionTitle,
-              accuracy: 1,
-            }]),
-          ).values(),
-        ).slice(0, 3);
-    const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
-    const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, focusSections, askedIds);
-    dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
+    setError(null);
+    try {
+      const focusSections = diagnosis!.weakSections.length
+        ? diagnosis!.weakSections
+        : Array.from(
+            new Map(
+              (state.knowledgePackage?.quiz ?? []).map((question) => [question.sectionId, {
+                sectionId: question.sectionId,
+                sectionTitle: question.sectionTitle,
+                accuracy: 1,
+              }]),
+            ).values(),
+          ).slice(0, 3);
+      const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
+      const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, focusSections, askedIds);
+      dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
+    } catch (err) {
+      setLoadingRetest(false);
+      setError(err instanceof Error ? err.message : 'Could not generate the retest.');
+    }
   }
 
   if (loadingRetest) {
@@ -90,6 +97,11 @@ export default function DiagnosisView() {
           </button>
         )}
       </div>
+      {error && (
+        <div className="clay-panel" style={{ color: 'var(--clay-orange-dark)', fontSize: 13 }}>
+          <strong>Không sinh được retest.</strong> {error}
+        </div>
+      )}
     </div>
   );
 }

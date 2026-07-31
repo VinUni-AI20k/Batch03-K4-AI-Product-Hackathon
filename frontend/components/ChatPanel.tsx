@@ -37,15 +37,22 @@ export default function ChatPanel() {
   const roadmap = state.roadmap!;
   const [sectionIndex, setSectionIndex] = useState(0);
   const [loadingRetest, setLoadingRetest] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const item = roadmap.items[sectionIndex];
   const isLast = sectionIndex === roadmap.items.length - 1;
 
   async function handleFinish() {
     setLoadingRetest(true);
-    const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
-    const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, state.diagnosis!.weakSections, askedIds);
-    dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
+    setError(null);
+    try {
+      const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
+      const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, state.diagnosis!.weakSections, askedIds);
+      dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
+    } catch (err) {
+      setLoadingRetest(false);
+      setError(err instanceof Error ? err.message : 'Could not generate the retest.');
+    }
   }
 
   if (loadingRetest) {
@@ -101,6 +108,11 @@ export default function ChatPanel() {
             </button>
           )}
         </div>
+        {error && (
+          <div className="clay-panel" style={{ color: 'var(--clay-orange-dark)', fontSize: 13 }}>
+            <strong>Không sinh được retest.</strong> {error}
+          </div>
+        )}
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>

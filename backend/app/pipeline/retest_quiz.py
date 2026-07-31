@@ -94,34 +94,18 @@ def generate_retest_quiz(
         filtered_transcript=json.dumps(transcript_rows, ensure_ascii=False),
         avoid_similar_to=json.dumps(list(avoid_similar_to or []), ensure_ascii=False),
     )
-    try:
-        response = generate_json(SYSTEM_PROMPT, prompt)
-    except Exception:
-        # TODO-DEMO: keep retest usable offline until a provider is configured.
-        response = {
-            "questions": [
-                {
-                    "id": f"demo-rq{index + 1}",
-                    "question": f"Ý chính của section {_value(section, 'title', '')} là gì?",
-                    "options": [
-                        _value(section, "summary", "Nội dung được nêu trong bài"),
-                        "Một nội dung không xuất hiện trong bài",
-                        "Một thông báo hành chính",
-                        "Không có thông tin liên quan",
-                    ],
-                    "correct_index": 0,
-                    "outline_section_id": _value(section, "id", _value(section, "section_id")),
-                    "explanation": "Câu hỏi demo bám theo summary của section.",
-                    "source_refs": [],
-                    "slide_ref": _value(section, "slide_ref", None),
-                }
-                for index, section in enumerate(sections)
-                for _ in range(next(
-                    item["count"] for item in requested_counts
-                    if item["outline_section_id"] == _value(section, "id", _value(section, "section_id"))
-                ))
-            ]
-        }
+    # No fallback to fake questions here: a failed AI call must surface as an
+    # error (the API layer turns this into a 502), never silently swap in
+    # generic placeholder questions — the CP3 rule this whole prototype
+    # follows is "real AI call or a clear failure, not a disguised mock".
+    #
+    # max_tokens matters here: each question carries question+4 options+
+    # explanation+misconception_tag+source_refs. The default max_tokens=1000
+    # truncates mid-JSON past ~3-4 questions (same failure mode already fixed
+    # once in quiz_bank.py and once in classify.py — this was the third,
+    # unfixed copy of it, and the actual cause of "câu hỏi lỗi" here).
+    max_tokens = min(6000, max(1500, num_questions * 250))
+    response = generate_json(SYSTEM_PROMPT, prompt, max_tokens=max_tokens)
     raw_questions = response.get("questions", []) if isinstance(response, Mapping) else []
     if not isinstance(raw_questions, list):
         raise ValueError("Retest LLM response must contain a questions list")
@@ -132,7 +116,11 @@ def generate_retest_quiz(
         if not isinstance(raw, Mapping):
             LOGGER.warning("invalid retest question at index=%s", index)
             continue
-        question_id = str(raw.get("id") or f"rq{index}")
+        # Always assign the id ourselves — trusting the model's own "id" risks
+        # duplicates across questions (seen in practice), which breaks the
+        # frontend's answer map (answers keyed by question id) and citation
+        # matching for wrong-answer review.
+        question_id = f"rq{index}"
         section_id = raw.get("outline_section_id") or raw.get("section_id")
         options = _normalize_options(raw.get("options"))
         correct_index = raw.get("correct_index")

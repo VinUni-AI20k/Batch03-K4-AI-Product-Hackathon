@@ -50,6 +50,7 @@ export default function RetestResultView() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [current, setCurrent] = useState(0);
   const [grading, setGrading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const result = state.retestResult;
   const q = quiz[current];
@@ -57,8 +58,18 @@ export default function RetestResultView() {
 
   async function handleSubmit() {
     setGrading(true);
-    const res = await submitRetest(quiz, answers, state.diagnosis?.score ?? 0);
-    dispatch({ type: 'SET_RETEST_RESULT', payload: res });
+    setError(null);
+    try {
+      const res = await submitRetest(quiz, answers, state.diagnosis?.score ?? 0);
+      dispatch({ type: 'SET_RETEST_RESULT', payload: res });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not grade the retest.');
+    } finally {
+      // Result is now in context, but this component stays mounted (phase no
+      // longer auto-changes) — without this the loader would stay stuck
+      // forever even though grading already finished.
+      setGrading(false);
+    }
   }
 
   if (grading) {
@@ -177,6 +188,12 @@ export default function RetestResultView() {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="clay-panel" style={{ color: 'var(--clay-orange-dark)', fontSize: 13 }}>
+          <strong>Chấm bài thất bại.</strong> {error}
+        </div>
+      )}
     </div>
   );
 }
