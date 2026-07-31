@@ -1,6 +1,8 @@
 import os
 import shutil
 import logging
+import json
+import base64
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Các type hợp lệ cho từng phần trong outline
+VALID_TYPES = {"quiz", "slide", "animation", "mindmap"}
+MIN_DISTINCT_TYPES = 3   # bắt buộc tối thiểu 3 loại type khác nhau
+MAX_RETRY = 3            # số lần gọi lại AI nếu chưa đủ đa dạng
+
 
 @app.get("/")
 def read_root():
@@ -38,6 +45,120 @@ def read_root():
 @app.get("/api/health")
 def health_check():
     return {"status": "healthy", "service": "backend"}
+
+
+def ensure_type_diversity(outline_data: list, min_types: int = 3) -> list:
+    """
+    Lưới an toàn cuối cùng: nếu model vẫn không tạo đủ số loại type sau nhiều lần retry,
+    tự động chèn thêm mindmap/quiz/animation dựa theo nội dung slide sẵn có,
+    đảm bảo output cuối cùng luôn đạt tối thiểu `min_types` loại khác nhau.
+    """
+    distinct_types = set(item["type"] for item in outline_data)
+    if len(distinct_types) >= min_types:
+        return outline_data
+
+    logger.warning(f"Áp dụng bổ sung tự động: hiện có {distinct_types}, cần thêm cho đủ {min_types} loại")
+
+    slide_items = [item for item in outline_data if item["type"] == "slide"]
+
+    # Bổ sung mindmap tổng kết nếu chưa có
+    if "mindmap" not in distinct_types and slide_items:
+        summary_points = "; ".join(
+            (item["content"][:80] + "...") for item in slide_items[:5]
+        )
+        outline_data.append({
+            "index": len(outline_data) + 1,
+            "type": "mindmap",
+            "content": f"Tổng kết các ý chính đã học: {summary_points}"
+        })
+        distinct_types.add("mindmap")
+
+    # Bổ sung quiz đơn giản dựa trên slide đầu tiên nếu chưa có
+    if "quiz" not in distinct_types and slide_items:
+        first_slide = slide_items[0]
+        outline_data.append({
+            "index": len(outline_data) + 1,
+            "type": "quiz",
+            "content": (
+                f"Câu hỏi ôn tập: Hãy tóm tắt lại nội dung chính sau đây bằng lời của bạn: "
+                f"\"{first_slide['content'][:150]}...\". "
+                f"Gợi ý: xem lại phần slide tương ứng nếu chưa chắc chắn."
+            )
+        })
+        distinct_types.add("quiz")
+
+    # Bổ sung animation gợi ý tổng quát nếu vẫn chưa đủ loại
+    if "animation" not in distinct_types and len(distinct_types) < min_types and slide_items:
+        outline_data.append({
+            "index": len(outline_data) + 1,
+            "type": "animation",
+            "content": (
+                "Minh hoạ trực quan: dựng sơ đồ các bước/mốc chính đã đề cập trong tài liệu "
+                "theo trình tự thời gian hoặc trình tự logic, giúp hình dung tổng thể quy trình."
+            )
+        })
+        distinct_types.add("animation")
+
+    # Đánh số lại index cho đúng thứ tự
+    for idx, item in enumerate(outline_data, start=1):
+        item["index"] = idx
+
+    logger.info(f"Sau bổ sung tự động: {set(item['type'] for item in outline_data)}")
+    return outline_data
+
+
+def build_prompt(markdown_text: str) -> str:
+    return f"""
+Bạn là một GIÁO VIÊN AI thiết kế lại tài liệu học tập thành một buổi ôn tập đa dạng hình thức, giúp học viên không bị nhàm chán và hiểu bài sâu hơn.
+
+QUY TẮC BẮT BUỘC (KHÔNG ĐƯỢC VI PHẠM):
+- Output PHẢI có ít nhất {MIN_DISTINCT_TYPES} LOẠI TYPE KHÁC NHAU trong số 4 loại: slide, quiz, animation, mindmap.
+- TUYỆT ĐỐI KHÔNG được để toàn bộ output chỉ có 1 hoặc 2 loại type. Đây là lỗi nghiêm trọng, output sẽ bị từ chối.
+- Bắt buộc phải có ít nhất 1 "mindmap" (đặt ở đầu để tổng quan, hoặc cuối để tổng kết — bạn tự quyết định vị trí phù hợp hơn).
+- Bắt buộc phải có ít nhất 2 "quiz" nếu tài liệu có từ 3 block "slide" trở lên — số liệu, mốc thời gian, điều kiện, quy định, định nghĩa nào cũng có thể ra quiz được, không có lý do gì để bỏ qua.
+- Bắt buộc phải có ít nhất 1 "animation" nếu tài liệu có: quy trình nhiều bước, timeline/lịch trình, mối quan hệ giữa nhiều đối tượng, hoặc khái niệm trừu tượng. Nếu tài liệu có bảng các bước/mốc thời gian (như lịch trình, quy trình, checklist), đây LUÔN LÀ ứng viên tốt để dựng animation dạng timeline — không được bỏ qua.
+- Chỉ trong trường hợp tài liệu cực ngắn (dưới 150 từ, không có gì để hỏi hay minh hoạ) mới được phép ít loại type hơn — nhưng với hầu hết tài liệu thực tế, quy tắc trên là BẮT BUỘC.
+
+CÁCH DÙNG TỪNG TYPE:
+- "slide": kiến thức nền tảng, định nghĩa, số liệu, quy định — viết lại mạch lạc, không copy nguyên văn.
+- "quiz": câu hỏi cụ thể kiểm tra 1 chi tiết vừa học (số liệu, điều kiện, mốc thời gian, định nghĩa...), kèm đáp án đúng + giải thích ngắn. Ưu tiên trắc nghiệm 4 đáp án hoặc đúng/sai.
+- "animation": mô tả hoạt cảnh minh hoạ theo từng bước — đặc biệt hợp với timeline, quy trình, luồng xử lý, so sánh trực quan.
+- "mindmap": sơ đồ phân nhánh các ý chính và mối liên hệ giữa chúng — dùng gạch đầu dòng/mũi tên thể hiện quan hệ cha-con.
+
+QUY TRÌNH BẠN PHẢI LÀM:
+1. Đọc toàn bộ nội dung, xác định các ý chính -> tạo 1 "mindmap" tổng quan ở đầu.
+2. Với mỗi cụm kiến thức: viết "slide" giải thích, sau đó BẮT BUỘC cân nhắc thêm "quiz" ngay sau nếu có chi tiết cụ thể để hỏi.
+3. Nếu phát hiện quy trình/timeline/mốc thời gian nối tiếp nhau -> chèn 1 "animation" mô tả timeline đó.
+4. Kết thúc bằng 1 "mindmap" tổng kết liên kết lại toàn bộ nội dung và các đối tượng liên quan.
+5. TRƯỚC KHI TRẢ KẾT QUẢ: tự đếm lại xem output có bao nhiêu loại type khác nhau. Nếu chưa đủ {MIN_DISTINCT_TYPES} loại, bắt buộc phải bổ sung thêm cho đủ trước khi trả lời.
+
+VÍ DỤ MINH HOẠ (chỉ để tham khảo mức độ đa dạng, không phải nội dung thật):
+[
+  {{"index": 1, "type": "mindmap", "content": "Tổng quan các mốc chính: (1) Đăng ký đề tài, (2) Xét duyệt, (3) Thực hiện, (4) Bảo vệ, (5) Nộp báo cáo."}},
+  {{"index": 2, "type": "slide", "content": "Điều kiện đăng ký: sinh viên khóa D22 cần tích lũy tối thiểu 75% tổng số tín chỉ chương trình đào tạo."}},
+  {{"index": 3, "type": "quiz", "content": "Câu hỏi: Sinh viên khóa D22 cần tích lũy tối thiểu bao nhiêu % tín chỉ để đủ điều kiện đăng ký báo cáo tốt nghiệp? A. 50% B. 65% C. 75% D. 90%. Đáp án đúng: C."}},
+  {{"index": 4, "type": "animation", "content": "Timeline animation: 01/7 xây dựng kế hoạch -> 02/7 gửi thông báo GV -> 15/7 SV đăng ký đề tài -> 03-07/8 xét duyệt đề cương -> 18/8-13/12 thực hiện đề tài -> 21-30/12 bảo vệ. Mỗi mốc hiện lần lượt trên trục thời gian."}},
+  {{"index": 5, "type": "slide", "content": "Trách nhiệm các bên: Tổ thư ký theo dõi tiến độ, Lãnh đạo CTĐT phân công GVHD, Sinh viên chủ động đăng ký và thực hiện đúng hạn."}},
+  {{"index": 6, "type": "quiz", "content": "Câu hỏi Đúng/Sai: Sinh viên có thể tự chọn giảng viên hướng dẫn mà không cần thông qua phân công của Lãnh đạo CTĐT? Đáp án: Sai — nếu SV chưa có GVHD, Lãnh đạo CTĐT sẽ phân công."}},
+  {{"index": 7, "type": "mindmap", "content": "Tổng kết: Timeline từ đăng ký đến bảo vệ, vai trò 3 bên (Tổ thư ký - Lãnh đạo CTĐT - Sinh viên), các mốc deadline quan trọng nhất cần nhớ."}}
+]
+(Ví dụ trên có đủ 4 loại type — đây là mức đa dạng bạn cần hướng tới.)
+
+YÊU CẦU OUTPUT: CHỈ trả về DUY NHẤT một mảng JSON hợp lệ (không markdown formatting ```, không giải thích thêm), đúng cấu trúc:
+
+[
+  {{
+    "index": 1,
+    "type": "slide",
+    "content": "..."
+  }}
+]
+
+"content" viết bằng tiếng Việt, đủ chi tiết để học viên tự ôn tập không cần mở lại tài liệu gốc.
+
+Nội dung Markdown gốc của tài liệu cần phân tích:
+{markdown_text[:8000]}
+"""
 
 
 @app.post("/api/upload-slide")
@@ -104,7 +225,6 @@ async def upload_slide(file: UploadFile = File(...)):
         from dotenv import load_dotenv
         load_dotenv()
 
-        import json
         from openai import OpenAI
 
         outline_data = []
@@ -112,7 +232,10 @@ async def upload_slide(file: UploadFile = File(...)):
         base_url = os.getenv("BASE_URL", "")
         api_key = os.getenv("API_KEY", "")
 
-        logger.debug(f"ENV -> MODEL_NAME={model_name!r}, BASE_URL={base_url!r}, API_KEY={'***' + api_key[-4:] if api_key else '(empty)'}")
+        logger.debug(
+            f"ENV -> MODEL_NAME={model_name!r}, BASE_URL={base_url!r}, "
+            f"API_KEY={'***' + api_key[-4:] if api_key else '(empty)'}"
+        )
 
         if api_key:
             try:
@@ -121,75 +244,147 @@ async def upload_slide(file: UploadFile = File(...)):
                     client_kwargs["base_url"] = base_url
                 client = OpenAI(**client_kwargs)
 
-                prompt = f"""
-                Hãy đóng vai một chuyên gia giáo dục. Đọc nội dung Markdown sau của một file Slide và tự động sinh ra một cấu trúc Outline (Mục lục) phân cấp logic.
-                Trả về DUY NHẤT một mảng JSON (không có markdown formatting), mỗi phần tử gồm:
-                - "level": 1, 2, hoặc 3 (độ sâu của mục)
-                - "title": tiêu đề của mục
-                - "summary": (tuỳ chọn) một dòng tóm tắt mục này.
+                prompt = build_prompt(markdown_text)
 
-                Nội dung Markdown:
-                {markdown_text[:8000]}
-                """
+                for attempt in range(1, MAX_RETRY + 1):
+                    logger.info(f"Gọi OpenAI API (lần {attempt}/{MAX_RETRY}) với model={model_name or 'gpt-4o-mini'} ...")
 
-                logger.info(f"Gọi OpenAI API với model={model_name or 'gpt-4o-mini'} ...")
+                    completion = client.chat.completions.create(
+                        model=model_name or "gpt-4o-mini",
+                        messages=[
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.4,
+                    )
 
-                completion = client.chat.completions.create(
-                    model=model_name or "gpt-4o-mini",
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.3,
-                )
+                    raw_text = completion.choices[0].message.content.strip()
+                    logger.debug(f"Raw response (lần {attempt}, 500 ký tự đầu): {raw_text[:500]}")
 
-                raw_text = completion.choices[0].message.content.strip()
-                logger.debug(f"Raw response từ model (500 ký tự đầu): {raw_text[:500]}")
+                    json_str = raw_text
+                    if json_str.startswith("```json"):
+                        json_str = json_str[7:]
+                    if json_str.startswith("```"):
+                        json_str = json_str[3:]
+                    if json_str.endswith("```"):
+                        json_str = json_str[:-3]
+                    json_str = json_str.strip()
 
-                json_str = raw_text
-                if json_str.startswith("```json"):
-                    json_str = json_str[7:]
-                if json_str.startswith("```"):
-                    json_str = json_str[3:]
-                if json_str.endswith("```"):
-                    json_str = json_str[:-3]
-                json_str = json_str.strip()
+                    try:
+                        parsed = json.loads(json_str)
+                    except Exception as e:
+                        logger.warning(f"Lần {attempt}: JSON không hợp lệ ({e}), thử lại...")
+                        continue
 
-                outline_data = json.loads(json_str)
-                logger.info(f"Parse JSON outline thành công, số mục = {len(outline_data)}")
+                    cleaned = []
+                    for idx, item in enumerate(parsed, start=1):
+                        item_type = item.get("type", "slide")
+                        if item_type not in VALID_TYPES:
+                            logger.warning(f"Type không hợp lệ '{item_type}' ở index {idx}, fallback về 'slide'")
+                            item_type = "slide"
+                        cleaned.append({
+                            "index": item.get("index", idx),
+                            "type": item_type,
+                            "content": item.get("content", "")
+                        })
+
+                    distinct_types = set(item["type"] for item in cleaned)
+                    logger.info(f"Lần {attempt}: số loại type khác nhau = {len(distinct_types)} ({distinct_types})")
+
+                    outline_data = cleaned  # giữ lại dù đạt hay chưa, phòng khi hết retry
+
+                    if len(distinct_types) >= MIN_DISTINCT_TYPES:
+                        logger.info(f"Đạt yêu cầu đa dạng ({len(distinct_types)} loại) ở lần thử {attempt}")
+                        break
+                    else:
+                        logger.warning(
+                            f"Lần {attempt}: chỉ có {len(distinct_types)} loại type "
+                            f"(yêu cầu tối thiểu {MIN_DISTINCT_TYPES}) -> thử lại"
+                        )
+
+                # Lưới an toàn cuối cùng: nếu sau MAX_RETRY vẫn chưa đủ đa dạng, bổ sung bằng code
+                if outline_data:
+                    final_distinct = set(item["type"] for item in outline_data)
+                    if len(final_distinct) < MIN_DISTINCT_TYPES:
+                        logger.error(
+                            f"Sau {MAX_RETRY} lần thử vẫn không đạt đủ {MIN_DISTINCT_TYPES} loại type "
+                            f"(chỉ có {len(final_distinct)}: {final_distinct}). Áp dụng bổ sung tự động."
+                        )
+                        outline_data = ensure_type_diversity(outline_data, min_types=MIN_DISTINCT_TYPES)
 
             except Exception as e:
                 logger.error(f"Lỗi khi gọi OpenAI: {e}", exc_info=True)
         else:
-            logger.warning("Không có API_KEY trong biến môi trường -> bỏ qua bước gọi AI, dùng fallback regex")
+            logger.warning("Không có API_KEY trong biến môi trường -> bỏ qua bước gọi AI, dùng fallback")
 
+        # Fallback nếu không gọi được AI (thiếu API key hoặc lỗi hoàn toàn):
+        # tách theo từng slide gốc, gán type mặc định "slide", sau đó ép đa dạng bằng code
         if not outline_data:
             import re
-            headings = re.findall(r'(#+)\s+(.*)', markdown_text)
-            for level, title in headings:
-                outline_data.append({'level': len(level), 'title': title.strip()})
-            logger.info(f"Dùng fallback regex, số mục outline = {len(outline_data)}")
+            slide_sections = re.split(r'\n?---\n## Slide \d+\n\n?', markdown_text)
+            slide_sections = [s.strip() for s in slide_sections if s.strip()]
+            for idx, content in enumerate(slide_sections, start=1):
+                outline_data.append({
+                    "index": idx,
+                    "type": "slide",
+                    "content": content
+                })
+            logger.info(f"Dùng fallback theo slide gốc, số block = {len(outline_data)}")
+            outline_data = ensure_type_diversity(outline_data, min_types=MIN_DISTINCT_TYPES)
 
-        outline_html = "<h2>Mục lục (Outline AI)</h2><ul>"
+        # Log thống kê cuối cùng
+        final_type_counts = {}
         for item in outline_data:
-            indent = (item.get('level', 1) - 1) * 20
-            title = item.get('title', '')
-            summary = item.get('summary', '')
-            outline_html += f"<li style='margin-left: {indent}px; margin-bottom: 12px;'>"
-            outline_html += f"<a href='#{title}' style='text-decoration: none; color: #2563eb; font-weight: bold;'>{title}</a>"
-            if summary:
-                outline_html += f"<br><span style='font-size: 12px; color: #64748b;'>{summary}</span>"
+            t = item.get("type", "slide")
+            final_type_counts[t] = final_type_counts.get(t, 0) + 1
+        logger.info(f"Phân bố type CUỐI CÙNG trong outline: {final_type_counts}")
+
+        # ------------------------------------------------------------------
+        # Render sidebar HTML theo type
+        # ------------------------------------------------------------------
+        type_labels = {
+            "slide": "📄 Slide",
+            "quiz": "❓ Quiz",
+            "animation": "🎬 Animation",
+            "mindmap": "🧠 Mindmap",
+        }
+        type_colors = {
+            "slide": "#2563eb",
+            "quiz": "#f59e0b",
+            "animation": "#8b5cf6",
+            "mindmap": "#10b981",
+        }
+
+        outline_html = "<h2>Outline (AI Generated)</h2><ul>"
+        for item in outline_data:
+            idx = item.get("index")
+            item_type = item.get("type", "slide")
+            content_preview = (item.get("content", "") or "")[:100]
+            color = type_colors.get(item_type, "#2563eb")
+            label = type_labels.get(item_type, item_type)
+
+            outline_html += f"<li style='margin-bottom: 14px;'>"
+            outline_html += f"<a href='#block-{idx}' style='text-decoration: none; color: {color}; font-weight: bold;'>{idx}. {label}</a>"
+            outline_html += f"<br><span style='font-size: 12px; color: #64748b;'>{content_preview}...</span>"
             outline_html += "</li>"
         outline_html += "</ul>"
 
+        # Lưu markdown gốc
         md_file_path = file_path.replace(".pdf", ".md")
         with open(md_file_path, "w", encoding="utf-8") as f:
             f.write(markdown_text)
-        logger.info(f"Đã ghi file markdown: {md_file_path} (tồn tại: {os.path.exists(md_file_path)})")
+        logger.info(f"Đã ghi file markdown gốc: {md_file_path} (tồn tại: {os.path.exists(md_file_path)})")
 
+        # Lưu outline dạng JSON
+        outline_json_path = file_path.replace(".pdf", ".outline.json")
+        with open(outline_json_path, "w", encoding="utf-8") as f:
+            json.dump(outline_data, f, ensure_ascii=False, indent=2)
+        logger.info(f"Đã ghi file outline JSON: {outline_json_path} (tồn tại: {os.path.exists(outline_json_path)})")
+
+        # ------------------------------------------------------------------
+        # Dựng lại slides_html kèm ảnh nền từ PDF
+        # ------------------------------------------------------------------
         slides_html = ""
 
-        import fitz
-        import base64
         try:
             pdf_doc = fitz.open(file_path)
         except Exception as e:
@@ -237,7 +432,11 @@ async def upload_slide(file: UploadFile = File(...)):
                     </div>
                     """
 
-            bg_style = f"background-image: url('data:image/png;base64,{bg_image_b64}'); background-size: 100% 100%; background-repeat: no-repeat;" if bg_image_b64 else "background: white;"
+            bg_style = (
+                f"background-image: url('data:image/png;base64,{bg_image_b64}'); "
+                f"background-size: 100% 100%; background-repeat: no-repeat;"
+                if bg_image_b64 else "background: white;"
+            )
 
             slides_html += f"""
             <div class="slide-container" id="slide-{page_no}" data-page="{page_no}" style="position: relative; width: {p_width}px; height: {p_height}px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; flex-shrink: 0; transform-origin: top center; transform: scale(0.9); {bg_style}">
@@ -285,6 +484,7 @@ async def upload_slide(file: UploadFile = File(...)):
         return {
             "status": "success",
             "markdown": markdown_text,
+            "outline": outline_data,
             "html": full_html,
             "html_file_path": html_file_path
         }
