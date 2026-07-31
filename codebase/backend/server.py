@@ -24,7 +24,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from agents import PageAwareRAGAgent
+from agents import PageAwareRAGAgent, SlideshowAgent
 from config.settings import DEFAULT_PROVIDER, DEFAULT_OPENAI_MODEL, SLIDES_DIR
 
 app = FastAPI(title="VLearn Page-Aware AI Tutor Backend API")
@@ -40,6 +40,7 @@ app.add_middleware(
 
 # Khởi tạo Page-Aware RAG Agent (Tự động nhận diện LLM Provider từ .env)
 rag_agent = PageAwareRAGAgent()
+slideshow_agent = SlideshowAgent()
 
 class LoginRequest(BaseModel):
     email: str
@@ -55,6 +56,10 @@ class ChatRequest(BaseModel):
 class SummarizeRequest(BaseModel):
     page_number: int
     slide_file: Optional[str] = None
+
+class SlideshowRequest(BaseModel):
+    slide_file: Optional[str] = None
+
 
 def resolve_slide_path(slide_file_input: Optional[str]) -> str:
     if not slide_file_input:
@@ -133,6 +138,16 @@ async def summarize_page_endpoint(req: SummarizeRequest):
     slide_path = resolve_slide_path(req.slide_file)
     answer = rag_agent.summarize_page(slide_path=slide_path, page_number=req.page_number)
     return {"answer": answer, "page_number": req.page_number}
+
+@app.post("/api/generate-slideshow")
+async def generate_slideshow_endpoint(req: SlideshowRequest):
+    slide_path = resolve_slide_path(req.slide_file)
+    try:
+        data = slideshow_agent.generate_slideshow_data(slide_path)
+        return {"slides": data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi sinh trình chiếu: {str(e)}")
+
 
 
 # Mount thư mục codebase làm static files cho Frontend

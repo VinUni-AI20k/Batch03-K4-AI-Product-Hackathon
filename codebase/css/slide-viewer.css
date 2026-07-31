@@ -1838,3 +1838,417 @@ button {
 .sel-tooltip-btn svg {
   flex-shrink: 0;
 }
+
+/* ============================================
+   VPlay - AI Slideshow Presentation Styles
+   ============================================ */
+.vplay-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  color: #f8fafc;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vplay-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vplay-header {
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.vplay-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #3b82f6;
+}
+
+.vplay-logo .logo-accent {
+  color: #ef4444;
+}
+
+.vplay-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+
+.vplay-close-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.vplay-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vplay-slide-frame {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vplay-slide {
+  flex: 1;
+  padding: 40px 64px 90px 64px; /* Protected space at bottom for subtitles */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateX(100px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.vplay-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  position: relative;
+}
+
+.vplay-slide.exit {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+
+.vplay-slide-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.vplay-slide-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.vplay-slide-num {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.vplay-slide-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.vplay-bullets-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vplay-bullet-item {
+  font-size: 1.15rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: fadeInBullet 0.5s forwards;
+  opacity: 0;
+}
+
+.vplay-bullet-item::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+@keyframes fadeInBullet {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vplay-footer {
+  height: 80px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.5);
+  position: relative;
+}
+
+.vplay-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vplay-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.vplay-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.vplay-btn.primary {
+  background: #3b82f6;
+}
+
+.vplay-btn.primary:hover {
+  background: #2563eb;
+}
+
+.vplay-btn-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+
+.vplay-btn-circle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.vplay-btn-circle.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.vplay-controls-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vplay-btn-play {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.vplay-btn-play:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.vplay-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vplay-speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vplay-speed-select {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.vplay-subtitles-container {
+  position: absolute;
+  bottom: 15px; /* Positioned at the very bottom of the slide frame */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.vplay-subtitles {
+  display: inline-block;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px; /* Sleeker, less height */
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.95rem; /* Clean text size to avoid blocking bullet content */
+  font-weight: 500;
+  line-height: 1.4;
+  max-width: 100%;
+  box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.vplay-subtitles.active {
+  opacity: 1;
+}
+
+.vplay-progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+.vplay-progress-bar {
+  height: 100%;
+  background: #3b82f6;
+  width: 0%;
+  transition: width 0.3s linear;
+}
+
+.vplay-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 100;
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+}
+
+.vplay-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #3b82f6;
+  border-radius: 50%;
+  animation: vplay-spin 1s linear infinite;
+}
+
+@keyframes vplay-spin {
+  to { transform: rotate(360deg); }
+}
+
+.vplay-loading-text {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.vplay-recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  animation: pulseRecording 1.5s infinite;
+}
+
+@keyframes pulseRecording {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.vplay-btn-export-record {
+  background: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.vplay-btn-export-record:hover {
+  background: #dc2626;
+}
+
