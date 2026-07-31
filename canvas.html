@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas CP1 — VLearn Active Recall (Nhóm 5tuat)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 26, 43, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-purple: #8b5cf6;
+            --accent-red: #f43f5e;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-cyan {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .badge-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Grid Layout */
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+        }
+
+        .card-body {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            flex-grow: 1;
+        }
+
+        .highlight-text {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Highlight Center Card */
+        .card-highlight {
+            grid-column: span 1;
+            border: 1px solid var(--accent-cyan);
+            background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.12), var(--card-bg) 60%);
+            box-shadow: 0 0 30px var(--accent-cyan-glow);
+        }
+
+        .quote-box {
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 14px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            color: #ecfeff;
+            font-style: italic;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        /* Stat Badges */
+        .stat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(244, 63, 94, 0.08);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .stat-item-green {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .stat-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--accent-red);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .stat-number-green {
+            color: var(--accent-green);
+        }
+
+        /* Flow Chart */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Team & Users */
+        .list-group {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .list-group li {
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+        }
+
+        .list-group li:last-child {
+            border-bottom: none;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Editable Hint Footer */
+        footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+                padding: 0;
+            }
+            .card {
+                background: #fff;
+                border: 1px solid #ccc;
+                color: #000;
+                box-shadow: none;
+            }
+            .card-title, .highlight-text {
+                color: #000;
+            }
+            .quote-box {
+                background: #f0f9ff;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <div class="header-title">
+            <h1>CANVAS CP1 — VLEARN ACTIVE RECALL</h1>
+            <p>Khung bảo vệ ý tưởng sản phẩm AI · Checkpoint 1 (CP1)</p>
+        </div>
+        <div class="header-badges">
+            <span class="badge badge-cyan">Hướng A — VLearn</span>
+            <span class="badge badge-purple">Nhóm 5tuat</span>
+            <span class="badge badge-green">N = 24 Khảo sát (Đạt chuẩn A)</span>
+        </div>
+    </header>
+
+    <!-- 6 Card Grid -->
+    <div class="canvas-grid">
+
+        <!-- Card 1: Job Executor & Core JTBD -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="color: #38bdf8;">👤</div>
+                <div class="card-title">1. Job Executor & Core JTBD</div>
+            </div>
+            <div class="card-body">
+                <p><span class="highlight-text">Job Executor:</span> Học viên khóa AI Thực Chiến ngay sau khi kết thúc 1 bài giảng / video bài học (Day 2).</p>
+                <br>
+                <p><span class="highlight-text">Core JTBD (Không chữ AI):</span> Kiểm tra và xác nhận mức độ hiểu bài thực tế của bản thân trước khi làm bài tập lớn để không bị hổng kiến thức cốt lõi.</p>
+            </div>
+        </div>
+
+        <!-- Card 2: Pain Point & Evidence -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="color: #f43f5e;">🔴</div>
+                <div class="card-title">2. Nỗi đau & Bằng chứng Mining / Khảo sát</div>
+            </div>
+            <div class="card-body">
+                <p><span class="highlight-text">Pain Point:</span> Ảo tưởng đã hiểu bài (Illusion of Competence) sau khi xem video, nhưng thực chất bị hổng kiến thức cốt lõi mà không tự biết.</p>
+                
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <span class="stat-number">99.88%</span>
+                        <div><strong>Data Mining (2.522 chat):</strong> <code>asked_check_question = False</code> (2.515/2.518 lượt). Tutor hoàn toàn thụ động không kiểm tra hiểu bài.</div>
+                    </div>
+                    <div class="stat-item stat-item-green">
+                        <span class="stat-number stat-number-green">83.3%</span>
+                        <div><strong>Khảo sát thực tế (N=24):</strong> 20/24 học viên sẵn sàng làm Quiz ngắn ngay sau bài học để hệ thống kiểm tra lại mức hiểu bài.</div>
+                    </div>
+                    <div class="stat-item stat-item-green">
+                        <span class="stat-number stat-number-green">91.7%</span>
+                        <div><strong>Chia sẻ lịch sử sai (N=24):</strong> 22/24 học viên đồng ý chia sẻ lịch sử câu sai để AI phát hiện lỗ hổng kiến thức.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Core Slice (Highlight Center) -->
+        <div class="card card-highlight">
+            <div class="card-header">
+                <div class="card-icon" style="color: #06b6d4;">⚡</div>
+                <div class="card-title" style="color: var(--accent-cyan);">3. Lát cắt MỘT CÂU (Core Slice)</div>
+            </div>
+            <div class="card-body">
+                <p><span class="highlight-text">1 User · 1 Việc · 1 Quyết định AI · 1 Kết quả:</span></p>
+                <div class="quote-box">
+                    "Dành cho học viên vừa học xong bài Day 2, AI tự động sinh 3 câu hỏi tình huống bám sát transcript bài giảng <code>[T02-xxx]</code>, chấm điểm câu tự luận của học viên và chỉ ra chính xác khái niệm hiểu sai kèm trích dẫn trang slide/transcript."
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Mini User Flow -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="color: #a78bfa;">🔄</div>
+                <div class="card-title">4. Kịch bản Trải nghiệm (User Flow)</div>
+            </div>
+            <div class="card-body">
+                <div class="flow-container">
+                    <div class="flow-step">
+                        <div class="step-num">1</div>
+                        <div>Học viên bấm <strong>"Kiểm tra hiểu bài"</strong> sau bài Day 2.</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-num">2</div>
+                        <div>AI sinh 3 câu hỏi tình huống mở từ Transcript.</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-num">3</div>
+                        <div>Học viên gõ tự luận ➔ AI chấm & phát hiện lỗ hổng kèm <code>[T02-xxx]</code>.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Automation Level & Cost of Error -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="color: #f59e0b;">🛡️</div>
+                <div class="card-title">5. Automation & Cost of Error</div>
+            </div>
+            <div class="card-body">
+                <p><span class="highlight-text">Mức Automation:</span> <span class="badge badge-purple" style="font-size: 11px;">Conditional Automation</span></p>
+                <br>
+                <p><span class="highlight-text">Insight Khảo sát PAIR (N=24):</span> 37.5% học viên yêu cầu nút <em>"Đồng ý gửi"</em> trước khi hệ thống chuyển câu hỏi cho Giảng viên/TA.</p>
+                <br>
+                <p><span class="highlight-text">Lý do theo Cost-of-Error:</span> Hiểu sai kiến thức cốt lõi dẫn đến làm sai bài tập lớn. AI nhận xét & dẫn nguồn, user chủ động xác nhận trước khi escalate.</p>
+            </div>
+        </div>
+
+        <!-- Card 6: Willing Users & Phân công -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="color: #10b981;">👥</div>
+                <div class="card-title">6. Willing Users & Phân công (5tuat)</div>
+            </div>
+            <div class="card-body">
+                <p><span class="highlight-text">≥3 Willing Users sẵn sàng test (CP5):</span></p>
+                <ul class="list-group">
+                    <li><span>1. Nguyễn Văn Thành</span> <span class="tag">2A202601030</span></li>
+                    <li><span>2. Nguyễn Chiến Thắng</span> <span class="tag">2A202601734</span></li>
+                    <li><span>3. Hồ Ngọc Quỳnh</span> <span class="tag">2A202601684</span></li>
+                </ul>
+                <br>
+                <p><span class="highlight-text">Phân công thành viên nhóm 5tuat:</span></p>
+                <ul class="list-group">
+                    <li><span>Phạm Quốc Bảo (01502)</span> <span class="tag">Spec / R3</span></li>
+                    <li><span>Trần Hoàng Long (01646)</span> <span class="tag">Data / Evidence</span></li>
+                    <li><span>Trần Đức Bảo (01472)</span> <span class="tag">Prompt / Eval</span></li>
+                    <li><span>Nguyễn Sỹ Mạnh Cường (01040)</span> <span class="tag">Code Working</span></li>
+                    <li><span>Phạm Công Đạt (01406)</span> <span class="tag">Demo / Slide</span></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>💡 File HTML này nằm tại <code>K4-hackathon-5tuat-E403/canvas.html</code>. Mở trực tiếp bằng trình duyệt để thuyết trình tại CP1.</p>
+    </footer>
+</div>
+
+</body>
+</html>
