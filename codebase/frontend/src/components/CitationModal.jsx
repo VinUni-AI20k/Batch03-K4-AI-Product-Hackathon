@@ -18,7 +18,7 @@ export default function CitationModal({ citation, onClose }) {
           <p style={{ marginBottom: '8px' }}>
             <strong>Nguồn URL/File: </strong>
             <a
-              href={citation.url || '#'}
+              href={citation.url ? (citation.url.startsWith('http') ? citation.url : `${import.meta.env.VITE_API_URL || ''}${citation.url}`) : '#'}
               target="_blank"
               rel="noreferrer"
               style={{ color: 'var(--primary-cyan)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}

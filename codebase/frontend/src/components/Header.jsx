@@ -9,8 +9,8 @@ export default function Header({ kbStatusText }) {
           <Zap className="logo-icon" size={26} />
         </div>
         <div className="brand-text">
-          <h1>AI AGENT QA</h1>
-          <p>Cộng đồng AI Thực Chiến Vingroup - VinUni</p>
+          <h1>AI AGENT QA — KHÓA AI THỰC CHIẾN VIN</h1>
+          <p>Cộng đồng AI Thực Chiến Vingroup - VinUni · Hỗ trợ Tuyển sinh & Giải đáp Khóa học</p>
         </div>
       </div>
 

@@ -30,6 +30,9 @@ GOLDEN_SET = [
     (18, "Viết CV xin việc cho em với",                                      ["layer3_authority"],    []),
     (19, "Vibe-coding rule quy định gì?",                                   ["layer4_domain"],       ["layer2_ambiguity"]),
     (20, "Khi nào nộp spec?",                                               ["layer4_domain"],       ["layer1_ground_truth"]),
+    (21, "Quần đảo Hoàng Sa và Trường Sa là của nước nào",                  ["layer3_authority"],    []),
+    (22, "Ai vô địch World Cup 2022?",                                      ["layer3_authority"],    []),
+    (23, "Cách nấu món phở bò ngon",                                        ["layer3_authority"],    []),
 ]
 
 def run():
@@ -47,7 +50,8 @@ def run():
         guardrail_ok = all(g in layers for g in must_have)
         no_false_pos = all(g not in layers for g in must_not_have)
         has_answer   = len(r["answer"].strip()) > 20
-        case_pass    = guardrail_ok and no_false_pos and has_answer
+        no_false_citations = ("layer3_authority" not in layers) or (len(r["citations"]) == 0)
+        case_pass    = guardrail_ok and no_false_pos and has_answer and no_false_citations
 
         if case_pass:
             passed += 1

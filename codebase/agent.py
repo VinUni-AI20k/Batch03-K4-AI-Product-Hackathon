@@ -19,7 +19,15 @@ import json
 import math
 import os
 import re
+import sys
 from datetime import datetime
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
@@ -40,6 +48,11 @@ try:
     from duckduckgo_search import DDGS
 except ImportError:
     DDGS = None
+
+try:
+    from pymongo import MongoClient
+except ImportError:
+    MongoClient = None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
@@ -149,12 +162,42 @@ class AIQAAgent:
     """
 
     def __init__(self, kb_fb_path: str = None, kb_vlearn_path: str = None):
-        kb_fb_path = kb_fb_path or os.getenv("FB_KB_PATH", "data/fb_group_qa.json")
-        kb_vlearn_path = kb_vlearn_path or os.getenv("VLEARN_KB_PATH", "data/vlearn_kb.json")
+        mongo_uri = os.getenv("MONGO_URI", "")
+        mongo_db_name = os.getenv("MONGO_DB_NAME", "ai_hackathon_kb")
+        self.use_mongo = False
 
-        self.fb_kb = self._load_kb(kb_fb_path)
-        self.vlearn_kb = self._load_kb(kb_vlearn_path)
-        self.handbook_kb = self._load_handbook_kb()
+        if MongoClient and mongo_uri:
+            try:
+                client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
+                client.admin.command('ping')
+                db = client[mongo_db_name]
+                self.fb_kb = list(db["fb_posts"].find({}, {"_id": 0}))
+                self.vlearn_kb = list(db["vlearn"].find({}, {"_id": 0}))
+                self.handbook_kb = list(db["handbooks"].find({}, {"_id": 0}))
+                if self.fb_kb or self.vlearn_kb or self.handbook_kb:
+                    self.use_mongo = True
+                    print(f"[MongoDB] Successfully loaded KB from database '{mongo_db_name}' ({len(self.fb_kb)} FB, {len(self.vlearn_kb)} VLearn, {len(self.handbook_kb)} Handbooks)")
+            except Exception as e:
+                print(f"[Warning] Could not load from MongoDB ({e}). Falling back to local files.")
+
+        if not self.use_mongo:
+            kb_fb_path = kb_fb_path or os.getenv("FB_KB_PATH", "data/fb_group_qa.json")
+            kb_vlearn_path = kb_vlearn_path or os.getenv("VLEARN_KB_PATH", "data/vlearn_kb.json")
+            self.fb_kb = self._load_kb(kb_fb_path)
+            self.vlearn_kb = self._load_kb(kb_vlearn_path)
+            self.handbook_kb = self._load_handbook_kb()
+
+        # Loại bỏ tuyệt đối các file transcript (-clean.md) và chatlog (.csv) khỏi handbook_kb
+        # để tránh gây nhiễu citation (bấm vào ra toàn bộ text âm thanh thô không đáp án)
+        self.handbook_kb = [
+            d for d in self.handbook_kb
+            if not any(
+                ignored in str(d.get("id", "")).lower()
+                or ignored in str(d.get("title", "")).lower()
+                or ignored in str(d.get("url", "")).lower()
+                for ignored in ["transcript", "chatlog", "-clean.md", ".csv"]
+            )
+        ]
 
         self.all_docs: List[Dict] = []
         self._prepare_docs()
@@ -325,10 +368,7 @@ class AIQAAgent:
 
     def _load_handbook_kb(self) -> List[Dict[str, Any]]:
         default_paths = [
-            "README.md", "01-de-bai.md", "02-guide.md",
-            "03-template-ai-spec.md", "04-rubric.md", "spec.md",
-            "data/vlearn-pack/transcript",
-            "data/vlearn-pack/chatlog/DATA_DICTIONARY.md",
+            "tham-khao",
         ]
         configured = os.getenv("PROGRAM_HANDBOOK_PATHS", "")
         paths = [p.strip() for p in configured.split(";") if p.strip()] or default_paths
@@ -339,7 +379,9 @@ class AIQAAgent:
             if os.path.isdir(full_path):
                 for root, _, files in os.walk(full_path):
                     for filename in files:
-                        if filename.lower().endswith((".md", ".txt", ".csv")):
+                        if filename.lower().endswith((".md", ".txt")):
+                            if any(ignored in filename.lower() or ignored in root.lower() for ignored in ["transcript", "chatlog", "-clean.md", ".csv"]):
+                                continue
                             docs.extend(self._read_text_chunks(os.path.join(root, filename)))
             elif os.path.isfile(full_path):
                 docs.extend(self._read_text_chunks(full_path))
@@ -368,7 +410,7 @@ class AIQAAgent:
                 "id": f"handbook_{rel_path}_{idx // chunk_size + 1}",
                 "title": f"Sổ tay chương trình - {rel_path}",
                 "content": chunk,
-                "url": rel_path,
+                "url": f"/api/docs/{rel_path}",
             })
         return chunks
 
@@ -483,21 +525,49 @@ class AIQAAgent:
 
         hybrid_scores = 0.7 * semantic_scores + 0.3 * bm25_scores
 
-        # Tag bonus
+        # Tag bonus & keyword relevance boost
+        query_words = set(re.findall(r"\w+", query.lower()))
         for i, doc in enumerate(self.all_docs):
             tags = doc.get("original_doc", {}).get("tags", []) if isinstance(doc.get("original_doc"), dict) else []
             if any(tag.lower() in query.lower() for tag in tags):
-                hybrid_scores[i] += 0.1
+                hybrid_scores[i] += 0.15
+            title_words = set(re.findall(r"\w+", doc.get("title", "").lower()))
+            overlap = len(query_words.intersection(title_words))
+            if overlap > 0:
+                hybrid_scores[i] += min(0.2, overlap * 0.05)
+
+        if self._is_out_of_domain(query):
+            return []
+
+        STOPWORDS = {
+            "là", "và", "của", "cho", "em", "hỏi", "mình", "có", "không", "thế", "nào", "gì", "ai",
+            "được", "trong", "với", "các", "những", "này", "khi", "tại", "sao", "thì", "mà", "hay",
+            "hoặc", "ở", "từ", "làm", "về", "cái", "để", "ra", "bị", "đang", "đã", "vào", "nhiều",
+            "ít", "rất", "quá", "vậy", "ạ", "nhé", "luôn", "chỉ", "cần", "một", "hai", "ba"
+        }
+        query_words = {w for w in re.findall(r"\w+", query.lower()) if len(w) > 1 and w not in STOPWORDS}
 
         top_indices = np.argsort(hybrid_scores)[::-1][:top_k]
         results = []
         for idx in top_indices:
-            if hybrid_scores[idx] > 0.1:
-                doc = self.all_docs[idx].copy()
-                doc["score"] = float(hybrid_scores[idx])
-                doc.pop("search_text", None)
-                doc.pop("original_doc", None)
-                results.append(doc)
+            score = float(hybrid_scores[idx])
+            doc = self.all_docs[idx]
+            doc_text = f"{doc.get('title', '')} {doc.get('content', '')}".lower()
+            tags = doc.get("original_doc", {}).get("tags", []) if isinstance(doc.get("original_doc"), dict) else []
+            doc_words = set(re.findall(r"\w+", doc_text))
+            for tag in tags:
+                doc_words.update(re.findall(r"\w+", str(tag).lower()))
+            overlap = len(query_words.intersection(doc_words))
+            has_bm25 = (self.bm25 is not None and bm25_scores[idx] > 0)
+
+            # Lọc tài liệu thực sự liên quan: tránh đính kèm tài liệu không liên quan cho câu hỏi của người dùng
+            is_relevant = (score >= 0.22 and (overlap > 0 or has_bm25)) or (score >= 0.35) or (overlap >= 2 and score >= 0.15)
+            if is_relevant:
+                doc_copy = doc.copy()
+                doc_copy["score"] = score
+                doc_copy.pop("search_text", None)
+                doc_copy.pop("original_doc", None)
+                results.append(doc_copy)
 
         return results
 
@@ -522,9 +592,35 @@ class AIQAAgent:
         r"|ngo[aà]i\s*(ph[aạ]m\s*vi|kh[oó]a\s*h[oọ]c)",
         re.IGNORECASE,
     )
+    _L3_OUT_OF_DOMAIN_EXPLICIT = re.compile(
+        r"qu[aầ]n\s*đ[aả]o|ho[aà]ng\s*sa|tr[uườ]ng\s*sa|bi[eể]n\s*đ[oô]ng|l[aã]nh\s*th[oổ]|ch[uủ]\s*quy[eề]n"
+        r"|th[uủ]\s*đ[oô]|qu[oố]c\s*gia|t[oổ]ng\s*th[oố]ng|ch[uủ]\s*t[iị]ch|th[uủ]\s*t[uướ]ng|chi[eế]n\s*tranh"
+        r"|l[iị]ch\s*s[uử]\s*(vi[eệ]t|th[eế]|n[uướ]c)|lu[aậ]t\s*đ[aấ]t\s*đai|hi[eế]n\s*ph[aá]p|qu[oố]c\s*h[oộ]i"
+        r"|b[oó]ng\s*đ[aá]|world\s*cup|aff\s*cup|ngo[aạ]i\s*h[aạ]ng|c[aầ]u\s*th[uủ]|ca\s*s[iĩ]|ngh[eệ]\s*s[iĩ]"
+        r"|di[eễ]n\s*vi[eê]n|phim|b[aà]i\s*h[aá]t|ch[uơ]ng\s*tr[iì]nh\s*truy[eề]n\s*h[iì]nh|tr[aấ]n\s*th[aà]nh|s[oơ]n\s*t[uù]ng"
+        r"|c[aá]ch\s*n[aấ]u|m[oó]n\s*[aă]n|c[oô]ng\s*th[uứ]c\s*n[aấ]u|qu[aá]n\s*[aă]n|du\s*l[iị]ch|đ[iị]a\s*đi[eể]m"
+        r"|gi[aá]\s*v[aà]ng|b[aấ]t\s*đ[oộ]ng\s*s[aả]n|c[oổ]\s*phi[eế]u|ch[uứ]ng\s*kho[aá]n|x[oổ]\s*s[oố]|t[uử]\s*vi"
+        r"|cung\s*ho[aà]ng\s*đ[aạ]o|th[oờ]i\s*ti[eế]t"
+        r"|ph[uơ]ng\s*tr[iì]nh\s*ho[aá]|h[oó]a\s*h[oọ]c|v[aậ]t\s*l[yý]\s*(l[oớ]p|h[aạ]t)|sinh\s*h[oọ]c|v[aă]n\s*h[oọ]c|b[aà]i\s*v[aă]n",
+        re.IGNORECASE,
+    )
+    _IN_DOMAIN_KW = re.compile(
+        r"ai|llm|rag|agent|prompt|vlearn|hackathon|vinuni|vingroup|spec|rubric|jtbd|hax|pair|vibe"
+        r"|code|l[aậ]p\s*tr[iì]nh|python|pip|install|m[oô]i\s*tr[uườ]ng|l[oỗ]i|error|bug|fix|ch[aạ]y"
+        r"|checkpoint|cp\d|deadline|h[aạ]n\s*n[oộ]p|b[aà]i\s*t[aậ]p|b[aà]i\s*1|b[aà]i\s*2|b[aà]i\s*3"
+        r"|th[aầ]y|c[oô]|ta|mentor|gi[aả]ng\s*vi[eê]n|kh[oó]a\s*h[oọ]c|batch|l[oớ]p|ch[oỗ]\s*kh[oó]"
+        r"|ch[aấ]m\s*đi[eể]m|evidence|b[aằ]ng\s*ch[uứ]ng|dataset|model|token|embedding|api|key"
+        r"|t[aà]i\s*li[eệ]u|s[oổ]\s*tay|slide|b[aà]i\s*gi[aả]ng|ph[aâ]n\s*c[oô]ng|n[oộ]p\s*b[aà]i"
+        r"|m[aá]y\s*t[ií]nh|c[aà]i\s*đ[aặ]t|th[uư]\s*vi[eệ]n|package|git|github|vscode|cursor|cline|selenium|scraper|scrape",
+        re.IGNORECASE,
+    )
+    _CONVERSATIONAL_KW = re.compile(
+        r"^(xin\s*ch[aà]o|ch[aà]o|hello|hi|hey|b[aạ]n\s*l[aà]\s*ai|ai\s*đ[oó]|c[aả]m\s*[oơ]n|thank|ok|t[oố]t|t[aạ]m\s*bi[eệ]t|gi[uú]p\s*(em|m[iì]nh|t[oô]i)|c[oó]\s*ai\s*kh[oô]ng)[\s\W]*$",
+        re.IGNORECASE,
+    )
     _L2_AMBIGUOUS_KW = re.compile(
         r"^(l[oỗ]i\s*pip|l[oỗ]i\s*c[aà]i|b[aà]i\s*\d\s*l[aà]m\s*sao|sao\s*kh[oô]ng\s*ch[aạ]y"
-        r"|fix\s*th[eế]\s*n[aà]o|error\s*code|kh[oô]ng\s*ch[aạ]y)\s*\w{0,10}$",
+        r"|fix\s*th[eế]\s*n[aà]o|error\s*code|kh[oô]ng\s*ch[aạ]y)[\s\W]*$",
         re.IGNORECASE,
     )
     _L4_DOMAIN = re.compile(
@@ -537,6 +633,27 @@ class AIQAAgent:
         r"|deadline|h[aạ]n\s*n[oộ]p|c[aâ]u\s*h[oỏ]i\s*ki[eể]m\s*th[uử]",
         re.IGNORECASE,
     )
+
+    def _get_max_kb_similarity(self, query: str) -> float:
+        if not self.all_docs:
+            return 0.0
+        max_score = 0.0
+        if self.encoder and self.doc_embeddings is not None:
+            query_embedding = self.encoder.encode(query, convert_to_tensor=True)
+            cos_scores = st_util.cos_sim(query_embedding, self.doc_embeddings)[0].cpu().numpy()
+            max_score = float(np.max(cos_scores)) if len(cos_scores) > 0 else 0.0
+        return max_score
+
+    def _is_out_of_domain(self, query: str) -> bool:
+        q_strip = query.strip()
+        if self._CONVERSATIONAL_KW.search(q_strip):
+            return False
+        if self._L3_OUT_OF_DOMAIN_EXPLICIT.search(query):
+            return True
+        if not self._IN_DOMAIN_KW.search(query):
+            if self._get_max_kb_similarity(query) < 0.25:
+                return True
+        return False
 
     def _check_guardrails(self, query: str) -> Tuple[List[str], str, float]:
         triggered, override_msg, conf_mod = [], "", 1.0
@@ -554,19 +671,30 @@ class AIQAAgent:
             )
             return triggered, override_msg, 0.98
 
-        if self._L3_CHEAT.search(query):
+        if self._L3_CHEAT.search(query) or self._is_out_of_domain(query):
             triggered.append("layer3_authority")
-            override_msg = (
-                "🚫 **Từ chối theo Academic Integrity (Vibe-coding rule):** "
-                "AI Agent không viết trọn gói code bài nộp/checkpoint.\n\n"
-                "Mình có thể giúp bạn:\n"
-                "1. **Tách nhỏ bài toán** — chia bài thành các bước nhỏ độc lập\n"
-                "2. **Giải thích kiến trúc** — mô tả luồng dữ liệu, các module cần có\n"
-                "3. **Debug lỗi cụ thể** — paste stacktrace để mình phân tích\n"
-                "4. **Gợi ý hướng tiếp cận** — pseudocode hoặc outline logic\n\n"
-                "Theo luật Vibe-coding: bạn dùng AI để build thoải mái, nhưng phải "
-                "giải thích được từng phần có tên mình tại CP5."
-            )
+            if self._is_out_of_domain(query) and not self._L3_CHEAT.search(query):
+                override_msg = (
+                    "🚫 **Từ chối trả lời (Ngoài phạm vi chuyên môn / Out of Domain):**\n\n"
+                    "Câu hỏi của bạn không thuộc phạm vi hỗ trợ của khóa học **AI Thực Chiến Vingroup - VinUni**.\n\n"
+                    "Mình là Trợ lý AI QA chuyên trách chỉ hỗ trợ giải đáp thuộc lĩnh vực:\n"
+                    "1. **Quy chế & Lịch trình khóa học:** Spec, Rubric, Checkpoints (CP1-CP6), Deadline, Vibe-coding rule...\n"
+                    "2. **Kiến thức AI & Lập trình:** Python, pip, môi trường, lỗi code, LLM, RAG, Agent, HAX, PAIR, JTBD...\n"
+                    "3. **Tra cứu cơ sở tri thức:** Các bài đăng hỏi-đáp đã được Giảng viên/TA xác nhận trên FB Group & VLearn.\n\n"
+                    "Vui lòng đặt câu hỏi liên quan đến nội dung khóa học hoặc bài tập Hackathon để mình hỗ trợ chính xác nhất nhé!"
+                )
+            else:
+                override_msg = (
+                    "🚫 **Từ chối theo Academic Integrity (Vibe-coding rule):** "
+                    "AI Agent không viết trọn gói code bài nộp/checkpoint.\n\n"
+                    "Mình có thể giúp bạn:\n"
+                    "1. **Tách nhỏ bài toán** — chia bài thành các bước nhỏ độc lập\n"
+                    "2. **Giải thích kiến trúc** — mô tả luồng dữ liệu, các module cần có\n"
+                    "3. **Debug lỗi cụ thể** — paste stacktrace để mình phân tích\n"
+                    "4. **Gợi ý hướng tiếp cận** — pseudocode hoặc outline logic\n\n"
+                    "Theo luật Vibe-coding: bạn dùng AI để build thoải mái, nhưng phải "
+                    "giải thích được từng phần có tên mình tại CP5."
+                )
             return triggered, override_msg, 1.0
 
         if self._L2_AMBIGUOUS_KW.search(query):
@@ -592,17 +720,20 @@ class AIQAAgent:
     # Core: Agent Loop with Function Calling
     # ------------------------------------------------------------------
 
-    SYSTEM_PROMPT = """Bạn là AI Agent QA cho khóa AI Thực Chiến Vingroup - VinUni (Batch 03).
+    SYSTEM_PROMPT = """Bạn là AI Agent QA thông minh cho khóa học AI Thực Chiến Vingroup - VinUni (Batch 03).
 
-Nguyên tắc cơ bản:
-- Với câu giao tiếp thông thường (chào hỏi, hỏi thăm): trả lời tự nhiên, thân thiện như người bạn. KHÔNG cần tra tài liệu.
-- Với câu hỏi chuyên môn, kỹ thuật, deadline, rubric, lỗi code: BẮT BUỘC dùng tool `search_knowledge_base` trước tiên.
-- Nếu KB không đủ thông tin: dùng `search_internet` để tìm thêm.
-- Với yêu cầu tính toán: dùng `calculate`.
-- Với câu hỏi về thời gian: dùng `get_current_time`.
-- Luôn trả lời bằng tiếng Việt, đúng trọng tâm.
-- Nêu rõ nguồn tài liệu đã dùng nếu có (FB Post #..., Guide, Rubric, v.v.).
-- Không viết hộ toàn bộ code bài nộp/checkpoint; chỉ hướng dẫn tư duy và debug."""
+Nguyên tắc BẮT BUỘC (Guardrails & Phạm vi chuyên môn):
+1. CHỈ trả lời các câu hỏi trong phạm vi:
+   - Nội dung, quy chế, spec, rubric, lịch trình khóa học AI Thực Chiến Vingroup - VinUni.
+   - Kỹ thuật, lập trình Python, lỗi code, công nghệ AI, LLM, RAG, Agent, Vibe-coding.
+2. TUYỆT ĐỐI TỪ CHỐI trả lời mọi vấn đề NGOÀI LĨNH VỰC / NGOÀI PHẠM VI (ví dụ: địa lý, chính trị, lịch sử, tin tức giải trí, thể thao, nấu ăn, các chủ đề không liên quan đến khóa học và công nghệ AI/lập trình). Khi từ chối, giải thích rõ phạm vi hỗ trợ và KHÔNG được gửi/kèm bất kỳ tài liệu hay link tra cứu nào.
+3. Với câu giao tiếp thông thường (chào hỏi, cảm ơn, hỏi thăm): trả lời tự nhiên, thân thiện như người bạn, KHÔNG cần tra tài liệu và KHÔNG gửi link tài liệu.
+4. Với câu hỏi thuộc chuyên môn/khóa học: BẮT BUỘC dùng tool `search_knowledge_base` trước tiên. Chỉ khi tài liệu thực sự liên quan đến câu hỏi mới gửi kèm Danh sách Tài liệu & Link gốc liên quan ở cuối câu trả lời dưới định dạng Markdown link rõ ràng (ví dụ: `[📖 Sổ tay chương trình: spec.md](/api/docs/spec.md)`). TUYỆT ĐỐI KHÔNG gửi tài liệu hoặc link không liên quan đến câu hỏi mà người dùng hỏi.
+5. Nếu KB không đủ thông tin về chủ đề thuộc phạm vi khóa học/kỹ thuật: có thể dùng `search_internet` để tìm thêm.
+6. Với yêu cầu tính toán: dùng `calculate`.
+7. Với câu hỏi về thời gian: dùng `get_current_time`.
+8. Luôn trả lời bằng tiếng Việt, đúng trọng tâm và trình bày đẹp mắt.
+9. Không viết hộ toàn bộ code bài nộp/checkpoint; chỉ hướng dẫn tư duy và debug."""
 
     def _agent_loop_openai(self, query: str, guardrail_prefix: str) -> Tuple[str, List[Dict]]:
         """Vòng lặp Agent OpenAI Function Calling. Trả về (answer, tool_citations)."""
@@ -694,34 +825,68 @@ Nguyên tắc cơ bản:
                 print(f"[Warning] Fallback LLM failed: {e}")
 
         # Pure local fallback
-        answer += self._local_answer(retrieved)
+        answer += self._local_answer(retrieved, query)
         return answer, self._build_tool_citations_from_docs(retrieved)
 
-    def _local_answer(self, retrieved_docs: List[Dict]) -> str:
+    def _local_answer(self, retrieved_docs: List[Dict], query: str = "") -> str:
         if not retrieved_docs:
             return (
                 "**Trợ lý AI Thực Chiến Vingroup - VinUni:**\n\n"
-                "Hiện tại mình chưa tìm thấy căn cứ rõ trong Facebook Group KB hoặc sổ tay chương trình. "
-                "Bạn hãy hỏi cụ thể hơn, hoặc dẫn thêm lỗi/ngữ cảnh để mình tra đúng nguồn."
+                "Hiện tại mình chưa tìm thấy tài liệu phù hợp trong kho dữ liệu (Facebook Group KB, Sổ tay chương trình & VLearn). "
+                "Bạn hãy hỏi rõ hơn thông ngữ cảnh (ví dụ: đang làm phần nào trong spec.md, gặp lỗi gì lúc chạy code, hoặc cần tìm quy chế checkpoint nào) để mình dẫn đúng tài liệu nhé!"
             )
 
-        top = retrieved_docs[0]
-        source_type = top.get("source_type", "")
-        content = top.get("content", "")
+        answer_parts = []
+        answer_parts.append("### 🎯 Giải đáp & Hướng dẫn từ cơ sở tri thức khóa học:\n")
 
-        if source_type == "fb_group":
-            prefix = "**Giải đáp từ Facebook Group đã được TA/Mentor kiểm chứng:**"
-        elif source_type == "handbook":
-            prefix = f"**Căn cứ từ sổ tay chương trình ({top.get('url', '')}):**"
-        else:
-            prefix = f"**Kiến thức từ VLearn ({top.get('title', '')}):**"
+        # 1. Main answer synthesis from top 1-2 docs
+        top_docs = retrieved_docs[:2]
+        for i, doc in enumerate(top_docs, 1):
+            st = doc.get("source_type", "")
+            title = doc.get("title", "")
+            content = doc.get("content", "").strip()
+            
+            if st == "fb_group":
+                badge = "💬 **Giải đáp từ FB Group (Đã được Mentor/TA xác nhận):**"
+            elif st == "handbook":
+                badge = f"📖 **Quy chế & Hướng dẫn từ Sổ tay chương trình (`{title}`):**"
+            else:
+                badge = f"🎓 **Kiến thức khóa học VLearn (`{title}`):**"
 
-        answer = f"{prefix}\n\n{content}\n\n"
-        if len(retrieved_docs) > 1:
-            answer += "**Nguồn liên quan thêm:**\n"
-            for doc in retrieved_docs[1:3]:
-                answer += f"- {doc.get('title', '')}: {doc.get('content', '')[:140]}...\n"
-        return answer
+            answer_parts.append(f"{badge}\n\n{content}\n")
+
+        # 2. Supplementary insights if more documents retrieved
+        if len(retrieved_docs) > 2:
+            answer_parts.append("\n### 📌 Thông tin tham khảo & mở rộng:\n")
+            for doc in retrieved_docs[2:5]:
+                title = doc.get("title", "Tài liệu tham khảo")
+                snippet = doc.get("content", "").strip()
+                if len(snippet) > 220:
+                    snippet = snippet[:220] + "..."
+                answer_parts.append(f"- **{title}**: {snippet}")
+
+        # 3. Dedicated Document & Link Access Section
+        answer_parts.append("\n---\n### 📑 Tài liệu & Link truy cập chuẩn xác cho bạn:\n")
+        seen_links = set()
+        for doc in retrieved_docs:
+            url = str(doc.get("url", "") or "").strip()
+            title = doc.get("title", "Tài liệu")
+            st = doc.get("source_type", "")
+            if not url or url in seen_links:
+                continue
+            seen_links.add(url)
+            
+            # Format clean descriptive clickable markdown links
+            if st == "handbook" or url.startswith("/api/docs/"):
+                answer_parts.append(f"- [📖 Mở và đọc chi tiết Sổ tay chương trình: **{title}**]({url})")
+            elif st == "fb_group" or "facebook.com" in url:
+                answer_parts.append(f"- [💬 Xem bài đăng & các bình luận gốc trên **FB Group**]({url})")
+            elif st == "vlearn":
+                answer_parts.append(f"- [🎓 Truy cập bài giảng VLearn: **{title}**]({url})")
+            else:
+                answer_parts.append(f"- [🔗 Xem tài liệu: **{title}**]({url})")
+
+        return "\n".join(answer_parts)
 
     def _build_tool_citations_from_docs(self, docs: List[Dict]) -> List[Dict]:
         return [{
@@ -743,13 +908,36 @@ Nguyên tắc cơ bản:
         triggered_layers, override_msg, conf_mod = self._check_guardrails(query)
 
         # Hard block guardrails → trả về ngay không qua LLM
-        if "layer1_ground_truth" in triggered_layers or "layer3_authority" in triggered_layers:
-            retrieved = self._retrieve_relevant_docs(query, top_k=3)
+        if "layer3_authority" in triggered_layers:
             return {
                 "question": query,
                 "answer": override_msg,
                 "guardrails_triggered": triggered_layers,
-                "confidence_score": 0.98,
+                "confidence_score": conf_mod,
+                "citations": [],
+                "retrieved_docs": [],
+            }
+
+        if "layer1_ground_truth" in triggered_layers:
+            retrieved = self._retrieve_relevant_docs(query, top_k=2)
+            if retrieved:
+                override_msg += "\n\n---\n### 📑 Tài liệu & Link truy cập gốc liên quan:\n"
+                for d in retrieved:
+                    url = str(d.get("url", "") or "").strip()
+                    title = d.get("title", "Tài liệu")
+                    st = d.get("source_type", "")
+                    if url:
+                        if st == "handbook" or url.startswith("/api/docs/"):
+                            override_msg += f"- [📖 Mở Sổ tay chương trình: **{title}**]({url})\n"
+                        elif st == "fb_group" or "facebook.com" in url:
+                            override_msg += f"- [💬 Xem trên FB Group ({title})]({url})\n"
+                        else:
+                            override_msg += f"- [🔗 Xem chi tiết: **{title}**]({url})\n"
+            return {
+                "question": query,
+                "answer": override_msg,
+                "guardrails_triggered": triggered_layers,
+                "confidence_score": conf_mod,
                 "citations": self._build_citations(retrieved),
                 "retrieved_docs": retrieved,
             }

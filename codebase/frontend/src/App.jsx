@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import ChatTab from './components/ChatTab';
+import CourseScheduleSidebar from './components/CourseScheduleSidebar';
 import CitationModal from './components/CitationModal';
-import { FALLBACK_STATS } from './mockData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const WELCOME_MSG = {
   sender: 'agent',
-  text: 'Xin chào! Mình là AI Agent QA của khóa AI Thực Chiến Vingroup - VinUni.\n\nMình có thể giúp bạn giải đáp các vấn đề từ cài đặt, lỗi code, đến tìm hiểu quy trình Hackathon. Hãy đặt câu hỏi nhé!',
+  text: 'Xin chào! Mình là Trợ lý AI Tư vấn Khóa học AI Thực Chiến (Vingroup - VinUni).\n\nMình sẵn sàng giải đáp mọi thắc mắc của bạn về:\n• Thông tin tuyển sinh, lộ trình đào tạo 3 tháng & yêu cầu đầu vào khóa học\n• Thông tin cơ sở vật chất, khu vực học tập & các nơi phục vụ cá nhân khi học tại trường (VinUni / Tòa Vin)\n• Giải đáp thắc mắc chuyên môn, kỹ thuật & quy định từ cơ sở dữ liệu Facebook Group và VLearn (@codebase/data)\n\nHãy chọn kịch bản demo bên dưới hoặc đặt câu hỏi nhé!',
   meta: null,
 };
 
@@ -79,17 +79,22 @@ export default function App() {
       <div className="bg-glow glow-cyan" />
       <div className="bg-glow glow-violet" />
 
-      <div className="app-container">
+      <div className="app-container app-container-mockup">
         <Header kbStatusText={kbStatusText} />
-        
-        <div className="chat-layout">
-          <ChatTab
-            messages={messages}
-            onSendMessage={sendMessage}
-            isTyping={isTyping}
-            citations={citations}
-            onSelectCitation={setSelectedCitation}
-          />
+
+        <div className="mockup-2col-layout">
+          <div className="mockup-left-col">
+            <ChatTab
+              messages={messages}
+              onSendMessage={sendMessage}
+              isTyping={isTyping}
+              citations={citations}
+              onSelectCitation={setSelectedCitation}
+            />
+          </div>
+          <div className="mockup-right-col">
+            <CourseScheduleSidebar />
+          </div>
         </div>
       </div>
 

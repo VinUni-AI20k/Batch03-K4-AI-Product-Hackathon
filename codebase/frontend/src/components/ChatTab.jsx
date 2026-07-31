@@ -1,21 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, FileText, Send, ShieldCheck, Sparkles } from 'lucide-react';
-
-const guardrailLabels = {
-  layer1_ground_truth: { label: 'Nguồn sự thật', tone: 'badge-danger' },
-  layer2_ambiguity: { label: 'Cần làm rõ', tone: 'badge-warn' },
-  layer3_authority: { label: 'Ngoài thẩm quyền', tone: 'badge-danger' },
-  layer4_domain: { label: 'Đặc thù domain', tone: 'badge-info' }
-};
+import { Send, ThumbsUp, AlertTriangle, UserCheck, FileText, CheckCircle2 } from 'lucide-react';
 
 export default function ChatTab({
   messages,
   onSendMessage,
   isTyping,
-  citations,
+  citations = [],
   onSelectCitation
 }) {
   const [input, setInput] = useState('');
+  const [activeDemo, setActiveDemo] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -27,6 +21,7 @@ export default function ChatTab({
     if (!input.trim() || isTyping) return;
     onSendMessage(input.trim());
     setInput('');
+    setActiveDemo(null);
   };
 
   const handleKeyDown = (e) => {
@@ -36,126 +31,191 @@ export default function ChatTab({
     }
   };
 
-  const hintQueries = [
-    'Lỗi pip install trên Windows thì sửa thế nào?',
-    'Hạn nộp spec.md Batch 03 là mấy giờ?',
-    'HAX và PAIR áp dụng vào AI Spec thế nào?',
-    'Vibe-coding rule quy định ra sao?'
+  // Kịch bản demo giống trong mockup UI của USER
+  const demoScripts = [
+    {
+      id: 'happy',
+      label: '1. Happy Path',
+      text: 'Khóa học AI Thực Chiến kéo dài trong bao lâu và lộ trình đào tạo 3 tháng ra sao?'
+    },
+    {
+      id: 'low_conf',
+      label: '2. Low Confidence',
+      text: 'Lỗi pip install trên Windows báo Visual C++ 14.0 là fix thế nào?'
+    },
+    {
+      id: 'out_of_scope',
+      label: '3. Out of Scope (Failure)',
+      text: 'Xe VinFast VF8 bản Plus bây giờ giá lăn bánh bao nhiêu?'
+    },
+    {
+      id: 'correction',
+      label: '4. Correction',
+      text: 'Căng tin VinUni mở cửa lúc mấy giờ và khu vực phục vụ sinh hoạt cá nhân của học viên ra sao?'
+    }
   ];
 
+  const handleSelectDemo = (demo) => {
+    setActiveDemo(demo.id);
+    onSendMessage(demo.text);
+  };
+
   return (
-    <div className="chat-layout chat-layout-single">
-      <section className="chat-main-card glass-panel">
-        <div className="chat-topbar">
-          <div>
-            <p className="eyebrow">Facebook Group + Sổ tay chương trình</p>
-            <h2>Trợ lý hỏi đáp AI Thực Chiến</h2>
-          </div>
-          <div className="topbar-badges">
-            <span><ShieldCheck size={14} /> Guardrails</span>
-            <span><FileText size={14} /> Citations</span>
+    <section className="chat-main-card">
+      {/* Header UI giống mockup */}
+      <div className="chat-header-mockup">
+        <div className="agent-avatar-circle">
+          <span>AI</span>
+        </div>
+        <div className="chat-header-info">
+          <h2 className="chat-title-mockup">Khóa AI Thực Chiến - Vin</h2>
+          <div className="chat-status-mockup">
+            <span className="online-dot"></span>
+            <span>Đang trực tuyến · Tư vấn Khóa học & Hỏi đáp từ Facebook QA / VLearn</span>
           </div>
         </div>
+      </div>
 
-        <div className="chat-messages">
-          {messages.map((msg, idx) => {
-            const isLatestAgent = msg.sender === 'agent' && idx === messages.length - 1;
-            return (
-              <div key={idx} className={`message ${msg.sender}-message`}>
-                <div className={`avatar ${msg.sender}-avatar`}>
-                  {msg.sender === 'agent' ? <Sparkles size={20} /> : 'U'}
+      {/* Messages Area */}
+      <div className="chat-messages-mockup">
+        {messages.map((msg, idx) => {
+          const isAgent = msg.sender === 'agent';
+          const isLatestAgent = isAgent && idx === messages.length - 1;
+          const isOutOfScope =
+            msg.meta?.guardrails?.includes('layer3_authority') ||
+            msg.text.includes('Rất xin lỗi bạn') ||
+            msg.text.includes('không có thông tin về sản phẩm');
+
+          return (
+            <div
+              key={idx}
+              className={`message-row-mockup ${isAgent ? 'agent-row' : 'user-row'}`}
+            >
+              {isAgent && (
+                <div className="agent-avatar-circle small-avatar">
+                  <span>AI</span>
                 </div>
+              )}
 
-                <div className="msg-content">
-                  <div className="msg-sender">
-                    {msg.sender === 'agent' ? 'AI Agent QA' : 'Bạn'}
-                  </div>
+              <div className="message-content-wrapper">
+                <div className={`message-bubble-mockup ${isAgent ? 'agent-bubble' : 'user-bubble'}`}>
+                  {msg.text.split('\n').map((line, i) => (
+                    <p key={i}>{line || '\u00A0'}</p>
+                  ))}
 
-                  <div className="msg-bubble">
-                    {msg.text.split('\n').map((line, i) => (
-                      <p key={i}>{line || '\u00A0'}</p>
-                    ))}
-                  </div>
-
-                  {msg.meta && (
-                    <div className="msg-meta">
-                      {(msg.meta.guardrails || []).map((g, gi) => {
-                        const info = guardrailLabels[g] || { label: g, tone: 'badge-warn' };
-                        return (
-                          <span key={gi} className={`badge ${info.tone}`}>
-                            {info.label}
-                          </span>
-                        );
-                      })}
-
-                      {msg.meta.confidence && (
-                        <span className="badge badge-success">
-                          <CheckCircle2 size={12} />
-                          {Math.round(msg.meta.confidence * 100)}% tin cậy
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {isLatestAgent && citations.length > 0 && (
-                    <div className="inline-citations">
-                      {citations.slice(0, 4).map((cit, citIdx) => (
-                        <a 
-                          key={citIdx} 
-                          href={cit.url || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
+                  {/* Hiển thị Citation Source ngay bên trong hoặc ngay cuối bubble nếu có */}
+                  {isLatestAgent && citations.length > 0 && !isOutOfScope && (
+                    <div className="inline-source-tags">
+                      {citations.slice(0, 2).map((cit, citIdx) => (
+                        <button
+                          key={citIdx}
+                          type="button"
+                          className="source-tag-btn"
+                          onClick={() => onSelectCitation?.(cit)}
                         >
-                          <FileText size={14} />
-                          <span>{cit.title || `Nguồn ${citIdx + 1}`}</span>
-                        </a>
+                          [Nguồn: {cit.title ? cit.title.replace(/^Sổ tay chương trình -\s*/i, '').slice(0, 35) : `Tài liệu ${citIdx + 1}`}]
+                        </button>
                       ))}
                     </div>
                   )}
                 </div>
-              </div>
-            );
-          })}
 
-          {isTyping && (
-            <div className="typing-indicator">
-              <div className="avatar agent-avatar">
-                <Sparkles size={20} />
+                {/* Nút hành động phía dưới bubble Agent */}
+                {isAgent && (
+                  <div className="bubble-actions-mockup">
+                    {!isOutOfScope ? (
+                      <>
+                        <button
+                          type="button"
+                          className="action-pill-btn useful-btn"
+                          onClick={() => alert('Cảm ơn phản hồi hữu ích của bạn!')}
+                        >
+                          <ThumbsUp size={12} className="text-yellow-600" />
+                          <span>Hữu ích</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="action-pill-btn report-btn"
+                          onClick={() => alert('Đã ghi nhận báo cáo lỗi để cải thiện!')}
+                        >
+                          <AlertTriangle size={12} className="text-orange-500" />
+                          <span>Báo sai / Sửa lỗi</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="transfer-agent-btn"
+                        onClick={() => alert('Đã chuyển yêu cầu đến tư vấn viên BTC AI Thực Chiến!')}
+                      >
+                        <UserCheck size={14} />
+                        <span>Chuyển cho tư vấn viên để được giải đáp đúng nhu cầu</span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
+            </div>
+          );
+        })}
+
+        {isTyping && (
+          <div className="message-row-mockup agent-row">
+            <div className="agent-avatar-circle small-avatar">
+              <span>AI</span>
+            </div>
+            <div className="message-bubble-mockup agent-bubble typing-bubble">
               <div className="typing-dots">
                 <span></span><span></span><span></span>
               </div>
-              <span>Đang tra cứu nguồn và tổng hợp câu trả lời...</span>
+              <span style={{ fontSize: '13px', color: '#64748b' }}>
+                Đang tra cứu Knowledge Base...
+              </span>
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div className="chat-input-wrapper">
-          <form onSubmit={handleSubmit} className="chat-input-box">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Nhập câu hỏi về bài học, deadline, rubric, lỗi cài đặt hoặc dữ liệu Facebook..."
-              rows={2}
-            />
-            <button type="submit" className="send-button" disabled={!input.trim() || isTyping}>
-              <span>Gửi</span>
-              <Send size={18} />
-            </button>
-          </form>
-
-          <div className="input-hints">
-            <span>Gợi ý:</span>
-            {hintQueries.map((q, i) => (
-              <button key={i} type="button" className="hint-chip" onClick={() => onSendMessage(q)}>
-                {q}
-              </button>
-            ))}
           </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Demo Script Bar (Kịch bản demo:) */}
+      <div className="demo-scripts-bar">
+        <span className="demo-label">Kịch bản demo:</span>
+        <div className="demo-pills-list">
+          {demoScripts.map((demo) => (
+            <button
+              key={demo.id}
+              type="button"
+              className={`demo-pill-btn ${activeDemo === demo.id ? 'active-demo' : ''}`}
+              onClick={() => handleSelectDemo(demo)}
+            >
+              {demo.label}
+            </button>
+          ))}
         </div>
-      </section>
-    </div>
+      </div>
+
+      {/* Input Box Bottom Bar */}
+      <div className="chat-input-bottom">
+        <form onSubmit={handleSubmit} className="chat-input-form-mockup">
+          <input
+            type="text"
+            className="chat-input-field-mockup"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Nhập câu hỏi của bạn..."
+          />
+          <button
+            type="submit"
+            className="send-circle-btn"
+            disabled={!input.trim() || isTyping}
+            title="Gửi câu hỏi"
+          >
+            <Send size={18} />
+          </button>
+        </form>
+      </div>
+    </section>
   );
 }

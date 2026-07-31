@@ -57,6 +57,15 @@ async def search_kb(q: Optional[str] = ""):
     results = qa_agent._retrieve_relevant_docs(q, top_k=10)
     return {"results": results}
 
+@app.get("/api/docs/{file_path:path}")
+async def serve_docs(file_path: str):
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    full_path = os.path.join(base_dir, file_path)
+    if os.path.exists(full_path) and os.path.isfile(full_path):
+        return FileResponse(full_path)
+    raise HTTPException(status_code=404, detail="File not found")
+
 # Serve React Frontend Build if available, fallback to static UI
 frontend_dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "dist")
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
