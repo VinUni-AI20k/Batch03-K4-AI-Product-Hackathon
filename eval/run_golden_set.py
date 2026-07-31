@@ -1,10 +1,10 @@
-"""Run eval/golden-set.json against the live /recommend API and write eval/run-01.md.
+"""Run eval/golden-set.json against the live /recommend API and write eval/run-03.md.
 
-Usage: python3 eval/run_golden_set.py [--api http://localhost:8001] [--out eval/run-01.md]
+Usage: python3 eval/run_golden_set.py [--api http://localhost:8001] [--out eval/run-03.md]
 
-Cases with a non-standard `input` shape (R04 failure simulation, L02 system check,
-L06 out-of-170 request) are not POST-able as-is and are marked SKIPPED with a note
-to score by hand — see golden-set.json `what_it_tests` for how to check them manually.
+Only cases without a POST-able profile (currently R04 failure simulation) are marked
+SKIPPED. Extra test metadata inside `input` is removed before calling the API; system
+checks still require manual scoring using `what_it_tests`.
 """
 from __future__ import annotations
 
@@ -42,14 +42,14 @@ def is_postable(case: dict) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://localhost:8001")
-    parser.add_argument("--out", default=str(ROOT / "eval" / "run-01.md"))
+    parser.add_argument("--out", default=str(ROOT / "eval" / "run-03.md"))
     args = parser.parse_args()
 
     golden = json.loads((ROOT / "eval" / "golden-set.json").read_text(encoding="utf-8"))
     cases = golden["cases"]
 
     lines = [
-        "# Eval run — lượt 1",
+        "# Eval run — lượt 3",
         "",
         f"API: `{args.api}` · Cases: {len(cases)} · Model: xem `codebase/server/.env` (`OPENROUTER_MODEL`).",
         "",
@@ -90,8 +90,8 @@ def main() -> None:
         "",
         "1. Với mỗi dòng RAN: mở `trace_id` tương ứng trong `codebase/server/logs/recommend_calls.jsonl`, đối chiếu `reasons`/`risk_note`/`confidence` với cột `expected` trong `golden-set.json`.",
         "2. Điền cột cuối: `pass` / `fail` + 1 câu lý do.",
-        "3. Case SKIPPED (L02, L06, R04) chấm hoàn toàn bằng tay theo `what_it_tests` — L02/L06 đọc log server để xác nhận không có ma_de lạ; R04 tắt server hoặc set sai `OPENROUTER_API_KEY` rồi thử trên UI.",
-        "4. Tính % = số case pass / 20 (tổng golden set, kể cả SKIPPED sau khi chấm tay) — không chia trên số case RAN.",
+        "3. L02/L06 vẫn gọi API nhưng có điều kiện hệ thống phải chấm tay qua log để xác nhận không có `ma_de` lạ; R04 là case SKIPPED, cần tắt server hoặc set sai `OPENROUTER_API_KEY` rồi thử trên UI.",
+        f"4. Tính % = số case pass / {len(cases)} (tổng golden set hiện tại, kể cả SKIPPED sau khi chấm tay) — không chia trên số case RAN.",
     ]
 
     out_path = Path(args.out)

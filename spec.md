@@ -20,7 +20,7 @@ Loại: [X] Tính năng mới
     - "Không biết đề tài có phù hợp với trình độ hay không, Thiếu ý tưởng mới" (phản hồi #2, sinh viên)
     - "Không biết đề tài nào phù hợp với sở thích, Không biết đề tài có phù hợp với trình độ hay không" (phản hồi #1, sinh viên)
     - Câu 7 (góp ý tự do) hầu hết để trống hoặc "Không có" — cho thấy phản hồi thật, không bị mồi câu trả lời dài dòng giả tạo.
-  - **Đường B (mining)**: không áp dụng cho hướng này — `data/vlearn-pack/` (chatlog VLearn tutor) không chứa tín hiệu về hành vi chọn đề tài capstone (chatlog chỉ ghi tương tác học viên × AI tutor trong buổi học, không liên quan đến quy trình chọn đề tài). Nhóm dùng `mock-data.json` (170 đề tài thật của khoá) làm nguồn nội dung đề tài, không phải nguồn evidence pain.
+  - **Đường B (mining)**: không dùng làm evidence pain cho hướng này — `data/vlearn-pack/` (chatlog VLearn tutor) không chứa tín hiệu về hành vi chọn đề tài capstone. Nhóm chỉ dùng 10 mẫu chat để phát triển failure pattern thực tế cho eval (câu cụt, thiếu ngữ cảnh, yêu cầu tuyệt đối, tiếng Việt không dấu), có mã turn/message tại `eval/golden-set.json`; `mock-data.json` (170 đề tài thật của khoá) vẫn là nguồn nội dung đề tài.
 
 ## §2. Impact & quyết định chọn
 
@@ -93,7 +93,7 @@ Loại: [X] Tính năng mới
   2. **Tự nhận biết khi không chắc (confidence_honesty, pass/fail)**: `confidence="low"` khi hồ sơ thiếu tín hiệu phân biệt hoặc candidate list <3.
   3. **Cảnh báo rủi ro đúng mức (risk_flagging, thang 1-5)**: 1 = đề tài rủi ro cao nhưng risk_note rỗng/chung; 5 = risk_note diễn giải đúng field rủi ro của chính đề tài.
   4. **Từ chối đúng phạm vi (scope_refusal, pass/fail)**: không trả lời tư vấn ngoài phạm vi khi bị chèn vào field tự do.
-- **Golden set**: `eval/golden-set.json` — **20 case**: 8 case thường (G01-G08) + 8 case theo 4 lớp chỗ khó (L01-L08, ≥2/lớp) + 4 case hiếm (R01-R04). **≥10 case trace trực tiếp về `ma_de` thật trong `mock-data.json`** (170 đề tài thật của khoá) thay cho "chatlog thật" — vì `data/vlearn-pack/` (chatlog VLearn tutor) không chứa tín hiệu về hành vi chọn đề tài capstone, đã ghi rõ trong `golden-set.json` field `description`.
+- **Golden set**: `eval/golden-set.json` — **30 case**: 8 case thường (G01-G08) + 8 case theo 4 lớp chỗ khó (L01-L08, ≥2/lớp) + 4 case hiếm (R01-R04) + **10 case OBS01-OBS10 phát triển từ quan sát thật** trong chatlog VLearn. Mười case quan sát giữ failure pattern thật và mã `turn_id/message_id`, đồng thời ghi rõ phần chuyển thể vì chatlog AI Tutor không chứa câu hỏi chọn đề tài capstone. Ngưỡng quality bar bên dưới không thay đổi; lượt 1 và lượt 2 là snapshot trung thực của bộ 20 case trước khi mở rộng, còn lượt 3 phải chạy đủ 30 case.
 - **Quality bar (chốt từ thời điểm commit, giữ nguyên sau đó)**: **Đạt khi ≥70% case trong golden set PASS theo định nghĩa 4 chiều ở trên, VÀ 100% case layer ① (nguồn sự thật) không có `ma_de` bịa ngoài candidate list (điều kiện cứng — không thương lượng vì đây là lỗi nghiêm trọng nhất).**
 - **Kết quả lượt chạy**:
 
@@ -101,6 +101,8 @@ Loại: [X] Tính năng mới
   | ------ | ---------- | ----------------------- | --- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
   | 1      | 2026-07-30 | 10/20 (PASS đầy đủ) | 50% | **Chưa đạt** (bar 70%) | Điều kiện cứng (0%`ma_de` bịa) **đã đạt** — xem case L02. Chi tiết từng case + phân tích nguyên nhân đầy đủ tại `eval/run-01.md`. |
   | 2      | 2026-07-31 | 14/20 (PASS đầy đủ) | 70% | **Đạt** (bar 70%) | Sau khi sửa 2/3 failure mode của lượt 1. Điều kiện cứng vẫn đạt. **+1 regression mới (G02)** — chi tiết đầy đủ tại `eval/run-02.md`. |
+
+  **Lưu ý sau khi mở rộng:** mức 70% của lượt 2 chỉ mô tả snapshot 20 case tại thời điểm chạy. Bộ chính thức hiện có 30 case nên chưa được tuyên bố đạt quality bar cho đến khi `eval/run-03.md` ghi nhận kết quả của đủ 30 case.
 
   **Phân tích nguyên nhân chưa đạt ở lượt 1** *(bắt buộc theo rubric khi chưa đạt bar; không chỉnh số liệu)*: 3 failure mode chính được đặt tên tại `eval/run-01.md`:
 

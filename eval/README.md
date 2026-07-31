@@ -4,12 +4,29 @@ Thư mục này chứa các bộ eval cho lát cắt sản phẩm: **giúp học
 
 ## File
 
-- `golden-set.json`: bộ 20 case chính thức đã chốt trong `spec.md`, dùng với API `/recommend` và `run_golden_set.py`.
+- `golden-set.json`: bộ 30 case chính thức dùng với API `/recommend` và `run_golden_set.py`: 20 case nền + 10 case `OBS01`-`OBS10` phát triển từ quan sát thật trong chatlog.
 - `conversation-golden-set.json`: đúng 40 case hội thoại mở rộng và oracle mong đợi.
-- `run-01.md`: kết quả lượt chạy thật của bộ chính thức; không được sửa số liệu để khớp quality bar.
+- `run-01.md`: kết quả lịch sử của 20 case trước khi mở rộng; không được sửa số liệu để khớp quality bar.
+- `run-02.md`: kết quả lịch sử lượt 2 trên 20 case trước khi mở rộng; không được ghi đè.
+- `run-03.md`: đầu ra mặc định cho lượt chạy đủ 30 case sau khi bổ sung provenance thực tế; phải giữ nguyên cả case fail.
 - `validate.js`: kiểm tra schema, số lượng, độ phủ, ID trùng và mã đề tài của bộ 40 case mở rộng.
 
-Bộ mở rộng chưa được điền kết quả. Khi chạy phải lưu nguyên output, kể cả case fail. Hai bộ có mục đích khác nhau và không được cộng gộp tỷ lệ pass nếu chưa định nghĩa lại quality bar trong `spec.md`.
+Bộ hội thoại mở rộng chưa được điền kết quả. Khi chạy phải lưu nguyên output, kể cả case fail. Không cộng gộp tỷ lệ pass của bộ hội thoại với golden set chính thức; 10 case quan sát thật đã được đưa riêng vào golden set chính thức dưới mã `OBS01`-`OBS10`.
+
+## Mười case từ quan sát thật
+
+Các case `OBS01`-`OBS10` được phát triển từ 10 tin nhắn có thật của học viên trong
+`data/vlearn-pack/chatlog/chat_history_anonymized_for_hackathon.csv`. Mỗi case có:
+
+- `origin.kind = "adapted_real_chatlog"`;
+- `origin.refs` chứa mã `turn_id/message_id` kiểm chứng được;
+- `observation_summary` mô tả ngắn hành vi đã quan sát;
+- `adaptation` nói rõ cách chuyển hành vi AI Tutor thành input cho `/recommend`.
+
+Chatlog không chứa hành vi chọn đề tài capstone, nên các case này không được trình
+bày như câu hỏi nguyên văn về ĐềTài+. Chúng giữ các failure pattern thật như câu hỏi
+thiếu đối tượng, yêu cầu deterministic, ưu tiên giải pháp đơn giản và tiếng Việt
+không dấu. Không sao chép hội thoại dài hoặc dữ liệu định danh vào golden set.
 
 ## Cơ cấu bộ 40 case mở rộng
 
