@@ -1936,6 +1936,7 @@
         function renderSlideHtml(s, idx, fileLabel, citationPrefix, docKey, total) {
             const page = idx + 1;
             const citation = `${citationPrefix}-${String(page).padStart(3, '0')}`;
+            const imgSrc = `assets/${docKey}/page-${String(page).padStart(3, '0')}.png`;
 
             const heading = s ? escapeHtml(s.heading || '') : `Trang ${page}`;
             const subheading = s && s.subheading ? `<div class="slide-subheading" style="color: #2563eb; margin-top: 6px; font-size: 15px; font-weight: 600;">${escapeHtml(s.subheading)}</div>` : '';
@@ -2007,6 +2008,7 @@
             const citationPrefix = doc === 'd1' ? 'T01' : 'T02';
             const container = document.getElementById(doc === 'd1' ? 'docD1Container' : 'docD2Container');
             const list = sections[doc];
+            const slidesList = doc === 'd1' ? d1Slides : d2Slides;
 
             let html = '';
             for (let i = 0; i < list.length; i++) {
@@ -2028,14 +2030,6 @@
                     renderQuizQuestions(doc, section.id);
                 } else {
                     loadQuizInto(doc, section.id);
-                }
-            }
-            if (unlockedCount >= list.length && extraSlidesHtml(doc, fileLabel, citationPrefix)) {
-                const extra = extras[doc];
-                if (extra) {
-                    for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
-                        renderPdfPageCanvas(doc, idx + 1);
-                    }
                 }
             }
             setTimeout(initDrawCanvases, 60);
