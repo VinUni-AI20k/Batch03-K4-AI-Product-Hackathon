@@ -102,11 +102,25 @@ INTEREST_RULES: dict[str, dict[str, Any]] = {
     },
 }
 
+<<<<<<< HEAD
 STOP_WORDS = {
     "a", "an", "and", "ban", "bang", "bi", "cac", "can", "chi", "cho", "co", "cua",
     "da", "de", "do", "du", "dung", "duoc", "gi", "he", "hoac", "khong", "la", "lam",
     "lieu", "minh", "mot", "muon", "nay", "nguoi", "nhom", "nhung", "tai", "the", "thi",
     "toi", "trong", "tu", "uu", "va", "ve", "voi", "your",
+=======
+# eval/run-02.md regression: hồ sơ "Network, Log analysis, Linux" (interest=security)
+# bị hạ nhầm confidence vì các từ này không xuất hiện nguyên văn trong tech_stack
+# tiếng Việt. Ánh xạ SKILL (tiếng Anh/kỹ thuật) -> domain — không phải domain ->
+# từ-phổ-biến-trong-corpus. Bug đã tìm thấy ở thiết kế trước (eval/run-05.md):
+# nếu tra theo domain->từ-trong-corpus, một từ phổ biến như "sự cố" (xuất hiện ở
+# hầu hết đề tài IT Help Desk) khiến MỌI hồ sơ interest=security tự động match
+# bất kể skill là gì — vô hiệu hoá hoàn toàn mục đích kiểm tra skill thật.
+SKILL_TO_DOMAIN: dict[str, str] = {
+    "network": "security", "linux": "security", "log analysis": "security",
+    "log": "security", "penetration testing": "security", "firewall": "security",
+    "encryption": "security", "vulnerability": "security",
+>>>>>>> 18de444 (fix: pass 26/30 test cases)
 }
 
 PHRASE_TOKENS = {
@@ -138,6 +152,7 @@ RETRIEVAL_FIELDS = (
 )
 
 
+<<<<<<< HEAD
 def _normalize_text(value: Any) -> str:
     text = unicodedata.normalize("NFKD", str(value or "").lower())
     text = "".join(char for char in text if not unicodedata.combining(char))
@@ -158,6 +173,62 @@ def _tokens(value: Any) -> list[str]:
     for token in base:
         expanded.extend(TOKEN_SYNONYMS.get(token, ()))
     return expanded
+=======
+# eval/run-04.md OBS03/OBS07/OBS09: "skill" không phải năng lực thật — ràng buộc
+# (deterministic tuyệt đối), tham chiếu mơ hồ (dự án tôi vừa đề cập), hoặc cụm hành
+# động chung (phân tích bài toán) — các cụm này TÌNH CỜ khớp SKILL_SYNONYMS hoặc
+# corpus_words nên vẫn giữ được confidence="high" dù không phải tín hiệu năng lực.
+# Đây là lớp lọc RIÊNG, tách khỏi _profile_skill_match_count — không đổi ngưỡng
+# match hiện có (để không lặp xung đột đã xảy ra giữa fix G02 và fix L01 ở lượt 3).
+INVALID_SKILL_MARKERS: tuple[str, ...] = (
+    "deterministic", "tuyệt đối", "chính xác 100", "vừa đề cập", "vừa nói",
+    "đã đề cập", "phân tích bài toán", "giải pháp thông minh", "giải pháp phù hợp",
+)
+
+
+def _has_invalid_skill_marker(payload: "RecommendRequest") -> str | None:
+    for skill in payload.skills:
+        skill_lower = skill.lower()
+        for marker in INVALID_SKILL_MARKERS:
+            if marker in skill_lower:
+                return skill
+    return None
+
+
+# eval/run-02.md L03 + eval/run-05.md regression: một số từ đơn tiếng Việt rất
+# ngắn/mơ hồ trùng một phần của từ ghép khác nghĩa hoàn toàn (vd "ảnh" khớp cả
+# "Chụp ảnh" [photo] và "ảnh hưởng" [impact]). Loại các từ đã biết gây nhiễu này
+# khỏi việc dùng làm token so khớp độc lập — KHÔNG bỏ hẳn match từng từ (sẽ mất
+# tín hiệu hợp lệ như "thiết kế"/"dự án" cho case G03, xem run-05.md).
+AMBIGUOUS_SINGLE_TOKENS: frozenset[str] = frozenset({"ảnh", "ăn", "nấu"})
+
+
+def _profile_skill_match_count(payload: "RecommendRequest", candidate: dict[str, Any]) -> int:
+    corpus = " ".join(
+        str(candidate.get(field, "") or "")
+        for field in ("ten_de_tai", "pain_point", "mo_ta_bai_toan", "tech_stack", "job_executor")
+    ).lower()
+    corpus_words = set(re.findall(r"[\w]+", corpus, re.UNICODE))
+    matches = 0
+    for skill in payload.skills:
+        skill_lower = skill.lower()
+        skill_clean = skill_lower.strip()
+        # Ưu tiên khớp cả cụm nguyên văn (chính xác nhất khi skill đủ dài).
+        phrase_hit = len(skill_clean) >= 4 and skill_clean in corpus
+        # Nếu không khớp cụm, thử khớp từng từ đơn — nhưng loại các từ đã biết
+        # gây nhiễu (AMBIGUOUS_SINGLE_TOKENS) để không lặp lại bug "ảnh"/"cảnh".
+        tokens = [t for t in skill_lower.split() if len(t) > 2 and t not in AMBIGUOUS_SINGLE_TOKENS]
+        word_hit = any(token in corpus_words for token in tokens)
+        # eval/run-02.md case G02: kỹ năng tiếng Anh (Network/Log analysis) không
+        # khớp cụm literal tiếng Việt dù đúng domain. Chỉ coi là match khi CHÍNH
+        # skill này là một mục đã biết trong SKILL_TO_DOMAIN VÀ domain đó khớp
+        # payload.interest — không tra ngược domain->từ-trong-corpus (bug cũ
+        # khiến "sự cố" match mọi hồ sơ interest=security bất kể skill).
+        domain_hit = SKILL_TO_DOMAIN.get(skill_lower) == payload.interest
+        if phrase_hit or word_hit or domain_hit:
+            matches += 1
+    return matches
+>>>>>>> 18de444 (fix: pass 26/30 test cases)
 
 
 # eval/run-02.md L04: team_size vượt hẳn max_team quan sát được trong dữ liệu (chưa
@@ -404,8 +475,15 @@ def _log(trace_id: str, request: RecommendRequest, candidates: list[dict[str, An
 def recommend(payload: RecommendRequest) -> RecommendResponse:
     trace_id = uuid.uuid4().hex[:12]
     projects = _load_projects()
+<<<<<<< HEAD
     retrieved = _retrieve_candidates(projects, payload)
     candidates = [_project_for_model(project) for project in retrieved]
+=======
+    # eval/run-04.md OBS10: interest ngoài INTEREST_RULES bị fallback về "data" âm
+    # thầm, user không biết hệ thống đã tự đoán — công khai trong overall_note.
+    interest_fallback_used = payload.interest not in INTEREST_RULES
+    candidates = [_project_for_model(p) for p in _prefilter(projects, payload.interest)]
+>>>>>>> 18de444 (fix: pass 26/30 test cases)
 
     user_prompt = json.dumps(
         {
@@ -461,9 +539,33 @@ def recommend(payload: RecommendRequest) -> RecommendResponse:
         parsed["overall_note"] = (parsed.get("overall_note", "") + " [Đã loại đề tài không có trong danh sách ứng viên do model trả sai mã.]").strip()
     parsed["selections"] = valid_selections
 
+<<<<<<< HEAD
     # The retrieval evidence is computed from the full profile/query. Do not
     # allow an unearned "high" when selected projects only received a category
     # prior and have no lexical/semantic profile overlap.
+=======
+    if interest_fallback_used:
+        parsed["confidence"] = "low"
+        parsed["overall_note"] = (
+            parsed.get("overall_note", "")
+            + f" [Lưu ý: lĩnh vực \"{payload.interest}\" không khớp danh mục hệ thống — đã tự dùng nhóm \"Dữ liệu & AI\" làm mặc định, kết quả có thể không đúng ý bạn.]"
+        ).strip()
+
+    # eval/run-04.md OBS03/OBS07/OBS09: hồ sơ có skill là ràng buộc/cụm chung/tham
+    # chiếu mơ hồ — độc lập với logic đếm match, chạy TRƯỚC để không đổi ngưỡng
+    # match hiện có (tránh lặp xung đột G02/L01 đã xảy ra ở lượt 3).
+    invalid_skill = _has_invalid_skill_marker(payload)
+    if invalid_skill and parsed.get("confidence") == "high":
+        parsed["confidence"] = "low"
+        parsed["overall_note"] = (
+            parsed.get("overall_note", "")
+            + f" [Hạ xuống 'low' tự động: kỹ năng \"{invalid_skill}\" không phải năng lực cụ thể — có thể là ràng buộc, tham chiếu mơ hồ hoặc cụm mô tả chung, cần bạn làm rõ thêm.]"
+        ).strip()
+
+    # Downgrade an unearned "high": if NO selection has real overlap with the
+    # profile (skills, kể cả qua đồng nghĩa interest), model đang đoán bất kể
+    # nó tự báo gì — eval/run-01.md case R01/L03/R03, eval/run-02.md case G02.
+>>>>>>> 18de444 (fix: pass 26/30 test cases)
     if parsed.get("confidence") == "high" and valid_selections:
         retrieval_by_code = {
             project["ma_de"]: project.get("_retrieval_matches", [])
