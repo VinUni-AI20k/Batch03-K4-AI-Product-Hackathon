@@ -1,12 +1,12 @@
 {
   "backend": {
-    "pid": 28640,
+    "pid": 24020,
     "port": 8000,
     "status": "started"
   },
   "frontend": {
-    "pid": 0,
+    "pid": 29324,
     "port": 5173,
-    "status": "already_running"
+    "status": "started"
   }
 }

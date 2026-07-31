@@ -12,19 +12,19 @@ function ul(items: string[]): PrivacyBlock {
 
 export const privacyIntro: Record<Locale, string[]> = {
   vi: [
-    "Điều khoản sử dụng này quy định việc truy cập và sử dụng nền tảng CIVI — công cụ ứng dụng trí tuệ nhân tạo hỗ trợ người dân tìm hiểu, chuẩn bị và kiểm tra trước hồ sơ thủ tục hành chính.",
+    "Điều khoản sử dụng này quy định việc truy cập và sử dụng nền tảng SPDVC — công cụ ứng dụng trí tuệ nhân tạo hỗ trợ người dân tìm hiểu, chuẩn bị và kiểm tra trước hồ sơ thủ tục hành chính.",
     "Bằng việc truy cập hoặc sử dụng hệ thống, người dùng xác nhận đã đọc, hiểu và đồng ý với các điều khoản dưới đây.",
   ],
   en: [
-    "These Terms of Use govern access to and use of the CIVI platform — an AI-powered tool that helps citizens research, prepare, and pre-check administrative procedure applications.",
+    "These Terms of Use govern access to and use of the SPDVC platform — an AI-powered tool that helps citizens research, prepare, and pre-check administrative procedure applications.",
     "By accessing or using the system, users confirm that they have read, understood, and agreed to the terms below.",
   ],
   mww: [
-    "Cov Cai Siv no teev txog kev nkag mus thiab siv lub platform CIVI — ib lub cuab yeej AI pab cov pej xeem kawm txog, npaj, thiab kuaj daim ntawv thov ua ntej xa mus rau txheej txheem nom tswv.",
+    "Cov Cai Siv no teev txog kev nkag mus thiab siv lub platform SPDVC — ib lub cuab yeej AI pab cov pej xeem kawm txog, npaj, thiab kuaj daim ntawv thov ua ntej xa mus rau txheej txheem nom tswv.",
     "Los ntawm kev nkag mus los sis siv lub kaw lus no, tus neeg siv lees paub tias twb nyeem, nkag siab, thiab pom zoo raws li cov cai hauv qab no.",
   ],
   km: [
-    "លក្ខខណ្ឌប្រើប្រាស់នេះកំណត់អំពីការចូលប្រើ និងការប្រើប្រាស់វេទិកា CIVI — ឧបករណ៍ដែលប្រើបញ្ញាសិប្បនិមិត្តជួយប្រជាពលរដ្ឋស្វែងយល់ រៀបចំ និងពិនិត្យជាមុននូវឯកសារនីតិវិធីរដ្ឋបាល។",
+    "លក្ខខណ្ឌប្រើប្រាស់នេះកំណត់អំពីការចូលប្រើ និងការប្រើប្រាស់វេទិកា SPDVC — ឧបករណ៍ដែលប្រើបញ្ញាសិប្បនិមិត្តជួយប្រជាពលរដ្ឋស្វែងយល់ រៀបចំ និងពិនិត្យជាមុននូវឯកសារនីតិវិធីរដ្ឋបាល។",
     "ដោយការចូលប្រើ ឬប្រើប្រាស់ប្រព័ន្ធនេះ អ្នកប្រើប្រាស់បញ្ជាក់ថាបានអាន យល់ និងយល់ព្រមតាមលក្ខខណ្ឌខាងក្រោម។",
   ],
 };
@@ -34,7 +34,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Điều 1. Thông tin về hệ thống",
       blocks: [
-        p("CIVI là sản phẩm xây dựng nhằm hỗ trợ người dùng:"),
+        p("SPDVC là sản phẩm xây dựng nhằm hỗ trợ người dùng:"),
         ul([
           "Xác định thủ tục hành chính phù hợp với nhu cầu;",
           "Tra cứu thành phần hồ sơ, biểu mẫu và cơ quan thực hiện;",
@@ -180,7 +180,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Điều 10. Quyền sở hữu trí tuệ",
       blocks: [
-        p("Tên, logo, giao diện, mã nguồn, thiết kế, tài liệu kỹ thuật và nội dung do Nhóm Độc Bản tự phát triển thuộc quyền sở hữu của đơn vị này hoặc bên cấp phép tương ứng."),
+        p("Tên, logo, giao diện, mã nguồn, thiết kế, tài liệu kỹ thuật và nội dung do Nhóm SPDVC tự phát triển thuộc quyền sở hữu của nhóm hoặc bên cấp phép tương ứng."),
         p("Văn bản pháp luật, biểu mẫu và dữ liệu hành chính được sử dụng theo chế độ pháp lý áp dụng đối với từng nguồn."),
         p("Người dùng được phép sử dụng kết quả AI cho mục đích cá nhân và thực hiện thủ tục hợp pháp."),
         p("Người dùng không được tuyên bố kết quả AI là thông tin chính thức do cơ quan nhà nước ban hành."),
@@ -228,10 +228,10 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
       heading: "Điều 18. Thông tin đơn vị vận hành",
       blocks: [
         ul([
-          "Tên dự án: CIVI",
-          "Đơn vị phát triển: Nhóm Độc Bản",
-          "Người đại diện/phụ trách: Nguyễn Thị Chi Ninh",
-          "Email: ninh2023nguyen@gmail.com",
+          "Tên dự án: SPDVC",
+          "Đơn vị phát triển: Nhóm SPDVC",
+          "Đại diện nhóm phát triển: Nguyễn Quang Hà",
+          "Email: quangha.dev@gmail.com",
           "Tình trạng: Bản demo thử nghiệm",
         ]),
       ],
@@ -241,7 +241,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Article 1. About the system",
       blocks: [
-        p("CIVI is built to help users:"),
+        p("SPDVC is built to help users:"),
         ul([
           "Identify the administrative procedure that matches their need;",
           "Look up required documents, forms, and the responsible authority;",
@@ -387,7 +387,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Article 10. Intellectual property",
       blocks: [
-        p("The name, logo, interface, source code, design, technical documentation, and content developed by Nhóm Độc Bản belong to that organization or its respective licensors."),
+        p("The name, logo, interface, source code, design, technical documentation, and content developed by the SPDVC Team belong to the team or its respective licensors."),
         p("Legal documents, forms, and administrative data are used under the legal regime applicable to each source."),
         p("Users may use AI results for personal purposes and for carrying out lawful procedures."),
         p("Users must not represent AI results as official information issued by a state authority."),
@@ -435,10 +435,10 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
       heading: "Article 18. Operator information",
       blocks: [
         ul([
-          "Project name: CIVI",
-          "Developed by: Nhóm Độc Bản",
-          "Representative/contact person: Nguyễn Thị Chi Ninh",
-          "Email: ninh2023nguyen@gmail.com",
+          "Project name: SPDVC",
+          "Developed by: SPDVC Team",
+          "Development team representative: Nguyễn Quang Hà",
+          "Email: quangha.dev@gmail.com",
           "Status: Trial demo",
         ]),
       ],
@@ -448,7 +448,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Nqe 1. Txog lub kaw lus",
       blocks: [
-        p("CIVI yog tsim los pab cov neeg siv:"),
+        p("SPDVC yog tsim los pab cov neeg siv:"),
         ul([
           "Nrhiav txheej txheem nom tswv uas raug rau qhov xav tau;",
           "Tshawb cov ntawv, daim foos thiab lub chaw ua haujlwm uas ua;",
@@ -576,7 +576,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "Nqe 10. Cai tswv ntawm kev tsim",
       blocks: [
-        p("Lub npe, logo, screen, code, tsim thiab cov ntaub ntawv Nhóm Độc Bản tsim yog ntawm lawv lossis tus muab cai."),
+        p("Lub npe, logo, screen, code, tsim thiab cov ntaub ntawv pab pawg SPDVC tsim yog ntawm lawv lossis tus muab cai."),
         p("Cov ntawv cai lij choj, daim foos thiab ntaub ntawv nom tswv siv raws li txoj cai ntawm txhua qhov chaw."),
         p("Tus neeg siv siv tau qhov AI muab rau tus kheej thiab ua txheej txheem raug cai."),
         p("Tus neeg siv tsis pub hais tias qhov AI muab yog ntaub ntawv raug cai los ntawm lub nom tswv."),
@@ -624,10 +624,10 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
       heading: "Nqe 18. Cov ntaub ntawv ntawm tus tswv",
       blocks: [
         ul([
-          "Lub npe: CIVI",
-          "Tsim los ntawm: Nhóm Độc Bản",
-          "Tus sawv cev: Nguyễn Thị Chi Ninh",
-          "Email: ninh2023nguyen@gmail.com",
+          "Lub npe: SPDVC",
+          "Tsim los ntawm: Pab pawg SPDVC",
+          "Tus sawv cev pab pawg tsim kho: Nguyễn Quang Hà",
+          "Email: quangha.dev@gmail.com",
           "Xwm txheej: Demo sim siv",
         ]),
       ],
@@ -637,7 +637,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "មាត្រា ១. អំពីប្រព័ន្ធ",
       blocks: [
-        p("CIVI ត្រូវបានបង្កើតឡើងដើម្បីជួយអ្នកប្រើប្រាស់៖"),
+        p("SPDVC ត្រូវបានបង្កើតឡើងដើម្បីជួយអ្នកប្រើប្រាស់៖"),
         ul([
           "កំណត់នីតិវិធីរដ្ឋបាលដែលសមស្របនឹងតម្រូវការ;",
           "ស្វែងរកឯកសារ ទម្រង់ និងអាជ្ញាធរទទួលបន្ទុក;",
@@ -770,7 +770,7 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
     {
       heading: "មាត្រា ១០. កម្មសិទ្ធិបញ្ញា",
       blocks: [
-        p("ឈ្មោះ ស្លាកសញ្ញា ចំណុចប្រទាក់ កូដប្រភព ការរចនា ឯកសារបច្ចេកទេស និងមាតិកាដែលបង្កើតឡើងដោយ Nhóm Độc Bản ជាកម្មសិទ្ធិរបស់អង្គភាពនេះ ឬអ្នកផ្តល់អាជ្ញាប័ណ្ណដែលពាក់ព័ន្ធ។"),
+        p("ឈ្មោះ ស្លាកសញ្ញា ចំណុចប្រទាក់ កូដប្រភព ការរចនា ឯកសារបច្ចេកទេស និងមាតិកាដែលបង្កើតឡើងដោយក្រុម SPDVC ជាកម្មសិទ្ធិរបស់ក្រុម ឬអ្នកផ្តល់អាជ្ញាប័ណ្ណដែលពាក់ព័ន្ធ។"),
         p("ឯកសារច្បាប់ ទម្រង់ និងទិន្នន័យរដ្ឋបាល ត្រូវប្រើប្រាស់តាមរបបច្បាប់អនុវត្តចំពោះប្រភពនីមួយៗ។"),
         p("អ្នកប្រើប្រាស់អាចប្រើលទ្ធផល AI សម្រាប់គោលបំណងផ្ទាល់ខ្លួន និងអនុវត្តនីតិវិធីស្របច្បាប់។"),
         p("អ្នកប្រើប្រាស់មិនត្រូវប្រកាសថាលទ្ធផល AI ជាព័ត៌មានផ្លូវការចេញផ្សាយដោយអាជ្ញាធររដ្ឋឡើយ។"),
@@ -818,10 +818,10 @@ export const privacyContent: Record<Locale, PrivacySection[]> = {
       heading: "មាត្រា ១៨. ព័ត៌មានប្រតិបត្តិករ",
       blocks: [
         ul([
-          "ឈ្មោះគម្រោង: CIVI",
-          "អង្គភាពអភិវឌ្ឍ: Nhóm Độc Bản",
-          "អ្នកតំណាង/ទទួលបន្ទុក: Nguyễn Thị Chi Ninh",
-          "អ៊ីមែល: ninh2023nguyen@gmail.com",
+          "ឈ្មោះគម្រោង: SPDVC",
+          "អង្គភាពអភិវឌ្ឍ: ក្រុម SPDVC",
+          "តំណាងក្រុមអភិវឌ្ឍ: Nguyễn Quang Hà",
+          "អ៊ីមែល: quangha.dev@gmail.com",
           "ស្ថានភាព: ជំនាន់សាកល្បង",
         ]),
       ],

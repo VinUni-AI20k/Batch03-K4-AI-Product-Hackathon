@@ -107,9 +107,10 @@ def test_chat_request_no_longer_exposes_external_llm_consent() -> None:
 def _complete_payload(sse_text: str) -> dict:
     import json
 
-    for line in sse_text.splitlines():
-        if line.startswith("data:") and '"form_code"' in line:
-            return json.loads(line.removeprefix("data:").strip())
+    lines = sse_text.splitlines()
+    for index, line in enumerate(lines):
+        if line == "event: message.complete" and index + 1 < len(lines):
+            return json.loads(lines[index + 1].removeprefix("data:").strip())
     raise AssertionError(f"no message.complete payload found in: {sse_text!r}")
 
 
@@ -150,7 +151,7 @@ async def test_citations_are_suppressed_when_form_guidance_overrides_the_reply(a
 
 
 @pytest.mark.asyncio
-async def test_chat_can_call_simulated_submission_tool_after_validated_form(app) -> None:
+async def test_chat_cannot_bypass_pdf_review_and_final_confirmation(app) -> None:
     valid_values = {
         "applicant_full_name": "Nguyễn Văn An",
         "relationship_to_child": "Cha",
@@ -178,7 +179,9 @@ async def test_chat_can_call_simulated_submission_tool_after_validated_form(app)
                 json={"message": "Tôi xác nhận nộp hồ sơ mô phỏng", "language_code": "vi"},
             )
 
-    assert "event: tool.call" in response.text
-    assert "event: tool.result" in response.text
-    assert "SPDVC-DEMO-" in response.text
-    assert '"official_submission": false' in response.text
+    payload = _complete_payload(response.text)
+    assert "event: tool.call" not in response.text
+    assert "event: tool.result" not in response.text
+    assert payload["form_code"] == "BIRTH_REGISTRATION_FORM"
+    assert payload["open_review"] is False
+    assert payload["confidence_reasons"] == ["Bắt buộc xác nhận hai bước trên giao diện"]

@@ -1,22 +1,22 @@
-INFO:     Started server process [24684]
+INFO:     Started server process [10800]
 INFO:     Waiting for application startup.
-[23:13:19] WARNING  voice_stt_unavailable reason=ffmpeg_unavailable  main.py:85
+[09:24:34] WARNING  voice_stt_unavailable reason=ffmpeg_unavailable  main.py:97
            INFO     procedure_settings_loaded         procedure_settings.py:422
                     directory=D:\DEV\Project\hackerth                          
                     on\SP_Dich_Vu_Cong\be\app\setting                          
-                    s checksum=b8464b242869                                    
-[23:13:36] INFO     procedure_snapshot_loaded procedure_count=207    main.py:99
+                    s checksum=e6e08d2aaae9                                    
+[09:25:14] INFO     procedure_snapshot_loaded procedure_count=207   main.py:111
                     crawled_at=2026-07-17T17:45:53.8293289+07:00               
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:65145 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65146 - "PUT /api/v1/forms/BIRTH_REGISTRATION_FORM/draft HTTP/1.1" 200 OK
-[23:13:39] INFO     HTTP Request: POST                          _client.py:1740
+INFO:     127.0.0.1:63166 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:63166 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57326 - "POST /api/v1/sessions HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:57327 - "POST /api/v1/chat/stream HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59196 - "POST /api/v1/chat/stream HTTP/1.1" 200 OK
+[09:26:08] INFO     HTTP Request: POST                          _client.py:1740
                     https://api.openai.com/v1/chat/completions                 
                     "HTTP/1.1 200 OK"                                          
-INFO:     127.0.0.1:65146 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/validate HTTP/1.1" 200 OK
-           INFO     simulated_submission_complete                   main.py:493
-                    session=5f91738f2c                                         
-                    form_code=BIRTH_REGISTRATION_FORM                          
-                    receipt_code=SPDVC-DEMO-20260730-A5EBB0                    
-INFO:     127.0.0.1:65146 - "POST /api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate HTTP/1.1" 200 OK
+[09:26:09] INFO     HTTP Request: POST                          _client.py:1740
+                    https://api.openai.com/v1/chat/completions                 
+                    "HTTP/1.1 200 OK"                                          

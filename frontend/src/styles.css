@@ -796,6 +796,27 @@ h1 span {
 .simulation-receipt { margin-top: 12px; padding: 12px; border: 1px solid #8fc9b7; border-radius: 8px; background: #effaf6; display: grid; gap: 4px; }
 .simulation-receipt code { color: #07543f; font-weight: 800; overflow-wrap: anywhere; }
 .simulation-receipt span { color: #587069; font-size: .78rem; }
+.receipt-download { justify-self: start; border: 1px solid #8fc9b7; background: #fff; color: #07543f; border-radius: 6px; padding: 6px 9px; font-weight: 700; }
+.submission-approval-dialog { max-width: 620px; }
+.submission-approval-dialog dl { display: grid; grid-template-columns: 120px 1fr; gap: 9px 14px; margin: 16px 0; }
+.submission-approval-dialog dt { font-weight: 800; color: #243c35; }
+.submission-approval-dialog dd { margin: 0; color: #52645f; overflow-wrap: anywhere; }
+.chat-form-card { width: 100%; align-self: stretch; }
+.review-form-embedded { width: 100%; padding: 14px; border: 1px solid #cbded7; border-radius: 18px; background: #f5fbf8; }
+.review-form-embedded .review-form-main { box-shadow: none; }
+.final-submit-button { background: #0b6b50 !important; }
+.submission-success { border-color: #8fc9b7 !important; background: #effaf6 !important; color: #07543f; }
+.agent-plan { margin: 10px 0; padding: 12px; border: 1px solid #b8d7cc; border-radius: 10px; background: #f1faf7; display: grid; gap: 5px; }
+.agent-plan ol { margin: 4px 0 4px 20px; padding: 0; columns: 2; }
+.agent-plan small { color: #51665f; }
+.security-banner { padding: 8px 10px; border: 1px solid #e5b4b4; border-radius: 8px; background: #fff3f3; color: #8a2020; }
+.markdown-message { line-height: 1.62; overflow-wrap: anywhere; }
+.markdown-message p { margin: 6px 0; white-space: normal; }
+.markdown-message h3, .markdown-message h4, .markdown-message h5 { margin: 12px 0 5px; color: inherit; }
+.markdown-message ul, .markdown-message ol { margin: 7px 0 7px 22px; padding: 0; }
+.markdown-message li { margin: 4px 0; }
+.markdown-message code { padding: 2px 5px; border-radius: 5px; background: rgba(7, 84, 63, .09); font-size: .9em; }
+.markdown-message a { color: #086c52; text-decoration: underline; text-underline-offset: 2px; }
 
 .export-button,
 .preview-button {

@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import hashlib
 import json
 import logging
@@ -14,6 +15,14 @@ from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
 from app.config import Settings, get_settings
+from app.agent_runtime import (
+    AgentLoopStopped,
+    assess_prompt_injection,
+    build_agent_plan,
+    normalize_untrusted_text,
+    record_tool_result,
+    redact_known_secrets,
+)
 from app.db import create_database_engine
 from app.form_ai_review import ai_review_form, merge_ai_issues
 from app.form_conversation import maybe_fill_form
@@ -36,6 +45,8 @@ from app.schemas import (
     FormSchemaResponse,
     SimulatedSubmissionRequest,
     SimulatedSubmissionResponse,
+    SubmissionApprovalRequest,
+    SubmissionApprovalResponse,
     ValidationResult,
     VoiceStatusResponse,
     VoiceTranscriptResponse,
@@ -43,6 +54,7 @@ from app.schemas import (
 from app.session_store import SessionStore
 from app.submission_simulation import (
     SubmissionSimulationError,
+    create_submission_approval,
     create_simulated_submission,
     is_submission_simulation_request,
 )
@@ -213,9 +225,52 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                 canonical_message = await app.state.translation_service.to_vietnamese(
                     chat_request.message, chat_request.language_code,
                 )
-                messages = [*state.get("messages", []), {"role": "user", "content": canonical_message}]
+                injection = assess_prompt_injection(canonical_message)
+                if injection.blocked:
+                    answer = (
+                        "Yêu cầu này có dấu hiệu cố thay đổi chỉ dẫn, lấy thông tin bảo mật hoặc bỏ qua bước xác nhận. "
+                        "Tôi đã khóa các tool ghi trong lượt này. Bạn vẫn có thể hỏi thông tin thủ tục hoặc bắt đầu lại bằng yêu cầu bình thường."
+                    )
+                    for word in answer.split(" "):
+                        yield sse("message.delta", {"text": f"{word} "})
+                    yield sse("security.blocked", {"risk_score": injection.risk_score, "reasons": injection.reasons})
+                    yield sse("message.complete", {
+                        "intent": "out_of_scope", "quick_replies": ["Hỏi thông tin thủ tục", "Bắt đầu lại"], "citations": [],
+                        "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
+                        "confidence_reasons": ["Deterministic prompt-injection policy"], "external_search_used": False,
+                        "external_search_consent_required": False, "form_code": None, "translation_used": needs_translation,
+                    })
+                    return
+
+                workflow = state.get("agent_workflow") or {}
+                normalized_message = normalize_untrusted_text(canonical_message).casefold()
+                selected_mode = None
+                if workflow.get("status") == "awaiting_mode":
+                    if "điền từng bước" in normalized_message or "cùng agent" in normalized_message:
+                        selected_mode = "agent_chat"
+                    elif "mở biểu mẫu" in normalized_message or "điền trên biểu mẫu" in normalized_message:
+                        selected_mode = "review_form"
+                turn_state = state
+                if selected_mode:
+                    workflow = {**workflow, "status": "collecting", "mode": selected_mode}
+                    turn_state = {**state, "agent_workflow": workflow}
+                messages = [*turn_state.get("messages", []), {"role": "user", "content": canonical_message}]
+                if selected_mode == "review_form":
+                    form_code = workflow.get("form_code")
+                    answer = "Đã mở biểu mẫu ngay trong khung chat. Bạn có thể điền trực tiếp, chạy Agent kiểm tra, xác nhận dữ liệu, xem PDF và xác nhận lần cuối trước khi gửi mô phỏng."
+                    new_state = {**turn_state, "messages": [*messages, {"role": "assistant", "content": answer}][-12:]}
+                    await app.state.store.save(current_session_id, new_state)
+                    for word in answer.split(" "):
+                        yield sse("message.delta", {"text": f"{word} "})
+                    yield sse("message.complete", {
+                        "intent": "form_guidance", "quick_replies": [], "citations": [], "answer_strategy": "high",
+                        "confidence_score": 1, "confidence_band": "high", "confidence_reasons": ["User selected review_form mode"],
+                        "external_search_used": False, "external_search_consent_required": False,
+                        "form_code": form_code, "open_review": False, "translation_used": needs_translation,
+                    })
+                    return
                 if is_submission_simulation_request(canonical_message):
-                    form_code = state.get("active_scenario_code")
+                    form_code = turn_state.get("active_scenario_code")
                     if not form_code:
                         answer = "Bạn chưa có biểu mẫu đang làm. Hãy chọn thủ tục và điền biểu mẫu trước khi nộp mô phỏng."
                         for word in answer.split(" "):
@@ -227,65 +282,77 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                             "external_search_consent_required": False, "form_code": None, "translation_used": needs_translation,
                         })
                         return
-                    yield sse("tool.call", {"name": "submit_form_simulation", "form_code": form_code})
-                    try:
-                        receipt = create_simulated_submission(
-                            form_code=form_code,
-                            draft=state.get("form_draft", {}).get(form_code, {}),
-                            validation=state.get("last_validation", {}).get(form_code),
-                            confirmed=True,
-                            channel="chat",
-                        )
-                    except SubmissionSimulationError as exc:
-                        guidance = {
-                            "validation_required": "Hãy mở mục Rà soát & Nộp mô phỏng và thẩm định hồ sơ trước.",
-                            "draft_changed_since_validation": "Hồ sơ đã thay đổi. Hãy thẩm định lại trước khi nộp mô phỏng.",
-                            "blocking_errors_remaining": "Hồ sơ còn lỗi bắt buộc. Hãy sửa và thẩm định lại trước khi nộp mô phỏng.",
-                            "validation_not_ready": "Hồ sơ chưa đạt trạng thái sẵn sàng để nộp mô phỏng.",
-                        }.get(exc.reason, "Chưa thể nộp mô phỏng. Hãy kiểm tra lại hồ sơ.")
-                        yield sse("tool.result", {"name": "submit_form_simulation", "ok": False, "reason": exc.reason})
-                        for word in guidance.split(" "):
-                            yield sse("message.delta", {"text": f"{word} "})
-                        yield sse("message.complete", {
-                            "intent": "form_guidance", "quick_replies": ["Mở rà soát hồ sơ"], "citations": [],
-                            "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
-                            "confidence_reasons": [exc.reason], "external_search_used": False,
-                            "external_search_consent_required": False, "form_code": form_code, "translation_used": needs_translation,
-                        })
-                        return
-                    new_state = {
-                        **state,
-                        "messages": [*messages, {"role": "assistant", "content": receipt["message_vi"]}][-12:],
-                        "simulated_submissions": [*state.get("simulated_submissions", []), receipt][-10:],
-                    }
-                    await app.state.store.save(current_session_id, new_state)
-                    yield sse("tool.result", {"name": "submit_form_simulation", "ok": True, "receipt": receipt})
-                    answer = f'{receipt["message_vi"]} Mã biên nhận demo: {receipt["receipt_code"]}.'
+                    # Chat text is never sufficient authority to execute a write.
+                    # Submission must pass validation, scoped approval, rendered-PDF
+                    # review, and a second explicit confirmation in the form UI.
+                    answer = (
+                        "Tôi đã hiển thị biểu mẫu trong khung chat. Để gửi mô phỏng, bạn cần thẩm định hồ sơ, "
+                        "xác nhận dữ liệu sẽ sử dụng, kiểm tra bản PDF và xác nhận lần cuối."
+                    )
                     for word in answer.split(" "):
                         yield sse("message.delta", {"text": f"{word} "})
                     yield sse("message.complete", {
                         "intent": "form_guidance", "quick_replies": [], "citations": [],
                         "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
-                        "confidence_reasons": ["Công cụ nộp mô phỏng đã trả biên nhận"], "external_search_used": False,
+                        "confidence_reasons": ["Bắt buộc xác nhận hai bước trên giao diện"], "external_search_used": False,
                         "external_search_consent_required": False, "form_code": form_code,
-                        "simulated_submission": receipt, "translation_used": needs_translation,
+                        "open_review": False, "translation_used": needs_translation,
                     })
                     return
                 result = await app.state.procedure_pipeline.ainvoke({
                     "messages": messages,
                     "request_id": request_id,
                     "language_code": chat_request.language_code,
-                    "active_procedure_code": state.get("active_procedure_code"),
-                    "administrative_area_code": state.get("administrative_area_code"),
-                    "candidate_codes": state.get("candidate_codes", []),
-                    "selection_filters": state.get("selection_filters", {}),
-                    "pending_filter": state.get("pending_filter"),
-                    "locality_required": state.get("locality_required", False),
+                    "active_procedure_code": turn_state.get("active_procedure_code"),
+                    "administrative_area_code": turn_state.get("administrative_area_code"),
+                    "candidate_codes": turn_state.get("candidate_codes", []),
+                    "selection_filters": turn_state.get("selection_filters", {}),
+                    "pending_filter": turn_state.get("pending_filter"),
+                    "locality_required": turn_state.get("locality_required", False),
                 })
                 reply, form_patch = await maybe_fill_form(
-                    {**state, "language_code": VIETNAMESE}, result, settings, app.state.procedure_pipeline.procedure_settings, messages,
+                    {**turn_state, "language_code": VIETNAMESE}, result, settings, app.state.procedure_pipeline.procedure_settings, messages,
                 )
-                canonical_answer = reply.answer
+                form_code = form_patch["form_code"] if form_patch else None
+                workflow = turn_state.get("agent_workflow") or {}
+                is_new_workflow = bool(form_code and workflow.get("form_code") != form_code)
+                if is_new_workflow:
+                    form_candidate = app.state.procedure_pipeline.procedure_settings.form_candidates[form_code]
+                    required_data = [
+                        field.field_code
+                        for field in form_candidate.fields
+                        if field.required
+                    ]
+                    plan = await build_agent_plan(settings, canonical_message, form_code, required_data)
+                    tool_history = record_tool_result([], "lookup_procedure", {"form_code": form_code})
+                    tool_history = record_tool_result(tool_history, plan.selected_registration_tool, {"form_code": form_code})
+                    workflow = {
+                        **plan.model_dump(), "status": "awaiting_mode", "mode": None,
+                        "tool_history": tool_history,
+                    }
+                    reply.answer = (
+                        f"Agent đã xác định tool phù hợp: {plan.selected_registration_tool}. "
+                        "Biểu mẫu đã được hiển thị ngay trong khung chat. Bạn có thể điền trực tiếp trên biểu mẫu "
+                        "hoặc chọn điền từng bước cùng Agent."
+                    )
+                    reply.quick_replies = ["Điền trên biểu mẫu", "Điền từng bước cùng Agent"]
+                    yield sse("agent.plan", plan.model_dump())
+                elif form_patch and workflow.get("mode") == "agent_chat":
+                    try:
+                        workflow = {
+                            **workflow,
+                            "tool_history": record_tool_result(
+                                workflow.get("tool_history", []), "collect_form_data", {"fields": form_patch["fields"]},
+                            ),
+                        }
+                        yield sse("tool.result", {"name": "collect_form_data", "ok": True, "field_count": len(form_patch["fields"])})
+                    except AgentLoopStopped:
+                        reply.answer = "Agent đã dừng vì tool thu thập dữ liệu trả cùng một kết quả hai lần liên tiếp. Hãy cung cấp thông tin mới hoặc chuyển sang biểu mẫu."
+                        reply.quick_replies = ["Mở biểu mẫu và rà soát"]
+                        workflow = {**workflow, "status": "loop_stopped"}
+                        yield sse("agent.stopped", {"reason": "repeated_identical_tool_result"})
+                canonical_answer = redact_known_secrets(reply.answer)
+                reply.answer = canonical_answer
                 if needs_translation:
                     reply.answer = await app.state.translation_service.from_vietnamese(reply.answer, chat_request.language_code)
                     reply.quick_replies = [
@@ -295,21 +362,22 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                 for word in reply.answer.split(" "):
                     yield sse("message.delta", {"text": f"{word} "})
                     await asyncio.sleep(0)
-                form_code = form_patch["form_code"] if form_patch else None
                 new_state = {
+                    **turn_state,
                     "messages": [*messages, {"role": "assistant", "content": canonical_answer}][-12:],
                     "language_code": chat_request.language_code,
                     "translation_consent": bool(translation_consent),
                     "intent": reply.intent,
                     "active_procedure_code": result.get("active_procedure_code"),
-                    "active_scenario_code": form_code if form_code else state.get("active_scenario_code"),
+                    "active_scenario_code": form_code if form_code else turn_state.get("active_scenario_code"),
                     "candidate_codes": result.get("candidate_codes", []),
                     "selection_filters": result.get("selection_filters", {}),
                     "pending_filter": result.get("pending_filter"),
                     "locality_required": result.get("locality_required", False),
                     "administrative_area_code": result.get("administrative_area_code"),
-                    "form_draft": {**state.get("form_draft", {}), form_code: form_patch["fields"]} if form_patch else state.get("form_draft", {}),
-                    "last_validation": state.get("last_validation", {}),
+                    "form_draft": {**turn_state.get("form_draft", {}), form_code: form_patch["fields"]} if form_patch else turn_state.get("form_draft", {}),
+                    "last_validation": turn_state.get("last_validation", {}),
+                    "agent_workflow": workflow or turn_state.get("agent_workflow"),
                 }
                 await app.state.store.save(current_session_id, new_state)
                 yield sse("message.complete", {
@@ -412,7 +480,13 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
         if is_new:
             set_session_cookie(http_response, current_session_id)
         merged = {**state.get("form_draft", {}).get(form_code, {}), **payload.fields}
-        new_state = {**state, "form_draft": {**state.get("form_draft", {}), form_code: merged}}
+        workflow = state.get("agent_workflow") or {}
+        new_state = {
+            **state,
+            "form_draft": {**state.get("form_draft", {}), form_code: merged},
+            "submission_approvals": {},
+            "agent_workflow": {**workflow, "form_code": form_code, "status": "collecting"} if workflow else workflow,
+        }
         await app.state.store.save(current_session_id, new_state)
         return FormDraftResponse(form_code=form_code, fields=merged, updated_at=new_state.get("updated_at"))
 
@@ -428,7 +502,26 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
         base_result = validate_form(candidate, draft)
         ai_issues = await ai_review_form(settings, candidate, draft, base_result.issues)
         result = merge_ai_issues(base_result, ai_issues)
-        new_state = {**state, "last_validation": {**state.get("last_validation", {}), form_code: result.model_dump()}}
+        workflow = state.get("agent_workflow") or {"form_code": form_code, "status": "validating", "tool_history": []}
+        result_fingerprint = {
+            "form_code": result.form_code,
+            "input_hash": result.input_hash,
+            "status": result.status,
+            "summary": result.summary.model_dump(),
+            "issues": [issue.model_dump() for issue in result.issues],
+        }
+        try:
+            tool_history = record_tool_result(workflow.get("tool_history", []), "validate_form", result_fingerprint)
+        except AgentLoopStopped as exc:
+            stopped_state = {**state, "agent_workflow": {**workflow, "status": "loop_stopped", "stop_reason": str(exc)}}
+            await app.state.store.save(current_session_id, stopped_state)
+            raise HTTPException(status_code=409, detail=f"agent_loop_stopped:{exc}") from exc
+        new_state = {
+            **state,
+            "last_validation": {**state.get("last_validation", {}), form_code: result.model_dump()},
+            "submission_approvals": {},
+            "agent_workflow": {**workflow, "status": "review_ready" if result.summary.blocking_error == 0 else "needs_correction", "tool_history": tool_history},
+        }
         await app.state.store.save(current_session_id, new_state)
         return result
 
@@ -461,6 +554,35 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
             headers={"Content-Disposition": f'attachment; filename="{form_code.lower()}.pdf"'},
         )
 
+    @app.post("/api/v1/forms/{form_code}/submissions/approval", response_model=SubmissionApprovalResponse)
+    async def preview_submission_approval(
+        form_code: str,
+        payload: SubmissionApprovalRequest,
+        http_response: Response,
+        session_id: str | None = Cookie(default=None, alias=settings.session_cookie_name),
+    ) -> SubmissionApprovalResponse:
+        candidate = _form_candidate_or_404(form_code)
+        current_session_id, state, is_new = await ensure_session(session_id)
+        if is_new:
+            set_session_cookie(http_response, current_session_id)
+        validation = state.get("last_validation", {}).get(form_code)
+        if not validation or validation.get("validation_id") != payload.validation_id:
+            raise HTTPException(status_code=409, detail="validation_required_or_mismatched")
+        draft = state.get("form_draft", {}).get(form_code, {})
+        disclosed_fields = [field.label_vi for field in candidate.fields if draft.get(field.field_code) not in (None, "", [])]
+        try:
+            approval = create_submission_approval(
+                form_code=form_code, draft=draft, validation=validation, disclosed_fields=disclosed_fields,
+            )
+        except SubmissionSimulationError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.reason) from exc
+        new_state = {
+            **state,
+            "submission_approvals": {**state.get("submission_approvals", {}), approval["approval_id"]: approval},
+        }
+        await app.state.store.save(current_session_id, new_state)
+        return SubmissionApprovalResponse.model_validate(approval)
+
     @app.post("/api/v1/forms/{form_code}/submissions/simulate", response_model=SimulatedSubmissionResponse)
     async def simulate_form_submission(
         form_code: str,
@@ -468,26 +590,50 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
         http_response: Response,
         session_id: str | None = Cookie(default=None, alias=settings.session_cookie_name),
     ) -> SimulatedSubmissionResponse:
-        _form_candidate_or_404(form_code)
+        candidate = _form_candidate_or_404(form_code)
         current_session_id, state, is_new = await ensure_session(session_id)
         if is_new:
             set_session_cookie(http_response, current_session_id)
         validation = state.get("last_validation", {}).get(form_code)
         if not validation or validation.get("validation_id") != payload.validation_id:
             raise HTTPException(status_code=409, detail="validation_required_or_mismatched")
+        approval = state.get("submission_approvals", {}).get(payload.approval_id or "")
+        draft = state.get("form_draft", {}).get(form_code, {})
+        existing = next((item for item in reversed(state.get("simulated_submissions", [])) if item.get("validation_id") == payload.validation_id), None)
+        if existing:
+            return SimulatedSubmissionResponse.model_validate(existing)
+        try:
+            pdf_bytes = render_export(candidate, draft)
+        except ExportError as exc:
+            raise HTTPException(status_code=422, detail=f"export_failed:{exc.reason}:{exc.field_code}") from exc
         try:
             receipt = create_simulated_submission(
                 form_code=form_code,
-                draft=state.get("form_draft", {}).get(form_code, {}),
+                draft=draft,
                 validation=validation,
                 confirmed=payload.confirmed,
                 channel="review_form",
+                approval=approval,
+                pdf_bytes=pdf_bytes,
             )
         except SubmissionSimulationError as exc:
             raise HTTPException(status_code=exc.status_code, detail=exc.reason) from exc
+        workflow = state.get("agent_workflow") or {"form_code": form_code, "tool_history": []}
+        try:
+            tool_history = record_tool_result(workflow.get("tool_history", []), "render_pdf", {"pdf_sha256": receipt["pdf_sha256"]})
+            tool_history = record_tool_result(tool_history, "submit_simulation", {"receipt_code": receipt["receipt_code"]})
+        except AgentLoopStopped as exc:
+            raise HTTPException(status_code=409, detail=f"agent_loop_stopped:{exc}") from exc
+        consumed_approval = {**approval, "consumed": True}
         new_state = {
             **state,
             "simulated_submissions": [*state.get("simulated_submissions", []), receipt][-10:],
+            "simulated_submission_artifacts": {
+                **state.get("simulated_submission_artifacts", {}),
+                receipt["submission_id"]: base64.b64encode(pdf_bytes).decode("ascii"),
+            },
+            "submission_approvals": {**state.get("submission_approvals", {}), consumed_approval["approval_id"]: consumed_approval},
+            "agent_workflow": {**workflow, "status": "submitted", "tool_history": tool_history},
         }
         await app.state.store.save(current_session_id, new_state)
         logger.info(
@@ -495,6 +641,26 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
             session_hash(current_session_id), form_code, receipt["receipt_code"],
         )
         return SimulatedSubmissionResponse.model_validate(receipt)
+
+    @app.get("/api/v1/submissions/{submission_id}/artifact.pdf")
+    async def download_simulated_submission_artifact(
+        submission_id: str,
+        session_id: str | None = Cookie(default=None, alias=settings.session_cookie_name),
+    ) -> Response:
+        if not session_id:
+            raise HTTPException(status_code=404, detail="submission_not_found")
+        state = await app.state.store.get(session_id)
+        encoded = (state or {}).get("simulated_submission_artifacts", {}).get(submission_id)
+        if not encoded:
+            raise HTTPException(status_code=404, detail="submission_not_found")
+        pdf_bytes = base64.b64decode(encoded)
+        if not pdf_bytes.startswith(b"%PDF-"):
+            raise HTTPException(status_code=500, detail="submission_artifact_corrupt")
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{submission_id}.pdf"'},
+        )
 
     return app
 

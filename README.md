@@ -1,5 +1,17 @@
 # Mini Hackathon AI — Batch 03
 
+## Prototype của nhóm SPDVC
+
+Sản phẩm trong repo là **Trợ lý chuẩn bị và kiểm tra hồ sơ dịch vụ công**: hỏi đáp có nguồn, Agent chọn tool cho ba thủ tục, cho phép điền bằng chat hoặc form, validation + AI review, tạo PDF và gửi mô phỏng sau approval một lần.
+
+- [AI Spec](spec.md)
+- [Golden set và kết quả CP3](eval/README.md)
+- [Kiến trúc Agent và phòng thủ nhiều lớp](docs/agent-security.md)
+- [Hướng dẫn chạy backend](be/README.md)
+- [Hướng dẫn chạy frontend](frontend/README.md)
+
+> Mọi mã `SPDVC-DEMO-*` là biên nhận mô phỏng; hệ thống không kết nối Cổng Dịch vụ công, không ký số và không gửi dữ liệu tới cơ quan nhà nước.
+
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
@@ -18,7 +30,7 @@
 | `02-guide.md` | Hướng dẫn 5 giai đoạn: khám phá → spec → build → đo & validate → demo |
 | `03-template-ai-spec.md` | Template AI Spec (nộp 23:59 ngày 1) |
 | `04-rubric.md` | Rubric 100 điểm (25 nộp checkpoint + 75 chấm bài) + checklist xác minh 6 mốc |
-| `data/` | Dữ liệu thật đã ẩn danh: chatlog VLearn tutor + 6 transcript bài giảng + 2 bộ slide bản hackathon — dùng để tìm bằng chứng và xây golden set |
+| `be/data/` | Snapshot thủ tục và dữ liệu cấu hình phục vụ trực tiếp cho runtime SPDVC |
 | `tham-khao/` | JTBD Playbook (PDF) + worksheet JTBD đầy đủ — đọc khi muốn đào sâu |
 
 ## Lịch — 6 mốc

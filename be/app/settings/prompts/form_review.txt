@@ -22,10 +22,10 @@ NHIỆM VỤ
 - Không bao giờ tạo ra một field_code không có trong FIELD_SCHEMA; nếu vấn đề không gắn
   với một trường cụ thể, để field_code là null.
 - Không suy đoán hay bịa đặt thông tin không có trong SUBMITTED_VALUES.
-- "severity" có thể là "blocking_error", "warning", "suggestion" hoặc "unable_to_verify".
-  Chỉ dùng "blocking_error" khi bạn thực sự chắc chắn giá trị sai và sẽ khiến hồ sơ bị từ
-  chối; nếu chỉ nghi ngờ hoặc không đủ căn cứ để kết luận, dùng "unable_to_verify" thay vì
-  đoán liều. Nếu biểu mẫu không có gì đáng lo ngại thêm, trả về mảng issues rỗng.
+- "severity" chỉ dùng "warning", "suggestion" hoặc "unable_to_verify". AI review không có
+  quyền tạo "blocking_error"; lỗi chặn chỉ do rule engine xác định. Không đánh giá lại ngày,
+  enum hoặc số đã qua rule engine. Nếu chỉ nghi ngờ hoặc không đủ căn cứ, dùng
+  "unable_to_verify". Nếu biểu mẫu không có gì đáng lo ngại thêm, trả mảng issues rỗng.
 
 OUTPUT
 Trả về đúng một object JSON hợp lệ, không có văn bản nào khác, không bọc trong khối

@@ -20,6 +20,9 @@ vi.mock("./api", () => ({
   updateFormDraft: vi.fn().mockResolvedValue({ form_code: "BIRTH_REGISTRATION_FORM", fields: {}, updated_at: null }),
   validateForm: vi.fn(),
   exportFormPdf: vi.fn(),
+  requestSubmissionApproval: vi.fn(),
+  simulateFormSubmission: vi.fn(),
+  downloadSubmissionArtifact: vi.fn(),
 }));
 
 vi.mock("./VoiceInput", () => ({
@@ -44,6 +47,23 @@ describe("App", () => {
     expect(await screen.findByText("Phản hồi thử nghiệm")).toBeInTheDocument();
     expect(screen.getByText("Hỏi thêm")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Luật Hộ tịch" })).toHaveAttribute("href", "https://example.test/source");
+  });
+
+  it("shows an agent-selected form directly inside the chat", async () => {
+    vi.mocked(streamChat).mockImplementationOnce(async (_message, _language, _translationConsent, _searchConsent, onEvent) => {
+      onEvent({ type: "message.delta", text: "Đã mở biểu mẫu ngay trong khung chat." });
+      onEvent({
+        type: "message.complete", intent: "form_guidance", quickReplies: [], citations: [], answerStrategy: "high",
+        confidenceBand: "high", confidenceReasons: [], externalSearchUsed: false, externalSearchConsentRequired: false,
+        formCode: "BIRTH_REGISTRATION_FORM", openReview: true,
+      });
+    });
+    render(<App />);
+    fireEvent.click(screen.getByText("Tôi muốn đăng ký khai sinh cho bé"));
+
+    expect(await screen.findByRole("region", { name: "Biểu mẫu dịch vụ công trong hội thoại" })).toBeInTheDocument();
+    expect(await screen.findByText("Tờ khai đăng ký khai sinh")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Rà soát & Nộp mô phỏng/ })).not.toHaveClass("active");
   });
 
   it("keeps the message stream at its newest content", async () => {

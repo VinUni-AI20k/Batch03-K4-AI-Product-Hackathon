@@ -198,17 +198,37 @@ async def test_simulated_submission_returns_clearly_labeled_demo_receipt(app) ->
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             await client.put("/api/v1/forms/BIRTH_REGISTRATION_FORM/draft", json={"fields": VALID_BIRTH_VALUES})
             validation = (await client.post("/api/v1/forms/BIRTH_REGISTRATION_FORM/validate")).json()
+            approval = (await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/approval",
+                json={"validation_id": validation["validation_id"]},
+            )).json()
+            assert "Nguyễn Văn An" not in json.dumps(approval, ensure_ascii=False)
+            assert "Họ, chữ đệm, tên người yêu cầu" in approval["disclosed_fields"]
             response = await client.post(
                 "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate",
-                json={"validation_id": validation["validation_id"], "confirmed": True},
+                json={"validation_id": validation["validation_id"], "approval_id": approval["approval_id"], "confirmed": True},
             )
+            receipt_in_session = response.json()
+            artifact = await client.get(f"/api/v1/submissions/{receipt_in_session['submission_id']}/artifact.pdf")
+            replay = await client.post(
+                "/api/v1/forms/BIRTH_REGISTRATION_FORM/submissions/simulate",
+                json={"validation_id": validation["validation_id"], "approval_id": approval["approval_id"], "confirmed": True},
+            )
+            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as other_session:
+                cross_session_artifact = await other_session.get(f"/api/v1/submissions/{receipt_in_session['submission_id']}/artifact.pdf")
     assert response.status_code == 200
     receipt = response.json()
     assert receipt["status"] == "submitted_simulation"
     assert receipt["simulation"] is True
     assert receipt["official_submission"] is False
     assert receipt["receipt_code"].startswith("SPDVC-DEMO-")
+    assert receipt["artifact_available"] is True
+    assert receipt["delivery_destination"] == "SPDVC_DEMO_GATEWAY"
+    assert receipt["pdf_size_bytes"] > 100
     assert "Nguyễn" not in json.dumps(receipt, ensure_ascii=False)
+    assert artifact.status_code == 200 and artifact.content.startswith(b"%PDF-")
+    assert replay.status_code == 200 and replay.json()["submission_id"] == receipt["submission_id"]
+    assert cross_session_artifact.status_code == 404
 
 
 @pytest.mark.asyncio

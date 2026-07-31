@@ -11,10 +11,13 @@ import re
 from datetime import UTC, date, datetime
 from uuid import uuid4
 
+from app.agent_runtime import assess_prompt_injection
 from app.procedure_settings import CrossFieldRule, FormCandidate, FormField
 from app.schemas import ValidationIssue, ValidationResult, ValidationSummary
 
 _EMPTY_VALUES = (None, "", [], {})
+_SECRET_VALUE = re.compile(r"(?i)(?:\bsk-[A-Za-z0-9_-]{16,}\b|\bBearer\s+[A-Za-z0-9._~+/-]{12,}=*)")
+_PLACEHOLDER_VALUES = {"test", "testing", "xxx", "fake", "không biết", "chưa biết"}
 
 
 def canonical_input_hash(values: dict) -> str:
@@ -52,6 +55,44 @@ def _check_field(field: FormField, value: object) -> ValidationIssue | None:
         return _issue(field, "FIELD_REQUIRED", severity="blocking_error")
     if empty:
         return None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if assess_prompt_injection(stripped).blocked:
+            return ValidationIssue(
+                issue_code="UNTRUSTED_INSTRUCTION_BLOCKED",
+                rule_code="SECURITY_UNTRUSTED_INSTRUCTION",
+                field_code=field.field_code,
+                severity="blocking_error",
+                message_vi=f"{field.label_vi} chứa chỉ dẫn điều khiển hệ thống/tool và đã bị chặn.",
+                suggestion_vi="Chỉ nhập dữ liệu hành chính cần thiết, không nhập lệnh dành cho AI hoặc tool.",
+            )
+        if _SECRET_VALUE.search(stripped):
+            return ValidationIssue(
+                issue_code="SECRET_VALUE_BLOCKED",
+                rule_code="SECURITY_DLP_SECRET",
+                field_code=field.field_code,
+                severity="blocking_error",
+                message_vi=f"{field.label_vi} có chuỗi giống khóa truy cập và không được đưa vào hồ sơ.",
+                suggestion_vi="Xóa khóa truy cập/token và đổi khóa nếu đây là dữ liệu thật.",
+            )
+        if field.required and stripped.casefold() in _PLACEHOLDER_VALUES:
+            return ValidationIssue(
+                issue_code="PLACEHOLDER_VALUE_BLOCKED",
+                rule_code="DATA_PLACEHOLDER",
+                field_code=field.field_code,
+                severity="blocking_error",
+                message_vi=f"{field.label_vi} đang chứa dữ liệu giữ chỗ, chưa thể dùng để nộp.",
+                suggestion_vi="Thay bằng thông tin thực tế và kiểm tra lại.",
+            )
+        if "citizen_id" in field.field_code and re.fullmatch(r"(\d)\1{8,11}", stripped):
+            return ValidationIssue(
+                issue_code="IDENTIFIER_REPEATED_DIGIT",
+                rule_code="DATA_IDENTIFIER_SANITY",
+                field_code=field.field_code,
+                severity="blocking_error",
+                message_vi=f"{field.label_vi} có mẫu số lặp bất thường.",
+                suggestion_vi="Đối chiếu lại số định danh trên giấy tờ gốc.",
+            )
     if field.data_type == "enum" and field.validation.enum_values and value not in field.validation.enum_values:
         return _issue(field, "FIELD_ENUM_INVALID", severity="blocking_error")
     if field.validation.regex and isinstance(value, str) and not re.fullmatch(field.validation.regex, value.strip()):
