@@ -1,0 +1,92 @@
+[
+  {
+    "concept_id": "d2-c01",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Problem Discovery: mô hình Double Diamond",
+    "prereq_id": null
+  },
+  {
+    "concept_id": "d2-c02",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Case study: khởi nguồn từ bài toán (Cursor, Artifact, NotebookLM)",
+    "prereq_id": "d2-c01"
+  },
+  {
+    "concept_id": "d2-c03",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Tìm bài toán AI: bốn lens & sai lầm thường gặp (anti-pattern)",
+    "prereq_id": "d2-c02"
+  },
+  {
+    "concept_id": "d2-c04",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Reframe câu hỏi PAIR & Quick Problem Card",
+    "prereq_id": "d2-c03"
+  },
+  {
+    "concept_id": "d2-c05",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Khai thác bài toán & định lượng hóa (baseline/target/measurement)",
+    "prereq_id": "d2-c04"
+  },
+  {
+    "concept_id": "d2-c06",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Thiết lập chỉ số: Output metric & Input metric",
+    "prereq_id": "d2-c05"
+  },
+  {
+    "concept_id": "d2-c07",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "PAIR bước 1: AI có thật sự cần thiết? (AI probably better/not better)",
+    "prereq_id": "d2-c06"
+  },
+  {
+    "concept_id": "d2-c08",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Kiến trúc hệ thống AI (Model+Context+Planning+Tools) & Automate vs Augment",
+    "prereq_id": "d2-c07"
+  },
+  {
+    "concept_id": "d2-c09",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Ba mức giải pháp: Rule / Workflow / Agent",
+    "prereq_id": "d2-c08"
+  },
+  {
+    "concept_id": "d2-c10",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Workflow patterns & cây quyết định chọn cấp độ giải pháp",
+    "prereq_id": "d2-c09"
+  },
+  {
+    "concept_id": "d2-c11",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Reward function (TP/TN/FP/FN) & đánh đổi Precision-Recall",
+    "prereq_id": "d2-c08"
+  },
+  {
+    "concept_id": "d2-c12",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Viết tiêu chí thành công hành động được",
+    "prereq_id": "d2-c11"
+  },
+  {
+    "concept_id": "d2-c13",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Khoảng cách Demo đến Production & Eval Plan",
+    "prereq_id": "d2-c12"
+  },
+  {
+    "concept_id": "d2-c14",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Problem Statement đầy đủ 9 trường & quyết định Go/Not Yet/No-Go",
+    "prereq_id": "d2-c13"
+  },
+  {
+    "concept_id": "d2-c15",
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "name": "Recap: sáu nguyên tắc cốt lõi",
+    "prereq_id": "d2-c14"
+  }
+]

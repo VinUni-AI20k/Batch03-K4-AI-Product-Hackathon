@@ -1,0 +1,6 @@
+{
+  "lecture_id": "d1-ai-llm-foundation",
+  "title": "Day 1 - AI & LLM Foundation",
+  "n_slides": 29,
+  "summary": "Bài giảng mở ra bức tranh AI dạng tầng: AI bao trùm ML, Deep Learning, Generative AI, với LLM là tầng nền. Điểm qua lịch sử 70 năm AI (expert system 1980, ImageNet 2009, Transformer 2017, ChatGPT 2022) rồi đi sâu vào cơ chế LLM: token hóa, context window, attention, tham số và scaling law (dense vs MoE), quy trình huấn luyện pretraining → SFT → RLHF/DPO → reasoning. Nêu rõ giới hạn bẩm sinh của LLM (knowledge cutoff, hallucination, học vẹt đường tắt) và cách Chain-of-Thought cải thiện suy luận. Kết bài bằng bước từ LLM lên Agent (4 cấp độ tự chủ), cách chọn model theo tầng chi phí, và kỹ thuật prompt cơ bản (4 lớp prompt, temperature/top_p)."
+}
