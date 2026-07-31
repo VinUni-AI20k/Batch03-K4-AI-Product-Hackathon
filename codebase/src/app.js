@@ -510,43 +510,98 @@ class VLearnApp {
     // Append User Message to Chat Feed
     this.appendUserChatMessage(userText);
 
+    // SHOW THINKING / LOADING INDICATOR IMMEDIATELY
+    if (this.chatbotTypingIndicator) {
+      this.chatbotTypingIndicator.classList.remove('hidden');
+    }
+    this.scrollChatToBottom();
+
     const lowerText = userText.toLowerCase();
 
-    // 1. RELEVANCE & OFF-TOPIC VALIDATION
+    // Track conversational memory state
+    if (this.lastWasRefused === undefined) this.lastWasRefused = false;
+    if (this.lastWasError === undefined) this.lastWasError = false;
+
+    // Keywords relevant to flashcard creation or AI course topics
     const courseKeywords = [
-      'tạo', 'sinh', 'làm', 'tổng hợp', 'flashcard', 'thẻ', 'fc', 'câu hỏi', 'ôn tập', 'bài', 'hỏi', 'bài giảng', 'transcript',
+      'tạo', 'sinh', 'làm', 'tổng hợp', 'trích xuất', 'viết', 'cho', 'lấy', 'lại', 'tiếp', 'thử',
+      'flashcard', 'thẻ', 'fc', 'câu', 'câu hỏi', 'cái', 'bộ', 'danh sách',
+      'bài', 'ôn', 'học', 'bài giảng', 'transcript', 'giảng viên', 'nội dung',
       'rag', 'llm', 'ai', 'hallucination', 'hax', 'cost of error', 'jtbd', 'lát cắt', '1 câu', '4 lớp', 'nguồn sự thật',
       'conditional automation', 'spaced repetition', 'citation', 'golden set', 'prompt', 'retrieval', 'augment', 'automate',
-      'day 1', 'day 2', 'ngày 1', 'ngày 2', 'bài 1', 'bài 2', 'giao diện', 'đáp án', 'gợi ý', 'kiến thức'
+      'day 1', 'day 2', 'ngày 1', 'ngày 2', 'bài 1', 'bài 2', 'giao diện', 'đáp án', 'gợi ý', 'kiến thức', 'đơn giản', 'trọng tâm', 'nâng cao', 'cơ bản'
     ];
 
-    const isRelevant = courseKeywords.some(kw => lowerText.includes(kw));
+    // Check direct keyword match
+    let isRelevant = courseKeywords.some(kw => lowerText.includes(kw));
+
+    // Check if user specified a number (e.g. "8", "5", "10", "15") or short correction
+    const hasNumber = /\b(\d+)\b/.test(lowerText);
+    const isShortCorrection = lowerText.length < 35 && (hasNumber || lowerText.includes('vậy') || lowerText.includes('thế') || lowerText.includes('lại') || lowerText.includes('ừ') || lowerText.includes('ok'));
+
+    // Context Memory: If previous turn was refused/error and user sends a correction or number, treat as relevant!
+    if (!isRelevant && (this.lastWasRefused || this.lastWasError) && isShortCorrection) {
+      isRelevant = true;
+    }
 
     if (!isRelevant) {
+      if (this.chatbotTypingIndicator) this.chatbotTypingIndicator.classList.add('hidden');
+      this.lastWasRefused = true;
       const refusalMsg = `⚠️ <b>Rất tiếc, mình không thể trả lời câu hỏi này!</b><br><br>` +
         `Mình là <b>VLearn AI Tutor</b> chuyên hỗ trợ cho khoá học <b>AI Thực Chiến</b> và tạo bộ <b>Flashcard ôn tập</b> bám sát bài giảng.<br>` +
-        `Mình <b>chỉ xử lý các câu lệnh liên quan đến nội dung bài học</b> (RAG, LLM, HAX, Cost of Error, Lát cắt 1 câu,...) hoặc yêu cầu tạo bộ thẻ Flashcard ôn tập (từ 5 đến 25 thẻ).<br><br>` +
-        `<i>Vui lòng thử lại với câu hỏi hoặc lệnh chat liên quan đến bài học nhé!</i>`;
+        `Mình <b>chỉ xử lý các câu hỏi/câu lệnh liên quan đến nội dung bài học</b> (RAG, LLM, HAX, Cost of Error, Lát cắt 1 câu,...) hoặc yêu cầu tạo bộ thẻ Flashcard ôn tập (từ 5 đến 25 thẻ).<br><br>` +
+        `<i>Vui lòng thử lại với câu hỏi hoặc lệnh chat liên quan đến bài học nhé! (Ví dụ: "RAG là gì?" hoặc "Tạo 8 thẻ Day 1")</i>`;
       
       this.appendTutorOffTopicChatMessage(refusalMsg);
       this.scrollChatToBottom();
       return; // DO NOT ANSWER OFF-TOPIC QUESTIONS AND DO NOT GENERATE CARDS!
     }
 
-    // 2. Quantity Extraction from Chat Command Text
+    // Reset refusal state on valid course prompt
+    this.lastWasRefused = false;
+
+    // Remove Day/Bài/Ngày/Rule numbers before extracting requested card count to prevent false ambiguity
+    const cleanedTextForCount = lowerText
+      .replace(/\b(?:day|bài|ngày|t|g)\s*[1290]+\b/gi, '')
+      .replace(/\[t\d+-\d+\]/gi, '');
+
+    // Detect creation intent vs direct QA intent
+    const hasCreationVerb = /(?:tạo|sinh|làm|tổng hợp|trích xuất|cho|viết)\s*(?:bộ|danh sách|\d+)?\s*(?:thẻ|flashcard|câu|fc|cái)/i.test(cleanedTextForCount) ||
+                            /(?:tạo|sinh|làm|tổng hợp)\s*\d+/i.test(cleanedTextForCount) ||
+                            /(\d+)\s*(?:thẻ|flashcard|câu|fc|cái)/i.test(cleanedTextForCount);
+
+    // If it's a DIRECT LESSON QUESTION (e.g., "Nội dung Day 1 là gì?", "Bài 2 gồm những gì?", "RAG là gì?")
+    if (!hasCreationVerb && !/(\d+)\s*(?:thẻ|flashcard|câu|fc|cái)/i.test(cleanedTextForCount)) {
+      await new Promise(r => setTimeout(r, 400));
+
+      try {
+        await this.answerDirectCourseQuestion(userText);
+      } catch (err) {
+        console.error('Error answering direct course question:', err);
+        this.appendTutorOffTopicChatMessage(`⚠️ <b>Đã xảy ra sự cố khi xử lý câu hỏi.</b><br>Vui lòng thử lại với câu hỏi khác về bài giảng nhé!`);
+      } finally {
+        if (this.chatbotTypingIndicator) this.chatbotTypingIndicator.classList.add('hidden');
+      }
+      this.scrollChatToBottom();
+      return;
+    }
+
+    // 2. Quantity Extraction from Chat Command Text (for Creation Requests)
     let requestedCount = null;
-    const numMatch = userText.match(/(?:tạo|sinh|làm|tổng hợp)\s*(\d+)/i) || 
-                     userText.match(/(\d+)\s*(?:thẻ|flashcard|câu|fc)/i) ||
-                     userText.match(/\b(\d+)\b/);
+    const numMatch = cleanedTextForCount.match(/(?:tạo|sinh|làm|tổng hợp)\s*(\d+)/i) || 
+                     cleanedTextForCount.match(/(\d+)\s*(?:thẻ|flashcard|câu|fc|cái)/i) ||
+                     cleanedTextForCount.match(/\b(\d+)\b/);
 
     if (numMatch) {
       requestedCount = parseInt(numMatch[1], 10);
     } else {
-      requestedCount = 10; // Default to 10 if no number specified in command
+      requestedCount = 10; // Default to 10 if no number specified in creation command
     }
 
-    // 3. STRICT RANGE VALIDATION (5 to 25)
+    // 3. STRICT RANGE VALIDATION (5 to 25) FOR CREATION REQUESTS
     if (isNaN(requestedCount) || requestedCount < 5 || requestedCount > 25) {
+      if (this.chatbotTypingIndicator) this.chatbotTypingIndicator.classList.add('hidden');
+      this.lastWasError = true;
       const errorMsg = isNaN(requestedCount)
         ? 'Vui lòng ghi rõ số lượng thẻ (từ 5 đến 25 thẻ) trong câu lệnh chat!'
         : (requestedCount < 5 
@@ -557,6 +612,9 @@ class VLearnApp {
       this.scrollChatToBottom();
       return; // STOP EXECUTION IMMEDIATELY! DO NOT GENERATE
     }
+
+    // Reset error state on valid count
+    this.lastWasError = false;
 
     // 4. Lesson & Difficulty Extraction from Chat Text
     let lessonId = 'all';
@@ -590,6 +648,160 @@ class VLearnApp {
     // 7. Append AI Tutor Response Bubble with Inline Cards
     this.appendTutorSuccessChatMessage(cards, lessonId, requestedCount);
     this.scrollChatToBottom();
+  }
+
+  async answerDirectCourseQuestion(questionText) {
+    const lower = questionText.toLowerCase();
+    let topicName = 'AI & LLM Foundation';
+    let answerText = '';
+    let citation = '[T01-015]';
+    let snippet = '[T01-015] Giảng viên: RAG giúp hệ thống tra cứu đúng nguồn sự thật từ transcript bài giảng trước khi trả lời.';
+
+    if (this.apiKey) {
+      try {
+        const model = this.model || 'gemini-3.6-flash';
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Bạn là VLearn AI Tutor cho khoá học AI Thực Chiến. Hãy trả lời ĐẦY ĐỦ, CHI TIẾT, NÊU RÕ NỘI DUNG VÀ VÍ DỤ MINH HOẠ cho câu hỏi sau của học viên: [${questionText}].\nYÊU CẦU BẮT BUỘC:\n1. Giải thích chi tiết khái niệm, vai trò và nguyên lý hoạt động bám sát transcript bài giảng (không trả lời cụt ngủn).\n2. Trích dẫn mã đối chiếu [Txx-NNN] cụ thể.\n3. Trình bày rõ ràng thành các mục: 📌 Khái niệm cốt lõi, 💡 Ý nghĩa trong thiết kế AI, 📖 Trích dẫn bài giảng.`
+              }]
+            }]
+          })
+        });
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText && rawText.trim()) {
+          answerText = rawText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        }
+      } catch (err) {
+        console.warn('Gemini API call failed for direct question, using rich fallback database:', err);
+      }
+    }
+
+    if (!answerText) {
+      if (lower.includes('rag') || lower.includes('hallucination') || lower.includes('ảo giác')) {
+        topicName = 'RAG & Hallucination';
+        answerText = `<b>📌 1. Khái niệm cốt lõi:</b><br>` +
+          `<b>RAG (Retrieval-Augmented Generation)</b> là kỹ thuật nâng cao kết hợp giữa <i>Tra cứu tri thức (Retrieval)</i> và <i>Mô hình ngôn ngữ lớn (Generation)</i>. Thay vì để LLM tự do tạo ra văn bản theo xác suất từ ngữ (rất dễ dẫn tới <b>Hallucination - Ảo giác AI</b>), RAG tự động trích xuất và ép LLM đọc hiểu đúng dữ liệu thực tế từ bài giảng/transcript gốc trước khi tổng hợp câu trả lời.<br><br>` +
+          `<b>💡 2. Vai trò cốt lõi trong Khoá học AI Thực Chiến:</b><br>` +
+          `• <b>Triệt tiêu Ảo giác (Zero Hallucination)</b>: Đảm bảo 100% câu trả lời đều dựa trên nguồn sự thật (Source of Truth).<br>` +
+          `• <b>Minh bạch nguồn gốc kiểm chứng</b>: Mọi đáp án đều đính kèm mã đối chiếu vị trí đoạn bài giảng <code>[Txx-NNN]</code>.<br>` +
+          `• <b>Cập nhật tri thức linh hoạt</b>: Cập nhật tài liệu mới mà không cần tốn chi phí fine-tune mô hình.`;
+        citation = '[T01-015]';
+        snippet = '[T01-015] Giảng viên: RAG truy vấn dữ liệu bài giảng thực tế trước khi trả lời, giúp đảm bảo 100% câu trả lời có nguồn kiểm chứng.';
+      } else if (lower.includes('hax') || lower.includes('guidelines') || lower.includes('g2') || lower.includes('g9')) {
+        topicName = 'HAX Guidelines';
+        answerText = `<b>📌 1. Khái niệm & Nguyên tắc HAX:</b><br>` +
+          `<b>HAX Guidelines (Human-AI eXperience Guidelines)</b> do Microsoft nghiên cứu bao gồm 18 nguyên tắc thiết kế trải nghiệm người dùng với sản phẩm AI. Bộ nguyên tắc này chia thành 4 giai đoạn tương tác.<br><br>` +
+          `<b>💡 2. Hai nguyên tắc HAX trọng tâm trong Bài giảng Day 1:</b><br>` +
+          `• <b>HAX G2 (Minh bạch khả năng AI)</b>: Làm rõ mức độ tin cậy và nguồn trích dẫn bài giảng <code>[Txx-NNN]</code> để học viên chủ động kiểm chứng.<br>` +
+          `• <b>HAX G9 (Hỗ trợ sửa lỗi hiệu quả)</b>: Cho phép người học chủ động chỉnh sửa, phản hồi hoặc yêu cầu AI tạo lại đáp án/flashcard theo ý muốn.`;
+        citation = '[T01-042]';
+        snippet = '[T01-042] Giảng viên: HAX G9 nhấn mạnh quyền kiểm soát của người học, cho phép sửa hoặc yêu cầu sinh lại nội dung ôn tập.';
+      } else if (lower.includes('cost of error') || lower.includes('chi phí') || lower.includes('sai sót')) {
+        topicName = 'Cost of Error';
+        answerText = `<b>📌 1. Khái niệm & Vai trò định hình UX AI:</b><br>` +
+          `<b>Cost of Error (Chi phí rủi ro khi AI làm sai)</b> là chỉ số quan trọng nhất giúp Product Designer quyết định luồng trải nghiệm cho sản phẩm AI.<br><br>` +
+          `<b>💡 2. Hai hướng thiết kế dựa trên Cost of Error:</b><br>` +
+          `• <b>Hướng Augment (Hỗ trợ con người)</b>: Áp dụng khi <b>Cost of Error CAO</b> (ảnh hưởng tài chính, pháp lý, y tế, thi cử). AI đóng vai trò làm nháp, gợi ý; con người luôn kiểm duyệt và ra quyết định cuối cùng.<br>` +
+          `• <b>Hướng Automate (Tự động hoá)</b>: Áp dụng khi <b>Cost of Error RẤT THẤP</b> (phân loại tag, gợi ý từ khóa). Nếu AI sai, hậu quả nhỏ và người dùng dễ dàng khôi phục (Undo).`;
+        citation = '[T01-088]';
+        snippet = '[T01-088] Giảng viên: Chi phí sửa lỗi cao bắt buộc phải có con người kiểm duyệt trong luồng công việc.';
+      } else if (lower.includes('jtbd') || lower.includes('job') || lower.includes('statement')) {
+        topicName = 'JTBD Framework';
+        answerText = `<b>📌 1. Bản chất của JTBD Framework:</b><br>` +
+          `Framework <b>Job-to-be-Done (JTBD)</b> tập trung vào nhu cầu và động lực cốt lõi mà người học "thuê" sản phẩm giải quyết, thay vì chạy theo tính năng hay công nghệ AI thuần túy.<br><br>` +
+          `<b>💡 2. Cấu trúc Job Statement chuẩn trong Bài giảng Day 2:</b><br>` +
+          `Cấu trúc câu Job Statement chuẩn bắt buộc gồm 3 thành phần:<br>` +
+          `👉 <b>[Động từ hành động] + [Đối tượng tác động] + [Bối cảnh xảy ra công việc]</b><br>` +
+          `<i>Ví dụ chuẩn: "Tóm tắt bài giảng video dài (động từ + đối tượng) khi đang di chuyển trên xe bus (bối cảnh)".</i><br>` +
+          `⚠️ <b>Lưu ý quan trọng:</b> Job Statement tuyệt đối KHÔNG được chứa tên công nghệ (như ChatGPT, LLM, Python...).`;
+        citation = '[T01-145]';
+        snippet = '[T01-145] Giảng viên: Cấu trúc Job Statement chuẩn luôn tập trung vào việc con người cần làm, không ghi tên AI hay công cụ.';
+      } else if (lower.includes('lát cắt') || lower.includes('1 câu') || lower.includes('slice')) {
+        topicName = 'Lát cắt 1 câu';
+        answerText = `<b>📌 1. Định nghĩa Lát cắt sản phẩm 1 câu:</b><br>` +
+          `<b>One-Sentence Product Slice</b> là phương pháp cô đọng phạm vi sản phẩm AI xuống mức cực hẹp (Small Slice) giúp team làm prototype hoàn thành và thử nghiệm được ngay trong thời gian ngắn.<br><br>` +
+          `<b>💡 2. Cấu trúc 4 thành tố cốt lõi:</b><br>` +
+          `• ① <b>1 Đối tượng người dùng (User)</b>: Xác định chính xác 1 persona cụ thể.<br>` +
+          `• ② <b>1 Công việc cần làm (Job)</b>: 1 nhiệm vụ quan trọng theo JTBD.<br>` +
+          `• ③ <b>1 Quyết định AI hỗ trợ (Decision)</b>: Điểm AI tham gia giải quyết chỗ khó.<br>` +
+          `• ④ <b>1 Kết quả đầu ra (Output)</b>: Định dạng đầu ra đo lường được (VD: Bộ Flashcard kèm trích dẫn).`;
+        citation = '[T02-020]';
+        snippet = '[T02-020] Giảng viên: Lát cắt 1 câu giúp cô đọng bài toán AI thành 1 user - 1 việc - 1 quyết định - 1 kết quả.';
+      } else if (lower.includes('4 lớp') || lower.includes('chỗ khó') || lower.includes('nguồn sự thật')) {
+        topicName = '4 Lớp Chỗ Khó';
+        answerText = `<b>📌 1. Tổng quan về 4 Lớp Chỗ Khó (Choke Points):</b><br>` +
+          `Trong khoá học AI Thực Chiến Day 2, giảng viên nhấn mạnh 4 lớp chỗ khó kỹ thuật và UX mà mọi ứng dụng AI cần vượt qua để chạm tới mức sẵn sàng thương mại.<br><br>` +
+          `<b>💡 2. Chi tiết 4 lớp chỗ khó:</b><br>` +
+          `• ① <b>Nguồn sự thật (Source of Truth)</b>: Đảm bảo AI không tự bịa thông tin, trích xuất chuẩn xác từ CSDL/Transcript.<br>` +
+          `• ② <b>Độ tin cậy (Confidence Score)</b>: Hiển thị mức độ chắc chắn của câu trả lời.<br>` +
+          `• ③ <b>Luồng xử lý sự cố (Error Recovery)</b>: Thiết kế cơ chế Fallback và hỗ trợ người dùng sửa lỗi khi AI trả về kết quả chưa chuẩn.<br>` +
+          `• ④ <b>Đo lường định lượng (Golden Set Evaluation)</b>: Đánh giá chất lượng AI bằng tập Test Case chuẩn.`;
+        citation = '[T02-055]';
+        snippet = '[T02-055] Giảng viên: Lớp ① Nguồn sự thật giải quyết triệt để rủi ro AI bịa ra kiến thức không có trong bài giảng.';
+      } else if (lower.includes('day 1') || lower.includes('bài 1') || lower.includes('ngày 1')) {
+        topicName = 'Day 1 — Nền tảng RAG & HAX Guidelines';
+        answerText = `<b>📌 1. Tổng quan Bài giảng Day 1 (Bài 1):</b><br>` +
+          `Bài giảng Day 1 tập trung vào <b>Nền tảng RAG & Thiết kế Trải nghiệm Người dùng với AI (HAX Guidelines)</b>.<br><br>` +
+          `<b>💡 2. Các chủ đề trọng tâm trong Day 1:</b><br>` +
+          `• <b>RAG (Retrieval-Augmented Generation)</b>: Kỹ thuật chống ảo giác (Hallucination) bằng cách ép AI tra cứu transcript bài giảng trước khi trả lời.<br>` +
+          `• <b>HAX Guidelines (Microsoft)</b>: Bộ 18 nguyên tắc thiết kế UX AI, đặc biệt là <b>HAX G2</b> (minh bạch trích dẫn) và <b>HAX G9</b> (hỗ trợ người dùng sửa lỗi & sinh lại).<br>` +
+          `• <b>Cost of Error (Chi phí sửa sai)</b>: Định hướng chọn chiến lược <b>Augment</b> (con người duyệt khi rủi ro cao) hay <b>Automate</b> (tự động hoá khi rủi ro thấp).`;
+        citation = '[T01-015]';
+        snippet = '[T01-015] Giảng viên: Day 1 cung cấp toàn bộ nền tảng RAG, HAX Guidelines và Cost of Error giúp học viên xây dựng AI Tutor chuẩn mực.';
+      } else if (lower.includes('day 2') || lower.includes('bài 2') || lower.includes('ngày 2')) {
+        topicName = 'Day 2 — Thiết kế Sản phẩm & 4 Lớp Chỗ Khó';
+        answerText = `<b>📌 1. Tổng quan Bài giảng Day 2 (Bài 2):</b><br>` +
+          `Bài giảng Day 2 hướng dẫn <b>Phương pháp đóng gói sản phẩm AI thực tế</b> thông qua khung JTBD và 4 lớp giải quyết chỗ khó kỹ thuật.<br><br>` +
+          `<b>💡 2. Các chủ đề trọng tâm trong Day 2:</b><br>` +
+          `• <b>Lát cắt sản phẩm 1 câu (One-Sentence Product Slice)</b>: Cô đọng bài toán AI gồm 1 User - 1 Job - 1 Decision - 1 Output.<br>` +
+          `• <b>JTBD Framework (Job-to-be-Done)</b>: Cấu trúc Job Statement [Động từ + Đối tượng + Bối cảnh], tuyệt đối không ghi tên công nghệ.<br>` +
+          `• <b>4 Lớp Chỗ Khó (Choke Points)</b>: Nguồn sự thật, Độ tin cậy, Luồng xử lý sự cố và Đo lường thực tế (Golden Set Evaluation).`;
+        citation = '[T02-020]';
+        snippet = '[T02-020] Giảng viên: Day 2 tập trung vào kỹ năng làm sản phẩm AI thực chiến với lát cắt 1 câu và 4 lớp xử lý chỗ khó.';
+      } else {
+        answerText = `<b>📌 Giải đáp kiến thức bài giảng:</b><br>` +
+          `Về thắc mắc <b>"${this.escapeHtml(questionText)}"</b>:<br>` +
+          `Nội dung này thuộc <b>Khoá học AI Thực Chiến</b>. Bài giảng quy định việc trích xuất kiến thức phải luôn đi kèm trích dẫn bài giảng <code>${citation}</code> để người học dễ dàng tra cứu lại transcript bài giảng gốc.`;
+      }
+    }
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-bubble-msg tutor';
+    msgDiv.innerHTML = `
+      <div class="chat-avatar">V</div>
+      <div class="chat-body" style="max-width: 100%;">
+        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Giải đáp chi tiết bài giảng</span></div>
+        <div class="chat-text">
+          ${answerText}<br><br>
+          <div class="transcript-snippet-box" style="margin-top: 0.6rem;">
+            <div class="snippet-header"><i class="fa-solid fa-quote-left"></i> Trích dẫn bài giảng ${citation}:</div>
+            ${snippet}
+          </div>
+          <button class="btn btn-outline-primary btn-gen-prompt" data-gen-prompt="Tạo 8 flashcard ôn tập chủ đề ${topicName}" style="margin-top: 0.9rem; background: #edf5fd; border: 1px solid #004fb6; color: #004fb6; padding: 0.45rem 1rem; border-radius: 20px; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+            ⚡ Tạo 8 Flashcard ôn tập chủ đề ${topicName}
+          </button>
+        </div>
+      </div>
+    `;
+
+    if (this.chatbotFeed) this.chatbotFeed.appendChild(msgDiv);
+
+    // Attach click listener to prompt button
+    const btn = msgDiv.querySelector('.btn-gen-prompt');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const prompt = btn.dataset.genPrompt;
+        if (prompt && this.chatbotTextInput) {
+          this.chatbotTextInput.value = prompt;
+          this.handleChatbotSubmit();
+        }
+      });
+    }
   }
 
   appendTutorOffTopicChatMessage(refusalHtml) {
@@ -901,6 +1113,16 @@ class VLearnApp {
         <td><span class="badge badge-answer-title"><i class="fa-solid fa-check"></i> ${c.result}</span></td>
       </tr>
     `).join('');
+  }
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 }
 
