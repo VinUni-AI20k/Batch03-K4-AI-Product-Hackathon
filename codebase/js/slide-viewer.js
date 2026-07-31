@@ -437,9 +437,14 @@ function typewriterEffectOnNote(fullText, onComplete) {
     switchSidebarTab('notes');
   }
 
+  const existingHtml = noteEl.innerHTML.trim();
+  const hasExistingContent = existingHtml && existingHtml !== '<br>' && existingHtml !== '<div><br></div>';
+
   if (noteEl.tagName === 'TEXTAREA') {
     // Fallback textarea mode
-    noteEl.value = '';
+    const existingVal = noteEl.value.trim();
+    const startVal = existingVal ? existingVal + '\n' : '';
+    noteEl.value = startVal;
     let index = 0;
     noteTypewriterInterval = setInterval(() => {
       if (index < fullText.length) {
@@ -454,14 +459,14 @@ function typewriterEffectOnNote(fullText, onComplete) {
       }
     }, 18);
   } else {
-    // contenteditable mode: render từng dòng lần lượt tạo hiệu ứng
-    noteEl.innerHTML = '';
+    // contenteditable mode: Nối tiếp nội dung mới vào sau nội dung cũ (APPEND)
+    const baseHtml = hasExistingContent ? existingHtml + '<br>' : '';
     const lines = fullText.split('\n').filter(l => l.trim());
     let lineIndex = 0;
     noteTypewriterInterval = setInterval(() => {
       if (lineIndex < lines.length) {
         const partialText = lines.slice(0, lineIndex + 1).join('\n');
-        noteEl.innerHTML = markdownToNoteHtml(partialText);
+        noteEl.innerHTML = baseHtml + markdownToNoteHtml(partialText);
         pageTextNotes[currentPage] = noteEl.innerHTML;
         noteEl.scrollTop = noteEl.scrollHeight;
         autoSaveCurrentNote();
@@ -1174,11 +1179,18 @@ if (document.getElementById('btn-confuse-selection')) {
 if (document.getElementById('btn-note-selection')) {
   document.getElementById('btn-note-selection').addEventListener('click', () => {
     if (selectedText) {
-      const textareaInput = document.getElementById('note-textarea-input');
-      if (textareaInput) {
-        const currentVal = textareaInput.value.trim();
-        const appendStr = (currentVal ? "\n- " : "- ") + selectedText;
-        textareaInput.value = currentVal + appendStr;
+      const noteEl = document.getElementById('note-textarea-input');
+      if (noteEl) {
+        if (noteEl.tagName === 'TEXTAREA') {
+          const currentVal = noteEl.value.trim();
+          const appendStr = (currentVal ? "\n- " : "- ") + selectedText;
+          noteEl.value = currentVal + appendStr;
+        } else {
+          const existingHtml = noteEl.innerHTML.trim();
+          const hasContent = existingHtml && existingHtml !== '<br>' && existingHtml !== '<div><br></div>';
+          const appendHtml = `<ul><li>${escapeHtml(selectedText)}</li></ul>`;
+          noteEl.innerHTML = (hasContent ? existingHtml + '<br>' : '') + appendHtml;
+        }
         autoSaveCurrentNote();
         updateNotesPanelUI();
         switchSidebarTab('notes');
