@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2, AlertCircle } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
+import 'pdfjs-dist/web/pdf_viewer.css';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 export default function PdfCanvasViewer({ 
   pdfUrl, 
@@ -31,11 +38,6 @@ export default function PdfCanvasViewer({
 
     const loadAndRenderPdf = async () => {
       try {
-        const pdfjsLib = window.pdfjsLib;
-        if (!pdfjsLib) {
-          throw new Error('Thư viện PDF.js chưa được tải trên trình duyệt.');
-        }
-
         // Fetch PDF binary data
         const response = await fetch(pdfUrl);
         if (!response.ok) {
@@ -126,15 +128,12 @@ export default function PdfCanvasViewer({
 
               pageWrapper.appendChild(textLayerDiv);
 
-              const textLayerRenderTask = pdfjsLib.renderTextLayer({
+              const textLayer = new pdfjsLib.TextLayer({
                 textContentSource: textContent,
                 container: textLayerDiv,
                 viewport: viewport
               });
-
-              if (textLayerRenderTask && textLayerRenderTask.promise) {
-                await textLayerRenderTask.promise;
-              }
+              await textLayer.render();
             } catch (textLayerErr) {
               console.warn(`Không thể render TextLayer trang ${pageNum}:`, textLayerErr);
             }

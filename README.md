@@ -1,3 +1,40 @@
+# VLearn Tutor — bản chạy chính
+
+Ứng dụng dùng giao diện React/Vite trong `frontend/`, PDF Reader bằng PDF.js và
+API AI Tutor bằng FastAPI trong `backend/`. Giao diện Next.js thử nghiệm cũ đã
+được loại bỏ để repo chỉ còn một luồng chạy chính.
+
+## Cài đặt và chạy
+
+```powershell
+npm.cmd ci
+npm.cmd --prefix frontend ci
+python -m pip install -r backend\requirements.txt
+Copy-Item backend\.env.example backend\.env
+```
+
+Điền `GEMINI_API_KEY` mới vào `backend/.env`, sau đó chạy cả web và API:
+
+```powershell
+npm.cmd run dev
+```
+
+- Giao diện: `http://localhost:5173`
+- API health: `http://localhost:8000/api/health`
+- API docs: `http://localhost:8000/docs`
+
+Nếu chưa điền key, AI Tutor vẫn chạy fallback cục bộ để demo điều hướng, đọc ngữ
+cảnh trang và tải slide. Tuyệt đối không đặt Gemini key trong `frontend/.env` vì
+biến Vite được gửi xuống trình duyệt.
+
+Build giao diện production:
+
+```powershell
+npm.cmd run build
+```
+
+---
+
 # Mini Hackathon AI — Batch 03
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
