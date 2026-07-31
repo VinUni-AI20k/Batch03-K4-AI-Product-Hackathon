@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 *.env
+
+# Rasterized slide pages (generated from data/vlearn-pack/slides/*.pdf by
+# codebase/scripts/pdf-to-images.mjs). Not committed: it's a derived copy of
+# the confidential data pack — see README.md "Bảo mật dữ liệu được cung cấp".
+# Regenerate locally with: node codebase/scripts/pdf-to-images.mjs
+codebase/assets/
