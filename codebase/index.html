@@ -1301,13 +1301,13 @@
         <div class="ai-chat-header">
             <div>
                 <div class="ai-chat-header-title">🤖 Trợ lý AI VLearn</div>
-                <div class="ai-chat-sub">Hỏi đáp dựa trên nội dung Day 01 & Day 02 · luôn kèm trích dẫn slide</div>
+                <div class="ai-chat-sub">Ưu tiên trả lời từ slide · chỉ tra thêm trên web khi slide không đủ thông tin</div>
             </div>
             <button class="ai-chat-close-btn" onclick="toggleAiChat()">✕</button>
         </div>
         <div class="ai-chat-messages" id="aiChatMessages">
             <div class="chat-bubble ai">
-                Chào bạn 👋 Mình là trợ lý AI của VLearn. Hỏi mình bất cứ điều gì trong nội dung Day 01 (AI & LLM Foundation) hoặc Day 02 (Xác định bài toán cho AI) — câu trả lời sẽ luôn kèm mã trích dẫn trang slide, bấm vào để nhảy thẳng tới đúng slide.
+                Chào bạn 👋 Mình là trợ lý AI của VLearn. Hỏi mình bất cứ điều gì trong nội dung Day 01 (AI & LLM Foundation) hoặc Day 02 (Xác định bài toán cho AI) — mình luôn ưu tiên trả lời đúng theo slide (kèm mã trích dẫn, bấm để nhảy tới đúng trang), chỉ tra cứu thêm trên web khi slide không có đủ thông tin, và sẽ nói rõ khi nào câu trả lời đến từ web.
             </div>
         </div>
         <div class="ai-chat-suggest" id="aiChatSuggest">
@@ -1965,44 +1965,11 @@
         setTimeout(initDrawCanvases, 500);
 
         /* ================================================================= */
-        /* AI CHAT — simple keyword retrieval over d1Slides/d2Slides so every  */
-        /* answer stays grounded in a real, citable slide (demo, no live API) */
+        /* AI CHAT — calls codebase/server POST /api/chat-ask (Gemini, real).  */
+        /* Priority order enforced in server/prompts.js buildChatPrompt: slide */
+        /* content first, Google Search web grounding only as a fallback when */
+        /* the slide deck doesn't have the answer.                            */
         /* ================================================================= */
-        const CHAT_STOPWORDS = new Set(['la','gi','sao','tai','khi','nao','co','khong','va','cua','cho','trong',
-            'mot','cac','de','nen','a','oi','giup','minh','ban','hay','lam','the','nhu','neu','se','duoc','nay',
-            'do','voi','ve','tu','ra','vi','no','nhung','vay','sao','ai','hon']);
-
-        function stripDiacritics(str) {
-            return str.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
-        }
-
-        function tokenize(str) {
-            return stripDiacritics(str.toLowerCase())
-                .replace(/[?.,!;:"'()]/g, ' ')
-                .split(/\s+/)
-                .filter(w => w.length >= 2 && !CHAT_STOPWORDS.has(w));
-        }
-
-        function buildChatIndex() {
-            const d1 = d1Slides.map((s, i) => ({ ...s, doc: 'd1', page: i + 1, prefix: 'T01', file: 'd1-slide-hackathon.pdf' }));
-            const d2 = d2Slides.map((s, i) => ({ ...s, doc: 'd2', page: i + 1, prefix: 'T02', file: 'd2-slide-hackathon.pdf' }));
-            return d1.concat(d2);
-        }
-
-        function findBestSlideMatch(query) {
-            const queryWords = tokenize(query);
-            if (!queryWords.length) return null;
-            const index = buildChatIndex();
-            let best = null, bestScore = 0;
-            index.forEach(s => {
-                const haystack = tokenize([s.heading, s.subheading || '', (s.body || []).join(' '), s.takeaway || ''].join(' '));
-                const haystackSet = new Set(haystack);
-                let score = 0;
-                queryWords.forEach(w => { if (haystackSet.has(w)) score++; });
-                if (score > bestScore) { bestScore = score; best = s; }
-            });
-            return bestScore > 0 ? best : null;
-        }
 
         function escapeHtml(str) {
             const div = document.createElement('div');
@@ -2058,10 +2025,26 @@
             document.getElementById('taModal').style.display = 'flex';
         }
 
-        function sendChatMessage() {
+        // Turns inline [T0x-NNN] slide citations into clickable badges. Web
+        // sources aren't inlined this way — they come back separately as
+        // data.webSources and are listed under the answer instead, so slide
+        // and web provenance never get visually mixed up.
+        function renderChatAnswer(text) {
+            const escaped = escapeHtml(text);
+            return escaped
+                .replace(/\[T0([12])-(\d{3})\]/g, (m, dNum, page) => {
+                    const doc = dNum === '1' ? 'd1' : 'd2';
+                    return `<span class="citation-badge" style="cursor:pointer;" onclick="jumpToCitation('${doc}', ${parseInt(page, 10)})">📌 ${m}</span>`;
+                })
+                .replace(/\n/g, '<br>');
+        }
+
+        async function sendChatMessage() {
             const input = document.getElementById('aiChatInput');
             const text = input.value.trim();
             if (!text) return;
+
+            const doc = document.getElementById('docD1Container').style.display !== 'none' ? 'd1' : 'd2';
 
             appendChatBubble('user', escapeHtml(text));
             input.value = '';
@@ -2077,31 +2060,41 @@
             container.appendChild(typing);
             container.scrollTop = container.scrollHeight;
 
-            setTimeout(() => {
+            try {
+                const res = await fetch('/api/chat-ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ day: doc, message: text })
+                });
                 typing.remove();
-                const match = findBestSlideMatch(text);
-                if (match) {
-                    const answerText = match.takeaway || (match.body && match.body[0]) || match.heading;
-                    const citation = `${match.prefix}-${String(match.page).padStart(3, '0')}`;
-                    appendChatBubble('ai', `
-                        <div><strong>${escapeHtml(match.heading)}</strong></div>
-                        <div style="margin-top:6px;">${escapeHtml(answerText)}</div>
-                        <div style="margin-top:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <span class="citation-badge" onclick="jumpToCitation('${match.doc}', ${match.page})">📌 ${citation} — nhảy tới slide</span>
-                        </div>
-                    `);
-                } else {
-                    const safeText = escapeHtml(text).replace(/'/g, "\\'");
-                    appendChatBubble('ai', `
-                        <div>Mình chưa tìm thấy nội dung liên quan trực tiếp trong slide Day 01 & Day 02. Bạn có muốn chuyển câu hỏi này cho TA trực ban hỗ trợ không?</div>
-                        <div class="escalate-bar" style="margin-top:10px;">
-                            <span style="font-size:12px; color:#64748b;">Chưa chắc chắn?</span>
-                            <button class="btn-escalate-ta" onclick="escalateTAChat('${safeText}')">📩 Chuyển cho TA</button>
-                        </div>
-                    `);
+                if (!res.ok) {
+                    const body = await res.json().catch(() => ({}));
+                    throw new Error(body.error || ('HTTP ' + res.status));
                 }
+                const data = await res.json();
+                const webSourcesHtml = (data.webSources && data.webSources.length)
+                    ? `<div style="margin-top:10px; padding-top:8px; border-top:1px dashed #e2e8f0; font-size:11px; color:#64748b;">
+                           <div style="font-weight:600; margin-bottom:4px;">🌐 Thông tin bổ sung từ web (ngoài slide chính thức):</div>
+                           ${data.webSources.map(s => `<div>· <a href="${escapeHtml(s.uri)}" target="_blank" rel="noopener">${escapeHtml(s.title || s.uri)}</a></div>`).join('')}
+                       </div>`
+                    : '';
+                const webUnavailableHtml = data.usedWebSearch === false
+                    ? `<div style="margin-top:8px; font-size:11px; color:#b45309;">⚠️ Tra cứu web tạm thời không khả dụng cho gói API hiện tại — câu trả lời trên chỉ dựa vào slide.</div>`
+                    : '';
+                appendChatBubble('ai', `<div>${renderChatAnswer(data.answer || '(AI không trả về nội dung)')}</div>${webSourcesHtml}${webUnavailableHtml}`);
+            } catch (err) {
+                typing.remove();
+                const safeText = escapeHtml(text).replace(/'/g, "\\'");
+                appendChatBubble('ai', `
+                    <div>⚠️ Không hỏi được AI lúc này (${escapeHtml(String(err.message || err))}). Bạn có muốn chuyển câu hỏi này cho TA trực ban hỗ trợ không?</div>
+                    <div class="escalate-bar" style="margin-top:10px;">
+                        <span style="font-size:12px; color:#64748b;">Chưa chắc chắn?</span>
+                        <button class="btn-escalate-ta" onclick="escalateTAChat('${safeText}')">📩 Chuyển cho TA</button>
+                    </div>
+                `);
+            } finally {
                 sendBtn.disabled = false;
-            }, 650 + Math.random() * 500);
+            }
         }
     </script>
 </body>

@@ -2,13 +2,18 @@ require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
 const express = require("express");
 const cors = require("cors");
-const { GoogleGenAI, Type } = require("@google/genai");
-const { getSection, getSectionGroundingText } = require("./data/knowledge");
-const { buildQuizPrompt } = require("./prompts");
+const { GoogleGenAI } = require("@google/genai");
+const { getSection, getSectionGroundingText, getDocGroundingText } = require("./data/knowledge");
+const { buildQuizPrompt, buildChatPrompt } = require("./prompts");
+const { quizResponseSchema } = require("./quizSchema");
 
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = "gemini-flash-latest";
+// Google Search grounding tool currently can't be combined with responseSchema/JSON
+// mode in the Gemini API, so /api/chat-ask (plain text + citations) uses this model
+// directly rather than the structured quizResponseSchema path below.
+const CHAT_MODEL = "gemini-flash-lite-latest";
 
 if (!GEMINI_API_KEY) {
     console.error("Missing GEMINI_API_KEY — copy .env.example to .env and paste your key.");
@@ -16,38 +21,31 @@ if (!GEMINI_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-const quizResponseSchema = {
-    type: Type.OBJECT,
-    properties: {
-        questions: {
-            type: Type.ARRAY,
-            items: {
-                type: Type.OBJECT,
-                properties: {
-                    question: { type: Type.STRING },
-                    citation: { type: Type.STRING },
-                    sourcePages: { type: Type.ARRAY, items: { type: Type.INTEGER } },
-                    reviewSummary: { type: Type.STRING },
-                    options: {
-                        type: Type.ARRAY,
-                        items: {
-                            type: Type.OBJECT,
-                            properties: {
-                                key: { type: Type.STRING },
-                                text: { type: Type.STRING },
-                                correct: { type: Type.BOOLEAN },
-                                feedback: { type: Type.STRING }
-                            },
-                            required: ["key", "text", "correct", "feedback"]
-                        }
-                    }
-                },
-                required: ["question", "citation", "sourcePages", "reviewSummary", "options"]
-            }
-        }
-    },
-    required: ["questions"]
-};
+// Pre-built per-section question pool (see codebase/server/scripts/generate-question-bank.js).
+// generate-quiz draws its 2-3 questions from here instead of calling Gemini
+// live on every quiz load/retry. Missing file (bank not generated yet) just
+// means bankQuestionsFor() returns [] and the live-generation fallback below
+// kicks in, so the app still works before the bank exists.
+let questionBank = {};
+try {
+    questionBank = require("./data/questionBank.json").bank || {};
+} catch (err) {
+    console.warn("No question bank found at data/questionBank.json — falling back to live Gemini generation for every quiz. Run: node codebase/server/scripts/generate-question-bank.js");
+}
+
+function bankQuestionsFor(day, sectionId) {
+    return (questionBank[day] && questionBank[day][sectionId]) || [];
+}
+
+// Fisher-Yates shuffle, non-mutating.
+function sampleQuestions(pool, count) {
+    const shuffled = pool.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+}
 
 // Simple in-memory cache so reloading a section during one server run keeps
 // showing the same quiz (a fresh quiz every reload would make "did you pass
@@ -65,13 +63,10 @@ app.get("/api/health", (req, res) => {
 
 app.post("/api/generate-quiz", async (req, res) => {
     try {
-        const { day, sectionId, questionCount = 4, regenerate = false } = req.body || {};
+        const { day, sectionId, questionCount = 3, regenerate = false } = req.body || {};
 
         if (!day || !sectionId) {
             return res.status(400).json({ error: "day and sectionId are required" });
-        }
-        if (!GEMINI_API_KEY) {
-            return res.status(500).json({ error: "Server missing GEMINI_API_KEY — see codebase/server/.env.example" });
         }
 
         const section = getSection(day, sectionId);
@@ -84,8 +79,28 @@ app.post("/api/generate-quiz", async (req, res) => {
             return res.json(quizCache.get(cacheKey));
         }
 
+        const clampedCount = Math.max(2, Math.min(3, Number(questionCount) || 3));
+
+        const pool = bankQuestionsFor(day, sectionId);
+        if (pool.length) {
+            const payload = {
+                day,
+                sectionId,
+                sectionTitle: section.title,
+                questions: sampleQuestions(pool, Math.min(clampedCount, pool.length))
+            };
+            quizCache.set(cacheKey, payload);
+            return res.json(payload);
+        }
+
+        // Fallback: no pre-built bank for this section (bank not generated
+        // yet) — generate live from Gemini so the app still works.
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({ error: "No question bank for this section and server missing GEMINI_API_KEY — see codebase/server/.env.example" });
+        }
+
+        console.warn(`No bank entry for ${cacheKey} — generating live via Gemini.`);
         const groundingText = getSectionGroundingText(day, sectionId);
-        const clampedCount = Math.max(3, Math.min(5, Number(questionCount) || 4));
         const prompt = buildQuizPrompt({
             day,
             sectionTitle: section.title,
@@ -111,6 +126,71 @@ app.post("/api/generate-quiz", async (req, res) => {
     } catch (err) {
         console.error("generate-quiz failed:", err);
         res.status(502).json({ error: "AI generation failed, please retry.", detail: String(err.message || err) });
+    }
+});
+
+app.post("/api/chat-ask", async (req, res) => {
+    try {
+        const { day, message } = req.body || {};
+
+        if (!day || !message) {
+            return res.status(400).json({ error: "day and message are required" });
+        }
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({ error: "Server missing GEMINI_API_KEY — see codebase/server/.env.example" });
+        }
+
+        const groundingText = getDocGroundingText(day);
+        if (!groundingText) {
+            return res.status(404).json({ error: `Unknown day ${day}` });
+        }
+
+        const prompt = buildChatPrompt({ day, groundingText, message });
+
+        // googleSearch is a built-in tool: the model decides for itself whether it
+        // needs to search, per the source-priority rules in buildChatPrompt (slide
+        // first, web only as fallback). Tool use is not combinable with
+        // responseSchema/JSON mode in the current Gemini API, so this returns plain
+        // text — slide citations show up inline as [T0x-NNN] and are parsed out
+        // client-side (see renderChatAnswer in index.html).
+        //
+        // Google Search grounding needs a higher API tier than plain generateContent
+        // (a free-tier-only key gets RESOURCE_EXHAUSTED on the tool call specifically,
+        // even when plain calls still work). Rather than fail the whole chat feature
+        // on that, fall back to a slide-only answer (no tool) so the assistant still
+        // works — it just can't reach the web until billing/a higher tier is enabled.
+        let response, usedWebSearch = true;
+        try {
+            response = await ai.models.generateContent({
+                model: CHAT_MODEL,
+                contents: prompt,
+                config: {
+                    tools: [{ googleSearch: {} }],
+                    temperature: 0.3
+                }
+            });
+        } catch (toolErr) {
+            console.warn("chat-ask: googleSearch tool unavailable, falling back to slide-only:", toolErr.message);
+            usedWebSearch = false;
+            response = await ai.models.generateContent({
+                model: CHAT_MODEL,
+                contents: prompt,
+                config: { temperature: 0.3 }
+            });
+        }
+
+        const candidate = response.candidates && response.candidates[0];
+        const groundingChunks = (candidate && candidate.groundingMetadata && candidate.groundingMetadata.groundingChunks) || [];
+        const webSources = groundingChunks
+            .map((c) => c.web)
+            .filter(Boolean)
+            .map((w) => ({ title: w.title, uri: w.uri }))
+            .filter((w, i, arr) => w.uri && arr.findIndex((x) => x.uri === w.uri) === i);
+
+        res.json({ answer: response.text || "", webSources, usedWebSearch });
+    } catch (err) {
+        console.error("chat-ask failed:", err);
+        res.status(502).json({ error: "AI trả lời thất bại, thử lại.", detail: String(err.message || err) });
     }
 });
 
