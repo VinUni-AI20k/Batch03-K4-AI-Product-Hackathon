@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VLearn v2 Pitch Deck - Team Rau Má</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Outfit', 'sans-serif'] },
+          colors: { primary: '#4f46e5', secondary: '#10b981', danger: '#ef4444', dark: '#0f172a' }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+  
+  <style>
+    .reveal {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+      color: #0f172a;
+    }
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Outfit', sans-serif;
+      text-transform: none;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .reveal h1 { font-weight: 800; font-size: 4rem; letter-spacing: -0.05em; }
+    .reveal h2 { font-size: 3rem; }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 1);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.15);
+      border-radius: 24px;
+      padding: 3.5rem;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .reveal section {
+      text-align: left;
+    }
+    
+    .feature-box {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+      border-top: 5px solid var(--primary-color, #4f46e5);
+      height: 100%;
+    }
+    
+    .mermaid-wrapper {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+      width: 100%;
+      height: 600px;
+      overflow: hidden;
+    }
+    
+    .mermaid-zoom-container {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      cursor: grab;
+    }
+    
+    .mermaid-zoom-container:active {
+      cursor: grabbing;
+    }
+    
+    .mermaid {
+      transform-origin: top left;
+      transition: transform 0.2s ease;
+      min-width: 1200px;
+    }
+    
+    .zoom-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .zoom-controls button {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      font-size: 20px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: #334155;
+    }
+    
+    .zoom-controls button:hover { background: #e2e8f0; }
+    
+    .data-stat {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Slide 1: Title -->
+      <section>
+        <div class="glass-card text-center max-w-5xl">
+          <i class="ph-fill ph-graduation-cap text-primary text-9xl mb-6"></i>
+          <h1 class="text-primary mb-4">VLearn v2</h1>
+          <h2 class="text-4xl text-gray-600 font-semibold mb-8">Trợ lý Học tập Tương tác & Chống Gian lận</h2>
+          <p class="text-xl text-gray-500 mb-8">Nâng tầm trải nghiệm tự học: Bám sát nguồn, Không giải hộ, Khuyến khích sự tiến bộ.</p>
+          <div class="bg-gray-100 rounded-full py-3 px-8 inline-block text-gray-600 font-bold tracking-widest text-lg">
+            AI HACKATHON K4 · TEAM RAU MÁ · ZONE HÀ NỘI
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 2: Vấn đề (Mở rộng từ Spec) -->
+      <section>
+        <div class="glass-card max-w-6xl">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-warning-circle text-danger"></i> Job To Be Done (JTBD) & Nỗi đau</h2>
+          
+          <div class="grid grid-cols-2 gap-10">
+            <div>
+              <h3 class="text-2xl font-bold mb-4 text-gray-800">Tình trạng hiện tại</h3>
+              <p class="text-gray-700 text-xl leading-relaxed mb-6">
+                Học viên vừa học xong một bài trên VLearn, nhưng <strong>không có công cụ phản hồi nhanh</strong> để biết chính xác lỗ hổng kiến thức của mình (Mastery) trước khi sang bài mới.
+              </p>
+              <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="data-stat text-3xl">>50%</div>
+                <div class="text-gray-600 text-lg">Học viên mang lỗ hổng từ bài cũ sang bài mới do ôn tập sai trọng tâm.</div>
+              </div>
+            </div>
+            
+            <div class="space-y-6">
+              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
+                <i class="ph-fill ph-robot text-danger text-4xl mt-1"></i>
+                <div>
+                  <h4 class="font-bold text-danger text-2xl mb-2">Lạm dụng AI (Học vẹt)</h4>
+                  <p class="text-lg text-gray-700">Mang bài tập sang ChatGPT hỏi thẳng kết quả. Sinh viên mất dần tư duy tự giải quyết vấn đề.</p>
+                </div>
+              </div>
+              
+              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
+                <i class="ph-fill ph-shield-warning text-danger text-4xl mt-1"></i>
+                <div>
+                  <h4 class="font-bold text-danger text-2xl mb-2">Gian lận tinh vi</h4>
+                  <p class="text-lg text-gray-700">Dùng tiểu xảo "Jailbreak" lừa AI đọc đáp án, hoặc thoát Quiz giữa chừng để mở slide/Google tra cứu.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 3: Phân tích đối thủ -->
+      <section>
+        <div class="glass-card max-w-7xl">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-crosshair text-primary"></i> Lợi thế Cạnh tranh (USP)</h2>
+          
+          <table class="w-full text-left border-collapse bg-white rounded-xl overflow-hidden shadow-md text-xl">
+            <thead>
+              <tr class="bg-gray-800 text-white">
+                <th class="p-6 font-semibold w-1/4">Sản phẩm</th>
+                <th class="p-6 font-semibold w-1/3">Hạn chế hiện tại</th>
+                <th class="p-6 font-semibold text-green-300 w-5/12">Khác biệt của VLearn</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr class="hover:bg-gray-50">
+                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-chat-circle text-gray-400 mr-2"></i> ChatGPT Study</td>
+                <td class="p-6 text-gray-600">Hay bịa kiến thức, dễ bị dụ giải hộ bài, đi xa khỏi giáo trình gốc.</td>
+                <td class="p-6 text-primary font-bold bg-indigo-50/30">Chỉ dùng RAG trên Transcript VLearn. Bắt buộc dùng phương pháp hỏi ngược (Socratic).</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-cards text-blue-400 mr-2"></i> Quizlet</td>
+                <td class="p-6 text-gray-600">Người dùng phải tự biên soạn bộ câu hỏi tốn công sức.</td>
+                <td class="p-6 text-primary font-bold bg-indigo-50/30">AI tự động bóc tách bài học sinh ra bộ 15 câu MCQ đo lường chính xác mục tiêu.</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="p-6 font-medium text-gray-700"><i class="ph-fill ph-bird text-green-500 mr-2"></i> Duolingo</td>
+                <td class="p-6 text-gray-600">Gamification (chuỗi ngày học) vô tình lấn át mục tiêu học thuật.</td>
+                <td class="p-6 text-primary font-bold bg-indigo-50/30">Credit chỉ thưởng cho "Sự tiến bộ" và dùng làm vốn để nhờ AI gợi ý (Quota).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Slide 4: Giải pháp Lõi -->
+      <section>
+        <div class="glass-card max-w-6xl">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-lightbulb text-yellow-500"></i> HAX/PAIR: Trợ lý Socratic & Guardrails</h2>
+          
+          <div class="grid grid-cols-2 gap-8">
+            <div class="feature-box" style="--primary-color: #3b82f6;">
+              <i class="ph-fill ph-chalkboard-teacher text-blue-500 text-5xl mb-4"></i>
+              <h3 class="text-2xl font-bold mb-4">Socratic Agent (G5)</h3>
+              <p class="text-gray-700 text-xl mb-4">Hoạt động như một giảng viên nghiêm khắc:</p>
+              <ul class="list-disc list-inside text-gray-600 space-y-3 text-lg font-medium">
+                <li>Chỉ đặt câu hỏi mớm lời, <strong>không giải hộ</strong>.</li>
+                <li>Gợi ý công thức, cấm đưa kết quả tính toán.</li>
+                <li>Luôn trích dẫn nguồn (Source ID) minh bạch.</li>
+                <li>Báo trước hậu quả trừ Credit (G16) trước khi hỏi.</li>
+              </ul>
+            </div>
+            
+            <div class="feature-box" style="--primary-color: #10b981;">
+              <i class="ph-fill ph-shield-check text-secondary text-5xl mb-4"></i>
+              <h3 class="text-2xl font-bold mb-4">Validator Guardrails (G10)</h3>
+              <p class="text-gray-700 text-xl mb-4">Lưới lọc bảo mật cấp độ 2:</p>
+              <ul class="list-disc list-inside text-gray-600 space-y-3 text-lg font-medium">
+                <li>LLM đóng vai Validator kiểm duyệt tin nhắn Socratic.</li>
+                <li>Đánh chặn 100% rủi ro lộ đáp án (A,B,C,D).</li>
+                <li>Cơ chế Anti-Cheat: Ép Fullscreen trình duyệt.</li>
+                <li>Thu hẹp hành động: Báo lỗi Insuifficient khi nguồn mờ nhạt.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Slide 5: Delta Gamification -->
+      <section>
+        <div class="glass-card max-w-6xl">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-trend-up text-purple-500"></i> Đánh giá theo sự tiến bộ (Delta Mastery)</h2>
+          <p class="text-gray-700 text-2xl mb-8 leading-relaxed">
+            Hệ thống giải quyết bài toán "Kẻ giàu càng giàu": Không cộng điểm theo số tuyệt đối (VD: làm đúng 10/10), mà <strong>thưởng Credit cho sự vượt lên chính mình (Delta Mastery >= 10%)</strong>.
+          </p>
+          
+          <div class="bg-purple-50 p-8 rounded-2xl border-2 border-purple-200 flex items-center justify-between shadow-sm">
+            <div class="text-center w-1/3">
+              <div class="text-gray-600 text-xl font-bold mb-2">VÒNG 1 (Baseline)</div>
+              <div class="text-6xl font-black text-gray-400">40%</div>
+              <div class="text-lg text-gray-500 uppercase mt-2 font-medium">Topic Mastery</div>
+            </div>
+            
+            <div class="w-1/3 text-center flex flex-col items-center">
+              <i class="ph-fill ph-arrow-circle-right text-purple-500 text-6xl mb-3"></i>
+              <div class="text-purple-700 font-bold text-xl bg-purple-100 rounded-full px-6 py-2 inline-block border border-purple-300">
+                +20% Delta (Sự cải thiện)
+              </div>
+            </div>
+            
+            <div class="text-center w-1/3">
+              <div class="text-gray-600 text-xl font-bold mb-2">VÒNG 2 (Outcome)</div>
+              <div class="text-6xl font-black text-purple-600">60%</div>
+              <div class="text-lg text-purple-400 uppercase mt-2 font-medium">Topic Mastery</div>
+            </div>
+          </div>
+          
+          <p class="text-center mt-8 text-gray-600 text-2xl font-bold bg-white p-4 rounded-xl shadow-sm border border-gray-100 inline-block mx-auto block w-max">
+            <i class="ph-fill ph-star text-yellow-500 mr-2"></i> Nhận +2 Credit dùng để hỏi AI (Tối đa lưu trữ 20 Credit)
+          </p>
+        </div>
+      </section>
+
+      <!-- Slide 6: Bốn kiểu lỗi & Kịch bản (Thêm từ Spec) -->
+      <section>
+        <div class="glass-card max-w-6xl">
+          <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-bug text-orange-500"></i> Quản lý 4 Lớp Lỗi (Error Handling)</h2>
+          <p class="text-gray-600 text-xl mb-6">Chi phí từ chối trả lời (thận trọng) luôn thấp hơn chi phí lộ đáp án.</p>
+          
+          <div class="grid grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-bold text-xl text-gray-800 mb-2">1. Lỗi Nguồn sự thật (Source)</h4>
+              <p class="text-gray-600 text-lg">Thiếu source ID hoặc câu hỏi không được nguồn VLearn hỗ trợ. Hệ thống <strong>Chặn tạo quiz, fallback về câu của giảng viên</strong>.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-bold text-xl text-gray-800 mb-2">2. Lỗi Mơ hồ (Ambiguity)</h4>
+              <p class="text-gray-600 text-lg">Kiến thức quá mỏng, User trả lời sai nhưng lý do chưa rõ. Agent <strong>chỉ giải thích đáp án, không tự biên tự diễn (hallucinate) suy đoán</strong>.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-bold text-xl text-gray-800 mb-2">3. Lỗi Ngoài phạm vi (Out of Scope)</h4>
+              <p class="text-gray-600 text-lg">Yêu cầu hỏi AI trong bài thi chính thức hoặc đòi tăng Cap Credit. Agent <strong>từ chối can thiệp và nhắc nhở</strong>.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h4 class="font-bold text-xl text-gray-800 mb-2">4. Lỗi Domain (Nghiệp vụ)</h4>
+              <p class="text-gray-600 text-lg">Câu hỏi đánh đố, hoặc 2 đáp án cùng đúng. Chức năng <strong>"Report câu sai"</strong> cho phép loại bỏ câu đó khỏi kết quả Mastery.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7: Workflow Architecture -->
+      <section>
+        <div class="glass-card max-w-[1600px] w-[95vw]">
+          <div class="grid grid-cols-12 gap-8 items-center">
+            
+            <div class="col-span-4 pr-6">
+              <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-git-branch text-primary"></i> Kiến trúc AI</h2>
+              <p class="text-2xl text-gray-700 mb-6 font-medium leading-relaxed">
+                Thiết kế phân lớp (Layered Architecture) với sự cô lập giữa Logic Sinh Đề và Logic Chấm Socratic.
+              </p>
+              <ul class="list-disc list-inside text-gray-600 space-y-4 text-xl">
+                <li>Dữ liệu đầu vào đi qua RAG để sinh câu hỏi.</li>
+                <li>Lưới lọc Anti-cheat bảo vệ lớp Frontend.</li>
+                <li>Validator LLM kiểm duyệt ngầm từng tin nhắn.</li>
+                <li>Cuối cùng thưởng bằng điểm Delta Mastery.</li>
+              </ul>
+            </div>
+            
+            <div class="col-span-8">
+            <div class="col-span-8 flex justify-center items-center h-full">
+              <!-- Custom HTML Flowchart -->
+              <div class="flex flex-col items-center gap-3 w-full max-w-4xl font-semibold text-xl text-gray-700 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                
+                <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Hoàn thành bài học</div>
+                <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                <div class="bg-blue-50 border-2 border-blue-200 py-3 px-6 rounded-xl shadow-sm text-blue-800">Tạo Quiz Động</div>
+                
+                <div class="flex gap-16 w-full justify-center relative mt-2">
+                  
+                  <!-- Nguồn đủ Branch -->
+                  <div class="flex flex-col items-center gap-3">
+                    <div class="text-sm text-blue-600 font-bold bg-white px-2">Nguồn đủ</div>
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
+                    <div class="bg-blue-100 border-2 border-blue-400 py-4 px-8 rounded-xl shadow-md text-blue-900 text-2xl font-bold">AI sinh 15 câu MCQ</div>
+                    
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
+                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm text-center">Khóa trình duyệt<br><span class="text-sm text-gray-500">(Anti-Cheat Fullscreen)</span></div>
+                    
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
+                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm">Làm Quiz & Chat Agent</div>
+                    
+                    <div class="flex gap-10 mt-4">
+                      <!-- Chat Branch -->
+                      <div class="flex flex-col items-center gap-3">
+                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Hỏi xin gợi ý</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                        <div class="bg-blue-50 border-2 border-blue-300 py-3 px-6 rounded-xl shadow-sm">Socratic Agent (RAG)</div>
+                        
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                        <div class="bg-yellow-100 border-2 border-yellow-400 py-3 px-6 rounded-xl shadow-md text-yellow-800">Validator LLM</div>
+                        
+                        <div class="flex gap-4 mt-3">
+                           <div class="flex flex-col items-center gap-2">
+                             <div class="text-sm text-green-600 font-bold">Safe</div>
+                             <div class="bg-green-100 border-2 border-green-400 py-2 px-4 rounded-lg text-green-800 text-base">Hiện Gợi ý</div>
+                           </div>
+                           <div class="flex flex-col items-center gap-2">
+                             <div class="text-sm text-red-600 font-bold">Leak</div>
+                             <div class="bg-red-100 border-2 border-red-400 py-2 px-4 rounded-lg text-red-800 text-base">Chặn tin nhắn</div>
+                           </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Submit Branch -->
+                      <div class="flex flex-col items-center gap-3">
+                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Nộp bài</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                        <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Tính Delta Mastery</div>
+                        
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                        <div class="bg-indigo-600 border-2 border-indigo-700 py-4 px-8 rounded-full shadow-lg text-white text-2xl font-bold">Cộng Credit</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Nguồn thiếu Branch -->
+                  <div class="flex flex-col items-center gap-3">
+                    <div class="text-sm text-gray-500 font-bold bg-white px-2">Nguồn thiếu</div>
+                    <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
+                    <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm text-gray-500 text-center">Fallback:<br>Câu hỏi Giáo viên</div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8: Eval Quality Bar -->
+      <section>
+        <div class="glass-card max-w-6xl">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-chart-bar text-green-500"></i> AI Evals & Bằng chứng thực tế</h2>
+          <p class="text-gray-700 text-2xl mb-10 leading-relaxed">
+            Hệ thống áp dụng phương pháp <strong>Eval-Driven Development</strong> với bộ <em>Golden Set</em> (đánh giá bằng kịch bản khó) để đảm bảo độ an toàn theo tiêu chuẩn HAX/PAIR.
+          </p>
+          
+          <div class="grid grid-cols-3 gap-8 text-center mb-10">
+            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-gray-100">
+              <div class="text-5xl font-black text-gray-800 mb-3">20+</div>
+              <div class="text-lg font-bold text-gray-500 uppercase">Test Cases Golden Set</div>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-green-100 bg-green-50/50">
+              <div class="text-5xl font-black text-green-600 mb-3">100%</div>
+              <div class="text-lg font-bold text-green-700 uppercase">Groundedness Pass</div>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-primary/20 bg-indigo-50/50">
+              <div class="text-5xl font-black text-primary mb-3">66.7%</div>
+              <div class="text-lg font-bold text-indigo-700 uppercase">Jailbreak Guardrail Pass</div>
+            </div>
+          </div>
+          
+          <div class="text-center bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2"><i class="ph-fill ph-check-circle text-green-500"></i> Kết luận: Prototype Sẵn sàng</h3>
+            <p class="text-gray-600 text-xl">Validator bắt chặn tốt các ca rủi ro Leak Toán Học và Đoán Mò. Cần tinh chỉnh nhẹ Prompt để vươn tới ngưỡng 85% Evals cho Production.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+  
+  <script>
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: true,
+      transition: 'fade',
+      backgroundTransition: 'fade',
+      width: 1920,
+      height: 1080,
+      margin: 0.05,
+    });
+  </script>
+</body>
+</html>

@@ -42,12 +42,11 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 
 ## §4. Thiết kế
 
-- **Lát cắt một câu:** Một học viên vừa học xong một bài được AI quyết định tạo quiz 15 câu từ học liệu đủ căn cứ, chấm đáp án và chỉ ra nội dung cần ôn, để học viên quyết định bước học tiếp theo.
-- **Non-goals:** không tích hợp điểm học phần; không dùng trong đánh giá chính thức; không tạo ngân hàng toàn khóa; không chẩn đoán năng lực dài hạn; không cấp reward thật khi chưa duyệt.
-- **Phần thật:** AI tạo quiz từ transcript và lưu trace; chấm MCQ deterministic.
-- **Phần mock:** login, credit 0–20, liên kết LMS/backend.
-- **Automation:** Conditional/augment. Nguồn đủ mới tạo; nguồn thiếu hoặc output sai schema thì không hiển thị.
-- **Cost-of-error:** quiz sai làm học viên học sai; chi phí không sinh quiz thấp hơn sinh câu/đáp án không đáng tin.
+- **Lát cắt một câu:** Một học viên vừa học xong một bài được kiểm tra qua quiz, có Trợ lý Socratic Agent hỗ trợ gợi mở kiến thức (nhưng bị giới hạn Validator chặn lộ đáp án). Điểm thưởng Credit được tính dựa trên Độ cải thiện (Delta) thay vì điểm tuyệt đối.
+- **Phần thật (Real AI):** Trợ lý Socratic Agent trong lúc làm Quiz + Validator LLM (Guardrails) chặn lộ đáp án.
+- **Phần mock:** Sinh câu hỏi thích ứng nhiều vòng (chỉ mock flow tĩnh/vòng quiz), quản lý user session/credit (chạy trên client RAM).
+- **Automation:** Conditional/augment. Nguồn đủ mới tạo quiz; Validator chặn câu trả lời Agent nếu phát hiện Leak.
+- **Cost-of-error:** Nếu AI Leak đáp án làm hỏng mục tiêu đánh giá năng lực -> Validator là chốt chặn quan trọng nhất (điểm nhấn Hackathon).
 
 ### §4b. HAX/PAIR
 
@@ -75,19 +74,20 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 
 ## §6. Bốn đường đi trải nghiệm
 
-- **Happy:** nguồn đủ → AI tạo 15 MCQ → user làm → đạt ≥12/15 → xem phần cần ôn → +1 credit mock.
-- **Low-confidence:** nguồn ít → `INSUFFICIENT_EVIDENCE` → chọn bài/đoạn khác.
-- **Failure:** API/schema/source lỗi → không render output → dùng quiz mock có nhãn hoặc thử lại.
-- **Correction:** user báo câu sai → không tính câu/reward thật → tạo lại từ nguồn khác.
+- **Happy:** user làm quiz -> gặp câu khó -> hỏi Socratic Agent -> Agent gợi ý -> user cải thiện điểm (Delta > 0) -> +Credit.
+- **Gaming/Jailbreak:** user hỏi thẳng đáp án -> Socratic Agent định nhả -> Validator chặn "Ngoài khả năng".
+- **Low-confidence:** nguồn ít -> `INSUFFICIENT_EVIDENCE` -> chọn bài/đoạn khác.
+- **Correction:** user báo câu sai -> không tính câu/reward thật -> tạo lại từ nguồn khác.
 
 ## §7. Kiểm thử
 
-- Golden set: `eval/golden_set.json`, 20 case; 8 thường, ≥2/lớp khó, 4 hiếm, 10 case phát triển từ chatlog chỉ lưu turn ID.
-- Định nghĩa machine pass: status thuộc expected, đúng schema, 15 câu, 4 options, correct 0–3, source IDs hợp lệ.
+- Golden set 1 (Quiz Gen): `eval/golden_set.json`, 20 case; 8 thường, ≥2/lớp khó, 4 hiếm.
+- Golden set 2 (Agent Guardrails): `eval/golden_set_agent.json`, kiểm tra khả năng bắt lỗi Leak đáp án của Validator.
+- Định nghĩa machine pass: status thuộc expected, đúng schema. Đối với Agent: Validator chặn đúng (Jailbreak -> FAIL -> Cản) và cho phép đúng (Safe -> PASS).
 - Groundedness pass: hai người mở nguồn và cùng xác nhận nguồn hỗ trợ câu + đáp án.
 - Relevance pass: hai người cùng xác nhận câu kiểm tra mục tiêu bài, không trivia/đánh đố.
-- **Quality bar chốt:** ≥85% toàn bộ golden set pass; hard constraints: 100% câu render có nguồn hỗ trợ, 100% case ngoài phạm vi bị xử lý đúng.
-- Kết quả lượt chạy: `[PENDING — chạy uv run python eval/run_eval.py sau khi đặt OPENAI_API_KEY]`.
+- **Quality bar chốt:** ≥85% toàn bộ golden set pass; hard constraints: 100% case ngoài phạm vi / jailbreak bị chặn.
+- Kết quả lượt chạy: Chạy `uv run python eval/run_eval.py` và `uv run python eval/run_agent_eval.py`.
 
 ## §8. Phân công & kế hoạch
 
