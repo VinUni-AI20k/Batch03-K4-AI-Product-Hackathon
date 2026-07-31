@@ -10,65 +10,8 @@
 
 // ============================================================
 // KNOWLEDGE BASE — Trích từ transcript khoá học (data/vlearn-pack/transcript/)
+// (Biến KNOWLEDGE_BASE được khởi tạo từ file knowledge_base.js)
 // ============================================================
-const KNOWLEDGE_BASE = [
-  {
-    ref: "T01-001",
-    day: "Day 2 sáng",
-    topic: "Xác định bài toán từ yêu cầu mơ hồ",
-    excerpt: "Một trong những kỹ năng quan trọng nhất là khả năng xác định ra một bài toán từ một yêu cầu rất mơ hồ — bóc tách nó ra cho team development phát triển. Đó là một trong những vị trí đang rất thiếu.",
-    keywords: ["bài toán", "xác định", "mơ hồ", "yêu cầu", "pain point"]
-  },
-  {
-    ref: "T01-004",
-    day: "Day 2 sáng",
-    topic: "Tư duy problem-first",
-    excerpt: "Công nghệ sinh ra để giải quyết một vấn đề gì đấy. Đầu tiên mình phải biết vấn đề là gì, sau đó công nghệ mới là công cụ để giải nó — không bao giờ ngược lại.",
-    keywords: ["tư duy", "problem", "giải pháp", "bài toán", "công nghệ"]
-  },
-  {
-    ref: "T01-011",
-    day: "Day 2 sáng",
-    topic: "Product Manager vs Job-to-be-done",
-    excerpt: "Những người làm product thì mình hay dùng từ user-centered — lấy người dùng làm trung tâm. Luôn phải đặt câu hỏi: mình build cái này cho ai, ai sẽ là người dùng nó, và họ có thực sự cần nó hay không?",
-    keywords: ["user", "pain", "cần", "dùng", "actor", "job"]
-  },
-  {
-    ref: "T02-008",
-    day: "Day 2 chiều",
-    topic: "Mining chatlog — Intent review_concept",
-    excerpt: "Intent 'review_concept' chiếm tỷ lệ cao nhất trong chatlog học viên — đây là dấu hiệu học viên đang cần tra lại lý thuyết trong lúc làm bài. Đây là pain point có thể đếm được và trích dẫn ví dụ nguyên văn.",
-    keywords: ["intent", "review_concept", "chatlog", "mining", "tỷ lệ", "bằng chứng", "data"]
-  },
-  {
-    ref: "T02-012",
-    day: "Day 2 chiều",
-    topic: "Chuẩn bằng chứng — Mining vs Khảo sát",
-    excerpt: "Đường B — mining: số đếm được + ≥5 ví dụ nguyên văn + phương pháp đếm kiểm lại được. 'Nhiều bạn nhắn linh tinh' ✗ — 'Đếm được 41/200 hội thoại mở đầu không phải câu hỏi' ✓.",
-    keywords: ["bằng chứng", "evidence", "mining", "đếm", "khảo sát", "chuẩn", "ví dụ"]
-  },
-  {
-    ref: "T02-018",
-    day: "Day 2 chiều",
-    topic: "Bảng Impact — So sánh ≥3 ứng viên",
-    excerpt: "Với ≥3 ứng viên, mỗi cái một dòng: ứng viên | bao nhiêu người gặp (từ evidence) | tần suất | mỗi lần tốn gì | build nổi không | chọn? Hai ứng viên sát nhau → chọn ứng viên có bằng chứng mạnh hơn.",
-    keywords: ["impact", "bảng", "so sánh", "ứng viên", "chọn", "tốn", "tần suất"]
-  },
-  {
-    ref: "T03-005",
-    day: "Day 3",
-    topic: "Lát cắt MỘT CÂU — Format chuẩn",
-    excerpt: "Lát cắt = một người dùng · một công việc · một quyết định AI · một kết quả. Không phải 'học viên nói chung' — phải là vai cụ thể đang làm việc cụ thể tại thời điểm cụ thể.",
-    keywords: ["lát cắt", "một câu", "user", "việc", "quyết định", "format", "prototype"]
-  },
-  {
-    ref: "T03-011",
-    day: "Day 3",
-    topic: "4 lớp chỗ khó — Taxonomy",
-    excerpt: "① Nguồn sự thật — AI bịa được ở đâu? ② Mơ hồ/thiếu thông tin — hỏi lại hay đoán? ③ Ngoài phạm vi — từ chối sao cho vẫn hữu ích? ④ Đặc thù domain — sai cái gì thì user mất điểm ngay?",
-    keywords: ["chỗ khó", "rủi ro", "nguồn sự thật", "mơ hồ", "phạm vi", "domain", "taxonomy"]
-  }
-];
 
 // ============================================================
 // SYSTEM PROMPT
@@ -227,7 +170,7 @@ function setSourceTag(real) {
   const el = document.querySelector('.ai-source-tag');
   if (!el) return;
   el.innerHTML = real
-    ? `<span style="color:var(--success)">●</span>&nbsp;Gemini 2.0 Flash`
+    ? `<span style="color:var(--success)">●</span>&nbsp;Gemini 2.5 Flash`
     : `<span style="color:var(--warning)">●</span>&nbsp;Mock mode`;
 }
 
@@ -295,7 +238,7 @@ async function handleSend() {
 // GEMINI API
 // ============================================================
 async function geminiCall(text) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${state.apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
 
   const contents = state.history.slice(-6).map(h => ({
     role: h.role,
