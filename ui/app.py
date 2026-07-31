@@ -1,14 +1,16 @@
-# ui/app.py - Streamlit AI Slide Tutor Demo App (Dark Slide Viewer View)
+# ui/app.py - Streamlit AI Slide Tutor Demo App (Bản Kết Nối Backend Thật)
 """
 VLearn AI Tutor - Streamlit Application for AI Slide Reading & Context Learning.
 Matched 100% to Latest Dark Slide Viewer Screenshot with 100% Interactive Buttons.
-Run command: streamlit run Space/ui/app.py
+Run command: streamlit run ui/app.py
 """
 
 import os
 import sys
 import json
+import threading
 from pathlib import Path
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -21,13 +23,74 @@ SLIDES_DIR = PROJECT_ROOT / "data" / "vlearn-pack" / "slides"
 if str(CODEBASE_DIR) not in sys.path:
     sys.path.insert(0, str(CODEBASE_DIR))
 
-# Attempt to load AI agent & PDF processor from codebase/core
+# Nạp AI agent từ codebase/core của nhóm
 try:
     from core.agent import run_agent
-    from core.pdf_processor import read_slide_page_real
     HAS_AI_CORE = True
 except Exception as err:
     HAS_AI_CORE = False
+
+# --- CỔNG API LẮNG NGHE CHẠY NGẦM (PORT 8000) ---
+class AIChatAPIHandler(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        # Trả về CORS Header cho trình duyệt chấp nhận gọi chéo cổng (Cross-Origin)
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
+        self.end_headers()
+
+    def do_POST(self):
+        if self.path == '/api/chat':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                payload = json.loads(post_data.decode('utf-8'))
+                user_message = payload.get("message", "")
+                day_code = payload.get("day_code", "d1")
+                current_slide = payload.get("current_slide", 1)
+
+                # Thiết lập câu hỏi kèm theo ngữ cảnh slide học viên đang xem gửi cho Backend
+                prompt_with_context = f"Học viên đang xem slide {day_code.upper()} trang {current_slide}. Câu hỏi: '{user_message}'"
+                
+                # Thực thi hàm xử lý thực tế dưới Backend
+                if HAS_AI_CORE:
+                    ai_reply = run_agent(prompt_with_context)
+                else:
+                    ai_reply = "[Lỗi]: Chưa kết nối được với codebase/core/agent.py."
+
+            except Exception as e:
+                ai_reply = f"[Lỗi backend]: {str(e)}"
+
+            # Trả dữ liệu JSON về cho JavaScript hiển thị lên bong bóng chat
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            response_data = json.dumps({"reply": ai_reply})
+            self.wfile.write(response_data.encode('utf-8'))
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def log_message(self, format, *args):
+        # Tắt bớt log HTTP để Terminal luôn sạch
+        return
+
+def start_api_server():
+    try:
+        server_address = ('', 8000)
+        httpd = HTTPServer(server_address, AIChatAPIHandler)
+        httpd.serve_forever()
+    except Exception as e:
+        pass
+
+# Khởi tạo API Server ngầm (chỉ chạy duy nhất 1 lần)
+if "api_server_started" not in st.session_state:
+    t = threading.Thread(target=start_api_server, daemon=True)
+    t.start()
+    st.session_state.api_server_started = True
 
 # --- STREAMLIT PAGE CONFIGURATION ---
 st.set_page_config(
