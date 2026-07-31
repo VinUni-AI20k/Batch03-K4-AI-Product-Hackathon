@@ -5,6 +5,7 @@ node_modules/
 # Frontend build output
 dist/
 codebase/dist/
+codebase/uploads/
 
 # Local environment files
 .env

@@ -15,24 +15,29 @@ function createMessage(role, content, extra = {}) {
 }
 
 export default function App() {
-  const [slideData, setSlideData] = useState(null);
-  const [currentSlideId, setCurrentSlideId] = useState(12);
+  const [deckData, setDeckData] = useState(null);
+  const [currentDeckId, setCurrentDeckId] = useState("day-1");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageCounts, setPageCounts] = useState({});
+  const [pageText, setPageText] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [messages, setMessages] = useState([
     createMessage(
       "assistant",
-      "Chào Minh Anh! Mình đã đồng bộ với Slide 12.\n\n📌 Bôi đen một khái niệm trên slide hoặc chọn câu hỏi gợi ý để bắt đầu."
+      "Chào Minh Anh! Mình đã đồng bộ với tài liệu Day 1.\n\n📌 Hãy bôi đen một đoạn trên PDF và chọn “Hỏi AI Tutor”, hoặc nhập câu hỏi vào ô chat."
     )
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [serviceMode, setServiceMode] = useState("openrouter");
 
   useEffect(() => {
-    fetch("/api/slides")
+    fetch("/api/decks")
       .then((response) => {
-        if (!response.ok) throw new Error("Không tải được dữ liệu slide.");
+        if (!response.ok) throw new Error("Không tải được danh sách tài liệu.");
         return response.json();
       })
-      .then(setSlideData)
+      .then(setDeckData)
       .catch((error) => {
         setMessages((current) => [
           ...current,
@@ -41,67 +46,118 @@ export default function App() {
       });
   }, []);
 
-  const orderedSlides = slideData?.slides || [];
-  const currentIndex = orderedSlides.findIndex(
-    (slide) => slide.id === currentSlideId
+  const decks = deckData?.decks || [];
+  const deck = useMemo(
+    () => decks.find((item) => item.id === currentDeckId),
+    [decks, currentDeckId]
   );
-  const slide = useMemo(
-    () => orderedSlides.find((item) => item.id === currentSlideId),
-    [orderedSlides, currentSlideId]
-  );
+  const totalPages = deck
+    ? pageCounts[deck.id] || deck.totalPages || 1
+    : 1;
 
-  function changeSlide(id, announce = true) {
-    const target = orderedSlides.find((item) => item.id === Number(id));
-    if (!target) return;
-    setCurrentSlideId(target.id);
+  const slide = deck
+    ? {
+        id: currentPage,
+        totalPages,
+        title: deck.title,
+        contextLabel: deck.shortTitle
+      }
+    : null;
+
+  function changeDeck(deckId) {
+    const target = decks.find((item) => item.id === deckId);
+    if (!target || target.id === currentDeckId) return;
+    setCurrentDeckId(target.id);
+    setCurrentPage(1);
+    setPageText("");
+    setMessages((current) => [
+      ...current,
+      createMessage(
+        "assistant",
+        `Đã mở ${target.shortTitle}: ${target.title}. Mình sẽ dùng nội dung của từng trang làm nguồn trả lời.`
+      )
+    ]);
+  }
+
+  function changePage(pageNumber, announce = false) {
+    if (!deck) return;
+    const target = Number(pageNumber);
+    if (!Number.isInteger(target) || target < 1 || target > totalPages) {
+      return;
+    }
+    setCurrentPage(target);
+    setPageText("");
     if (announce) {
       setMessages((current) => [
         ...current,
         createMessage(
           "assistant",
-          `Đã mở Slide ${target.id}: ${target.title}.\n\n${target.tutorRecap || target.summary.join(" ")}`
+          `Đã mở ${deck.shortTitle}, trang ${target}. Bạn có thể bôi đen nội dung để hỏi ngay.`
         )
       ]);
     }
   }
 
+  async function uploadDeck(file) {
+    if (!file || isUploading) return;
+    setIsUploading(true);
+    setUploadError("");
+    try {
+      const formData = new FormData();
+      formData.append("pdf", file);
+      const response = await fetch("/api/decks/upload", {
+        method: "POST",
+        body: formData
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Không thể tải PDF lên.");
+      }
+
+      setDeckData((current) => ({
+        ...current,
+        decks: [...current.decks, result.deck]
+      }));
+      setCurrentDeckId(result.deck.id);
+      setCurrentPage(1);
+      setPageText("");
+      setMessages((current) => [
+        ...current,
+        createMessage(
+          "assistant",
+          `Đã tải lên “${result.deck.title}”. Mình sẽ dùng nội dung PDF này làm nguồn trả lời.`
+        )
+      ]);
+    } catch (error) {
+      setUploadError(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
   async function sendMessage(text, options = {}) {
-    if (isTyping || !slide) return;
+    if (isTyping || !deck) return;
 
     const normalized = text.toLowerCase().trim();
+    const includeQuiz =
+      Boolean(options.includeQuiz) ||
+      normalized.includes("quiz") ||
+      normalized.includes("câu hỏi kiểm tra");
     const userMessage = createMessage("user", text);
     const history = [...messages, userMessage];
     setMessages(history);
-
-    if (normalized.includes("mở slide 5")) {
-      changeSlide(5);
-      return;
-    }
-
-    if (normalized.includes("so sánh slide 5") && normalized.includes("12")) {
-      setIsTyping(true);
-      window.setTimeout(() => {
-        setMessages((current) => [
-          ...current,
-          createMessage(
-            "assistant",
-            "Slide 5 giải thích nguyên lý Loose Coupling; Slide 12 áp dụng nguyên lý đó vào kiến trúc Microservices. Nói ngắn gọn: Slide 5 là nền tảng, Slide 12 là cách triển khai trong thực tế."
-          )
-        ]);
-        setIsTyping(false);
-      }, 650);
-      return;
-    }
-
     setIsTyping(true);
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slideId: slide.id,
+          deckId: deck.id,
+          pageNumber: currentPage,
+          pageText,
           selectedText: options.selectedText || "",
-          includeQuiz: Boolean(options.includeQuiz),
+          includeQuiz,
           messages: history.map(({ role, content }) => ({ role, content }))
         })
       });
@@ -152,10 +208,10 @@ export default function App() {
         )
       ]);
       setIsTyping(false);
-    }, 700);
+    }, 550);
   }
 
-  if (!slide) {
+  if (!deck || !slide) {
     return (
       <div className="grid min-h-screen place-items-center bg-[#0B0F1A] text-sm text-slate-400">
         Đang tải không gian học tập…
@@ -168,17 +224,32 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header slide={slide} />
         <SlideViewer
-          slide={slide}
+          deck={deck}
+          decks={decks}
+          pageNumber={currentPage}
+          totalPages={totalPages}
+          onDeckChange={changeDeck}
+          onPageChange={changePage}
+          onDocumentLoad={(numPages) =>
+            setPageCounts((current) => ({
+              ...current,
+              [deck.id]: numPages
+            }))
+          }
+          onPageText={setPageText}
+          onUpload={uploadDeck}
+          isUploading={isUploading}
+          uploadError={uploadError}
           onAskSelection={(selectedText) =>
-            sendMessage(`Giải thích "${selectedText}"`, {
+            sendMessage(`Giải thích đoạn được chọn: “${selectedText}”`, {
               selectedText,
               includeQuiz: true
             })
           }
-          onPrev={() => changeSlide(orderedSlides[currentIndex - 1]?.id)}
-          onNext={() => changeSlide(orderedSlides[currentIndex + 1]?.id)}
-          canPrev={currentIndex > 0}
-          canNext={currentIndex < orderedSlides.length - 1}
+          onPrev={() => changePage(currentPage - 1)}
+          onNext={() => changePage(currentPage + 1)}
+          canPrev={currentPage > 1}
+          canNext={currentPage < totalPages}
         />
       </div>
 
@@ -189,7 +260,7 @@ export default function App() {
         serviceMode={serviceMode}
         onSend={sendMessage}
         onQuizAnswer={answerQuiz}
-        onOpenSlide={changeSlide}
+        onOpenSlide={(page) => changePage(page, true)}
       />
     </div>
   );

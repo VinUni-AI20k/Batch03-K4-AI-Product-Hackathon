@@ -1,7 +1,7 @@
 import { Icon } from "./Icons";
 
 export default function Header({ slide }) {
-  const progress = Math.round((slide.id / 45) * 100);
+  const progress = Math.round((slide.id / slide.totalPages) * 100);
 
   return (
     <header className="flex h-[82px] items-center justify-between border-b border-white/[0.07] bg-[#0D121E] px-8">
@@ -15,11 +15,11 @@ export default function Header({ slide }) {
 
         <nav className="flex min-w-0 items-center gap-2 text-sm">
           <a className="text-blue-400 transition hover:text-blue-300" href="#">
-            SWD392
+            AI in Action
           </a>
           <span className="text-slate-600">/</span>
           <a className="text-blue-400 transition hover:text-blue-300" href="#">
-            Software Architecture
+            VLearn
           </a>
           <span className="text-slate-600">/</span>
           <span className="truncate font-medium text-slate-200">
@@ -31,7 +31,7 @@ export default function Header({ slide }) {
       <div className="flex shrink-0 items-center gap-7">
         <div className="w-36">
           <div className="mb-2 flex items-center justify-between text-[11px] font-medium text-slate-400">
-            <span>Slide {slide.id} of 45</span>
+            <span>Trang {slide.id} / {slide.totalPages}</span>
             <span>{progress}%</span>
           </div>
           <div className="h-1 overflow-hidden rounded-full bg-slate-800">

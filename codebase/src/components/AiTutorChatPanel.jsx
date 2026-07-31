@@ -106,9 +106,9 @@ export default function AiTutorChatPanel({
   const [input, setInput] = useState("");
   const endRef = useRef(null);
   const quickReplies = [
-    "Loosely Coupled là gì?",
-    "So sánh Slide 5 và 12",
-    "Mở slide 5"
+    "Tóm tắt trang này",
+    "Giải thích ý chính",
+    "Tạo một micro-quiz"
   ];
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function AiTutorChatPanel({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Context Synced: Slide {slide.id} · Chương 3
+          Context Synced: {slide.contextLabel} · Trang {slide.id}
         </div>
       </div>
 
