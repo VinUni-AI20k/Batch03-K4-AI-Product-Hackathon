@@ -9,6 +9,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from api.llm_client import LLMClient
 from tools.rag_engine import PageAwareRAGEngine
+from tools.note_tool import NoteTool
 from config.settings import DEFAULT_GEMINI_MODEL, BASE_DIR
 from prompts import (
     SLIDE_AGENT_SYSTEM_PROMPT,
@@ -19,7 +20,7 @@ from prompts import (
 class PageAwareRAGAgent:
     """
     AI Agent định vị trang slide (Page-Aware AI Tutor) hỗ trợ RAG lọc cứng metadata theo trang
-    sử dụng mô hình nhẹ Gemini 2.5 Flash.
+    sử dụng mô hình nhẹ Gemini 2.5 Flash / OpenAI.
     """
 
     def __init__(
@@ -30,6 +31,7 @@ class PageAwareRAGAgent:
     ):
         self.llm_client = LLMClient(provider=provider, model_name=model_name, temperature=temperature)
         self.rag_engine = PageAwareRAGEngine()
+        self.note_tool = NoteTool()
         self.system_prompt = SLIDE_AGENT_SYSTEM_PROMPT
         
         # Thử tự động load transcript bài giảng nếu có

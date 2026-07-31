@@ -205,9 +205,9 @@
         <div class="notes-editor-box">
           <textarea class="note-textarea" id="note-textarea-input" placeholder="Nhập ghi chú cá nhân cho trang slide này..." oninput="autoSaveCurrentNote()"></textarea>
           <div class="notes-editor-footer">
-            <button class="btn-ask-ai-note" onclick="askTutorAboutNote()">
+            <button class="btn-ask-ai-note" onclick="generateAINoteForCurrentPage()" title="Tự động tạo ghi chú cho trang này bằng AI">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a9.96 9.96 0 0 1-4.587-1.112l-3.826 1.07a1 1 0 0 1-1.235-1.236l1.07-3.825A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2z"/></svg>
-              Hỏi AI về Note này
+              Ghi chú bằng AI
             </button>
           </div>
         </div>
@@ -324,7 +324,7 @@
           </div>
           <div>
             <div class="tutor-header-title">VLearn Tutor</div>
-            <div class="tutor-header-subtitle">Trợ lý học theo ngữ cảnh</div>
+            <div class="tutor-header-subtitle">Trợ lý AI</div>
           </div>
         </div>
         <div class="tutor-header-right">
@@ -337,16 +337,26 @@
 
       <!-- Chat History -->
       <div class="tutor-chat-body" id="tutor-chat-body">
+        <div class="chat-empty-state" id="chat-empty-state">
+          <div class="empty-state-logo">
+            <img src="brand/vinuni-mark.svg" alt="VLearn AI Tutor" />
+          </div>
+          <div class="empty-state-title"><span class="v-letter">V</span>Learn Tutor</div>
+          <p class="empty-state-desc">Trợ lý AI học tập </p>
+        </div>
       </div>
 
       <!-- Input Bar -->
       <div class="tutor-input-wrap">
         <form id="tutor-form" onsubmit="sendTutorMsg(event)">
           <div class="tutor-input-box">
-            <input type="text" class="tutor-input-field" id="tutor-input" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu..." />
-            <button type="submit" class="btn-send-tutor" title="Gửi">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
+            <div class="input-chip-container" id="input-chip-container"></div>
+            <div class="tutor-input-row">
+              <input type="text" class="tutor-input-field" id="tutor-input" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu..." />
+              <button type="submit" class="btn-send-tutor" title="Gửi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
           </div>
         </form>
       </div>

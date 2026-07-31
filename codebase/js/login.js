@@ -74,7 +74,7 @@ if (form) {
     loginBtn.classList.add('loading');
     loginBtn.disabled = true;
 
-    const apiBase = window.location.origin.includes('localhost:8080') ? '' : 'http://localhost:8080';
+    const apiBase = window.location.protocol.startsWith('http') ? '' : 'http://localhost:8080';
     fetch(`${apiBase}/api/login`, {
       method: 'POST',
       headers: {
