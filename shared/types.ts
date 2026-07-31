@@ -93,6 +93,57 @@ export type McqQuestion = {
   segment_id?: string;
 };
 
+export type AlignmentMatch = {
+  segment_id: SegmentId;
+  score: number;
+  cosine: number;
+  token_overlap: number;
+};
+
+export type AlignmentItem = {
+  section_id: Section;
+  related_segment_ids: SegmentId[];
+  matches: AlignmentMatch[];
+  matched: boolean;
+  method: string;
+};
+
+/** Retest-only question shape; the initial quiz contract above stays unchanged. */
+export type RetestQuestion = McqQuestion & {
+  source_refs: string[];
+  slide_ref?: string;
+};
+
+export type RetestScope =
+  | { mode: "selected"; sectionIds: string[] }
+  | { mode: "whole" };
+
+export type RetestGradeResultItem = {
+  question_id: string;
+  outline_section_id: string;
+  correct: boolean;
+  userAnswerText: string;
+  correctAnswerText: string;
+  source_refs: string[];
+  slide_ref?: string;
+  studyNoteSectionId?: string;
+};
+
+export type RetestGradeResult = {
+  score: number;
+  totalQuestions: number;
+  results: RetestGradeResultItem[];
+};
+
+export type SavedRetestQuiz = {
+  saved_quiz_id: string;
+  session_id?: string;
+  scope: RetestScope;
+  numQuestions: number;
+  questions: RetestQuestion[];
+  created_at: string;
+};
+
 export type QuizAnswer = {
   question_id: string;
   selected_index: number;

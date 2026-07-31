@@ -24,6 +24,18 @@ CREATE TABLE IF NOT EXISTS learning_sessions (
 
 CREATE INDEX IF NOT EXISTS idx_learning_sessions_updated_at
     ON learning_sessions (updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS saved_retest_quizzes (
+    saved_quiz_id TEXT PRIMARY KEY,
+    session_id TEXT,
+    scope_json TEXT NOT NULL,
+    num_questions INTEGER NOT NULL CHECK (num_questions > 0),
+    questions_json TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_saved_retest_quizzes_created_at
+    ON saved_retest_quizzes (created_at DESC);
 """
 
 

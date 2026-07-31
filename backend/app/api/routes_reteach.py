@@ -7,6 +7,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from app.core.config import TRANSCRIPT_DIR
+from app.core.session_store import get_session, save_session
 from app.core.schemas import (
     CheckJudgementResponse, Citation, JudgeAnswerRequest, Level, OutlineSection,
     ReteachContent, ReteachRequest, SelfCheckGrade, SelfCheckGradeRequest, Slide,
@@ -14,6 +15,7 @@ from app.core.schemas import (
     TranscriptSegment, WeakSection,
 )
 from app.pipeline.outline import parse_transcript
+from app.pipeline.align import align_sections
 from app.pipeline.rewrite import CheckSessionNotFound, generate_study_note, judge_answer
 from app.prompts.self_check_prompt import SELF_CHECK_PROMPT
 from app.utils.pdf_extract import extract_pdf_pages, parse_slide_outline
@@ -22,59 +24,50 @@ router = APIRouter(prefix="/api/reteach", tags=["reteach"])
 
 
 class StudyNoteRequest(BaseModel):
+    session_id: str = Field(..., min_length=1)
     weak_sections: list[WeakSection] = Field(..., min_length=1)
     level: Level = Level.INTERMEDIATE
     style: Style = Style.BOTH
     time_budget_minutes: int = Field(default=15, gt=0)
     active_mode: bool = False
-    session_id: str = ""
-    transcript_file: str = "transcript-01-clean.md"
 
 
-def _transcript_rewrite_sources(transcript_file: str) -> tuple[
-    list[OutlineSection], list[Slide], list[TranscriptSegment]
-]:
-    path = TRANSCRIPT_DIR / transcript_file
-    if not path.is_file():
-        raise HTTPException(status_code=404, detail="Transcript not found")
-    parsed_sections = parse_transcript(path.read_text(encoding="utf-8"))
-    outline: list[OutlineSection] = []
-    transcript_segments: list[TranscriptSegment] = []
-    for index, section in enumerate(parsed_sections, start=1):
-        slide_id = f"P{index:02d}"
-        outline.append(OutlineSection(
-            section_id=section.section_id, title=section.title,
-            key_points=section.key_points, slide_ids=[slide_id],
-        ))
-        transcript_segments.extend(
-            TranscriptSegment(segment_id=item.segment_id, text=item.text, slide_id=slide_id)
-            for item in section.segments
-        )
-    return outline, [], transcript_segments
-
-
-def _pdf_rewrite_sources(pdf_bytes: bytes) -> tuple[
-    list[OutlineSection], list[Slide], list[TranscriptSegment]
-]:
+def _pdf_rewrite_sources(pdf_bytes: bytes):
     page_text = extract_pdf_pages(pdf_bytes)
     parsed_sections = parse_slide_outline(pdf_bytes)
+    transcript_sections = parse_transcript(
+        (TRANSCRIPT_DIR / "transcript-01-clean.md").read_text(encoding="utf-8")
+    )
+    transcript_by_id = {
+        item.segment_id: item
+        for section in transcript_sections
+        for item in section.segments
+    }
+    alignment = align_sections(parsed_sections, list(transcript_by_id.values()))
+    matched = {item["section_id"]: item["related_segment_ids"] for item in alignment}
     outline: list[OutlineSection] = []
     slides: list[Slide] = []
+    transcript: list[TranscriptSegment] = []
     for section in parsed_sections:
-        if not section.slide_ids:
+        slide_id = section.slide_ids[0] if section.slide_ids else None
+        if slide_id is None:
             continue
-        slide_id = section.slide_ids[0]
-        page_number = int(slide_id[1:])
+        page = int(slide_id[1:])
         outline.append(OutlineSection(
             section_id=section.section_id, title=section.title,
             key_points=section.key_points, slide_ids=[slide_id],
         ))
         slides.append(Slide(
-            slide_id=slide_id, page_number=page_number, title=section.title,
-            text=page_text[page_number - 1],
-            segment_ids=[item.segment_id for item in section.segments],
+            slide_id=slide_id, page_number=page, title=section.title,
+            text=page_text[page - 1], segment_ids=[],
         ))
-    return outline, slides, []
+        for segment_id in matched.get(section.section_id, []):
+            source = transcript_by_id.get(segment_id)
+            if source is not None:
+                transcript.append(TranscriptSegment(
+                    segment_id=source.segment_id, text=source.text, slide_id=slide_id,
+                ))
+    return outline, slides, transcript
 
 
 def _generate_note(
@@ -83,7 +76,7 @@ def _generate_note(
 ) -> StudyNote:
     outline, slides, transcript_segments = sources
     try:
-        return generate_study_note(
+        study_note = generate_study_note(
             payload.weak_sections, outline, slides, transcript_segments,
             payload.level, payload.style, payload.time_budget_minutes,
             active_mode=payload.active_mode,
@@ -93,15 +86,30 @@ def _generate_note(
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:  # noqa: BLE001 - present provider failures safely
         raise HTTPException(status_code=502, detail="Grounded rewrite generation failed") from error
+    session = get_session(payload.session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    session.study_note = study_note
+    save_session(session)
+    return study_note
+
+
+def _session_rewrite_sources(session_id: str):
+    session = get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if not session.outline or not session.raw_transcript:
+        raise HTTPException(status_code=422, detail="Session has no uploaded learning context")
+    return session.outline, session.slides or [], session.raw_transcript
 
 
 @router.post("/study-note", response_model=StudyNote)
 def generate_study_note_from_transcript(payload: StudyNoteRequest) -> StudyNote:
-    """Generate a grounded note from the configured cleaned transcript."""
-    return _generate_note(payload, _transcript_rewrite_sources(payload.transcript_file))
+    """Generate a grounded note from context retained by the learning session."""
+    return _generate_note(payload, _session_rewrite_sources(payload.session_id))
 
 
-@router.post("/study-note/pdf", response_model=StudyNote)
+@router.post("/study-note/pdf", response_model=StudyNote, deprecated=True)
 async def generate_study_note_from_pdf(
     payload_json: str = Form(...), file: UploadFile = File(...)
 ) -> StudyNote:
@@ -115,7 +123,7 @@ async def generate_study_note_from_pdf(
     return _generate_note(payload, _pdf_rewrite_sources(await file.read()))
 
 
-@router.post("/content", response_model=ReteachContent)
+@router.post("/content", response_model=ReteachContent, deprecated=True)
 def generate_static_reteach(payload: ReteachRequest) -> ReteachContent:
     """Return one deterministic markdown stream grounded in transcript segments.
 
@@ -167,11 +175,12 @@ def generate_static_reteach(payload: ReteachRequest) -> ReteachContent:
 def grade_self_check(payload: SelfCheckGradeRequest) -> SelfCheckGrade:
     """Grade a mandatory written self-check using the section's grounded context."""
     try:
-        # Import lazily: the server can still start its non-LLM endpoints without an API key.
-        from app.core.llm_client import llm_client
+        from app.core.llm_provider import generate_text
 
-        response = llm_client.generate_text(
-            SELF_CHECK_PROMPT.format(**payload.model_dump()), temperature=0.1
+        response = generate_text(
+            "Bạn là giám khảo bài tự kiểm tra. Trả về đúng JSON theo rubric trong yêu cầu.",
+            SELF_CHECK_PROMPT.format(**payload.model_dump()),
+            temperature=0.1,
         )
         match = re.search(r"\{.*\}", response, re.DOTALL)
         if not match:

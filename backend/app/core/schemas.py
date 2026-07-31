@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +98,34 @@ class MCQItem(BaseModel):
     misconception_tag: Optional[str] = None
 
 
+class RetestQuestion(MCQItem):
+    """Retest-only question metadata; MCQItem remains unchanged for Step 3."""
+    q_id: str = Field(..., alias="id")
+    section_id: str = Field(..., alias="outline_section_id")
+    explanation: str = ""
+    source_refs: List[str] = Field(default_factory=list)
+    slide_ref: Optional[str] = None
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class RetestSelectedScope(BaseModel):
+    mode: Literal["selected"]
+    section_ids: List[str] = Field(..., min_length=1, alias="sectionIds")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class RetestWholeScope(BaseModel):
+    mode: Literal["whole"]
+
+
+RetestScope = Annotated[
+    Union[RetestSelectedScope, RetestWholeScope],
+    Field(discriminator="mode"),
+]
+
+
 class OpenQuestion(BaseModel):
     q_id: str
     question: str
@@ -168,6 +196,9 @@ class WeaknessAnalysis(BaseModel):
 class AlignmentItem(BaseModel):
     section_id: str
     related_segment_ids: List[str]
+    matches: List[dict] = Field(default_factory=list)
+    matched: bool = False
+    method: str = "tfidf_cosine+token_overlap"
 
 
 # ---------------------------------------------------------------------------
@@ -256,6 +287,18 @@ class SectionContext(BaseModel):
     source_thin: bool = False
 
 
+class PersistedRubricPoint(BaseModel):
+    point: str
+    citation: str | None = None
+
+
+class ActiveModeCheck(BaseModel):
+    """Rubric and grounded context retained for active-mode grading."""
+    question: str
+    rubric: List[PersistedRubricPoint] = Field(default_factory=list)
+    context: SectionContext
+
+
 class SelfCheckGradeRequest(BaseModel):
     """A learner's free-text response to the end-of-section active check."""
     section_id: str = Field(..., pattern=r"^[sS]\d+$")
@@ -288,18 +331,16 @@ class ReteachContent(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# chat.py - P1, grounded Q&A cho highlight-to-ask
+# chat.py - P1, grounded Q&A cho free-form question
 # ---------------------------------------------------------------------------
 
 class ChatRequest(BaseModel):
     session_id: str
-    highlighted_text: Optional[str] = None
     question: str
 
 
 class ChatResponse(BaseModel):
     answer: str
-    cited_segment_ids: List[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +361,38 @@ class RetestResult(BaseModel):
     previous_score: Optional[float] = None  # de hien thi before/after
 
 
+class RetestGradeResultItem(BaseModel):
+    question_id: str
+    outline_section_id: str
+    correct: bool
+    user_answer_text: str = Field(..., alias="userAnswerText")
+    correct_answer_text: str = Field(..., alias="correctAnswerText")
+    source_refs: List[str] = Field(default_factory=list)
+    slide_ref: Optional[str] = None
+    study_note_section_id: Optional[str] = Field(default=None, alias="studyNoteSectionId")
+
+    model_config = {"populate_by_name": True}
+
+
+class RetestGradeResult(BaseModel):
+    score: float = Field(..., ge=0, le=1)
+    total_questions: int = Field(..., ge=0, alias="totalQuestions")
+    results: List[RetestGradeResultItem]
+
+    model_config = {"populate_by_name": True}
+
+
+class SavedRetestQuiz(BaseModel):
+    saved_quiz_id: str
+    session_id: Optional[str] = None
+    scope: RetestScope
+    num_questions: int = Field(..., ge=1, alias="numQuestions")
+    questions: List[RetestQuestion]
+    created_at: str
+
+    model_config = {"populate_by_name": True}
+
+
 # ---------------------------------------------------------------------------
 # session_store.py - state tong cua 1 phien hoc
 # ---------------------------------------------------------------------------
@@ -333,6 +406,8 @@ class SessionState(BaseModel):
     raw_transcript: Optional[List[TranscriptSegment]] = None
     classified_transcript: Optional[List[ClassifiedSegment]] = None
     outline: Optional[List[OutlineSection]] = None
+    slides: Optional[List[Slide]] = None
+    source: Optional[str] = None
     quiz_bank: Optional[QuizBank] = None
 
     initial_quiz: Optional[Quiz] = None
@@ -341,6 +416,7 @@ class SessionState(BaseModel):
 
     alignment: Optional[List[AlignmentItem]] = None
     study_note: Optional[StudyNote] = None
+    active_mode_checks: dict[str, ActiveModeCheck] = Field(default_factory=dict)
 
     retest_quiz: Optional[Quiz] = None
     retest_result: Optional[RetestResult] = None

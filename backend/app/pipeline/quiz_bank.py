@@ -4,7 +4,7 @@ lọc (chỉ lời giảng viên), gắn section_id + segment_id để trích d�
 Đây là lời gọi AI thật duy nhất bắt buộc cho CP3 — không hardcode."""
 import re
 
-from app.core.llm_client_openai import call_json
+from app.core.llm_provider import generate_json
 from app.pipeline.outline import Section
 from app.prompts.quiz_bank_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 
@@ -51,7 +51,7 @@ def call_llm_for_quiz(sections: list[Section], n_questions: int = 20) -> list[di
     )
     user_prompt = USER_PROMPT_TEMPLATE.format(n_questions=n_questions, content=content)
     try:
-        result = call_json(SYSTEM_PROMPT, user_prompt)
+        result = generate_json(SYSTEM_PROMPT, user_prompt)
     except Exception as exc:  # noqa: BLE001 — surface as a domain error, no silent fallback
         raise QuizGenerationError(f"AI call failed: {exc}") from exc
     questions = result.get("questions")

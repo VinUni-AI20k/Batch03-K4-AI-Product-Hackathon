@@ -21,7 +21,7 @@ def post_session(payload: CreateSessionRequest = CreateSessionRequest()):
     return create_session(**payload.dict())
 
 
-@router.get("/{session_id}", response_model=SessionState)
+@router.get("/{session_id}", response_model=SessionState, deprecated=True)
 def read_session(session_id: str):
     session = get_session(session_id)
     if session is None:
@@ -29,7 +29,7 @@ def read_session(session_id: str):
     return session
 
 
-@router.put("/{session_id}", response_model=SessionState)
+@router.put("/{session_id}", response_model=SessionState, deprecated=True)
 def put_session(session_id: str, payload: SessionState):
     if payload.session_id != session_id:
         raise HTTPException(status_code=400, detail="session_id in URL and body must match")

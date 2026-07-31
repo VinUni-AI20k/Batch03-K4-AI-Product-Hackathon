@@ -8,13 +8,16 @@ import logging
 import re
 from typing import Any
 
-from app.core.llm_client_openai import call_text
+from app.core.llm_provider import generate_text
+from app.core.session_store import get_session, save_session
 from app.core.schemas import (
+    ActiveModeCheck,
     Citation,
     CheckJudgement,
     CheckQuestion,
     Level,
     OutlineSection,
+    PersistedRubricPoint,
     SectionContext,
     SectionContextSlide,
     SectionContextTranscript,
@@ -30,9 +33,6 @@ from app.core.schemas import (
 SOURCE_THIN_CHARACTER_LIMIT = 200
 MINUTES_PER_SECTION = 2
 GROUNDING_LOGGER = logging.getLogger("illumimate.grounding")
-session_store: dict[tuple[str, str], dict[str, Any]] = {}
-
-
 class CheckSessionNotFound(LookupError):
     """Raised when an active-mode check was not retained for grading."""
 
@@ -190,7 +190,12 @@ Viết lại phần "{context.title}" theo đúng yêu cầu trên.{active_mode_
 
 def call_rewrite_llm(prompt: str) -> str:
     """Generate one rewritten section as raw Markdown using the shared LLM client."""
-    return call_text(prompt, max_tokens=1000, temperature=0.2)
+    return generate_text(
+        "Bạn là trợ giảng cá nhân hóa. Trả về đúng nội dung Markdown được yêu cầu.",
+        prompt,
+        max_tokens=1000,
+        temperature=0.2,
+    )
 
 
 def parse_rewrite_output(raw_text: str, active_mode: bool) -> tuple[str, CheckQuestion | None]:
@@ -305,7 +310,8 @@ def _normalise_rubric_text(value: str) -> str:
 
 def judge_answer(session_id: str, section_id: str, learner_answer: str) -> CheckJudgement:
     """Judge an active-mode answer using the retained rubric and source context."""
-    stored = session_store.get((session_id, section_id))
+    session = get_session(session_id)
+    stored = session.active_mode_checks.get(section_id) if session else None
     if stored is None:
         raise CheckSessionNotFound(
             f"Active-mode check session not found for session_id={session_id!r}, "
@@ -313,11 +319,19 @@ def judge_answer(session_id: str, section_id: str, learner_answer: str) -> Check
             "or start a new session."
         )
 
-    question = stored["question"]
-    rubric_points: list[RubricPoint] = stored["rubric"]
-    section_context: SectionContext = stored["context"]
+    question = stored.question
+    rubric_points = [
+        RubricPoint(point=point.point, citation=point.citation)
+        for point in stored.rubric
+    ]
+    section_context = stored.context
     prompt = render_judge_prompt(question, rubric_points, learner_answer, section_context)
-    raw_response = call_text(prompt, max_tokens=400, temperature=0.1)
+    raw_response = generate_text(
+        "Bạn là giám khảo bài tự kiểm tra. Trả về đúng JSON theo rubric trong yêu cầu.",
+        prompt,
+        max_tokens=400,
+        temperature=0.1,
+    )
 
     verdict = ""
     feedback = ""
@@ -456,6 +470,7 @@ def _generate_study_note_section(
     time_budget_minutes: int,
     active_mode: bool = False,
     session_id: str = "",
+    active_checks: dict[str, ActiveModeCheck] | None = None,
 ) -> StudyNoteSection:
     section = next(
         (item for item in outline if item.section_id == weak_section.section_id), None
@@ -474,18 +489,22 @@ def _generate_study_note_section(
     content_markdown, check_question = parse_rewrite_output(generated_markdown, active_mode)
     if check_question is not None:
         check_question.section_id = section.section_id
-        session_store[(session_id, section.section_id)] = {
-            "question": check_question.question,
-            "rubric": check_question.rubric_points,
-            "context": context,
-        }
+        if active_checks is not None:
+            active_checks[section.section_id] = ActiveModeCheck(
+                question=check_question.question,
+                rubric=[
+                    PersistedRubricPoint(point=point.point, citation=point.citation)
+                    for point in check_question.rubric_points
+                ],
+                context=context,
+            )
     citations = validate_citations(content_markdown, context)
     return StudyNoteSection(
         section_id=section.section_id,
         title=section.title,
         content_md=postprocess(content_markdown, citations),
         citations=citations,
-        # Rubric points remain server-side in session_store.
+        # Rubric points remain server-side in the persisted learning session.
         check_question=check_question.question if check_question is not None else None,
     )
 
@@ -517,6 +536,7 @@ def generate_study_note(
     outline_list = list(outline)
     slides_list = list(slides)
     transcript_list = list(transcript_segments)
+    active_checks: dict[str, ActiveModeCheck] = {}
     per_section_minutes = max(1, time_budget_minutes // len(selected_weak_sections))
     with ThreadPoolExecutor(max_workers=len(selected_weak_sections)) as executor:
         sections = list(
@@ -531,8 +551,14 @@ def generate_study_note(
                     per_section_minutes,
                     active_mode,
                     session_id,
+                    active_checks,
                 ),
                 selected_weak_sections,
             )
         )
+    if active_mode and session_id and active_checks:
+        session = get_session(session_id)
+        if session is not None:
+            session.active_mode_checks.update(active_checks)
+            save_session(session)
     return StudyNote(sections=sections)

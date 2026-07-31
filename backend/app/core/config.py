@@ -12,6 +12,13 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_API_KEYS = os.environ.get("OPENAI_API_KEYS", "")
 OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "")
 QUIZ_MODEL = os.environ.get("QUIZ_MODEL", "gpt-4o-mini")
+LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "auto").strip().lower()
+CHAT_MODEL = os.environ.get("CHAT_MODEL", QUIZ_MODEL)
+CLASSIFY_MODEL = os.environ.get("CLASSIFY_MODEL", CHAT_MODEL)
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
+GROQ_BASE_URL = os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
 
 
 def _env_list(name: str) -> list[str]:

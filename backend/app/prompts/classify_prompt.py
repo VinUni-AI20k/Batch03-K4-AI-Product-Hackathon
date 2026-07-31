@@ -32,13 +32,13 @@ You MUST output strictly in JSON format with the following keys:
 
 # EXAMPLES
 Input: [T01-001] Một trong những kỹ năng mình nghĩ quan trọng và đang cần nhất là khả năng xác định ra một bài toán từ một yêu cầu rất mơ hồ...
-Output: {"segment_id": "T01-001", "label": "TEACHING_CONTENT"}
+Output: {{"segment_id": "T01-001", "label": "TEACHING_CONTENT"}}
 
 Input: [T01-009] [Học viên]: Project thì kiểu một dự án tạo ra xong rồi là xong luôn...
-Output: {"segment_id": "T01-009", "label": "CLASSROOM_ACTIVITY"}
+Output: {{"segment_id": "T01-009", "label": "CLASSROOM_ACTIVITY"}}
 
 Input: [T01-035] [Hoạt động lớp: kênh Discord bị lỗi không tạo được thread...]
-Output: {"segment_id": "T01-035", "label": "CLASSROOM_ACTIVITY"}
+Output: {{"segment_id": "T01-035", "label": "CLASSROOM_ACTIVITY"}}
 
 ---
 INPUT:

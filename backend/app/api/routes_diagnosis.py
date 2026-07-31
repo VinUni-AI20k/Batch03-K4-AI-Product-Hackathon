@@ -6,7 +6,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from app.core.llm_client_openai import call_json
+from app.core.llm_provider import generate_json
 from app.prompts.weakness_prompt import SYSTEM_PROMPT
 
 
@@ -61,7 +61,7 @@ def refine_weaknesses(payload: WeaknessRefinementRequest) -> WeaknessRefinementR
     compact_input = payload.model_dump(mode="json")
     _debug_log("request", input=compact_input)
     try:
-        result = call_json(
+        result = generate_json(
             SYSTEM_PROMPT,
             payload.model_dump_json(),
         )

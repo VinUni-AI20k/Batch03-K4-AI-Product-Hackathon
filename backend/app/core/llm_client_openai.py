@@ -43,11 +43,29 @@ def _is_retryable(exc: Exception) -> bool:
     return isinstance(exc, APIStatusError) and (exc.status_code == 429 or exc.status_code >= 500)
 
 
-def call_json(system_prompt: str, user_prompt: str, model: str | None = None) -> dict:
+def call_json(
+    system_prompt: str,
+    user_prompt: str,
+    model: str | None = None,
+    *,
+    max_tokens: int = 1000,
+    api_keys: list[str] | None = None,
+    base_urls: list[str] | None = None,
+) -> dict:
     """Call the model and parse a JSON object response. Raises on malformed output —
     callers should catch and treat as a hard failure (no silent fallback to fake data)."""
     global _next_client
-    clients = _get_clients()
+    if api_keys is None and base_urls is None:
+        clients = _get_clients()
+    else:
+        keys = api_keys if api_keys is not None else openai_api_keys()
+        urls = base_urls if base_urls is not None else openai_base_urls()
+        if not keys:
+            raise RuntimeError("No API key configured for the OpenAI-compatible provider")
+        clients = [
+            OpenAI(api_key=key, base_url=urls[index] if index < len(urls) else None)
+            for index, key in enumerate(keys)
+        ]
     errors: list[str] = []
     # Start from the rotating cursor, then try each key at most once.
     with _client_lock:
@@ -63,6 +81,7 @@ def call_json(system_prompt: str, user_prompt: str, model: str | None = None) ->
                     {"role": "user", "content": user_prompt},
                 ],
                 response_format={"type": "json_object"},
+                max_tokens=max_tokens,
                 temperature=0.3,
             )
             return json.loads(response.choices[0].message.content)
@@ -115,3 +134,45 @@ def call_text(
                 raise
             errors.append(type(exc).__name__)
     raise RuntimeError("No OpenAI client available")
+
+
+def call_chat(
+    system_prompt: str,
+    user_prompt: str,
+    *,
+    model: str | None = None,
+    max_tokens: int = 1000,
+    temperature: float = 0.2,
+    api_keys: list[str] | None = None,
+    base_urls: list[str] | None = None,
+) -> str:
+    """Call an OpenAI-compatible chat provider with explicit system/user turns."""
+    keys = api_keys if api_keys is not None else openai_api_keys()
+    urls = base_urls if base_urls is not None else openai_base_urls()
+    if not keys:
+        raise RuntimeError("No API key configured for the OpenAI-compatible provider")
+    clients = [
+        OpenAI(api_key=key, base_url=urls[index] if index < len(urls) else None)
+        for index, key in enumerate(keys)
+    ]
+    errors: list[str] = []
+    for client in clients:
+        try:
+            response = client.chat.completions.create(
+                model=model or QUIZ_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            content = response.choices[0].message.content
+            if not isinstance(content, str) or not content.strip():
+                raise RuntimeError("Model returned an empty response")
+            return content.strip()
+        except Exception as exc:  # noqa: BLE001
+            errors.append(type(exc).__name__)
+            if not _is_retryable(exc):
+                break
+    raise RuntimeError(f"LLM provider failed ({', '.join(errors)})")
