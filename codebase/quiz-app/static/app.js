@@ -405,6 +405,11 @@ generateBtn.addEventListener('click', async () => {
   hideError();
   generateBtn.disabled = true;
 
+  // Mốc thời gian ngay lúc bấm nút — dùng để tính "tổng thời gian từ lúc bấm Tạo Quiz
+  // đến khi TẤT CẢ câu hỏi hiển thị xong trên giao diện" (khác với elapsed_seconds
+  // backend trả về, vốn CHƯA tính thời gian mạng đi/về + thời gian render DOM).
+  const clickStartTime = performance.now();
+
   formPanel.classList.add('hidden');
   demoPanel.classList.add('hidden');
   resultsPanel.classList.add('hidden');
@@ -439,7 +444,7 @@ generateBtn.addEventListener('click', async () => {
     if (!res.ok) {
       throw new Error(data.error || `Lỗi không xác định (HTTP ${res.status})`);
     }
-    renderResults(data);
+    renderResults(data, clickStartTime);
   } catch (err) {
     loadingPanel.classList.add('hidden');
     formPanel.classList.remove('hidden');
@@ -534,7 +539,7 @@ function renderQuizCard(q, idx, { interactive = true } = {}) {
   return card;
 }
 
-function renderResults(data) {
+function renderResults(data, clickStartTime) {
   loadingPanel.classList.add('hidden');
   resultsPanel.classList.remove('hidden');
   setStep('review');
@@ -566,6 +571,19 @@ function renderResults(data) {
   data.questions.forEach((q, idx) => {
     quizList.appendChild(renderQuizCard(q, idx));
   });
+
+  // Đo "tổng thời gian từ lúc bấm Tạo Quiz đến khi TẤT CẢ câu hỏi đã hiển thị lên
+  // giao diện" — chờ 1 frame để chắc chắn trình duyệt đã vẽ (paint) xong các thẻ
+  // câu hỏi vừa append ở trên, rồi mới chốt mốc thời gian kết thúc.
+  if (typeof clickStartTime === 'number') {
+    requestAnimationFrame(() => {
+      const totalUiSeconds = ((performance.now() - clickStartTime) / 1000).toFixed(2);
+      console.log(`[QUIZ UI] Tổng thời gian từ lúc bấm "Tạo Quiz" đến khi hiển thị xong ${data.questions.length} câu: ${totalUiSeconds}s`);
+      if (metaLine) {
+        metaLine.textContent += ` · Tổng thời gian (bấm nút → hiển thị xong): ${totalUiSeconds}s`;
+      }
+    });
+  }
 }
 
 document.getElementById('reset-btn').addEventListener('click', () => {
@@ -614,6 +632,203 @@ const DEMO_QUESTIONS = [
 
 DEMO_QUESTIONS.forEach((q, idx) => {
   demoQuizList.appendChild(renderQuizCard(q, idx));
+});
+
+// ---------- Bôi đen -> Hỏi AI ----------
+// Cùng bộ limit với backend (app.py: SELECTION_MIN_CHARS/MAX_CHARS/MAX_WORDS) — kiểm
+// tra ở client trước để phản hồi tức thì (không cần chờ round-trip mạng cho lỗi rõ ràng).
+const SELECTION_MIN_CHARS = 2;
+const SELECTION_MAX_CHARS = 300;
+const SELECTION_MAX_WORDS = 40;
+
+const askAiBtn = document.getElementById('ask-ai-btn');
+const askAiBubble = document.getElementById('ask-ai-bubble');
+const askAiClose = document.getElementById('ask-ai-close');
+const askAiQuote = document.getElementById('ask-ai-quote');
+const askAiBody = document.getElementById('ask-ai-body');
+
+// Cache theo text đã chuẩn hoá — bôi đen lại đúng cụm đã hỏi thì dùng lại luôn,
+// khỏi tốn thêm 1 lần gọi AI (tiết kiệm token + nhanh hơn).
+const askAiCache = new Map();
+
+function validateSelectionClientSide(text) {
+  if (!text) return { valid: false, reason: null };
+  if (text.length < SELECTION_MIN_CHARS) {
+    return { valid: false, reason: `Bôi đen ít nhất ${SELECTION_MIN_CHARS} ký tự.` };
+  }
+  if (text.length > SELECTION_MAX_CHARS) {
+    return { valid: false, reason: `Bôi đen tối đa ${SELECTION_MAX_CHARS} ký tự (khoảng 1-2 câu).` };
+  }
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length > SELECTION_MAX_WORDS) {
+    return { valid: false, reason: `Bôi đen tối đa ${SELECTION_MAX_WORDS} từ.` };
+  }
+  if (!/\p{L}/u.test(text)) {
+    return { valid: false, reason: 'Cần bôi đen chữ, không chỉ số/ký hiệu.' };
+  }
+  return { valid: true, reason: null };
+}
+
+// Nới vùng bôi đen ra đúng ranh giới từ (vd người dùng lỡ thả chuột giữa chữ "achine
+// Lear..." thay vì "Machine Learning") — heuristic đơn giản dựa vào ký tự lân cận
+// trong cùng 1 text node, KHÔNG phải tách câu bằng NLP thật sự (đủ dùng cho phạm vi
+// bôi đen trong 1 thẻ .qtext/.qscenario/.expl-text, vốn luôn là text thuần).
+function snapRangeToWordBoundaries(range) {
+  const NOT_BOUNDARY = /[^\s.,;:!?()"'“”‘’\-–—]/;
+  try {
+    if (range.startContainer.nodeType === Node.TEXT_NODE) {
+      const text = range.startContainer.textContent;
+      let start = range.startOffset;
+      while (start > 0 && NOT_BOUNDARY.test(text[start - 1])) start--;
+      range.setStart(range.startContainer, start);
+    }
+    if (range.endContainer.nodeType === Node.TEXT_NODE) {
+      const text = range.endContainer.textContent;
+      let end = range.endOffset;
+      while (end < text.length && NOT_BOUNDARY.test(text[end])) end++;
+      range.setEnd(range.endContainer, end);
+    }
+  } catch (e) {
+    // Bôi đen xuyên nhiều thẻ (vd từ .qtext tràn sang .options) -> không snap được,
+    // dùng nguyên vùng chọn gốc thay vì lỗi trắng màn hình.
+  }
+  return range;
+}
+
+function hideAskAiBtn() {
+  askAiBtn.classList.add('hidden');
+  delete askAiBtn.dataset.text;
+}
+
+function showAskAiBtn(range, text) {
+  const rects = range.getClientRects();
+  const rect = rects.length ? rects[rects.length - 1] : range.getBoundingClientRect();
+  const btnWidth = 110;
+  const left = Math.min(Math.max(8, rect.left), window.innerWidth - btnWidth - 8);
+  const top = Math.min(Math.max(8, rect.bottom + 8), window.innerHeight - 44);
+
+  askAiBtn.style.left = `${left}px`;
+  askAiBtn.style.top = `${top}px`;
+  askAiBtn.dataset.text = text;
+  askAiBtn.classList.remove('hidden');
+}
+
+// Chỉ bắt bôi đen bên trong nội dung 1 câu quiz (.qcard — dùng chung cho cả demo
+// và kết quả thật), tránh việc bôi đen linh tinh (menu, nút, footer...) làm phiền.
+document.addEventListener('mouseup', (e) => {
+  if (askAiBtn.contains(e.target) || askAiBubble.contains(e.target)) return;
+
+  // setTimeout 0 để đợi trình duyệt cập nhật xong Selection trước khi mình đọc nó
+  setTimeout(() => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+      hideAskAiBtn();
+      return;
+    }
+
+    const anchorNode = selection.anchorNode;
+    const anchorEl = anchorNode.nodeType === Node.ELEMENT_NODE ? anchorNode : anchorNode.parentElement;
+    const qcard = anchorEl ? anchorEl.closest('.qcard') : null;
+    if (!qcard) {
+      hideAskAiBtn();
+      return;
+    }
+
+    const snapped = snapRangeToWordBoundaries(selection.getRangeAt(0).cloneRange());
+    const text = snapped.toString().trim().replace(/\s+/g, ' ');
+    const { valid } = validateSelectionClientSide(text);
+    if (!valid) {
+      hideAskAiBtn();
+      return;
+    }
+
+    // Áp lại vùng chọn đã snap lên UI để người dùng thấy đúng phần sẽ được hỏi
+    try {
+      selection.removeAllRanges();
+      selection.addRange(snapped);
+    } catch (err) { /* một số trình duyệt mobile không cho set lại — bỏ qua, không ảnh hưởng logic */ }
+
+    showAskAiBtn(snapped, text);
+  }, 0);
+});
+
+// Nút nổi ở position:fixed theo toạ độ viewport -> cuộn trang là toạ độ cũ sai ngay,
+// đơn giản nhất là ẩn nút khi cuộn (capture:true để bắt cả cuộn trong khung con).
+window.addEventListener('scroll', hideAskAiBtn, { passive: true, capture: true });
+
+function positionBubbleNear(rect) {
+  const bubbleWidth = askAiBubble.offsetWidth || 340;
+  const estimatedHeight = askAiBubble.offsetHeight || 180;
+  let left = Math.min(Math.max(8, rect.left), window.innerWidth - bubbleWidth - 8);
+  let top = rect.bottom + 8;
+  if (top + estimatedHeight > window.innerHeight) {
+    top = Math.max(8, rect.top - estimatedHeight - 8);
+  }
+  askAiBubble.style.left = `${left}px`;
+  askAiBubble.style.top = `${top}px`;
+}
+
+function renderAskAiLoading() {
+  askAiBody.innerHTML = '<span class="ask-ai-loading">Đang hỏi AI…</span>';
+}
+function renderAskAiResult(data) {
+  const explanationHtml = escapeHtml(data.explanation || '').replace(/\n/g, '<br>');
+  // Không cảnh báo "ngoài tài liệu" nữa — AI dùng kiến thức chung để giải thích là
+  // bình thường. Chỉ cảnh báo khi CHÍNH AI xác định đoạn bôi đen không có nghĩa gì.
+  if (data.meaningful === false) {
+    askAiBody.innerHTML =
+      '<span class="ask-ai-empty">⚠️ Cụm từ/đoạn bôi đen này không mang nghĩa rõ ràng để giải thích.</span><br>' +
+      explanationHtml;
+  } else {
+    askAiBody.innerHTML = explanationHtml;
+  }
+}
+function renderAskAiError(msg) {
+  askAiBody.innerHTML = `<span class="ask-ai-error">⚠️ ${escapeHtml(msg)}</span>`;
+}
+
+askAiBtn.addEventListener('click', async () => {
+  const text = askAiBtn.dataset.text;
+  if (!text) return;
+  const rect = askAiBtn.getBoundingClientRect();
+
+  askAiQuote.textContent = `"${text}"`;
+  hideAskAiBtn();
+  askAiBubble.classList.remove('hidden');
+  positionBubbleNear(rect);
+
+  const cacheKey = text.toLowerCase();
+  if (askAiCache.has(cacheKey)) {
+    renderAskAiResult(askAiCache.get(cacheKey));
+    positionBubbleNear(rect);
+    return;
+  }
+
+  renderAskAiLoading();
+  try {
+    const res = await fetch('/api/explain-selection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Lỗi HTTP ${res.status}`);
+    askAiCache.set(cacheKey, data);
+    renderAskAiResult(data);
+  } catch (err) {
+    renderAskAiError(err.message || 'Lỗi gọi AI, thử lại sau.');
+  }
+  positionBubbleNear(rect);
+});
+
+askAiClose.addEventListener('click', () => askAiBubble.classList.add('hidden'));
+
+// Bấm ra ngoài bubble/nút thì tự đóng (trừ khi đang bôi đen chọn văn bản mới)
+document.addEventListener('mousedown', (e) => {
+  if (!askAiBubble.classList.contains('hidden') &&
+      !askAiBubble.contains(e.target) && !askAiBtn.contains(e.target)) {
+    askAiBubble.classList.add('hidden');
+  }
 });
 
 // ---------- Helpers ----------

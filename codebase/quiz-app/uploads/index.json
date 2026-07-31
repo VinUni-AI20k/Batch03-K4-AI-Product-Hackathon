@@ -1,5 +1,12 @@
 [
   {
+    "doc_id": "e0399a8b4b49",
+    "filename": "day01-slide-blue-v0.pdf",
+    "total_pages": 19,
+    "total_chars": 6527,
+    "upload_time": "2026-07-31 12:21:55"
+  },
+  {
     "doc_id": "8cf53d59dd07",
     "filename": "FAIA416.pdf",
     "total_pages": 461,
@@ -19,12 +26,5 @@
     "total_pages": 16,
     "total_chars": 11494,
     "upload_time": "2026-07-31 03:01:01"
-  },
-  {
-    "doc_id": "e0399a8b4b49",
-    "filename": "day01-slide-blue-v0.pdf",
-    "total_pages": 19,
-    "total_chars": 6527,
-    "upload_time": "2026-07-31 02:41:59"
   }
 ]

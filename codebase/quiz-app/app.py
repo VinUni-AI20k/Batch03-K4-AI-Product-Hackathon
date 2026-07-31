@@ -26,6 +26,7 @@ import json
 import re
 import sys
 import time
+import concurrent.futures
 
 # Đảm bảo Windows Terminal hiển thị đúng UTF-8 tiếng Việt
 if hasattr(sys.stdout, 'reconfigure'):
@@ -46,7 +47,7 @@ load_dotenv()
 # không thể chỉ đổi base_url). Chọn provider bằng biến PROVIDER trong .env,
 # hoặc để trống cho tự suy đoán qua tên model (xem model_factory.py).
 # ============================================================================
-from services.model_factory import resolve_provider_and_model, resolve_api_key, call_llm
+from services.model_factory import resolve_provider_and_model, resolve_api_key, call_llm, call_llm_with_usage
 
 PROVIDER, _LITELLM_MODEL = resolve_provider_and_model()
 OPENAI_API_KEY, _ACTIVE_KEY_ENV = resolve_api_key(PROVIDER)
@@ -56,6 +57,14 @@ MODEL = OPENAI_MODEL  # dùng chung cho hiển thị UI + response JSON
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30MB, khớp copy trên UI
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0  # Vô hiệu hóa cache static file trên trình duyệt
+
+# ---- Giới hạn cho tính năng "bôi đen -> hỏi AI" (xem route /api/explain-selection) ----
+# Tại sao cần limit: mỗi lần hỏi = 1 lệnh gọi LLM thật (tốn tiền + thời gian), và học
+# viên có thể vô tình bôi đen nguyên cả đoạn dài hoặc chỉ 1 ký tự rác -> nên chặn ở
+# biên hợp lý thay vì để AI cố "bịa" câu trả lời từ input vô nghĩa.
+SELECTION_MIN_CHARS = 2      # dưới mức này gần như chắc chắn không phải 1 từ có nghĩa
+SELECTION_MAX_CHARS = 300    # ~ 1-2 câu; dài hơn thì nên hỏi cả câu qua ô chat khác, không phải qua bôi đen
+SELECTION_MAX_WORDS = 40     # chặn thêm theo số từ, phòng trường hợp 300 ký tự nhưng toàn từ ngắn dính liền nhau
 
 
 @app.errorhandler(413)
@@ -202,7 +211,7 @@ def extract_pdf_text(file_stream) -> list[dict]:
     return pages
 
 
-DIFFICULTY_PROMPT_LABEL = {"easy": "dễ", "medium": "trung bình", "hard": "khó"}
+DIFFICULTY_PROMPT_LABEL = {"easy": "dễ", "medium": "trung bình", "hard": "khó", "mixed": "trộn"}
 
 
 def build_difficulty_instruction(num_questions: int, difficulty_level: str) -> str:
@@ -367,6 +376,137 @@ def parse_markdown_quiz(text: str) -> list[dict]:
                 "difficulty": "medium"
             })
     return questions
+
+
+BATCH_SIZE = 5  # số câu hỏi tối đa mỗi lô gọi AI — chia nhỏ + chạy song song để giảm
+                 # thời gian chờ thực tế (nhất là câu trung bình/khó vốn sinh nhiều token hơn)
+
+
+def plan_generation_batches(num_questions: int, difficulty_level: str, batch_size: int = BATCH_SIZE) -> list[tuple[str, int]]:
+    """Chia num_questions thành các lô (difficulty, count) để gọi AI song song
+    thay vì 1 lệnh sinh hết.
+
+    Độ khó cố định (easy/medium/hard): chia đều theo batch_size như cũ, không đổi.
+
+    Mixed: KHÔNG còn tách riêng thành 3 nhóm easy/medium/hard trước khi chia lô
+    nữa (bản cũ làm vậy) — vì cách đó ép tối thiểu 3 lệnh gọi AI riêng (1/độ khó)
+    dù tổng số câu ít (vd 5 câu mixed vẫn ra 3 lô), mà MỖI lệnh đều phải gửi kèm
+    TOÀN BỘ nội dung PDF trong prompt -> lãng phí token đầu vào lặp lại nhiều lần
+    cho cùng 1 tài liệu (build_prompt() nhúng nguyên văn PDF mỗi lần gọi). Giờ
+    chia thẳng theo batch_size, mỗi lô tự trộn đủ 3 mức độ khó bên trong (model
+    đã được hướng dẫn việc này qua build_difficulty_instruction) -> số lệnh gọi
+    AI giảm từ tối thiểu 3 xuống còn ceil(num_questions/batch_size) — vd 5 câu
+    mixed: 3 lô -> 1 lô (giảm 66% lần gửi lại tài liệu); 10 câu (mặc định UI):
+    3 lô -> 2 lô (giảm 33%). Đánh đổi: ít lô hơn = ít song song hơn = có thể chậm
+    hơn 1 chút với quiz nhỏ (1 lệnh sinh 5 câu thay vì 3 lệnh song song sinh ~2
+    câu/lệnh) — nhưng bù lại tiết kiệm token đầu vào đáng kể, và với quiz lớn hơn
+    (vd 20 câu) vẫn còn 4 lô chạy song song nên không mất hết lợi ích tốc độ."""
+    remaining = num_questions
+    batches = []
+    label = difficulty_level if difficulty_level in ("easy", "medium", "hard") else "mixed"
+    while remaining > 0:
+        take = min(batch_size, remaining)
+        batches.append((label, take))
+        remaining -= take
+    return batches
+
+
+def parse_llm_json_output(raw_text: str) -> list[dict]:
+    """Bóc JSON (hoặc fallback Markdown) từ text LLM trả về -> list câu hỏi thô."""
+    cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_text.strip(), flags=re.IGNORECASE)
+    cleaned_text = re.sub(r"\s*```$", "", cleaned_text).strip()
+    try:
+        result = json.loads(cleaned_text)
+    except json.JSONDecodeError:
+        try:
+            from json_repair import repair_json
+            result = json.loads(repair_json(cleaned_text))
+        except Exception:
+            # Lớp fallback thứ 3: model đôi khi chèn 1 câu dẫn dắt/giải thích trước hoặc
+            # sau khối JSON dù prompt đã cấm — thử cắt từ dấu "{"/"[" đầu tiên đến dấu
+            # đóng cuối cùng tương ứng, bỏ qua phần văn bản thừa bao quanh.
+            try:
+                start_candidates = [i for i in (cleaned_text.find("{"), cleaned_text.find("[")) if i != -1]
+                start = min(start_candidates) if start_candidates else -1
+                end_char = "}" if cleaned_text[start] == "{" else "]"
+                end = cleaned_text.rfind(end_char)
+                if start != -1 and end > start:
+                    result = json.loads(cleaned_text[start:end + 1])
+                else:
+                    raise ValueError("không tìm thấy khối JSON hợp lệ")
+            except Exception:
+                parsed_md = parse_markdown_quiz(raw_text)
+                if parsed_md:
+                    print(f"[FALLBACK PARSER] Bóc tách {len(parsed_md)} câu hỏi từ văn bản Markdown thành công!")
+                    return parsed_md
+                # Log nguyên văn (rút gọn) những gì LLM thực sự trả về — trước đây lỗi
+                # này chỉ hiện thông báo chung chung, không ai biết model đã trả lời gì
+                # để debug. In ra console để lần sau tra lỗi không phải đoán mò.
+                preview = raw_text.strip()[:800]
+                print("\n" + "!" * 70)
+                print("[PARSE FAIL] Không bóc được JSON/Markdown từ phản hồi LLM. Nội dung thô "
+                      f"(rút gọn {len(preview)}/{len(raw_text)} ký tự):")
+                print(preview)
+                print("!" * 70 + "\n")
+                raise RuntimeError("LLM trả về kết quả không parse được JSON hay Markdown. Vui lòng bấm Tạo Quiz lại.")
+
+    if isinstance(result, list):
+        items = result
+    elif isinstance(result, dict):
+        items = result.get("questions", [])
+    else:
+        items = []
+
+    # LLM đôi khi trả JSON đúng cú pháp nhưng sai shape (vd. list string thay vì
+    # list object câu hỏi) -> lọc bỏ phần tử không phải dict để tránh AttributeError
+    # ('str' object has no attribute 'get') ở bước verify phía sau.
+    valid_items = [q for q in items if isinstance(q, dict)]
+    if len(valid_items) != len(items):
+        print(f"[PARSE WARNING] Bỏ qua {len(items) - len(valid_items)} phần tử không đúng "
+              f"định dạng object câu hỏi (LLM trả sai shape).")
+    return valid_items
+
+
+def generate_batch(pages: list[dict], count: int, mode: str, difficulty: str, label: str) -> tuple:
+    """Sinh 1 lô câu hỏi (cùng 1 độ khó) — chạy trong thread riêng, có retry khi
+    bị rate-limit/quá tải. Trả về (questions, usage, elapsed_seconds, label)."""
+    prompt = build_prompt(pages, count, mode, difficulty)
+    temperature = 1.4 if mode == "stress" else 0.25
+
+    RETRY_HINTS = ("429", "rate limit", "overloaded", "503", "502")
+    max_retries = 3
+    attempt = 0
+    t0 = time.time()
+    while True:
+        try:
+            text, usage = call_llm_with_usage(prompt, temperature=temperature, model_name=_LITELLM_MODEL)
+            # Phòng hờ: 1 số model (đặc biệt DeepSeek V4 khi thinking mode lỡ vẫn bật)
+            # thỉnh thoảng trả "content" RỖNG dù request coi như thành công — không phải
+            # lỗi mạng/auth nên không rơi vào except bên dưới. Coi content rỗng như 1
+            # dạng lỗi tạm thời và tự retry, thay vì để rớt xuống tận parse_llm_json_output
+            # rồi mới báo lỗi 502 cho người dùng.
+            if not text or not text.strip():
+                if attempt < max_retries:
+                    attempt += 1
+                    print(f"[EMPTY CONTENT RETRY] {label}: model trả về rỗng, thử lại lần {attempt}/{max_retries}...")
+                    time.sleep(attempt * 2)
+                    continue
+                raise RuntimeError(
+                    "LLM trả về nội dung rỗng sau nhiều lần thử lại (có thể do thinking mode "
+                    "tiêu hết ngân sách token). Vui lòng bấm Tạo Quiz lại."
+                )
+            break
+        except RuntimeError as e:
+            msg = str(e).lower()
+            if attempt < max_retries and any(h in msg for h in RETRY_HINTS):
+                attempt += 1
+                time.sleep(attempt * 2)
+                continue
+            raise
+    elapsed = time.time() - t0
+
+    questions = parse_llm_json_output(text)
+    return questions, usage, elapsed, label
 
 
 def call_openai(prompt: str, mode: str) -> dict:
@@ -685,51 +825,53 @@ def generate_quiz():
         )
 
     t0 = time.time()
-    
-    # Tuỳ chọn bật/tắt RAG (mặc định TẮT để tăng tốc với tài liệu ngắn)
-    use_rag = request.form.get("use_rag", "false").lower() == "true"
-    
-    try:
-        from services.langgraph_workflow import run_quiz_workflow
-        doc_full_content = "\n\n".join(f"[Trang {p['page']}]\n{p['text']}" for p in pages)
-        
-        # Kích hoạt luồng LangGraph Workflow (gồm LightRAG Graph Context + DeepSeek Model Factory)
-        raw_result_str = run_quiz_workflow(
-            slide_content=doc_full_content,
-            model_name=OPENAI_MODEL,
-            num_questions=num_questions,
-            mode=mode,
-            difficulty_level=difficulty_level,
-            use_rag=use_rag
-        )
-        
-        cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_result_str.strip(), flags=re.IGNORECASE)
-        cleaned_text = re.sub(r"\s*```$", "", cleaned_text).strip()
-        try:
-            result = json.loads(cleaned_text)
-        except json.JSONDecodeError:
-            try:
-                from json_repair import repair_json
-                result = json.loads(repair_json(cleaned_text))
-            except Exception:
-                result = {"questions": parse_markdown_quiz(raw_result_str)}
-    except Exception as e:
-        print(f"[LANGGRAPH FALLBACK] LangGraph/LightRAG pipeline info: {e}. Executing fallback call_openai...")
-        try:
-            prompt = build_prompt(pages, num_questions, mode, difficulty_level)
-            result = call_openai(prompt, mode)
-        except RuntimeError as err:
-            return jsonify({"error": str(err)}), 502
-        except Exception as err:
-            return jsonify({"error": f"Lỗi không lường trước: {err}"}), 500
-    elapsed = round(time.time() - t0, 2)
 
-    if isinstance(result, list):
-        questions = result
-    elif isinstance(result, dict):
-        questions = result.get("questions", [])
-    else:
-        questions = []
+    # Chia num_questions thành các lô nhỏ theo độ khó, gọi AI SONG SONG (thay vì
+    # 1 lệnh sinh hết tuần tự) — giảm thời gian chờ thực tế, nhất là khi có nhiều
+    # câu trung bình/khó (vốn khiến model sinh nhiều token hơn -> lâu hơn).
+    batches_plan = plan_generation_batches(num_questions, difficulty_level)
+
+    try:
+        batch_results = [None] * len(batches_plan)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, len(batches_plan))) as executor:
+            future_map = {}
+            for i, (diff, count) in enumerate(batches_plan):
+                label = f"Lô {i + 1}/{len(batches_plan)} ({DIFFICULTY_PROMPT_LABEL.get(diff, diff)} x{count})"
+                fut = executor.submit(generate_batch, pages, count, mode, diff, label)
+                future_map[fut] = i
+            for fut in concurrent.futures.as_completed(future_map):
+                batch_results[future_map[fut]] = fut.result()
+    except RuntimeError as err:
+        return jsonify({"error": str(err)}), 502
+    except Exception as err:
+        return jsonify({"error": f"Lỗi không lường trước: {err}"}), 500
+
+    wall_clock_elapsed = round(time.time() - t0, 2)  # thời gian thực tế người dùng phải chờ (đã chạy song song)
+
+    # ---- Gộp kết quả các lô + log ra console: token đã dùng, số câu, thời gian ----
+    questions = []
+    total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    total_quiz_time = 0.0  # "Tổng thời gian tạo quiz" = CỘNG DỒN thời gian từng lô (kiểu tuần tự,
+                            # vd 5 câu dễ mỗi câu 5s -> tổng 25s), KHÔNG phải thời gian chờ thực tế
+                            # (thời gian chờ thực tế ngắn hơn vì các lô chạy song song).
+    print("\n" + "=" * 70)
+    print(f"[QUIZ GENERATION LOG] Provider: {PROVIDER} | Model: {OPENAI_MODEL} | {len(batches_plan)} lô chạy song song")
+    for qs, usage, batch_elapsed, label in batch_results:
+        questions.extend(qs)
+        total_quiz_time += batch_elapsed
+        for k in total_usage:
+            total_usage[k] += usage.get(k, 0)
+        print(f"  - {label}: {batch_elapsed:.2f}s | {len(qs)} câu | token: {usage.get('total_tokens', 0)} "
+              f"(prompt {usage.get('prompt_tokens', 0)} + completion {usage.get('completion_tokens', 0)})")
+    print(f"  => Tổng số câu hỏi tạo ra   : {len(questions)}")
+    print(f"  => Tổng token đã dùng       : {total_usage['total_tokens']} "
+          f"(prompt {total_usage['prompt_tokens']} + completion {total_usage['completion_tokens']})")
+    print(f"  => Tổng thời gian tạo quiz  : {total_quiz_time:.2f}s (cộng dồn từng lô, kiểu chạy tuần tự)")
+    print(f"  => Thời gian chờ thực tế    : {wall_clock_elapsed}s (nhờ chạy song song nên ngắn hơn tổng ở trên)")
+    print("=" * 70 + "\n")
+
+    elapsed = wall_clock_elapsed  # dùng cho response JSON bên dưới (elapsed_seconds) — vẫn là thời gian
+                                  # người dùng thực sự phải chờ, không phải tổng cộng dồn ở log console
 
     # Kiểm tra chống bịa (spec §5 kịch bản #1, #8): source_snippet phải trace được
     # về text đã trích từ PDF. Chế độ chuẩn -> loại câu không verify được trước khi
@@ -789,6 +931,117 @@ def generate_quiz():
         "warning": warning,
         "dropped_unverified": dropped,
         "questions": questions,
+    })
+
+
+def _parse_explain_json(raw_text: str) -> dict:
+    """Bóc JSON {"meaningful": bool, "explanation": str} từ text LLM trả về.
+    Nếu AI lỡ không trả đúng JSON (model không hỗ trợ response_format tốt), coi như
+    "meaningful": True và dùng nguyên văn bản trả lời — an toàn hơn là báo lỗi trắng
+    cho học viên vì lỗi format, không phải lỗi nội dung."""
+    cleaned = re.sub(r"^```(?:json)?\s*", "", raw_text.strip(), flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned).strip()
+    obj = None
+    try:
+        obj = json.loads(cleaned)
+    except json.JSONDecodeError:
+        try:
+            from json_repair import repair_json
+            obj = json.loads(repair_json(cleaned))
+        except Exception:
+            obj = None
+
+    if not isinstance(obj, dict):
+        return {"meaningful": True, "explanation": raw_text.strip()}
+
+    return {
+        "meaningful": bool(obj.get("meaningful", True)),
+        "explanation": str(obj.get("explanation", "")).strip() or raw_text.strip(),
+    }
+
+
+@app.route("/api/explain-selection", methods=["POST"])
+def explain_selection():
+    """Học viên bôi đen 1 đoạn trong quiz -> hỏi AI giải thích. Trả lời ngắn, mang
+    tính lý thuyết/định nghĩa (không phải chat tự do) để: (1) rẻ và nhanh — max_tokens
+    thấp, (2) tránh lạc đề — prompt ép format giải thích khái niệm.
+
+    LƯU Ý QUAN TRỌNG: đoạn bôi đen KHÔNG cần khớp nguyên văn với tài liệu PDF gốc để
+    được giải thích — quiz thường diễn giải lại nội dung slide, và học viên có thể
+    bôi đen bất kỳ khái niệm liên quan nào, kể cả kiến thức nền không có trong slide.
+    AI được phép (và nên) dùng kiến thức chung để giải thích chính xác trong trường
+    hợp đó. Cái CẦN cảnh báo không phải "có/không có trong tài liệu", mà là khi đoạn
+    bôi đen THỰC SỰ không mang nghĩa gì (rác, từ nối rời rạc, số liệu vô nghĩa...) —
+    AI tự đánh giá việc này qua field "meaningful" trong JSON trả về, thay vì mình tự
+    suy đoán bằng cách so khớp chuỗi (không đáng tin bằng để AI đọc hiểu ngữ cảnh)."""
+    data = request.get_json(silent=True) or {}
+    selected_text = str(data.get("text", "")).strip()
+    # Dọn khoảng trắng thừa/xuống dòng do người dùng bôi đen dính cả câu kế bên
+    selected_text = re.sub(r"\s+", " ", selected_text)
+
+    # ---- Limit #1: độ dài ký tự — chặn cả quá ngắn (rác/1 ký tự) lẫn quá dài (nguyên đoạn) ----
+    if len(selected_text) < SELECTION_MIN_CHARS:
+        return jsonify({
+            "error": f"Đoạn bôi đen quá ngắn (cần tối thiểu {SELECTION_MIN_CHARS} ký tự). "
+                     "Hãy bôi đen 1 từ/cụm từ có nghĩa."
+        }), 400
+    if len(selected_text) > SELECTION_MAX_CHARS:
+        return jsonify({
+            "error": f"Đoạn bôi đen quá dài (tối đa {SELECTION_MAX_CHARS} ký tự, khoảng 1-2 câu). "
+                     "Hãy bôi đen đoạn ngắn hơn để AI trả lời đúng trọng tâm hơn."
+        }), 400
+
+    # ---- Limit #2: số từ — 300 ký tự vẫn có thể là 1 chuỗi số/ký tự dính liền nhau ----
+    words = [w for w in re.split(r"\s+", selected_text) if w]
+    if len(words) > SELECTION_MAX_WORDS:
+        return jsonify({
+            "error": f"Đoạn bôi đen có {len(words)} từ, vượt giới hạn {SELECTION_MAX_WORDS} từ. "
+                     "Hãy bôi đen ngắn gọn hơn (1 khái niệm/1 câu)."
+        }), 400
+
+    # ---- Limit #3: phải có ít nhất 1 ký tự chữ cái — chặn bôi đen toàn số/dấu câu ----
+    if not re.search(r"[^\W\d_]", selected_text, flags=re.UNICODE):
+        return jsonify({"error": "Đoạn bôi đen cần chứa chữ (không chỉ số hoặc ký hiệu)."}), 400
+
+    # Prompt ép trả lời LÝ THUYẾT (giống định nghĩa sách giáo khoa) và ĐỦ Ý, không ép
+    # cứng theo số câu — cap cứng kiểu "tối đa 4-5 câu" từng khiến khái niệm phức tạp
+    # bị cắt thiếu ý, còn khái niệm đơn giản thì bị chèn câu thừa cho đủ số. Thay vào
+    # đó, ưu tiên chất lượng nội dung: ngắn khi khái niệm đơn giản, dài hơn khi khái
+    # niệm thật sự cần nhiều ý để hiểu đúng — nhưng luôn đi thẳng vào bản chất, không
+    # lan man/kể chuyện/lặp ý.
+    prompt = f"""Bạn là trợ giảng. Học viên đang làm quiz và bôi đen 1 đoạn để hỏi nghĩa/giải thích.
+
+Nội dung bôi đen: "{selected_text}"
+Câu hỏi cần trả lời: Cụm từ/đoạn trên có nghĩa là gì?
+
+YÊU CẦU:
+- Nếu đây LÀ 1 khái niệm/thuật ngữ/cụm từ có nghĩa rõ ràng: giải thích mang tính LÝ THUYẾT/ĐỊNH NGHĨA (như giải thích thuật ngữ trong sách giáo khoa). Ưu tiên ĐỦ Ý QUAN TRỌNG hơn là ngắn cho có — độ dài co giãn tự nhiên theo độ phức tạp của khái niệm: khái niệm đơn giản thì 1-2 câu là đủ, khái niệm có nhiều thành phần/dễ nhầm lẫn thì có thể dài hơn để giải thích trọn vẹn. Dù ngắn hay dài đều phải: đi thẳng vào bản chất ngay từ câu đầu (không rào trước đón sau), không lặp lại ý đã nói, không thêm ví dụ/câu chuyện minh hoạ trừ khi thật sự cần để phân biệt khái niệm dễ nhầm. Được phép và NÊN dùng kiến thức chung (kể cả kiến thức không có trong tài liệu bài giảng) để giải thích chính xác nhất — hoàn toàn bình thường khi khái niệm không xuất hiện y nguyên trong slide, KHÔNG cần nhắc gì về việc có/không có trong tài liệu.
+- Nếu cụm từ này THỰC SỰ không mang nghĩa/khái niệm gì (rác, từ nối rời rạc kiểu "và sau đó", số liệu không có ngữ cảnh, ký tự vô nghĩa...): đặt "meaningful": false, và "explanation" chỉ cần nêu ngắn gọn lý do — KHÔNG bịa ra 1 khái niệm không tồn tại để giải thích cho có.
+- Không dùng markdown phức tạp (không bảng, không code block).
+
+Trả về DUY NHẤT 1 JSON object đúng format sau, không kèm chữ nào khác ngoài JSON:
+{{"meaningful": true hoặc false, "explanation": "..."}}"""
+
+    try:
+        raw_text, usage = call_llm_with_usage(
+            # max_tokens nới lên 550 (từ 350) — chừa đủ chỗ cho khái niệm phức tạp
+            # cần giải thích dài hơn, tránh bị cắt cụt giữa câu.
+            prompt, temperature=0.2, max_tokens=550, response_json=True
+        )
+    except RuntimeError as err:
+        return jsonify({"error": str(err)}), 502
+    except Exception as err:
+        return jsonify({"error": f"Lỗi không lường trước: {err}"}), 500
+
+    parsed = _parse_explain_json(raw_text)
+
+    print(f"[EXPLAIN SELECTION] \"{selected_text[:60]}\" ({len(words)} từ) | "
+          f"token: {usage.get('total_tokens', 0)} | meaningful={parsed['meaningful']}")
+
+    return jsonify({
+        "selected_text": selected_text,
+        "explanation": parsed["explanation"],
+        "meaningful": parsed["meaningful"],
     })
 
 

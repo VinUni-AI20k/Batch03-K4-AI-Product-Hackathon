@@ -168,6 +168,18 @@
 
 </main>
 
+<!-- ============ BÔI ĐEN -> HỎI AI (nút nổi + ô trò chuyện nhỏ) ============ -->
+<button type="button" id="ask-ai-btn" class="ask-ai-btn hidden">🤖 Hỏi AI</button>
+
+<div id="ask-ai-bubble" class="ask-ai-bubble hidden">
+  <div class="ask-ai-bubble-head">
+    <span>🤖 Giải thích nhanh</span>
+    <button type="button" id="ask-ai-close" class="ask-ai-close" aria-label="Đóng">✕</button>
+  </div>
+  <div class="ask-ai-quote" id="ask-ai-quote"></div>
+  <div class="ask-ai-body" id="ask-ai-body"></div>
+</div>
+
 <footer>Prototype hackathon — Hướng A VLearn · Automation: Augment — AI chỉ sinh nháp, học viên tự luyện tập ngay, người dạy nên duyệt trước khi phát chính thức</footer>
 
 <script src="{{ url_for('static', filename='app.js') }}?v=1001"></script>

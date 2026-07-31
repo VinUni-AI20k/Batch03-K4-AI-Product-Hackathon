@@ -88,15 +88,9 @@ def resolve_api_key(provider: str) -> Tuple[str, Optional[str]]:
     return "", None
 
 
-def call_llm(
-    prompt: str,
-    temperature: float = 0.3,
-    model_name: Optional[str] = None,
-    response_json: bool = True,
-    max_tokens: int = 8192,
-) -> str:
-    """Gọi LLM qua LiteLLM — dùng chung cho OpenAI/DeepSeek/Claude/Gemini.
-    Trả về text thô (nội dung message) để nơi gọi tự parse JSON như trước."""
+def _do_completion(prompt: str, temperature: float, model_name: Optional[str],
+                    response_json: bool, max_tokens: int):
+    """Gọi litellm.completion(), trả về response object đầy đủ (có .usage)."""
     provider, litellm_model = resolve_provider_and_model(model_name)
     api_key, _ = resolve_api_key(provider)
 
@@ -116,12 +110,59 @@ def call_llm(
     if response_json:
         kwargs["response_format"] = {"type": "json_object"}
 
+    if provider == "deepseek":
+        # DeepSeek V4 bật "thinking mode" MẶC ĐỊNH — model suy luận ẩn (reasoning_content)
+        # trước khi trả lời, phần suy luận này cũng tính vào max_tokens. Khi kết hợp với
+        # response_format=json_object, model đôi khi tiêu hết ngân sách token cho suy luận
+        # và trả về "content" RỖNG (không phải lỗi mạng/auth — request vẫn "thành công",
+        # chỉ là không còn chỗ cho câu trả lời cuối). Đây chính là nguyên nhân gốc của lỗi
+        # "LLM trả về kết quả không parse được JSON hay Markdown" gặp phải. Tắt hẳn thinking
+        # mode: (1) hết lỗi content rỗng, (2) temperature mình đặt mới thực sự có tác dụng —
+        # theo tài liệu DeepSeek, thinking mode bỏ qua temperature/top_p một cách âm thầm.
+        kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
+
     try:
         resp = litellm.completion(**kwargs)
     except Exception as e:
         raise RuntimeError(f"Lỗi gọi provider '{provider}' (model {litellm_model}): {e}")
 
+    return provider, litellm_model, resp
+
+
+def call_llm(
+    prompt: str,
+    temperature: float = 0.3,
+    model_name: Optional[str] = None,
+    response_json: bool = True,
+    max_tokens: int = 8192,
+) -> str:
+    """Gọi LLM qua LiteLLM — dùng chung cho OpenAI/DeepSeek/Claude/Gemini.
+    Trả về text thô (nội dung message) để nơi gọi tự parse JSON như trước."""
+    _, _, resp = _do_completion(prompt, temperature, model_name, response_json, max_tokens)
     return resp["choices"][0]["message"]["content"]
+
+
+def call_llm_with_usage(
+    prompt: str,
+    temperature: float = 0.3,
+    model_name: Optional[str] = None,
+    response_json: bool = True,
+    max_tokens: int = 8192,
+) -> Tuple[str, dict]:
+    """Giống call_llm() nhưng trả kèm (text, usage) — usage gồm prompt_tokens/
+    completion_tokens/total_tokens, LiteLLM tự chuẩn hoá format này cho MỌI
+    provider (kể cả Claude/Gemini vốn có format usage gốc khác OpenAI)."""
+    provider, litellm_model, resp = _do_completion(prompt, temperature, model_name, response_json, max_tokens)
+    text = resp["choices"][0]["message"]["content"]
+    usage_obj = getattr(resp, "usage", None) or resp.get("usage") or {}
+    usage = {
+        "prompt_tokens": getattr(usage_obj, "prompt_tokens", None) or usage_obj.get("prompt_tokens", 0),
+        "completion_tokens": getattr(usage_obj, "completion_tokens", None) or usage_obj.get("completion_tokens", 0),
+        "total_tokens": getattr(usage_obj, "total_tokens", None) or usage_obj.get("total_tokens", 0),
+        "provider": provider,
+        "model": litellm_model,
+    }
+    return text, usage
 
 
 def list_supported_providers():
