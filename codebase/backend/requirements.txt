@@ -9,3 +9,12 @@ fastapi>=0.110
 uvicorn[standard]>=0.30
 google-auth>=2.35.0
 google-auth-oauthlib>=1.4.0
+
+# studypulse/ — LangGraph orchestration + FAISS RAG. Chat/embedding calls go
+# through providers.OpenAIProvider (see providers/openai_provider.py), NOT
+# langchain-openai or langchain-google-genai — no second LLM vendor stack.
+langgraph>=0.2
+langgraph-checkpoint-sqlite>=2.0
+langchain-core>=0.3
+langchain-community>=0.3
+faiss-cpu>=1.8

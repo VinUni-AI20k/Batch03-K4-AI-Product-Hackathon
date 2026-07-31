@@ -10,6 +10,7 @@ loop guards, persistent checkpointer factory, and HITL interrupt_before points.
 from __future__ import annotations
 
 import os
+import threading
 from typing import Any, List, Optional
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -238,6 +239,23 @@ def compile_graph(
 # ═══════════════════════════════════════════════════════════════════════════
 # GRAPH METADATA
 # ═══════════════════════════════════════════════════════════════════════════
+
+_compiled_graph: Any = None
+_compiled_graph_lock = threading.Lock()
+
+
+def get_compiled_graph() -> Any:
+    """Process-wide singleton compiled graph, shared by server.py's chat
+    endpoint and mail_ingest.py's background ingestion — one checkpointer
+    DB connection and one FAISS/SQLite-backed set of nodes, not one per
+    caller."""
+    global _compiled_graph
+    if _compiled_graph is None:
+        with _compiled_graph_lock:
+            if _compiled_graph is None:
+                _compiled_graph = compile_graph()
+    return _compiled_graph
+
 
 GRAPH_METADATA = {
     "name": "StudyPulse AI — EduCentral Agent",

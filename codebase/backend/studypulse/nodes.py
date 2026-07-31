@@ -272,9 +272,12 @@ class ExtractionResult(BaseModel):
 def ai_extraction_node(state: StudyPulseState) -> StudyPulseState:
     """
     LLM extraction using:
-    - SystemMessage: BASE_PERSONA only (~120 tokens, cacheable)
-    - HumanMessage: EXTRACTION_PROMPT with runtime context
-    - .with_structured_output(ExtractionResult) → Pydantic enforced at API level
+    - system message: BASE_PERSONA only (~120 tokens, cacheable)
+    - user message: EXTRACTION_PROMPT with runtime context
+    - provider.parse(ExtractionResult) -> Pydantic enforced at API level, via
+      providers.OpenAIProvider (see providers/openai_provider.py) rather than
+      a LangChain chat model, so this stays on the same vendor as the rest
+      of the agent.
     """
     raw = state.get("raw_payload", {})
     text = raw.get("body_masked", state.get("user_query", ""))
@@ -284,23 +287,21 @@ def ai_extraction_node(state: StudyPulseState) -> StudyPulseState:
     current_year = datetime.utcnow().year
 
     # ── PRODUCTION LLM CALL ──
-    from langchain_core.messages import HumanMessage, SystemMessage
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    import os
+    from providers import make_provider
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
-    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0)
-    structured_llm = llm.with_structured_output(ExtractionResult)
-
-    result: ExtractionResult = structured_llm.invoke([
-        SystemMessage(content=get_base_persona()),       # ~120 tokens, CACHED
-        HumanMessage(content=get_extraction_prompt(      # Task-specific, fresh
-            text=text,
-            source_platform=source,
-            today=today,
-            current_year=current_year,
-        )),
-    ])
+    provider = make_provider("openai")
+    result: ExtractionResult = provider.parse(
+        [
+            {"role": "system", "content": get_base_persona()},  # ~120 tokens, CACHED
+            {"role": "user", "content": get_extraction_prompt(  # Task-specific, fresh
+                text=text,
+                source_platform=source,
+                today=today,
+                current_year=current_year,
+            )},
+        ],
+        response_format=ExtractionResult,
+    )
     extracted_items = [
         ExtractedItem(
             source_platform=(
@@ -490,6 +491,8 @@ def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
         user_profile["student_id"] = id_match.group(1).strip()
 
     # ── DYNAMIC RAG RETRIEVAL (FAISS Vector Store) ──
+    sources_cited: list[dict[str, str]] = []
+    timeline_items_referenced: list[str] = []
     try:
         from .vector_store import get_vector_store
         vs = get_vector_store()
@@ -498,25 +501,39 @@ def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
             vs.index_timeline_items(timeline)
         retrieved_docs = vs.similarity_search(query, k=3)
         print(f"  [FAISS] Dynamic RAG: Retrieved {len(retrieved_docs.split('[Doc'))-1} relevant documents.")
+
+        # Same retrieval, metadata form — for citing which mail/item the
+        # answer is grounded in (FE's sources_cited / timeline_items_referenced).
+        for doc in vs.similarity_search_with_metadata(query, k=3):
+            item_id = doc.get("item_id", "")
+            if item_id:
+                timeline_items_referenced.append(item_id)
+            platform = doc.get("source_platform", "")
+            title = doc.get("title", "")
+            if platform == "gmail":
+                label = f"Email: {title}" if title else "Email gốc"
+            elif platform == "outlook":
+                label = f"Email Outlook: {title}" if title else "Email Outlook gốc"
+            elif title:
+                label = title
+            else:
+                continue
+            sources_cited.append({"label": label, "url": ""})
     except Exception as e:
         retrieved_docs = "VinAI Academy Mini Hackathon Day 1 Foundation & Day 2 Specs. [T01-001] Introduction to AI Hackathon."
         print(f"  [FAISS] Fallback to static docs: {e}")
 
     # ── PRODUCTION LLM CALL WITH TOKEN TRACKING ──
-    from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    import os
+    from providers import make_provider
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
-    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.2)
-    
-    # 2. Short-Term Memory: Parse previous chat history to LangChain message formats
-    messages = [SystemMessage(content=get_base_persona())]
+    provider = make_provider("openai")
+    model_name = provider.default_model
+
+    # 2. Short-Term Memory: previous chat history, as plain OpenAI-style messages
+    messages: list[dict[str, str]] = [{"role": "system", "content": get_base_persona()}]
     for msg in chat_history:
-        if msg.get("role") == "user":
-            messages.append(HumanMessage(content=msg.get("content", "")))
-        else:
-            messages.append(AIMessage(content=msg.get("content", "")))
+        role = "user" if msg.get("role") == "user" else "assistant"
+        messages.append({"role": role, "content": msg.get("content", "")})
 
     # Inject Long-Term user profile context into RAG prompt
     profile_context = f"USER PROFILE (LONG-TERM MEMORY): {json.dumps(user_profile)}\n" if user_profile else ""
@@ -526,17 +543,16 @@ def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
         rag_context=retrieved_docs,
         timeline_data=json.dumps(timeline[:10]),
     )
-    messages.append(HumanMessage(content=prompt_text))
+    messages.append({"role": "user", "content": prompt_text})
 
-    structured_llm = llm.with_structured_output(ChatResponse)
-    result: ChatResponse = structured_llm.invoke(messages)
+    result: ChatResponse = provider.parse(messages, response_format=ChatResponse, temperature=0.2)
     response_text = result.response_text
 
     # ── TOKEN USAGE TRACKING ──
     token_usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
     try:
         # Estimate token usage from message lengths (approximate)
-        input_text = " ".join(m.content for m in messages)
+        input_text = " ".join(m["content"] for m in messages)
         est_input = len(input_text) // 4  # ~4 chars per token estimate
         est_output = len(response_text) // 4
         token_usage = {
@@ -569,6 +585,8 @@ def rag_chatbot_node(state: StudyPulseState) -> StudyPulseState:
         intent=IntentType(intent) if intent in [e.value for e in IntentType] else IntentType.GENERAL,
         response_text=response_text,
         confidence=0.9,
+        sources_cited=sources_cited,
+        timeline_items_referenced=timeline_items_referenced,
     ).model_dump()
 
     metadata = _trace(state, "rag_chatbot_node")
@@ -788,13 +806,9 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
                 "raw_snippet": i.get("raw_snippet", "")
             })
 
-        # Call Gemini model
-        from langchain_core.messages import HumanMessage, SystemMessage
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        import os
+        from providers import make_provider
 
-        model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
-        llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.3)
+        provider = make_provider("openai")
 
         prompt_text = get_reminder_prompt(
             target_date=tomorrow,
@@ -803,19 +817,17 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
         )
 
         try:
-            response = llm.invoke([
-                SystemMessage(content=get_base_persona() + "\nRule: Never use emojis, icons or visual symbols in the output message. Keep it clean and text-only."),
-                HumanMessage(content=prompt_text)
-            ])
-            content_text = ""
-            if isinstance(response.content, list):
-                content_text = "\n".join(
-                    part.get("text", "") if isinstance(part, dict) else str(part)
-                    for part in response.content
-                )
-            else:
-                content_text = str(response.content)
-            msg = content_text.strip()
+            response = provider.complete(
+                [
+                    {
+                        "role": "system",
+                        "content": get_base_persona() + "\nRule: Never use emojis, icons or visual symbols in the output message. Keep it clean and text-only.",
+                    },
+                    {"role": "user", "content": prompt_text},
+                ],
+                temperature=0.3,
+            )
+            msg = (response.text or "").strip()
             print(f"  [DailyReminder] Generated with LLM summary.")
         except Exception as e:
             print(f"  [DailyReminder] LLM call failed, falling back: {e}")
@@ -865,40 +877,6 @@ def daily_reminder_node(state: StudyPulseState) -> StudyPulseState:
     metadata["reminder_generator"] = "llm_summary"
     
     return {**state, "daily_reminder": reminder, "final_response": msg, "metadata": metadata}
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# MOCK EXTRACTION (prototype only — replace with LLM structured output)
-# ═══════════════════════════════════════════════════════════════════════════
-
-def _mock_extract(text: str, source: str, language: str) -> list[dict]:
-    """Mock extraction for prototype. Production: use .with_structured_output()."""
-    items = []
-    deadline_patterns = [
-        (r"(?:deadline|hạn nộp|hạn chót)[:\s]*(.+?)(?:\n|$)", "deadline"),
-        (r"(?:nộp bài|submit)[:\s]*(.+?)(?:\n|$)", "assignment"),
-        (r"(?:thi|exam|kiểm tra)[:\s]*(.+?)(?:\n|$)", "exam"),
-        (r"(?:lịch học|schedule|buổi học)[:\s]*(.+?)(?:\n|$)", "schedule"),
-    ]
-    for pattern, category in deadline_patterns:
-        matches = re.findall(pattern, text, re.IGNORECASE)
-        for match in matches:
-            item = ExtractedItem(
-                source_platform=(
-                    SourcePlatform(source)
-                    if source in [e.value for e in SourcePlatform]
-                    else SourcePlatform.DIRECT_INPUT
-                ),
-                source_message_id=str(uuid.uuid4()),
-                category=ItemCategory(category),
-                title=match.strip()[:200],
-                confidence_score=0.88,
-                language_detected=Language(language),
-                pii_masked=True,
-                raw_snippet=text[:500],
-            ).model_dump()
-            items.append(item)
-    return items
 
 
 # ═══════════════════════════════════════════════════════════════════════════

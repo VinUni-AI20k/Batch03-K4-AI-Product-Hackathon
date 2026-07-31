@@ -109,10 +109,31 @@ async def leave_guild(guild_id: Optional[str] = None) -> str:
 # Channel management
 # ---------------------------------------------------------------------------
 
-@mcp.tool(name="list_channels", description="List all channels in the server, grouped by category")
-async def list_channels(guild_id: Optional[str] = None) -> str:
+@mcp.tool(
+    name="list_channels",
+    description=(
+        "List all channels in the server, grouped by category. output='text' (default) returns a "
+        "formatted listing for chat; output='json' returns structured records (id, name, type, "
+        "category) for ingestion callers."
+    ),
+)
+async def list_channels(guild_id: Optional[str] = None, output: str = "text") -> str:
+    if output not in ("text", "json"):
+        raise ValueError("output must be 'text' or 'json'")
     guild = await discord_bot.resolve_guild(guild_id)
     channels = sorted(guild.channels, key=lambda c: (c.position if hasattr(c, "position") else 0))
+
+    if output == "json":
+        return json.dumps([
+            {
+                "id": str(channel.id),
+                "name": getattr(channel, "name", ""),
+                "type": channel.type.name,
+                "category": channel.category.name if channel.category else "",
+            }
+            for channel in channels
+        ])
+
     if not channels:
         return "No channels found."
     lines = [f"**Found {len(channels)} channel(s):**"]
@@ -273,9 +294,27 @@ def _validate_cursors(before: Optional[str], after: Optional[str], around: Optio
         raise ValueError("before, after, and around are mutually exclusive; provide only one")
 
 
+def _message_json(message: discord.Message) -> dict:
+    """Structured form of one message — for ingestion callers that need to
+    chunk/paginate by message boundary, not free text. Mirrors
+    gmail_mcp/tools.py's output=json addition for the same reason."""
+    return {
+        "id": str(message.id),
+        "author": message.author.name,
+        "created_at": message.created_at.isoformat(),
+        "content": message.content,
+        "attachments": [a.filename for a in message.attachments],
+        "is_bot": bool(message.author.bot),
+    }
+
+
 @mcp.tool(
     name="read_messages",
-    description="Read message history from a specific channel, optionally paginated with before/after/around cursors",
+    description=(
+        "Read message history from a specific channel, optionally paginated with before/after/around "
+        "cursors. output='text' (default) returns a formatted listing for chat; output='json' returns "
+        "structured records (id, author, created_at, content, is_bot) for ingestion callers."
+    ),
 )
 async def read_messages(
     channel_id: str,
@@ -283,9 +322,12 @@ async def read_messages(
     before: Optional[str] = None,
     after: Optional[str] = None,
     around: Optional[str] = None,
+    output: str = "text",
 ) -> str:
     if not channel_id:
         raise ValueError("channelId cannot be empty")
+    if output not in ("text", "json"):
+        raise ValueError("output must be 'text' or 'json'")
     limit = _parse_message_count(count)
     _validate_cursors(before, after, around)
 
@@ -300,6 +342,10 @@ async def read_messages(
         history_kwargs["around"] = discord.Object(id=discord_bot.parse_id(around, "around"))
 
     messages = [m async for m in channel.history(**history_kwargs)]
+
+    if output == "json":
+        return json.dumps([_message_json(m) for m in messages])
+
     formatted = "\n".join(_format_message(m) for m in messages)
     return f"**Retrieved {len(messages)} messages:**\n{formatted}"
 
