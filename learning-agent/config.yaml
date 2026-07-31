@@ -25,7 +25,7 @@ llm:
   #   ollama      -> chạy local, không cần key · model vd: llama3.1
   #   custom      -> tự điền LLM_BASE_URL + LLM_API_KEY trong .env (bất kỳ endpoint OpenAI-compatible)
   provider: openai
-  model: gpt-4o-mini              # model dùng để CHAT (đổi theo provider ở trên)
+  model: gpt-5.4-mini            # model dùng để CHAT (đổi theo provider ở trên)
   structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng lúc nạp (có thể giữ rẻ)
   max_tool_rounds: 8
 
