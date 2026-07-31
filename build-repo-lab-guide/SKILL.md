@@ -324,3 +324,31 @@ Lead with the created file. Briefly summarize:
 
 Do not dump the full audit process. Keep source-path evidence in the artifact
 so another coach can review the conclusions.
+
+## Evaluation Criteria
+
+1. Repository Grounding
+- Every referenced file exists.
+- Every command is executable.
+- No hallucinated paths.
+
+2. Completeness
+- Covers all required tasks.
+- Covers setup, execution, validation, deliverables.
+
+3. Actionability
+- Every task contains:
+    - exact file
+    - exact command
+    - validation
+    - expected outcome
+
+4. Coordination
+- No overlapping ownership.
+- Dependencies respected.
+- Parallel tasks are actually independent.
+
+5. Hallucination
+- No nonexistent files.
+- No nonexistent commands.
+- No invented dependencies.
