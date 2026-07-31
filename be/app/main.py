@@ -219,15 +219,28 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
             try:
                 needs_translation = chat_request.language_code != VIETNAMESE
                 translation_consent = chat_request.translation_consent or state.get("translation_consent", False)
-                if needs_translation and not translation_consent:
-                    yield sse("translation.consent_required", {"provider": settings.translation_provider_name})
-                    return
-                canonical_message = await app.state.translation_service.to_vietnamese(
-                    chat_request.message, chat_request.language_code,
+                has_trusted_context = bool(state.get("messages"))
+                preflight_injection = assess_prompt_injection(
+                    chat_request.message,
+                    has_trusted_context=has_trusted_context,
                 )
+                if preflight_injection.blocked:
+                    # Do not send an obvious attack to the translation provider.
+                    canonical_message = normalize_untrusted_text(chat_request.message)
+                    injection = preflight_injection
+                else:
+                    if needs_translation and not translation_consent:
+                        yield sse("translation.consent_required", {"provider": settings.translation_provider_name})
+                        return
+                    canonical_message = await app.state.translation_service.to_vietnamese(
+                        chat_request.message, chat_request.language_code,
+                    )
+                    injection = assess_prompt_injection(
+                        canonical_message,
+                        has_trusted_context=has_trusted_context,
+                    )
                 normalized_message = normalize_untrusted_text(canonical_message).casefold()
                 repeated_user_message = normalized_message == state.get("last_user_message_normalized")
-                injection = assess_prompt_injection(canonical_message)
                 if injection.blocked:
                     answer = (
                         "Yêu cầu bất thường này đã lặp lại và tiếp tục bị chặn. Không có tool, quyền hay thao tác phê duyệt nào được thực thi."
@@ -237,11 +250,16 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     )
                     blocked_state = {
                         **state,
-                        "messages": [
-                            *state.get("messages", []),
-                            {"role": "user", "content": canonical_message},
-                            {"role": "assistant", "content": answer},
-                        ][-12:],
+                        # Raw attack text is quarantined and never appended to the
+                        # model-visible conversation on later turns.
+                        "security_events": [
+                            *state.get("security_events", []),
+                            {
+                                "input_hash": hashlib.sha256(canonical_message.encode("utf-8")).hexdigest(),
+                                "risk_score": injection.risk_score,
+                                "reasons": injection.reasons,
+                            },
+                        ][-10:],
                         "last_user_message_normalized": normalized_message,
                         "security_event_count": int(state.get("security_event_count", 0)) + 1,
                     }
@@ -353,6 +371,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     "selection_filters": turn_state.get("selection_filters", {}),
                     "pending_filter": turn_state.get("pending_filter"),
                     "locality_required": turn_state.get("locality_required", False),
+                    "original_query": turn_state.get("original_query"),
                 })
                 reply, form_patch = await maybe_fill_form(
                     {**turn_state, "language_code": VIETNAMESE}, result, settings, app.state.procedure_pipeline.procedure_settings, messages,
@@ -439,6 +458,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     "pending_filter": result.get("pending_filter"),
                     "locality_required": result.get("locality_required", False),
                     "administrative_area_code": result.get("administrative_area_code"),
+                    "original_query": result.get("original_query"),
                     "form_draft": {**turn_state.get("form_draft", {}), form_code: form_patch["fields"]} if form_patch else turn_state.get("form_draft", {}),
                     "last_validation": turn_state.get("last_validation", {}),
                     "agent_workflow": workflow or turn_state.get("agent_workflow"),

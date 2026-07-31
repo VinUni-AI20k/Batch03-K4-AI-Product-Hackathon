@@ -152,6 +152,51 @@ async def test_unresolved_request_explicitly_discloses_uncertainty(catalog: Proc
 
 
 @pytest.mark.asyncio
+async def test_unsupported_passport_request_abstains_without_taxonomy_drift(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Tôi muốn đăng ký cấp hộ chiếu"}],
+    })
+
+    assert result["reply"].confidence_reasons == ["procedure_not_identified"]
+    assert "không tìm thấy thông tin đủ tin cậy" in result["reply"].answer.lower()
+    assert result["reply"].quick_replies == []
+    assert result["citations"] == []
+    assert result["active_procedure_code"] is None
+
+
+@pytest.mark.asyncio
+async def test_control_reply_is_never_used_as_retrieval_content(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Cần hỏi thêm"}],
+        "candidate_codes": [record.code for record in catalog.records],
+        "pending_filter": "audience",
+        "selection_filters": {},
+        "original_query": "Tôi muốn đăng ký cấp hộ chiếu",
+    })
+
+    assert result["reply"].confidence_reasons == ["control_action_requires_clarification"]
+    assert result["candidate_codes"] == []
+    assert result["citations"] == []
+
+
+@pytest.mark.asyncio
+async def test_new_unrelated_topic_clears_stale_active_procedure(catalog: ProcedureCatalog) -> None:
+    pipeline = ProcedurePipeline(catalog)
+    result = await pipeline.ainvoke({
+        "messages": [{"role": "user", "content": "Tôi muốn đăng ký cấp hộ chiếu"}],
+        "active_procedure_code": "5.003859",
+        "candidate_codes": ["5.003859"],
+        "original_query": "Thủ tục 5.003859 cần hồ sơ gì",
+    })
+
+    assert result["active_procedure_code"] is None
+    assert result["citations"] == []
+    assert result["reply"].confidence_reasons == ["procedure_not_identified"]
+
+
+@pytest.mark.asyncio
 async def test_pipeline_refuses_unauthorized_signature_and_submission(catalog: ProcedureCatalog) -> None:
     pipeline = ProcedurePipeline(catalog)
     result = await pipeline.ainvoke({

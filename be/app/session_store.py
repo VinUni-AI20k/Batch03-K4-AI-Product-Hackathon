@@ -30,6 +30,7 @@ class SessionStore:
             "pending_filter": None,
             "locality_required": False,
             "administrative_area_code": None,
+            "original_query": None,
             "form_draft": {},
             "last_validation": {},
             "simulated_submissions": [],
@@ -39,6 +40,7 @@ class SessionStore:
             "last_user_message_normalized": None,
             "last_assistant_answer_normalized": None,
             "security_event_count": 0,
+            "security_events": [],
         }
         await self.redis.set(self.key(session_id), json.dumps(state), ex=self.ttl_seconds)
         return session_id
