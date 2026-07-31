@@ -264,6 +264,7 @@ button {
   min-height: 0;
 }
 
+/* Notebook Ruled Paper Styling */
 .note-textarea {
   flex: 1;
   width: 100%;
@@ -277,7 +278,7 @@ button {
   line-height: 28px;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--ink);
+  color: #0f172a;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   resize: none;
   outline: none;
@@ -1070,6 +1071,61 @@ button {
   background: #f8fafc;
 }
 
+/* Chat Empty State Centered */
+.chat-empty-state {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px 16px;
+  user-select: none;
+}
+
+.empty-state-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(18, 79, 140, 0.08);
+  border: 1px solid rgba(18, 79, 140, 0.12);
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+
+.empty-state-logo:hover {
+  transform: scale(1.05);
+}
+
+.empty-state-logo img {
+  width: 32px;
+  height: 32px;
+}
+
+.empty-state-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.empty-state-title .v-letter {
+  color: var(--red);
+}
+
+.empty-state-desc {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 220px;
+  line-height: 1.45;
+}
+
 .chat-context-tag {
   align-self: flex-start;
   font-size: 0.65rem;
@@ -1259,12 +1315,13 @@ button {
 
 .tutor-input-box {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 6px 6px 6px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 8px 10px;
   transition: all 0.2s ease;
 }
 
@@ -1272,6 +1329,52 @@ button {
   border-color: var(--blue-light);
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tutor-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.input-chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.input-chip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  color: #334155;
+  font-size: 0.74rem;
+  font-weight: 700;
+  animation: fadeIn 0.2s ease;
+  user-select: none;
+}
+
+.input-chip-badge svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.input-chip-badge .chip-close {
+  cursor: pointer;
+  margin-left: 2px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.input-chip-badge .chip-close:hover {
+  color: var(--red);
 }
 
 .tutor-input-field {

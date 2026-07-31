@@ -237,8 +237,13 @@ function updateNotesPanelUI() {
   if (pageNumEl) pageNumEl.textContent = currentPage;
 
   const textareaInput = document.getElementById('note-textarea-input');
-  if (textareaInput && document.activeElement !== textareaInput) {
+  if (textareaInput) {
     textareaInput.value = pageTextNotes[currentPage] || '';
+  }
+
+  const chipSpan = document.querySelector('#note-ai-chip span');
+  if (chipSpan) {
+    chipSpan.textContent = `Slide Trang ${currentPage}: Ghi chú bằng AI`;
   }
 
   renderSavedNotesList();
@@ -305,6 +310,108 @@ function renderSavedNotesList() {
     `;
     container.appendChild(card);
   });
+}
+
+function stripMarkdownForNote(text) {
+  if (!text) return '';
+  let cleaned = text
+    .replace(/\[WRITE_NOTE:\s*([\s\S]*?)\]/gi, '$1')
+    .replace(/\[(?:T\d+-\d+|Slide\s*\d+|Trang\s*\d+)\]/gi, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__(.*?)__/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/_(.*?)_/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .trim();
+
+  // Loại bỏ các câu hội thoại giao tiếp thừa
+  let lines = cleaned.split('\n');
+  let filtered = lines.filter(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    if (/^(tiêu đề slide là|dưới đây là|bạn có thể|nếu bạn muốn|rất tiếc|hi vọng|dựa vào slide|ngữ cảnh chỉ nói về)/i.test(trimmed)) {
+      return false;
+    }
+    if (trimmed.endsWith(':') && !trimmed.includes('-') && !trimmed.includes('•')) {
+      return false;
+    }
+    return true;
+  });
+
+  return (filtered.length > 0 ? filtered.join('\n') : cleaned).trim();
+}
+
+let noteTypewriterInterval = null;
+
+function typewriterEffectOnNote(fullText, onComplete) {
+  const textareaInput = document.getElementById('note-textarea-input');
+  if (!textareaInput) return;
+
+  if (noteTypewriterInterval) {
+    clearInterval(noteTypewriterInterval);
+    noteTypewriterInterval = null;
+  }
+
+  // Tự động chuyển sang tab Ghi chú bên trái để người dùng quan sát hiệu ứng chữ chạy
+  const notesTabBtn = document.querySelector('.sidebar-tab-btn[data-tab="notes"]');
+  if (notesTabBtn && !notesTabBtn.classList.contains('active')) {
+    switchSidebarTab('notes');
+  }
+
+  textareaInput.value = '';
+  let index = 0;
+  const speed = 18; // Hiệu ứng chữ chạy mượt mà 18ms / ký tự
+
+  noteTypewriterInterval = setInterval(() => {
+    if (index < fullText.length) {
+      textareaInput.value += fullText.charAt(index);
+      index++;
+      pageTextNotes[currentPage] = textareaInput.value;
+      textareaInput.scrollTop = textareaInput.scrollHeight;
+      if (typeof autoSaveCurrentNote === 'function') autoSaveCurrentNote();
+    } else {
+      clearInterval(noteTypewriterInterval);
+      noteTypewriterInterval = null;
+      if (typeof onComplete === 'function') onComplete();
+    }
+  }, speed);
+}
+
+function removeAINoteChip() {
+  const chipContainer = document.getElementById('input-chip-container');
+  if (chipContainer) chipContainer.innerHTML = '';
+  const input = document.getElementById('tutor-input');
+  if (input) input.placeholder = 'Nhập câu hỏi hoặc bôi đen tài liệu...';
+}
+
+function generateAINoteForCurrentPage() {
+  // 1. Mở khung Chatbot VLearn Tutor bên phải nếu đang thu gọn
+  const panel = document.querySelector('.tutor-panel');
+  if (panel && panel.classList.contains('collapsed')) {
+    toggleTutorPanel();
+  }
+
+  // 2. Hiển thị thẻ Chip Badge đính kèm ở ô nhập Chat (Duy trì cố định)
+  const chipContainer = document.getElementById('input-chip-container');
+  if (chipContainer) {
+    chipContainer.innerHTML = `
+      <div class="input-chip-badge" id="note-ai-chip">
+        <svg xmlns="http://www.w3.org/2000/svg" class="chip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Slide Trang ${currentPage}: Ghi chú bằng AI</span>
+        <span class="chip-close" onclick="removeAINoteChip()">&times;</span>
+      </div>
+    `;
+  }
+
+  // 3. Để trống ô nhập văn bản và con trỏ sẵn sàng chờ người dùng gõ
+  const input = document.getElementById('tutor-input');
+  if (input) {
+    input.value = '';
+    input.placeholder = `Nhập yêu cầu hoặc câu hỏi cho Slide Trang ${currentPage}...`;
+    input.focus();
+  }
 }
 
 function askTutorAboutNote() {
@@ -693,6 +800,13 @@ function sendTutorMsg(e) {
   const chatBody = document.getElementById('tutor-chat-body');
   if (!chatBody) return;
 
+  const emptyState = document.getElementById('chat-empty-state');
+  if (emptyState) emptyState.remove();
+
+  // Kiểm tra nếu thẻ chip đính kèm đang kích hoạt hoặc câu lệnh có từ khóa ghi chú
+  const chipBadge = document.getElementById('note-ai-chip') || document.querySelector('.input-chip-badge');
+  const isNoteRequest = !!chipBadge || /ghi chú|note|lưu note|tạo note|ghi chép|đọc slide.*ghi chú/i.test(text);
+
   // Append context tag
   const userTag = document.createElement('div');
   userTag.className = 'chat-context-tag';
@@ -706,8 +820,6 @@ function sendTutorMsg(e) {
   chatBody.appendChild(userMsg);
 
   input.value = '';
-  chatBody.scrollTop = chatBody.scrollHeight;
-
   chatBody.scrollTop = chatBody.scrollHeight;
 
   // Hiển thị hiệu ứng AI đang suy nghĩ (Thinking Indicator Animation)
@@ -784,7 +896,6 @@ function sendTutorMsg(e) {
         })
       });
 
-      
       const dataApi = await resApi.json();
       if (dataApi.error) {
         if (dataApi.error.message && dataApi.error.message.includes("API key")) {
@@ -812,6 +923,23 @@ function sendTutorMsg(e) {
     if (thinkingCard && thinkingCard.parentNode) {
       thinkingCard.remove();
     }
+
+    // Kiểm tra thẻ lệnh [WRITE_NOTE: ...] hoặc tự động lưu note nếu đây là yêu cầu ghi chú
+    const noteMatch = (answerText || '').match(/\[WRITE_NOTE:\s*([\s\S]*?)\]/i);
+    let noteContentToSave = '';
+
+    if (noteMatch) {
+      noteContentToSave = noteMatch[1].trim();
+      answerText = (answerText || '').replace(/\[WRITE_NOTE:\s*[\s\S]*?\]/gi, '').trim();
+    } else if (isNoteRequest) {
+      noteContentToSave = (answerText || '').trim();
+    }
+
+    if (noteContentToSave) {
+      const cleanNoteText = stripMarkdownForNote(noteContentToSave);
+      typewriterEffectOnNote(cleanNoteText);
+    }
+
     const contextTag = document.createElement('div');
     contextTag.className = 'chat-context-tag';
     contextTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
@@ -996,6 +1124,7 @@ window.switchSidebarTab = switchSidebarTab;
 window.autoSaveCurrentNote = autoSaveCurrentNote;
 window.clearCurrentPageNote = clearCurrentPageNote;
 window.askTutorAboutNote = askTutorAboutNote;
+window.generateAINoteForCurrentPage = generateAINoteForCurrentPage;
 
 // ============================================
 // Initial Load
