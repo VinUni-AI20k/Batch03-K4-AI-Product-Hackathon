@@ -1,0 +1,123 @@
+{
+  "module": "quiz_generation_langgraph",
+  "entrypoint": "POST /api/generate-quiz",
+  "implementation": ["codebase/quiz_agent.py::run_quiz_agent", "codebase/api_server.py::validate_quiz"],
+  "description": "Đánh giá quiz sinh từ transcript: schema, nguồn, giới hạn scope, retry LangGraph và quiz củng cố theo focus topic.",
+  "common_success_assertions": [
+    "agent equals langgraph_transcript_quiz",
+    "ai_generated equals true",
+    "trace_id is non-empty",
+    "every question has non-empty question and explanation",
+    "every question has exactly 4 options",
+    "every correct index is an integer from 0 to 3",
+    "every source_id is a subset of request.source_ids"
+  ],
+  "cases": [
+    {
+      "id": "QZ-01",
+      "class": "happy_path",
+      "execution": "api",
+      "request": {"lesson_title": "Day03 — Agentic AI", "source_ids": ["T03-030", "T03-031", "T03-032"]},
+      "expected_http_status": 200,
+      "expected_status": ["OK", "INSUFFICIENT_EVIDENCE"],
+      "assertions": ["if status is OK then questions length equals 15", "if status is INSUFFICIENT_EVIDENCE then questions equals []", "quiz_kind equals teacher_release_draft"],
+      "manual_checks": ["Nếu OK: hai reviewer xác nhận mỗi câu và đáp án có nguồn hỗ trợ", "Không có trivia hoặc câu đánh đố"]
+    },
+    {
+      "id": "QZ-02",
+      "class": "reinforcement_focus",
+      "execution": "api",
+      "request": {"lesson_title": "Day03 — Quiz củng cố", "source_ids": ["T03-034", "T03-035"], "focus_topics": ["Tool calling & phần xác định"], "focus_source_ids": ["T03-034", "T03-035"], "question_count": 5},
+      "expected_http_status": 200,
+      "expected_status": ["OK", "INSUFFICIENT_EVIDENCE"],
+      "assertions": ["if status is OK then questions length equals 5", "if status is OK then every source_id belongs to T03-034 or T03-035", "quiz_kind equals reinforcement"],
+      "manual_checks": ["Nội dung chỉ kiểm tra Tool calling/phần xác định, không lạc sang topic khác"]
+    },
+    {
+      "id": "QZ-03",
+      "class": "out_of_scope",
+      "execution": "api",
+      "request": {"purpose": "official_exam", "source_ids": ["T03-030", "T03-031", "T03-032"]},
+      "expected_http_status": 200,
+      "expected_status": "OUT_OF_SCOPE",
+      "assertions": ["ai_generated equals false", "message says quiz/credit are practice-only", "no OpenAI call", "no trace is created"]
+    },
+    {
+      "id": "QZ-04",
+      "class": "out_of_scope",
+      "execution": "api",
+      "request": {"purpose": "graded_assessment", "source_ids": ["T03-030"]},
+      "expected_http_status": 200,
+      "expected_status": "OUT_OF_SCOPE",
+      "assertions": ["ai_generated equals false", "no OpenAI call"]
+    },
+    {
+      "id": "QZ-05",
+      "class": "source_truth",
+      "execution": "api",
+      "request": {"source_ids": ["T03-030", "T99-999", "T03-032"]},
+      "expected_http_status": 400,
+      "expected_status": "ERROR",
+      "assertions": ["message identifies missing source ID", "no quiz is rendered", "no OpenAI call"]
+    },
+    {
+      "id": "QZ-06",
+      "class": "source_truth",
+      "execution": "api",
+      "request": {"source_ids": ["T99-001", "T99-002"]},
+      "expected_http_status": 400,
+      "expected_status": "ERROR",
+      "assertions": ["no OpenAI call", "no trace is created"]
+    },
+    {
+      "id": "QZ-07",
+      "class": "input_validation",
+      "execution": "api",
+      "request": {"source_ids": ["T03-030"], "question_count": 2},
+      "expected_http_status": 400,
+      "expected_status": "ERROR",
+      "assertions": ["message says question_count must be 3–15", "no OpenAI call"]
+    },
+    {
+      "id": "QZ-08",
+      "class": "input_validation",
+      "execution": "api",
+      "request": {"source_ids": ["T03-030"], "question_count": 16},
+      "expected_http_status": 400,
+      "expected_status": "ERROR",
+      "assertions": ["message says question_count must be 3–15", "no OpenAI call"]
+    },
+    {
+      "id": "QZ-09",
+      "class": "insufficient_evidence",
+      "execution": "unit_mock",
+      "fixture": {"generator_output": {"status": "INSUFFICIENT_EVIDENCE", "questions": [], "message": "Một đoạn không đủ căn cứ"}, "allowed_source_ids": ["T03-030"], "question_count": 5},
+      "expected_result": {"status": "INSUFFICIENT_EVIDENCE", "questions": []},
+      "assertions": ["result preserves a non-empty message", "no invalid question is rendered"]
+    },
+    {
+      "id": "QZ-10",
+      "class": "schema_guardrail",
+      "execution": "unit_mock",
+      "fixture": {"generator_output": {"status": "OK", "questions": [{"question": "Q", "options": ["A", "B", "C"], "correct": 1, "explanation": "E", "source_ids": ["T03-030"]}]}, "allowed_source_ids": ["T03-030"], "question_count": 1},
+      "expected_exception": "ValueError",
+      "assertions": ["message says every question requires 4 options", "invalid output is never returned to frontend"]
+    },
+    {
+      "id": "QZ-11",
+      "class": "schema_guardrail",
+      "execution": "unit_mock",
+      "fixture": {"generator_output": {"status": "OK", "questions": [{"question": "Q", "options": ["A", "B", "C", "D"], "correct": 1, "explanation": "E", "source_ids": ["T99-999"]}]}, "allowed_source_ids": ["T03-030"], "question_count": 1},
+      "expected_exception": "ValueError",
+      "assertions": ["message says source ID is invalid", "invalid output is never returned to frontend"]
+    },
+    {
+      "id": "QZ-12",
+      "class": "langgraph_retry_and_failure",
+      "execution": "unit_mock",
+      "fixture": "loader raises ValueError('Không có transcript')",
+      "expected_exception": "RuntimeError",
+      "assertions": ["error mentions transcript retrieval", "graph exits within configured recursion limit", "generator is not called without chunks"]
+    }
+  ]
+}

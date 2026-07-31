@@ -1,0 +1,109 @@
+{
+  "module": "delta_credit_and_in_quiz_quota",
+  "entrypoint": "codebase/app.js::renderResults and askQuizAgent",
+  "description": "Kiểm tra công bằng của Delta Mastery, cap credit và quota trong quiz. Đây là browser/state test, không cần gọi API thật trừ khi case ghi rõ.",
+  "constants": {"credit_cap": 20, "first_round_score_threshold": 12, "delta_threshold_percent": 10, "per_round_credit_cap": 3},
+  "cases": [
+    {
+      "id": "CRD-01",
+      "class": "first_round_reward",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": null, "quizType": "published", "score": 12},
+      "expected_state": {"credits": 8, "award": 1, "reason_contains": "12/15"},
+      "assertions": ["credit is awarded once", "UI displays current/max credit"]
+    },
+    {
+      "id": "CRD-02",
+      "class": "first_round_no_reward",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": null, "quizType": "published", "score": 11},
+      "expected_state": {"credits": 7, "award": 0},
+      "assertions": ["reward message explains the 12/15 threshold"]
+    },
+    {
+      "id": "CRD-03",
+      "class": "positive_delta",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": [{"id": "tool", "percent": 50}, {"id": "rag", "percent": 50}]},
+      "current_mastery": [{"id": "tool", "percent": 60}, {"id": "rag", "percent": 50}],
+      "expected_state": {"credits": 8, "award": 1, "reason_contains": "Delta +10%"},
+      "assertions": ["delta is calculated from the same topic IDs only"]
+    },
+    {
+      "id": "CRD-04",
+      "class": "delta_below_threshold",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": [{"id": "tool", "percent": 50}]},
+      "current_mastery": [{"id": "tool", "percent": 59}],
+      "expected_state": {"credits": 7, "award": 0},
+      "assertions": ["9% improvement does not earn a credit"]
+    },
+    {
+      "id": "CRD-05",
+      "class": "per_round_cap",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": [{"id": "tool", "percent": 0}]},
+      "current_mastery": [{"id": "tool", "percent": 100}],
+      "expected_state": {"credits": 10, "award": 3},
+      "assertions": ["100% delta does not grant more than 3 credits in one round"]
+    },
+    {
+      "id": "CRD-06",
+      "class": "global_cap",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 19, "previousMastery": [{"id": "tool", "percent": 0}]},
+      "current_mastery": [{"id": "tool", "percent": 30}],
+      "expected_state": {"credits": 20, "award_visible": 1},
+      "assertions": ["credits never exceed 20"]
+    },
+    {
+      "id": "CRD-07",
+      "class": "net_growth_fairness",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "previousMastery": [{"id": "tool", "percent": 40}, {"id": "rag", "percent": 80}]},
+      "current_mastery": [{"id": "tool", "percent": 60}, {"id": "rag", "percent": 60}],
+      "expected_current_result": "FAIL_UNTIL_FIXED",
+      "expected_state": {"credits": 7, "award": 0},
+      "assertions": ["credit uses net mastery improvement, not only the sum of positive topic changes"],
+      "rationale": "Tăng 20% ở một topic nhưng giảm 20% ở topic khác không phải tăng trưởng tổng thể."
+    },
+    {
+      "id": "CRD-08",
+      "class": "reinforcement_no_credit",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 7, "quizType": "reinforcement", "score": 5},
+      "expected_state": {"credits": 7, "award": 0},
+      "assertions": ["quiz củng cố only supports review and does not change credit"]
+    },
+    {
+      "id": "CRD-09",
+      "class": "quota_consumption",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 2, "activeQuiz": "one valid question"},
+      "action": "submit one valid in-quiz question",
+      "expected_state": {"credits": 1},
+      "assertions": ["exactly one quota is consumed", "visible quota updates before or with request"]
+    },
+    {
+      "id": "CRD-10",
+      "class": "validator_block_refund",
+      "execution": "browser_manual_with_stubbed_api",
+      "initial_state": {"credits": 2},
+      "stubbed_api_payload": {"status": "OK", "is_safe": false, "answer": "Xin lỗi, câu hỏi này nằm ngoài khả năng của mình."},
+      "expected_current_result": "FAIL_UNTIL_FIXED",
+      "expected_state": {"credits": 2},
+      "assertions": ["a validator-blocked response does not consume learner quota", "UI explains that no quota was charged"],
+      "rationale": "v2/spec.md §4 says a response that fails validator must not count against quota."
+    },
+    {
+      "id": "CRD-11",
+      "class": "pre_charge_transparency",
+      "execution": "browser_manual",
+      "initial_state": {"credits": 2},
+      "action": "open in-quiz assistant then attempt to send a question",
+      "expected_current_result": "FAIL_UNTIL_FIXED",
+      "assertions": ["before confirmation, UI states one quota will be spent and shows remaining quota", "learner can cancel without a deduction"],
+      "rationale": "Required by G16 in v2/spec.md."
+    }
+  ]
+}
