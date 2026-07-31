@@ -28,7 +28,27 @@ def _setup(cfg):
         cfg.get("index", "collection", default="lessons"),
         make_embedder(cfg),
     )
+    _ensure_indexed(cfg, vault, index)
     return vault, index
+
+
+def _ensure_indexed(cfg, vault, index) -> None:
+    """Cài đặt là DÙNG ĐƯỢC NGAY: repo đã bundle sẵn vault (bài học); lần đầu chạy mà index còn
+    rỗng thì tự embed toàn bộ kho có sẵn (một lần) — khớp đúng embedder người dùng vừa cấu hình."""
+    try:
+        if index.collection.count() > 0:
+            return
+        notes = list(vault.notes("courses"))
+        if not notes:
+            return
+        emb = "Voyage" if cfg.voyage_api_key else "local (miễn phí)"
+        print(f"🔎 Lần đầu chạy — đang index {len(notes)} bài học có sẵn trong repo bằng embedding {emb} "
+              "(một lần, chờ chút)...", flush=True)
+        from .updater.sync import reindex_all
+        n = reindex_all(cfg, vault, index)
+        print(f"✅ Kho kiến thức sẵn sàng — {n} đoạn. Agent trả lời được ngay.", flush=True)
+    except Exception as e:  # lỗi index không được chặn agent khởi động
+        print(f"⚠️ Chưa tự index được kho kiến thức ({e}). Chạy tay: learning-agent reindex", flush=True)
 
 
 def main() -> None:

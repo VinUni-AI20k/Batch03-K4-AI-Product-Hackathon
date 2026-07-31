@@ -40,10 +40,14 @@ learning-agent onboard || true
 cat <<'EOF'
 
 ────────────────────────────────────────────────
-✅ Cài xong. Tiếp theo:
+✅ Cài xong. Repo đã kèm sẵn KHO KIẾN THỨC (thư mục vault/) — lần đầu chạy bot/ui
+   sẽ TỰ ĐỘNG index để dùng được ngay (không cần nạp lại).
+
+Tiếp theo:
   1. Mở .env điền: LLM key (theo provider trong config.yaml), TELEGRAM_BOT_TOKEN/DISCORD_BOT_TOKEN
+     (VOYAGE_API_KEY tuỳ chọn — bỏ trống sẽ dùng embedding local miễn phí)
   2. Kích hoạt môi trường:   source .venv/bin/activate
-  3. Chạy bot:               learning-agent bot
+  3. Chạy bot:               learning-agent bot   (lần đầu tự index kho kiến thức, chờ chút)
   4. Dashboard (cửa sổ khác): learning-agent ui   → http://127.0.0.1:8321
 ────────────────────────────────────────────────
 EOF

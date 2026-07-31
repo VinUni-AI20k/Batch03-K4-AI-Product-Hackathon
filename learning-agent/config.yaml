@@ -25,12 +25,14 @@ llm:
   #   ollama      -> chạy local, không cần key · model vd: llama3.1
   #   custom      -> tự điền LLM_BASE_URL + LLM_API_KEY trong .env (bất kỳ endpoint OpenAI-compatible)
   provider: openai
-  model: gpt-4o-mini              # model dùng để CHAT (đổi theo provider ở trên)
+  model: gpt-5.4-mini            # model dùng để CHAT (đổi theo provider ở trên)
   structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng lúc nạp (có thể giữ rẻ)
   max_tool_rounds: 8
 
 asr:
-  model: vinai/PhoWhisper-large   # đổi sang đường dẫn bản CTranslate2 khi convert xong
+  # faster-whisper cần model CTranslate2. Dùng bản chuẩn: large-v3 (chất lượng cao, chậm)
+  # hoặc medium (nhanh ~0.5x realtime, tiếng Việt vẫn tốt). PhoWhisper phải convert CT2 trước khi dùng.
+  model: medium
   language: vi
 
 discord:
