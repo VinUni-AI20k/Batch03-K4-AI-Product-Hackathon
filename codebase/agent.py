@@ -626,10 +626,16 @@ GIỚI HẠN (BOUNDARIES):
 
 VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ ràng. Dùng tiếng Việt chuẩn."""
 
-    def _agent_loop_openai(self, query: str, guardrail_prefix: str) -> Tuple[str, List[Dict]]:
+    def _agent_loop_openai(self, query: str, guardrail_prefix: str, user_email: str = "", user_role: str = "") -> Tuple[str, List[Dict]]:
         """Vòng lặp Agent OpenAI Function Calling. Trả về (answer, tool_citations)."""
+        system_content = self.SYSTEM_PROMPT
+        if user_role == 'admin':
+            system_content += "\n\nLƯU Ý ĐẶC BIỆT: Người đang chat với bạn có vai trò là ADMIN của hệ thống. Hãy cung cấp câu trả lời ngắn gọn, súc tích, đi thẳng vào vấn đề quản trị nếu cần thiết, và hỗ trợ họ ở mức tối đa."
+        else:
+            system_content += f"\n\nLƯU Ý: Người đang chat là {user_role} với email {user_email}."
+
         messages = [
-            {"role": "system", "content": self.SYSTEM_PROMPT},
+            {"role": "system", "content": system_content},
             {"role": "user", "content": query}
         ]
 
@@ -681,8 +687,8 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
 
         return "Đã xử lý nhưng không tạo được câu trả lời cuối. Vui lòng thử lại.", all_tool_results
 
-    def _fallback_answer(self, query: str, guardrail_prefix: str) -> Tuple[str, List[Dict]]:
-        """Fallback: dùng RAG + Gemini/Anthropic hoặc local match. Lấy top_k=8 từ toàn bộ MongoDB KB."""
+    def _fallback_answer(self, query: str, guardrail_prefix: str, user_email: str = "", user_role: str = "") -> Tuple[str, List[Dict]]:
+        """Fallback LLM prompt khi không dùng OpenAI Function Calling."""
         retrieved = self._retrieve_relevant_docs(query, top_k=8)
         answer = guardrail_prefix + "\n\n---\n\n" if guardrail_prefix else ""
 
@@ -699,12 +705,13 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
                 self.SYSTEM_PROMPT + "\n\n"
                 f"=== DỮ LIỆU TỪ KNOWLEDGE BASE MONGODB ({len(retrieved)} tài liệu liên quan) ===\n"
                 f"{context}\n\n"
-                f"=== CÂU HỎI CỦA NGƯỜI DÙNG ===\n"
+                f"=== CÂU HỎI CỦA NGƯỜI DÙNG ({user_role} - {user_email}) ===\n"
                 f"{query}\n\n"
                 f"Hãy trả lời đầy đủ, chính xác và hữu ích nhất có thể dựa trên dữ liệu KB trên "
                 f"và kiến thức chuyên môn của bạn về AI/ML/lập trình. "
                 f"Nếu KB có dữ liệu liên quan hãy trích dẫn rõ nguồn. "
-                f"Nếu KB không đủ, hãy dùng kiến thức chuyên môn để bổ sung."
+                f"Nếu KB không đủ, hãy dùng kiến thức chuyên môn để bổ sung. Tuyệt đối không bịa đặt thông tin lịch học, chính sách."
+                f"{' Lưu ý: Người hỏi là ADMIN.' if user_role == 'admin' else ''}"
             )
             try:
                 if self.llm_provider == "gemini":
@@ -820,7 +827,7 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
     # Public API
     # ------------------------------------------------------------------
 
-    def ask(self, query: str) -> Dict[str, Any]:
+    def ask(self, query: str, user_email: str = "", user_role: str = "") -> Dict[str, Any]:
         # 0. Phát hiện câu hỏi giao tiếp đơn giản (chào hỏi, cảm ơn...) → KHÔNG gửi citations
         is_conversational = bool(self._CONVERSATIONAL_KW.search(query.strip()))
 
@@ -870,12 +877,12 @@ VĂN PHONG: Thân thiện, nhiệt huyết, chuyên nghiệp. Dùng Markdown rõ
 
         try:
             if self.llm_provider == "openai" and self.client:
-                answer_text, tool_citations = self._agent_loop_openai(query, guardrail_prefix)
+                answer_text, tool_citations = self._agent_loop_openai(query, guardrail_prefix, user_email, user_role)
             else:
-                answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix)
+                answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix, user_email, user_role)
         except Exception as e:
             print(f"[Error] Agent loop failed: {e}")
-            answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix)
+            answer_text, tool_citations = self._fallback_answer(query, guardrail_prefix, user_email, user_role)
 
         # 3. Chỉ gửi citations khi câu hỏi cần thông tin thực sự, không gửi cho câu giao tiếp
         if is_conversational:

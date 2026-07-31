@@ -37,6 +37,8 @@ except Exception:
 
 class ChatRequest(BaseModel):
     message: str
+    user_email: str = ""
+    user_role: str = "student"
 
 class ChatResponse(BaseModel):
     question: str
@@ -51,7 +53,7 @@ async def chat_with_agent(request: ChatRequest):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Câu hỏi không được để trống")
     try:
-        result = qa_agent.ask(request.message)
+        result = qa_agent.ask(request.message, user_email=request.user_email, user_role=request.user_role)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

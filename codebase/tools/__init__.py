@@ -18,6 +18,7 @@ from .format_code      import run as format_code,             SCHEMA as SCHEMA_F
 from .kb_stats         import run as get_kb_stats,            SCHEMA as SCHEMA_KB_STATS
 from .campus_info      import run as get_campus_info,         SCHEMA as SCHEMA_CAMPUS_INFO
 from .create_ticket    import run as create_ticket,           SCHEMA as SCHEMA_CREATE_TICKET
+from .get_course_schedule import run as get_course_schedule,  SCHEMA as SCHEMA_GET_COURSE_SCHEDULE
 
 ALL_SCHEMAS = [
     SCHEMA_SEARCH_KB,
@@ -33,6 +34,7 @@ ALL_SCHEMAS = [
     SCHEMA_KB_STATS,
     SCHEMA_CAMPUS_INFO,
     SCHEMA_CREATE_TICKET,
+    SCHEMA_GET_COURSE_SCHEDULE,
 ]
 
 TOOL_REGISTRY = {

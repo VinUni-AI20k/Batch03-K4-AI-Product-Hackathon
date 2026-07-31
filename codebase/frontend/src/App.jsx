@@ -168,10 +168,15 @@ export default function App() {
     setCitations([]);
 
     try {
+      const payload = {
+        message: text,
+        user_email: user?.email || 'guest',
+        user_role: user?.role || 'student'
+      };
       const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
