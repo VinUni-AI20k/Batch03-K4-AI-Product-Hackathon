@@ -293,16 +293,32 @@ button {
   margin: 0 4px;
 }
 
-/* Note Content Editable — thay thế textarea */
+/* Edge-to-Edge Notebook Editor Container */
+.notes-editor-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  position: relative;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Note Content Editable — Kẻ dòng vở ngang full chiều cao & khớp 100% với từng dòng chữ */
 .note-content-editable {
   flex: 1;
   width: 100%;
-  min-height: 200px;
-  padding: 14px 20px;
+  height: 100%;
+  min-height: 0;
+  padding: 0 16px 20px 16px;
   border: none;
   outline: none;
-  background: #ffffff;
-  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(226, 232, 240, 0.6) 28px);
+  background-color: #ffffff;
+  /* Kẻ dòng vở 28px phủ kín 100% full chiều cao và trượt chuẩn khi scroll */
+  background-image: linear-gradient(to bottom, transparent 27px, #e2e8f0 27px);
+  background-size: 100% 28px;
+  background-attachment: local; /* Kẻ dòng trượt cùng chữ khi scroll */
   line-height: 28px;
   font-size: 0.875rem;
   color: #0f172a;
@@ -319,32 +335,39 @@ button {
   pointer-events: none;
   font-weight: 400;
   font-style: italic;
+  line-height: 28px;
 }
 
-/* Heading styles trong note */
+/* Đảm bảo mọi thẻ bên trong (p, div, li, h1, h2) khớp hoàn hảo từng dòng kẻ 28px */
+.note-content-editable p,
+.note-content-editable div {
+  margin: 0;
+  padding: 0;
+  line-height: 28px;
+  min-height: 28px;
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+/* Heading styles trong note — căn chuẩn 28px grid */
 .note-content-editable h1 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #124f8c;
-  margin: 6px 0 4px;
-  line-height: 1.35;
-  border-bottom: 2px solid rgba(18, 79, 140, 0.15);
-  padding-bottom: 4px;
+  margin: 0;
+  padding: 0;
+  line-height: 28px;
+  min-height: 28px;
 }
 
 .note-content-editable h2 {
   font-size: 0.95rem;
   font-weight: 700;
   color: #1e40af;
-  margin: 8px 0 3px;
-  line-height: 1.35;
-}
-
-.note-content-editable p {
-  margin: 4px 0;
-  font-size: 0.875rem;
+  margin: 0;
+  padding: 0;
   line-height: 28px;
-  color: #0f172a;
+  min-height: 28px;
 }
 
 .note-content-editable strong {
@@ -358,22 +381,26 @@ button {
 }
 
 .note-content-editable ul {
-  margin: 4px 0 4px 18px;
-  padding: 0;
+  margin: 0;
+  padding: 0 0 0 20px;
   list-style: disc;
 }
 
 .note-content-editable ul li {
-  font-size: 0.875rem;
+  margin: 0;
+  padding: 0;
   line-height: 28px;
+  min-height: 28px;
+  font-size: 0.875rem;
   color: #0f172a;
-  margin: 1px 0;
 }
 
 .note-content-editable hr {
   border: none;
   border-top: 1.5px dashed #cbd5e1;
-  margin: 8px 0;
+  margin: 0;
+  height: 28px;
+  box-sizing: border-box;
 }
 
 .note-content-editable:focus {
@@ -417,11 +444,7 @@ button {
   box-shadow: 0 4px 12px rgba(18, 79, 140, 0.25);
 }
 
-.note-saved-status {
-  font-size: 0.68rem;
-  color: var(--emerald);
-  font-weight: 700;
-}
+
 
 /* Saved Notes Summary List */
 .saved-notes-section {

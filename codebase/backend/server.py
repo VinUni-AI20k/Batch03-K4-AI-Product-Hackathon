@@ -4,18 +4,22 @@ import json
 import datetime
 import re
 from pathlib import Path
+
+# Đảm bảo thư mục codebase/backend đứng vị trí đầu tiên trong sys.path,
+# loại bỏ root dir / CWD khỏi sys.path để tránh import nhầm folder tools/agents/api ở root repo
+BACKEND_DIR = Path(__file__).resolve().parent
+ROOT_DIR = BACKEND_DIR.parent.parent
+
+if str(BACKEND_DIR) in sys.path:
+    sys.path.remove(str(BACKEND_DIR))
+sys.path.insert(0, str(BACKEND_DIR))
+
+for p in ["", ".", str(ROOT_DIR), str(BACKEND_DIR.parent)]:
+    if p in sys.path:
+        sys.path.remove(p)
+
 from pydantic import BaseModel
 from typing import Optional
-
-# Thêm thư mục backend vào sys.path và ưu tiên tuyệt đối
-BACKEND_DIR = Path(__file__).resolve().parent
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
-
-# Đảm bảo không để ROOT_DIR làm nhiễu import của các folder con
-ROOT_DIR = BACKEND_DIR.parent.parent
-if str(ROOT_DIR) in sys.path:
-    sys.path.remove(str(ROOT_DIR))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
