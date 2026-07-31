@@ -413,6 +413,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Fullscreen Toggle Logic
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+
+    function toggleFullScreen() {
+        const doc = document;
+        const docEl = document.documentElement;
+
+        const isFull = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement || document.body.classList.contains('fullscreen-mode'));
+
+        if (!isFull) {
+            if (docEl.requestFullscreen) {
+                docEl.requestFullscreen().catch(() => {});
+            } else if (docEl.webkitRequestFullscreen) {
+                docEl.webkitRequestFullscreen();
+            } else if (docEl.msRequestFullscreen) {
+                docEl.msRequestFullscreen();
+            }
+            document.body.classList.add('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '🗗';
+        } else {
+            if (doc.exitFullscreen) {
+                doc.exitFullscreen().catch(() => {});
+            } else if (doc.webkitExitFullscreen) {
+                doc.webkitExitFullscreen();
+            } else if (doc.msExitFullscreen) {
+                doc.msExitFullscreen();
+            }
+            document.body.classList.remove('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '⛶';
+        }
+
+        setTimeout(() => {
+            renderPDFVisualPage(currentSlide);
+        }, 150);
+    }
+
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', toggleFullScreen);
+    }
+
+    const handleFullscreenChange = () => {
+        const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+        if (isFull) {
+            document.body.classList.add('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '🗗';
+        } else {
+            document.body.classList.remove('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '⛶';
+        }
+        setTimeout(() => {
+            renderPDFVisualPage(currentSlide);
+        }, 150);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+
     if (btnAddNote) btnAddNote.addEventListener('click', openNotesModal);
     const btnViewNotes = document.getElementById('btn-view-notes');
     if (btnViewNotes) btnViewNotes.addEventListener('click', openNotesModal);
@@ -660,10 +718,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // 10. AI CHATBOT INTERACTION
     // ==========================================================================
+    // ui/app.js (Tìm hàm sendChatMessage và cập nhật lại đoạn fetch như dưới đây)
     async function sendChatMessage(text) {
         if (!text.trim()) return;
 
-        // User message bubble
+        // Vẽ tin nhắn của học viên
         const userBubble = document.createElement('div');
         userBubble.className = 'user-card';
         userBubble.textContent = text;
@@ -671,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawerUserInput.value = '';
         drawerChatMessages.scrollTop = drawerChatMessages.scrollHeight;
 
-        // Bot loading bubble
+        // Vẽ tin nhắn chờ của AI
         const botBubble = document.createElement('div');
         botBubble.className = 'bot-card';
         botBubble.innerHTML = '⏳ <em>VLearn Tutor đang suy luận từ slide...</em>';
@@ -680,7 +739,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const dayCode = currentDocFile.includes('d2') ? 'd2' : 'd1';
-            const response = await fetch('/api/chat', {
+            const apiUrl = window.location.hostname ? `http://${window.location.hostname}:8502/api/chat` : 'http://localhost:8502/api/chat';
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -692,15 +752,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
+                // Hiển thị câu trả lời thật từ Python Backend Agent
                 botBubble.innerHTML = data.reply || data.response;
                 drawerChatMessages.scrollTop = drawerChatMessages.scrollHeight;
                 return;
             }
         } catch (err) {
-            console.log('Backend API offline, using smart context fallback');
+            console.log('Backend API connection attempted:', err);
         }
 
-        // Fallback response
+        // Khung fallback dự phòng (chỉ chạy khi mất kết nối backend)
         setTimeout(() => {
             let replyText = `Cảm ơn bạn đã đặt câu hỏi: <strong>"${escapeHtml(text)}"</strong>.<br>Trong Slide ${currentSlide} của <em>${currentDocFile}</em>, nội dung này phân tích nguyên lý hoạt động của mô hình ngôn ngữ lớn (LLM).`;
             

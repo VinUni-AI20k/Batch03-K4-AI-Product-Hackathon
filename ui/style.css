@@ -29,7 +29,7 @@ body.light-theme {
     --bg-stage: #f1f5f9;
     --bg-sidebar: #ffffff;
     --bg-navbar: #ffffff;
-    --bg-toolbar: #ffffff;
+    --bg-toolbar: #0d152c;
     --bg-card-outer: #ffffff;
     --bg-sage: #7fa08b;
     
@@ -911,4 +911,148 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .history-item-time {
     font-size: 0.65rem;
     color: var(--text-muted);
+}
+
+/* ==========================================================================
+   FULLSCREEN & PRESENTATION MODE STYLES (FIXES 2 WHITE PILLS BUG & CENTERING)
+   ========================================================================== */
+:fullscreen,
+:-webkit-full-screen,
+:-moz-full-screen,
+.fullscreen-mode {
+    background-color: #060914 !important;
+}
+
+:fullscreen .navbar,
+:-webkit-full-screen .navbar,
+.fullscreen-mode .navbar {
+    display: none !important;
+}
+
+:fullscreen .sidebar-left,
+:-webkit-full-screen .sidebar-left,
+.fullscreen-mode .sidebar-left {
+    display: none !important;
+}
+
+:fullscreen .sidebar-expand-btn,
+:-webkit-full-screen .sidebar-expand-btn,
+.fullscreen-mode .sidebar-expand-btn {
+    display: none !important;
+}
+
+:fullscreen .app-layout,
+:-webkit-full-screen .app-layout,
+.fullscreen-mode .app-layout {
+    height: 100vh !important;
+    width: 100vw !important;
+}
+
+/* Perfectly center viewer content vertically and horizontally in Fullscreen */
+:fullscreen .viewer-center,
+:-webkit-full-screen .viewer-center,
+.fullscreen-mode .viewer-center {
+    width: 100vw !important;
+    height: 100vh !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+:fullscreen .stage-area,
+:-webkit-full-screen .stage-area,
+.fullscreen-mode .stage-area {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 16px !important;
+    overflow: hidden !important;
+}
+
+:fullscreen .slide-stack,
+:-webkit-full-screen .slide-stack,
+.fullscreen-mode .slide-stack {
+    max-width: 900px !important;
+    width: 100% !important;
+    margin: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure Floating Toolbar & Footer Pills match dark glassmorphism, NO WHITE PILLS */
+.floating-toolbar,
+.bottom-nav-footer {
+    background-color: #0d152c !important;
+    border: 1px solid #1c2b4e !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+:fullscreen .floating-toolbar,
+:-webkit-full-screen .floating-toolbar,
+:fullscreen .bottom-nav-footer,
+:-webkit-full-screen .bottom-nav-footer,
+.fullscreen-mode .floating-toolbar,
+.fullscreen-mode .bottom-nav-footer {
+    background-color: rgba(13, 21, 44, 0.9) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7) !important;
+    color: #ffffff !important;
+}
+
+:fullscreen .floating-toolbar,
+:-webkit-full-screen .floating-toolbar,
+.fullscreen-mode .floating-toolbar {
+    margin: 12px auto 6px auto !important;
+}
+
+:fullscreen .bottom-nav-footer,
+:-webkit-full-screen .bottom-nav-footer,
+.fullscreen-mode .bottom-nav-footer {
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+}
+
+:fullscreen .floating-toolbar .pill-tool-btn,
+:-webkit-full-screen .floating-toolbar .pill-tool-btn,
+:fullscreen .floating-toolbar .tool-icon-btn,
+:-webkit-full-screen .floating-toolbar .tool-icon-btn,
+:fullscreen .floating-toolbar .zoom-action-btn,
+:-webkit-full-screen .floating-toolbar .zoom-action-btn,
+:fullscreen .bottom-nav-footer .foot-arrow-btn,
+:-webkit-full-screen .bottom-nav-footer .foot-arrow-btn,
+.fullscreen-mode .floating-toolbar .pill-tool-btn,
+.fullscreen-mode .floating-toolbar .tool-icon-btn,
+.fullscreen-mode .floating-toolbar .zoom-action-btn,
+.fullscreen-mode .bottom-nav-footer .foot-arrow-btn {
+    color: #cbd5e1 !important;
+}
+
+:fullscreen .floating-toolbar .pill-tool-btn.active,
+:-webkit-full-screen .floating-toolbar .pill-tool-btn.active,
+.fullscreen-mode .floating-toolbar .pill-tool-btn.active {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+:fullscreen .pdf-canvas-container,
+:-webkit-full-screen .pdf-canvas-container,
+.fullscreen-mode .pdf-canvas-container {
+    max-height: calc(100vh - 160px) !important;
+}
+
+:fullscreen #pdf-render-canvas,
+:-webkit-full-screen #pdf-render-canvas,
+.fullscreen-mode #pdf-render-canvas {
+    max-height: calc(100vh - 160px) !important;
 }
