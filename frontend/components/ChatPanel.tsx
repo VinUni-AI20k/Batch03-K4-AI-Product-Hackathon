@@ -43,7 +43,8 @@ export default function ChatPanel() {
 
   async function handleFinish() {
     setLoadingRetest(true);
-    const retestQuiz = await generateRetest(state.diagnosis!.weakSections);
+    const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
+    const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, state.diagnosis!.weakSections, askedIds);
     dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
   }
 

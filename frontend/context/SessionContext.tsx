@@ -14,7 +14,7 @@ interface SessionState {
   phase: Phase;
   knowledgePackage: KnowledgePackage | null;
   diagnosis: Diagnosis | null;
-  style: 'visual' | 'reading' | 'practice' | null;
+  style: 'intuitive' | 'mathematical' | 'both' | null;
   minutesPerDay: number | null;
   roadmap: Roadmap | null;
   retestQuiz: QuizQuestion[] | null;

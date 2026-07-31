@@ -3,10 +3,10 @@ import { generateRoadmap } from '../api/client';
 import { useSession } from '../context/SessionContext';
 import ProgressLoader from './shared/ProgressLoader';
 
-const STYLES: { id: 'visual' | 'reading' | 'practice'; label: string; emoji: string }[] = [
-  { id: 'visual', label: 'Visual', emoji: '🖼️' },
-  { id: 'reading', label: 'Reading', emoji: '📖' },
-  { id: 'practice', label: 'Hands-on practice', emoji: '🛠️' },
+const STYLES: { id: 'intuitive' | 'mathematical' | 'both'; label: string; emoji: string }[] = [
+  { id: 'intuitive', label: 'Intuitive', emoji: '🖼️' },
+  { id: 'mathematical', label: 'Mathematical', emoji: '📐' },
+  { id: 'both', label: 'Both', emoji: '🧩' },
 ];
 
 const TIME_GROUPS: { id: string; label: string; sub: string; minutes: number }[] = [
@@ -17,7 +17,7 @@ const TIME_GROUPS: { id: string; label: string; sub: string; minutes: number }[]
 export default function StyleTimeSelect() {
   const { state, dispatch } = useSession();
   const diagnosis = state.diagnosis!;
-  const [style, setStyle] = useState<'visual' | 'reading' | 'practice' | null>(state.style);
+  const [style, setStyle] = useState<'intuitive' | 'mathematical' | 'both' | null>(state.style);
   const [timeGroup, setTimeGroup] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState(false);
   const [building, setBuilding] = useState(false);
@@ -27,7 +27,14 @@ export default function StyleTimeSelect() {
     if (!style || !minutes) return;
     dispatch({ type: 'SET_STYLE_TIME', style, minutesPerDay: minutes });
     setBuilding(true);
-    const roadmap = await generateRoadmap(diagnosis.weakSections, style, minutes);
+    const roadmap = await generateRoadmap(
+      state.knowledgePackage!.sessionId,
+      diagnosis.weakSections,
+      style,
+      minutes,
+      diagnosis.score,
+      activeMode,
+    );
     dispatch({ type: 'SET_ROADMAP', payload: roadmap });
   }
 

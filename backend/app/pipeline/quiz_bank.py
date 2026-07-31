@@ -50,8 +50,11 @@ def call_llm_for_quiz(sections: list[Section], n_questions: int = 20) -> list[di
         f"## {s.title} (section_id: {s.section_id})\n{s.as_text()}" for s in sections
     )
     user_prompt = USER_PROMPT_TEMPLATE.format(n_questions=n_questions, content=content)
+    # Each question carries question+4 options+explanation+misconception_tag —
+    # the default max_tokens=1000 truncates mid-JSON past ~4-5 questions.
+    max_tokens = min(6000, max(1500, n_questions * 250))
     try:
-        result = generate_json(SYSTEM_PROMPT, user_prompt)
+        result = generate_json(SYSTEM_PROMPT, user_prompt, max_tokens=max_tokens)
     except Exception as exc:  # noqa: BLE001 — surface as a domain error, no silent fallback
         raise QuizGenerationError(f"AI call failed: {exc}") from exc
     questions = result.get("questions")

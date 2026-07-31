@@ -12,8 +12,8 @@ export default function DiagnosisView() {
 
   async function startRetest() {
     setLoadingRetest(true);
-    const focusSections = diagnosis.weakSections.length
-      ? diagnosis.weakSections
+    const focusSections = diagnosis!.weakSections.length
+      ? diagnosis!.weakSections
       : Array.from(
           new Map(
             (state.knowledgePackage?.quiz ?? []).map((question) => [question.sectionId, {
@@ -23,7 +23,8 @@ export default function DiagnosisView() {
             }]),
           ).values(),
         ).slice(0, 3);
-    const retestQuiz = await generateRetest(focusSections);
+    const askedIds = state.knowledgePackage?.quiz.map((q) => q.id) ?? [];
+    const retestQuiz = await generateRetest(state.knowledgePackage!.sessionId, focusSections, askedIds);
     dispatch({ type: 'SET_RETEST_QUIZ', payload: retestQuiz });
   }
 

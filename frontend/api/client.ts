@@ -1,6 +1,10 @@
 // api/client.ts
-// Talks to the "Knowledge Coach" backend. Swap the mock bodies below for real
-// fetch() calls against your FastAPI/Express endpoints — the shapes are the contract.
+// Real backend integration — FastAPI at http://127.0.0.1:8000 (see backend/README.md).
+// No mock data below: every function calls a real endpoint. If the backend is
+// down or an AI call fails, these throw — callers surface the error, they do
+// not fall back to fake output.
+
+const API_BASE = 'http://127.0.0.1:8000';
 
 export interface QuizQuestion {
   id: string;
@@ -9,14 +13,22 @@ export interface QuizQuestion {
   prompt: string;
   options: string[];
   correctIndex: number;
+  /** Present on questions the backend can trace to a transcript segment. */
+  sourceRefs?: string[];
+}
+
+export interface OutlineEntry {
+  id: string;
+  title: string;
 }
 
 export interface KnowledgePackage {
   id: string;
-  sessionId?: string;
+  sessionId: string;
   fileNames: string[];
   sectionCount: number;
   quiz: QuizQuestion[];
+  outline: OutlineEntry[];
 }
 
 export interface Diagnosis {
@@ -36,7 +48,7 @@ export interface RoadmapItem {
 }
 
 export interface Roadmap {
-  style: 'visual' | 'reading' | 'practice';
+  style: 'intuitive' | 'mathematical' | 'both';
   minutesPerDay: number;
   items: RoadmapItem[];
 }
@@ -45,7 +57,7 @@ export interface WrongAnswer {
   question: string;
   yourAnswer: string;
   correctAnswer: string;
-  sourceRef: string; // e.g. "Slide 12 · 04:32"
+  sourceRef: string;
 }
 
 export interface RetestResult {
@@ -54,9 +66,6 @@ export interface RetestResult {
   afterScore: number;
   wrongAnswers: WrongAnswer[];
 }
-
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8001';
 
 export interface AgentStep {
   label: string;
@@ -70,92 +79,85 @@ export interface AskAnswer {
   sourceRef: string;
 }
 
-/**
- * NotebookLM-style Q&A over the uploaded knowledge package. Always checks the
- * documents first; only falls back to web search when the docs don't cover it.
- * onStep fires as each trace step starts, so the UI can show a live agent
- * status ("Reading your slides…", "Searching the web…") instead of a blank spinner.
- */
-export async function askKnowledgeBase(
-  question: string,
-  hasKnowledgePackage: boolean,
-  onStep?: (step: AgentStep, index: number) => void
-): Promise<AskAnswer> {
-  const steps: AgentStep[] = [{ label: 'Reading your slides & transcript', icon: 'doc' }];
-  onStep?.(steps[0], 0);
-  await delay(700);
-
-  // Mock heuristic: short/very specific-sounding questions "miss" the docs and fall back to web.
-  const foundInDocs = hasKnowledgePackage && question.length > 25;
-
-  if (!foundInDocs) {
-    const webStep: AgentStep = { label: "Not in your docs — searching the web", icon: 'web' };
-    steps.push(webStep);
-    onStep?.(webStep, 1);
-    await delay(900);
-  }
-
-  const composeStep: AgentStep = { label: 'Composing your answer', icon: 'brain' };
-  steps.push(composeStep);
-  onStep?.(composeStep, steps.length - 1);
-  await delay(600);
-
-  return {
-    steps,
-    answer: foundInDocs
-      ? `Based on your uploaded material: **${question}** is covered directly in your slides — here's the short version, restated simply from your own lecture.`
-      : `Your slides don't cover this directly, so here's what I found on the web about **${question}** — worth double-checking against your course's own definitions.`,
-    sourceType: foundInDocs ? 'doc' : 'web',
-    sourceRef: foundInDocs ? `Slide ${Math.ceil(Math.random() * 20)}` : 'web search result',
-  };
+async function readError(res: Response): Promise<string> {
+  const body = await res.json().catch(() => null);
+  return body?.detail ?? res.statusText;
 }
 
-/** Phase 1 — upload slides + transcript, then run the real backend pipeline. */
+/**
+ * Phase 1 — upload slides + transcript, get back a generated 20Q quiz.
+ * Uses /api/knowledge/upload (real classify + align, session-persisted) then
+ * /api/quiz/generate/pdf (the central AI decision — quiz_bank.py).
+ */
 export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> {
-  const slides = files.find((file) => file.name.toLowerCase().endsWith('.pdf'));
-  const transcript = files.find((file) => {
-    const name = file.name.toLowerCase();
+  const slides = files.find((f) => f.name.toLowerCase().endsWith('.pdf'));
+  const transcript = files.find((f) => {
+    const name = f.name.toLowerCase();
     return name.endsWith('.md') || name.endsWith('.txt') || name.endsWith('.vtt') || name.endsWith('.srt');
   });
   if (!slides || !transcript) throw new Error('A PDF slide file and a transcript file are required.');
 
-  const sessionResponse = await fetch(`${API_BASE}/api/sessions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-  if (!sessionResponse.ok) throw new Error(`Could not create learning session (${sessionResponse.status}).`);
-  const session = await sessionResponse.json() as { session_id: string };
+  const sessionRes = await fetch(`${API_BASE}/api/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  if (!sessionRes.ok) throw new Error(`Could not start a learning session: ${await readError(sessionRes)}`);
+  const session = (await sessionRes.json()) as { session_id: string };
 
-  const form = new FormData();
-  form.append('slides', slides);
-  form.append('transcript', transcript);
-  form.append('session_id', session.session_id);
-  const uploadResponse = await fetch(`${API_BASE}/api/knowledge/upload`, { method: 'POST', body: form });
-  if (!uploadResponse.ok) throw new Error(await uploadResponse.text());
+  const uploadForm = new FormData();
+  uploadForm.append('slides', slides);
+  uploadForm.append('transcript', transcript);
+  uploadForm.append('session_id', session.session_id);
+  const uploadRes = await fetch(`${API_BASE}/api/knowledge/upload`, { method: 'POST', body: uploadForm });
+  if (!uploadRes.ok) throw new Error(`Could not process the uploaded materials: ${await readError(uploadRes)}`);
 
-  const quizResponse = await fetch(`${API_BASE}/api/quiz/generate/pdf?session_id=${encodeURIComponent(session.session_id)}&n_questions=20`, { method: 'POST' });
-  if (!quizResponse.ok) throw new Error(await quizResponse.text());
-  const result = await quizResponse.json() as { outline: Array<{ section_id: string; title: string }>; questions: Array<Record<string, unknown>> };
+  const quizRes = await fetch(
+    `${API_BASE}/api/quiz/generate/pdf?session_id=${encodeURIComponent(session.session_id)}&n_questions=20`,
+    { method: 'POST' },
+  );
+  if (!quizRes.ok) throw new Error(`Sinh MCQ thất bại: ${await readError(quizRes)}`);
+  const quizData = await quizRes.json();
+
+  const outline: OutlineEntry[] = (quizData.outline as { section_id: string; title: string }[]).map((o) => ({
+    id: o.section_id,
+    title: o.title,
+  }));
+  const titleFor = (sectionId: string) => outline.find((o) => o.id === sectionId)?.title ?? sectionId;
+
+  const quiz: QuizQuestion[] = (quizData.questions as {
+    question: string;
+    options: string[];
+    correct_index: number;
+    section_id: string;
+    segment_id?: string;
+  }[]).map((q, i) => ({
+    id: `${q.section_id}-${i}`,
+    sectionId: q.section_id,
+    sectionTitle: titleFor(q.section_id),
+    prompt: q.question,
+    options: q.options,
+    correctIndex: q.correct_index,
+    sourceRefs: q.segment_id ? [q.segment_id] : [],
+  }));
 
   return {
     id: `kp_${session.session_id}`,
     sessionId: session.session_id,
     fileNames: files.map((f) => f.name),
-    sectionCount: result.outline.length,
-    quiz: result.questions.map((question, index) => ({
-      id: String(question.id ?? `q${index + 1}`),
-      sectionId: String(question.section_id ?? ''),
-      sectionTitle: result.outline.find((section) => section.section_id === question.section_id)?.title ?? String(question.section_id ?? 'Section'),
-      prompt: String(question.question ?? ''),
-      options: Array.isArray(question.options) ? question.options.map(String) : [],
-      correctIndex: Number(question.correct_index ?? 0),
-    })),
+    sectionCount: outline.length,
+    quiz,
+    outline,
   };
 }
 
-/** Phase 2 — grade the quiz and diagnose weak sections */
+/** Phase 2 — grade the quiz and diagnose weak sections. Rule-based by design
+ * (no AI leverage here per problem-definition.md §3 — a plain accuracy
+ * threshold is exactly as good as a model at "did they get 70%+ right"). */
 export async function submitQuiz(
   quiz: QuizQuestion[],
-  answers: Record<string, number>
+  answers: Record<string, number>,
 ): Promise<Diagnosis> {
-  await delay(900);
   const correctCount = quiz.filter((q) => answers[q.id] === q.correctIndex).length;
   const bySection = new Map<string, { title: string; total: number; correct: number }>();
   quiz.forEach((q) => {
@@ -179,46 +181,118 @@ export async function submitQuiz(
   };
 }
 
-/** Phase 3 — build a personalized roadmap for the weak sections */
+/** Phase 3 — build a personalized, grounded roadmap for the weak sections.
+ * /api/reteach/study-note is the highest-value AI feature in the product spec
+ * ("dạy lại" — grounded rewrite, every claim traceable to a citation);
+ * /api/reteach/examples fills the real-world-example card for real too. */
 export async function generateRoadmap(
+  sessionId: string,
   weakSections: Diagnosis['weakSections'],
   style: Roadmap['style'],
-  minutesPerDay: number
+  minutesPerDay: number,
+  quizScore: number,
+  activeMode: boolean,
 ): Promise<Roadmap> {
-  await delay(1100);
+  const level = quizScore < 50 ? 'beginner' : quizScore < 80 ? 'intermediate' : 'advanced';
+
+  const noteRes = await fetch(`${API_BASE}/api/reteach/study-note`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      session_id: sessionId,
+      weak_sections: weakSections.map((s) => ({
+        section_id: s.sectionId,
+        weak_score: 1 - s.accuracy,
+        reason: `Quiz accuracy ${Math.round(s.accuracy * 100)}% on this section`,
+      })),
+      level,
+      style,
+      time_budget_minutes: minutesPerDay,
+      active_mode: activeMode,
+    }),
+  });
+  if (!noteRes.ok) throw new Error(`Không sinh được bài ôn tập: ${await readError(noteRes)}`);
+  const note = await noteRes.json();
+  const sections = note.sections as {
+    section_id: string;
+    title: string;
+    content_md: string;
+    check_question: string | null;
+  }[];
+
+  const examplesRes = await fetch(`${API_BASE}/api/reteach/examples`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sections: sections.map((s) => ({ section_id: s.section_id, title: s.title, summary: s.content_md.slice(0, 800) })),
+    }),
+  });
+  const examples: Record<string, string> = examplesRes.ok ? (await examplesRes.json()).examples ?? {} : {};
+
   return {
     style,
     minutesPerDay,
-    items: weakSections.map((s) => ({
-      sectionId: s.sectionId,
-      sectionTitle: s.sectionTitle,
-      summaryCard: `Here's the short version of "${s.sectionTitle}": the key idea, restated simply, with the one detail most people miss.`,
-      realWorldExample: `Picture "${s.sectionTitle}" showing up in a everyday situation — that's the same pattern at work.`,
-      miniPracticeQuestion: `Quick check: can you explain "${s.sectionTitle}" in one sentence to a friend?`,
+    items: sections.map((section) => ({
+      sectionId: section.section_id,
+      sectionTitle: section.title,
+      summaryCard: section.content_md,
+      realWorldExample: examples[section.section_id] ?? '',
+      miniPracticeQuestion: section.check_question ?? '',
     })),
   };
 }
 
-/** Phase 4 — generate a shorter retest focused on weak sections */
-export async function generateRetest(weakSections: Diagnosis['weakSections']): Promise<QuizQuestion[]> {
-  await delay(900);
-  return weakSections.map((s, i) => ({
-    id: `retest_${i + 1}`,
-    sectionId: s.sectionId,
-    sectionTitle: s.sectionTitle,
-    prompt: `Retest: which statement best matches "${s.sectionTitle}"?`,
-    options: ['Option A', 'Option B', 'Option C', 'Option D'],
-    correctIndex: i % 4,
+/** Phase 4 — generate a shorter retest focused on weak sections, biased away
+ * from questions already asked in round 1 (avoid_similar_to). */
+export async function generateRetest(
+  sessionId: string,
+  weakSections: Diagnosis['weakSections'],
+  askedQuestionIds: string[],
+): Promise<QuizQuestion[]> {
+  const scope = weakSections.length
+    ? { mode: 'selected' as const, sectionIds: weakSections.map((s) => s.sectionId) }
+    : { mode: 'whole' as const };
+  const numQuestions = Math.min(10, Math.max(4, weakSections.length * 2 || 4));
+
+  const res = await fetch(`${API_BASE}/api/retest/generate-quiz`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      session_id: sessionId,
+      scope,
+      numQuestions,
+      avoidSimilarTo: askedQuestionIds,
+    }),
+  });
+  if (!res.ok) throw new Error(`Không sinh được bài retest: ${await readError(res)}`);
+  const questions = (await res.json()) as {
+    id: string;
+    outline_section_id: string;
+    question: string;
+    options: string[];
+    correct_index: number;
+    source_refs: string[];
+  }[];
+  const titleFor = new Map(weakSections.map((s) => [s.sectionId, s.sectionTitle]));
+
+  return questions.map((q) => ({
+    id: q.id,
+    sectionId: q.outline_section_id,
+    sectionTitle: titleFor.get(q.outline_section_id) ?? q.outline_section_id,
+    prompt: q.question,
+    options: q.options,
+    correctIndex: q.correct_index,
+    sourceRefs: q.source_refs,
   }));
 }
 
-/** Phase 4 — grade the retest and produce a before/after report or wrong-answer review */
+/** Phase 4 — grade the retest and produce a before/after report or wrong-answer
+ * review. Rule-based, same reasoning as submitQuiz. */
 export async function submitRetest(
   retestQuiz: QuizQuestion[],
   answers: Record<string, number>,
-  beforeScore: number
+  beforeScore: number,
 ): Promise<RetestResult> {
-  await delay(900);
   const correctCount = retestQuiz.filter((q) => answers[q.id] === q.correctIndex).length;
   const afterScore = Math.round((correctCount / retestQuiz.length) * 100);
   const wrongAnswers: WrongAnswer[] = retestQuiz
@@ -227,12 +301,58 @@ export async function submitRetest(
       question: q.prompt,
       yourAnswer: q.options[answers[q.id] ?? 0] ?? '—',
       correctAnswer: q.options[q.correctIndex],
-      sourceRef: `${q.sectionTitle} · Slide ${Math.ceil(Math.random() * 20)}`,
+      sourceRef: q.sourceRefs?.length ? `${q.sectionTitle} · ${q.sourceRefs.join(', ')}` : q.sectionTitle,
     }));
   return {
     masteryAchieved: afterScore >= 80,
     beforeScore,
     afterScore,
     wrongAnswers,
+  };
+}
+
+/**
+ * Grounded Q&A over the uploaded knowledge package. Calls /api/chat/ask, which
+ * retrieves from the session's transcript/slides/study-note and answers only
+ * from those sources — it does not search the web, so callers must not claim
+ * it does.
+ */
+export async function askKnowledgeBase(
+  question: string,
+  sessionId: string | null,
+  onStep?: (step: AgentStep, index: number) => void,
+): Promise<AskAnswer> {
+  if (!sessionId) {
+    const step: AgentStep = { label: 'No lecture uploaded yet', icon: 'doc' };
+    onStep?.(step, 0);
+    return {
+      steps: [step],
+      answer: 'Upload your slides and transcript first so I have something grounded to answer from.',
+      sourceType: 'doc',
+      sourceRef: 'no session yet',
+    };
+  }
+
+  const readingStep: AgentStep = { label: 'Reading your slides & transcript', icon: 'doc' };
+  onStep?.(readingStep, 0);
+
+  const res = await fetch(`${API_BASE}/api/chat/ask`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId, question }),
+  });
+
+  const composeStep: AgentStep = { label: 'Composing your answer', icon: 'brain' };
+  onStep?.(composeStep, 1);
+
+  if (!res.ok) throw new Error(`Q&A unavailable: ${await readError(res)}`);
+  const data = await res.json();
+  const citedIds: string[] = data.cited_segment_ids ?? [];
+
+  return {
+    steps: [readingStep, composeStep],
+    answer: data.answer,
+    sourceType: 'doc',
+    sourceRef: citedIds.length ? citedIds.join(', ') : 'no direct citation found in your material',
   };
 }
