@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>IllumiMATE — Personalized Re-teaching Agent</title>
+  <style>
+    :root{--ink:#29403b;--muted:#687c75;--sage:#82a793;--sage-dark:#5f8271;--sage-soft:#dbe9df;--mint:#edf4ed;--peach:#f4d9ca;--lav:#dedcef;--cream:#f6f3eb;--white:#fbfcf8;--shadow:16px 16px 38px #ced6cf,-14px -14px 34px #fff;--small-shadow:8px 8px 20px #d0d7d1,-8px -8px 20px #fff}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+    body:before,body:after{content:"";position:fixed;pointer-events:none;opacity:.68;filter:blur(1px)}body:before{width:34vw;height:34vw;right:-11vw;top:-16vw;border-radius:41% 59% 64% 36%/52% 41% 59% 48%;background:linear-gradient(145deg,#d9e9dc,#eef4e9);animation:drift 12s ease-in-out infinite alternate}body:after{width:27vw;height:27vw;left:-9vw;bottom:-14vw;border-radius:61% 39% 43% 57%/41% 61% 39% 59%;background:linear-gradient(145deg,#f1d3c2,#f9ede2);animation:drift 15s ease-in-out infinite alternate-reverse}@keyframes drift{to{transform:translate(2vw,2vw) rotate(7deg)}}
+    .brand{position:fixed;left:7.5vw;top:28px;z-index:20;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.07em}.brand-mark{width:28px;height:28px;border-radius:44% 56% 61% 39%/52% 43% 57% 48%;background:linear-gradient(145deg,#a7c7b5,#739885);box-shadow:4px 4px 10px #cbd2cc,-4px -4px 10px #fff}
+    .deck{height:100%;position:relative}.slide{position:absolute;inset:0;padding:10vh 7.5vw 10vh;display:grid;opacity:0;transform:translateX(28px) scale(.99);pointer-events:none;transition:.5s cubic-bezier(.2,.8,.2,1)}.slide.active{opacity:1;transform:none;pointer-events:auto;z-index:2}
+    .eyebrow{font-size:clamp(12px,1.05vw,16px);font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#6c927f;margin-bottom:18px}.title{font-size:clamp(42px,5.5vw,78px);line-height:1.04;letter-spacing:-.045em;margin:0;font-weight:750}.subtitle{font-size:clamp(18px,1.7vw,26px);line-height:1.55;color:var(--muted);margin:24px 0 0;max-width:800px}.accent{color:var(--sage-dark)}
+    .nav{position:fixed;z-index:20;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:rgba(247,245,238,.82);backdrop-filter:blur(14px);box-shadow:var(--small-shadow)}.nav button{border:0;background:transparent;width:34px;height:34px;border-radius:50%;font-size:18px;color:var(--ink);cursor:pointer}.nav button:hover{background:#e3ece5}.dots{display:flex;gap:7px}.dot{width:7px;height:7px;border-radius:10px;background:#c2ccc5;cursor:pointer;transition:.25s}.dot.on{width:23px;background:var(--sage)}.page{position:fixed;z-index:20;right:7.5vw;bottom:30px;font-size:12px;font-weight:700;color:#87958f}
+    .hero{grid-template-columns:1.12fr .88fr;gap:6vw;align-items:center}.hero-copy{max-width:900px}.name{display:inline-block;position:relative}.name:after{content:"";position:absolute;left:2%;right:-1%;bottom:4px;height:14px;background:#cfe3d5;z-index:-1;border-radius:12px;transform:rotate(-1deg)}.hero-visual{position:relative;height:min(55vh,490px)}.orb{position:absolute;inset:9% 3% 2% 8%;border-radius:52% 48% 38% 62%/44% 58% 42% 56%;background:linear-gradient(145deg,#e2eee4,#c4daca);box-shadow:var(--shadow);display:grid;place-items:center}.mate{width:58%;aspect-ratio:1;border-radius:44% 56% 54% 46%/55% 43% 57% 45%;background:linear-gradient(145deg,#91b49f,#739985);box-shadow:inset 9px 9px 20px #698b79,inset -8px -8px 20px #a7c4b3;display:grid;place-items:center;color:white;text-align:center}.mate b{font-size:clamp(23px,2.5vw,36px);line-height:1.12}.float{position:absolute;padding:13px 17px;border-radius:18px;background:#f2f6ef;box-shadow:var(--small-shadow);font-size:13px;font-weight:700;color:#617b6d}.f1{top:3%;left:0}.f2{right:0;top:27%}.f3{left:2%;bottom:3%}
+    .persona{grid-template-columns:.85fr 1.15fr;gap:6vw;align-items:center}.profile{padding:38px;border-radius:36px;background:rgba(242,246,240,.9);box-shadow:var(--shadow)}.avatar{width:86px;height:86px;border-radius:45% 55% 58% 42%/50% 44% 56% 50%;display:grid;place-items:center;background:linear-gradient(145deg,#efd4c5,#ddb8a8);font-size:32px;font-weight:800;color:#845f52;margin-bottom:24px}.profile h3{font-size:28px;margin:0 0 7px}.profile p{margin:0;color:var(--muted);line-height:1.55}.time-pill{display:inline-flex;align-items:center;gap:10px;margin-top:24px;padding:13px 17px;border-radius:16px;background:#e7eee7;box-shadow:6px 6px 15px #d0d7d1,-6px -6px 15px #fff;font-weight:750}.time-pill i{width:9px;height:9px;border-radius:50%;background:#d39172}.pain-title{font-size:clamp(34px,3.8vw,58px);line-height:1.08;letter-spacing:-.04em;margin:0 0 30px}.pain-list{display:grid;gap:17px}.pain{display:grid;grid-template-columns:50px 1fr;gap:17px;align-items:start}.pain-num{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#e6ede6;box-shadow:5px 5px 13px #d0d7d1,-5px -5px 13px #fff;font-weight:800;color:#6f927f}.pain b{display:block;font-size:18px;margin-bottom:5px}.pain span{display:block;color:var(--muted);font-size:15px;line-height:1.45}.survey{margin-top:25px;padding:15px 19px;border-left:4px solid var(--sage);border-radius:4px 18px 18px 4px;background:#e6eee7;color:#587064;font-size:14px;line-height:1.45}.survey strong{font-size:23px;color:var(--sage-dark)}
+    .workflow{align-content:center}.workflow .title{font-size:clamp(38px,4.5vw,66px);max-width:950px}.flow{display:grid;grid-template-columns:1fr 80px 1fr 80px 1.15fr;margin-top:58px;align-items:center}.flow-box{min-height:275px;padding:30px 28px;border-radius:28px;background:rgba(242,246,240,.94);box-shadow:var(--shadow);display:flex;flex-direction:column}.flow-box:last-child{background:linear-gradient(145deg,#dceadf,#edf4ec)}.flow-icon{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:#dde9e0;color:#648471;font-size:25px;font-weight:800;box-shadow:5px 5px 13px #cbd5cd,-5px -5px 13px #fff}.flow-box em{font-style:normal;font-size:11px;letter-spacing:.13em;font-weight:800;color:#759382;margin-top:22px}.flow-box h3{font-size:22px;line-height:1.25;margin:10px 0 11px}.flow-box p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}.arrow{height:3px;background:#9bb6a7;position:relative;margin:0 14px}.arrow:after{content:"";position:absolute;right:-2px;top:-6px;border-left:12px solid #9bb6a7;border-top:7px solid transparent;border-bottom:7px solid transparent}.flow-note{margin-top:30px;color:#6d7e77;font-size:15px;text-align:center}.flow-note b{color:var(--sage-dark)}
+    .personalize{grid-template-columns:.84fr 1.16fr;gap:6vw;align-items:center}.personalize .title{font-size:clamp(39px,4.55vw,67px)}.usp-copy{max-width:650px}.usp-line{margin-top:30px;font-size:18px;line-height:1.6;color:var(--muted)}.usp-line b{color:var(--sage-dark)}.config{padding:34px 38px;border-radius:36px;background:rgba(242,246,240,.94);box-shadow:var(--shadow);display:grid;gap:20px}.field label{display:flex;justify-content:space-between;margin:0 4px 10px;font-size:12px;font-weight:800;letter-spacing:.08em;color:#60766b}.field label span{letter-spacing:0;color:#769281}.options{display:grid;grid-template-columns:repeat(var(--count),1fr);gap:10px}.option{border:0;border-radius:15px;padding:14px 8px;background:#edf1eb;box-shadow:5px 5px 12px #d2d9d3,-5px -5px 12px #fff;color:#556b61;font:700 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,Helvetica,sans-serif;cursor:pointer;transition:.22s}.option.selected{color:#fff;background:linear-gradient(145deg,#93b49f,#769886);box-shadow:inset 3px 3px 7px #698b79,inset -3px -3px 7px #a6c3b2}.active-row{display:flex;align-items:center;justify-content:space-between;padding:4px}.active-row b{font-size:16px}.active-row small{display:block;margin-top:5px;color:var(--muted);line-height:1.35}.switch{width:58px;height:32px;border-radius:20px;background:#d9e1da;box-shadow:inset 4px 4px 9px #c8d0c9,inset -4px -4px 9px #fff;padding:4px;cursor:pointer}.switch i{display:block;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:3px 3px 7px #b9c3bb;transition:.25s}.switch.on{background:#85a994}.switch.on i{transform:translateX(26px)}.result{padding:14px 18px;border-radius:16px;background:#e4ede5;color:#577064;font-size:13px;line-height:1.45;border-left:4px solid #84a58f}
+    @media(max-width:850px){.slide{padding:11vh 7vw 12vh;overflow:auto}.hero,.persona,.personalize{grid-template-columns:1fr}.hero-visual{display:none}.profile{padding:27px}.flow{grid-template-columns:1fr;gap:14px;margin-top:30px}.arrow{width:3px;height:32px;margin:auto}.arrow:after{right:-6px;top:auto;bottom:-2px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:12px solid #9bb6a7;border-bottom:0}.flow-box{min-height:auto}.config{padding:27px}.brand{left:7vw}.title{font-size:42px}.pain-title{font-size:35px}}
+  </style>
+</head>
+<body>
+  <div class="brand"><i class="brand-mark"></i> ILLUMIMATE × VLEARN</div>
+  <main class="deck">
+    <section class="slide hero active">
+      <div class="hero-copy">
+        <div class="eyebrow">Your in-action learning buddy</div>
+        <h1 class="title"><span class="name">IllumiMATE</span><br><span class="accent">Ôn đúng phần cần hiểu.</span></h1>
+        <p class="subtitle">Một agent được tích hợp vào <strong>VLearn</strong>, hỗ trợ học viên ôn lại bài giảng từ slide, transcript và các tài liệu học tập đã có.</p>
+      </div>
+      <div class="hero-visual"><div class="orb"><div class="mate"><b>learn<br>with you</b></div></div><div class="float f1">Hiểu tài liệu lớp học</div><div class="float f2">Tìm đúng lỗ hổng</div><div class="float f3">Dạy lại theo cách của bạn</div></div>
+    </section>
+
+    <section class="slide persona">
+      <div class="profile">
+        <div class="avatar">MA</div><div class="eyebrow">Learner persona</div>
+        <h3>Mai Anh</h3><p>Học viên khóa 4<br><strong>AI Thực Chiến</strong></p>
+        <div class="time-pill"><i></i> Dưới 1 tiếng tự học mỗi ngày</div>
+      </div>
+      <div>
+        <h2 class="pain-title">Muốn ôn bài trước khi đến lớp, nhưng <span class="accent">không đủ thời gian để bắt đầu lại từ đầu.</span></h2>
+        <div class="pain-list">
+          <div class="pain"><div class="pain-num">01</div><div><b>Khối lượng kiến thức quá lớn</b><span>Mỗi buổi có thể kéo dài 70–100 trang slide, chưa kể transcript.</span></div></div>
+          <div class="pain"><div class="pain-num">02</div><div><b>AI trả lời dài nhưng không hệ thống</b><span>Câu trả lời lan man dễ gây chán nản, khó biến thành lộ trình ôn tập.</span></div></div>
+          <div class="pain"><div class="pain-num">03</div><div><b>Phải tự thiết kế prompt</b><span>Mất thêm thời gian mới có câu trả lời mong muốn — và phần giải thích vẫn thường chung chung.</span></div></div>
+        </div>
+        <div class="survey"><strong>80%</strong> người được khảo sát không muốn mất nhiều thời gian để ôn tập lại toàn bộ nội dung.</div>
+      </div>
+    </section>
+
+    <section class="slide workflow">
+      <div>
+        <div class="eyebrow">Product workflow</div>
+        <h2 class="title">Từ tài liệu lớp học đến <span class="accent">bài giảng dành riêng cho từng học viên</span></h2>
+        <div class="flow">
+          <div class="flow-box"><div class="flow-icon">≡</div><em>BƯỚC 01</em><h3>Trích xuất outline</h3><p>IllumiMATE đọc slide và transcript, lọc phần giảng dạy và hệ thống hóa cấu trúc bài học.</p></div>
+          <div class="arrow"></div>
+          <div class="flow-box"><div class="flow-icon">?</div><em>BƯỚC 02</em><h3>Tạo quiz kiểm tra mức độ hiểu</h3><p>Một bài test ngắn giúp kiểm chứng học viên đã nắm chắc phần nào và đang nhầm ở đâu.</p></div>
+          <div class="arrow"></div>
+          <div class="flow-box"><div class="flow-icon">✦</div><em>BƯỚC 03</em><h3>Xác định lỗ hổng & personalize</h3><p>AI tạo bài giảng Markdown mới, tập trung đúng điểm yếu và điều chỉnh theo lựa chọn của học viên.</p></div>
+        </div>
+        <div class="flow-note"><b>Không đọc lại tất cả.</b> Chỉ học lại phần thật sự cần thiết.</div>
+      </div>
+    </section>
+
+    <section class="slide personalize">
+      <div class="usp-copy">
+        <div class="eyebrow">Unique selling proposition</div>
+        <h2 class="title">Một bài giảng,<br><span class="accent">nhiều cách học.</span></h2>
+        <p class="usp-line">IllumiMATE không chỉ tóm tắt. Agent <b>viết lại bài giảng theo lỗ hổng kiến thức, thời gian và cách tư duy</b> của từng người.</p>
+      </div>
+      <div class="config">
+        <div class="field"><label>LEVEL <span id="levelValue">Dễ hiểu</span></label><div class="options" style="--count:3" data-key="level"><button class="option selected">Dễ hiểu</button><button class="option">Vừa sức</button><button class="option">Chuyên sâu</button></div></div>
+        <div class="field"><label>TIME <span id="timeValue">Ngắn · 30 phút</span></label><div class="options" style="--count:2" data-key="time"><button class="option selected">Ngắn · 30 phút</button><button class="option">Dài · 1 tiếng</button></div></div>
+        <div class="field"><label>STYLE <span id="styleValue">Intuitive</span></label><div class="options" style="--count:2" data-key="style"><button class="option selected">Intuitive</button><button class="option">Mathematical</button></div></div>
+        <div class="active-row"><div><b>Active Mode</b><small>Đặt follow-up question để học viên tư duy thêm</small></div><div class="switch on" id="activeSwitch"><i></i></div></div>
+        <div class="result" id="result">Bài giảng: Dễ hiểu · Ngắn 30 phút · Intuitive · Active Mode bật</div>
+      </div>
+    </section>
+  </main>
+  <nav class="nav"><button id="prev" aria-label="Slide trước">←</button><div class="dots" id="dots"></div><button id="next" aria-label="Slide sau">→</button></nav>
+  <div class="page" id="page"></div>
+  <script>
+    const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots');let current=0;
+    slides.forEach((_,i)=>{const d=document.createElement('i');d.className='dot'+(i===0?' on':'');d.addEventListener('click',()=>goTo(i));dots.appendChild(d)});
+    function goTo(i){current=(i+slides.length)%slides.length;slides.forEach((s,n)=>s.classList.toggle('active',n===current));[...dots.children].forEach((d,n)=>d.classList.toggle('on',n===current));page.textContent=`${String(current+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`}
+    prev.addEventListener('click',()=>goTo(current-1));next.addEventListener('click',()=>goTo(current+1));document.addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key))goTo(current+1);if(['ArrowLeft','PageUp'].includes(e.key))goTo(current-1)});goTo(0);
+    const state={level:'Dễ hiểu',time:'Ngắn · 30 phút',style:'Intuitive',active:true};
+    document.querySelectorAll('.options').forEach(group=>group.addEventListener('click',e=>{if(!e.target.classList.contains('option'))return;group.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));e.target.classList.add('selected');state[group.dataset.key]=e.target.textContent;update()}));
+    activeSwitch.addEventListener('click',()=>{state.active=!state.active;activeSwitch.classList.toggle('on',state.active);update()});
+    function update(){levelValue.textContent=state.level;timeValue.textContent=state.time;styleValue.textContent=state.style;result.textContent=`Bài giảng: ${state.level} · ${state.time.replace(' · ',' ')} · ${state.style} · Active Mode ${state.active?'bật':'tắt'}`}
+  </script>
+</body>
+</html>

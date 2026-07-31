@@ -1,0 +1,42 @@
+{
+  "round": "round2",
+  "suite": "eval/eval_suite.md",
+  "summary": {
+    "total_cases": 25,
+    "passed": 25,
+    "failed": 0,
+    "pass_rate": 100.0,
+    "suite_contract_errors": 0,
+    "backend_unit_tests": "3 passed",
+    "frontend_build": "passed",
+    "real_user_cases": 8,
+    "evaluation": "teammate-observed user runs plus suite cases"
+  },
+  "cases": [
+    {"id":"R1-01","category":1,"source":"real_observed","pass":true,"result":"Study Note giữ nội dung yêu cầu mơ hồ, dẫn S1-01/T1-01 và từ chối bổ sung Scrum ngoài nguồn."},
+    {"id":"R1-02","category":1,"source":"real_observed","pass":true,"result":"Study Note giữ nội dung mạng nơ-ron nhiều lớp; ví dụ y khoa và số liệu được đánh dấu ngoài nguồn."},
+    {"id":"R1-03","category":1,"source":"real_observed","pass":true,"result":"Note nêu mục tiêu và đối tượng đọc; sampling temperature được đánh dấu không có trong nguồn."},
+    {"id":"R1-04","category":1,"source":"real_observed","pass":true,"result":"Rewrite giữ hai ý có nguồn và không khẳng định tăng năng suất 30%."},
+    {"id":"R1-05","category":1,"source":"real_observed","pass":true,"result":"Không kết luận ChatGPT hay Claude thông minh hơn khi nguồn không có bằng chứng."},
+    {"id":"R1-06","category":1,"source":"synthetic","pass":true,"result":"Từ chối giải thích backpropagation như kiến thức của buổi học."},
+    {"id":"R1-07","category":1,"source":"synthetic","pass":true,"result":"Giữ quiz và re-test; loại claim dự đoán điểm thi cuối khóa."},
+    {"id":"R1-08","category":1,"source":"synthetic","pass":true,"result":"Mô tả UI và phân tích quiz; từ chối bảo đảm người học chắc chắn nhớ bài."},
+    {"id":"R1-09","category":1,"source":"synthetic","pass":true,"result":"Đánh dấu nhận định LLM luôn hiểu đúng là ý kiến cần kiểm chứng."},
+    {"id":"R2-01","category":2,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Đoạn chọn không đề cập học tăng cường; output không trả lời grounded về học tăng cường."},
+    {"id":"R2-02","category":2,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Đoạn chọn không đề cập Redis hoặc TTL; output không tạo câu trả lời Redis grounded."},
+    {"id":"R2-03","category":2,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Đoạn quiz không bao phủ tư vấn thuế; output yêu cầu nguồn phù hợp hoặc từ chối grounded."},
+    {"id":"R2-04","category":2,"source":"synthetic","pass":true,"result":"Nêu rõ đoạn classification không đề cập lịch sử người phát minh mạng nơ-ron."},
+    {"id":"R2-05","category":2,"source":"synthetic","pass":true,"result":"Phân biệt context trong đoạn với context window của model X; không suy ra số token."},
+    {"id":"R2-06","category":2,"source":"synthetic","pass":true,"result":"Nêu rõ đoạn retest không đề cập kế hoạch tập gym; không đưa khuyến nghị grounded."},
+    {"id":"R3-01","category":3,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Self-report trống được nhận diện là thiếu tín hiệu; chỉ dùng bằng chứng Q2 sai với độ tin cậy phù hợp."},
+    {"id":"R3-02","category":3,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Phát hiện mâu thuẫn giữa điểm quiz và self-report, yêu cầu làm rõ trước khi kết luận weakness."},
+    {"id":"R3-03","category":3,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Nhận diện self-report về mạng chậm là lạc đề, không gán section nào là yếu."},
+    {"id":"R3-04","category":3,"source":"synthetic","pass":true,"result":"Không ánh xạ 'phần giữa' thành section cụ thể; điểm quiz toàn đúng không cho thấy weakness."},
+    {"id":"R3-05","category":3,"source":"synthetic","pass":true,"result":"Phản ánh lỗi phân tán và bất định trên ba section, đề nghị thêm câu hỏi."},
+    {"id":"R4-01","category":4,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Giữ objective và audience là teaching content; lọc câu mạng lag khỏi outline."},
+    {"id":"R4-02","category":4,"source":"real_observed","evidence":"teammate-provided user run","pass":true,"result":"Phân loại T01/T03 là teaching content, T02 là phản hồi lớp học; không dùng okela làm bằng chứng hiểu bài."},
+    {"id":"R4-03","category":4,"source":"synthetic","pass":true,"result":"Sửa typo ph?i theo ngữ cảnh, giữ goal/context và loại câu ăn tối."},
+    {"id":"R4-04","category":4,"source":"synthetic","pass":true,"result":"Giữ định nghĩa alignment; không kết luận weakness từ các từ slang."},
+    {"id":"R4-05","category":4,"source":"synthetic","pass":true,"result":"Study Note chỉ dùng T01/T03; banter về màu slide bị loại khỏi learning point."}
+  ]
+}
