@@ -1,10 +1,14 @@
 import React from 'react';
 import { useSession } from '../../context/SessionContext';
 
-export default function LearningProgressCard() {
+interface LearningProgressCardProps {
+  currentIndex: number;
+}
+
+export default function LearningProgressCard({ currentIndex }: LearningProgressCardProps) {
   const { state } = useSession();
   const items = state.roadmap?.items ?? [];
-  const current = Math.min(items.length, 1);
+  const current = currentIndex + 1;
 
   return (
     <div className="flat-card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -22,8 +26,26 @@ export default function LearningProgressCard() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {items.map((item, index) => (
           <div key={item.sectionId} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, fontWeight: 700 }}>
-            <span style={{ color: index < current ? 'var(--clay-mint-dark)' : 'var(--ink-faint)' }}>{index < current ? '✓' : '○'}</span>
-            <span style={{ color: index < current ? 'var(--ink)' : 'var(--ink-soft)' }}>{item.sectionTitle}</span>
+            <span
+              style={{
+                color:
+                  index < currentIndex
+                    ? 'var(--clay-mint-dark)'
+                    : index === currentIndex
+                      ? 'var(--clay-purple)'
+                      : 'var(--ink-faint)',
+              }}
+            >
+              {index < currentIndex ? '✓' : index === currentIndex ? '●' : '○'}
+            </span>
+            <span
+              style={{
+                color: index <= currentIndex ? 'var(--ink)' : 'var(--ink-soft)',
+                fontWeight: index === currentIndex ? 800 : 700,
+              }}
+            >
+              {item.sectionTitle}
+            </span>
           </div>
         ))}
       </div>
