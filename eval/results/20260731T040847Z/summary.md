@@ -11,11 +11,11 @@
 | Suite | Passed | Pass rate | p50 ms | p95 ms |
 |---|---:|---:|---:|---:|
 | delta_credit_and_quota | 0/3 | 0.0% | 0.01 | 0.01 |
-| lesson_qa | 0/4 | 0.0% | 0.0 | 0.01 |
-| quiz_generation | 0/4 | 0.0% | 0.0 | 0.0 |
-| quiz_integrity | 0/3 | 0.0% | 0.01 | 0.01 |
-| socratic_agent | 0/3 | 0.0% | 0.0 | 0.01 |
-| validator_guardrails | 1/3 | 33.3% | 0.01 | 0.01 |
+| lesson_qa | 0/4 | 0.0% | 0.0 | 0.0 |
+| quiz_generation | 0/4 | 0.0% | 0.0 | 0.01 |
+| quiz_integrity | 0/3 | 0.0% | 0.0 | 0.0 |
+| socratic_agent | 0/3 | 0.0% | 0.0 | 0.0 |
+| validator_guardrails | 1/3 | 33.3% | 0.0 | 0.0 |
 
 ## Aggregate metrics
 

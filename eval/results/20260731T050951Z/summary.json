@@ -1,0 +1,249 @@
+{
+  "schema_version": "2.0",
+  "timestamp_utc": "2026-07-31T05:09:51.996627+00:00",
+  "adapter": "adapters.project_adapter",
+  "total_cases": 20,
+  "passed": 7,
+  "failed": 13,
+  "errors": 0,
+  "pass_rate": 0.35,
+  "quality_bar": 0.8,
+  "meets_quality_bar": false,
+  "latency": {
+    "mean_ms": 2899.88,
+    "p50_ms": 2080.68,
+    "p95_ms": 12684.6,
+    "max_ms": 14556.11
+  },
+  "metrics": {
+    "bleu": 0.0397,
+    "citation_f1": 0.5,
+    "citation_precision": 0.5,
+    "citation_recall": 0.5,
+    "integrity_pass": 0.6667,
+    "keyword_recall": 0.3083,
+    "llm_judge": 0.7273,
+    "quota_pass": 0.6667,
+    "rouge_l": 0.0512,
+    "tool_call_f1": 0.7143,
+    "tool_call_precision": 0.7143,
+    "tool_call_recall": 0.7143,
+    "validator_pass": 1.0
+  },
+  "by_suite": {
+    "delta_credit_and_quota": {
+      "total": 3,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "metrics": {
+        "bleu": 0.0719,
+        "keyword_recall": 0.2778,
+        "quota_pass": 0.6667,
+        "rouge_l": 0.0247
+      },
+      "latency_p50_ms": 0.01,
+      "latency_p95_ms": 0.01
+    },
+    "lesson_qa": {
+      "total": 4,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "metrics": {
+        "bleu": 0.0225,
+        "citation_f1": 0.0,
+        "citation_precision": 0.0,
+        "citation_recall": 0.0,
+        "keyword_recall": 0.25,
+        "llm_judge": 0.5,
+        "rouge_l": 0.0307,
+        "tool_call_f1": 0.0,
+        "tool_call_precision": 0.0,
+        "tool_call_recall": 0.0
+      },
+      "latency_p50_ms": 10341.77,
+      "latency_p95_ms": 14260.61
+    },
+    "quiz_generation": {
+      "total": 4,
+      "passed": 4,
+      "pass_rate": 1.0,
+      "metrics": {
+        "bleu": 0.023,
+        "citation_f1": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "keyword_recall": 0.4166,
+        "llm_judge": 1.0,
+        "rouge_l": 0.059,
+        "tool_call_f1": 1.0,
+        "tool_call_precision": 1.0,
+        "tool_call_recall": 1.0
+      },
+      "latency_p50_ms": 3063.98,
+      "latency_p95_ms": 3266.46
+    },
+    "quiz_integrity": {
+      "total": 3,
+      "passed": 0,
+      "pass_rate": 0.0,
+      "metrics": {
+        "bleu": 0.0691,
+        "integrity_pass": 0.6667,
+        "keyword_recall": 0.4445,
+        "rouge_l": 0.1579
+      },
+      "latency_p50_ms": 0.0,
+      "latency_p95_ms": 0.01
+    },
+    "socratic_agent": {
+      "total": 3,
+      "passed": 2,
+      "pass_rate": 0.6667,
+      "metrics": {
+        "bleu": 0.0233,
+        "keyword_recall": 0.0,
+        "llm_judge": 0.6667,
+        "rouge_l": 0.0112,
+        "tool_call_f1": 1.0,
+        "tool_call_precision": 1.0,
+        "tool_call_recall": 1.0
+      },
+      "latency_p50_ms": 2051.89,
+      "latency_p95_ms": 2158.05
+    },
+    "validator_guardrails": {
+      "total": 3,
+      "passed": 1,
+      "pass_rate": 0.3333,
+      "metrics": {
+        "bleu": 0.0394,
+        "keyword_recall": 0.4444,
+        "rouge_l": 0.028,
+        "tool_call_f1": 1.0,
+        "tool_call_precision": 1.0,
+        "tool_call_recall": 1.0,
+        "validator_pass": 1.0
+      },
+      "latency_p50_ms": 2.23,
+      "latency_p95_ms": 1898.75
+    }
+  },
+  "failed_cases": [
+    {
+      "case_id": "quota_001",
+      "suite": "delta_credit_and_quota",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall",
+        "quota_pass"
+      ]
+    },
+    {
+      "case_id": "quota_002",
+      "suite": "delta_credit_and_quota",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    },
+    {
+      "case_id": "quota_003",
+      "suite": "delta_credit_and_quota",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    },
+    {
+      "case_id": "lesson_qa_001",
+      "suite": "lesson_qa",
+      "error": null,
+      "failed_checks": [
+        "llm_judge",
+        "citation_recall",
+        "tool_call_recall",
+        "tool_call_precision"
+      ]
+    },
+    {
+      "case_id": "lesson_qa_002",
+      "suite": "lesson_qa",
+      "error": null,
+      "failed_checks": [
+        "citation_recall",
+        "tool_call_recall",
+        "tool_call_precision"
+      ]
+    },
+    {
+      "case_id": "lesson_qa_003",
+      "suite": "lesson_qa",
+      "error": null,
+      "failed_checks": [
+        "llm_judge",
+        "citation_recall",
+        "tool_call_recall",
+        "tool_call_precision"
+      ]
+    },
+    {
+      "case_id": "lesson_qa_004",
+      "suite": "lesson_qa",
+      "error": null,
+      "failed_checks": [
+        "citation_recall",
+        "tool_call_recall",
+        "tool_call_precision"
+      ]
+    },
+    {
+      "case_id": "integrity_001",
+      "suite": "quiz_integrity",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    },
+    {
+      "case_id": "integrity_002",
+      "suite": "quiz_integrity",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall",
+        "integrity_pass"
+      ]
+    },
+    {
+      "case_id": "integrity_003",
+      "suite": "quiz_integrity",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    },
+    {
+      "case_id": "socratic_001",
+      "suite": "socratic_agent",
+      "error": null,
+      "failed_checks": [
+        "llm_judge"
+      ]
+    },
+    {
+      "case_id": "validator_001",
+      "suite": "validator_guardrails",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    },
+    {
+      "case_id": "validator_002",
+      "suite": "validator_guardrails",
+      "error": null,
+      "failed_checks": [
+        "keyword_recall"
+      ]
+    }
+  ]
+}

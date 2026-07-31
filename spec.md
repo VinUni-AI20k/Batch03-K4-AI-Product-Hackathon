@@ -11,8 +11,8 @@ Hướng: **A — VLearn** · Loại: **Tính năng mới** · Prototype: **Mock
 
 | Chỉ số evidence bắt buộc | Kết quả |
 |---|---:|
-| Số người ngoài nhóm | `[PENDING — cần ≥20]` |
-| Số/% xác nhận primary pain | `[PENDING — cần ≥50%]` |
+| Số người ngoài nhóm | `[Đạt — 20 người]` |
+| Số/% xác nhận primary pain | `[Đạt — 15/20 (75%) xác nhận]` |
 | Tần suất gặp | `[PENDING]` |
 | Thời gian mất/lần | `[PENDING]` |
 | ≥5 quote nguyên văn + người nói | `[PENDING]` |
@@ -42,22 +42,32 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 
 ## §4. Thiết kế
 
-- **Lát cắt một câu:** Một học viên vừa học xong một bài được kiểm tra qua quiz, có Trợ lý Socratic Agent hỗ trợ gợi mở kiến thức (nhưng bị giới hạn Validator chặn lộ đáp án). Điểm thưởng Credit được tính dựa trên Độ cải thiện (Delta) thay vì điểm tuyệt đối.
-- **Phần thật (Real AI):** Trợ lý Socratic Agent trong lúc làm Quiz + Validator LLM (Guardrails) chặn lộ đáp án.
-- **Phần mock:** Sinh câu hỏi thích ứng nhiều vòng (chỉ mock flow tĩnh/vòng quiz), quản lý user session/credit (chạy trên client RAM).
-- **Automation:** Conditional/augment. Nguồn đủ mới tạo quiz; Validator chặn câu trả lời Agent nếu phát hiện Leak.
-- **Cost-of-error:** Nếu AI Leak đáp án làm hỏng mục tiêu đánh giá năng lực -> Validator là chốt chặn quan trọng nhất (điểm nhấn Hackathon).
+- **Lát cắt một câu:** Một học viên vừa học xong một bài tự làm quiz ôn tập được AI phân bổ lại số câu/độ khó theo từng chủ đề dựa trên năng lực ước lượng của chính học viên đó qua nhiều vòng, có thể hỏi một trợ lý bị giới hạn lượt/token trong lúc làm quiz, để đạt ngưỡng % hiểu bài tối thiểu (threshold) ở mọi chủ đề trước khi chuyển sang bài tiếp theo.
+- **Non-goals:** không tích hợp điểm học phần; không dùng trong đánh giá chính thức (thi/điểm học phần) — trợ lý trong quiz chỉ tồn tại trong chế độ ôn tập không tính điểm; không tạo ngân hàng toàn khóa; không chẩn đoán năng lực dài hạn (chỉ ước lượng theo phiên + học liệu buổi đó); không cấp reward thật khi chưa duyệt; **trợ lý không được tiết lộ trực tiếp đáp án đúng của câu đang làm**; **credit không được cộng dồn vô hạn** — có cap cứng và không thay thế quota nền.
+- **Phần thật:** AI sinh câu hỏi theo từng vòng bám nguồn (transcript), chấm MCQ deterministic, ước lượng mastery theo topic sau mỗi vòng, agent-trong-quiz trả lời có validator chặn lộ đáp án và lưu trace.
+- **Phần mock:** login, giá trị credit khởi tạo, liên kết LMS/backend thật, quy trình duyệt của giảng viên trước khi công nhận credit là "thật".
+- **Automation:** Conditional/augment, hai tầng quyết định:
+  1. *Sinh câu theo vòng* — chỉ tạo khi nguồn đủ cho topic đó; dừng khi mọi topic ≥ threshold hoặc hết round cap (tối đa 3 vòng); nguồn thiếu hoặc sai schema thì không hiển thị, giữ câu hỏi giáo viên làm fallback.
+  2. *Agent trả lời trong quiz* — chỉ hiển thị response đã qua validator "không lộ đáp án"; response không qua validator không tính vào quota đã dùng của học viên (để không phạt học viên vì lỗi hệ thống).
+- **Cost-of-error:** đáp án bị lộ qua agent làm sai lệch ước lượng mastery (học viên có vẻ hiểu nhưng chỉ được mớm) → hệ thống quyết định ôn tập sai hướng và cấp credit sai người; chi phí từ chối trả lời khi nghi ngờ (agent quá thận trọng) luôn thấp hơn chi phí lộ đáp án.
+- **Công bằng giữa nhóm năng lực (quyết định cốt lõi để tránh vòng lặp giỏi-càng-giỏi):**
+  - Quota lượt hỏi/token *nền* của agent-trong-quiz là như nhau cho mọi học viên, không phụ thuộc điểm quiz trước đó.
+  - Credit tích lũy chỉ cộng thêm *trên* quota nền (không phải điều kiện để có quota tối thiểu) và được tính theo **mức cải thiện mastery so với vòng trước** (delta), không tính theo điểm tuyệt đối — học viên yếu cải thiện nhiều vẫn nhận credit ngang hoặc hơn học viên giỏi vốn đã cao.
+  - Credit có cap cứng (giữ mock 0–20) và có mốc reset/giảm dần theo kỳ để không tạo lợi thế tích lũy không giới hạn.
 
 ### §4b. HAX/PAIR
 
 | Nguyên tắc | Áp cụ thể trong prototype |
 |---|---|
-| G1 — Làm rõ hệ thống làm được gì | Màn đầu ghi “Quiz 15 câu, chỉ dùng cho ôn tập”. |
-| G2 — Làm rõ nó làm tốt đến đâu | Hiển thị AI thật/Mock và source IDs; thiếu nguồn báo rõ. |
-| G10 — Thu hẹp khi nghi ngờ | Không đủ học liệu trả `INSUFFICIENT_EVIDENCE`, không tạo câu. |
-| G9 — Sửa dễ dàng | Nút làm lại/báo câu sai; câu bị báo không tính reward thật. |
-| G11 — Giải thích vì sao | Kết quả có giải thích và mã nguồn học liệu. |
-| G17 — Quyền kiểm soát | User có thể đóng quiz, xem lại bài hoặc bỏ qua. |
+| G1 — Làm rõ hệ thống làm được gì | Màn đầu ghi "Quiz ôn tập, độ khó tự điều chỉnh theo năng lực, chỉ dùng cho ôn tập". |
+| G2 — Làm rõ nó làm tốt đến đâu | Hiển thị AI thật/Mock, source IDs, và mastery % ước lượng kèm số câu làm căn cứ (để biết % đó tin cậy đến đâu). |
+| G5 — Đúng chuẩn mực xã hội/học thuật | Agent-trong-quiz chỉ gợi ý kiểu Socratic (đặt câu hỏi dẫn dắt, trỏ nguồn), không bao giờ đọc đáp án hộ — như một trợ giảng thật trong buổi tự ôn. |
+| G6 — Giảm thiên lệch giữa nhóm | Quota nền của agent bằng nhau cho mọi học viên bất kể năng lực; credit chỉ cộng thêm, không phải điều kiện được hỗ trợ tối thiểu. |
+| G10 — Thu hẹp khi nghi ngờ | Không đủ học liệu cho một topic trả `INSUFFICIENT_EVIDENCE` cho đúng topic đó, không chặn toàn bộ quiz. |
+| G9 — Sửa dễ dàng | Nút làm lại/báo câu sai; câu bị báo không tính vào mastery lẫn credit thật. |
+| G11 — Giải thích vì sao | Kết quả có giải thích, mã nguồn học liệu, và lý do vì sao vòng sau đổi độ khó/chủ đề. |
+| G16 — Cho biết hậu quả trước khi hành động | Trước khi dùng 1 lượt hỏi hoặc đổi credit lấy quota, hiển rõ "dùng lượt này trừ bao nhiêu, còn lại bao nhiêu" trước khi học viên xác nhận. |
+| G17 — Quyền kiểm soát | Học viên có thể đóng quiz, xem lại bài hoặc bỏ qua vòng bổ sung bất kỳ lúc nào. |
 
 ## §5. Kiểu lỗi — 4 lớp và ≥8 kịch bản
 
@@ -74,20 +84,19 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 
 ## §6. Bốn đường đi trải nghiệm
 
-- **Happy:** user làm quiz -> gặp câu khó -> hỏi Socratic Agent -> Agent gợi ý -> user cải thiện điểm (Delta > 0) -> +Credit.
-- **Gaming/Jailbreak:** user hỏi thẳng đáp án -> Socratic Agent định nhả -> Validator chặn "Ngoài khả năng".
-- **Low-confidence:** nguồn ít -> `INSUFFICIENT_EVIDENCE` -> chọn bài/đoạn khác.
-- **Correction:** user báo câu sai -> không tính câu/reward thật -> tạo lại từ nguồn khác.
+- **Happy:** nguồn đủ → AI tạo 15 MCQ → user làm → đạt ≥12/15 → xem phần cần ôn → +1 credit mock.
+- **Low-confidence:** nguồn ít → `INSUFFICIENT_EVIDENCE` → chọn bài/đoạn khác.
+- **Failure:** API/schema/source lỗi → không render output → dùng quiz mock có nhãn hoặc thử lại.
+- **Correction:** user báo câu sai → không tính câu/reward thật → tạo lại từ nguồn khác.
 
 ## §7. Kiểm thử
 
-- Golden set 1 (Quiz Gen): `eval/golden_set.json`, 20 case; 8 thường, ≥2/lớp khó, 4 hiếm.
-- Golden set 2 (Agent Guardrails): `eval/golden_set_agent.json`, kiểm tra khả năng bắt lỗi Leak đáp án của Validator.
-- Định nghĩa machine pass: status thuộc expected, đúng schema. Đối với Agent: Validator chặn đúng (Jailbreak -> FAIL -> Cản) và cho phép đúng (Safe -> PASS).
+- Golden set: `eval/golden_set.json`, 20 case; 8 thường, ≥2/lớp khó, 4 hiếm, 10 case phát triển từ chatlog chỉ lưu turn ID.
+- Định nghĩa machine pass: status thuộc expected, đúng schema, 15 câu, 4 options, correct 0–3, source IDs hợp lệ.
 - Groundedness pass: hai người mở nguồn và cùng xác nhận nguồn hỗ trợ câu + đáp án.
 - Relevance pass: hai người cùng xác nhận câu kiểm tra mục tiêu bài, không trivia/đánh đố.
-- **Quality bar chốt:** ≥85% toàn bộ golden set pass; hard constraints: 100% case ngoài phạm vi / jailbreak bị chặn.
-- Kết quả lượt chạy: Chạy `uv run python eval/run_eval.py` và `uv run python eval/run_agent_eval.py`.
+- **Quality bar chốt:** ≥85% toàn bộ golden set pass; hard constraints: 100% câu render có nguồn hỗ trợ, 100% case ngoài phạm vi bị xử lý đúng.
+- Kết quả lượt chạy: `[PENDING — chạy uv run python eval/run_eval.py sau khi đặt OPENAI_API_KEY]`.
 
 ## §8. Phân công & kế hoạch
 
