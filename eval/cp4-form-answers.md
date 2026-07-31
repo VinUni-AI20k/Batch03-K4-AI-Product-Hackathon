@@ -2,7 +2,7 @@
 
 ## Thông tin nhóm
 
-- Khóa VinAI: **Khóa 3**
+- Khóa VinAI: **Khóa 4**
 - Lớp labcode: **D305**
 - Nhóm trưởng: **Nguyễn Quang Hà — 2A202601424**
 

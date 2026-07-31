@@ -7,7 +7,7 @@ File này là điểm bắt đầu dành cho người chấm. Dữ liệu chi ti
 - Nhóm: **SPDVC**
 - Sản phẩm: **Trợ lý chuẩn bị và kiểm tra hồ sơ dịch vụ công**
 - Nhóm trưởng: **Nguyễn Quang Hà — 2A202601424**
-- Khóa/lớp labcode: **Khóa 3 — D305**
+- Khóa/lớp labcode: **Khóa 4 — D305**
 - Model tại quyết định trung tâm: **GPT-4.1-mini**
 - Phạm vi: hỏi đáp có nguồn; chọn tool; điền/rà soát ba biểu mẫu; tạo PDF; nộp mô phỏng sau xác nhận. Không ký hoặc gửi hồ sơ thật đến cơ quan nhà nước.
 
@@ -47,7 +47,14 @@ Bằng chứng A chứng minh người dùng gặp vấn đề; bằng chứng B
 - Không cộng tỷ lệ giữa các lựa chọn checkbox vì một người có thể chọn nhiều phương án.
 - Log B được mô tả đúng là log nhóm tự dùng thử, không trình bày như log của người dùng bên ngoài.
 
-## 6. Đường dẫn kiểm tra nhanh
+## 6. CP5 — Validation ngoài nhóm
+
+- **5 người ngoài nhóm** đã thử các luồng chính, UI nhiều bước và tình huống tấn công.
+- Feedback dẫn đến các thay đổi: ẩn plan/tool; chọn form/Agent trước khi nhập; xem PDF và xác nhận; reset context; render Markdown an toàn; chặn prompt injection và leo thang quyền trước tool.
+- Feedback nguyên văn, vai trò người thử, quan sát và mapping thay đổi nằm tại [`../validation/feedback-log.md`](../validation/feedback-log.md).
+- Nội dung copy vào form CP5 nằm tại [`../validation/cp5-form-answers.md`](../validation/cp5-form-answers.md).
+
+## 7. Đường dẫn kiểm tra nhanh
 
 | Nội dung | Đường dẫn |
 |---|---|
@@ -58,3 +65,5 @@ Bằng chứng A chứng minh người dùng gặp vấn đề; bằng chứng B
 | Báo cáo mining log | [`../evidence/cp4-log-mining/report.json`](../evidence/cp4-log-mining/report.json) |
 | Golden set | [`../eval/cases.json`](../eval/cases.json) |
 | Kết quả golden set mới nhất | [`../eval/report.md`](../eval/report.md) |
+| Feedback log CP5 | [`../validation/feedback-log.md`](../validation/feedback-log.md) |
+| Nội dung form CP5 | [`../validation/cp5-form-answers.md`](../validation/cp5-form-answers.md) |
