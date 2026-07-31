@@ -1,0 +1,241 @@
+{
+  "timestamp_utc": "2026-07-30T14:34:35.632562+00:00",
+  "model": "gpt-5.6-luna",
+  "lesson_title": "Day03 — Agentic AI",
+  "source_ids": [
+    "T03-024",
+    "T03-025",
+    "T03-026",
+    "T03-027",
+    "T03-028",
+    "T03-029",
+    "T03-030",
+    "T03-031",
+    "T03-032",
+    "T03-033",
+    "T03-034",
+    "T03-035",
+    "T03-036",
+    "T03-037",
+    "T03-038"
+  ],
+  "output": {
+    "status": "OK",
+    "message": "Đủ bằng chứng để tạo 15 câu hỏi củng cố.",
+    "questions": [
+      {
+        "question": "Trong bài toán lập kế hoạch du lịch cho gia đình, vì sao chỉ dùng LLM có thể chưa phù hợp?",
+        "options": [
+          "Vì LLM không thể xử lý văn bản",
+          "Vì bài toán cần xét nhiều ràng buộc và có thể liên quan đến duyệt đồ thị, tìm kiếm tối ưu",
+          "Vì LLM chỉ dùng được cho dịch máy",
+          "Vì LLM không thể nhận yêu cầu người dùng"
+        ],
+        "correct": 1,
+        "explanation": "Bài toán có nhiều yêu cầu về thời gian, khoảng cách và đặc điểm thành viên nên cần các phương thức như duyệt đồ thị và tìm kiếm tối ưu.",
+        "source_ids": [
+          "T03-024",
+          "T03-033"
+        ]
+      },
+      {
+        "question": "Theo đề xuất trong lớp, hệ cơ sở tri thức có thể biểu diễn thông tin dưới dạng nào?",
+        "options": [
+          "Một bảng tính ngẫu nhiên",
+          "Một graph gồm các node chứa đặc điểm của đối tượng",
+          "Một đoạn hội thoại duy nhất",
+          "Một mô hình chỉ chứa hình ảnh"
+        ],
+        "correct": 1,
+        "explanation": "Các node của graph có thể chứa đặc điểm, tính chất của công viên, khu vui chơi hoặc khách sạn.",
+        "source_ids": [
+          "T03-027"
+        ]
+      },
+      {
+        "question": "Khi truy xuất trong hệ cơ sở tri thức, hệ thống có thể dựa vào yếu tố nào?",
+        "options": [
+          "Yêu cầu người dùng và các luật liên kết",
+          "Màu giao diện ứng dụng",
+          "Tên người lập trình",
+          "Số lượng tham số của LLM"
+        ],
+        "correct": 0,
+        "explanation": "Hệ thống truy xuất dựa trên yêu cầu như đi quãng đường ngắn hoặc nhu cầu vui chơi của trẻ em, cùng các luật đã đặt ra.",
+        "source_ids": [
+          "T03-027"
+        ]
+      },
+      {
+        "question": "Cách kết hợp nào được đề xuất để lập kế hoạch du lịch linh hoạt hơn?",
+        "options": [
+          "Chỉ dùng dữ liệu huấn luyện của LLM",
+          "Dùng cơ sở dữ liệu cho thông tin ổn định và tool/API cho thông tin thay đổi",
+          "Chỉ dùng giao diện đồ họa",
+          "Chỉ dùng dữ liệu do người dùng nhập thủ công"
+        ],
+        "correct": 1,
+        "explanation": "Cơ sở dữ liệu lưu thông tin ít thay đổi, còn API thời tiết có thể cung cấp thông tin theo thời điểm cụ thể.",
+        "source_ids": [
+          "T03-028"
+        ]
+      },
+      {
+        "question": "Theo giảng viên, kỹ thuật xác suất thống kê dựa trên đồ thị được nhắc đến là gì?",
+        "options": [
+          "Markov model",
+          "RAG",
+          "Fine-tuning",
+          "Voice synthesis"
+        ],
+        "correct": 0,
+        "explanation": "Giảng viên уточ định hướng graph được nói đến sâu hơn là mô hình Markov dựa trên xác suất thống kê.",
+        "source_ids": [
+          "T03-029"
+        ]
+      },
+      {
+        "question": "Trong bài toán kế hoạch vui chơi, state graph có thể biểu diễn điều gì?",
+        "options": [
+          "Các khu vực có thể đi và vị trí của chúng",
+          "Các câu trả lời trong bài kiểm tra tiếng Anh",
+          "Lịch sử thanh toán API",
+          "Nội dung quảng cáo"
+        ],
+        "correct": 0,
+        "explanation": "Giảng viên đề xuất biểu diễn đồ thị trạng thái của các khu vực có thể đi trong kế hoạch, kèm vị trí.",
+        "source_ids": [
+          "T03-030"
+        ]
+      },
+      {
+        "question": "Khi bắt đầu xây dựng hệ thống, nên xử lý yêu cầu theo cách nào?",
+        "options": [
+          "Cố hoàn thiện toàn bộ mọi yêu cầu ngay lập tức",
+          "Narrow down phạm vi và giải quyết từng phần, cải tiến dần",
+          "Bỏ qua hoàn toàn yêu cầu người dùng",
+          "Chỉ tập trung vào giao diện"
+        ],
+        "correct": 1,
+        "explanation": "Bài học khuyến nghị thu hẹp phạm vi ban đầu, chẳng hạn chỉ phân loại theo thời gian rảnh và khoảng cách.",
+        "source_ids": [
+          "T03-031",
+          "T03-032"
+        ]
+      },
+      {
+        "question": "UI/UX có thể giúp agent xử lý yêu cầu như thế nào?",
+        "options": [
+          "Buộc người dùng trả lời theo các lựa chọn hoặc nhánh rõ ràng",
+          "Tự động thay thế mọi cơ sở dữ liệu",
+          "Loại bỏ nhu cầu hiểu intent",
+          "Chỉ làm ứng dụng đẹp hơn mà không ảnh hưởng logic"
+        ],
+        "correct": 0,
+        "explanation": "Các câu hỏi và lựa chọn của UI/UX giúp thu hẹp không gian trả lời và đơn giản hóa logic của hệ thống.",
+        "source_ids": [
+          "T03-032"
+        ]
+      },
+      {
+        "question": "Khi đánh giá một problem, điều gì cần được kiểm tra trước?",
+        "options": [
+          "LLM có đủ khả năng xử lý hay cần thêm tool bên ngoài",
+          "Tên thương hiệu của sản phẩm",
+          "Số lượng màn hình ứng dụng",
+          "Màu sắc của logo"
+        ],
+        "correct": 0,
+        "explanation": "Cần đối chiếu sức mạnh của LLM với yêu cầu bài toán và xác định phần cần bổ sung nếu LLM không đủ.",
+        "source_ids": [
+          "T03-033"
+        ]
+      },
+      {
+        "question": "Với nhiệm vụ đếm số lần xuất hiện của một chữ cái trong từ, giải pháp được đề xuất là gì?",
+        "options": [
+          "Fine-tune LLM trong nhiều năm",
+          "Gọi một tool Python sau khi xác định đúng intent và các đầu vào",
+          "Yêu cầu người dùng tự đếm",
+          "Dùng API thời tiết"
+        ],
+        "correct": 1,
+        "explanation": "LLM cần nhận diện intent, tách từ và chữ cái cần đếm, rồi gọi function Python để cho kết quả chính xác.",
+        "source_ids": [
+          "T03-034"
+        ]
+      },
+      {
+        "question": "Để tool đếm chữ cái hoạt động đúng, LLM cần bóc tách những đầu vào nào?",
+        "options": [
+          "Tên người dùng và ngày sinh",
+          "Từ cần đếm và chữ cái cần đếm",
+          "Địa điểm và thời tiết",
+          "Sản phẩm A và sản phẩm B"
+        ],
+        "correct": 1,
+        "explanation": "Tool nhận từ cần đếm và chữ cái cần đếm, sau đó trả về số lượng.",
+        "source_ids": [
+          "T03-034"
+        ]
+      },
+      {
+        "question": "Theo bài học, LLM có thể thực hiện phép tính tốt hơn trong một số trường hợp khi nào?",
+        "options": [
+          "Khi được yêu cầu reasoning từng bước theo logic phù hợp",
+          "Khi không được cung cấp bất kỳ ngữ cảnh nào",
+          "Khi chỉ nhận một hình ảnh bất kỳ",
+          "Khi tắt toàn bộ tool"
+        ],
+        "correct": 0,
+        "explanation": "LLM có thể đưa ra đáp án nếu được train hoặc hướng dẫn reasoning từng bước theo logic cần thiết.",
+        "source_ids": [
+          "T03-035"
+        ]
+      },
+      {
+        "question": "Vì sao chatbot nắm quy tắc nội bộ công ty thường cần RAG?",
+        "options": [
+          "Vì quy tắc nội bộ thường không nằm trong dữ liệu huấn luyện của LLM",
+          "Vì RAG thay thế hoàn toàn giao diện",
+          "Vì RAG chỉ dùng để tạo giọng nói",
+          "Vì LLM không thể reasoning dựa trên text"
+        ],
+        "correct": 0,
+        "explanation": "RAG đưa tài liệu nội bộ vào làm nguồn tham chiếu để LLM trả lời dựa trên thông tin phù hợp.",
+        "source_ids": [
+          "T03-036"
+        ]
+      },
+      {
+        "question": "Khi phát triển sản phẩm AI, ngoài việc xác nhận bài toán có thể làm bằng AI, cần xác nhận thêm điều gì?",
+        "options": [
+          "Người dùng có thể tự làm việc đó bằng các công cụ sẵn có hay không",
+          "Ứng dụng có bao nhiêu biểu tượng",
+          "Nhân viên có thích màu nền không",
+          "Mô hình có tên ngắn hay không"
+        ],
+        "correct": 0,
+        "explanation": "Cần xem xét khả năng người dùng tự thực hiện bằng Gemini, ChatGPT hoặc các phương tiện có sẵn để đánh giá tính cạnh tranh.",
+        "source_ids": [
+          "T03-037"
+        ]
+      },
+      {
+        "question": "Giá trị của một nền tảng AI học tiếng Anh có thể vượt ra ngoài việc tiết kiệm thời gian ở điểm nào?",
+        "options": [
+          "Cung cấp không gian tương tác, cạnh tranh hoặc cộng đồng",
+          "Chỉ giảm số lượng câu hỏi",
+          "Chỉ thay đổi phông chữ",
+          "Chỉ lưu kết quả trên máy cá nhân"
+        ],
+        "correct": 0,
+        "explanation": "Nền tảng có thể kết nối nhiều chức năng và tạo không gian tương tác, cạnh tranh hoặc cộng đồng mà người dùng tự làm riêng khó có được.",
+        "source_ids": [
+          "T03-038"
+        ]
+      }
+    ]
+  },
+  "usage": {}
+}

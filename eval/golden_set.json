@@ -1,0 +1,22 @@
+[
+  {"id":"N01","class":"normal","origin":"transcript","reference":"T03-030..032","source_ids":["T03-030","T03-031","T03-032"],"expected":["OK"]},
+  {"id":"N02","class":"normal","origin":"transcript","reference":"T03-024..026","source_ids":["T03-024","T03-025","T03-026"],"expected":["OK"]},
+  {"id":"N03","class":"normal","origin":"transcript","reference":"T03-027..029","source_ids":["T03-027","T03-028","T03-029"],"expected":["OK"]},
+  {"id":"N04","class":"normal","origin":"transcript","reference":"T03-033..035","source_ids":["T03-033","T03-034","T03-035"],"expected":["OK"]},
+  {"id":"N05","class":"normal","origin":"transcript","reference":"T03-036..038","source_ids":["T03-036","T03-037","T03-038"],"expected":["OK"]},
+  {"id":"N06","class":"normal","origin":"transcript","reference":"T03-039..041","source_ids":["T03-039","T03-040","T03-041"],"expected":["OK"]},
+  {"id":"N07","class":"normal","origin":"transcript","reference":"T03-042..044","source_ids":["T03-042","T03-043","T03-044"],"expected":["OK"]},
+  {"id":"N08","class":"normal","origin":"transcript","reference":"T03-045..047","source_ids":["T03-045","T03-046","T03-047"],"expected":["OK"]},
+  {"id":"S01","class":"source_truth","origin":"chatlog-derived","reference":"T0649","source_ids":["T03-030","T03-031","T99-999"],"expected":["ERROR"]},
+  {"id":"S02","class":"source_truth","origin":"chatlog-derived","reference":"T0905","source_ids":["T99-001","T99-002","T99-003"],"expected":["ERROR"]},
+  {"id":"A01","class":"ambiguous","origin":"chatlog-derived","reference":"T0115","source_ids":["T03-030"],"expected":["OK","INSUFFICIENT_EVIDENCE"]},
+  {"id":"A02","class":"ambiguous","origin":"chatlog-derived","reference":"T0154","source_ids":["T03-031","T03-032"],"expected":["OK","INSUFFICIENT_EVIDENCE"]},
+  {"id":"O01","class":"out_of_scope","origin":"chatlog-derived","reference":"T1189","purpose":"official_exam","source_ids":["T03-030","T03-031","T03-032"],"expected":["OUT_OF_SCOPE"]},
+  {"id":"O02","class":"out_of_scope","origin":"chatlog-derived","reference":"T0909","purpose":"graded_assessment","source_ids":["T03-030","T03-031","T03-032"],"expected":["OUT_OF_SCOPE"]},
+  {"id":"D01","class":"domain","origin":"chatlog-derived","reference":"T0811","source_ids":["T03-030","T03-030","T03-030"],"expected":["OK","INSUFFICIENT_EVIDENCE"]},
+  {"id":"D02","class":"domain","origin":"chatlog-derived","reference":"T0122","source_ids":["T03-031","T03-031","T03-032"],"expected":["OK","INSUFFICIENT_EVIDENCE"]},
+  {"id":"R01","class":"rare","origin":"chatlog-derived","reference":"T0769","source_ids":[],"expected":["OK"]},
+  {"id":"R02","class":"rare","origin":"chatlog-derived","reference":"T0399","source_ids":["T03-030","T03-032","T03-031"],"expected":["OK"]},
+  {"id":"R03","class":"rare","origin":"synthetic","reference":"credit-cap","purpose":"practice","source_ids":["T03-030","T03-031","T03-032"],"expected":["OK"]},
+  {"id":"R04","class":"rare","origin":"synthetic","reference":"unicode-vietnamese","source_ids":["T03-024","T03-031","T03-033"],"expected":["OK"]}
+]

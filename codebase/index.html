@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VLearn · Quiz củng cố cuối buổi</title>
+    <!-- Premium Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar glass-panel">
+        <div class="brand">
+          <i class="ph-fill ph-graduation-cap brand-mark"></i>
+          <span>VLearn</span>
+        </div>
+        <div class="document-name" id="document-name">
+          <i class="ph-fill ph-file-pdf doc-icon"></i>
+          <span id="document-title">day03-material.pdf</span>
+          <small id="document-meta">COMP2010 · Day03</small>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" aria-label="Chế độ sáng"><i class="ph ph-sun"></i></button>
+          <button class="avatar" aria-label="Tài khoản">HV</button>
+        </div>
+      </header>
+
+      <aside class="course-sidebar glass-panel">
+        <div class="sidebar-title">
+          <i class="ph-fill ph-books"></i>
+          <div><strong>Học liệu môn học</strong><small>Chương, slide và tài liệu</small></div>
+        </div>
+        <nav class="day-list" aria-label="Danh sách bài học">
+          <button class="day-item"><i class="ph-fill ph-check-circle text-success"></i><div><strong>Day01</strong><small>2 TÀI LIỆU · PUBLISHED</small></div><i class="ph ph-caret-down"></i></button>
+          <button class="day-item"><i class="ph-fill ph-check-circle text-success"></i><div><strong>Day02</strong><small>1 TÀI LIỆU · PUBLISHED</small></div><i class="ph ph-caret-down"></i></button>
+          <button class="day-item selected lesson-trigger" data-lesson="day03"><i class="ph-fill ph-play-circle text-primary"></i><div><strong>Day03</strong><small>2 NỘI DUNG · STUDYING</small></div><i class="ph ph-caret-up"></i></button>
+          <button class="lesson-file active lesson-trigger" data-lesson="day03"><i class="ph-fill ph-file-pdf text-danger"></i><div><strong>day03-material.pdf</strong><small>Slide Day03</small></div></button>
+          <button class="lesson-file quiz-entry" id="side-end-quiz"><i class="ph-fill ph-lightning"></i><div><strong>Quiz cuối bài</strong><small>Kiểm tra & nhận Credit</small></div><i class="ph ph-arrow-right quiz-arrow"></i></button>
+          <button class="day-item lesson-trigger" data-lesson="day04"><i class="ph-fill ph-lock-key"></i><div><strong>Day04</strong><small>1 TÀI LIỆU · LOCKED</small></div><i class="ph ph-caret-down"></i></button>
+          <button class="day-item lesson-trigger" data-lesson="day05"><i class="ph-fill ph-lock-key"></i><div><strong>Day05</strong><small>1 TÀI LIỆU · LOCKED</small></div><i class="ph ph-caret-down"></i></button>
+        </nav>
+      </aside>
+
+      <main class="reader">
+        <div class="reader-toolbar glass-panel">
+          <button class="tool active-tool"><i class="ph ph-book-open"></i> Đọc</button>
+          <button class="tool"><i class="ph ph-pen"></i> Bút</button>
+          <button class="tool"><i class="ph ph-highlighter"></i> Highlight</button>
+          <span class="toolbar-divider"></span>
+          <span class="page-pill">Trang 46 · 1 note</span>
+          <button class="tool zoom"><i class="ph ph-minus"></i></button>
+          <span class="zoom-text">100%</span>
+          <button class="tool zoom"><i class="ph ph-plus"></i></button>
+        </div>
+        <section class="slide-preview glass-panel">
+          <div class="slide-topline"><span id="slide-label">Day03</span><span id="slide-filename">day03-material.pdf</span></div>
+          <iframe id="slide-frame" class="slide-frame" title="Slide bài học Day03" src="/slides/day03#view=FitH"></iframe>
+        </section>
+      </main>
+
+      <aside class="tutor-panel glass-panel">
+        <div class="tutor-header">
+          <div><strong><i class="ph-fill ph-robot"></i> VLearn Tutor</strong><small><span class="status-dot"></span> Trợ lý học theo ngữ cảnh</small></div>
+        </div>
+        <div class="credit-card">
+          <div><span class="credit-label">Quota câu hỏi</span><strong id="credit-value">7 / 20</strong></div>
+          <div class="credit-track"><span id="credit-progress"></span></div>
+          <small>Hoàn thành quiz hoặc có độ cải thiện (Delta) tốt để nhận thêm lượt hỏi.</small>
+        </div>
+        <label class="lesson-picker" for="lesson-select">BÀI ĐANG HỎI</label>
+        <select id="lesson-select" class="lesson-select">
+          <option value="day03">Day03 · Từ Chatbot đến Agentic Agent</option>
+          <option value="day04">Day04 · Prompt Engineering & Tool Calling</option>
+          <option value="day05">Day05 · AI Product</option>
+        </select>
+        <div id="tutor-conversation" class="tutor-conversation" aria-live="polite">
+          <div class="tutor-message" id="tutor-message">Bạn đã học xong Day03. Hỏi mình một ý trong slide, mình sẽ trả lời kèm trang nguồn.</div>
+        </div>
+        <div class="ask-suggestions">
+          <button type="button" class="suggestion" data-question="ReAct khác chatbot thông thường ở điểm nào?">ReAct khác chatbot ở điểm nào?</button>
+          <button type="button" class="suggestion" data-question="Tool calling dùng để làm gì trong agent?">Tool calling dùng để làm gì?</button>
+        </div>
+        <form class="chat-form" id="ask-form">
+          <input id="ask-input" autocomplete="off" placeholder="Hỏi nội dung bài học..." />
+          <button type="submit" aria-label="Gửi câu hỏi"><i class="ph-fill ph-paper-plane-right"></i></button>
+        </form>
+        <small class="grounding-note">Agent chỉ trả lời từ file PDF trong thư mục slide/.</small>
+      </aside>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div class="modal-backdrop hidden" id="quiz-modal" role="dialog" aria-modal="true">
+      <section class="quiz-modal glass-panel">
+        <button class="close-modal" id="close-quiz" aria-label="Đóng quiz"><i class="ph ph-x"></i></button>
+        
+        <!-- Anti-cheat Start Screen -->
+        <div id="quiz-start-screen" class="quiz-start-screen">
+          <i class="ph-fill ph-warning-circle text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+          <h2>YÊU CẦU LÀM BÀI TRUNG THỰC</h2>
+          <p>Bài Quiz củng cố yêu cầu thực hiện ở chế độ Toàn Màn Hình (Fullscreen).<br/>Mọi hành vi thoát màn hình hoặc chuyển tab sẽ bị ghi nhận là gian lận.</p>
+          <div id="cheat-log" class="cheat-log hidden"></div>
+          <button id="start-fullscreen-btn" class="primary-button" style="margin-top: 1.5rem;"><i class="ph ph-arrows-out"></i> Bắt đầu làm bài</button>
+        </div>
+
+        <div class="quiz-layout hidden" id="quiz-layout-main">
+          <!-- Cột bên trái: Câu hỏi Quiz -->
+          <div id="quiz-view" class="quiz-main"></div>
+          
+          <!-- Cột bên phải: Socratic Agent -->
+          <div id="quiz-agent-view" class="quiz-agent hidden">
+            <div class="tutor-header">
+              <div><strong><i class="ph-fill ph-robot"></i> Socratic Agent</strong><small><span class="status-dot"></span> Trợ lý thi cử (Bị giới hạn)</small></div>
+              <div class="agent-quota">Còn: <span id="quiz-quota-val"></span> lượt</div>
+            </div>
+            <div class="warning-banner">
+              <i class="ph-fill ph-warning"></i> Agent chỉ gợi ý phương pháp học, KHÔNG giải hộ hay đọc đáp án. Lộ đáp án sẽ bị Validator chặn.
+            </div>
+            <div id="quiz-agent-chat" class="tutor-conversation">
+              <div class="tutor-message">Câu này khó? Mình có thể gợi mở giúp bạn nhớ lại bài. Tốn 1 Quota/lượt hỏi.</div>
+            </div>
+            <form class="chat-form" id="quiz-agent-form">
+              <input id="quiz-agent-input" autocomplete="off" placeholder="Nhờ gợi ý..." />
+              <button type="submit" aria-label="Gửi câu hỏi"><i class="ph-fill ph-paper-plane-right"></i></button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
