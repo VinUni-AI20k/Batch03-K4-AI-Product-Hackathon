@@ -54,6 +54,17 @@ SECTION_FALLBACKS = {
     "fee": {"processing_time"},
 }
 
+CONTROL_ACTIONS = {
+    "can hoi them",
+    "hoi them",
+    "khong co lua chon phu hop",
+    "chon lai",
+}
+QUERY_STOPWORDS = {
+    "toi", "minh", "ban", "cho", "can", "muon", "lam", "thu", "tuc", "dang", "ky", "cap", "xin",
+    "so", "giup", "voi", "ve", "nay", "kia", "mot", "cua", "duoc", "the", "nao",
+}
+
 
 @dataclass(frozen=True)
 class PipelineResult:
@@ -137,6 +148,21 @@ class ProcedurePipeline:
 
     def respond(self, state: dict[str, Any]) -> PipelineResult:
         message = state["messages"][-1]["content"].strip()
+        normalized_message = normalize_text(message).strip()
+        if normalized_message in CONTROL_ACTIONS:
+            return self._result(
+                "Tôi sẽ không dùng lựa chọn điều khiển này làm dữ liệu tra cứu. Bạn hãy mô tả lại tên thủ tục hoặc kết quả bạn muốn thực hiện.",
+                [],
+                state,
+                quick_replies=[],
+                confidence="low",
+                reasons=["control_action_requires_clarification"],
+                active_procedure_code=None,
+                candidate_codes=[],
+                selection_filters={},
+                pending_filter=None,
+                original_query=None,
+            )
         safety_refusal = refusal_for_unsafe_request(message)
         if safety_refusal:
             return self._result(
@@ -147,11 +173,26 @@ class ProcedurePipeline:
                 confidence="low",
                 reasons=["unsafe_or_unauthorized_request"],
             )
-        if state.get("locality_required") and state.get("active_procedure_code"):
+        locality_answer = bool(state.get("locality_required") and state.get("active_procedure_code"))
+        if locality_answer:
             # A locality reply is intentionally interpreted only after a procedure was selected.
             state = {**state, "administrative_area_code": message}
         selected = self._selected_record(state)
+        if selected and not locality_answer and self._should_reselect(selected, message):
+            state = {
+                **state,
+                "active_procedure_code": None,
+                "candidate_codes": [],
+                "selection_filters": {},
+                "pending_filter": None,
+                "locality_required": False,
+                "administrative_area_code": None,
+                "original_query": message,
+            }
+            selected = None
         if selected is None:
+            if not state.get("candidate_codes") and not state.get("pending_filter"):
+                state = {**state, "original_query": state.get("original_query") or message}
             candidates, filters = self._resolve_candidates(message, state)
             if len(candidates) == 1:
                 selected = candidates[0]
@@ -163,7 +204,8 @@ class ProcedurePipeline:
             return self._ask_locality(selected, state)
         if selected.is_local and not self._locality_matches(selected, locality):
             return self._locality_mismatch(selected, locality, state)
-        return self._answer(selected, message, state)
+        answer_query = selected.name if locality_answer else message
+        return self._answer(selected, answer_query, state)
 
     def _selected_record(self, state: dict[str, Any]) -> ProcedureRecord | None:
         code = state.get("active_procedure_code")
@@ -198,15 +240,50 @@ class ProcedurePipeline:
                 records = [record for record in records if getattr(record, attribute) == choice]
         for attribute, value in filters.items():
             records = [record for record in records if getattr(record, attribute) == value]
-        query_tokens = tokens(message)
+        intent_query = state.get("original_query") or message
+        query_tokens = tokens(intent_query)
         ranked = sorted(
             ((self._procedure_score(record, query_tokens), record) for record in records),
             key=lambda item: item[0],
             reverse=True,
         )
+        meaningful_tokens = self._meaningful_query_tokens(intent_query)
+        meaningful_support = max(
+            (self._procedure_score(record, meaningful_tokens) for record in records),
+            default=0.0,
+        )
+        maximum_meaningful_overlap = max(
+            (
+                len(
+                    meaningful_tokens
+                    & tokens(" ".join((record.name, record.group, record.field, record.request_type, record.scenario)))
+                )
+                for record in records
+            ),
+            default=0,
+        )
+        if len(meaningful_tokens) >= 2 and maximum_meaningful_overlap < 2:
+            return [], filters
+        if len(records) == 1 and len(meaningful_tokens) >= 2 and meaningful_support < 0.35:
+            return [], filters
         if ranked and ranked[0][0] >= 0.72 and (len(ranked) == 1 or ranked[0][0] - ranked[1][0] >= 0.20):
             return [ranked[0][1]], filters
         return records, filters
+
+    @staticmethod
+    def _meaningful_query_tokens(message: str) -> set[str]:
+        return {token for token in tokens(message) - QUERY_STOPWORDS if not token.isdigit()}
+
+    def _should_reselect(self, record: ProcedureRecord, message: str) -> bool:
+        normalized = normalize_text(message)
+        if record.code in message:
+            return False
+        if any(normalize_text(phrase) in normalized for phrase in QUESTION_SECTIONS):
+            return False
+        meaningful = self._meaningful_query_tokens(message)
+        if len(meaningful) < 2:
+            return False
+        return self._procedure_score(record, meaningful) < 0.25
 
     @staticmethod
     def _procedure_score(record: ProcedureRecord, query_tokens: set[str]) -> float:
@@ -220,7 +297,7 @@ class ProcedurePipeline:
     def _clarify(self, candidates: list[ProcedureRecord], filters: dict[str, str], state: dict[str, Any]) -> PipelineResult:
         if not candidates:
             return self._result(
-                "Tôi chưa xác định được thủ tục phù hợp từ dữ liệu snapshot. Bạn hãy mô tả mục đích và tỉnh/thành nơi thực hiện để tôi tra cứu chính xác.",
+                "Tôi không tìm thấy thông tin đủ tin cậy về thủ tục này trong dữ liệu hiện có. Tôi sẽ không tự chọn một thủ tục gần giống để trả lời. Bạn có thể cung cấp tên hoặc mã thủ tục chính xác hơn.",
                 [],
                 state,
                 quick_replies=[],
@@ -231,7 +308,10 @@ class ProcedurePipeline:
             attribute = selection_filter.attribute
             if attribute in filters:
                 continue
-            values = sorted({getattr(record, attribute) for record in candidates})
+            values = sorted({
+                getattr(record, attribute) for record in candidates
+                if normalize_text(getattr(record, attribute)).strip() not in CONTROL_ACTIONS
+            })
             if len(values) == 1:
                 filters[attribute] = values[0]
                 candidates = [record for record in candidates if getattr(record, attribute) == values[0]]
@@ -418,5 +498,6 @@ class ProcedurePipeline:
             "pending_filter": updates.get("pending_filter"),
             "locality_required": updates.get("locality_required", False),
             "administrative_area_code": updates.get("administrative_area_code", state.get("administrative_area_code")),
+            "original_query": updates.get("original_query", state.get("original_query")),
         }
         return PipelineResult(reply, [chunk.citation.to_dict() for chunk in chunks], next_state)

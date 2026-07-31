@@ -22,6 +22,7 @@ async def test_session_is_created_saved_and_deleted() -> None:
         "pending_filter": None,
         "locality_required": False,
         "administrative_area_code": None,
+        "original_query": None,
         "form_draft": {},
         "last_validation": {},
         "simulated_submissions": [],
@@ -31,6 +32,7 @@ async def test_session_is_created_saved_and_deleted() -> None:
         "last_user_message_normalized": None,
         "last_assistant_answer_normalized": None,
         "security_event_count": 0,
+        "security_events": [],
     }
 
     await store.save(session_id, {"messages": [{"role": "user", "content": "Xin chào"}], "intent": "general"})

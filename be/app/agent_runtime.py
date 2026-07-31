@@ -72,18 +72,29 @@ def normalize_untrusted_text(value: str) -> str:
     return " ".join(value.split())
 
 
-def assess_prompt_injection(value: str) -> InjectionAssessment:
-    text = normalize_untrusted_text(value).casefold()
+def _accent_insensitive(value: str) -> str:
+    decomposed = unicodedata.normalize("NFD", value.casefold().replace("đ", "d"))
+    return "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+
+
+def assess_prompt_injection(value: str, *, has_trusted_context: bool = False) -> InjectionAssessment:
+    normalized = normalize_untrusted_text(value)
+    text = f"{normalized.casefold()} {_accent_insensitive(normalized)}"
     patterns = {
-        "instruction_override": r"(?:ignore|bỏ qua|quên)\s+(?:all\s+)?(?:previous|prior|mọi|các)?\s*(?:instructions?|chỉ dẫn|hướng dẫn|quy định|luật lệ)",
-        "secret_exfiltration": r"(?:api[ _-]?key|system prompt|developer message|access token|bearer token).{0,40}(?:show|reveal|in|hiển thị|tiết lộ)",
-        "approval_bypass": r"(?:bypass|skip|bỏ qua|không cần).{0,30}(?:approval|confirm|xác nhận|validation|kiểm tra)",
-        "forced_tool": r"(?:call|gọi|execute|chạy).{0,20}(?:submit_simulation|tool).{0,30}(?:without|không cần).{0,20}(?:confirm|xác nhận)",
-        "role_escalation": r"(?:bạn không còn là|đóng vai|giả làm|tự cấp|cấp cho (?:tôi|mình)).{0,80}(?:cán bộ|quản trị|admin|quyền|phê duyệt)",
-        "authority_impersonation": r"(?:cán bộ|hệ thống).{0,35}(?:có quyền|toàn quyền).{0,35}(?:phê duyệt|xác nhận|cấp quyền)",
+        "instruction_override": r"(?:ignore|bo qua|quen)\s+(?:all\s+)?(?:previous|prior|moi|cac)?\s*(?:instructions?|chi dan|huong dan|quy dinh|luat le|safety|policy)",
+        "secret_exfiltration": r"(?:(?:show|reveal|print|hien thi|tiet lo).{0,45}(?:api[ _-]?key|system prompt|developer message|access token|bearer token)|(?:api[ _-]?key|system prompt|developer message|access token|bearer token).{0,45}(?:show|reveal|print|hien thi|tiet lo))",
+        "approval_bypass": r"(?:bypass|skip|bo qua|khong can).{0,35}(?:approval|confirm|xac nhan|validation|kiem tra|tham dinh)",
+        "forced_tool": r"(?:call|goi|execute|chay).{0,25}(?:submit_simulation|tool).{0,35}(?:without|khong can).{0,25}(?:confirm|xac nhan)",
+        "role_escalation": r"(?:ban khong con la|dong vai|gia lam|tu cap|cap cho (?:toi|minh)).{0,90}(?:can bo|quan tri|admin|quyen|phe duyet)",
+        "authority_impersonation": r"(?:can bo|he thong).{0,40}(?:co quyen|toan quyen).{0,40}(?:phe duyet|xac nhan|cap quyen)",
+        "jailbreak_mode": r"(?:jailbreak|developer mode|dan mode|unrestricted mode|vo hieu hoa).{0,35}(?:safety|bao ve|quy tac|policy|guardrail)?",
+        "encoded_instruction": r"(?:(?:base64|rot13|hex).{0,35}(?:decode|giai ma)|(?:decode|giai ma).{0,35}(?:base64|rot13|hex)).{0,55}(?:instruction|chi dan|system prompt|lenh)",
     }
     reasons = [name for name, pattern in patterns.items() if re.search(pattern, text, re.IGNORECASE)]
-    return InjectionAssessment(blocked=bool(reasons), risk_score=min(100, len(reasons) * 40), reasons=reasons)
+    if reasons and has_trusted_context:
+        reasons.append("abrupt_context_switch")
+    risk_score = min(100, 55 + max(0, len(reasons) - 1) * 15) if reasons else 0
+    return InjectionAssessment(blocked=bool(reasons), risk_score=risk_score, reasons=reasons)
 
 
 _SECRET_PATTERNS = (
