@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
 *.env
-.venv/
+__pycache__/
+*.py[cod]
+data/vlearn-pack/processed/
+eval/private-results/
