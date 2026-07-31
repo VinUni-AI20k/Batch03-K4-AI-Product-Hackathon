@@ -933,13 +933,6 @@ function sendTutorMsg(e) {
   // Kiểm tra nếu thẻ chip đính kèm đang kích hoạt hoặc câu lệnh có từ khóa ghi chú
   const chipBadge = document.getElementById('note-ai-chip') || document.querySelector('.input-chip-badge');
   const isNoteRequest = !!chipBadge || /ghi chú|note|lưu note|tạo note|ghi chép|đọc slide.*ghi chú/i.test(text);
-
-  // Append context tag
-  const userTag = document.createElement('div');
-  userTag.className = 'chat-context-tag';
-  userTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
-  chatBody.appendChild(userTag);
-
   // Append user message
   const userMsg = document.createElement('div');
   userMsg.className = 'tutor-msg user';
@@ -1050,7 +1043,6 @@ function sendTutorMsg(e) {
     if (thinkingCard && thinkingCard.parentNode) {
       thinkingCard.remove();
     }
-
     // Chỉ ghi note khi AI dùng thẻ [WRITE_NOTE:] tường minh
     // Không tự động ghi toàn bộ answerText để tránh ghi trùng 2 lần
     const noteMatch = (answerText || '').match(/\[WRITE_NOTE:\s*([\s\S]*?)\]/i);
@@ -1065,11 +1057,6 @@ function sendTutorMsg(e) {
       const cleanNoteText = stripMarkdownForNote(noteContentToSave);
       typewriterEffectOnNote(cleanNoteText);
     }
-
-    const contextTag = document.createElement('div');
-    contextTag.className = 'chat-context-tag';
-    contextTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
-    chatBody.appendChild(contextTag);
 
     const botMsg = document.createElement('div');
     botMsg.className = 'tutor-msg assistant';

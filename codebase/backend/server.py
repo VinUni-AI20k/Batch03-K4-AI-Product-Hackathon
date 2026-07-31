@@ -2,17 +2,20 @@ import sys
 import os
 import json
 import datetime
+import re
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
 
-# Thêm thư mục backend và thư mục gốc vào sys.path
+# Thêm thư mục backend vào sys.path và ưu tiên tuyệt đối
 BACKEND_DIR = Path(__file__).resolve().parent
-ROOT_DIR = BACKEND_DIR.parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
+
+# Đảm bảo không để ROOT_DIR làm nhiễu import của các folder con
+ROOT_DIR = BACKEND_DIR.parent.parent
+if str(ROOT_DIR) in sys.path:
+    sys.path.remove(str(ROOT_DIR))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -86,12 +89,13 @@ async def login_endpoint(req: LoginRequest):
 async def chat_endpoint(req: ChatRequest):
     slide_path = resolve_slide_path(req.slide_file)
     
-    # Kiểm tra xem có phải yêu cầu tóm tắt trang không
-    query_lower = req.query.lower()
-    if "tóm tắt" in query_lower and ("trang" in query_lower or "slide" in query_lower):
-        answer = rag_agent.summarize_page(slide_path=slide_path, page_number=req.page_number)
-    else:
-        answer = rag_agent.ask_question(slide_path=slide_path, query=req.query, page_number=req.page_number)
+    # Để RAG Agent tự động định tuyến thông minh qua LLM Router
+    answer = rag_agent.ask_question(
+        slide_path=slide_path, 
+        query=req.query, 
+        page_number=req.page_number,
+        student_email=req.student_email
+    )
 
     # Ghi log cuộc trò chuyện
     try:
@@ -140,5 +144,5 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))
     print(f"[VLearn Backend] Dang khoi chay tai http://localhost:{port}")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)
 

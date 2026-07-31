@@ -11,7 +11,8 @@ from .slide_prompts import (
 )
 from .rag_prompts import (
     RAG_PAGE_SUMMARY_PROMPT,
-    RAG_GROUNDED_QA_PROMPT
+    RAG_GROUNDED_QA_PROMPT,
+    RAG_ROUTER_SYSTEM_PROMPT
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "SLIDE_REDUCE_PROMPT",
     "RAG_PAGE_SUMMARY_PROMPT",
     "RAG_GROUNDED_QA_PROMPT",
+    "RAG_ROUTER_SYSTEM_PROMPT",
 ]

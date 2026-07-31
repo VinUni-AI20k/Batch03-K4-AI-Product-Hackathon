@@ -8,7 +8,7 @@ BASE_DIR = BACKEND_DIR.parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
+    sys.path.append(str(BASE_DIR))
 
 # Load environment variables from .env file
 try:

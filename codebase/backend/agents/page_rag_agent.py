@@ -16,6 +16,7 @@ from prompts import (
     SLIDE_AGENT_SYSTEM_PROMPT,
     RAG_PAGE_SUMMARY_PROMPT,
     RAG_GROUNDED_QA_PROMPT,
+    RAG_ROUTER_SYSTEM_PROMPT,
     GUARDRAIL_OUT_OF_SCOPE_MSG,
     GUARDRAIL_NO_CONTEXT_MSG,
     GUARDRAIL_INJECTION_MSG,
@@ -139,10 +140,18 @@ class PageAwareRAGAgent:
         # Output Guardrail
         return _check_output_guardrails(response, page_number)
 
-    def ask_question(self, slide_path: str, query: str, page_number: Optional[int] = None) -> str:
+    def ask_question(
+        self, 
+        slide_path: str, 
+        query: str, 
+        page_number: Optional[int] = None,
+        student_email: Optional[str] = None
+    ) -> str:
         """
-        Grounded RAG Q&A: Trả lời câu hỏi học viên với đầy đủ Guardrails Input/Output.
+        Grounded RAG Q&A: Trả lời câu hỏi học viên với đầy đủ Guardrails Input/Output, LLM Intent Router và Lịch sử trò chuyện.
         - Input Guardrail: chặn câu hỏi ngoài phạm vi & prompt injection trước khi gọi LLM.
+        - LLM Intent Router: Tự động phân tích ý định để lấy đúng ngữ cảnh.
+        - Conversation History: Đọc log chat gần nhất của học viên để duy trì ngữ cảnh hội thoại.
         - Output Guardrail: kiểm tra độ dài & cắt ngắn response nếu cần.
         """
         # --- INPUT GUARDRAIL ---
@@ -152,13 +161,82 @@ class PageAwareRAGAgent:
 
         self.load_slide(slide_path)
 
-        if page_number is not None:
-            page_info = self.rag_engine.get_page_context(page_number)
+        # --- BƯỚC 0: Tải lịch sử trò chuyện gần đây ---
+        history_str = "Chưa có cuộc trò chuyện trước đó."
+        if student_email:
+            try:
+                logs_file = Path(__file__).resolve().parent.parent / "chat_logs.json"
+                if logs_file.exists():
+                    import json
+                    with open(logs_file, "r", encoding="utf-8") as f:
+                        logs = json.load(f)
+                    student_logs = [log for log in logs if log.get("student_email") == student_email]
+                    recent_logs = student_logs[-4:]  # Lấy tối đa 4 lượt chat gần nhất
+                    if recent_logs:
+                        history_blocks = []
+                        for log in recent_logs:
+                            history_blocks.append(f"Học viên: {log['query']}")
+                            history_blocks.append(f"Tutor: {log['answer']}")
+                        history_str = "\n".join(history_blocks)
+            except Exception as e:
+                print(f"[Router Agent Warning] Lỗi đọc lịch sử chat: {e}")
+
+        # --- BƯỚC 1: Gọi LLM phân tích Intent (Routing) ---
+        current_page = page_number if page_number is not None else 1
+        router_prompt = f"Lịch sử chat gần đây:\n{history_str}\n\nCâu hỏi mới: \"{query}\""
+        router_instruction = RAG_ROUTER_SYSTEM_PROMPT.format(current_page=current_page)
+        
+        intent = "general_qa"
+        target_page = None
+        
+        try:
+            router_res = self.llm_client.generate(
+                prompt=router_prompt,
+                system_instruction=router_instruction
+            )
+            
+            cleaned = router_res.strip()
+            if cleaned.startswith("```"):
+                cleaned = cleaned.split("```")[1]
+                if cleaned.startswith("json"):
+                    cleaned = cleaned[4:]
+            
+            import json
+            route_data = json.loads(cleaned.strip())
+            intent = route_data.get("intent", "general_qa")
+            target_page = route_data.get("target_page")
+            print(f"[Router Agent] Phân tích thành công: Intent={intent}, Target Page={target_page}")
+        except Exception as e:
+            print(f"[Router Agent Warning] Lỗi định tuyến: {e}. Fallback về general_qa.")
+
+        # --- BƯỚC 2: Gọi Tool tương ứng để lấy ngữ cảnh ---
+        context_str = ""
+        
+        if intent == "summarize_single_page":
+            page_to_use = target_page if target_page is not None else current_page
+            page_info = self.rag_engine.get_page_context(page_to_use)
             context_str = page_info["context_str"]
-        else:
-            docs = self.rag_engine.search_relevant(query, top_k=4)
+            
+        elif intent == "summarize_all_pages":
+            sorted_slides = sorted(self.rag_engine.slides_by_page.values(), key=lambda x: x["slide_number"])
+            blocks = ["=== NỘI DUNG TOÀN BỘ CÁC SLIDE TRONG BÀI GIẢNG ==="]
+            for s in sorted_slides:
+                blocks.append(f"--- SLIDE {s['slide_number']} ---\n{s['content']}")
+            context_str = "\n\n".join(blocks)
+            
+        elif intent == "social":
+            context_str = "Học viên đang chào hỏi xã giao. Không có ngữ cảnh bài giảng cụ thể nào được trích xuất."
+            
+        else: # general_qa
+            docs = self.rag_engine.search_relevant(query, top_k=6)
+            current_page_content = ""
+            if page_number is not None:
+                p_info = self.rag_engine.get_page_context(page_number)
+                if p_info["has_content"]:
+                    current_page_content = f"=== TRANG HIỆN TẠI (Trang {page_number}) ===\n{p_info['slide_text']}\n\n"
+
             if not docs:
-                context_str = "Không tìm thấy đoạn thông tin trùng khớp trong tài liệu."
+                context_str = current_page_content + "Không tìm thấy đoạn thông tin trùng khớp khác trong tài liệu."
             else:
                 blocks = []
                 for d in docs:
@@ -166,11 +244,13 @@ class PageAwareRAGAgent:
                         blocks.append(f"[Slide {d['slide_number']}]\n{d['content']}")
                     else:
                         blocks.append(f"[{d['chunk_id']}]\n{d['content']}")
-                context_str = "\n\n".join(blocks)
+                context_str = current_page_content + "\n\n".join(blocks)
 
+        # --- BƯỚC 3: Tạo câu trả lời cuối cùng ---
         prompt = RAG_GROUNDED_QA_PROMPT.format(
             query=query,
-            context_str=context_str
+            context_str=context_str,
+            history_str=history_str
         )
 
         response = self.llm_client.generate(
