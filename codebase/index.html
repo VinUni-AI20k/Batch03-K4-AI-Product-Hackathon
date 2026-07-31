@@ -569,17 +569,25 @@ async function callMock(system,msgs){
   const last = msgs[msgs.length-1].content;
   const sawUserBefore = msgs.slice(0,-1).some(m=>m.role==="user");
   const isBaseline = (system===SYS_BASE);   // 2 engine phải trả lời KHÁC nhau, kể cả khi chưa có lịch sử
-  if(!sawUserBefore && (hasRef(last)||norm(last).includes("hỏi"))){
-    if(isBaseline){
-      /* Baseline: đây đúng là lỗi kiến trúc — KHÔNG BAO GIỜ giữ được prompt cũ của user,
-         dù có hỏi bao nhiêu lượt trước đó trong phiên. */
-      return {text:"[MÔ PHỎNG] Như đã chia sẻ trong các lượt trước, tôi không có khả năng lưu trữ hoặc theo dõi lịch sử các tin nhắn trước đó, bao gồm cả câu hỏi gần nhất của bạn. Tôi chỉ phản hồi dựa trên nội dung bạn gửi trong mỗi lượt và thông tin trong tài liệu giảng dạy.",usage:null,raw:"mock"};
-    }
+  /* Bắt cả câu hỏi tham chiếu ngầm ("nó", "ý trên"...) LẪN câu hỏi index cụ thể
+     ("câu đầu tiên/câu thứ 2 tôi hỏi là gì") — Baseline phải từ chối cả hai kiểu,
+     vì payload của nó không hề chứa prompt cũ của user (xem buildBaseline()). */
+  const asksAboutPastQ = hasRef(last) || /hỏi\s*(là\s*)?gì|câu hỏi (trước|trên|đầu tiên|thứ\s*\d+)|câu (đầu tiên|thứ\s*\d+).*(hỏi|là gì)/i.test(norm(last));
+  if(isBaseline && asksAboutPastQ){
+    /* Baseline: đây đúng là lỗi kiến trúc — KHÔNG BAO GIỜ giữ được prompt cũ của user,
+       dù có hỏi bao nhiêu lượt trước đó trong phiên, kể cả khi hỏi trúng chỉ số cụ thể. */
+    return {text:"[MÔ PHỎNG] Như đã chia sẻ trong các lượt trước, tôi không có khả năng lưu trữ hoặc theo dõi lịch sử các tin nhắn trước đó, bao gồm cả câu hỏi gần nhất của bạn. Tôi chỉ phản hồi dựa trên nội dung bạn gửi trong mỗi lượt và thông tin trong tài liệu giảng dạy.",usage:null,raw:"mock"};
+  }
+  if(!isBaseline && !sawUserBefore && asksAboutPastQ){
     /* v2: KHÔNG dùng câu phủ nhận của baseline — v2 có khả năng lưu, chỉ là phiên này
        chưa có lượt nào trước đó để nhắc lại. Gõ thêm một câu follow-up để thấy nó nhớ. */
     return {text:"[MÔ PHỎNG] Đây là câu hỏi đầu tiên của bạn trong phiên này, nên tôi chưa có câu hỏi trước đó để nhắc lại. Nhưng từ lượt tiếp theo, tôi sẽ giữ lại toàn bộ mạch hội thoại (cả câu hỏi của bạn lẫn câu trả lời của tôi) để bám đúng thắc mắc gốc — hãy thử hỏi thêm một câu follow-up như \"vậy nó khác gì với...\" để thấy rõ.",usage:null,raw:"mock"};
   }
-  const prevU = [...msgs].reverse().find((m,i)=>m.role==="user" && i>0);
+  /* prevU chỉ có ý nghĩa cho v2 (msgs[] của nó thật sự chứa các lượt user cũ nhờ
+     sliding window). Với Baseline, msgs[] luôn chỉ có 1 phần tử (xem buildBaseline()
+     dòng messages:[{role:"user",...}]) nên prevU luôn undefined — không lộ ra
+     kiểu nói "bạn vừa hỏi..." dù nội dung tài liệu bên trong ctx có nhắc câu trả lời cũ. */
+  const prevU = !isBaseline ? [...msgs].reverse().find((m,i)=>m.role==="user" && i>0) : null;
   /* Trích luôn đoạn tài liệu THẬT vừa retrieve được (đã nằm sẵn trong "last")
      làm nội dung trả lời — để chấm điểm bằng probe vẫn có ý nghĩa dù chưa cắm
      API key, thay vì một câu chung chung không liên quan đến tài liệu. */
