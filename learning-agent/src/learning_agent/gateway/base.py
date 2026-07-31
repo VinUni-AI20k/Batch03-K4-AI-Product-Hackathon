@@ -10,8 +10,51 @@ import os
 from pathlib import Path
 
 
+_MD_TABLE_RE = None  # compile lười
+
+
+def md_tables_to_text(text: str) -> str:
+    """Discord/Telegram KHÔNG render bảng markdown -> chuyển trước khi gửi:
+    - bảng 2 cột: mỗi hàng thành '• **cột1** — cột2' (đẹp trên cả 2 platform)
+    - bảng >=3 cột: code block căn cột (font mono hiển thị thẳng hàng)."""
+    import re
+    global _MD_TABLE_RE
+    if _MD_TABLE_RE is None:
+        _MD_TABLE_RE = re.compile(r"(?:^[ \t]*\|.*\|[ \t]*$\n?){2,}", re.MULTILINE)
+
+    def _conv(m):
+        rows = []
+        for line in m.group(0).strip().splitlines():
+            line = line.strip()
+            if re.fullmatch(r"\|[\s:\-|]+\|", line):  # hàng phân cách |---|---|
+                continue
+            rows.append([c.strip() for c in line.strip("|").split("|")])
+        if not rows:
+            return m.group(0)
+        ncol = max(len(r) for r in rows)
+        if ncol == 2:
+            out = []
+            for r in rows[1:] if len(rows) > 1 else rows:  # bỏ hàng tiêu đề
+                a = r[0] if len(r) > 0 else ""
+                b = r[1] if len(r) > 1 else ""
+                if a and "**" not in a:
+                    a = f"**{a}**"
+                out.append(f"• {a} — {b}")
+            return "\n".join(out) + "\n"
+        plain = [[re.sub(r"\*\*|__", "", r[i]) if i < len(r) else "" for i in range(ncol)] for r in rows]
+        widths = [max(len(row[i]) for row in plain) for i in range(ncol)]
+        def fmt(row):
+            return " | ".join(row[i].ljust(widths[i]) for i in range(ncol)).rstrip()
+        lines = [fmt(plain[0]), "-+-".join("-" * w for w in widths)] + [fmt(r) for r in plain[1:]]
+        return "```\n" + "\n".join(lines) + "\n```\n"
+
+    return _MD_TABLE_RE.sub(_conv, text)
+
+
 def split_message(text: str, max_len: int) -> list[str]:
-    """Cắt theo đoạn, không vượt giới hạn ký tự của platform (Discord 2000, Telegram 4096)."""
+    """Cắt theo đoạn, không vượt giới hạn ký tự của platform (Discord 2000, Telegram 4096).
+    Đồng thời chuyển bảng markdown sang dạng platform render được (chỉ đường ra chat)."""
+    text = md_tables_to_text(text)
     if len(text) <= max_len:
         return [text]
     chunks, current = [], ""

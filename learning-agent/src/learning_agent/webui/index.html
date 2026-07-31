@@ -132,6 +132,16 @@
   .msg a{color:var(--accent);text-decoration:underline}
   .msg code{font-family:var(--mono);background:var(--input);border:1px solid var(--line);padding:.5px 5px;border-radius:5px;font-size:.86em}
   .msg pre{font-family:var(--mono);background:var(--input);border:1px solid var(--line);padding:10px 12px;border-radius:8px;font-size:.82em;overflow-x:auto;white-space:pre;margin:6px 0}
+  /* bảng markdown */
+  .msg .tblwrap{overflow-x:auto;margin:9px 0;border:1px solid var(--line);border-radius:9px}
+  .msg table{border-collapse:collapse;width:100%;font-size:.88em;line-height:1.5}
+  .msg th,.msg td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  .msg th{background:var(--panel2);font-weight:700;white-space:nowrap}
+  .msg td:first-child{white-space:nowrap}
+  .msg tr:last-child td{border-bottom:none}
+  /* heading markdown */
+  .msg .mdh{display:block;font-weight:700;font-size:1.03em;margin:11px 0 4px}
+  .msg .mdh:first-child{margin-top:0}
   .steps{align-self:flex-start;max-width:76%;width:100%}
   .steps details{background:var(--input);border:1px solid var(--line);border-radius:11px;padding:0}
   .steps summary{cursor:pointer;padding:9px 14px;font-size:.74rem;color:var(--muted);font-family:var(--mono);display:flex;align-items:center;gap:8px;list-style:none}
@@ -303,7 +313,20 @@ function mdToHtml(t) {
   s = s.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
   s = s.replace(/(^|[^\w_])_([^_\n]+?)_(?![\w_])/g, '$1<em>$2</em>');
   s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  s = s.replace(/^\s*#{1,6}\s+(.+)$/gm, '<strong>$1</strong>');
+  /* bảng markdown -> <table> (sau inline format để cell giữ <strong>) */
+  s = s.replace(/(?:^|\n)((?:[ \t]*\|.*\|[ \t]*(?:\n|$)){2,})/g, (_, blk) => {
+    const rows = [];
+    blk.trim().split('\n').forEach(l => {
+      l = l.trim();
+      if (/^\|[\s:\-|]+\|$/.test(l)) return;              /* hàng |---|---| */
+      rows.push(l.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim()));
+    });
+    if (!rows.length) return '\n' + blk;
+    const h = '<tr>' + rows[0].map(c => '<th>' + c + '</th>').join('') + '</tr>';
+    const b = rows.slice(1).map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('');
+    return '\n<div class="tblwrap"><table>' + h + b + '</table></div>\n';
+  });
+  s = s.replace(/^\s*#{1,6}\s+(.+)$/gm, '<span class="mdh">$1</span>');
   s = s.replace(/^[ \t]*[-*] +/gm, '• ');
   return s;
 }
