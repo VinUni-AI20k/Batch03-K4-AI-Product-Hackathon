@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SessionProvider } from "./context/SessionContext";
 import type {
   McqQuestion,
@@ -6,6 +6,8 @@ import type {
   Section,
   StudyContent,
   SelfCheckGrade,
+  SlideRange,
+  LearningUnit,
 } from "./api/client";
 import {
   MASTERY_THRESHOLD,
@@ -32,31 +34,115 @@ import "./styles.css";
 type WrongItem = { question: McqQuestion; userAnswer: string };
 type RetestSource = "verify" | "reteach";
 
+const getInitialState = <T,>(key: string, defaultValue: T): T => {
+  try {
+    const saved = localStorage.getItem("vlearn_state");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed[key] !== undefined) {
+        return parsed[key];
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load state from localStorage:", e);
+  }
+  return defaultValue;
+};
+
 function App() {
-  const [slideText, setSlideText] = useState<string>("");
-  const [slideFilename, setSlideFilename] = useState<string>("");
-  const [stage, setStage] = useState<Stage>("upload");
+  const [slideText, setSlideText] = useState<string>(() => getInitialState("slideText", ""));
+  const [slideRanges, setSlideRanges] = useState<SlideRange[]>(() => getInitialState("slideRanges", []));
+  const [slideLearningUnits, setSlideLearningUnits] = useState<LearningUnit[]>(() => getInitialState("slideLearningUnits", []));
+  const [slideFilename, setSlideFilename] = useState<string>(() => getInitialState("slideFilename", ""));
+  const [stage, setStage] = useState<Stage>(() => getInitialState("stage", "upload"));
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const [outline, setOutline] = useState<OutlineSection[]>([]);
-  const [round1Questions, setRound1Questions] = useState<McqQuestion[]>([]);
+  const [outline, setOutline] = useState<OutlineSection[]>(() => getInitialState("outline", []));
+  const [round1Questions, setRound1Questions] = useState<McqQuestion[]>(() => getInitialState("round1Questions", []));
 
-  const [quizMode, setQuizMode] = useState<"round1" | "retest">("round1");
-  const [questions, setQuestions] = useState<McqQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [quizMode, setQuizMode] = useState<"round1" | "retest">(() => getInitialState("quizMode", "round1"));
+  const [questions, setQuestions] = useState<McqQuestion[]>(() => getInitialState("questions", []));
+  const [currentIndex, setCurrentIndex] = useState<number>(() => getInitialState("currentIndex", 0));
+  const [answers, setAnswers] = useState<string[]>(() => getInitialState("answers", []));
 
-  const [round1Accuracy, setRound1Accuracy] = useState(0);
-  const [weakSections, setWeakSections] = useState<Section[]>([]);
-  const [goodSections, setGoodSections] = useState<Section[]>([]);
-  const [retestSource, setRetestSource] = useState<RetestSource>("reteach");
-  const [finalAccuracy, setFinalAccuracy] = useState(0);
-  const [masteredSections, setMasteredSections] = useState<Section[]>([]);
+  const [round1Accuracy, setRound1Accuracy] = useState<number>(() => getInitialState("round1Accuracy", 0));
+  const [weakSections, setWeakSections] = useState<Section[]>(() => getInitialState("weakSections", []));
+  const [goodSections, setGoodSections] = useState<Section[]>(() => getInitialState("goodSections", []));
+  const [retestSource, setRetestSource] = useState<RetestSource>(() => getInitialState("retestSource", "reteach"));
+  const [finalAccuracy, setFinalAccuracy] = useState<number>(() => getInitialState("finalAccuracy", 0));
+  const [masteredSections, setMasteredSections] = useState<Section[]>(() => getInitialState("masteredSections", []));
 
-  const [studyContent, setStudyContent] = useState<StudyContent[]>([]);
-  const [activeMode, setActiveMode] = useState(true);
-  const [wrongItems, setWrongItems] = useState<WrongItem[]>([]);
+  const [studyContent, setStudyContent] = useState<StudyContent[]>(() => getInitialState("studyContent", []));
+  const [activeMode, setActiveMode] = useState<boolean>(() => getInitialState("activeMode", true));
+  const [wrongItems, setWrongItems] = useState<WrongItem[]>(() => getInitialState("wrongItems", []));
+
+  // --- Persistence Effects ---
+  useEffect(() => {
+    const stateObj = {
+      slideText,
+      slideRanges,
+      slideLearningUnits,
+      slideFilename,
+      stage,
+      outline,
+      round1Questions,
+      quizMode,
+      questions,
+      currentIndex,
+      answers,
+      round1Accuracy,
+      weakSections,
+      goodSections,
+      retestSource,
+      finalAccuracy,
+      masteredSections,
+      studyContent,
+      activeMode,
+      wrongItems,
+    };
+    try {
+      localStorage.setItem("vlearn_state", JSON.stringify(stateObj));
+    } catch (e) {
+      console.error("Failed to save state to localStorage:", e);
+    }
+  }, [
+    slideText,
+    slideRanges,
+    slideLearningUnits,
+    slideFilename,
+    stage,
+    outline,
+    round1Questions,
+    quizMode,
+    questions,
+    currentIndex,
+    answers,
+    round1Accuracy,
+    weakSections,
+    goodSections,
+    retestSource,
+    finalAccuracy,
+    masteredSections,
+    studyContent,
+    activeMode,
+    wrongItems,
+  ]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isR = e.key?.toLowerCase() === "r";
+      const isF5 = e.key === "F5";
+      const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+      const isShift = e.shiftKey;
+
+      if ((isCtrlOrMeta && isShift && isR) || (isCtrlOrMeta && isShift && isF5)) {
+        localStorage.removeItem("vlearn_state");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const sectionTitle = (id: Section) =>
     outline.find((o) => o.section_id === id)?.title ?? id;
@@ -65,6 +151,8 @@ function App() {
     setIsLoading(true);
     const result = await uploadSlide(file);
     setSlideText(result.textContent);
+    setSlideRanges(result.ranges || []);
+    setSlideLearningUnits(result.learningUnits || []);
     setSlideFilename(file.name);
     setStage("ready");
     setIsLoading(false);
@@ -234,6 +322,8 @@ function App() {
 
   const handleReset = () => {
     setSlideText("");
+    setSlideRanges([]);
+    setSlideLearningUnits([]);
     setStage("upload");
     setOutline([]);
     setRound1Questions([]);
@@ -250,6 +340,11 @@ function App() {
     setActiveMode(true);
     setWrongItems([]);
     setErrorMessage("");
+    try {
+      localStorage.removeItem("vlearn_state");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const studyContentBySection = Object.fromEntries(
@@ -299,7 +394,51 @@ function App() {
               {slideText && (
                 <div className="preview-box">
                   <h3>Nội dung slide (Knowledge Package)</h3>
-                  <p>{slideText}</p>
+                  <p className="upload-success-msg">{slideText}</p>
+                  {slideLearningUnits.length > 0 ? (
+                    <div className="learning-units-section">
+                      <p className="metadata-title">Đơn vị học tập (Learning Units từ AI):</p>
+                      <div className="learning-units-list">
+                        {slideLearningUnits.map((lu, luIdx) => (
+                          <div key={luIdx} className="learning-unit-card">
+                            <h4 className="learning-unit-name">
+                              <span className="unit-icon">📚</span> {lu.unit}
+                            </h4>
+                            <ul className="outline-list">
+                              {lu.slides.map((slideNum) => {
+                                const slide = slideRanges[slideNum - 1];
+                                if (!slide) return null;
+                                return (
+                                  <li key={slideNum} className="outline-item">
+                                    <span className="outline-item-title">
+                                      <span className="outline-bullet">✦</span> {slide.title}
+                                    </span>
+                                    <span className="outline-item-pages">Trang {slide.start_page} - {slide.end_page}</span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    slideRanges.length > 0 && (
+                      <div className="metadata-outline">
+                        <p className="metadata-title">Khung nội dung trích xuất (Outline & Metadata):</p>
+                        <ul className="outline-list">
+                          {slideRanges.map((r, idx) => (
+                            <li key={idx} className="outline-item">
+                              <span className="outline-item-title">
+                                <span className="outline-bullet">✦</span> {r.title}
+                              </span>
+                              <span className="outline-item-pages">Trang {r.start_page} - {r.end_page}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
             </section>

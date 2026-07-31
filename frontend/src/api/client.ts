@@ -36,9 +36,20 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // Mock — upload chỉ xác nhận file, nội dung dùng để sinh MCQ luôn lấy từ transcript
 // thật đã bundle sẵn ở backend (transcript-01-clean.md). PDF->text thật là việc còn
 // thiếu, ghi rõ trong docs/product-overview.md.
+export type SlideRange = {
+  title: string;
+  start_page: number;
+  end_page: number;
+};
+
+export type LearningUnit = {
+  unit: string;
+  slides: number[];
+};
+
 export async function uploadSlide(
   file: File,
-): Promise<{ textContent: string }> {
+): Promise<{ textContent: string; ranges?: SlideRange[]; learningUnits?: LearningUnit[] }> {
   const mockFallback = `Đã nhận ${file.name}. Demo dùng transcript thật: "Xác định bài toán kinh doanh cho AI" (Day 2 sáng, data pack).`;
 
   try {
@@ -55,22 +66,33 @@ export async function uploadSlide(
     }
 
     const data = await res.json();
-    // Trả về thông tin metadata đã trích xuất được để hiển thị trong preview-box
-    const sectionsInfo = data.sections
-      .map((s: [string, number]) => `${s[0]} (Trang ${s[1]})`)
-      .join(", ");
-
     return {
-      textContent: `✅ Upload thành công: ${file.name}. Đã trích xuất metadata: ${sectionsInfo}`,
+      textContent: `✅ Upload thành công: ${file.name}`,
+      ranges: data.ranges,
+      learningUnits: data.learning_units,
     };
   } catch (err) {
     console.error("PDF upload failed, falling back to mock:", err);
     await delay(400);
     return {
       textContent: mockFallback,
+      ranges: [
+        { title: "Bài toán kinh doanh & Tiêu chí đo lường AI", start_page: 1, end_page: 8 },
+        { title: "Thu thập & Chuẩn bị dữ liệu", start_page: 9, end_page: 15 },
+        { title: "Lựa chọn & Huấn luyện mô hình", start_page: 16, end_page: 25 },
+        { title: "Đánh giá & Triển khai", start_page: 26, end_page: 35 },
+      ],
+      learningUnits: [
+        { unit: "Khái quát & Định nghĩa bài toán", slides: [1] },
+        { unit: "Chuẩn bị & Xử lý dữ liệu", slides: [2] },
+        { unit: "Xây dựng & Huấn luyện mô hình", slides: [3] },
+        { unit: "Đánh giá & Triển khai ứng dụng", slides: [4] }
+      ]
     };
   }
 }
+
+
 
 type RawBackendQuestion = {
   question: string;
@@ -162,6 +184,31 @@ export async function getStudyContent(
   questionPool: McqQuestion[],
 ): Promise<StudyContent[]> {
   await delay(400);
+
+  const examplesRequest = sections.map((sectionId) => {
+    const o = outline.find((os) => os.section_id === sectionId);
+    return {
+      section_id: sectionId,
+      title: o?.title ?? sectionId,
+      summary: o?.key_points.join(" ") ?? "",
+    };
+  });
+
+  let examplesMap: Record<string, string> = {};
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/reteach/examples`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sections: examplesRequest }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      examplesMap = data.examples;
+    }
+  } catch (e) {
+    console.error("Failed to fetch examples:", e);
+  }
+
   return sections.map((sectionId) => {
     const outlineSection = outline.find((o) => o.section_id === sectionId);
     const poolQuestion = questionPool.find((q) => q.section === sectionId);
@@ -169,8 +216,7 @@ export async function getStudyContent(
       section: sectionId,
       title: outlineSection?.title ?? sectionId,
       summary: outlineSection?.key_points.join(" ") ?? "(chưa có tóm tắt)",
-      example:
-        "(Mock — bước sinh ví dụ thực tế bằng AI chưa build, xem docs/product-overview.md)",
+      example: examplesMap[sectionId] ?? "(Không có ví dụ thực tế cho phần này)",
       practice: poolQuestion
         ? {
             question: poolQuestion.question,
@@ -184,8 +230,9 @@ export async function getStudyContent(
 }
 
 export type SelfCheckGrade = {
-  isCorrect: boolean;
+  score: number;
   feedback: string;
+  next_step: string;
 };
 
 export async function gradeSelfCheck(
@@ -196,11 +243,16 @@ export async function gradeSelfCheck(
     source_context: string;
   },
 ): Promise<SelfCheckGrade> {
-  await delay(500);
-  return {
-    isCorrect: true,
-    feedback: "Câu trả lời của bạn chính xác dựa trên nội dung bài giảng.",
-  };
+  const res = await fetch(`${BACKEND_URL}/api/reteach/self-check/grade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(`Grading failed: ${body.detail ?? res.statusText}`);
+  }
+  return res.json();
 }
 
 export async function enrichKnowledge(weakSections: string[], pdfFilename: string): Promise<void> {

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from pathlib import Path
+import json
+import re
 from app.core.config import DATA_PACK_DIR
 from app.pipeline.pdf_processor import extract_slide_ranges, update_knowledge_md, extract_pages_content
 from app.core.llm_client import LLMClient # Assuming this is the Gemini client
@@ -87,10 +89,47 @@ async def upload_pdf(file: UploadFile = File(...)):
         ranges = extract_slide_ranges(str(file_path))
         update_knowledge_md(str(KNOWLEDGE_FILE), ranges)
 
+        # --- New Logic: Group slides into Learning Units using LLM ---
+        titles = [r["title"] for r in ranges]
+        prompt = (
+            "You are analyzing a lecture.\n\n"
+            "Here are all slide titles in order:\n"
+            f"{titles}\n\n"
+            "Your task:\n"
+            "1. Divide this lecture into major learning units.\n"
+            "2. Assign each slide to one learning unit.\n"
+            "3. Give each learning unit a concise name.\n"
+            "4. Return JSON only. Ví dụ output: [\n"
+            "  {\n"
+            "    \"unit\": \"Transformer Overview\",\n"
+            "    \"slides\": [1,2]\n"
+            "  },\n"
+            "  {\n"
+            "    \"unit\": \"Encoder\",\n"
+            "    \"slides\": [3,4,5]\n"
+            "  },\n"
+            "  {\n"
+            "    \"unit\": \"Self Attention\",\n"
+            "    \"slides\": [6,7,8,9]\n"
+            "  }\n"
+            "]"
+        )
+
+        llm = LLMClient()
+        response_text = llm.generate_text(prompt)
+
+        # Clean JSON response from LLM (remove markdown markers)
+        json_match = re.search(r"\[.*\]", response_text, re.DOTALL)
+        if json_match:
+            learning_units = json.loads(json_match.group())
+        else:
+            learning_units = []
+
         return {
             "message": "PDF uploaded and processed successfully",
             "filename": file.filename,
             "ranges": ranges,
+            "learning_units": learning_units,
             "knowledge_path": str(KNOWLEDGE_FILE)
         }
     except Exception as e:
