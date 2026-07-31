@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from core import db
-from core.deep_explain import explain_highlight, explain_node, generate_exercise
+from core.deep_explain import explain_highlight, explain_node, explain_question, generate_quiz
 from core.ingest import ingest_document
 from core.tree_summary import find_node, get_or_create_tree
 
@@ -62,6 +62,14 @@ def create_session(payload: SessionRequest):
     return {"session_id": session_id}
 
 
+# --- PDF list (for the sidebar) -----------------------------------------------
+
+@app.get("/pdfs")
+def list_pdfs():
+    filenames = sorted(f for f in os.listdir(RAW_PDF_DIR) if f.lower().endswith(".pdf"))
+    return [{"filename": f, "label": os.path.splitext(f)[0]} for f in filenames]
+
+
 # --- Ingest ------------------------------------------------------------------
 
 class IngestRequest(BaseModel):
@@ -91,8 +99,8 @@ def get_pdf(document_id: str):
 # --- Summary tree --------------------------------------------------------------
 
 @app.get("/summary/{document_id}")
-def get_summary(document_id: str):
-    tree = get_or_create_tree(document_id)
+def get_summary(document_id: str, refresh: bool = False):
+    tree = get_or_create_tree(document_id, force_refresh=refresh)
     return {"tree": tree}
 
 
@@ -106,6 +114,7 @@ class ExplainRequest(BaseModel):
     page_number: Optional[int] = None
     selected_text: Optional[str] = None
     user_question: Optional[str] = None
+    chat_history: Optional[list[dict]] = None
 
 
 @app.post("/explain")
@@ -137,36 +146,35 @@ def explain(payload: ExplainRequest):
             background,
             payload.user_question,
         )
+    elif payload.mode == "question":
+        if payload.page_number is None or not payload.user_question:
+            raise HTTPException(
+                status_code=400, detail="page_number and user_question required for mode=question"
+            )
+        explanation, related_pages = explain_question(
+            payload.document_id, payload.page_number, background, payload.user_question, payload.chat_history
+        )
     else:
-        raise HTTPException(status_code=400, detail="mode must be 'node' or 'highlight'")
+        raise HTTPException(status_code=400, detail="mode must be 'node', 'highlight', or 'question'")
 
     return {"explanation": explanation, "related_pages": related_pages}
 
 
-# --- Exercises ---------------------------------------------------------------
+# --- Quiz (whole-document multiple choice) ------------------------------------
 
-class ExerciseRequest(BaseModel):
+class QuizRequest(BaseModel):
     document_id: str
     session_id: str
-    page_number: int
-    user_request: str
+    user_request: str = ""
+    num_questions: int = 5
 
 
-@app.post("/exercise")
-def create_exercise_endpoint(payload: ExerciseRequest):
+@app.post("/quiz")
+def create_quiz_endpoint(payload: QuizRequest):
     background = db.get_session_background(payload.session_id)
     if background is None:
         raise HTTPException(status_code=404, detail="Unknown session_id")
-    exercise_id, exercise_text = generate_exercise(
-        payload.document_id, payload.page_number, payload.session_id, payload.user_request, background
+    quiz_id, questions = generate_quiz(
+        payload.document_id, payload.session_id, payload.user_request, background, payload.num_questions
     )
-    return {"exercise_id": exercise_id, "exercise_text": exercise_text}
-
-
-@app.get("/exercises/{document_id}/{page_number}")
-def list_exercises_endpoint(document_id: str, page_number: int, session_id: str):
-    rows = db.list_exercises(document_id, page_number, session_id)
-    return [
-        {"exercise_id": r[0], "user_request": r[1], "exercise_text": r[2], "created_at": r[3]}
-        for r in rows
-    ]
+    return {"quiz_id": quiz_id, "questions": questions}

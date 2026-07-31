@@ -82,6 +82,7 @@ export default function MindmapPopup({ documentId, sessionId, chatHistory, setCh
   const [rawTree, setRawTree] = useState(null)
   const [collapsedNodeIds, setCollapsedNodeIds] = useState(new Set())
   const [explainLoading, setExplainLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -89,6 +90,20 @@ export default function MindmapPopup({ documentId, sessionId, chatHistory, setCh
       .then((res) => setRawTree(res.tree))
       .catch((err) => setError(err.message))
   }, [documentId])
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    setError(null)
+    try {
+      const res = await getSummary(documentId, true)
+      setRawTree(res.tree)
+      setCollapsedNodeIds(new Set())
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const fullTree = useMemo(() => (rawTree ? buildFullTree(rawTree) : null), [rawTree])
   const displayTree = useMemo(
@@ -130,7 +145,12 @@ export default function MindmapPopup({ documentId, sessionId, chatHistory, setCh
         <button type="button" className="popup-close" onClick={onClose}>
           ×
         </button>
-        <h2 className="popup-title">Tóm tắt / Mindmap</h2>
+        <div className="popup-title-row">
+          <h2 className="popup-title">Tóm tắt / Mindmap</h2>
+          <button type="button" className="mindmap-refresh-button" onClick={handleRefresh} disabled={refreshing}>
+            {refreshing ? 'Đang tạo lại...' : '🔄 Tạo lại tóm tắt'}
+          </button>
+        </div>
         <div className="popup-body">
           <div className="mindmap-area">
             {error && <p className="error-banner">{error}</p>}

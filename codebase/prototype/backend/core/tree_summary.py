@@ -48,10 +48,11 @@ def _parse_tree_json(raw_text):
     return json.loads(text)["tree"]
 
 
-def get_or_create_tree(document_id):
-    cached = db.get_tree(document_id)
-    if cached:
-        return json.loads(cached)
+def get_or_create_tree(document_id, force_refresh=False):
+    if not force_refresh:
+        cached = db.get_tree(document_id)
+        if cached:
+            return json.loads(cached)
 
     pages = db.get_pages(document_id)
     prompt = TREE_PROMPT.format(document_id=document_id, pages_block=_build_pages_block(pages))

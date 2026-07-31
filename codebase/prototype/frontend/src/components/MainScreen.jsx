@@ -3,12 +3,14 @@ import PdfViewer from './PdfViewer'
 import ChatboxPanel from './ChatboxPanel'
 import MindmapPopup from './MindmapPopup'
 import ExercisePopup from './ExercisePopup'
-import { ingestPdf, pdfUrl, explain } from '../api'
+import { ingestPdf, listPdfs, pdfUrl, explain } from '../api'
 import { scrollToPage } from '../scrollToPage'
 
-const SAMPLE_PDF_FILENAME = 'L11-SVM.pdf'
+const DEFAULT_PDF_FILENAME = 'L11-SVM.pdf'
 
 export default function MainScreen({ sessionId, documentId, setDocumentId, chatHistory, setChatHistory }) {
+  const [pdfList, setPdfList] = useState([])
+  const [selectedFilename, setSelectedFilename] = useState(null)
   const [ingestError, setIngestError] = useState(null)
   const [pendingSelection, setPendingSelection] = useState(null)
   const [explainLoading, setExplainLoading] = useState(false)
@@ -16,11 +18,36 @@ export default function MainScreen({ sessionId, documentId, setDocumentId, chatH
   const [activePopup, setActivePopup] = useState(null) // null | 'mindmap' | 'exercise'
 
   useEffect(() => {
-    if (documentId) return
-    ingestPdf(SAMPLE_PDF_FILENAME)
+    listPdfs()
+      .then((list) => {
+        setPdfList(list)
+        setSelectedFilename(
+          (prev) =>
+            prev ||
+            list.find((p) => p.filename === DEFAULT_PDF_FILENAME)?.filename ||
+            list[0]?.filename ||
+            null,
+        )
+      })
+      .catch((err) => setIngestError(err.message))
+  }, [])
+
+  useEffect(() => {
+    if (!selectedFilename) return
+    setDocumentId(null)
+    setIngestError(null)
+    ingestPdf(selectedFilename)
       .then((res) => setDocumentId(res.document_id))
       .catch((err) => setIngestError(err.message))
-  }, [documentId, setDocumentId])
+  }, [selectedFilename, setDocumentId])
+
+  function handleSelectPdf(filename) {
+    if (filename === selectedFilename) return
+    setSelectedFilename(filename)
+    setCurrentPageNumber(1)
+    setPendingSelection(null)
+    setChatHistory([])
+  }
 
   const handleCurrentPageChange = useCallback((pageNumber) => {
     setCurrentPageNumber(pageNumber)
@@ -54,12 +81,53 @@ export default function MainScreen({ sessionId, documentId, setDocumentId, chatH
     }
   }
 
+  async function handleAskFreeform(userQuestion) {
+    setExplainLoading(true)
+    try {
+      // Context window = 3: only the last 3 free-form chat turns (not highlight
+      // explanations) are replayed back to the model as conversation history.
+      const recentTurns = chatHistory
+        .filter((e) => e.kind === 'question')
+        .slice(-3)
+        .map((e) => ({ question: e.question, answer: e.explanation }))
+
+      const res = await explain({
+        documentId,
+        sessionId,
+        mode: 'question',
+        pageNumber: currentPageNumber,
+        userQuestion,
+        chatHistory: recentTurns,
+      })
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          kind: 'question',
+          label: `Câu hỏi (trang ${currentPageNumber}): "${userQuestion}"`,
+          question: userQuestion,
+          explanation: res.explanation,
+          relatedPages: res.related_pages || [],
+        },
+      ])
+    } finally {
+      setExplainLoading(false)
+    }
+  }
+
   return (
     <div className="main-screen">
       <aside className="sidebar">
-        <div className="sidebar-item active">Day01</div>
-        <div className="sidebar-item disabled">Day02</div>
-        <div className="sidebar-item disabled">Day03</div>
+        {pdfList.map((pdf) => (
+          <button
+            key={pdf.filename}
+            type="button"
+            className={`sidebar-item${pdf.filename === selectedFilename ? ' active' : ''}`}
+            onClick={() => handleSelectPdf(pdf.filename)}
+          >
+            {pdf.label}
+          </button>
+        ))}
       </aside>
 
       <main className="pdf-column">
@@ -88,6 +156,8 @@ export default function MainScreen({ sessionId, documentId, setDocumentId, chatH
         pendingSelection={pendingSelection}
         loading={explainLoading}
         onExplainPending={handleExplainPending}
+        onAskFreeform={handleAskFreeform}
+        onClearPending={() => setPendingSelection(null)}
         onRelatedPageClick={scrollToPage}
       />
 
@@ -102,12 +172,7 @@ export default function MainScreen({ sessionId, documentId, setDocumentId, chatH
       )}
 
       {activePopup === 'exercise' && documentId && (
-        <ExercisePopup
-          documentId={documentId}
-          sessionId={sessionId}
-          pageNumber={currentPageNumber}
-          onClose={() => setActivePopup(null)}
-        />
+        <ExercisePopup documentId={documentId} sessionId={sessionId} onClose={() => setActivePopup(null)} />
       )}
     </div>
   )

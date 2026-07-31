@@ -18,15 +18,19 @@ export function createSession(answers) {
   return request('/session', { method: 'POST', body: JSON.stringify(answers) })
 }
 
+export function listPdfs() {
+  return request('/pdfs')
+}
+
 export function ingestPdf(pdfFilename) {
   return request('/ingest', { method: 'POST', body: JSON.stringify({ pdf_filename: pdfFilename }) })
 }
 
-export function getSummary(documentId) {
-  return request(`/summary/${documentId}`)
+export function getSummary(documentId, refresh = false) {
+  return request(`/summary/${documentId}${refresh ? '?refresh=true' : ''}`)
 }
 
-export function explain({ documentId, sessionId, mode, nodeId, pageNumber, selectedText, userQuestion }) {
+export function explain({ documentId, sessionId, mode, nodeId, pageNumber, selectedText, userQuestion, chatHistory }) {
   return request('/explain', {
     method: 'POST',
     body: JSON.stringify({
@@ -37,24 +41,21 @@ export function explain({ documentId, sessionId, mode, nodeId, pageNumber, selec
       page_number: pageNumber,
       selected_text: selectedText,
       user_question: userQuestion,
+      chat_history: chatHistory,
     }),
   })
 }
 
-export function createExercise({ documentId, sessionId, pageNumber, userRequest }) {
-  return request('/exercise', {
+export function createQuiz({ documentId, sessionId, userRequest, numQuestions }) {
+  return request('/quiz', {
     method: 'POST',
     body: JSON.stringify({
       document_id: documentId,
       session_id: sessionId,
-      page_number: pageNumber,
       user_request: userRequest,
+      num_questions: numQuestions,
     }),
   })
-}
-
-export function listExercises(documentId, pageNumber, sessionId) {
-  return request(`/exercises/${documentId}/${pageNumber}?session_id=${sessionId}`)
 }
 
 export function pdfUrl(documentId) {
