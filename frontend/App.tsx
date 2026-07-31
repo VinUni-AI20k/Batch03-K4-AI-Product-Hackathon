@@ -62,7 +62,7 @@ export default function App() {
   const { state } = useSession();
 
   return (
-    <div style={{ maxWidth: state.phase === 'reteach' ? 1000 : 720, margin: '0 auto', padding: '32px 20px 60px', transition: 'max-width 0.15s ease' }}>
+    <div style={{ maxWidth: state.phase === 'reteach' ? 1200 : 720, margin: '0 auto', padding: '32px 20px 60px', transition: 'max-width 0.15s ease' }}>
       <header style={{ textAlign: 'center', marginBottom: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         <img src={headerIcon} alt="logo" style={{ width: 88, height: 88, borderRadius: 12 }} />
         <h1 className="font-display" style={{ fontSize: 32, margin: 0 }}>

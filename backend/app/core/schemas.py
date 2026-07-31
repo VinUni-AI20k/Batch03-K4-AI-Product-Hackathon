@@ -49,7 +49,7 @@ class Slide(BaseModel):
     slide_id: str = Field(..., pattern=r"^P\d{2}$")
     page_number: int = Field(..., gt=0)
     title: str = Field(..., min_length=1)
-    text: str = Field(..., min_length=1)
+    text: str = Field("")
     segment_ids: List[str] = Field(default_factory=list)
 
 
