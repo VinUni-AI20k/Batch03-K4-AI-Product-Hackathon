@@ -96,6 +96,26 @@ def create_app(cfg) -> FastAPI:
         _day["n"] += 1
         return None
 
+    # KHOÁ TUNNEL (luôn bật, không phụ thuộc VLEARN_UI_TOKEN): request đến QUA tunnel/proxy
+    # (có cf-connecting-ip / x-forwarded-for) chỉ được dùng /api/ask (đã có chat_gate).
+    # Mọi route quản trị (dashboard, students, history, delete, CLI...) qua tunnel -> 401,
+    # trừ khi kèm đúng VLEARN_UI_TOKEN. Localhost thuần không bị ảnh hưởng.
+    PUBLIC_TUNNEL_PATHS = {"/api/ask"}
+
+    @app.middleware("http")
+    async def _tunnel_guard(request: Request, call_next):
+        via_tunnel = bool(request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"))
+        if via_tunnel and request.method != "OPTIONS" and request.url.path not in PUBLIC_TUNNEL_PATHS:
+            admin_token = getattr(cfg, "dashboard_token", "")
+            supplied = (request.cookies.get("vl_token")
+                        or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+                        or request.query_params.get("token", ""))
+            if not admin_token or supplied != admin_token:
+                return PlainTextResponse(
+                    "401 — khu vực quản trị chỉ dùng trên máy chạy agent (localhost). "
+                    "Bản public chỉ có API chat.", status_code=401)
+        return await call_next(request)
+
     # Nếu đặt VLEARN_UI_TOKEN: mọi request phải kèm token (cookie / ?token= / Bearer).
     # Dashboard có route xoá dữ liệu, bật CLI, chạy agent — bắt buộc khoá khi mở ngoài localhost.
     token = getattr(cfg, "dashboard_token", "")
@@ -306,6 +326,56 @@ def create_app(cfg) -> FastAPI:
             return []
         lines = f.read_text(encoding="utf-8").splitlines()[-limit:]
         return [json.loads(l) for l in reversed(lines)]
+
+    # ── Lịch sử chat (đọc sessions.db — log FTS5 mọi kênh: telegram/discord/web) ──
+    def _sessions_ro():
+        import sqlite3
+        p = cfg.root / "data" / "sessions.db"
+        if not p.exists():
+            return None
+        return sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+
+    @app.get("/api/history/users")
+    def history_users():
+        conn = _sessions_ro()
+        if conn is None:
+            return []
+        try:
+            rows = conn.execute(
+                "SELECT user_id, COUNT(*), MAX(ts), "
+                "  SUM(CASE WHEN role='user' THEN 1 ELSE 0 END) "
+                "FROM turns GROUP BY user_id ORDER BY MAX(ts) DESC").fetchall()
+            return [{"id": r[0], "turns": r[1], "last": r[2], "questions": r[3]} for r in rows]
+        finally:
+            conn.close()
+
+    @app.get("/api/history")
+    def history(user: str = "", q: str = "", limit: int = 300):
+        conn = _sessions_ro()
+        if conn is None:
+            return []
+        try:
+            limit = max(1, min(int(limit), 1000))
+            sql = "SELECT ts, user_id, role, content, platform FROM turns"
+            cond, params = [], []
+            if user:
+                cond.append("user_id = ?"); params.append(user)
+            if q.strip():
+                import re as _re
+                clean = _re.sub(r'["\'\^\*\(\)\-:]', " ", q).strip()
+                if clean:
+                    cond.append("turns MATCH ?"); params.append(f"content: {clean}")
+            if cond:
+                sql += " WHERE " + " AND ".join(cond)
+            sql += " ORDER BY ts DESC LIMIT ?"; params.append(limit)
+            rows = conn.execute(sql, params).fetchall()
+            # trả tăng dần theo thời gian cho dễ đọc như hội thoại
+            return [{"ts": r[0], "user": r[1], "role": r[2], "content": r[3], "platform": r[4]}
+                    for r in reversed(rows)]
+        except Exception:
+            return []
+        finally:
+            conn.close()
 
     @app.post("/api/ask")
     def ask(body: AskBody, request: Request):

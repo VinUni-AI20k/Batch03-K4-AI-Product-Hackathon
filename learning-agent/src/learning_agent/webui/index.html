@@ -122,6 +122,12 @@
   .chat-top .page-head{margin:0;flex:1}
   .chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
   .chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px;min-height:0}
+  /* lịch sử chat */
+  .hist-log{display:flex;flex-direction:column;gap:12px;padding:2px}
+  .hist-log .msg{max-width:82%}
+  .hist-day{align-self:center;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.08em;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 14px;margin:8px 0 2px}
+  .hist-meta{font-size:.62rem;color:var(--muted);margin-top:6px;display:flex;gap:8px}
+  .hist-meta .pf{text-transform:uppercase;letter-spacing:.1em;font-weight:700}
   .msg{max-width:76%;border-radius:12px;padding:11px 14px;font-size:.87rem;line-height:1.55;white-space:pre-wrap}
   .msg.user{align-self:flex-end;background:var(--accent-dim);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
   .msg.bot{align-self:flex-start;background:var(--panel);border:1px solid var(--line)}
@@ -174,6 +180,7 @@
 <aside id="nav">
   <h3>Chat</h3>
   <button data-tab="chat"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="label">Chat</span></button>
+  <button data-tab="history"><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span class="label">Lịch sử chat</span></button>
   <h3>Control</h3>
   <button data-tab="overview" class="active"><svg class="ic" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="label">Overview</span></button>
   <button data-tab="tasks"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="label">Cron Jobs</span></button>
@@ -295,6 +302,20 @@
       <button class="btn" onclick="newSession()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Phiên mới</button>
       <button class="btn primary" onclick="ask()">Gửi<svg class="ic" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg></button>
     </div>
+  </section>
+
+  <section id="tab-history" class="hidden">
+    <div class="page-head"><h1>Lịch sử chat</h1><p>Toàn bộ hội thoại đã ghi (Telegram · Discord · Web) — đọc từ session log FTS5, nguồn dữ liệu tool <code>search_sessions</code> của agent.</p></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select id="hist-user" onchange="loadHistory()" style="min-width:190px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+        <option value="">Tất cả người dùng</option>
+      </select>
+      <input id="hist-q" placeholder="Tìm trong nội dung… (Enter)" onkeydown="if(event.key==='Enter')loadHistory()"
+        style="flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+      <button class="btn" onclick="loadHistory()">Lọc</button>
+      <span id="hist-count" class="muted" style="align-self:center;font-size:.8rem"></span>
+    </div>
+    <div id="hist-log" class="hist-log"><div class="muted">Đang tải…</div></div>
   </section>
 </main>
 <div id="toasts"></div>
@@ -420,6 +441,7 @@ async function load(tab) {
         return `<tr><td class="muted" style="font-family:var(--mono);font-size:.76rem">${ts.replace('T',' ').slice(0,19)}</td><td><b>${esc(event)}</b></td><td class="muted" style="font-family:var(--mono);font-size:.76rem">${esc(JSON.stringify(rest))}</td></tr>`;
       }).join('') || '<tr><td colspan=3 class="muted">trống</td></tr>';
     }
+    if (tab === 'history') { await loadHistoryUsers(); await loadHistory(); }
     if (tab === 'config') {
       $('#config').textContent = JSON.stringify(await api('/api/config'), null, 2);
       const items = await api('/api/integrations');
@@ -567,6 +589,37 @@ async function toggleAddon(name, enabled) {
     headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled})});
   toast(`addon ${name}: ${enabled ? 'agent ĐƯỢC PHÉP dùng' : 'đã tắt'}`);
 }
+/* ---- Lịch sử chat ---- */
+const PLATFORM_ICON = {telegram:'✈️', discord:'🎮', web:'🌐', '':'💻'};
+async function loadHistoryUsers() {
+  const users = await api('/api/history/users');
+  const sel = $('#hist-user'), cur = sel.value;
+  sel.innerHTML = '<option value="">Tất cả người dùng (' + users.length + ')</option>' +
+    users.map(u => `<option value="${esc(u.id)}">${esc(u.id)} · ${u.questions} câu hỏi · lần cuối ${esc((u.last||'').slice(0,10))}</option>`).join('');
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+async function loadHistory() {
+  const user = $('#hist-user').value, q = $('#hist-q').value.trim();
+  const rows = await api('/api/history?user=' + encodeURIComponent(user) + '&q=' + encodeURIComponent(q) + '&limit=300');
+  $('#hist-count').textContent = rows.length ? rows.length + ' lượt' + (q ? ' khớp "' + q + '"' : '') : '';
+  if (!rows.length) {
+    $('#hist-log').innerHTML = '<div class="muted">' + (q ? 'Không có tin nhắn nào khớp.' : 'Chưa có hội thoại nào được ghi.') + '</div>';
+    return;
+  }
+  let html = '', day = '';
+  rows.forEach(r => {
+    const d = (r.ts || '').slice(0, 10);
+    if (d && d !== day) { day = d; html += `<div class="hist-day">${esc(d)}</div>`; }
+    const time = (r.ts || '').slice(11, 16);
+    const who = r.role === 'user' ? esc(r.user) : 'Agent';
+    const body = r.role === 'user' ? esc(r.content) : mdToHtml(r.content);
+    html += `<div class="msg ${r.role === 'user' ? 'user' : 'bot'}">`
+          + `<div class="who">${who}</div>${body}`
+          + `<div class="hist-meta"><span>${esc(time)} UTC</span><span class="pf">${PLATFORM_ICON[r.platform] || '💻'} ${esc(r.platform || 'web')}</span></div></div>`;
+  });
+  $('#hist-log').innerHTML = html;
+}
+
 async function loadRegistry() {
   const key = $('#reg-select').value;
   $('#registry-list').textContent = '⏳ Đang tải registry (lần đầu clone repo)...';
