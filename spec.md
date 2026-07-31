@@ -174,6 +174,10 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 - **Golden set — 22 case** *(file `eval/golden-set.md`)*: **≥2 case/lớp chỗ khó** (8) + **10 case thường** + **4 case hiếm**; **16/22 lấy từ chatlog thật** (ghi mã hội thoại thay vì dán nguyên văn dài, theo quy định bảo mật data pack). Chatlog gốc phát sinh trên trang tài liệu — câu hỏi giữ nguyên, phần "(Trang N, đoạn được chọn: ...)" thay bằng ngữ cảnh Bước đang làm trong Codelab.
 
+  **Đối chiếu 2 tiêu chí nộp:**
+  - **Đủ 4 kiểu tình huống:** ① nguồn sự thật (G01-G03) · ② mơ hồ/thiếu ngữ cảnh (G04-G06) · ③ ngoài phạm vi (G07-G09) · ④ trả lời sai gây hậu quả thật (G10-G11).
+  - **Đủ câu bắt nguồn từ quan sát thực tế:** 16/22 case lấy từ chatlog thật, vượt ngưỡng tối thiểu 5 case.
+
   | ID | Input | Loại | Lớp | Nguồn | Kỳ vọng |
   |---|---|---|---|---|---|
   | G01 | "error matrix ở slide nào" | khó | ① | `U0065/C0578/T1132` | Nói không tìm thấy · `citations` rỗng · gợi ý khái niệm gần có thật |
