@@ -22,13 +22,13 @@ function detailMarkup(day) {
     <div class="day-actions" aria-label="Tài nguyên Day${String(day.day).padStart(2, "0")}">
       ${
         isWarmupReady
-          ? `<a class="day-action day-action--warmup" href="../warmup-ai/index.html"><span>◷</span><b>Chuẩn bị trước buổi học</b><small>Warm-up AI · khoảng 4 phút</small></a>`
+          ? `<a class="day-action day-action--warmup" href="../warmup-ai/"><span>◷</span><b>Chuẩn bị trước buổi học</b><small>Warm-up AI · khoảng 4 phút</small></a>`
           : `<button class="day-action" type="button" data-unavailable="warmup"><span>◷</span><b>Chuẩn bị trước buổi học</b><small>Đang được biên soạn</small></button>`
       }
       <button class="day-action" type="button" data-action="slides"><span>▤</span><b>Đọc slide</b><small>${day.slides} slide · mở tài liệu bên dưới</small></button>
       ${
         isQuizReady
-          ? `<a class="day-action day-action--quiz" href="../quizzcuoi/index.html"><span>✓</span><b>Kiểm tra sau bài</b><small>Khảo sát nhanh và quiz củng cố</small></a>`
+          ? `<a class="day-action day-action--quiz" href="../quizzcuoi/"><span>✓</span><b>Kiểm tra sau bài</b><small>Khảo sát nhanh và quiz củng cố</small></a>`
           : `<button class="day-action" type="button" data-unavailable="quiz"><span>✓</span><b>Kiểm tra sau bài</b><small>Đang được biên soạn</small></button>`
       }
     </div>

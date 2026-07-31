@@ -7,10 +7,12 @@ Warm-up tương tác trước buổi học AI: 5 tình huống, tỷ lệ chọn
 Từ thư mục này:
 
 ```bash
-python3 -m http.server 4173
+python3 -m http.server 8765
 ```
 
-Mở `http://localhost:4173`.
+Mở `http://localhost:8765/codebase/frontend/warmup-ai/`.
+
+Server phải được chạy từ root repository để liên kết quay về VLearn hoạt động.
 
 ## File chính
 

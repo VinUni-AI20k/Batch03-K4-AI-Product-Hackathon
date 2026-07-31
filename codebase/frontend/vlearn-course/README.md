@@ -7,10 +7,11 @@ Trang tĩnh mô phỏng cổng khóa học VLearn cho COMP2010. Visual của tra
 Từ root repo:
 
 ```bash
-python3 -m http.server 4173
+python3 -m http.server 8765
 ```
 
-Mở `http://localhost:4173/codebase/frontend/vlearn-course/`. Chạy từ root giúp các link PDF và transcript trong `data/vlearn-pack/` hoạt động đúng.
+Mở `http://localhost:8765/` hoặc `http://localhost:8765/codebase/frontend/vlearn-course/`.
+Chạy từ root giúp liên kết sang warm-up, quiz, PDF và transcript hoạt động đúng.
 
 ## Luồng
 
