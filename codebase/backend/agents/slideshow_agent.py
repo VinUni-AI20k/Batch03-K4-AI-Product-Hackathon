@@ -15,7 +15,9 @@ from config.settings import DEFAULT_GEMINI_MODEL, DEFAULT_OPENAI_MODEL
 
 SLIDESHOW_SYSTEM_PROMPT = """Bạn là VLearn AI Slide Presenter — chuyên gia tổng hợp bài giảng và biên soạn kịch bản thuyết trình.
 Nhiệm vụ của bạn là nhận nội dung slide bài học và tổng hợp lại thành một slide show tóm tắt (5 đến 8 slide) chứa tất cả những kiến thức cốt lõi quan trọng nhất sinh viên cần nhớ.
-Với mỗi slide tóm tắt, hãy biên soạn kịch bản nói (narration) bằng tiếng Việt thật tự nhiên, lưu loát, lôi cuốn và dễ nghe khi đọc bằng Text-to-Speech (khoảng 60-100 từ mỗi slide)."""
+Với mỗi slide tóm tắt, hãy biên soạn:
+1. Kịch bản nói hiển thị dạng phụ đề (narration): dùng tiếng Việt tự nhiên và giữ nguyên các thuật ngữ tiếng Anh chuẩn chính tả (như AI, LLM, Agent, Fine-tuning, Model, Precision, Recall).
+2. Kịch bản phát âm tiếng Việt (narration_phonetic): hãy chuyển đổi tất cả các từ/thuật ngữ tiếng Anh xuất hiện ở bản phụ đề sang phiên âm phát âm tiếng Việt, các âm tiết cách nhau bằng khoảng trắng (ví dụ: AI -> ây ai, LLM -> eo eo em, RAG -> rác, Agent -> ây giơnt, Model -> mô đen, Fine-tuning -> phai tun ninh, Double Diamond -> đắp bồ đai mơn, Problem Statement -> próp lơm xtết mơnt, Precision -> pri xí giưn, Recall -> ri côn, False Positive -> phôn pó gi típ) để bộ đọc TTS tiếng Việt có thể đọc đầy đủ, rõ chữ và đúng phát âm tiếng Anh."""
 
 SLIDESHOW_GENERATOR_PROMPT = """Dưới đây là toàn bộ nội dung trích xuất từ bộ slide bài giảng (gồm {total_slides} trang):
 
@@ -28,7 +30,8 @@ Với mỗi trang slide tóm tắt này, hãy biên soạn:
 1. "slide_number": Số thứ tự slide tóm tắt (bắt đầu từ 1)
 2. "title": Tiêu đề của slide tóm tắt
 3. "bullets": Mảng chứa từ 3 đến 4 ý chính tóm tắt kiến thức (mỗi ý viết ngắn gọn, rõ ràng)
-4. "narration": Đoạn văn kịch bản thuyết trình bằng tiếng Việt tự nhiên để AI đọc khi trình chiếu slide này (dài khoảng 60-100 từ). Hãy viết trôi chảy, có mở đầu và kết nối giữa các slide.
+4. "narration": Đoạn văn kịch bản thuyết trình bằng tiếng Việt tự nhiên để hiển thị trên phụ đề (giữ nguyên các từ tiếng Anh chuyên ngành như AI, LLM, Agent, Model, v.v.).
+5. "narration_phonetic": Đoạn văn kịch bản thuyết trình phiên âm tiếng Việt tương ứng (chuyển đổi tất cả từ tiếng Anh ở mục 'narration' sang phiên âm viết cách nhau bằng khoảng trắng, ví dụ: ây ai, eo eo em, rác, ây giơnt, mô đen, phai tun ninh, đắp bồ đai mơn, v.v.) để bộ đọc phát âm chậm rãi và chuẩn xác.
 
 Đầu ra BẮT BUỘC phải là một mảng JSON hợp lệ chứa các đối tượng slide này. Không chèn thêm các giải thích khác ngoài JSON, không bọc trong markdown codeblock (như ```json).
 
@@ -42,7 +45,8 @@ Ví dụ định dạng đầu ra:
       "Các bài toán ứng dụng thực tế trong doanh nghiệp",
       "Lộ trình triển khai hệ thống AI thông minh"
     ],
-    "narration": "Chào mừng các bạn sinh viên đến với buổi trình chiếu tóm tắt nội dung bài giảng. Hôm nay, chúng ta sẽ cùng nhau ôn tập lại các kiến thức trọng tâm của buổi học trước..."
+    "narration": "Chào mừng các bạn sinh viên đến với buổi trình chiếu tóm tắt nội dung bài giảng về AI và LLM.",
+    "narration_phonetic": "Chào mừng các bạn sinh viên đến với buổi trình chiếu tóm tắt nội dung bài giảng về ây ai và eo eo em."
   }}
 ]
 """
@@ -159,6 +163,7 @@ class SlideshowAgent:
                     "Tự động trích xuất do quá trình xử lý AI bị quá tải",
                     f"Nội dung thô: {content}"
                 ],
-                "narration": f"Chào bạn. Đây là nội dung tóm tắt của slide số {num}. Do xảy ra lỗi kỹ thuật hoặc quá tải khi kết nối API, chúng tôi hiển thị bản tóm tắt thô từ nội dung slide. Bạn có thể nhấn tiếp tục để xem các slide sau."
+                "narration": f"Chào bạn. Đây là nội dung tóm tắt của slide số {num}. Do xảy ra lỗi kỹ thuật hoặc quá tải khi kết nối API, chúng tôi hiển thị bản tóm tắt thô từ nội dung slide. Bạn có thể nhấn tiếp tục để xem các slide sau.",
+                "narration_phonetic": f"Chào bạn. Đây là nội dung tóm tắt của slide số {num}. Do xảy ra lỗi kỹ thuật hoặc quá tải khi kết nối ây pi ai, chúng tôi hiển thị bản tóm tắt thô từ nội dung slide. Bạn có thể nhấn tiếp tục để xem các slide sau."
             })
         return fallback
