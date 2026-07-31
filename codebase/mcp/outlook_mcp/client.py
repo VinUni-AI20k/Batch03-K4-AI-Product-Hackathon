@@ -21,7 +21,7 @@ class OutlookMCPClient:
     over stdio, spawned as `docker run -i --rm ...` (see config.docker_run_args).
 
     The container is stdio-only (no HTTP mode), so unlike discord_mcp /
-    google_calendar_mcp this isn't a server your agent connects to over a
+    gmail_mcp this isn't a server your agent connects to over a
     port — it's a subprocess your agent's Python process holds open and
     talks MCP to directly, the same way Claude Desktop's `"command": "docker"`
     config does, just from Python instead of a GUI.

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from typing import Any
 
-from mcp_bridge.http_mcp_client import call_tool_text
-from tools._shared import GOOGLE_CALENDAR_MCP_URL, err
+from mcp_bridge.google_calendar_client import call
+from tools._calendar_format import format_event_list
+from tools._shared import err
 
 
 def calendar_list_events(
@@ -17,22 +17,19 @@ def calendar_list_events(
 ) -> dict[str, Any]:
     """List events on the student's Google Calendar in a time range, optionally filtered by text query."""
     try:
-        args: dict[str, Any] = {"max_results": str(max_results)}
+        args: dict[str, Any] = {"pageSize": max_results, "orderBy": "startTime"}
+        # Google's list_events wants these omitted entirely unless the user
+        # asked for a specific timeframe — it picks a sensible window itself.
         if time_min:
-            args["time_min"] = time_min
+            args["startTime"] = time_min
         if time_max:
-            args["time_max"] = time_max
+            args["endTime"] = time_max
         if query:
-            args["query"] = query
+            args["fullText"] = query
         if calendar_id:
-            args["calendar_id"] = calendar_id
-        raw = asyncio.run(call_tool_text(GOOGLE_CALENDAR_MCP_URL, "list_events", args))
-        try:
-            payload = json.loads(raw)
-            text, events = payload["text"], payload.get("events", [])
-        except (json.JSONDecodeError, KeyError, TypeError):
-            # Defensive fallback if the MCP server ever returns plain text.
-            text, events = raw, []
-        return {"tool": "calendar_list_events", "text": text, "events": events}
+            args["calendarId"] = calendar_id
+        result = asyncio.run(call("list_events", args))
+        payload = format_event_list(result.get("events", []) or [])
+        return {"tool": "calendar_list_events", "text": payload["text"], "events": payload["events"]}
     except Exception as exc:
         return err("calendar_list_events", exc)

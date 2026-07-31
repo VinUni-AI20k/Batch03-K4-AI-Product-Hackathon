@@ -2,7 +2,9 @@
 
 Tài liệu này hướng dẫn cách cài đặt, cấu hình biến môi trường (`.env`) và
 chạy toàn bộ hệ thống ở local: backend (FastAPI), frontend (Vite + React),
-và 4 MCP server tích hợp (Discord, Gmail, Google Calendar, Outlook).
+và 3 MCP server chạy local (Discord, Gmail, Outlook). Google Calendar không
+chạy server local — backend gọi thẳng MCP server của Google
+(`calendarmcp.googleapis.com`).
 
 ## 1. Yêu cầu hệ thống
 
@@ -20,7 +22,8 @@ và 4 MCP server tích hợp (Discord, Gmail, Google Calendar, Outlook).
 codebase/
 ├── backend/        # FastAPI server + agent chat (Python)
 ├── FE/             # Frontend Vite + React
-└── mcp/            # 4 MCP server: discord_mcp, gmail_mcp, google_calendar_mcp, outlook_mcp
+└── mcp/            # 3 MCP server local: discord_mcp, gmail_mcp, outlook_mcp
+#                  (Google Calendar dùng MCP server của Google, không cần chạy local)
 scripts/dev.sh       # Script start/stop backend + frontend cùng lúc
 ```
 
@@ -36,7 +39,7 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-### 3.2. MCP servers (Discord / Gmail / Google Calendar / Outlook)
+### 3.2. MCP servers (Discord / Gmail / Outlook)
 
 Dùng chung một venv:
 
@@ -66,7 +69,7 @@ Có **3 file `.env`** riêng biệt, mỗi file nằm cạnh file `.env.example`
 |---|---|---|
 | `OPENAI_API_KEY` | ✅ | API key OpenAI, dùng cho agent trả lời chat |
 | `DISCORD_MCP_URL` | mặc định sẵn | URL của `discord_mcp` (mặc định `http://localhost:8085/mcp`) |
-| `GOOGLE_CALENDAR_MCP_URL` | mặc định sẵn | URL của `google_calendar_mcp` (mặc định `http://localhost:8086/mcp`) |
+| `GOOGLE_CALENDAR_MCP_URL` | mặc định sẵn | URL MCP server Google Calendar của Google (mặc định `https://calendarmcp.googleapis.com/mcp/v1`) — chỉ đổi nếu muốn ghim endpoint theo vùng |
 | `GMAIL_MCP_URL` | mặc định sẵn | URL của `gmail_mcp` (mặc định `http://localhost:8087/mcp`) |
 | `GOOGLE_OAUTH_REDIRECT_URI` | mặc định sẵn | Redirect URI cho luồng OAuth Google (`http://localhost:8000/api/v1/connections/google/callback`) — phải khớp với redirect URI khai báo trên Google Cloud Console |
 | `FRONTEND_URL` | mặc định sẵn | URL frontend đang chạy (mặc định `http://localhost:5190`), dùng để redirect lại sau khi OAuth Google xong |
@@ -75,11 +78,24 @@ Cách lấy `OPENAI_API_KEY`: đăng nhập https://platform.openai.com/api-keys
 
 **Kết nối Google (Gmail + Google Calendar dùng chung 1 OAuth client):**
 1. Vào https://console.cloud.google.com/ → tạo (hoặc chọn) project.
-2. **APIs & Services → Library** → bật **Google Calendar API** và **Gmail API**.
+2. **APIs & Services → Library** → bật **Google Calendar API**, **Gmail API**
+   và **Google Calendar MCP API** (`calendarmcp.googleapis.com`). Bằng gcloud:
+   ```bash
+   gcloud services enable calendar-json.googleapis.com --project=PROJECT_ID
+   gcloud services enable calendarmcp.googleapis.com --project=PROJECT_ID
+   ```
+   ⚠️ **MCP server Google Calendar đang ở Developer Preview** — project phải
+   được đăng ký [Google Workspace Developer Preview Program](https://developers.google.com/workspace/preview)
+   thì mới gọi được. Nếu chưa đủ điều kiện, mọi tool calendar sẽ trả lỗi
+   `The caller does not have permission`.
 3. **APIs & Services → OAuth consent screen** → User Type "External" → điền tên app/email → mục "Test users" thêm email Google của bạn.
 4. **APIs & Services → Credentials → Create Credentials → OAuth client ID** → chọn **Web application** → thêm `http://localhost:8000/api/v1/connections/google/callback` vào "Authorized redirect URIs" → **Download JSON**.
 5. Lưu file JSON vừa tải thành `codebase/backend/credentials/client_secret.json` (thư mục này đã có sẵn, file bị gitignore nên không lo lộ key).
-6. Sau đó vào FE, mục "Quản lý kết nối" → bấm kết nối Gmail để thực hiện OAuth — token sẽ được lưu tại `codebase/backend/credentials/token.json` và các MCP server Gmail/Calendar sẽ dùng chung token này.
+6. Sau đó vào FE, mục "Quản lý kết nối" → bấm kết nối Gmail để thực hiện OAuth — token sẽ được lưu tại `codebase/backend/credentials/token.json`, dùng chung cho `gmail_mcp` và cho các tool Google Calendar (backend gắn token này vào header `Authorization` khi gọi MCP server của Google).
+   Nếu bạn đã kết nối từ trước khi chuyển sang MCP server của Google, hãy bấm
+   **ngắt kết nối rồi kết nối lại** — token cũ thiếu 3 scope mà MCP server của
+   Google yêu cầu (`calendar.calendarlist.readonly`, `calendar.events.freebusy`,
+   `calendar.events.readonly`).
 
 ### 4.2. `codebase/mcp/.env`
 
@@ -90,9 +106,6 @@ Cách lấy `OPENAI_API_KEY`: đăng nhập https://platform.openai.com/api-keys
 | `MCP_HOST` / `MCP_PORT` | mặc định sẵn | Host/port cho `discord_mcp` (mặc định `0.0.0.0:8085`) |
 | `GOOGLE_CLIENT_SECRETS_FILE` | mặc định sẵn | Đường dẫn tới `client_secret.json` (trỏ chung sang `codebase/backend/credentials/`) |
 | `GOOGLE_CALENDAR_TOKEN_FILE` | mặc định sẵn | Đường dẫn tới `token.json` (token OAuth dùng chung Gmail + Calendar) |
-| `GOOGLE_CALENDAR_ID` | mặc định sẵn | Calendar để đọc/ghi sự kiện (mặc định `primary`) |
-| `GOOGLE_CALENDAR_DEFAULT_TZ` | mặc định sẵn | Timezone mặc định (`Asia/Ho_Chi_Minh`) |
-| `GOOGLE_CALENDAR_MCP_HOST` / `_PORT` | mặc định sẵn | Host/port cho `google_calendar_mcp` (mặc định `0.0.0.0:8086`) |
 | `OUTLOOK_MCP_IMAGE` | chỉ khi dùng Outlook | Tên Docker image (`outlook-local-mcp:local`) |
 | `OUTLOOK_MCP_VOLUME` | chỉ khi dùng Outlook | Docker volume lưu token đăng nhập Outlook |
 | `OUTLOOK_MCP_CLIENT_ID` / `OUTLOOK_MCP_TENANT_ID` | mặc định sẵn | Client ID public của Microsoft, không cần tự đăng ký app |
@@ -120,7 +133,7 @@ Outlook không cần đăng ký app riêng (dùng client ID công khai của Mic
 
 Script này tự chạy cả backend (`:8000`) và frontend (`:5190`) cùng lúc (không
 bao gồm các MCP server — cần các MCP nào thì chạy thêm ở bước 5.3/5.4 nếu
-muốn dùng tính năng Discord/Gmail/Calendar/Outlook thật).
+muốn dùng tính năng Discord/Gmail/Outlook thật; Calendar không cần chạy gì thêm).
 
 ```bash
 # từ thư mục gốc repo
@@ -165,11 +178,6 @@ python -m discord_mcp            # http://localhost:8085/mcp
 
 ```bash
 cd codebase/mcp && source .venv/bin/activate
-python -m google_calendar_mcp    # http://localhost:8086/mcp
-```
-
-```bash
-cd codebase/mcp && source .venv/bin/activate
 python -m gmail_mcp              # http://localhost:8087/mcp
 ```
 
@@ -203,11 +211,11 @@ Nếu không có Docker/không cần Outlook, bỏ qua bước này — các too
 
 Không sao — các tool tương ứng sẽ trả lỗi dạng
 `{"tool": ..., "error": ..., "message": ...}` thay vì crash cả agent, nên có
-thể phát triển/test dần từng phần mà không cần bật đủ 4 kết nối.
+thể phát triển/test dần từng phần mà không cần bật đủ các kết nối.
 
 ## 6. Thứ tự khởi động khuyến nghị
 
-1. `codebase/mcp` → chạy `discord_mcp`, `google_calendar_mcp`, `gmail_mcp` (nếu cần)
+1. `codebase/mcp` → chạy `discord_mcp`, `gmail_mcp` (nếu cần)
 2. Docker daemon bật sẵn (nếu cần Outlook)
 3. Backend (`uvicorn` hoặc `scripts/dev.sh start`)
 4. Frontend (`npm run dev` hoặc đã được `scripts/dev.sh start` chạy cùng)

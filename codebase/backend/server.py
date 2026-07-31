@@ -117,6 +117,19 @@ def chat(request: ChatRequest) -> dict[str, Any]:
     guardrail, not a clarify-style follow-up question (no graph equivalent
     yet). See the mail-rag-design migration artifact, section 3c.
     """
+
+    try:
+        google_status = google_connection.get_status()
+    except Exception:
+        google_status = {"connected": False}
+
+    if not google_status.get("connected"):
+        raise error_response(
+            401,
+            "UNAUTHORIZED",
+            "Bạn chưa đăng nhập Google. Vui lòng bấm 'Đăng nhập với Google' ở góc trên bên phải để bắt đầu sử dụng trợ lý StudyPulse AI.",
+        )
+
     conversation_id = request.conversation_id or uuid.uuid4().hex
     config = {"configurable": {"thread_id": conversation_id}}
 
