@@ -8,6 +8,13 @@ Chạy server có API key ở terminal 1, rồi terminal 2:
 uv run python eval/run_eval.py
 ```
 
+Nếu server chạy ở cổng khác 8000, đặt `EVAL_BASE_URL`:
+
+```bash
+EVAL_BASE_URL=http://127.0.0.1:8010 uv run python eval/run_eval.py
+EVAL_BASE_URL=http://127.0.0.1:8010 uv run python eval/run_agent_eval.py
+```
+
 Kết quả máy tự lưu trong `eval/results/`. Hai người phải chấm độc lập `manual_grounded` và `manual_relevance`; không thay đổi quality bar sau 23:59 ngày 1.
 
 ## Đánh giá toàn bộ module
@@ -29,7 +36,7 @@ Kiểm tra evaluator:
 uv run python -m unittest eval.test_module_eval -v
 ```
 
-Smoke test toàn bộ pipeline:
+Contract smoke test toàn bộ pipeline (phải đạt 20/20; chỉ xác nhận evaluator):
 
 ```bash
 uv run python eval/run_module_eval.py \
@@ -37,6 +44,16 @@ uv run python eval/run_module_eval.py \
 ```
 
 Smoke adapter chỉ kiểm tra hệ thống đo, không phải bằng chứng chất lượng Agent.
+`mock_vlearn_adapter` là contract fixture nên đọc expectation trong testcase.
+Để kiểm tra evaluator có thực sự bắt lỗi, chạy adapter cố ý sai:
+
+```bash
+uv run python eval/run_module_eval.py \
+  --adapter eval.adapters.faulty_vlearn_adapter
+```
+
+Lượt faulty phải fail; lượt contract phải pass. Cả hai đều không được dùng để
+thay thế kết quả Agent/API thật.
 Để đánh giá Agent thật, sao chép `eval/adapters/project_adapter_template.py`
 thành adapter của dự án, gọi Agent/API thật trong `run_case()`, rồi chạy:
 

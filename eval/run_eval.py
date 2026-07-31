@@ -1,14 +1,15 @@
 """Run the complete golden set against the local API and write an honest result table."""
-import csv, json, urllib.error, urllib.request
+import csv, json, os, urllib.error, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 cases = json.loads((ROOT / "eval/golden_set.json").read_text())
+BASE_URL = os.getenv("EVAL_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 rows = []
 for case in cases:
     body = {"lesson_title": f"Golden case {case['id']}", "source_ids": case.get("source_ids", []), "purpose": case.get("purpose", "practice")}
-    request = urllib.request.Request("http://127.0.0.1:8000/api/generate-quiz", data=json.dumps(body).encode(), headers={"Content-Type":"application/json"}, method="POST")
+    request = urllib.request.Request(f"{BASE_URL}/api/generate-quiz", data=json.dumps(body).encode(), headers={"Content-Type":"application/json"}, method="POST")
     try:
         with urllib.request.urlopen(request, timeout=90) as response: payload = json.loads(response.read())
     except urllib.error.HTTPError as exc: payload = json.loads(exc.read())
