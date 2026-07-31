@@ -30,67 +30,57 @@ try:
 except Exception as err:
     HAS_AI_CORE = False
 
-# --- CỔNG API LẮNG NGHE CHẠY NGẦM (PORT 8000) ---
-class AIChatAPIHandler(BaseHTTPRequestHandler):
+import threading
+import base64
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# --- LIGHTWEIGHT BACKEND API BRIDGE FOR AI CHATBOT ---
+class ChatAPIHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
-        # Trả về CORS Header cho trình duyệt chấp nhận gọi chéo cổng (Cross-Origin)
-        self.send_response(200, "ok")
+        self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
     def do_POST(self):
         if self.path == '/api/chat':
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers.get('Content-Length', 0))
             post_data = self.rfile.read(content_length)
-            try:
-                payload = json.loads(post_data.decode('utf-8'))
-                user_message = payload.get("message", "")
-                day_code = payload.get("day_code", "d1")
-                current_slide = payload.get("current_slide", 1)
+            data = json.loads(post_data.decode('utf-8'))
+            user_msg = data.get('message', '')
+            day_code = data.get('day_code', 'd1')
+            slide_num = data.get('current_slide', 1)
 
-                # Thiết lập câu hỏi kèm theo ngữ cảnh slide học viên đang xem gửi cho Backend
-                prompt_with_context = f"Học viên đang xem slide {day_code.upper()} trang {current_slide}. Câu hỏi: '{user_message}'"
-                
-                # Thực thi hàm xử lý thực tế dưới Backend
-                if HAS_AI_CORE:
-                    ai_reply = run_agent(prompt_with_context)
-                else:
-                    ai_reply = "[Lỗi]: Chưa kết nối được với codebase/core/agent.py."
+            prompt = f"Tôi đang xem slide {day_code.upper()}, trang {slide_num}. Câu hỏi của tôi: {user_msg}"
 
-            except Exception as e:
-                ai_reply = f"[Lỗi backend]: {str(e)}"
+            reply = ""
+            if HAS_AI_CORE:
+                try:
+                    reply = run_agent(prompt)
+                except Exception as e:
+                    reply = f"⚠️ Lỗi kết nối AI Agent: {str(e)}. Hãy kiểm tra file .env API Key."
+            else:
+                reply = f"🤖 <strong>VLearn Tutor:</strong> Bạn vừa hỏi: '{user_msg}' tại slide {slide_num}."
 
-            # Trả dữ liệu JSON về cho JavaScript hiển thị lên bong bóng chat
             self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.end_headers()
-            
-            response_data = json.dumps({"reply": ai_reply})
-            self.wfile.write(response_data.encode('utf-8'))
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def log_message(self, format, *args):
-        # Tắt bớt log HTTP để Terminal luôn sạch
-        return
+            response_body = json.dumps({'reply': reply}, ensure_ascii=False).encode('utf-8')
+            self.wfile.write(response_body)
 
 def start_api_server():
     try:
-        server_address = ('', 8000)
-        httpd = HTTPServer(server_address, AIChatAPIHandler)
-        httpd.serve_forever()
-    except Exception as e:
+        server = HTTPServer(('0.0.0.0', 8502), ChatAPIHandler)
+        server.serve_forever()
+    except Exception:
         pass
 
-# Khởi tạo API Server ngầm (chỉ chạy duy nhất 1 lần)
-if "api_server_started" not in st.session_state:
+if 'api_server_started' not in st.session_state:
+    st.session_state.api_server_started = True
     t = threading.Thread(target=start_api_server, daemon=True)
     t.start()
-    st.session_state.api_server_started = True
 
 # --- STREAMLIT PAGE CONFIGURATION ---
 st.set_page_config(

@@ -413,6 +413,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Fullscreen Toggle Logic
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+
+    function toggleFullScreen() {
+        const doc = document;
+        const docEl = document.documentElement;
+
+        const isFull = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement || document.body.classList.contains('fullscreen-mode'));
+
+        if (!isFull) {
+            if (docEl.requestFullscreen) {
+                docEl.requestFullscreen().catch(() => {});
+            } else if (docEl.webkitRequestFullscreen) {
+                docEl.webkitRequestFullscreen();
+            } else if (docEl.msRequestFullscreen) {
+                docEl.msRequestFullscreen();
+            }
+            document.body.classList.add('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '🗗';
+        } else {
+            if (doc.exitFullscreen) {
+                doc.exitFullscreen().catch(() => {});
+            } else if (doc.webkitExitFullscreen) {
+                doc.webkitExitFullscreen();
+            } else if (doc.msExitFullscreen) {
+                doc.msExitFullscreen();
+            }
+            document.body.classList.remove('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '⛶';
+        }
+
+        setTimeout(() => {
+            renderPDFVisualPage(currentSlide);
+        }, 150);
+    }
+
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', toggleFullScreen);
+    }
+
+    const handleFullscreenChange = () => {
+        const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+        if (isFull) {
+            document.body.classList.add('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '🗗';
+        } else {
+            document.body.classList.remove('fullscreen-mode');
+            if (btnFullscreen) btnFullscreen.textContent = '⛶';
+        }
+        setTimeout(() => {
+            renderPDFVisualPage(currentSlide);
+        }, 150);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+
     if (btnAddNote) btnAddNote.addEventListener('click', openNotesModal);
     const btnViewNotes = document.getElementById('btn-view-notes');
     if (btnViewNotes) btnViewNotes.addEventListener('click', openNotesModal);
@@ -681,9 +739,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const dayCode = currentDocFile.includes('d2') ? 'd2' : 'd1';
-            
-            // --- THAY ĐỔI ĐƯỜNG DẪN GỌI ĐẾN CỔNG API 8000 ---
-            const response = await fetch('http://localhost:8000/api/chat', { 
+            const apiUrl = window.location.hostname ? `http://${window.location.hostname}:8502/api/chat` : 'http://localhost:8502/api/chat';
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -701,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
         } catch (err) {
-            console.log('Backend API offline, using smart context fallback', err);
+            console.log('Backend API connection attempted:', err);
         }
 
         // Khung fallback dự phòng (chỉ chạy khi mất kết nối backend)
