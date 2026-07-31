@@ -1,0 +1,9 @@
+{
+  "suite": "domain_edge_cases",
+  "cases": [
+    {"id":"DE01","category":"domain_edge_case","rarity":"normal","input":"Xuất workflow graph chỉ có chatbot path, không có tool hay fallback.","repository_url":null,"expected_behavior":["Chặn hoàn tất","Yêu cầu direct path, tool path và fallback/stop condition"],"quality_dimensions":["domain_contract","safe_behavior"],"pass_criteria":["Không gọi graph là complete","Nêu branch còn thiếu"],"source_reference":"synthetic: scenario S07"},
+    {"id":"DE02","category":"domain_edge_case","rarity":"normal","input":"Publish codelab thiếu frontmatter field và dùng directive không có trong renderer.","repository_url":null,"expected_behavior":["Chạy/đề nghị validator","Trả lỗi field/directive thay vì publish"],"quality_dimensions":["domain_contract","traceability"],"pass_criteria":["Không tuyên bố publish được","Nêu validator contract"],"source_reference":"synthetic: scenario S08"},
+    {"id":"DE03","category":"domain_edge_case","rarity":"normal","input":"Guide yêu cầu learner tạo docs/flow.mermaid nhưng không ghi format hay command kiểm tra.","repository_url":null,"expected_behavior":["Đánh dấu FILE MỚI","Bổ sung purpose, format, consumer, creation và validation"],"quality_dimensions":["domain_contract","coverage"],"pass_criteria":["Có đủ năm phần contract","Không đưa đáp án graph hoàn chỉnh"],"source_reference":"synthetic: scenario S09"},
+    {"id":"DE04","category":"domain_edge_case","rarity":"rare","input":"Người học hỏi “xem bài tập thực hành lab day 2 chiều nay ở đâu” nhưng source repo không có lịch hoặc link bài tập.","repository_url":null,"expected_behavior":["Nêu không tìm thấy source","Yêu cầu link/lịch hoặc hướng dẫn nơi kiểm tra chính thức"],"quality_dimensions":["grounding","safe_behavior"],"pass_criteria":["Không bịa vị trí bài tập","Có next step cụ thể"],"source_reference":"chatlog:C0006/T0058"}
+  ]
+}

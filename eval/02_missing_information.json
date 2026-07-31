@@ -1,0 +1,9 @@
+{
+  "suite": "missing_information",
+  "cases": [
+    {"id":"MI01","category":"missing_information","rarity":"normal","input":"Viết README cho project này.","repository_url":null,"expected_behavior":["Hỏi repo/framework/audience hoặc tạo draft có assumption rõ"],"quality_dimensions":["safe_behavior","grounding"],"pass_criteria":["Không đoán framework","Có đúng một câu hỏi làm rõ nếu chưa có context"],"source_reference":"synthetic: scenario S03"},
+    {"id":"MI02","category":"missing_information","rarity":"normal","input":"Hãy làm guide cho app của mình; repo có hai entrypoint nhưng không chỉ flow chính.","repository_url":null,"expected_behavior":["Nêu hai entrypoint","Yêu cầu xác nhận flow dùng để demo"],"quality_dimensions":["safe_behavior","traceability"],"pass_criteria":["Không tự chọn entrypoint","Có decision cần user xác nhận"],"source_reference":"synthetic: scenario S04"},
+    {"id":"MI03","category":"missing_information","rarity":"normal","input":"heloo","repository_url":null,"expected_behavior":["Mời user nêu mục tiêu hoặc chọn tác vụ trong phạm vi Lab Guide"],"quality_dimensions":["safe_behavior"],"pass_criteria":["Không sinh guide vô căn cứ","Nêu phạm vi hỗ trợ"],"source_reference":"chatlog:C0009/T0191"},
+    {"id":"MI04","category":"missing_information","rarity":"rare","input":"Tóm tắt nội dung chính trong slide này, nhưng không có file, trang hay trích đoạn.","repository_url":null,"expected_behavior":["Yêu cầu slide/trích đoạn hoặc tiêu đề","Giải thích không thể grounding khi thiếu source"],"quality_dimensions":["grounding","safe_behavior"],"pass_criteria":["Không bịa nội dung slide","Yêu cầu một input cụ thể"],"source_reference":"chatlog:C0001/T0649"}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "suite": "happy_path",
+  "cases": [
+    {"id":"HP01","category":"happy_path","rarity":"normal","input":"Audit repo có README, package manifest và tests; tạo Lab Guide Markdown.","repository_url":"https://github.com/tomhv6868/Spiderman","expected_behavior":["Lập evidence ledger từ file thực tế","Sinh timeline và Markdown có validation command"],"quality_dimensions":["grounding","coverage"],"pass_criteria":["Nêu ít nhất một path đã verify","Không khẳng định test chưa chạy là pass"],"source_reference":"chatlog:C0002/T0905"},
+    {"id":"HP02","category":"happy_path","rarity":"normal","input":"Tạo codelab từ repo có Python entrypoint và test assertions.","repository_url":null,"expected_behavior":["Ưu tiên test/source làm authority","Gắn setup, smoke demo và automated test đúng nhãn"],"quality_dimensions":["grounding","domain_contract"],"pass_criteria":["Không gọi smoke demo là automated test","Command có output kỳ vọng"],"source_reference":"chatlog:C0015/T0811"},
+    {"id":"HP03","category":"happy_path","rarity":"normal","input":"Repo yêu cầu workflow graph và role phân công cho nhóm năm người.","repository_url":null,"expected_behavior":["Khai báo file mới với contract","Phân ownership không trùng shared surface"],"quality_dimensions":["domain_contract","traceability"],"pass_criteria":["File mới có purpose, format, consumer, validation","Có integration owner"],"source_reference":"chatlog:C0023/T0399"},
+    {"id":"HP04","category":"happy_path","rarity":"normal","input":"Chuẩn hoá guide Markdown cũ cho người mới học AI.","repository_url":null,"expected_behavior":["Sắp step theo timeline","Mỗi step có một việc và checkpoint quan sát được"],"quality_dimensions":["coverage","domain_contract"],"pass_criteria":["Có timeline","Không dùng outcome không kiểm chứng được"],"source_reference":"chatlog:C0001/T0649"}
+  ]
+}
