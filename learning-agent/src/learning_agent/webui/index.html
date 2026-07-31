@@ -356,13 +356,21 @@ const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;'
 // Render markdown an toàn cho tin nhắn agent: escape HTML TRƯỚC, rồi mới bold/italic/code/link/bullet.
 // Giữ '\n' để white-space:pre-wrap tự xuống dòng.
 function mdToHtml(t) {
-  const mer = [];
-  // tách khối ```mermaid TRƯỚC khi escape để render sơ đồ (card viewer)
-  let s = String(t ?? '').replace(/```mermaid\s*\n?([\s\S]*?)```/g, (_, code) => {
-    mer.push(code.trim()); return '%%MM' + (mer.length - 1) + '%%';
-  });
+  const mer = [], code = [];
+  let s = String(t ?? '');
+  // tách khối ```mermaid và ``` thường ra placeholder TRƯỚC mọi xử lý khác — vừa để
+  // render sơ đồ riêng, vừa để dòng trống/thụt lề BÊN TRONG code không bị đụng khi
+  // chuẩn hoá khoảng trắng dọc của phần văn xuôi ở bước sau.
+  s = s.replace(/```mermaid\s*\n?([\s\S]*?)```/g, (_, c) => { mer.push(c.trim()); return '%%MM' + (mer.length - 1) + '%%'; });
+  s = s.replace(/```([\s\S]*?)```/g, (_, c) => { code.push(c.replace(/^\n/, '')); return '%%CB' + (code.length - 1) + '%%'; });
+  // model hay trả 3+ dòng trống liên tiếp (không nhất quán, tuỳ hứng) -> ép về ĐÚNG 1
+  // dòng trống (paragraph break đều nhau); list rời rạc (cách dòng giữa các gạch đầu
+  // dòng liền kề) -> ép sát lại thành list liền mạch.
+  s = s.replace(/[ \t]+\n/g, '\n');
+  s = s.replace(/\n{3,}/g, '\n\n');
+  s = s.replace(/^([ \t]*[-*] .+)\n\n(?=[ \t]*[-*] )/gm, '$1\n');
   s = esc(s);
-  s = s.replace(/```([\s\S]*?)```/g, (_, c) => '<pre>' + c.replace(/^\n/, '') + '</pre>');
+  s = s.replace(/%%CB(\d+)%%/g, (_, i) => '<pre>' + esc(code[+i]) + '</pre>');
   s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
   s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
