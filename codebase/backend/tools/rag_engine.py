@@ -21,13 +21,19 @@ class PageAwareRAGEngine:
     def __init__(self):
         self.documents: List[Dict[str, Any]] = []
         self.slides_by_page: Dict[int, Dict[str, Any]] = {}
+        self.current_slide_path: Optional[str] = None
 
     def index_slide_file(self, slide_path: str):
         """
-        Đọc và đánh chỉ mục bộ slide theo từng trang.
+        Đọc và đánh chỉ mục bộ slide theo từng trang (Có Cache).
         """
+        if self.current_slide_path == slide_path and self.slides_by_page:
+            return  # Cache hit: Slide đã được nạp trước đó, không cần parse lại!
+
         slides = SlideParser.extract_slides(slide_path)
         self.slides_by_page.clear()
+        self.documents = [d for d in self.documents if d.get("type") != "slide"]
+        self.current_slide_path = slide_path
 
         for s in slides:
             s_num = s["slide_number"]

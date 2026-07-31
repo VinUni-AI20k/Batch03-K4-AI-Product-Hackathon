@@ -354,16 +354,19 @@ function stripMarkdownForNote(text) {
   let cleaned = text
     .replace(/\[WRITE_NOTE:\s*([\s\S]*?)\]/gi, '$1')
     .replace(/\[(?:T\d+-\d+|Slide\s*\d+|Trang\s*\d+)\]/gi, '')
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/__(.*?)__/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/_(.*?)_/g, '$1')
-    .replace(/^#{1,6}\s+/gm, '')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .trim();
 
-  // Loại bỏ các câu hội thoại giao tiếp thừa và dòng gợi ý format
+  // Nếu AI trả về 1 dòng duy nhất phân cách bởi dấu ; thì tự động tách thành gạch đầu dòng
+  if (!cleaned.includes('\n') && cleaned.includes(';')) {
+    cleaned = cleaned
+      .split(';')
+      .map(part => part.trim())
+      .filter(Boolean)
+      .map(part => `- ${part}`)
+      .join('\n');
+  }
+
+  // Loại bỏ các câu hội thoại giao tiếp thừa
   let lines = cleaned.split('\n');
   const seenLines = new Set();
   let filtered = lines.filter(line => {
@@ -373,12 +376,8 @@ function stripMarkdownForNote(text) {
     if (/^(tiêu đề slide là|tiêu đề slide để ghi vào note|dưới đây là|bạn có thể|nếu bạn muốn|rất tiếc|hi vọng|dựa vào slide|ngữ cảnh chỉ nói về|mình có thể ghi luôn|chủ đề:)/i.test(trimmed)) {
       return false;
     }
-    // Lọc dòng chỉ là tiêu đề nhãn kết thúc bằng dấu :
-    if (trimmed.endsWith(':') && !trimmed.includes('-') && !trimmed.includes('•')) {
-      return false;
-    }
-    // Loại bỏ dòng trùng lặp (ghi 2 lần)
-    const normalizedLine = trimmed.replace(/^[-•*]\s*/, '').toLowerCase();
+    // Loại bỏ dòng trùng lặp
+    const normalizedLine = trimmed.replace(/^[-•*#]\s*/, '').toLowerCase();
     if (seenLines.has(normalizedLine)) return false;
     seenLines.add(normalizedLine);
     return true;
@@ -1250,6 +1249,7 @@ window.autoSaveCurrentNote = autoSaveCurrentNote;
 window.clearCurrentPageNote = clearCurrentPageNote;
 window.askTutorAboutNote = askTutorAboutNote;
 window.generateAINoteForCurrentPage = generateAINoteForCurrentPage;
+window.removeAINoteChip = removeAINoteChip;
 window.noteFormatCmd = noteFormatCmd;
 
 // ============================================
