@@ -34,6 +34,7 @@ from app.procedure_pipeline import ProcedurePipeline, ReviewRegistry
 from app.procedure_embeddings import ProcedureEmbeddingClient
 from app.procedure_rag import ProcedureRagService
 from app.procedure_settings import get_procedure_settings
+from app.request_quality import assess_request_quality, request_quality_message
 from app.schemas import (
     AssistantReply,
     ChatRequest,
@@ -272,6 +273,61 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                         "answer_strategy": "high", "confidence_score": 1, "confidence_band": "high",
                         "confidence_reasons": ["Deterministic prompt-injection policy"], "external_search_used": False,
                         "external_search_consent_required": False, "form_code": None, "translation_used": needs_translation,
+                    })
+                    return
+
+                current_workflow = state.get("agent_workflow") or {}
+                mode_choice = any(value in normalized_message for value in (
+                    "điền từng bước", "cùng agent", "mở biểu mẫu", "điền trên biểu mẫu",
+                ))
+                slot_answer = bool(
+                    current_workflow.get("status") in {"collecting", "ready_for_review"}
+                    and not mode_choice
+                )
+                quality = await assess_request_quality(
+                    settings,
+                    canonical_message,
+                    app.state.procedure_pipeline.procedure_settings.form_mappings,
+                    active_form_code=state.get("active_scenario_code"),
+                    slot_answer=slot_answer or mode_choice or repeated_user_message,
+                )
+                if quality.blocked:
+                    answer, quick_replies = request_quality_message(quality)
+                    quality_state = {
+                        **state,
+                        # Invalid content is quarantined just like an injection:
+                        # keep an auditable hash/reason, never feed raw text back
+                        # into the model-visible history on later turns.
+                        "request_quality_events": [
+                            *state.get("request_quality_events", []),
+                            {
+                                "input_hash": hashlib.sha256(canonical_message.encode("utf-8")).hexdigest(),
+                                "status": quality.status,
+                                "reason_code": quality.reason_code,
+                                "source": quality.source,
+                            },
+                        ][-10:],
+                        "last_user_message_normalized": normalized_message,
+                    }
+                    await app.state.store.save(current_session_id, quality_state)
+                    for word in answer.split(" "):
+                        yield sse("message.delta", {"text": f"{word} "})
+                    yield sse("request.rejected", {
+                        "status": quality.status,
+                        "reason_code": quality.reason_code,
+                    })
+                    yield sse("message.complete", {
+                        "intent": "out_of_scope" if quality.status == "reject" else "general",
+                        "quick_replies": quick_replies,
+                        "citations": [],
+                        "answer_strategy": "high",
+                        "confidence_score": 1,
+                        "confidence_band": "high",
+                        "confidence_reasons": [f"Pre-routing coherence gate: {quality.reason_code}"],
+                        "external_search_used": False,
+                        "external_search_consent_required": False,
+                        "form_code": None,
+                        "translation_used": needs_translation,
                     })
                     return
 

@@ -22,6 +22,15 @@ def test_resolve_form_code_returns_none_for_unrelated_message() -> None:
     assert resolve_form_code(None, "thủ tục cấp phép khai thác cát", SETTINGS.form_mappings) is None
 
 
+def test_resolve_form_code_does_not_route_illogical_keyword_match() -> None:
+    assert resolve_form_code(
+        None, "tôi muốn đăng kí khai sinh ngôn ngữ cho LLM", SETTINGS.form_mappings,
+    ) is None
+    assert resolve_form_code(
+        "1.013225", "tôi muốn đăng kí khai sinh ngôn ngữ cho LLM", SETTINGS.form_mappings,
+    ) is None
+
+
 @pytest.mark.asyncio
 async def test_maybe_fill_form_is_noop_for_unrelated_procedure() -> None:
     state = {"active_scenario_code": None, "form_draft": {}, "language_code": "vi"}

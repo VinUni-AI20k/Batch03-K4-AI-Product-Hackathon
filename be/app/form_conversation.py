@@ -13,11 +13,16 @@ from app.config import Settings
 from app.form_llm import fill_form
 from app.procedure_catalog import normalize_text
 from app.procedure_settings import FormMapping, ProcedureSettings
+from app.request_quality import deterministic_request_quality
 from app.schemas import AssistantReply
 from app.safety import refusal_for_unsafe_request
 
 
 def resolve_form_code(active_procedure_code: str | None, message: str, mappings: tuple[FormMapping, ...]) -> str | None:
+    # Defense in depth: a procedure keyword alone must never be sufficient to
+    # open a form when the named object is incompatible with that procedure.
+    if deterministic_request_quality(message, mappings).blocked:
+        return None
     if active_procedure_code:
         for mapping in mappings:
             if active_procedure_code in mapping.match_procedure_codes:

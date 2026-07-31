@@ -221,6 +221,31 @@ async def test_birth_request_requires_mode_choice_and_does_not_expose_agent_plan
 
 
 @pytest.mark.asyncio
+async def test_illogical_birth_request_is_rejected_before_form_and_tool_routing(app) -> None:
+    message = "tôi muốn đăng kí khai sinh ngôn ngữ cho LLM"
+    async with app.router.lifespan_context(app):
+        app.state.procedure_pipeline.rag_service = None
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post(
+                "/api/v1/chat/stream", json={"message": message, "language_code": "vi"},
+            )
+            session_id = client.cookies.get("icivi_session")
+            state = await app.state.store.get(session_id)
+
+    payload = _complete_payload(response.text)
+    answer = _streamed_answer(response.text)
+    assert "event: request.rejected" in response.text
+    assert "event: tool.call" not in response.text
+    assert "event: tool.result" not in response.text
+    assert payload["form_code"] is None
+    assert payload["intent"] == "out_of_scope"
+    assert "không hợp lý" in answer
+    assert "chưa mở biểu mẫu" in answer
+    assert state["request_quality_events"][-1]["reason_code"] == "procedure_object_mismatch"
+    assert all(message not in item["content"] for item in state["messages"])
+
+
+@pytest.mark.asyncio
 async def test_agent_chat_mode_asks_for_one_field_without_opening_the_form(app) -> None:
     async with app.router.lifespan_context(app):
         app.state.procedure_pipeline.rag_service = None
