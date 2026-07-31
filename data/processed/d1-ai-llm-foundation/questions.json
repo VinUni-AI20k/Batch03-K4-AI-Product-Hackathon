@@ -1,0 +1,1458 @@
+[
+  {
+    "stem": "Trong bức tranh \"AI ⊃ ML ⊃ Deep Learning ⊃ ... ⊃ LLM\", mối quan hệ đúng giữa các tầng là gì?",
+    "options": [
+      "LLM là một tầng hẹp nằm trong Generative AI, còn AI là tầng rộng nhất bao trùm tất cả.",
+      "LLM và AI là hai khái niệm ngang hàng, không lồng nhau.",
+      "Deep Learning là tầng rộng nhất, bao trùm cả AI.",
+      "Machine Learning là tầng hẹp nhất, nằm bên trong LLM."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 3 vẽ rõ thứ tự từ rộng đến hẹp: AI → ML → Deep Learning → Generative AI → LLM.",
+    "source_slide": 3,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Discriminative AI khác Generative AI ở điểm nào?",
+    "options": [
+      "Discriminative AI luôn cần nhiều dữ liệu huấn luyện hơn Generative AI.",
+      "Discriminative AI cho ra một nhãn/một con số (VD lọc spam); Generative AI sinh ra nội dung mới (văn bản, ảnh, code).",
+      "Generative AI chỉ được dùng để phân loại ảnh.",
+      "Discriminative AI là một dạng con của Agentic AI."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 4: Discriminative AI = Input → một nhãn/con số; Generative AI = Prompt → nội dung mới.",
+    "source_slide": 4,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Agentic AI khác gì so với Generative AI thuần túy?",
+    "options": [
+      "Agentic AI không sử dụng LLM làm nền.",
+      "Agentic AI chỉ khác ở việc dùng model có nhiều tham số hơn.",
+      "Agentic AI nhận mục tiêu rồi tự làm nhiều bước (Goal → Plan → Action), không chỉ sinh nội dung một lần.",
+      "Generative AI luôn tự lập kế hoạch nhiều bước như Agentic AI."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 4: Agentic AI = Goal → Plan → Action, còn Generative AI chỉ là Prompt → nội dung mới.",
+    "source_slide": 4,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Ví dụ nào sau đây thuộc nhóm Discriminative AI theo bài giảng?",
+    "options": [
+      "ChatGPT viết một bài luận hoàn chỉnh.",
+      "Agent tự đặt vé máy bay qua nhiều bước.",
+      "Midjourney vẽ một bức tranh theo mô tả.",
+      "Hệ thống phát hiện email gian lận / lọc spam."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 4 liệt kê lọc spam, phát hiện gian lận, nhận diện ảnh là ví dụ Discriminative AI.",
+    "source_slide": 4,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Câu \"LLM là engine chung của cả Generative lẫn Agentic AI\" nghĩa là gì?",
+    "options": [
+      "Cùng một LLM có thể vừa sinh nội dung vừa làm nền cho agent hành động nhiều bước, tùy cách nó được đặt vào hệ thống.",
+      "Mỗi loại AI (Generative, Agentic) cần huấn luyện một LLM hoàn toàn riêng biệt.",
+      "LLM chỉ có thể dùng cho Agentic AI, không dùng được cho Generative AI.",
+      "Agentic AI không cần LLM, chỉ cần rule cứng do con người viết."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 4 nêu rõ LLM là engine chung của Generative lẫn Agentic AI.",
+    "source_slide": 4,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Theo bài giảng, việc \"lọc spam\" và \"gợi ý phim\" là ví dụ minh họa cho tầng nào trong bức tranh AI?",
+    "options": [
+      "Generative AI — vì đây là các tác vụ sinh nội dung mới.",
+      "Machine Learning — học từ dữ liệu thay vì viết luật tay.",
+      "LLM — vì mọi tác vụ AI hiện nay đều dùng LLM.",
+      "Agentic AI — vì hệ thống tự quyết định gợi ý."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 3 đặt \"lọc spam · gợi ý phim\" làm ví dụ minh họa cho tầng Machine Learning.",
+    "source_slide": 3,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Phát biểu nào sau đây là SAI về bức tranh AI theo bài giảng?",
+    "options": [
+      "AI là chiếc ô lớn nhất, bao gồm cả những hệ thống luật tay viết cứng.",
+      "LLM là tầng nền của gần hết trải nghiệm AI hiện nay.",
+      "Generative AI là tầng rộng nhất, bao trùm cả AI nói chung.",
+      "Deep learning là mạng nơ-ron nhiều tầng tự học đặc trưng."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 3: AI mới là \"chiếc ô lớn nhất\", Generative AI chỉ là một tầng con hẹp hơn.",
+    "source_slide": 3,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Ba nhóm AI chính được bài giảng phân loại là gì?",
+    "options": [
+      "Supervised, Unsupervised, Reinforcement.",
+      "Narrow AI, General AI, Super AI.",
+      "Rule-based, Statistical, Neural.",
+      "Discriminative, Generative, Agentic."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 4: \"Ba nhóm AI chính: phân loại · sinh nội dung · hành động\" = Discriminative, Generative, Agentic.",
+    "source_slide": 4,
+    "concept_id": "d1-c01"
+  },
+  {
+    "stem": "Hệ chuyên gia (expert system, 1980) ra đời vì lý do gì theo bài giảng?",
+    "options": [
+      "AI đổi chiến lược: thôi theo đuổi trí tuệ tổng quát, tập trung giải thật tốt một miền hẹp bằng cách mã hóa tri thức chuyên gia thành luật.",
+      "Vì đã có kiến trúc Transformer để xử lý ngôn ngữ tốt hơn.",
+      "Vì đã có bộ dữ liệu lớn như ImageNet để huấn luyện.",
+      "Vì máy tính lúc đó đã đủ mạnh để huấn luyện mạng nơ-ron sâu."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 6: expert system ra đời khi AI \"đặt lại vấn đề\" — giải hẹp bằng luật, các mốc kia đến sau (2009, 2017).",
+    "source_slide": 6,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Đóng góp chính của Fei-Fei Li và ImageNet (2009) là gì?",
+    "options": [
+      "Phát minh ra kiến trúc Transformer.",
+      "Xây một bộ dữ liệu lớn hơn (14 triệu ảnh gán nhãn tay) thay vì chỉ chạy theo thuật toán thông minh hơn.",
+      "Tạo ra ChatGPT — giao diện chat đại chúng đầu tiên.",
+      "Xây dựng hệ chuyên gia đầu tiên trong lịch sử AI."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 7: bài học \"đôi khi dữ liệu tốt hơn đánh bại thuật toán khôn hơn\", ba năm sau là cú nổ AlexNet 2012.",
+    "source_slide": 7,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Vì sao Transformer (2017) được xem là bước ngoặt theo bài giảng?",
+    "options": [
+      "Vì nó là mô hình đầu tiên được huấn luyện trên dữ liệu lớn.",
+      "Vì nó loại bỏ hoàn toàn nhu cầu dữ liệu huấn luyện.",
+      "Nó cho phép mỗi từ \"nhìn sang\" những từ quan trọng khác trong câu, thay vì xử lý tuần tự từng bước.",
+      "Vì nó là giao diện chat đầu tiên cho người dùng phổ thông."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 8: Transformer trở thành nền móng kỹ thuật cho GPT, BERT và làn sóng LLM sau đó.",
+    "source_slide": 8,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "ChatGPT (2022) đánh dấu cột mốc gì theo bài giảng?",
+    "options": [
+      "Là mô hình LLM đầu tiên từng được huấn luyện.",
+      "Là thời điểm kiến trúc Transformer ra đời.",
+      "Là lúc AI chính thức vượt qua bài kiểm tra Turing.",
+      "Lần đầu tiên đông đảo người dùng phổ thông trực tiếp chạm vào một LLM mạnh, qua giao diện đơn giản dễ hiểu."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 9: ChatGPT là \"trải nghiệm đại chúng\" đầu tiên, không phải cột mốc kỹ thuật nền tảng.",
+    "source_slide": 9,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Cột mốc nào trong lịch sử AI 70 năm xảy ra SỚM NHẤT theo bài giảng?",
+    "options": [
+      "Hệ chuyên gia (expert system, 1980).",
+      "ImageNet (2009).",
+      "Transformer (2017).",
+      "ChatGPT (2022)."
+    ],
+    "answer_idx": 0,
+    "explanation": "Thứ tự thời gian: 1980 (expert system) → 2009 (ImageNet) → 2017 (Transformer) → 2022 (ChatGPT).",
+    "source_slide": 6,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Bài học \"đôi khi dữ liệu tốt hơn đánh bại thuật toán khôn hơn\" được rút ra từ sự kiện nào?",
+    "options": [
+      "Sự ra đời của hệ chuyên gia (1980).",
+      "ImageNet (2009) và cú nổ AlexNet ba năm sau (2012).",
+      "Sự ra đời của Transformer (2017).",
+      "Sự phổ biến của ChatGPT (2022)."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 7 gắn trực tiếp bài học này với câu chuyện Fei-Fei Li xây ImageNet.",
+    "source_slide": 7,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Trước khi có Transformer, hạn chế gì khiến các mô hình ngôn ngữ trước đó xử lý ngữ cảnh kém linh hoạt hơn?",
+    "options": [
+      "Chúng hoàn toàn không có dữ liệu huấn luyện.",
+      "Chúng không thể chạy trên phần cứng GPU.",
+      "Chúng xử lý tuần tự từng bước, chưa cho phép mỗi từ chủ động \"nhìn sang\" các từ quan trọng khác trong câu.",
+      "Chúng chưa có khái niệm token."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 8: Transformer là bước ngoặt đúng vì thay đổi cách xử lý từ tuần tự sang \"nhìn sang\" linh hoạt.",
+    "source_slide": 8,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Hệ chuyên gia (1980) mã hóa tri thức theo cách nào?",
+    "options": [
+      "Học từ một bộ dữ liệu lớn có gán nhãn tay (cách của ImageNet).",
+      "Dùng cơ chế attention để hiểu ngữ cảnh (cách của Transformer).",
+      "Huấn luyện qua phản hồi xếp hạng của con người (RLHF, một khái niệm sau này).",
+      "Mã hóa tri thức chuyên gia thành các luật (rule) tường minh để giải một miền hẹp."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 6: expert system dùng luật mã hóa tri thức, khác hẳn cách tiếp cận dữ liệu lớn hay attention sau này.",
+    "source_slide": 6,
+    "concept_id": "d1-c02"
+  },
+  {
+    "stem": "Theo bài giảng, \"chatbot\" là gì so với LLM?",
+    "options": [
+      "Chatbot chỉ là một dạng sản phẩm đóng gói quanh LLM — \"lớp áo bên ngoài\", không phải bản thân bộ não.",
+      "Chatbot và LLM là một, không có gì khác biệt.",
+      "LLM là một loại chatbot chuyên biệt.",
+      "Chatbot là mô hình nền, LLM chỉ là một ứng dụng của nó."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 10: \"LLM = bộ não ngôn ngữ dùng chung cho mọi việc — sản phẩm bạn thấy chỉ là lớp áo bên ngoài\".",
+    "source_slide": 10,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Khi sinh văn bản, ở mỗi bước model thực chất làm gì?",
+    "options": [
+      "Chọn ngẫu nhiên hoàn toàn, không liên quan đến xác suất.",
+      "Chấm điểm xác suất cho MỌI từ trong từ vựng, rồi chọn từ tiếp theo theo phân bố xác suất đó.",
+      "Tra cứu trong một bảng luật cố định để chọn từ tiếp theo.",
+      "Chỉ xem xét đúng một từ ngay trước đó, bỏ qua toàn bộ phần còn lại của câu."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 11: model chấm điểm MỌI từ trong từ vựng (VD \"land\" 22%, \"forest\" 9%…) rồi chọn theo xác suất.",
+    "source_slide": 11,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Cơ chế \"predict → append → rerun\" khi sinh văn bản nghĩa là gì?",
+    "options": [
+      "Model sinh toàn bộ câu trả lời cùng lúc trong một lần chạy duy nhất.",
+      "Model chỉ chạy một lần rồi cache sẵn toàn bộ câu trả lời.",
+      "Mỗi token mới sinh ra được nối vào ngữ cảnh, rồi model chạy lại từ đầu để đoán token tiếp theo.",
+      "Model chọn ngẫu nhiên một đoạn văn bản có sẵn từ cơ sở dữ liệu."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 12: \"Mỗi token mới được nối vào ngữ cảnh, rồi model chạy lại từ đầu — vòng lặp predict → append → rerun\".",
+    "source_slide": 12,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "LLM học cách hoạt động dựa trên nguyên lý gì trong giai đoạn pre-training?",
+    "options": [
+      "Học phân loại ảnh đã được gán nhãn tay.",
+      "Học theo phần thưởng do con người chấm điểm (đó là RLHF, một bước sau).",
+      "Học các quy tắc if-else do chuyên gia viết sẵn (expert system).",
+      "Học đoán mảnh chữ (token) tiếp theo trong ngữ cảnh, từ hàng nghìn tỷ mảnh chữ."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 10: LLM \"được luyện trên hàng nghìn tỷ mảnh chữ để học cách đoán mảnh chữ tiếp theo trong ngữ cảnh\".",
+    "source_slide": 10,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Vì sao bài giảng gọi LLM là \"một nền chung\" (foundation model)?",
+    "options": [
+      "Vì cùng một model có thể làm được rất nhiều việc (chat, tóm tắt, code, dịch) thay vì train riêng mỗi việc một model.",
+      "Vì nó chạy được trên mọi loại phần cứng không cần GPU.",
+      "Vì nó hoàn toàn miễn phí sử dụng cho mọi người.",
+      "Vì nó không cần bất kỳ dữ liệu huấn luyện nào."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 10: \"nhờ được luyện đủ rộng, nó trở thành một nền chung… cùng một model làm được rất nhiều việc\".",
+    "source_slide": 10,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Kiến trúc phổ biến của các LLM hiện nay (GPT, Claude, Gemini, Kimi) là gì?",
+    "options": [
+      "Encoder-only, không dùng decoder.",
+      "Chủ yếu là decoder-only, nhiều model còn dùng thêm MoE.",
+      "Mạng nơ-ron tích chập (CNN).",
+      "Mạng hồi quy tuần hoàn (RNN) đơn thuần, không dùng Transformer."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 10: \"Model hiện nay chủ yếu là kiến trúc decoder-only… nhiều model dùng MoE\".",
+    "source_slide": 10,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "LLM được huấn luyện (pre-training) trên nguồn dữ liệu nào theo bài giảng?",
+    "options": [
+      "Chỉ trên các cuộc hội thoại đã được con người gán nhãn.",
+      "Chỉ trên mã nguồn phần mềm mã nguồn mở.",
+      "Hàng nghìn tỷ mảnh chữ (token), để học đoán mảnh chữ tiếp theo trong ngữ cảnh.",
+      "Chỉ trên văn bản đã được chuyên gia kiểm duyệt kỹ (gần với SFT/RLHF hơn)."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 10 nêu rõ LLM \"luyện trên hàng nghìn tỷ mảnh chữ\" ở bước pre-training.",
+    "source_slide": 10,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Output của Transformer tại mỗi bước sinh một \"chữ\" có dạng gì?",
+    "options": [
+      "Một câu trả lời hoàn chỉnh đã được xếp hạng sẵn.",
+      "Một tập hợp các quy tắc ngữ pháp cố định.",
+      "Một con số duy nhất biểu thị độ dài câu trả lời.",
+      "Một phân bố xác suất trên toàn bộ từ vựng (VD \"land\" 22%, \"forest\" 9%...)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 11: \"đầu ra luôn là một phân bố xác suất\" trên mọi từ trong từ vựng.",
+    "source_slide": 11,
+    "concept_id": "d1-c03"
+  },
+  {
+    "stem": "Token là gì theo bài giảng?",
+    "options": [
+      "Mảnh chữ mà model dùng để đọc văn bản — có thể là một từ, một phần từ, dấu câu hay khoảng trắng.",
+      "Luôn luôn là một từ hoàn chỉnh, không thể nhỏ hơn.",
+      "Là một câu hoàn chỉnh trong văn bản.",
+      "Là một byte trong bảng mã UTF-8."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 13: model \"đọc mảnh chữ\", có từ là một mảnh, có từ vỡ ba bốn mảnh, cả dấu câu/khoảng trắng cũng là mảnh.",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Theo ví dụ trong bài, \"Xin chào\" tốn khoảng bao nhiêu token so với \"Hello world\" (≈2 token)?",
+    "options": [
+      "Cả hai đều tốn đúng 1 token.",
+      "\"Xin chào\" có thể tới 3–4 token — tiếng Việt thường tốn token hơn tiếng Anh.",
+      "\"Xin chào\" luôn tốn ít token hơn \"Hello world\".",
+      "Số token là cố định, không phụ thuộc ngôn ngữ."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 13: \"Hello world\" ≈ 2 token, nhưng \"Xin chào\" có thể tới 3–4 token.",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Vì sao tiếng Việt, code, JSON thường tốn token hơn tiếng Anh thường?",
+    "options": [
+      "Vì model không được huấn luyện với các ngôn ngữ/định dạng đó.",
+      "Vì chúng luôn dài hơn về số ký tự hiển thị.",
+      "Vì dấu thanh, ký tự đặc biệt và cấu trúc của chúng bị cắt nhỏ ra thành nhiều mảnh hơn.",
+      "Vì chúng yêu cầu nhiều lượt gọi API hơn."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 13 nêu rõ lý do: dấu thanh, ký tự đặc biệt, cấu trúc bị cắt nhỏ ra.",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Vì sao \"mọi thứ model làm đều quy ra token\" lại quan trọng cần nhớ?",
+    "options": [
+      "Vì token quyết định giá trị temperature của model.",
+      "Vì token là đơn vị đo độ chính xác của model.",
+      "Vì token chỉ ảnh hưởng tốc độ, không ảnh hưởng chi phí.",
+      "Vì mỗi token đều có giá — ảnh hưởng trực tiếp đến chi phí (hóa đơn) mỗi lần gọi API."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 13: \"Mọi thứ model làm đều quy ra token — và mỗi token đều có giá. Nhớ điều này khi sang phần chi phí.\"",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Số token chính xác của một đoạn văn bản phụ thuộc vào điều gì?",
+    "options": [
+      "Tokenizer riêng của từng model — khác nhau giữa các model.",
+      "Luôn cố định giống nhau ở mọi model.",
+      "Chỉ phụ thuộc độ dài ký tự, không phụ thuộc model.",
+      "Phụ thuộc vào temperature được cài đặt khi gọi API."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 13: \"Số token chính xác phụ thuộc tokenizer của từng model.\"",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Model \"đọc\" văn bản theo cách nào?",
+    "options": [
+      "Đọc từng chữ cái một, không gộp thành mảnh.",
+      "Cắt văn bản thành các mảnh nhỏ gọi là token, không đọc nguyên từ.",
+      "Đọc nguyên cả câu như một khối duy nhất.",
+      "Đọc theo âm tiết cố định 2 ký tự mỗi lần."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 13: \"Model không đọc 'từ', model đọc mảnh chữ\" — cắt văn bản thành token.",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Dấu câu và khoảng trắng được xử lý ra sao trong tokenization?",
+    "options": [
+      "Luôn bị loại bỏ trước khi đưa vào model.",
+      "Được gộp chung vào từ đứng trước, không tính token riêng.",
+      "Chúng cũng được tính là các mảnh (token) riêng.",
+      "Không tồn tại trong khái niệm token của model."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 13: \"cả dấu câu và khoảng trắng cũng là mảnh\".",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Công cụ nào được bài giảng gợi ý dùng để thử đếm token trực tiếp?",
+    "options": [
+      "Google Translate.",
+      "Kho ứng dụng plugin của ChatGPT.",
+      "Github Copilot.",
+      "platform.openai.com/tokenizer."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 13: \"Thử trực tiếp: platform.openai.com/tokenizer\".",
+    "source_slide": 13,
+    "concept_id": "d1-c04"
+  },
+  {
+    "stem": "Context trong bài giảng được ví như hình ảnh gì?",
+    "options": [
+      "Một \"bàn làm việc\" có hạn — mọi thứ muốn model thấy phải bày lên bàn.",
+      "Một cuốn từ điển vô hạn không bao giờ đầy.",
+      "Một ổ cứng lưu trữ vĩnh viễn mọi cuộc trò chuyện.",
+      "Một danh sách quy tắc cố định không đổi."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 14: \"Hãy hình dung một bàn làm việc: mọi thứ muốn model 'thấy' phải bày lên bàn.\"",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "128K token tương đương khoảng bao nhiêu theo ví dụ trong bài?",
+    "options": [
+      "Một cuốn sách khoảng 300.000 trang.",
+      "Một cuốn sách khoảng 300 trang.",
+      "Một tin nhắn ngắn khoảng 300 từ.",
+      "Toàn bộ nội dung của một thư viện quốc gia."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 14: \"128K token ≈ một cuốn sách 300 trang\".",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Điều gì xảy ra khi \"bàn làm việc\" (context) bị đầy quá mức?",
+    "options": [
+      "Model sẽ tự động dừng hoạt động hoàn toàn.",
+      "Model sẽ tăng tốc độ xử lý lên đáng kể.",
+      "Đồ ở giữa bàn — thông tin ở giữa một prompt dài — dễ bị model bỏ sót.",
+      "Toàn bộ nội dung được ưu tiên xử lý như nhau, không phần nào bị bỏ sót."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 14: \"Bàn đầy quá thì đồ ở giữa bàn dễ bị bỏ sót\".",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Hiện tượng \"Lost in the Middle\" được trích dẫn trong bài giảng nói về điều gì?",
+    "options": [
+      "Model quên toàn bộ system instruction ngay từ đầu.",
+      "Model chỉ nhớ được câu hỏi đầu tiên trong cả cuộc trò chuyện.",
+      "Model luôn ưu tiên xử lý thông tin nằm ở giữa nhất.",
+      "Model có xu hướng \"quên\" hoặc bỏ sót thông tin quan trọng nằm ở giữa một prompt rất dài."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 14 trích Liu et al. (2023), \"Lost in the Middle\", đúng như mô tả về việc bỏ sót thông tin giữa prompt.",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Context càng dài thì đánh đổi ra sao theo bài giảng?",
+    "options": [
+      "Càng tốn tiền và càng chậm — không đồng nghĩa với việc dùng tốt hơn.",
+      "Luôn giúp model trả lời chính xác hơn một cách tuyệt đối.",
+      "Không ảnh hưởng gì đến chi phí gọi API.",
+      "Giúp giảm số token cần dùng ở output."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 14: \"Context càng dài càng tốn tiền và càng chậm — bàn rộng không có nghĩa là dùng tốt\".",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "1M token tương đương khoảng bao nhiêu cuốn sách 300 trang theo bài giảng?",
+    "options": [
+      "Khoảng 1 cuốn.",
+      "Khoảng 4–5 cuốn.",
+      "Khoảng 50 cuốn.",
+      "Khoảng 500 cuốn."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 14: \"1M token ≈ 4–5 cuốn sách trên bàn cùng lúc\".",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Hiện tượng \"quên phần giữa\" ở các model thế hệ mới hiện nay thì sao theo bài giảng?",
+    "options": [
+      "Đã được giải quyết hoàn toàn, không còn xảy ra nữa.",
+      "Ngày càng trầm trọng hơn theo thời gian.",
+      "Đã cải thiện đáng kể nhưng chưa hết hẳn.",
+      "Chỉ xảy ra riêng với văn bản tiếng Việt."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 14: \"Model thế hệ mới đã cải thiện đáng kể nhưng chưa hết hẳn.\"",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Vì sao bài giảng nói \"bàn rộng không có nghĩa là dùng tốt\" về context?",
+    "options": [
+      "Vì context dài luôn làm giảm số token đầu ra.",
+      "Vì model không thể xử lý context vượt quá 10K token.",
+      "Vì context dài khiến model ngừng hoạt động ngay lập tức.",
+      "Vì context dài hơn không tự động đảm bảo câu trả lời tốt hơn, còn tốn phí và dễ bỏ sót thông tin."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 14 nối trực tiếp ý \"context càng dài càng tốn tiền, càng chậm\" với câu kết \"bàn rộng không có nghĩa là dùng tốt\".",
+    "source_slide": 14,
+    "concept_id": "d1-c05"
+  },
+  {
+    "stem": "Cơ chế Attention cho phép mỗi token làm gì?",
+    "options": [
+      "Chủ động \"quay đầu\" nhìn lại các token trước đó, chấm điểm mức độ liên quan để hiểu nghĩa theo ngữ cảnh.",
+      "Chỉ nhìn đúng token liền trước, không nhìn xa hơn.",
+      "Xử lý hoàn toàn độc lập, không liên quan gì đến token khác.",
+      "Luôn ưu tiên token đầu tiên của toàn bộ văn bản."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 15: attention cho phép mỗi token \"quay đầu nhìn lại các token trước đó… chấm điểm mức độ liên quan\".",
+    "source_slide": 15,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Chữ \"T\" trong GPT (Generative Pre-trained Transformer) gắn liền với cơ chế nào theo bài giảng?",
+    "options": [
+      "Token hóa (tokenization).",
+      "Attention (nằm trong kiến trúc Transformer).",
+      "Temperature khi sinh văn bản.",
+      "Quá trình huấn luyện (Training) nói chung."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 15: \"Đây chính là chữ T trong GPT\" — nhắc tới Transformer, nền tảng của cơ chế attention.",
+    "source_slide": 15,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Vị trí nào trong một prompt thường được attention chú ý nhiều nhất theo bài giảng?",
+    "options": [
+      "Chính giữa prompt.",
+      "Chỉ dòng cuối cùng của prompt.",
+      "Đầu và cuối prompt.",
+      "Toàn bộ prompt được chú ý đều nhau tuyệt đối, không có vùng nào nổi bật hơn."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 16: \"Đầu và cuối prompt được chú ý nhiều nhất; đồ ở giữa dễ bị bỏ sót\".",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Lời khuyên \"giữ bàn làm việc sạch\" nghĩa là gì khi dùng AI?",
+    "options": [
+      "Xóa toàn bộ lịch sử chat sau mỗi câu hỏi.",
+      "Luôn đưa toàn bộ tài liệu có thể liên quan vào context cho chắc ăn.",
+      "Tắt hẳn cơ chế attention khi không cần thiết.",
+      "Tóm tắt lại khi chat dài, chỉ đưa đúng file liên quan thay vì dán cả repo — tránh context rác."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 16: \"tóm tắt lại thay vì kéo theo mọi thứ… đưa đúng file liên quan, không dán cả repo\".",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Nguyên tắc \"cho tra sổ thay vì bắt nhớ\" ám chỉ kỹ thuật nào?",
+    "options": [
+      "RAG — lấy đoạn liên quan nhét vào context thay vì trông chờ model nhớ hết hoặc nhét cả cuốn tài liệu.",
+      "Fine-tuning lại toàn bộ model từ đầu.",
+      "Tăng temperature lên mức tối đa.",
+      "Giảm kích thước context window xuống mức tối thiểu."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 16: \"Tài liệu dài: lấy đoạn liên quan nhét vào context (RAG) thay vì trông chờ model nhớ hết\".",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Vì sao bài giảng nói \"agent mạnh không phải vì context khổng lồ\"?",
+    "options": [
+      "Vì context không hề ảnh hưởng đến hiệu năng của agent.",
+      "Mà vì nó có tools để lấy đúng thứ vào bàn làm việc đúng lúc.",
+      "Vì agent hoàn toàn không sử dụng context.",
+      "Vì agent luôn dùng context nhỏ hơn LLM thông thường."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 16: \"Agent mạnh không phải vì context khổng lồ — mà vì nó có tools để lấy đúng thứ vào bàn làm việc đúng lúc\".",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Câu \"Context rác = attention rác\" nghĩa là gì?",
+    "options": [
+      "Context rác sẽ tự động bị model lọc bỏ hoàn toàn, không ảnh hưởng gì.",
+      "Context rác chỉ ảnh hưởng đến chi phí, không ảnh hưởng đến chất lượng.",
+      "Nếu nhồi thông tin không liên quan vào context, attention sẽ bị phân tán/chú ý sai chỗ, làm giảm chất lượng trả lời.",
+      "Attention hoàn toàn không bị ảnh hưởng bởi nội dung của context."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 16: \"Context rác = attention rác\" — dẫn ý cho lời khuyên giữ bàn làm việc sạch.",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Vì sao yêu cầu quan trọng không nên bị \"chôn giữa\" một prompt dài?",
+    "options": [
+      "Vì model đọc prompt theo thứ tự hoàn toàn ngẫu nhiên.",
+      "Vì phần giữa prompt luôn bị hệ thống tự động xóa bỏ.",
+      "Vì độ dài prompt không liên quan gì đến việc này.",
+      "Vì đầu và cuối prompt được attention chú ý nhiều nhất, phần giữa dễ bị bỏ sót."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 16: \"Đặt điều quan trọng đầu – cuối… yêu cầu quan trọng đừng chôn giữa\".",
+    "source_slide": 16,
+    "concept_id": "d1-c06"
+  },
+  {
+    "stem": "Tham số (parameter) của một LLM là gì theo bài giảng?",
+    "options": [
+      "Những con số cố định bên trong được học sau khi luyện xong — như các \"khớp nối thần kinh\" quyết định model \"biết\" gì.",
+      "Là các núm vặn người dùng chỉnh khi gọi API (đó là context/temperature).",
+      "Là số lượng token trong context window tối đa.",
+      "Là số lượng câu hỏi model đã từng trả lời."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 17: \"những gì model 'biết' nằm trong các con số cố định bên trong gọi là tham số\".",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Người dùng có thể trực tiếp chỉnh tham số (parameter) của model khi gọi API không?",
+    "options": [
+      "Có, chỉnh trực tiếp qua một tham số tên \"params\" trong request.",
+      "Không — tham số được đóng gói sẵn trong file weights; người dùng chỉ chỉnh được context và các núm vặn như temperature.",
+      "Có, nhưng chỉ khi trả phí ở gói cao cấp nhất.",
+      "Có, thông qua việc viết system instruction chi tiết hơn."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 17: \"Tham số không phải thứ bạn chỉnh khi dùng model… Bạn chỉ chỉnh được context và các núm vặn lúc gọi\".",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Theo ví dụ \"bệnh viện\" trong bài, MoE khác dense model như thế nào?",
+    "options": [
+      "MoE luôn dùng ít tham số hơn dense model ở cùng năng lực.",
+      "MoE không thể scale lên số tham số lớn như dense model.",
+      "Dense giống \"bác sĩ đa năng\" — mọi token đều đi qua toàn bộ khớp nối; MoE giống \"bệnh viện đa khoa\" — mỗi token chỉ gọi vài chuyên gia.",
+      "Dense model luôn rẻ hơn MoE ở cùng mức năng lực."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 17 dùng đúng ẩn dụ \"bác sĩ đa năng\" (dense, GPT-3) và \"bệnh viện đa khoa\" (MoE, Kimi K3).",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Scaling law (Kaplan et al. 2020) mô tả điều gì trong giai đoạn 2020–2024?",
+    "options": [
+      "Thêm compute không ảnh hưởng gì đến năng lực model.",
+      "Chỉ dữ liệu mới quan trọng, compute không liên quan.",
+      "Năng lực model giảm dần khi tăng compute.",
+      "Cứ thêm compute + dữ liệu là model khôn lên một cách dự đoán được."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 17: \"Luật chơi 2020–2024: cứ thêm compute + dữ liệu là model khôn lên một cách dự đoán được\".",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Lợi ích chính của kiến trúc MoE là gì theo bài giảng?",
+    "options": [
+      "Tăng số tham số lên nhiều lần (VD gấp 16 lần) mà chi phí mỗi lần dùng gần như không đổi.",
+      "Giúp model không cần bước pre-training nữa.",
+      "Loại bỏ hoàn toàn nhu cầu về context window.",
+      "Giúp model luôn trả lời chính xác 100%."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 17: \"Nhiều tham số ≠ tốn hơn tuyến tính — nhờ MoE, bệnh viện lớn gấp 16 lần mà chi phí mỗi ca khám gần như không đổi\".",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "GPT-3 (2020, 175 tỷ tham số) và Kimi K3 (2026, ~2.800 tỷ tham số) khác biệt chính về kiến trúc là gì?",
+    "options": [
+      "Cả hai đều dùng kiến trúc dense.",
+      "GPT-3 là dense, còn Kimi K3 dùng kiến trúc MoE.",
+      "GPT-3 dùng MoE còn Kimi K3 dùng dense.",
+      "Cả hai đều không công khai thông tin kiến trúc."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 17 ghi rõ GPT-3 là dense (\"bác sĩ đa năng\"), Kimi K3 là MoE (\"bệnh viện đa khoa\").",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "\"Nhiều tham số không đồng nghĩa tốn kém hơn tuyến tính\" là nhờ đâu theo bài giảng?",
+    "options": [
+      "Nhờ giảm kích thước context window xuống mức tối thiểu.",
+      "Nhờ tăng temperature khi sinh văn bản.",
+      "Nhờ kiến trúc MoE, mỗi token chỉ cần \"vài chuyên gia\" xử lý thay vì toàn bộ mạng.",
+      "Nhờ nén dữ liệu huấn luyện trước khi train."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 17 giải thích rõ cơ chế MoE giúp chi phí mỗi lần dùng gần như không đổi dù tham số tăng vọt.",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Trục hoành trong biểu đồ scaling law (test loss giảm dần theo thang log) đại diện cho điều gì?",
+    "options": [
+      "Số lượng người dùng đồng thời gọi API.",
+      "Giá tiền của mỗi token đầu ra.",
+      "Số vòng RLHF đã được thực hiện.",
+      "Compute và dữ liệu, theo thang log."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 17: \"compute / dữ liệu (thang log) → test loss ↓\".",
+    "source_slide": 17,
+    "concept_id": "d1-c07"
+  },
+  {
+    "stem": "Thứ tự đúng của quy trình tạo ra một LLM theo bài giảng là gì?",
+    "options": [
+      "Pre-training → SFT → RLHF/DPO → Luyện suy luận (reasoning).",
+      "SFT → Pre-training → RLHF/DPO → Luyện suy luận.",
+      "RLHF/DPO → SFT → Pre-training → Luyện suy luận.",
+      "Luyện suy luận → Pre-training → SFT → RLHF/DPO."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 18 đánh số rõ: ① Pre-training ② SFT ③ RLHF/DPO ④ Luyện suy luận.",
+    "source_slide": 18,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "SFT (Supervised Fine-Tuning) giúp model điều gì?",
+    "options": [
+      "Học đọc toàn bộ thư viện kiến thức lần đầu tiên (đó là pre-training).",
+      "Học theo ví dụ mẫu để \"ra dáng trợ lý\" — biết cách trả lời.",
+      "Học giải toán/code có đáp án kiểm chứng được (đó là luyện suy luận).",
+      "Học cách cắt văn bản thành token (tokenization)."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 18: SFT — \"được chỉ cách trả lời: học theo ví dụ mẫu để ra dáng trợ lý\".",
+    "source_slide": 18,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "RLHF/DPO trong quy trình huấn luyện đóng vai trò gì?",
+    "options": [
+      "Dạy model đọc hàng nghìn tỷ token lần đầu tiên.",
+      "Dạy model cách cắt văn bản thành token.",
+      "\"Uốn nắn\" model học theo phản hồi con người, để an toàn và dễ chịu hơn.",
+      "Tăng kích thước context window tối đa của model."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 18: RLHF/DPO — \"được uốn nắn: học theo phản hồi con người, an toàn và dễ chịu hơn\".",
+    "source_slide": 18,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "Vì sao bài giảng nói \"đọc vạn cuốn sách chưa chắc biết trả lời phỏng vấn\"?",
+    "options": [
+      "Vì model về bản chất không thể xử lý được văn bản dạng sách.",
+      "Vì pre-training không liên quan gì đến chất lượng câu trả lời.",
+      "Vì cần tăng context window lên rất lớn mới trả lời tốt được.",
+      "Vì pre-training (đọc nhiều) chưa đủ để model biết cách trả lời như trợ lý — cần thêm SFT, RLHF/DPO, luyện suy luận."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 18: \"Đọc vạn cuốn sách chưa chắc biết trả lời phỏng vấn — đó là lý do cần bước ②, ③, ④\".",
+    "source_slide": 18,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "Trong quy trình RLHF, \"Reward Model\" dùng để làm gì?",
+    "options": [
+      "Chấm điểm câu trả lời thay cho con người, dựa trên xếp hạng con người đã cho trước đó.",
+      "Sinh ra câu trả lời đầu tiên thay cho LLM chính.",
+      "Thay thế hoàn toàn bước pre-training của model.",
+      "Quyết định kích thước context window tối đa của model."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 19: \"REWARD MODEL — máy chấm điểm thay người\", dùng để huấn luyện tiếp theo điểm số.",
+    "source_slide": 19,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "Cụm \"helpful · harmless · honest\" mà RLHF hướng tới là kết quả của bước huấn luyện nào?",
+    "options": [
+      "Pre-training.",
+      "RLHF (Reinforcement Learning from Human Feedback).",
+      "Tokenization.",
+      "Scaling theo compute và dữ liệu."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 19: \"Cỗ máy đoán token + điểm xếp hạng của con người → trợ lý helpful · harmless · honest\".",
+    "source_slide": 19,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "\"Luyện suy luận\" (reasoning training, từ ~2025) đặc trưng bởi điều gì?",
+    "options": [
+      "Chỉ dựa vào phản hồi chủ quan của con người, không có đáp án kiểm chứng.",
+      "Là bước đầu tiên, xảy ra trước cả pre-training.",
+      "Luyện toán/code có đáp án kiểm chứng được, giúp model \"làm nháp\" trước khi trả lời.",
+      "Là bước thay thế hoàn toàn cho SFT, không cần SFT nữa."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 18: \"Luyện suy luận — 'giải đề tự chấm' (từ ~2025): luyện toán/code có đáp án kiểm chứng được\".",
+    "source_slide": 18,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "Trong quy trình RLHF ở slide 19, sau khi người chấm xếp hạng nhiều câu trả lời, bước tiếp theo là gì?",
+    "options": [
+      "Model được huấn luyện lại từ đầu với một bộ dữ liệu hoàn toàn mới.",
+      "Quá trình huấn luyện dừng lại ngay, không cần thêm bước nào.",
+      "Chuyển thẳng sang bước tokenization lại toàn bộ dữ liệu.",
+      "Huấn luyện Reward Model, rồi dùng nó để tăng xác suất model sinh ra câu trả lời ghi điểm cao, lặp lại hàng nghìn lần."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 19: sau xếp hạng → Reward Model → \"huấn luyện theo điểm… lặp lại hàng nghìn lần → model dần 'biết nghe lời'\".",
+    "source_slide": 19,
+    "concept_id": "d1-c08"
+  },
+  {
+    "stem": "\"Bong bóng thời gian\" (knowledge cutoff) của LLM nghĩa là gì?",
+    "options": [
+      "Model bị \"đóng băng\" tại ngày ngừng đọc dữ liệu huấn luyện, không biết chuyện xảy ra sau đó trừ khi được cung cấp thêm.",
+      "Model quên toàn bộ kiến thức ngay sau mỗi phiên chat.",
+      "Model không thể học bất kỳ điều gì trong toàn bộ vòng đời của nó.",
+      "Model tự động cập nhật kiến thức theo thời gian thực qua internet."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 20: \"Model bị 'đóng băng' tại ngày ngừng đọc. Chuyện sau đó nó không biết — trừ khi bạn cung cấp thêm\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Hallucination (\"nói chắc như đúng rồi\") xảy ra vì sao theo bài giảng?",
+    "options": [
+      "Model cố tình lừa dối người dùng.",
+      "Model tối ưu cho câu nghe hợp lý, không phải để tra sự thật, nên có thể tự tin mà sai.",
+      "Model thiếu bộ nhớ RAM khi xử lý câu hỏi.",
+      "Model chỉ hallucinate khi temperature bằng 0."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 20: \"Model tối ưu cho câu nghe hợp lý, không phải tra sự thật — nên có thể tự tin mà sai (hallucination)\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Ba giới hạn bẩm sinh của LLM được liệt kê trong bài giảng là gì?",
+    "options": [
+      "Thiếu GPU, thiếu dữ liệu, thiếu điện năng.",
+      "Chi phí cao, tốc độ chậm, không hỗ trợ đa ngôn ngữ.",
+      "Bong bóng thời gian (knowledge cutoff), nói chắc như đúng rồi (hallucination), bàn làm việc có hạn (context có trần).",
+      "Không có attention, không có token, không có tham số."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 20 liệt kê đúng 3 mục: bong bóng thời gian, nói chắc như đúng rồi, bàn làm việc có hạn.",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Theo trích dẫn của Łukasz Kaiser trong bài, phần lớn cơ chế hoạt động của LLM hiện nay được hiểu như thế nào?",
+    "options": [
+      "Đã được chứng minh toán học đầy đủ, không còn gì chưa rõ.",
+      "Hoàn toàn ngẫu nhiên, không thể giải thích bằng bất kỳ cách nào.",
+      "Chỉ áp dụng cho model cũ; model mới đã hiểu rõ hết cơ chế.",
+      "Phần lớn là trực giác (intuition), không phải định lý hay chân lý đã được chứng minh đầy đủ."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 20 trích: \"a lot here are intuitions, not theorems or truths\" — Łukasz Kaiser.",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Cách xử lý được đề xuất cho các giới hạn bẩm sinh của LLM là gì?",
+    "options": [
+      "Prompt tốt, context sạch, tra sổ (RAG), dùng tools, và luôn kiểm chứng.",
+      "Tăng temperature lên mức tối đa.",
+      "Giảm số tham số của model xuống mức tối thiểu.",
+      "Ngừng sử dụng LLM hoàn toàn cho mọi tác vụ."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 20: \"Vì vậy ta cần prompt tốt, context sạch, tra sổ (RAG), tools, và luôn kiểm chứng\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Câu \"Biết nhiều khác làm được\" trong bài giảng muốn nói gì?",
+    "options": [
+      "LLM càng biết nhiều thì càng hành động tốt, không cần thêm gì khác.",
+      "Dữ liệu mới và hành động thật cần thêm tools/retrieval/workflow, không chỉ dựa vào kiến thức có sẵn của LLM.",
+      "Hành động của LLM hoàn toàn không liên quan đến kiến thức nó có.",
+      "Chỉ cần tăng context window là đủ để LLM hành động được."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 20: \"'Biết nhiều' khác 'làm được': dữ liệu mới và hành động thật cần tools/retrieval/workflow\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Giới hạn \"bàn làm việc có hạn\" (context có trần) dẫn tới hệ quả gì?",
+    "options": [
+      "Giúp model trả lời nhanh hơn không giới hạn.",
+      "Không có hệ quả đáng kể nào trong thực tế.",
+      "Context quá dài vừa tốn tiền vừa dễ bỏ sót thông tin ở giữa.",
+      "Khiến model ngừng hoạt động hoàn toàn ngay khi vượt ngưỡng."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 20: \"Context có trần; quá dài vừa tốn tiền vừa dễ bỏ sót thông tin ở giữa\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Theo bài giảng, các giới hạn bẩm sinh của LLM (cutoff, hallucination, context) có phải lỗi tạm thời có thể vá hết được không?",
+    "options": [
+      "Có, sẽ được vá hoàn toàn ở bản cập nhật kỹ thuật tiếp theo.",
+      "Có, chỉ cần tăng số tham số của model là hết hoàn toàn.",
+      "Không liên quan gì đến bản chất model, chỉ do thiếu dữ liệu huấn luyện.",
+      "Không — đây là bản chất của cỗ máy đoán token, không phải lỗi tạm thời."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 20: \"Đây không phải lỗi tạm thời — đó là bản chất của cỗ máy đoán token\".",
+    "source_slide": 20,
+    "concept_id": "d1-c09"
+  },
+  {
+    "stem": "Trong ví dụ phân loại spam, model thực chất đã \"học vẹt\" điều gì thay vì hiểu nội dung thật?",
+    "options": [
+      "Đếm số hyperlink trong email — email sạch nhưng nhiều link vẫn bị gán spam.",
+      "Học từ vựng đặc trưng thường gặp trong email lừa đảo.",
+      "Học ngôn ngữ và văn phong của người gửi.",
+      "Học thời gian trong ngày mà email được gửi đi."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 21: model thực chất học \"đếm số hyperlink… email sạch nhưng nhiều link → vẫn bị gán spam\".",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Ở bài toán câu chủ quan vs khách quan, model đã \"ăn gian\" bằng cách nào?",
+    "options": [
+      "Dựa vào độ dài của câu văn.",
+      "Dựa vào nguồn gốc câu (có phải trích từ review phim hay không), không phải dựa vào nội dung câu thật sự.",
+      "Dựa vào ngôn ngữ mà câu được viết ra.",
+      "Dựa vào số lượng tính từ xuất hiện trong câu."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 21: \"có phải câu trích từ film review không — ăn gian bằng nguồn gốc câu, không phải nội dung câu\".",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Trong bài toán suy luận ngôn ngữ (MNLI), model thực chất học được \"đường tắt\" nào?",
+    "options": [
+      "Độ dài trung bình của câu trong tập dữ liệu.",
+      "Số lượng danh từ riêng xuất hiện trong câu.",
+      "Câu có động từ phủ định hay không — đổi cấu trúc dữ liệu test là điểm tụt ngay.",
+      "Ngôn ngữ gốc mà văn bản được dịch từ đó."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 21: \"'câu có động từ phủ định không' — đổi cấu trúc dữ liệu test là điểm tụt ngay\".",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "\"Spurious cues\" (đường tắt/dấu hiệu giả) trong bài giảng được phát hiện bằng cách nào?",
+    "options": [
+      "Do con người thủ công rà soát từng dòng dữ liệu.",
+      "Do một thuật toán thống kê cổ điển không liên quan gì đến LLM.",
+      "Không thể phát hiện được bằng bất kỳ phương pháp nào.",
+      "Do chính LLM tự động phát hiện và mô tả bằng ngôn ngữ tự nhiên, trên quy mô 675 bài toán của benchmark OpenD5."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 21: \"do chính LLM tự động phát hiện và mô tả… trên quy mô 675 bài toán thật của benchmark OpenD5\".",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Bài học chính rút ra từ hiện tượng \"học vẹt đường tắt\" là gì?",
+    "options": [
+      "Benchmark cao không đồng nghĩa model hiểu đúng thứ bạn tưởng — luôn cần test trên dữ liệu của chính mình.",
+      "Benchmark cao đồng nghĩa model đã hiểu hoàn toàn đúng bản chất bài toán.",
+      "Model không bao giờ mắc lỗi này nếu đã trải qua RLHF.",
+      "Chỉ các model nhỏ mới gặp hiện tượng này, model lớn thì không."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 21: \"Benchmark cao ≠ model hiểu đúng thứ bạn tưởng — luôn test trên dữ liệu của chính mình\".",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Vì sao hiện tượng này được gọi là \"học vẹt đường tắt\" (shortcut learning)?",
+    "options": [
+      "Vì model học thuộc lòng nguyên văn toàn bộ dữ liệu huấn luyện.",
+      "Model tìm ra một tín hiệu tương quan giả (không phải bản chất bài toán) để đạt điểm cao, nhưng sai khi cấu trúc dữ liệu thay đổi.",
+      "Vì model cố ý gian lận khi biết mình đang bị đánh giá.",
+      "Vì model chạy chậm hơn bình thường khi gặp benchmark."
+    ],
+    "answer_idx": 1,
+    "explanation": "Cả 3 ví dụ ở slide 21 đều là model tìm tín hiệu tương quan giả thay vì hiểu bản chất bài toán.",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Ba ví dụ \"đường tắt\" trong bài giảng đến từ nghiên cứu nào?",
+    "options": [
+      "Kaplan et al. (2020) về scaling law.",
+      "Wei et al. (2022) về Chain-of-Thought.",
+      "Zhong, Snell, Klein & Steinhardt (2022), trên benchmark OpenD5.",
+      "Ouyang et al. (2022) về InstructGPT."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 21 trích dẫn Zhong, Snell, Klein & Steinhardt (2022, ICML) và Zhong et al. (2023, OpenD5).",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Hệ quả thực tế của hiện tượng học vẹt đường tắt là gì?",
+    "options": [
+      "Model sẽ luôn báo lỗi rõ ràng khi gặp trường hợp này.",
+      "Model tự động chuyển sang chế độ suy luận chậm hơn nhưng chính xác hơn.",
+      "Hiện tượng này chỉ xảy ra với dữ liệu hình ảnh, không xảy ra với văn bản.",
+      "Model có thể đạt điểm benchmark cao nhưng vẫn sai nghiêm trọng khi gặp dữ liệu có cấu trúc khác một chút."
+    ],
+    "answer_idx": 3,
+    "explanation": "Cả 3 ví dụ ở slide 21 minh họa: điểm benchmark tốt nhưng sai ngay khi đổi cấu trúc dữ liệu test.",
+    "source_slide": 21,
+    "concept_id": "d1-c10"
+  },
+  {
+    "stem": "Chain-of-Thought (CoT) cải thiện điều gì ở LLM?",
+    "options": [
+      "Cho model được viết \"nháp\" từng bước trước khi trả lời, giúp bản chất suy luận lộ ra và tăng độ chính xác.",
+      "Giảm số token cần dùng cho mỗi câu trả lời.",
+      "Loại bỏ hoàn toàn hiện tượng hallucination.",
+      "Tăng kích thước context window tối đa của model."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 22: \"cho nó được viết nháp từng bước, bản chất suy luận lộ ra\".",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Trong ví dụ bóng tennis (5 quả + mua thêm 2 hộp mỗi hộp 3 quả), vì sao model \"không nháp\" trả lời sai (27 quả)?",
+    "options": [
+      "Vì đề bài không đủ dữ liệu để tính toán.",
+      "Model đọc câu hỏi rồi bật đáp án ngay, không có bước tính toán trung gian rõ ràng.",
+      "Vì model chưa từng được huấn luyện về phép cộng.",
+      "Vì câu hỏi có lỗi chính tả nghiêm trọng."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 22: \"Không có nháp — trả lời ngay: Model đọc câu hỏi → bật ra đáp án ngay… ✗ SAI\".",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Khi được yêu cầu \"hãy nghĩ từng bước\", model trong ví dụ tính đúng kết quả là bao nhiêu?",
+    "options": [
+      "27 quả.",
+      "6 quả.",
+      "11 quả (5 + 3×2 = 11).",
+      "8 quả."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 22: \"Bắt đầu có 5 quả. Mỗi hộp 3 quả × 2 hộp = 6 quả. 5 + 6 = 11. Đáp án là 11 quả. ✓ ĐÚNG\".",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Chain-of-Thought là mầm mống của những kỹ thuật/mô hình nào sau này theo bài giảng?",
+    "options": [
+      "Kỹ thuật tokenization.",
+      "Kiến trúc MoE.",
+      "RLHF.",
+      "Các reasoning model (o1, R1...) và test-time compute."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 22: \"Đây là mầm của các reasoning model (o1, R1...) và của test-time compute ở các slide sau\".",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Nghiên cứu nào giới thiệu kỹ thuật Chain-of-Thought Prompting theo bài giảng?",
+    "options": [
+      "Wei et al. (2022), \"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models\".",
+      "Ouyang et al. (2022), InstructGPT.",
+      "Kaplan et al. (2020), Scaling laws.",
+      "Deng et al. (2009), ImageNet."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 22 trích rõ nguồn: Wei et al. (2022) — arxiv.org/abs/2201.11903.",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Vì sao ví dụ tính nhẩm bóng tennis lại minh họa tốt cho Chain-of-Thought?",
+    "options": [
+      "Vì bài toán quá khó nên cần một model lớn hơn hẳn.",
+      "Vì cùng một model, cùng một câu hỏi, chỉ khác việc có được viết nháp từng bước hay không mà kết quả từ sai thành đúng.",
+      "Vì bài toán yêu cầu kiến thức nằm ngoài phạm vi huấn luyện.",
+      "Vì bài toán liên quan đến xử lý hình ảnh."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 22: \"Cùng một model, cùng một câu hỏi — cho nó được viết nháp từng bước, bản chất suy luận lộ ra\".",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Chain-of-Thought liên hệ thế nào với cơ chế \"predict → append → rerun\" đã học ở phần trước?",
+    "options": [
+      "CoT thay thế hoàn toàn cơ chế predict-append-rerun bằng một thuật toán khác.",
+      "CoT không liên quan gì đến cách LLM sinh token.",
+      "Mỗi bước nháp được viết ra sẽ trở thành một phần context, giúp bước dự đoán tiếp theo có thêm thông tin đúng hướng.",
+      "CoT chỉ hoạt động khi cơ chế attention bị tắt."
+    ],
+    "answer_idx": 2,
+    "explanation": "Vì mỗi token nháp được nối vào ngữ cảnh (slide 12) trước khi model đoán tiếp, nháp đúng hướng sẽ dẫn đến đáp án đúng hơn.",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "Phát biểu nào sau đây KHÔNG đúng về Chain-of-Thought?",
+    "options": [
+      "CoT giúp lộ ra bản chất suy luận của model.",
+      "CoT là mầm của reasoning model và test-time compute.",
+      "Có nháp, model đổi từ đáp án sai (27) sang đúng (11) trong ví dụ bóng tennis.",
+      "CoT luôn làm giảm chi phí token vì câu trả lời ngắn gọn hơn."
+    ],
+    "answer_idx": 3,
+    "explanation": "CoT thường làm TĂNG số token (vì có thêm bước nháp), không phải giảm — đây là phát biểu sai cần chọn.",
+    "source_slide": 22,
+    "concept_id": "d1-c11"
+  },
+  {
+    "stem": "4 cấp độ từ LLM đến Agent theo bài giảng lần lượt là gì?",
+    "options": [
+      "Level 0 (Bộ não suy luận, không tool) → Level 1 (Có kết nối, +tools) → Level 2 (Biết lập kế hoạch) → Level 3 (Đội agent phối hợp).",
+      "Level 0 (Đội agent phối hợp) → Level 3 (Bộ não suy luận).",
+      "Chỉ có 2 cấp độ: LLM trần và Agent hoàn chỉnh.",
+      "Level 1 (Đội agent phối hợp) → Level 3 (Bộ não suy luận)."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 23 liệt kê đúng thứ tự Level 0 → 1 → 2 → 3 với mức tự chủ tăng dần.",
+    "source_slide": 23,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Ở Level 1 (\"Có kết nối\"), agent có thêm năng lực gì?",
+    "options": [
+      "Tự chia mục tiêu thành nhiều bước.",
+      "+ tools: search web, đọc database, gọi API — vượt khỏi bong bóng thời gian.",
+      "Phối hợp với nhiều agent chuyên biệt khác.",
+      "Không có gì khác biệt so với Level 0."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 23: Level 1 \"Có kết nối — + tools: search web, đọc database, gọi API — vượt khỏi bong bóng thời gian\".",
+    "source_slide": 23,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "5 bộ phận cấu thành một agent theo \"giải phẫu agent\" là gì?",
+    "options": [
+      "Token, Context, Attention, Parameter, Prompt.",
+      "Pretraining, SFT, RLHF, Reasoning training, Deployment.",
+      "Goal, Reasoning, Tools, Memory, Action — chạy thành một vòng lặp.",
+      "Input, Output, Model, API, Database."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 24: \"Agent = Goal + Reasoning + Tools + Memory + Action — chạy thành vòng lặp\".",
+    "source_slide": 24,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "\"Memory\" trong giải phẫu agent đóng vai trò gì?",
+    "options": [
+      "Là nơi lưu tham số cố định của model (weights).",
+      "Là bộ đếm số token đã sử dụng trong phiên làm việc.",
+      "Là công cụ gọi API bên ngoài duy nhất của agent.",
+      "Sổ tay ghi nhớ các bước, đọc/ghi trong vòng lặp để quan sát kết quả và lặp lại."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 24: \"Memory — sổ tay ghi nhớ các bước… ghi / đọc\".",
+    "source_slide": 24,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Câu \"Agent không phải một loại model khác\" trong bài giảng nghĩa là gì?",
+    "options": [
+      "Agent = LLM được đặt vào vòng làm việc có mục tiêu và hành động, không phải một kiến trúc model hoàn toàn khác biệt.",
+      "Agent luôn cần một model được huấn luyện riêng biệt hoàn toàn khác LLM thường.",
+      "Agent không sử dụng LLM ở bất kỳ bước nào.",
+      "Agent chỉ là tên gọi khác của chatbot thông thường."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 23: \"Agent không phải 'một loại model khác' — đó là LLM được đặt vào vòng làm việc có mục tiêu và hành động\".",
+    "source_slide": 23,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Ở Level 3 (\"Đội agent phối hợp\"), điểm khác biệt chính so với Level 2 là gì?",
+    "options": [
+      "Không dùng tools nữa để tiết kiệm chi phí.",
+      "Nhiều agent chuyên biệt chia việc như một đội ngũ (multi-agent), thay vì một agent tự làm hết.",
+      "Quay lại dùng LLM trần, không lập kế hoạch.",
+      "Loại bỏ hoàn toàn bước Reasoning khỏi vòng lặp."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 23: Level 3 \"+ nhiều agent chuyên biệt chia việc như một đội ngũ (multi-agent)\".",
+    "source_slide": 23,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Mức tự chủ và tác động thật của agent thay đổi ra sao qua các cấp độ 0 → 3?",
+    "options": [
+      "Giảm dần từ Level 0 đến Level 3.",
+      "Không đổi ở mọi cấp độ.",
+      "Tăng dần từ Level 0 đến Level 3.",
+      "Tăng rồi giảm theo hình chữ U."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 23: \"mức tự chủ & tác động thật tăng dần →\".",
+    "source_slide": 23,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Vòng lặp agent trong \"giải phẫu\" hoạt động theo trình tự nào?",
+    "options": [
+      "Action → Goal → Memory → Reasoning → Tools.",
+      "Chỉ có Reasoning và Action, không tồn tại vòng lặp.",
+      "Tools → Goal → Action, rồi dừng lại sau đúng 1 lần chạy.",
+      "Goal → Reasoning → Tools → Action → quan sát kết quả → lặp lại (Memory ghi/đọc xuyên suốt)."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 24 mô tả vòng lặp: Goal → Reasoning → Tools → Action → \"quan sát kết quả → lặp lại\".",
+    "source_slide": 24,
+    "concept_id": "d1-c12"
+  },
+  {
+    "stem": "Theo bài giảng, giá của một mức năng lực AI nhất định thay đổi ra sao theo năm?",
+    "options": [
+      "Rơi khoảng 10 lần mỗi năm — việc năm ngoái cần model đắt nhất, năm nay model rẻ đã làm được.",
+      "Tăng đều khoảng 10 lần mỗi năm.",
+      "Không đổi qua các năm.",
+      "Giảm rồi tăng lại theo chu kỳ 2 năm một lần."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 25: \"Cùng một mức năng lực, giá rơi khoảng 10 lần mỗi năm\".",
+    "source_slide": 25,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Nguyên tắc chọn model theo bài giảng là gì?",
+    "options": [
+      "Luôn chọn model đắt nhất để đảm bảo chất lượng.",
+      "Chọn theo TẦNG (việc cần làm gì), không chọn theo tên thương hiệu.",
+      "Luôn chọn model rẻ nhất để tiết kiệm chi phí.",
+      "Chọn theo model được nhắc đến nhiều nhất trên mạng xã hội."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 26: \"Chọn model theo TẦNG, không chọn theo tên\".",
+    "source_slide": 26,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Hai lỗi đối xứng khi chọn model theo tầng là gì?",
+    "options": [
+      "Chọn model tiếng Anh thay vì tiếng Việt.",
+      "Chọn model có context window quá dài.",
+      "Việc đơn giản mà gọi model frontier (phí tiền), và việc khó mà cố dùng model rẻ (kết quả tệ).",
+      "Chọn model không hỗ trợ streaming."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 26: \"Hai lỗi đối xứng: ✗ việc đơn giản mà gọi frontier → phí tiền; ✗ việc khó mà cố dùng rẻ → kết quả tệ\".",
+    "source_slide": 26,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Trong hóa đơn ví dụ ở bài giảng, output token có giá gấp bao nhiêu lần input token?",
+    "options": [
+      "Bằng nhau, không có chênh lệch.",
+      "Input đắt hơn output.",
+      "Gấp khoảng 10 lần.",
+      "Khoảng 3–5 lần."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 27: \"VÉ RA — OUTPUT ×3–5… đắt — model phải 'vắt óc'\".",
+    "source_slide": 27,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Vì sao output token (\"vé ra\") đắt hơn input token (\"vé vào\")?",
+    "options": [
+      "Model phải tự sinh từng mảnh một, vừa chậm vừa tốn (\"phải vắt óc\"), trong khi input model chỉ cần đọc.",
+      "Vì output luôn dài hơn input về số ký tự hiển thị.",
+      "Vì output cần dùng loại GPU khác với input.",
+      "Vì output phải được dịch sang ngôn ngữ khác trước khi trả về."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 27: \"VÉ VÀO — rẻ, model chỉ cần đọc; VÉ RA — đắt, model phải 'vắt óc'\".",
+    "source_slide": 27,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "\"Núm vặn lớn nhất\" để kiểm soát chi phí một lần gọi API là gì theo bài giảng?",
+    "options": [
+      "Kiểm soát input — số token gửi đi.",
+      "Kiểm soát output — số token model sinh ra.",
+      "Kiểm soát temperature.",
+      "Kiểm soát kích thước tối đa của context window."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 27: \"Input tokens + Output tokens = Chi phí mỗi lần gọi — kiểm soát output là núm vặn lớn nhất\".",
+    "source_slide": 27,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Tầng 3 (\"Self-host / siêu rẻ\") trong bảng phân tầng model được dùng khi nào?",
+    "options": [
+      "Khi cần độ chính xác cao nhất cho việc khó nhất.",
+      "Khi mới bắt đầu thử nghiệm một use case nhỏ, khối lượng thấp.",
+      "Khi cần kiểm soát dữ liệu hoặc chi phí ở quy mô lớn (VD Kimi K3 open-weight, DeepSeek, Qwen).",
+      "Khi cần tốc độ phản hồi nhanh nhất thị trường bằng mọi giá."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 26: \"TẦNG 3 — SELF-HOST/SIÊU RẺ… khi cần kiểm soát dữ liệu hoặc chi phí quy mô lớn\".",
+    "source_slide": 26,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "Theo bài giảng, nên bắt đầu thử model ở tầng nào trước?",
+    "options": [
+      "Tầng 1 (frontier đóng) luôn phải thử trước tiên.",
+      "Tầng 3 (self-host) để tiết kiệm ngay từ đầu.",
+      "Không có thứ tự khuyến nghị, chọn ngẫu nhiên tùy thích.",
+      "Tầng 2 (\"rẻ mà mạnh\") — giải quyết đa số việc hằng ngày, mặc định thử trước."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 26: \"★ MẶC ĐỊNH THỬ TẦNG NÀY TRƯỚC\" được gắn ngay dưới Tầng 2.",
+    "source_slide": 26,
+    "concept_id": "d1-c13"
+  },
+  {
+    "stem": "4 lớp của một prompt hoàn chỉnh theo bài giảng là gì?",
+    "options": [
+      "System instruction, User input, Context bổ sung, Output mong muốn.",
+      "Token, Context, Attention, Parameter.",
+      "Input, Model, Output, Feedback.",
+      "Goal, Reasoning, Tools, Action."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 28: \"1 PROMPT = 4 PHẦN\" — System instruction, User input, Context bổ sung, Output mong muốn.",
+    "source_slide": 28,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "\"System instruction\" (Lớp 1) trong prompt có vai trò gì?",
+    "options": [
+      "Là câu hỏi cụ thể của người dùng trong lượt hiện tại.",
+      "\"Lời dặn đầu ca\" — model là ai, cư xử thế nào, không được làm gì.",
+      "Là tài liệu hoặc lịch sử chat đính kèm bổ sung.",
+      "Là định dạng kết quả mong muốn (bullet, JSON...)."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 28: \"LỚP 1 — System instruction: 'Lời dặn đầu ca' — model là ai, cư xử thế nào, không được làm gì\".",
+    "source_slide": 28,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "temperature = 0 phù hợp với loại việc nào theo bài giảng?",
+    "options": [
+      "Việc cần sự sáng tạo và đa dạng ở mức tối đa.",
+      "Việc cần model \"phiêu\", cố ý dễ lạc đề.",
+      "Việc cần ổn định, lặp lại, hợp với code và phân tích — luôn chọn từ chắc nhất.",
+      "Việc cần model trả lời hoàn toàn ngẫu nhiên."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 29: \"T = 0 … luôn chọn từ chắc nhất → ổn định, lặp lại, hợp code & phân tích\".",
+    "source_slide": 29,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "top_p (VD p = 0.9) hoạt động theo cơ chế nào?",
+    "options": [
+      "Chọn ngẫu nhiên p% số từ trong từ vựng, không phân biệt xác suất.",
+      "Tăng số lượng token tối đa được phép sinh ra.",
+      "Giảm kích thước context window xuống còn p%.",
+      "Chỉ giữ nhóm từ có xác suất cộng dồn ≥ ngưỡng p, cắt bỏ phần đuôi xác suất thấp rồi chuẩn hóa lại."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 29: top_p — \"giữ nhóm cộng dồn ≥ 90% → cắt & chuẩn hóa lại\".",
+    "source_slide": 29,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "Theo bài giảng, nên vặn cả temperature và top_p cùng lúc không?",
+    "options": [
+      "Thường chỉ vặn một trong hai, không phải cả hai cùng lúc.",
+      "Luôn cần vặn cả hai đồng thời để đạt hiệu quả tối đa.",
+      "Hai tham số này hoàn toàn độc lập, không liên quan gì đến nhau.",
+      "Chỉ nên vặn top_p, không bao giờ dùng đến temperature."
+    ],
+    "answer_idx": 0,
+    "explanation": "Slide 29: \"Thường chỉ vặn một trong hai: temperature hoặc top_p\".",
+    "source_slide": 29,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "temperature và top_p có làm model \"thông minh\" hơn không theo bài giảng?",
+    "options": [
+      "Có, tăng temperature giúp model biết thêm kiến thức mới.",
+      "Không — chúng chỉ đổi cách chọn từ, không thêm tri thức cho model.",
+      "Có, top_p giúp model truy cập internet để tra cứu thông tin.",
+      "Có, cả hai đều giúp mở rộng context window của model."
+    ],
+    "answer_idx": 1,
+    "explanation": "Slide 29: \"hai núm này không làm model thông minh hơn — chỉ đổi cách chọn từ, không thêm tri thức\".",
+    "source_slide": 29,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "\"Context bổ sung\" (Lớp 3 trong prompt) bao gồm những gì?",
+    "options": [
+      "Định dạng đầu ra mong muốn (bullet, JSON...).",
+      "Lời dặn về vai trò và giới hạn của model.",
+      "Tài liệu, lịch sử chat, dữ liệu tra sổ (RAG) — phần bày lên \"bàn làm việc\".",
+      "Giá trị temperature và top_p được cấu hình."
+    ],
+    "answer_idx": 2,
+    "explanation": "Slide 28: \"LỚP 3 — Context bổ sung: Tài liệu, lịch sử chat, dữ liệu tra sổ — phần bày lên 'bàn làm việc'\".",
+    "source_slide": 28,
+    "concept_id": "d1-c14"
+  },
+  {
+    "stem": "Ở temperature cao (VD T = 2) theo ví dụ \"Một tách ___\" trong bài, điều gì xảy ra với phân bố xác suất chọn từ?",
+    "options": [
+      "Phân bố tập trung tuyệt đối vào một từ chắc chắn nhất.",
+      "Phân bố không thay đổi gì so với khi T = 0.",
+      "Model sẽ ngừng chọn từ và trả về lỗi.",
+      "Phân bố phẳng ra, đa dạng hơn nhưng dễ \"phiêu\"/lạc đề."
+    ],
+    "answer_idx": 3,
+    "explanation": "Slide 29: \"T = 2 … phân bố phẳng ra → đa dạng, 'phiêu', dễ lạc đề\".",
+    "source_slide": 29,
+    "concept_id": "d1-c14"
+  }
+]
