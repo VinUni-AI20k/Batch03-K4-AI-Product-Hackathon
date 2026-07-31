@@ -114,6 +114,21 @@ class FormExportRequest(BaseModel):
 class SimulatedSubmissionRequest(BaseModel):
     validation_id: str
     confirmed: bool = False
+    approval_id: str | None = None
+
+
+class SubmissionApprovalRequest(BaseModel):
+    validation_id: str
+
+
+class SubmissionApprovalResponse(BaseModel):
+    approval_id: str
+    form_code: str
+    destination: str
+    purpose: str
+    disclosed_fields: list[str]
+    effect: str
+    expires_at: str
 
 
 class SimulatedSubmissionResponse(BaseModel):
@@ -127,4 +142,8 @@ class SimulatedSubmissionResponse(BaseModel):
     submitted_at: str
     simulation: Literal[True]
     official_submission: Literal[False]
+    delivery_destination: Literal["SPDVC_DEMO_GATEWAY"]
+    pdf_sha256: str
+    pdf_size_bytes: int
+    artifact_available: Literal[True]
     message_vi: str

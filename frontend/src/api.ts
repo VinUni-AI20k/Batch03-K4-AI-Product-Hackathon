@@ -1,6 +1,9 @@
 export type StreamEvent =
   | { type: "message.delta"; text: string }
   | { type: "translation.consent_required"; provider: string }
+  | { type: "agent.plan"; selectedTool: string; steps: string[]; requiredData: string[]; decisionBasis: string }
+  | { type: "agent.stopped"; reason: string }
+  | { type: "security.blocked"; riskScore: number; reasons: string[] }
   | {
     type: "message.complete";
     intent: string;
@@ -12,6 +15,7 @@ export type StreamEvent =
     externalSearchUsed: boolean;
     externalSearchConsentRequired: boolean;
     formCode: string | null;
+    openReview: boolean;
   }
   | { type: "error"; message: string };
 
@@ -68,7 +72,21 @@ export type SimulatedSubmission = {
   submitted_at: string;
   simulation: true;
   official_submission: false;
+  delivery_destination: string;
+  pdf_sha256: string;
+  pdf_size_bytes: number;
+  artifact_available: boolean;
   message_vi: string;
+};
+
+export type SubmissionApproval = {
+  approval_id: string;
+  form_code: string;
+  destination: string;
+  purpose: string;
+  disclosed_fields: string[];
+  effect: string;
+  expires_at: string;
 };
 
 export type VoiceStatus = { available: boolean };
@@ -189,6 +207,19 @@ export async function streamChat(
         const payload = JSON.parse(data) as Record<string, unknown>;
         if (event === "message.delta") onEvent({ type: event, text: String(payload.text ?? "") });
         if (event === "translation.consent_required") onEvent({ type: event, provider: String(payload.provider ?? "AI") });
+        if (event === "agent.plan") onEvent({
+          type: event,
+          selectedTool: String(payload.selected_registration_tool ?? ""),
+          steps: (payload.steps as string[]) ?? [],
+          requiredData: (payload.required_data as string[]) ?? [],
+          decisionBasis: String(payload.decision_basis ?? ""),
+        });
+        if (event === "agent.stopped") onEvent({ type: event, reason: String(payload.reason ?? "agent_stopped") });
+        if (event === "security.blocked") onEvent({
+          type: event,
+          riskScore: Number(payload.risk_score ?? 0),
+          reasons: (payload.reasons as string[]) ?? [],
+        });
         if (event === "message.complete") onEvent({
           type: event,
           intent: String(payload.intent ?? "general"),
@@ -200,6 +231,7 @@ export async function streamChat(
           externalSearchUsed: Boolean(payload.external_search_used),
           externalSearchConsentRequired: Boolean(payload.external_search_consent_required),
           formCode: (payload.form_code as string | null) ?? null,
+          openReview: Boolean(payload.open_review),
         });
         if (event === "error") onEvent({ type: event, message: String(payload.message ?? "Có lỗi xảy ra.") });
       });
@@ -218,6 +250,7 @@ export async function streamChat(
       externalSearchUsed: false,
       externalSearchConsentRequired: false,
       formCode: null,
+      openReview: false,
     });
   }
 }
@@ -308,13 +341,32 @@ export async function exportFormPdf(formCode: string, validationId: string): Pro
   }
 }
 
-export async function simulateFormSubmission(formCode: string, validationId: string): Promise<SimulatedSubmission> {
+export async function requestSubmissionApproval(formCode: string, validationId: string): Promise<SubmissionApproval> {
+  try {
+    const response = await fetch(`${apiBaseUrl}/v1/forms/${formCode}/submissions/approval`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ validation_id: validationId }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { detail?: string };
+      throw new ApiError(response.status, body.detail ?? "submission_approval_failed");
+    }
+    return await response.json() as SubmissionApproval;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(503, "submission_approval_unavailable");
+  }
+}
+
+export async function simulateFormSubmission(formCode: string, validationId: string, approvalId: string): Promise<SimulatedSubmission> {
   try {
     const response = await fetch(`${apiBaseUrl}/v1/forms/${formCode}/submissions/simulate`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ validation_id: validationId, confirmed: true }),
+      body: JSON.stringify({ validation_id: validationId, approval_id: approvalId, confirmed: true }),
     });
     if (!response.ok) {
       const body = await response.json().catch(() => ({})) as { detail?: string };
@@ -325,4 +377,14 @@ export async function simulateFormSubmission(formCode: string, validationId: str
     if (error instanceof ApiError) throw error;
     throw new ApiError(503, "simulated_submission_unavailable");
   }
+}
+
+export async function downloadSubmissionArtifact(submissionId: string): Promise<Blob> {
+  const response = await fetch(`${apiBaseUrl}/v1/submissions/${submissionId}/artifact.pdf`, { credentials: "include" });
+  if (!response.ok) throw new ApiError(response.status, "submission_artifact_unavailable");
+  const data = await response.arrayBuffer();
+  if (!new TextDecoder("ascii").decode(data.slice(0, 5)).startsWith("%PDF-")) {
+    throw new ApiError(502, "invalid_pdf_response");
+  }
+  return new Blob([data], { type: "application/pdf" });
 }

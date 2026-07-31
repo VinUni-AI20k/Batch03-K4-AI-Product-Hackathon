@@ -34,6 +34,6 @@ The runner exercises the real FastAPI SSE endpoint. It disables only the optiona
 PostgreSQL-backed embedding retrieval because Docker/PostgreSQL is unavailable in
 the local environment; the local procedure snapshot and form-routing paths remain
 real. The unchanged 25-case set produced 18/25 on the baseline run, 24/25 after
-the first system improvement, 25/25 after the safety fix, and 25/25 again after
-adding controlled submission simulation. Historical artifacts
+the first system improvement, 25/25 after the safety fix, 25/25 after
+controlled submission simulation, and 25/25 after bounded Agent + layered defenses. Historical artifacts
 are stored under `runs/`; `report.md` and `results.jsonl` contain the latest run.

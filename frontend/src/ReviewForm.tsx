@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FormSchemaResponse,
   ApiError,
   SimulatedSubmission,
+  SubmissionApproval,
   ValidationResult,
+  downloadSubmissionArtifact,
   exportFormPdf,
   getFormDraft,
   getFormSchema,
+  requestSubmissionApproval,
   simulateFormSubmission,
   updateFormDraft,
   validateForm,
@@ -81,6 +84,7 @@ function ResultPanel({
   submission,
   submitting,
   onSubmitSimulation,
+  onDownloadSubmission,
 }: {
   locale: Locale;
   validation: ValidationResult | null;
@@ -93,6 +97,7 @@ function ResultPanel({
   submission: SimulatedSubmission | null;
   submitting: boolean;
   onSubmitSimulation: () => void;
+  onDownloadSubmission: () => void;
 }) {
   const text = copy[locale];
   const simulationText = locale === "vi" ? {
@@ -175,6 +180,8 @@ function ResultPanel({
               <strong>{simulationText.receipt}</strong>
               <code>{submission.receipt_code}</code>
               <span>{new Date(submission.submitted_at).toLocaleString(locale === "vi" ? "vi-VN" : "en-US")}</span>
+              <span>{submission.delivery_destination} · PDF {(submission.pdf_size_bytes / 1024).toFixed(1)} KB</span>
+              <button className="receipt-download" onClick={onDownloadSubmission} type="button">⬇ Tải PDF đã gửi</button>
             </div>
           )}
         </div>
@@ -183,7 +190,15 @@ function ResultPanel({
   );
 }
 
-export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { activeFormCode: string | null; locale: Locale; onFormCodeConsumed: () => void }) {
+type ReviewFormProps = {
+  activeFormCode: string | null;
+  locale: Locale;
+  onFormCodeConsumed: () => void;
+  embedded?: boolean;
+  onSubmissionComplete?: (submission: SimulatedSubmission) => void;
+};
+
+export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed, embedded = false, onSubmissionComplete }: ReviewFormProps) {
   const [formCode, setFormCode] = useState<string | null>(activeFormCode);
   const [schema, setSchema] = useState<FormSchemaResponse | null>(null);
   const [values, setValues] = useState<Record<string, string>>({});
@@ -196,11 +211,11 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
   const [previewing, setPreviewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submission, setSubmission] = useState<SimulatedSubmission | null>(null);
+  const [approval, setApproval] = useState<SubmissionApproval | null>(null);
+  const [finalConfirmation, setFinalConfirmation] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const saveChainRef = useRef<Promise<unknown>>(Promise.resolve());
   const text = copy[locale];
-  const simulationConfirm = locale === "vi"
-    ? "Xác nhận nộp hồ sơ trong môi trường mô phỏng? Hồ sơ sẽ không được gửi tới cơ quan nhà nước."
-    : "Confirm submission in the simulation environment? Nothing will be sent to a government authority.";
   const simulationError = locale === "vi" ? "Không thể nộp mô phỏng." : "Could not simulate submission.";
   const previewUrl = useMemo(() => (previewBlob ? URL.createObjectURL(previewBlob) : null), [previewBlob]);
 
@@ -229,6 +244,8 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
         setDirty(false);
         setPreviewBlob(null);
         setSubmission(null);
+        setApproval(null);
+        setFinalConfirmation(false);
       })
       .catch(() => setError(text.formLoadError))
       .finally(() => setLoading(false));
@@ -238,15 +255,28 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
     setValues((current) => ({ ...current, [fieldCode]: value }));
     setDirty(true);
     setSubmission(null);
+    setApproval(null);
+    setFinalConfirmation(false);
   }
 
   // Always sends the full local snapshot (never a single changed field): the backend
   // PUT does a read-merge-write on the session draft, so overlapping per-field saves
   // from fast sequential edits can race and silently drop an earlier field's value.
   // A self-contained snapshot on every save makes each write independent of write order.
+  function enqueueDraftSave(snapshot: Record<string, string>): Promise<unknown> {
+    if (!formCode) return Promise.resolve();
+    const save = saveChainRef.current
+      .catch(() => undefined)
+      .then(() => updateFormDraft(formCode, snapshot));
+    saveChainRef.current = save;
+    return save.catch((error) => {
+      setError(text.formSaveError);
+      throw error;
+    });
+  }
+
   async function persistDraft() {
-    if (!formCode) return;
-    await updateFormDraft(formCode, values).catch(() => setError(text.formSaveError));
+    await enqueueDraftSave(values).catch(() => undefined);
   }
 
   function handleSelectChange(fieldCode: string, value: string) {
@@ -254,7 +284,9 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
     setValues(next);
     setDirty(true);
     setSubmission(null);
-    if (formCode) void updateFormDraft(formCode, next).catch(() => setError(text.formSaveError));
+    setApproval(null);
+    setFinalConfirmation(false);
+    if (formCode) void enqueueDraftSave(next).catch(() => undefined);
   }
 
   async function runValidation() {
@@ -262,7 +294,14 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
     setValidating(true);
     setError(null);
     setPreviewBlob(null);
+    setApproval(null);
+    setSubmission(null);
+    setFinalConfirmation(false);
     try {
+      // Validation must observe the exact snapshot visible to the user. A blur
+      // save can still be in flight when the button is clicked, so persist and
+      // await the complete local state before asking the backend to validate.
+      await enqueueDraftSave(values);
       setValidation(await validateForm(formCode));
       setDirty(false);
     } catch {
@@ -300,11 +339,10 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
 
   async function runSimulatedSubmission() {
     if (!formCode || !validation) return;
-    if (!window.confirm(simulationConfirm)) return;
     setSubmitting(true);
     setError(null);
     try {
-      setSubmission(await simulateFormSubmission(formCode, validation.validation_id));
+      setApproval(await requestSubmissionApproval(formCode, validation.validation_id));
     } catch (error) {
       const detail = error instanceof ApiError ? error.detail : "";
       setError(`${simulationError}${detail ? ` (${detail})` : ""}`);
@@ -313,8 +351,52 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
     }
   }
 
+  async function confirmDataAndPreviewPdf() {
+    if (!formCode || !validation || !approval) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      setPreviewBlob(await exportFormPdf(formCode, validation.validation_id));
+      setFinalConfirmation(true);
+    } catch (error) {
+      const detail = error instanceof ApiError ? error.detail : "";
+      setError(exportErrorMessage(error, `${simulationError} Không thể tạo bản PDF để xác nhận.`));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function confirmFinalSubmission() {
+    if (!formCode || !validation || !approval || !finalConfirmation) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const completed = await simulateFormSubmission(formCode, validation.validation_id, approval.approval_id);
+      setSubmission(completed);
+      setApproval(null);
+      setFinalConfirmation(false);
+      setPreviewBlob(null);
+      onSubmissionComplete?.(completed);
+    } catch (error) {
+      const detail = error instanceof ApiError ? error.detail : "";
+      setError(`${simulationError}${detail ? ` (${detail})` : ""}`);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function downloadSubmittedPdf() {
+    if (!submission) return;
+    try {
+      downloadBlob(await downloadSubmissionArtifact(submission.submission_id), `${submission.receipt_code}.pdf`);
+    } catch (error) {
+      setError(exportErrorMessage(error, text.formExportError));
+    }
+  }
+
   function closePreview() {
     setPreviewBlob(null);
+    setFinalConfirmation(false);
   }
 
   function downloadPreview() {
@@ -328,12 +410,12 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
   const groups = [...schema.groups].sort((a, b) => a.display_order - b.display_order);
 
   return (
-    <div className="review-form">
+    <div className={`review-form ${embedded ? "review-form-embedded" : ""}`}>
       <div className="review-form-main">
         <div className="review-form-header">
           <div>
             <h2>{schema.title_vi}</h2>
-            <button className="link-button" onClick={() => { setFormCode(null); setSchema(null); }}>{text.changeForm}</button>
+            <button className="link-button" onClick={() => { setFormCode(null); setSchema(null); setApproval(null); setFinalConfirmation(false); }}>{text.changeForm}</button>
           </div>
           <button className="primary-action" onClick={() => void runValidation()} disabled={validating}>
             {validating ? text.validating : text.validate}
@@ -351,6 +433,7 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
                     <span className="field-label">{field.label_vi}{field.required && <span className="required">*</span>}</span>
                     {field.data_type === "enum" ? (
                       <select
+                        data-testid={field.field_code}
                         value={values[field.field_code] ?? ""}
                         onChange={(event) => handleSelectChange(field.field_code, event.target.value)}
                         className={issue ? issue.severity : ""}
@@ -360,17 +443,19 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
                       </select>
                     ) : field.data_type === "table" ? (
                       <textarea
+                        data-testid={field.field_code}
                         value={values[field.field_code] ?? ""}
-                        onChange={(event) => updateField(field.field_code, event.target.value)}
+                        onInput={(event) => updateField(field.field_code, event.currentTarget.value)}
                         onBlur={() => void persistDraft()}
                         className={issue ? issue.severity : ""}
                         rows={2}
                       />
                     ) : (
                       <input
+                        data-testid={field.field_code}
                         type={field.data_type === "date" ? "date" : field.data_type === "number" ? "number" : "text"}
                         value={values[field.field_code] ?? ""}
-                        onChange={(event) => updateField(field.field_code, event.target.value)}
+                        onInput={(event) => updateField(field.field_code, event.currentTarget.value)}
                         onBlur={() => void persistDraft()}
                         className={issue ? issue.severity : ""}
                       />
@@ -395,7 +480,28 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
         submission={submission}
         submitting={submitting}
         onSubmitSimulation={() => void runSimulatedSubmission()}
+        onDownloadSubmission={() => void downloadSubmittedPdf()}
       />
+      {approval && (
+        <div className="consent-backdrop" role="presentation">
+          <section aria-labelledby="submission-approval-title" aria-modal="true" className="consent-dialog submission-approval-dialog" role="dialog">
+            <h2 id="submission-approval-title">Xác nhận hành động một lần</h2>
+            <dl>
+              <dt>Nơi nhận</dt><dd>{approval.destination}</dd>
+              <dt>Mục đích</dt><dd>{approval.purpose}</dd>
+              <dt>Dữ liệu đưa vào PDF</dt><dd>{approval.disclosed_fields.join(", ") || "Không có"}</dd>
+              <dt>Kết quả</dt><dd>{approval.effect}</dd>
+            </dl>
+            <p className="simulation-disclaimer">Quyền xác nhận chỉ dùng một lần và hết hạn lúc {new Date(approval.expires_at).toLocaleTimeString(locale === "vi" ? "vi-VN" : "en-US")}.</p>
+            <div>
+              <button onClick={() => setApproval(null)} type="button">Hủy</button>
+              <button className="primary" disabled={submitting} onClick={() => void confirmDataAndPreviewPdf()} type="button">
+                {submitting ? "Đang tạo PDF..." : "Xác nhận thông tin và xem PDF"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
       {previewUrl && (
         <div className="pdf-preview-backdrop" role="presentation" onClick={closePreview}>
           <section
@@ -406,10 +512,15 @@ export function ReviewForm({ activeFormCode, locale, onFormCodeConsumed }: { act
             role="dialog"
           >
             <header className="pdf-preview-header">
-              <h2 id="pdf-preview-title">{text.previewTitle}</h2>
+              <h2 id="pdf-preview-title">{finalConfirmation ? "Bước 2/2 · Kiểm tra PDF lần cuối" : text.previewTitle}</h2>
               <div className="pdf-preview-actions">
                 <button onClick={downloadPreview} type="button">⬇ {text.downloadInPreview}</button>
-                <button aria-label={text.close} className="pdf-preview-close" onClick={closePreview} type="button">✕</button>
+                {finalConfirmation && (
+                  <button className="final-submit-button" disabled={submitting} onClick={() => void confirmFinalSubmission()} type="button">
+                    {submitting ? "Đang gửi..." : "Xác nhận lần cuối và gửi"}
+                  </button>
+                )}
+                <button aria-label={finalConfirmation ? "Quay lại chỉnh sửa" : text.close} className="pdf-preview-close" onClick={closePreview} type="button">✕</button>
               </div>
             </header>
             <iframe className="pdf-preview-frame" src={previewUrl} title={text.previewTitle} />

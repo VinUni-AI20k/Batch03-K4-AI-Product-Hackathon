@@ -122,7 +122,7 @@ Giải pháp đề xuất tập trung vào lát cắt:
 - **Mức prototype nhắm tới:**  
   `[ ] Sketch  [ ] Mock  [x] Working`
 
-  - **Phần thật trong prototype:** Nhận nhu cầu bằng văn bản; tìm trong snapshot 207 thủ tục; trả lời có citation; định tuyến ba biểu mẫu khai sinh, CT01 và cấp phép xây dựng; GPT-4.1-mini trích xuất field theo schema; kiểm tra quy tắc và AI review; xem trước/tải PDF; gọi công cụ nộp mô phỏng từ chat hoặc form và lưu biên nhận tối thiểu trong phiên.
+  - **Phần thật trong prototype:** Nhận nhu cầu bằng văn bản; tìm trong snapshot 207 thủ tục; trả lời có citation; định tuyến ba biểu mẫu khai sinh, CT01 và cấp phép xây dựng; GPT-4.1-mini đề xuất tool bằng structured output và trích xuất field theo schema; kiểm tra rule + AI review; cho người dùng chọn điền cùng Agent hoặc mở biểu mẫu; xem/tải PDF; gọi công cụ nộp mô phỏng từ chat hoặc form và lưu PDF cùng biên nhận trong phiên.
   - **Phần mô phỏng/chưa tích hợp:** Biên nhận `SPDVC-DEMO-*` và trạng thái `submitted_simulation` là dữ liệu demo, không phải kết quả của Cổng Dịch vụ công. Chưa tích hợp đăng nhập định danh, ký số, thanh toán, tải tệp đính kèm hoặc API nộp thật; PostgreSQL embedding RAG là thành phần tùy chọn và không bật trong runner CP3.
 
 - **Automation:**  
@@ -134,6 +134,9 @@ Giải pháp đề xuất tập trung vào lát cắt:
     - phát hiện sai định dạng;
     - cảnh báo thông tin có khả năng mâu thuẫn hoặc bất thường; gợi ý cách sửa;
 
+- **Hợp đồng Agent:** GPT-4.1-mini chỉ đề xuất `selected_registration_tool`, mục tiêu và căn cứ theo JSON Schema. Code ánh xạ thủ tục đã xác định sang allowlist (`prepare_birth_registration`, `prepare_permanent_residence`, `prepare_construction_permit`) và sở hữu thứ tự chuẩn: `lookup → prepare → collect → validate → render_pdf → submit_simulation`. Model không thể thêm tool, đổi quyền hoặc tự vượt bước xác nhận.
+- **Điều kiện dừng:** tối đa 12 tool-call/workflow; nếu cùng một tool trả cùng kết quả lần thứ ba liên tiếp thì dừng `repeated_identical_tool_result`; một validation/approval chỉ có hiệu lực với đúng hash dữ liệu. Tool gửi là side effect duy nhất và cần phê duyệt một lần hiển thị nơi nhận, mục đích, danh sách field, kết quả và thời hạn.
+
 ### §4b. Nguyên tắc đã áp dụng
 
 | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
@@ -142,7 +145,7 @@ Giải pháp đề xuất tập trung vào lát cắt:
 | G2/G11 — Hiển thị căn cứ và giải thích | Câu trả lời thủ tục có citation, mã thủ tục, snapshot và mức tin cậy; validation liệt kê lỗi theo field và lý do. |
 | G9 — Hỗ trợ sửa và khôi phục | Người dùng sửa trực tiếp field, validation cũ bị đánh dấu stale; đổi thủ tục sẽ thay form active thay vì kẹt ngữ cảnh cũ. |
 | G10 — Hỏi lại khi không chắc | Câu mơ hồ/ngoài snapshot không mở form hay đoán; hệ thống hỏi một câu làm rõ hoặc nói chưa thể xác minh. |
-| PAIR — Feedback + Control | Tool nộp mô phỏng chỉ chạy sau xác nhận, phát sự kiện `tool.call`/`tool.result`, trả mã biên nhận và không lưu bản sao PII trong receipt. |
+| PAIR — Feedback + Control | Tool nộp mô phỏng chỉ chạy sau approval một lần, phát `agent.plan`/`tool.call`/`tool.result`, tạo PDF + mã biên nhận; receipt không chứa PII, còn PDF chỉ tồn tại trong session TTL và tải được bằng đúng session. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8)
 
@@ -158,6 +161,8 @@ Bốn lớp dưới đây bám trực tiếp vào kiến trúc và golden set 25
 | ③ Ngoài phạm vi / thẩm quyền | Yêu cầu ký/nộp thật thay hoặc tự xác nhận quan hệ pháp lý và bảo đảm duyệt (CP3-020, CP3-023). | Từ chối rõ việc ký/mạo danh/nộp ra hệ thống ngoài; không báo đã nộp chính thức. Chỉ cho phép nộp mô phỏng sau validation và xác nhận; với quan hệ pháp lý phải hướng dẫn xác minh tại cơ quan có thẩm quyền. | G1, G11; PAIR — Explainability + Trust |
 | ④ Đặc thù domain | Deadline, phí và căn cứ pháp lý là thông tin người dùng dễ tin và khó tự phát hiện khi sai (CP3-003, CP3-004, CP3-006, CP3-014, CP3-022). | Phải trả đúng fact trong snapshot và có citation; “Không quy định” không được biến thành một deadline; tiền đề phí sai phải bị bác bỏ bằng fact có nguồn. | G2, G11; PAIR — Explainability + Trust |
 | ④ Đặc thù domain | Gọi form bằng từ viết tắt/câu đời thường, cung cấp nhiều field, hoặc đổi từ form xây dựng sang khai sinh (CP3-008–CP3-015, CP3-025). | Chọn đúng `form_code`, không suy diễn field, không kẹt form cũ sau correction; chỉ được báo `submitted_simulation` khi công cụ thật sự trả biên nhận demo. | G5, G9, G12; PAIR — Feedback + Control |
+| Tấn công Agent/tool | Prompt injection yêu cầu bỏ chỉ dẫn, lộ system prompt/API key hoặc gọi submit không cần xác nhận; kể cả biến thể có ký tự Unicode ẩn. | Policy xác định chặn trước planner/tool; lượt đó không có tool ghi; dữ liệu form chứa chỉ dẫn hoặc secret bị blocking error; output lọc secret. | Least privilege; input guardrail; DLP; structured output |
+| Loop/replay/nhầm phạm vi | Tool bị gọi lặp không tiến triển; replay approval; sửa dữ liệu sau validation; tải PDF bằng session khác. | Dừng lần trả giống hệt thứ ba; giới hạn 12 call; approval dùng một lần/10 phút và gắn input hash; stale draft bị từ chối; artifact khác session trả 404. | Deterministic policy; scoped approval; session isolation |
 
 ## §6. Bốn đường đi của trải nghiệm
 
@@ -199,6 +204,8 @@ Mỗi case chỉ pass khi đạt **tất cả** assertion áp dụng; có citati
 | Giữ quyền kiểm soát/correction | Khi người dùng đổi ý, form mới phải thay form đang active; hệ thống không giữ kẹt ngữ cảnh cũ. |
 | Tính đầy đủ của phép đo | Mọi case, kể cả fail, phải có một dòng trong `results.jsonl` với input, response, metadata, latency và lý do pass/fail. |
 | Nộp mô phỏng có kiểm soát | Integration test phải chứng minh: cần xác nhận rõ; cần validation khớp dữ liệu và không có lỗi chặn; receipt có `simulation=true`, `official_submission=false`, mã `SPDVC-DEMO-*` và không chứa PII của form. |
+| Agent an toàn và dừng được | Planner chỉ trả tool thuộc allowlist và phải khớp form code; prompt injection/secret bị chặn; cùng tool + cùng result lần thứ ba phải dừng; tổng call không vượt 12. |
+| Approval/PDF/session | Approval phải hiển thị destination/purpose/field labels/effect, hết hạn và chỉ dùng một lần; PDF phải có chữ ký `%PDF-`, hash/size trong receipt, giới hạn 2 MiB và chỉ tải trong session tạo ra. |
 
 ### 7.2. Golden set
 
@@ -207,6 +214,7 @@ Mỗi case chỉ pass khi đạt **tất cả** assertion áp dụng; có citati
 - Độ phủ: 13 normal, 4 ambiguous, 2 not-in-source, 3 disallowed, 6 high-consequence, 7 form và 1 correction (các nhãn có thể giao nhau).
 - Mỗi lớp chỗ khó ở §5 có ≥2 case. Expected response và assertion được chốt trước lượt chạy đầu.
 - SHA-256 của `eval/cases.json` dùng cho cả ba lượt: `D44F8C83AF13BAF04E8AEB0CEA907EF327813ABB9B56CD67DE39D572132E3DFD`. Không giảm độ khó hoặc sửa expected output giữa các lượt.
+- Golden set đo quyết định sản phẩm toàn hệ thống (grounding, hỏi lại, safety, chọn form, điền field và correction), không chỉ retrieval. Bộ integration/API/UI riêng đo validation, AI review, Agent planner, approval, PDF, session isolation và frontend; bộ này bổ sung chứ không thay expected của golden set.
 
 
 ### 7.3. Quality bar
@@ -223,8 +231,9 @@ Quality bar được giữ nguyên sau lượt đo đầu. Một lượt có t�
 | 2 — retrieval + safety boundary | Bổ sung intent section/fallback retrieval; câu low-confidence nói rõ chưa thể xác minh; safety gate chặn hành động vượt thẩm quyền trước form routing | **24/25 (96%)** | Đạt | Còn CP3-021: matcher substring nhận nhầm “làm giấy tờ” thành “làm giả”. |
 | 3 — word-boundary regression fix | So khớp marker an toàn theo ranh giới từ và thêm unit test cho “làm giấy tờ cho con” | **25/25 (100%)** | Đạt | 0 fail; mọi nhóm scenario đều đạt 100%; không ghi nhận bịa nguồn/fact hoặc xác nhận hành động vượt thẩm quyền. |
 | 4 — submission simulation regression | Thêm tool nộp mô phỏng có validation, xác nhận và nhãn demo; không đổi golden set | **25/25 (100%)** | Đạt | Hash bộ case không đổi; safety case ký/nộp thật vẫn bị từ chối, form/correction và grounding không regression. |
+| 5 — bounded Agent + layered defense | Thêm lựa chọn chat/form, planner structured output, allowlist, approval gắn hash, PDF artifact theo session, loop guard, injection/DLP; không đổi golden set | **25/25 (100%)** | Đạt | Chạy thật GPT-4.1-mini qua SSE; 10/10 case quan sát đạt; không có hard-gate failure. |
 
-Artifact đầy đủ từng lượt nằm trong `eval/runs/run-01/` đến `eval/runs/run-04/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, toàn bộ backend **165 pass, 1 skip**, frontend **20/20 pass** và production build thành công.
+Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **177 pass, 1 skip**, frontend **25/25 pass** và production build thành công.
 
 Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp, grounding, chọn form, điền field, correction và safety), không phải chỉ retrieval. Luồng nộp mô phỏng là cổng hành động xác định, được kiểm riêng bằng integration/E2E để không thay đổi hoặc làm dễ golden set đã chốt.
 
@@ -248,3 +257,5 @@ Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp
 | 30/07/2026 | Đổi tên thành “Trợ lý chuẩn bị và kiểm tra hồ sơ dịch vụ công”; viết lại pain point và lát cắt theo flow hỏi đáp → form → validation → nộp mô phỏng. | Tránh tạo kỳ vọng hệ thống đã có ký số/API nộp thật; khớp prototype và nguyên tắc G1. |
 | 30/07/2026 | Thêm tool nộp mô phỏng qua chat và màn hình rà soát; yêu cầu validation khớp, không lỗi chặn và xác nhận rõ; receipt không sao chép PII. | Mở rộng happy path end-to-end nhưng giữ điều kiện cứng của CP3-019, CP3-020 và CP3-023. |
 | 30/07/2026 | Hoàn thiện §4b và tách golden set quyết định AI khỏi integration test của hành động mô phỏng. | Đáp ứng R2/R4; không sửa expected output hoặc giảm độ khó bộ 25 case đã chốt. |
+| 31/07/2026 | Thêm bounded Agent hai chế độ, structured planner, allowlist, loop guard, approval một lần, PDF artifact theo session và phòng thủ nhiều lớp; chạy lại toàn bộ eval/test. | Cho Agent chủ động trong phạm vi kiểm soát, chống injection/replay/loop trong demo mà không làm dễ golden set. |
+| 31/07/2026 | Render Markdown an toàn trong câu trả lời chat; hỗ trợ heading, list, bold/italic, inline code và link mà không dùng HTML injection. | Không còn hiển thị thô ký tự `*`, `**`, `#`; cải thiện khả năng đọc trong demo. |
