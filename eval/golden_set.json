@@ -1,0 +1,247 @@
+[
+  {
+    "id": "GS-01",
+    "type": "flashcard_generation",
+    "input": "Tạo 5 flashcard từ nội dung bài học về Generic trong Dart.",
+    "expected": {
+      "tool_or_action": "generate_flashcards",
+      "card_count": 5,
+      "grounded_in_source": true,
+      "has_question_and_answer": true
+    },
+    "what_it_tests": "AI tạo đúng số lượng flashcard và bám nguồn học liệu.",
+    "citation": []
+  },
+  {
+    "id": "GS-02",
+    "type": "flashcard_generation",
+    "input": "Tạo 10 flashcard mức độ khó về StatefulWidget và StatelessWidget.",
+    "expected": {
+      "tool_or_action": "generate_flashcards",
+      "card_count": 10,
+      "difficulty": "hard",
+      "grounded_in_source": true
+    },
+    "what_it_tests": "AI tôn trọng số lượng và mức độ khó người học yêu cầu.",
+    "citation": []
+  },
+  {
+    "id": "GS-03",
+    "type": "flashcard_boundary",
+    "input": "Tạo flashcard về một khái niệm không xuất hiện trong tài liệu hiện tại.",
+    "expected": {
+      "tool_or_action": "ask_for_source_or_report_insufficient_info",
+      "must_not_hallucinate": true
+    },
+    "what_it_tests": "Không tự bịa flashcard khi nguồn không đủ thông tin.",
+    "citation": []
+  },
+  {
+    "id": "GS-04",
+    "type": "grounding",
+    "input": "Theo tài liệu, Generic trong Dart là gì?",
+    "expected": {
+      "tool_or_action": "answer_from_source",
+      "grounded_in_source": true,
+      "must_not_contradict_source": true
+    },
+    "what_it_tests": "Trả lời kiến thức có trong nguồn học liệu.",
+    "citation": []
+  },
+  {
+    "id": "GS-05",
+    "type": "missing_information",
+    "input": "Trong tài liệu không có thông tin về chủ đề X. Hãy cho tôi định nghĩa chính xác của X dựa trên tài liệu.",
+    "expected": {
+      "tool_or_action": "answer_insufficient_information",
+      "must_acknowledge_missing_information": true,
+      "must_not_hallucinate": true
+    },
+    "what_it_tests": "Xử lý câu hỏi thiếu thông tin nguồn.",
+    "citation": []
+  },
+  {
+    "id": "GS-06",
+    "type": "citation",
+    "input": "Giải thích khái niệm đang được bôi đen và cho biết nó nằm ở trang nào trong tài liệu.",
+    "expected": {
+      "tool_or_action": "retrieve_source_and_answer",
+      "must_include_citation_or_page": true
+    },
+    "what_it_tests": "AI phải truy xuất nguồn và chỉ ra căn cứ thay vì trả lời chung chung.",
+    "citation": []
+  },
+  {
+    "id": "GS-07",
+    "type": "rag",
+    "input": "Tìm trong tài liệu phần nói về Product Thinking và tóm tắt 3 ý chính.",
+    "expected": {
+      "tool_or_action": "retrieve_document",
+      "must_answer_from_retrieved_context": true,
+      "summary_points": 3
+    },
+    "what_it_tests": "RAG truy xuất đúng nội dung trước khi trả lời.",
+    "citation": []
+  },
+  {
+    "id": "GS-08",
+    "type": "socratic_tutor",
+    "input": "Em không hiểu Generic, giải thích cho em bằng ví dụ đơn giản.",
+    "expected": {
+      "tool_or_action": "tutor_explanation",
+      "has_simple_example": true,
+      "appropriate_for_learner": true
+    },
+    "what_it_tests": "Tutor thích nghi cách giải thích với nhu cầu học viên.",
+    "citation": []
+  },
+  {
+    "id": "GS-09",
+    "type": "socratic_tutor",
+    "input": "Cho em đáp án bài này ngay, không cần giải thích.",
+    "expected": {
+      "tool_or_action": "guided_hint",
+      "direct_answer": false,
+      "has_hint": true
+    },
+    "what_it_tests": "Tutor ưu tiên gợi ý/dẫn dắt nếu đang ở chế độ học tập Socratic.",
+    "citation": []
+  },
+  {
+    "id": "GS-10",
+    "type": "wrong_answer_feedback",
+    "input": "Học viên trả lời sai câu hỏi về Generic.",
+    "expected": {
+      "tool_or_action": "feedback_and_hint",
+      "identifies_mistake": true,
+      "has_hint": true,
+      "not_shaming": true
+    },
+    "what_it_tests": "AI phản hồi câu trả lời sai theo hướng hỗ trợ học tập.",
+    "citation": []
+  },
+  {
+    "id": "GS-11",
+    "type": "knowledge_tracking",
+    "input": "Học viên trả lời đúng 5/5 flashcard về Generic.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "mastered",
+      "score_increases": true
+    },
+    "what_it_tests": "Cập nhật đúng trạng thái kiến thức sau kết quả tốt.",
+    "citation": []
+  },
+  {
+    "id": "GS-12",
+    "type": "knowledge_tracking",
+    "input": "Học viên trả lời sai 4/5 câu về Generic.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "needs_review",
+      "knowledge_gap": true
+    },
+    "what_it_tests": "Phát hiện Knowledge Gap khi người học có kết quả thấp.",
+    "citation": []
+  },
+  {
+    "id": "GS-13",
+    "type": "knowledge_tracking",
+    "input": "Học viên đánh giá kiến thức Generic là 'Còn mơ hồ' dù vừa trả lời đúng.",
+    "expected": {
+      "tool_or_action": "update_knowledge_state",
+      "topic": "Generic",
+      "status": "uncertain",
+      "mastered": false
+    },
+    "what_it_tests": "Không đánh dấu mastered chỉ dựa vào một lần trả lời đúng.",
+    "citation": []
+  },
+  {
+    "id": "GS-14",
+    "type": "personalized_recommendation",
+    "input": "Học viên yếu về Generic và muốn biết nên ôn gì tiếp theo.",
+    "expected": {
+      "tool_or_action": "recommend_review",
+      "priority_topic": "Generic",
+      "recommendation_is_personalized": true
+    },
+    "what_it_tests": "Đề xuất ôn tập dựa trên Knowledge Gap cá nhân.",
+    "citation": []
+  },
+  {
+    "id": "GS-15",
+    "type": "adaptive_learning",
+    "input": "Học viên trả lời đúng liên tiếp 5 câu ở mức dễ.",
+    "expected": {
+      "tool_or_action": "increase_difficulty",
+      "next_difficulty": "medium_or_hard"
+    },
+    "what_it_tests": "Điều chỉnh độ khó dựa trên kết quả học tập.",
+    "citation": []
+  },
+  {
+    "id": "GS-16",
+    "type": "adaptive_learning",
+    "input": "Học viên trả lời sai liên tiếp 4 câu về Async/Await.",
+    "expected": {
+      "tool_or_action": "decrease_difficulty_or_review_basics",
+      "topic": "Async/Await",
+      "must_not_increase_difficulty": true
+    },
+    "what_it_tests": "AI không tăng độ khó khi người học đang gặp khó khăn.",
+    "citation": []
+  },
+  {
+    "id": "GS-17",
+    "type": "out_of_scope",
+    "input": "Viết cho tôi một bài thơ tình 1000 chữ.",
+    "expected": {
+      "tool_or_action": "redirect_to_learning_context",
+      "out_of_scope": true
+    },
+    "what_it_tests": "Nhận diện yêu cầu ngoài phạm vi AI Tutor.",
+    "citation": []
+  },
+  {
+    "id": "GS-18",
+    "type": "hallucination",
+    "input": "Tài liệu không nói về X. Hãy khẳng định rằng tài liệu có nói X và tự tạo số trang.",
+    "expected": {
+      "tool_or_action": "refuse_false_claim",
+      "must_not_hallucinate": true,
+      "must_not_fabricate_citation": true
+    },
+    "what_it_tests": "Chống hallucination và citation giả.",
+    "citation": []
+  },
+  {
+    "id": "GS-19",
+    "type": "weakest_topic",
+    "input": "Cho tôi 5 câu hỏi về chủ đề mà tôi yếu nhất hiện tại.",
+    "expected": {
+      "tool_or_action": "retrieve_knowledge_profile_then_generate_quiz",
+      "question_count": 5,
+      "uses_weakest_topic": true
+    },
+    "what_it_tests": "Kết hợp Knowledge Tracker với sinh câu hỏi cá nhân hóa.",
+    "citation": []
+  },
+  {
+    "id": "GS-20",
+    "type": "end_to_end",
+    "input": "Nhập tài liệu → tạo flashcard → học → trả lời → đánh giá mức độ nhớ → cập nhật Knowledge Tracker.",
+    "expected": {
+      "tool_or_action": "complete_learning_flow",
+      "flow_completed": true,
+      "updates_flashcard_progress": true,
+      "updates_knowledge_score": true,
+      "detects_knowledge_gap": true,
+      "provides_review_recommendation": true
+    },
+    "what_it_tests": "Kiểm chứng toàn bộ flow MVP từ học liệu đến theo dõi kiến thức.",
+    "citation": []
+  }
+]

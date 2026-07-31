@@ -1,0 +1,98 @@
+[
+  {
+    "id": "fc-001",
+    "lesson_id": "day-1",
+    "lesson_title": "Day 1: AI & LLM Foundation",
+    "topic": "Khái niệm LLM & Hallucination",
+    "question": "Hallucination (hiện tượng 'ảo giác') trong các Mô hình Ngôn ngữ Lớn (LLM) là gì và vì sao nó xảy ra?",
+    "hint": "Nghĩ về cách LLM dự đoán từ tiếp theo dựa trên xác suất chứ không thực sự 'hiểu' hay tra cứu CSDL tĩnh.",
+    "answer": "Hallucination là hiện tượng LLM tạo ra thông tin trông có vẻ rất thuyết phục và tự tin nhưng thực chất hoàn toàn vô căn cứ hoặc sai sự thật. Nguyên nhân do LLM hoạt động dựa trên mô hình xác suất thống kê để dự đoán từ tiếp theo (next-token prediction) từ dữ liệu đã học, không có cơ chế tự xác minh tính đúng đắn thời gian thực.",
+    "citation": "[T01-015]",
+    "transcript_snippet": "[T01-015] Giảng viên: LLM bản chất là một cỗ máy dự đoán từ tiếp theo. Khi nó không có đủ ngữ cảnh hoặc thông tin trong prompt, nó sẽ 'đoán' từ có xác suất cao nhất. Đó là lý do hallucination xảy ra — nó tự tin nói sai vì mục tiêu của nó là hoàn thành câu văn chứ không phải kiểm tra sự thật.",
+    "difficulty": "Cơ bản"
+  },
+  {
+    "id": "fc-002",
+    "lesson_id": "day-1",
+    "lesson_title": "Day 1: AI & LLM Foundation",
+    "topic": "Phân biệt Augment vs Automate",
+    "question": "Sự khác biệt cốt lõi giữa hai hướng thiết kế sản phẩm AI: Augment (Gia tăng khả năng) và Automate (Tự động hoá) là gì?",
+    "hint": "Xem xét ai là người đưa ra quyết định cuối cùng và chi phí khi xảy ra lỗi (cost-of-error).",
+    "answer": "Augment là hướng AI đóng vai trò gợi ý/trợ lý, người dùng giữ quyền duyệt và ra quyết định cuối cùng (phù hợp khi cost-of-error cao). Automate là hướng AI tự động thực thi toàn bộ quy trình mà không cần con người can thiệp giữa chừng (phù hợp khi cost-of-error thấp hoặc dễ đảo ngược).",
+    "citation": "[T01-042]",
+    "transcript_snippet": "[T01-042] Giảng viên: Hãy nhớ quy tắc cost-of-error. Nếu AI sai mà hậu quả đắt (như ra quyết định y tế, chấm điểm học viên), hãy chọn Augment. Nếu AI sai mà sửa rất rẻ (như gợi ý tiêu đề, tự động sinh chapter video), bạn hoàn toàn có thể chọn Automate.",
+    "difficulty": "Trọng tâm"
+  },
+  {
+    "id": "fc-003",
+    "lesson_id": "day-1",
+    "lesson_title": "Day 1: AI & LLM Foundation",
+    "topic": "Kỹ thuật RAG (Retrieval-Augmented Generation)",
+    "question": "Kỹ thuật RAG giải quyết điểm yếu nào của LLM và nguyên lý hoạt động cơ bản của nó là gì?",
+    "hint": "Liên tưởng đến việc cho LLM 'mở sách tra cứu' (open-book exam) trước khi trả lời.",
+    "answer": "RAG giải quyết điểm yếu về tri thức lỗi thời và hallucination của LLM bằng cách trích xuất (Retrieve) các đoạn thông tin liên quan nhất từ CSDL/tài liệu uy tín của doanh nghiệp, sau đó đưa vào ngữ cảnh (Prompt) để LLM tổng hợp (Generate) câu trả lời có trích dẫn nguồn rõ ràng.",
+    "citation": "[T01-088]",
+    "transcript_snippet": "[T01-088] Giảng viên: RAG giống như biến thi đóng sách (closed-book) thành thi mở sách (open-book). Thay vì bắt LLM nhớ hết mọi thông tin trong tham số, ta tìm đúng trang sách cần thiết và bắt nó trả lời dựa trên trang sách đó.",
+    "difficulty": "Trọng tâm"
+  },
+  {
+    "id": "fc-004",
+    "lesson_id": "day-1",
+    "lesson_title": "Day 1: AI & LLM Foundation",
+    "topic": "Nguyên tắc HAX G2",
+    "question": "Nguyên tắc HAX G2 ('Make clear how well the system can do what it can do') được ứng dụng như thế nào trong giao diện AI Tutor?",
+    "hint": "Liên quan đến độ tin cậy, trích dẫn nguồn và lời cảnh báo giới hạn của AI.",
+    "answer": "HAX G2 yêu cầu sản phẩm AI phải làm rõ mức độ tin cậy của câu trả lời. Ví dụ: AI Tutor hiển thị chính xác mã trích dẫn đoạn bài giảng [Txx-NNN], cảnh báo khi thông tin không có trong tài liệu hoặc ghi rõ mức độ tự tin của AI để người dùng không tin tưởng mù quáng.",
+    "citation": "[T01-112]",
+    "transcript_snippet": "[T01-112] Giảng viên: Đừng để user kỳ vọng AI là vạn năng. HAX G2 nhắc chúng ta phải hiển thị rõ căn cứ. Khi user thấy [T01-042], họ biết AI nói có sách mách có chứng chứ không phải phét.",
+    "difficulty": "Nâng cao"
+  },
+  {
+    "id": "fc-005",
+    "lesson_id": "day-1",
+    "lesson_title": "Day 1: AI & LLM Foundation",
+    "topic": "JTBD (Jobs-To-Be-Done)",
+    "question": "Theo framework JTBD, một 'Job Statement' chuẩn phải tuân theo cấu trúc nào và tại sao không được chứa tên công nghệ AI?",
+    "hint": "Cấu trúc Verb + Object + Context. Bỏ AI đi thì công việc đó có còn tồn tại?",
+    "answer": "Job Statement chuẩn có cấu trúc 'Động từ + Đối tượng + Bối cảnh'. Không chứa chữ 'AI' vì nhu cầu cốt lõi của người dùng tồn tại độc lập với công nghệ. AI chỉ là giải pháp (enabler), không phải bản thân công việc mà người dùng cần hoàn thành.",
+    "citation": "[T01-145]",
+    "transcript_snippet": "[T01-145] Giảng viên: Nếu bỏ chữ AI ra mà công việc của học viên biến mất, tức là bạn đang tìm chỗ nhét AI chứ không phải giải quyết một bài toán thật. Nhu cầu ôn bài luôn tồn tại dù có AI hay không.",
+    "difficulty": "Trọng tâm"
+  },
+  {
+    "id": "fc-006",
+    "lesson_id": "day-2",
+    "lesson_title": "Day 2: Xác Định Bài Toán AI & Lát Cắt Prototype",
+    "topic": "Format Lát cắt MỘT CÂU",
+    "question": "Lát cắt MỘT CÂU (One-sentence slice) của bài toán AI Product phải bao gồm 4 thành tố bắt buộc nào?",
+    "hint": "1 user, 1 việc, 1 quyết định AI, 1 kết quả.",
+    "answer": "Lát cắt MỘT CÂU bao gồm: (1) Một người dùng cụ thể (User) -> (2) Một công việc cần làm (Job) -> (3) Một quyết định AI trung tâm (AI Decision) -> (4) Một kết quả đo lường được (Outcome).",
+    "citation": "[T02-020]",
+    "transcript_snippet": "[T02-020] Giảng viên: Lát cắt là thứ nhỏ nhất bạn có thể build và demo trong 5 phút. Hãy nhớ format: 1 người dùng, 1 việc, 1 quyết định AI, 1 kết quả. Đừng tham build cả hệ thống lớn.",
+    "difficulty": "Cơ bản"
+  },
+  {
+    "id": "fc-007",
+    "lesson_id": "day-2",
+    "lesson_title": "Day 2: Xác Định Bài Toán AI & Lát Cắt Prototype",
+    "topic": "4 Lớp Chỗ Khó (Taxonomy)",
+    "question": "Liệt kê 4 lớp chỗ khó trong taxonomy thiết kế AI Product và cho ví dụ lớp ① 'Nguồn sự thật'.",
+    "hint": "① Nguồn sự thật, ② Mơ hồ/Thiếu thông tin, ③ Ngoài phạm vi/Thẩm quyền, ④ Đặc thù domain.",
+    "answer": "4 lớp chỗ khó: ① Nguồn sự thật (Ground truth/Hallucination), ② Mơ hồ / Thiếu thông tin, ③ Ngoài phạm vi / Thẩm quyền, ④ Đặc thù domain. Ví dụ lớp ①: AI bịa ra kiến thức hoặc câu trả lời không có trong transcript bài giảng.",
+    "citation": "[T02-055]",
+    "transcript_snippet": "[T02-055] Giảng viên: 4 lớp chỗ khó là bản đồ rủi ro của AI Product. Nguồn sự thật là nơi AI dễ bốc phét nhất nếu bạn không kềm chế nó bằng RAG và Grounding.",
+    "difficulty": "Trọng tâm"
+  },
+  {
+    "id": "fc-008",
+    "lesson_id": "day-2",
+    "lesson_title": "Day 2: Xác Định Bài Toán AI & Lát Cắt Prototype",
+    "topic": "Cost-of-Error & Chuyển giao",
+    "question": "Thế nào là 'Conditional Automation' và khi nào sản phẩm nên áp dụng mức độ này?",
+    "hint": "AI tự làm case chắc chắn, chuyển con người (TA/Teacher) khi AI không chắc hoặc thiếu dữ liệu.",
+    "answer": "Conditional Automation là mức độ mà AI sẽ tự động xử lý các trường hợp có độ tự tin cao và đầy đủ dữ liệu; khi phát hiện trường hợp mơ hồ hoặc thiếu căn cứ, AI sẽ chủ động chuyển giao cho con người (chuyển TA hoặc yêu cầu học viên kiểm tra lại). Áp dụng khi môi trường có rủi ro trung bình.",
+    "citation": "[T02-092]",
+    "transcript_snippet": "[T02-092] Giảng viên: Biết mình không biết là phẩm chất quan trọng nhất của AI Tutor. Khi thiếu thông tin, thà chuyển TA trả lời còn hơn đoán liều làm học viên hiểu sai kiến thức.",
+    "difficulty": "Nâng cao"
+  }
+]

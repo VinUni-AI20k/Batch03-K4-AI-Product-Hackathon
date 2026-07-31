@@ -37,6 +37,13 @@
 
 Mỗi mốc cần show gì và được xác minh thế nào: xem bảng trong `04-rubric.md`.
 
+## Thành viên nhóm & Phân công
+
+- **Nguyễn Thế Hân** (Product Lead & Lead Frontend): Xây dựng `spec.md`, phát triển giao diện Web Prototype interactive (`codebase/src`), hiệu ứng lật thẻ Flashcard 3D.
+- **Thành viên 2** (AI & RAG Engineer): Thiết kế Prompt System, tích hợp Google Gemini API call & trích xuất mã transcript bài giảng `[Txx-NNN]`.
+- **Thành viên 3** (Data & Eval Specialist): khai thác chatlog VLearn, xây dựng 20 Golden set test cases (`eval/`).
+- **Thành viên 4** (User Validation & Demo Lead): Thực hiện User Test (`validation/`), tổng hợp feedback và chuẩn bị Slide Demo (`demo-slides.pdf`).
+
 ## Nộp bài
 
 Một repo nhóm, cấu trúc như sau. Spec chốt tại hạn chốt spec của khoá mình (xem Lịch); bản hoàn chỉnh trước CP6.

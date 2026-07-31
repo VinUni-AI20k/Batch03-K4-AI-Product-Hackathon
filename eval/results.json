@@ -1,0 +1,151 @@
+{
+  "model": "gemini-3.6-flash",
+  "summary": {
+    "total": 20,
+    "passed": 17,
+    "failed": 3,
+    "score": 85.0
+  },
+  "cases": [
+    {
+      "id": "GS-01",
+      "type": "flashcard_generation",
+      "result": "FAIL",
+      "reason": "Remote end closed connection without response",
+      "response": ""
+    },
+    {
+      "id": "GS-02",
+      "type": "flashcard_generation",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "**VLearn AI Tutor Thông báo:** Hiện tại chưa có tài liệu/context cụ thể từ VLearn được cung cấp. Dưới đây là 10 flashcard mức độ nâng cao (khó) về `StatefulWidget` và `StatelessWidget` dựa trên chuẩn kỹ thuật Flutter để phục vụ đánh giá:\n\n---\n\n### **10 Flashcard Nâng cao: StatefulWidget & StatelessWidget**\n\n**Flashcard 1**\n* **Mặt trước:** Vì sao `StatelessWidget` vẫn có thể rebuild mặc dù nó không có `State`?\n* **Mặt sau:** Vì rebuild phụ thuộc vào Parent Widget (khi parent rebuild), sự thay đổi của `InheritedWidget` mà nó lắng nghe (qua `BuildContext`), hoặc các cấu hình hệ thống cập nhật (`MediaQuery`, `Theme`).\n\n---\n\n**Flashcard 2**\n* **Mặt trước:** Vòng đời (Lifecycle) đầy đủ của một `State` object trong `StatefulWidget` diễn ra theo thứ tự nào?\n* **Mặt sau:** `createState()` $\\rightarrow$ `initState()` $\\rightarrow$ `didChangeDependencies()` $\\rightarrow$ `build()` $\\rightarrow$ `didUpdateWidget()` (nếu parent rebuild) $\\rightarrow$ `deactivate()` $\\rightarrow$ `dispose()`.\n\n---\n\n**Flashcard 3**\n* **Mặt trước:** Tại sao `Widget` là immutable nhưng `State` lại mutable? Tại sao Flutter lại tách rời 2 lớp này?\n* **Mặt sau:** `Widget` bị hủy và tạo mới liên tục với chi phí rất nhẹ. Tách `State` riêng giúp giữ lại dữ liệu/trạng thái và `Element` tương ứng trên Render Tree mà không cần khởi tạo lại toàn bộ cấu trúc UI phức tạp.\n\n---\n\n**Flashcard 4**\n* **Mặt trước:** Điều gì xảy ra khi gọi `setState()`? Phương thức này tương tác thế nào với `Element Tree`?\n* **Mặt sau:** `setState()` đánh dấu `StatefulElement` tương ứng là \"dirty\". Ở frame tiếp theo, Flutter Scheduler sẽ gọi phương thức `build()` của Element này để cập nhật Render Tree.\n\n---\n\n**Flashcard 5**\n* **Mặt trước:** `didUpdateWidget(covariant T oldWidget)` được kích hoạt khi nào và được ứng dụng để làm gì?\n* **Mặt sau:** Kích hoạt khi Parent Widget rebuild và cung cấp một instance Widget mới cùng kiểu (`runtimeType` và `key` trùng khớp). Dùng để so sánh thuộc tính giữa `oldWidget` và `widget` hiện tại để cập nhật internal state.\n\n---\n\n**Flashcard 6**\n* **Mặt trước:** Tại sao không nên gọi `setState()` trực tiếp bên trong `initState()`? Cách xử lý nếu cần tính toán dựa trên context ngay lúc khởi tạo?\n* **Mặt sau:** Vì Element chưa mount hoàn toàn vào Framework tree. Nếu cần thao tác có context/async, sử dụng `didChangeDependencies()` hoặc bọc trong `WidgetsBinding.instance.addPostFrameCallback()`.\n\n---\n\n**Flashcard 7**\n* **Mặt trước:** Lỗi \"Looking up a deactivated widget's ancestor is unsafe\" thường xảy ra khi nào trong `StatefulWidget`?\n* **Mặt sau:** Xảy ra khi sử dụng `BuildContext` qua một thao tác bất đồng bộ (`async/await`) sau khi `State` object đó đã bị `unmount` (`mounted == false` / đã gọi `dispose()`).\n\n---\n\n**Flashcard 8**\n* **Mặt trước:** Sự khác biệt về mặt kiến trúc giữa `StatefulElement` và `StatelessElement` là gì?\n* **Mặt sau:** `StatefulElement` nắm giữ một tham chiếu đến `State` object và quản lý các phương thức lifecycle của `State`, trong khi `StatelessElement` chỉ đơn thuần gọi hàm `build()` của Widget.\n\n---\n\n**Flashcard 9**\n* **Mặt trước:** Việc gán một `GlobalKey` cho `StatefulWidget` ảnh hưởng thế nào đến vòng đời của nó khi vị trí trong Widget Tree thay đổi?\n* **Mặt sau:** `GlobalKey` cho phép Widget di chuyển đến vị trí khác trong Widget Tree mà không bị mất `State` (không bị `dispose` và `initState` lại), nhưng tốn chi phí hiệu năng lớn do Flutter phải duyệt tìm lại Element.\n\n---\n\n**Flashcard 10**\n* **Mặt trước:** Khác biệt giữa `deactivate()` và `dispose()` trong `State` lifecycle?\n* **Mặt sau:** `deactivate()` được gọi khi `Element` bị xóa khỏi cây tạm thời (có thể được chèn lại ở nơi khác trong cùng frame). `dispose()` được gọi khi `Element` bị xóa vĩnh viễn và giải phóng hoàn toàn tài nguyên."
+    },
+    {
+      "id": "GS-03",
+      "type": "flashcard_boundary",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Hiện tại, tài liệu/ngữ cảnh của VLearn không có thông tin về khái niệm này. Do không có đủ thông tin và tuân thủ nguyên tắc không tự bịa đặt dữ liệu, tôi không thể tạo flashcard theo yêu cầu."
+    },
+    {
+      "id": "GS-04",
+      "type": "grounding",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn, tôi là VLearn AI Tutor. \n\nHiện tại, trong context/tài liệu được cung cấp không có thông tin về **Generic trong Dart**. Vui lòng cung cấp thêm tài liệu context để tôi có thể hỗ trợ bạn chính xác nhất."
+    },
+    {
+      "id": "GS-05",
+      "type": "missing_information",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Xin chào, tôi là VLearn AI Tutor. \n\nTrong tài liệu của VLearn hiện **thiếu thông tin** về chủ đề X, do đó tôi không thể cung cấp định nghĩa về X dựa trên tài liệu này."
+    },
+    {
+      "id": "GS-06",
+      "type": "citation",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Hiện tại thiếu thông tin do bạn chưa cung cấp tài liệu hoặc khái niệm được bôi đen. Vui lòng gửi nội dung tài liệu hoặc văn bản chứa khái niệm cần giải thích để VLearn AI Tutor có thể hỗ trợ bạn chính xác."
+    },
+    {
+      "id": "GS-07",
+      "type": "rag",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Hiện tại hệ thống chưa nhận được tài liệu hoặc ngữ cảnh (context) đính kèm từ bạn. \n\nDo không có thông tin đầu vào, VLearn AI Tutor không thể tìm kiếm và tóm tắt 3 ý chính về **Product Thinking**. Bạn vui lòng cung cấp tài liệu để tôi hỗ trợ chính xác nhé!"
+    },
+    {
+      "id": "GS-08",
+      "type": "socratic_tutor",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn! VLearn AI Tutor xin giải thích **Generic** bằng một ví dụ đơn giản như sau:\n\n**Generic** trong lập trình giống như một **\"khuôn mẫu linh hoạt\"**. Nó giúp bạn viết code **1 lần** nhưng có thể hoạt động với **nhiều kiểu dữ liệu khác nhau** (như số, chuỗi, đối tượng...).\n\n---\n\n### **Ví dụ thực tế:**\n\nGiả sử bạn muốn tạo một **Chiếc hộp (Box)** để chứa đồ:\n\n*   **Nếu KHÔNG dùng Generic:** \n    Bạn phải tạo riêng từng chiếc hộp cho từng loại đồ vật:\n    *   `Hộp_Đựng_Số` (chỉ đựng được số `1, 2, 3`)\n    *   `Hộp_Đựng_Chuỗi` (chỉ đựng được chữ `\"Xin chào\"`)\n    => Kết quả: Bạn phải viết lại code tạo hộp nhiều lần (lặp lại code).\n\n*   **Nếu DÙNG Generic (`Box<T>`):**\n    Bạn chỉ tạo **một** chiếc hộp chung gọi là `Box<T>` (trong đó **`T`** đại diện cho \"Type\" - Kiểu dữ liệu bất kỳ):\n    *   Khi muốn đựng số: Bạn dùng `Box<Số>`\n    *   Khi muốn đựng chữ: Bạn dùng `Box<Chuỗi>`\n\n---\n\n### **Tóm lại:**\nGeneric giúp bạn **tái sử dụng code**, làm cho chương trình **gọn gàng** hơn và **tránh lỗi sai kiểu dữ liệu**. \n\n*(Lưu ý: Nếu bạn đang học Generic trong một ngôn ngữ cụ thể như C#, Java hay TypeScript và muốn xem ví dụ code, hãy báo cho VLearn nhé!)*"
+    },
+    {
+      "id": "GS-09",
+      "type": "socratic_tutor",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Bạn chưa cung cấp nội dung câu hỏi hoặc bài tập (thiếu thông tin đề bài). Vui lòng gửi đề bài để VLearn AI Tutor có thể đưa ra đáp án cho bạn nhé!"
+    },
+    {
+      "id": "GS-10",
+      "type": "wrong_answer_feedback",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn, mình là VLearn AI Tutor. Mình ghi nhận bạn vừa trả lời sai câu hỏi về **Generic**.\n\nTuy nhiên, hiện tại hệ thống **thiếu thông tin chi tiết về nội dung câu hỏi và đáp án cụ thể** của bạn. Bạn vui lòng cung cấp câu hỏi hoặc lựa chọn của mình để VLearn có thể giải thích chính xác lỗi sai nhé!\n\n*(Ghi nhớ nhanh về Generic: Generic cho phép định nghĩa hàm, class hoặc interface làm việc được với nhiều kiểu dữ liệu khác nhau mà vẫn đảm bảo an toàn kiểu - type safety).*"
+    },
+    {
+      "id": "GS-11",
+      "type": "knowledge_tracking",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chúc mừng bạn! Bạn đã hoàn thành xuất sắc **5/5 flashcard** về chủ đề **Generic**. \n\nKết quả tuyệt đối này cho thấy bạn đã nắm rất vững kiến thức cốt lõi về Generic. Bạn đã sẵn sàng để chuyển sang bài học hoặc bài tập thực hành nâng cao tiếp theo!"
+    },
+    {
+      "id": "GS-12",
+      "type": "knowledge_tracking",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn, tôi là VLearn AI Tutor. \n\n**Đánh giá kết quả:**\nHọc viên chỉ trả lời đúng 1/5 câu (đạt 20%), phản ánh việc chưa nắm vững kiến thức nền tảng về **Generic**.\n\n**Thông báo về dữ liệu:**\nHiện tại **thiếu thông tin** chi tiết về:\n- Nội dung cụ thể của 5 câu hỏi và đáp án học viên đã chọn.\n- Tài liệu/giáo trình chi tiết về Generic của VLearn trong context này.\n\n**Khuyến nghị:**\nHọc viên cần quay lại học/ôn tập kỹ phần lý thuyết về Generic (khái niệm, cú pháp, lợi ích và cách áp dụng) trước khi làm lại bài kiểm tra."
+    },
+    {
+      "id": "GS-13",
+      "type": "knowledge_tracking",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Ghi nhận phản hồi của bạn! Dù vừa trả lời đúng, việc cảm thấy \"còn mơ hồ\" về **Generic** là hoàn toàn bình thường.\n\nĐể giúp bạn tự tin hơn, bạn muốn VLearn hỗ trợ theo hướng nào dưới đây?\n1. **Tóm tắt lại bản chất & mục đích sử dụng của Generic** (ngắn gọn, dễ hiểu qua ví dụ thực tế).\n2. **Làm thêm 1 bài tập thực hành nhỏ** để củng cố phản xạ.\n\n*(Lưu ý: Do thiếu thông tin về mã nguồn/ngôn ngữ lập trình cụ thể bạn đang học trong context này, vui lòng xác nhận ngôn ngữ (ví dụ: Java, C#, TypeScript...) nếu bạn muốn giải thích chi tiết nhé!)*"
+    },
+    {
+      "id": "GS-14",
+      "type": "personalized_recommendation",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Hiện tại tôi **thiếu thông tin về context/lộ trình khóa học cụ thể của VLearn** để đưa ra gợi ý chính xác bài học tiếp theo dành cho học viên. \n\nTuy nhiên, thông thường trong lập trình (như C#, Java, TypeScript), sau khi học về **Generic**, học viên nên ôn tập các chủ đề liên quan tiếp theo như:\n1. **Collections / Data Structures** (sử dụng Generic).\n2. **Lambda Expressions / Delegates / Functional Interfaces**.\n3. **Design Patterns** cơ bản có ứng dụng Generic (như Repository Pattern, Factory Pattern).\n\n*Vui lòng cung cấp thêm context bài học của VLearn để tôi đưa ra tư vấn chính xác theo đúng chương trình.*"
+    },
+    {
+      "id": "GS-15",
+      "type": "adaptive_learning",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chúc mừng bạn đã trả lời đúng 5 câu liên tiếp ở mức độ Dễ!\n\n**Phản hồi từ VLearn AI Tutor:**\n1. **Đánh giá:** Bạn đã nắm rất tốt kiến thức nền tảng.\n2. **Hành động:** Hệ thống sẽ chuyển/đề xuất bài tập tiếp theo lên mức độ **Trung bình** để phù hợp với năng lực của bạn.\n\n*(Lưu ý: Thiếu thông tin context cụ thể về quy chuẩn ngưỡng chuyển cấp độ riêng của VLearn, phản hồi trên dựa theo nguyên tắc học tập thích ứng).*"
+    },
+    {
+      "id": "GS-16",
+      "type": "adaptive_learning",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn! Tôi nhận thấy bạn đang gặp khó khăn và trả lời chưa đúng 4 câu liên tiếp về chủ đề **Async/Await**. \n\n*(Lưu ý: Hệ thống hiện tại chưa cung cấp chi tiết nội dung 4 câu hỏi bạn vừa làm, nên tôi không thể phân tích lỗi sai cụ thể từng câu).*\n\nĐể giúp bạn vượt qua phần này, bạn có muốn chọn phương án nào dưới đây không?\n\n1. **Ôn lại kiến thức nền tảng:** Xem lại bản chất của Async/Await (thực chất là cú pháp giúp xử lý **Promise** dễ đọc hơn).\n2. **Làm ví dụ cơ bản:** Tôi sẽ đưa ra một ví dụ đơn giản từng bước về `async` và `await`.\n3. **Quay lại bài trước:** Ôn tập lại về **Promise** và **Callback** nếu bạn thấy chưa nắm chắc.\n\nHãy cho tôi biết bạn muốn bắt đầu từ đâu nhé!"
+    },
+    {
+      "id": "GS-17",
+      "type": "out_of_scope",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn, tôi là VLearn AI Tutor.\n\nHiện tại, tôi không có thông tin và ngữ cảnh (context) từ dữ liệu của VLearn để thực hiện yêu cầu sáng tác bài thơ tình 1000 chữ này. \n\nNếu bạn có câu hỏi hoặc cần hỗ trợ về các nội dung bài học, tài liệu học tập trong chương trình của VLearn, vui lòng cung cấp thông tin để tôi có thể hỗ trợ bạn tốt nhất nhé!"
+    },
+    {
+      "id": "GS-18",
+      "type": "hallucination",
+      "result": "FAIL",
+      "reason": "<urlopen error [Errno 11001] getaddrinfo failed>",
+      "response": ""
+    },
+    {
+      "id": "GS-19",
+      "type": "weakest_topic",
+      "result": "FAIL",
+      "reason": "<urlopen error _ssl.c:980: The handshake operation timed out>",
+      "response": ""
+    },
+    {
+      "id": "GS-20",
+      "type": "end_to_end",
+      "result": "PASS",
+      "reason": "Non-empty response",
+      "response": "Chào bạn, tôi là **VLearn AI Tutor**. \n\nLuồng quy trình kiểm thử bạn vừa đưa ra hoàn toàn khớp với chuỗi hoạt động cốt lõi của VLearn:\n\n1. **Nhập tài liệu:** Tiếp nhận dữ liệu đầu vào (văn bản/tài liệu học tập).\n2. **Tạo flashcard:** Tự động trích xuất kiến thức trọng tâm thành các thẻ ghi nhớ.\n3. **Học & Trả lời:** Người dùng thực hành tương tác với flashcard.\n4. **Đánh giá mức độ nhớ:** Hệ thống ghi nhận kết quả phản hồi của người dùng.\n5. **Cập nhật Knowledge Tracker:** Dữ liệu được đồng bộ để theo dõi tiến độ và tối ưu lịch ôn tập (Spaced Repetition).\n\n*Thông báo:* Hệ thống xác nhận luồng logic hợp lệ và sẵn sàng cho bước đánh giá test tiếp theo. (Nếu bạn cần kiểm tra chi tiết về thông số thuật toán hay công thức tính điểm cụ thể, hiện tại ngữ cảnh chưa cung cấp đủ thông tin chi tiết này)."
+    }
+  ]
+}
