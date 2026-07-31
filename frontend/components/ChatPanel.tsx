@@ -117,7 +117,7 @@ export default function ChatPanel() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <LearningProgressCard />
+        <LearningProgressCard currentIndex={sectionIndex} />
         <AskPanel />
       </div>
     </div>
