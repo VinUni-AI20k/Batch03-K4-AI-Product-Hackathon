@@ -16,6 +16,11 @@ ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+CODEBASE = PROJECT_ROOT / "codebase"
+if str(CODEBASE) not in sys.path:
+    sys.path.insert(0, str(CODEBASE))
+    
+from llm import call_openai_api
 
 from eval.metrics import bleu, exact_match, json_serializable, keyword_recall, percentile, rouge_l, set_scores
 
@@ -55,6 +60,28 @@ def _boolean_check(result: dict[str, Any], key: str, expected: bool) -> float:
     return float(bool(result.get(key)) is bool(expected))
 
 
+def llm_judge(prompt: str, answer: str, rubric: str) -> float:
+    sys_prompt = (
+        "Bạn là giám khảo AI. Hãy đánh giá xem 'Câu trả lời của Agent' có đáp ứng được 'Tiêu chí chấm (Rubric)' "
+        "dựa trên 'Yêu cầu của User' hay không.\n"
+        "Chỉ trả về ĐÚNG 1 KÝ TỰ SỐ: '1' nếu đạt, '0' nếu không đạt."
+    )
+    user_prompt = (
+        f"Yêu cầu của User:\n{prompt}\n\n"
+        f"Tiêu chí chấm (Rubric):\n{rubric}\n\n"
+        f"Câu trả lời của Agent:\n{answer}\n\n"
+        f"Đánh giá của bạn (1/0):"
+    )
+    try:
+        score_text, _ = call_openai_api(f"{sys_prompt}\n\n{user_prompt}")
+        if "1" in score_text:
+            return 1.0
+        return 0.0
+    except Exception as e:
+        print(f"LLM Judge error: {e}")
+        return 0.0
+
+
 def score_case(case: dict[str, Any], result: dict[str, Any], latency_ms: float, error: str | None) -> dict[str, Any]:
     expected = case.get("expected", {})
     answer = str(result.get("answer", ""))
@@ -66,15 +93,22 @@ def score_case(case: dict[str, Any], result: dict[str, Any], latency_ms: float, 
         metrics["exact_match"] = exact_match(str(expected["exact"]), answer)
         required.append("exact_match")
         thresholds.setdefault("exact_match", 1.0)
+        
+    is_generative = case.get("suite") in ("quiz_generation", "lesson_qa", "socratic_agent")
+    
     if expected.get("keywords") is not None:
         metrics["keyword_recall"] = round(keyword_recall(answer, expected["keywords"]), 4)
-        required.append("keyword_recall")
+        if not is_generative:
+            required.append("keyword_recall")
+            
     if expected.get("reference_answer"):
         reference = str(expected["reference_answer"])
         metrics["bleu"] = bleu(reference, answer)
         metrics["rouge_l"] = rouge_l(reference, answer)
-        # Lexical similarity is diagnostic by default; opt into gating with required_metrics.
-
+        if is_generative:
+            metrics["llm_judge"] = llm_judge(case.get("input", ""), answer, reference)
+            required.append("llm_judge")
+            thresholds.setdefault("llm_judge", 1.0)
     if "expected_citations" in case:
         citation = set_scores(case["expected_citations"], result.get("citations", []))
         metrics.update({f"citation_{key}": value for key, value in citation.items()})
