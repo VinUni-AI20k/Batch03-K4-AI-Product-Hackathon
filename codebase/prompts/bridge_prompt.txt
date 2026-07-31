@@ -1,0 +1,7 @@
+# BRIDGE PROMPT TEMPLATE
+
+Hãy so sánh nội dung {PREVIOUS_DAY_CODE} và {NEXT_DAY_CODE}.
+Tìm ra 2–4 điểm liên kết kiến thức quan trọng nhất:
+1. Khái niệm ở {PREVIOUS_DAY_CODE} (kèm cite [slide X]).
+2. Được áp dụng / mở rộng thế nào ở {NEXT_DAY_CODE} (kèm cite [slide Y]).
+3. Giải thích ngắn gọn lý do logic tại sao kiến thức cũ là nền tảng cho kiến thức mới.
