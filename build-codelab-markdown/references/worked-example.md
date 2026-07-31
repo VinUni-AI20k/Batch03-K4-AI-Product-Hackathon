@@ -13,11 +13,14 @@ Ví dụ dưới đây lấy từ một lab dạng fill-in-có-test: learner đi
 - `**Lưu ý:** Nhớ import OpenAI bên trong hàm nhé!` → không nói vì sao, học viên import đầu file, test gọi API thật, fail.
 - `- [X] Hiểu về LLM API` → tick sẵn, và không verify được.
 - `[file này](file:///c:/Users/Admin/Documents/...)` → chết trên mọi máy trừ máy coach.
+- Không có mốc thời gian ở đâu → học viên làm tới phút 90 mới biết mình đáng lẽ phải xong step 2 từ phút 60.
 
 ## Cùng nội dung đó, đúng format
 
 ````markdown
-## 1. Gọi được Chat Completions API và đo latency (40 phút)
+## 1. Gọi được Chat Completions API và đo latency
+
+**40 phút · mốc 20–60.**
 
 :::goal{title="`call_openai` chạy được, 3 test đầu pass"}
 Bạn có hàm gọi Chat Completions trả về `(text, latency)`, và hiểu vì sao `import` phải nằm trong thân hàm.
@@ -25,8 +28,11 @@ Bạn có hàm gọi Chat Completions trả về `(text, latency)`, và hiểu v
 
 ### Tại sao import OpenAI bên trong hàm?
 
-Bộ test thay thế (mock) `openai.OpenAI`. Import ở đầu file thì hàm của bạn giữ tham chiếu tới
-class thật, test sẽ gọi API thật và fail vì không có key.
+Bộ test thay một người đóng thế vào chỗ `openai.OpenAI` — giống việc đổi diễn viên trước khi
+quay, nhưng chỉ đổi được nếu cảnh chưa bắt đầu.
+
+Import ở đầu file thì hàm của bạn đã giữ tham chiếu tới class thật từ trước, nên người đóng thế
+vào muộn không thay được gì: test sẽ gọi API thật và fail vì không có key.
 
 **Bạn làm:**
 
@@ -75,5 +81,12 @@ Test fail với lỗi liên quan API key
 ## Đã đổi gì
 
 Bản đúng dài hơn khoảng 40%, nhưng phần thêm vào là output kỳ vọng, checkpoint, và troubleshooting — thứ học viên cần để tự đi. Phần bị cắt là prose không mang thông tin.
+
+Bốn thứ đáng để ý:
+
+- **Thời lượng ra khỏi heading, thành một dòng riêng có mốc.** `(40 phút)` chỉ nói step này dài bao lâu; `mốc 20–60` nói học viên đang ở đâu trong buổi. Cái thứ hai mới giúp họ biết mình chậm.
+- **Một câu ví dụ đời thường trước cơ chế.** "Người đóng thế vào muộn không thay được gì" gánh phần trực giác, rồi mới đến chuyện tham chiếu class. Đúng một câu — câu thứ hai là bắt đầu viết văn tả.
+- **Câu "chưa viết code thì 3 test này fail" là phần dễ bị bỏ nhất.** Nó nói cho học viên biết trạng thái fail ban đầu là đúng, chứ không phải setup sai. Thiếu nó là chỗ mất người nhiều nhất ở step 1.
+- **Bullet chia thân hàm thành 5 bước** nhưng không viết hộ thân hàm. Đó là mức tiết lộ đúng cho người mới: không phải đoán coach muốn gì, vẫn phải tự viết cái được chấm.
 
 Lưu ý về nhãn: block `3 passed` ở trên suy ra từ tên test trong `tests/test_part1.py`, chưa chạy thật. Trong guide thật, coach chạy một lần rồi dán output thật. Chưa chạy được thì phải ghi `Kết quả kỳ vọng (Coach inference — chưa chạy được vì cần API key):`. Đừng để học viên đối chiếu với output bịa rồi tưởng mình sai.
