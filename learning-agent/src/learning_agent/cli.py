@@ -192,6 +192,19 @@ _PROVIDERS = [
     ("ollama",     "Ollama — chạy local, KHÔNG cần key"),
 ]
 
+# Model gợi ý theo provider (chọn từ list; luôn kèm mục "nhập tay" cho model khác)
+_MODELS = {
+    "openai":     ["gpt-5.4-mini", "gpt-4o-mini", "gpt-4o", "o4-mini", "gpt-4.1-mini"],
+    "openrouter": ["anthropic/claude-3.7-sonnet", "anthropic/claude-3.5-sonnet",
+                   "google/gemini-2.0-flash", "meta-llama/llama-3.3-70b-instruct", "openai/gpt-4o-mini"],
+    "gemini":     ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
+    "groq":       ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+    "together":   ["meta-llama/Llama-3.3-70B-Instruct-Turbo",
+                   "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "Qwen/Qwen2.5-72B-Instruct-Turbo"],
+    "ollama":     ["llama3.1", "llama3.2", "qwen2.5", "mistral"],
+}
+_MODEL_CUSTOM = "__custom__"
+
 
 def _env_set(path, key: str, value: str) -> None:
     """Ghi/ghi đè KEY=value trong .env, giữ nguyên các dòng khác."""
@@ -272,9 +285,23 @@ def _config_wizard(cfg) -> None:
                 f"API key cho {provider} (dán vào — hiện dạng ***, Enter để giữ nguyên):",
                 style=style, qmark="▸",
             ).ask()
-        model = questionary.text(
-            "Model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
+        model_opts = list(_MODELS.get(provider, []))
+        if cur_model and cur_model not in model_opts:
+            model_opts.insert(0, cur_model)  # giữ model đang dùng nếu khác list
+        model_choices = [Choice(m, value=m) for m in model_opts]
+        model_choices.append(Choice("✏️  Nhập model khác…", value=_MODEL_CUSTOM))
+        picked = questionary.select(
+            "Model (chọn từ list, hoặc nhập tay):",
+            choices=model_choices,
+            default=cur_model if cur_model in model_opts else (model_opts[0] if model_opts else _MODEL_CUSTOM),
+            style=style, qmark="▸",
         ).ask()
+        if picked == _MODEL_CUSTOM:
+            model = questionary.text(
+                "Nhập tên model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
+            ).ask()
+        else:
+            model = picked
         use_voyage = questionary.confirm(
             "Dùng Voyage AI embedding? (No = local, miễn phí, không cần key)",
             default=bool(cfg.voyage_api_key), style=style, qmark="▸",
