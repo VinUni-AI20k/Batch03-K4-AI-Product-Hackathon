@@ -969,6 +969,14 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="public/pdf.min.js"></script>
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = (window.location.protocol === 'file:')
+                ? 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+                : (window.location.origin + '/public/pdf.worker.min.js');
+        }
+    </script>
 </head>
 
 <body>
@@ -1858,16 +1866,105 @@
             if (el) el.innerHTML = finalScoreBodyHtml(doc);
         }
 
+        const pdfCache = {};
+
+        async function getPdfDoc(docKey) {
+            if (pdfCache[docKey]) return pdfCache[docKey];
+            const pdfUrl = docKey === 'd1' ? 'public/slides/d1-slide-hackathon.pdf' : 'public/slides/d2-slide-hackathon.pdf';
+            if (typeof pdfjsLib === 'undefined') return null;
+            try {
+                const loadingTask = pdfjsLib.getDocument(pdfUrl);
+                const pdf = await loadingTask.promise;
+                pdfCache[docKey] = pdf;
+                return pdf;
+            } catch (err) {
+                console.warn('PDF load attempt 1 failed:', err);
+                try {
+                    if (pdfjsLib.GlobalWorkerOptions) {
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    }
+                    const fallbackTask = pdfjsLib.getDocument(pdfUrl);
+                    const pdf = await fallbackTask.promise;
+                    pdfCache[docKey] = pdf;
+                    return pdf;
+                } catch (err2) {
+                    console.warn('PDF load attempt 2 (CDN worker) failed:', err2);
+                    return null;
+                }
+            }
+        }
+
+        async function renderPdfPageCanvas(docKey, pageNum) {
+            const canvas = document.getElementById(`pdf-canvas-${docKey}-${pageNum}`);
+            const loader = document.getElementById(`pdf-loading-${docKey}-${pageNum}`);
+            const wrapper = canvas ? canvas.parentElement : null;
+            if (!canvas || canvas.dataset.rendered === 'true') return;
+
+            const pdf = await getPdfDoc(docKey);
+            if (!pdf) {
+                if (loader) {
+                    loader.innerHTML = `⚠️ <span style="color: #64748b;">Không thể nạp bản xem trước PDF trực tiếp. Bạn vẫn có thể xem tóm tắt nội dung slide bên dưới hoặc <a href="${docKey === 'd1' ? 'public/slides/d1-slide-hackathon.pdf' : 'public/slides/d2-slide-hackathon.pdf'}" target="_blank" style="color:#2563eb; text-decoration: underline;">mở file PDF gốc ↗</a></span>`;
+                }
+                if (canvas) canvas.style.display = 'none';
+                if (wrapper) {
+                    wrapper.style.minHeight = 'auto';
+                    wrapper.style.padding = '12px 16px';
+                }
+                return;
+            }
+
+            try {
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 1.4 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                canvas.dataset.rendered = 'true';
+                if (loader) loader.style.display = 'none';
+                if (wrapper) wrapper.style.minHeight = 'auto';
+            } catch (e) {
+                console.warn(`Render PDF page ${pageNum} error:`, e);
+                if (loader) {
+                    loader.innerHTML = `⚠️ <span style="color: #64748b;">Không thể hiển thị hình ảnh slide trang ${pageNum}.</span>`;
+                }
+                if (canvas) canvas.style.display = 'none';
+                if (wrapper) wrapper.style.minHeight = 'auto';
+            }
+        }
+
         function renderSlideHtml(s, idx, fileLabel, citationPrefix, docKey, total) {
-            // Shows the ORIGINAL slide page (rasterized from data/vlearn-pack/slides/*.pdf
-            // by codebase/scripts/pdf-to-images.mjs into codebase/assets/${docKey}/).
-            // The text summary in d1Slides/d2Slides is intentionally NOT rendered here —
-            // it stays backend-only, used just to ground the AI quiz (see codebase/server).
             const page = idx + 1;
             const citation = `${citationPrefix}-${String(page).padStart(3, '0')}`;
-            const imgSrc = `assets/${docKey}/page-${String(page).padStart(3, '0')}.png`;
+
+            const heading = s ? escapeHtml(s.heading || '') : `Trang ${page}`;
+            const subheading = s && s.subheading ? `<div class="slide-subheading" style="color: #2563eb; margin-top: 6px; font-size: 15px; font-weight: 600;">${escapeHtml(s.subheading)}</div>` : '';
+            const bodyItems = s && s.body && s.body.length ? `<div class="slide-content-box" style="margin-top: 14px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13.5px;"><ul style="padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 6px;">${s.body.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>` : '';
+            
+            const isAttention = s && s.heading && s.heading.toLowerCase().includes('attention');
+            const attentionDemo = isAttention ? `
+                <div style="margin-top: 14px; padding: 14px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; font-size: 12.5px;">
+                    <div style="font-weight: 600; color: #0f172a;">Minh họa Khái niệm: <em>"Lan bỏ quyển sách vào túi vì <strong style="color: #e11d48;">nó</strong> quá dày"</em></div>
+                    <div class="attention-demo" style="display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace;">
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">Lan</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">bỏ</span>
+                        <span class="token highlight" style="background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd; padding: 3px 8px; border-radius: 4px;">quyển (0.28)</span>
+                        <span class="token highlight" style="background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd; padding: 3px 8px; border-radius: 4px;">sách (0.32)</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">vào</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">túi (0.09)</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">vì</span>
+                        <span class="token target" style="background: #ffe4e6; color: #9f1239; font-weight: 700; border: 1px solid #fecdd3; padding: 3px 8px; border-radius: 4px;">nó</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">quá</span>
+                        <span class="token" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 4px;">dày</span>
+                    </div>
+                    <div style="font-size: 11px; color: #0369a1; text-align: center; margin-top: 8px;">👉 Trọng số Attention mạnh nhất hướng về <strong>"quyển sách"</strong> (0.32) thay vì "cái túi" (0.09).</div>
+                </div>
+            ` : '';
+
+            const takeaway = s && s.takeaway ? `<div class="slide-takeaway" style="margin-top: 12px; padding: 10px 14px; background: #eff6ff; border-left: 3px solid #2563eb; color: #1d4ed8; font-weight: 600; font-size: 12.5px; border-radius: 0 8px 8px 0;">💡 Takeaway: ${escapeHtml(s.takeaway)}</div>` : '';
+
             return `
-                <div class="slide-frame" id="${docKey}-slide-${page}" style="padding: 0; overflow: hidden;">
+                <div class="slide-frame" id="${docKey}-slide-${page}" style="position: relative; border-radius: 16px; background: #fffdf9; border: 1px solid #f1e9db; box-shadow: 0 8px 20px rgba(0,0,0,0.04); padding: 24px 32px; display: flex; flex-direction: column; justify-content: space-between; min-height: 440px; margin-bottom: 24px;">
                     <canvas class="draw-canvas"></canvas>
                     <img src="${imgSrc}" alt="${td('slideAlt', fileLabel, page)}" style="width: 100%; display: block;" loading="lazy">
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-top: 1px solid var(--card-border);">
@@ -1889,6 +1986,7 @@
         function extraSlidesHtml(doc, fileLabel, citationPrefix) {
             const extra = extras[doc];
             if (!extra) return '';
+            const slidesList = doc === 'd1' ? d1Slides : d2Slides;
             let html = `
             <div style="width: 820px; display:flex; align-items:center; gap:10px; margin-top: 4px; color:#94a3b8; font-size:12px; font-weight:700; letter-spacing:0.02em;">
                 <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
@@ -1896,7 +1994,7 @@
                 <div style="flex:1; border-top:1px dashed #cbd5e1;"></div>
             </div>`;
             for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
-                html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+                html += renderSlideHtml(slidesList[idx], idx, fileLabel, citationPrefix, doc, totalPages[doc]);
             }
             return html;
         }
@@ -1914,7 +2012,7 @@
             for (let i = 0; i < list.length; i++) {
                 const section = list[i];
                 for (let idx = section.slideStart; idx <= section.slideEnd; idx++) {
-                    html += renderSlideHtml(null, idx, fileLabel, citationPrefix, doc, totalPages[doc]);
+                    html += renderSlideHtml(slidesList[idx], idx, fileLabel, citationPrefix, doc, totalPages[doc]);
                 }
                 html += quizGateHtml(doc, section);
             }
@@ -1932,8 +2030,15 @@
                     loadQuizInto(doc, section.id);
                 }
             }
-
-            initDrawCanvases();
+            if (unlockedCount >= list.length && extraSlidesHtml(doc, fileLabel, citationPrefix)) {
+                const extra = extras[doc];
+                if (extra) {
+                    for (let idx = extra.slideStart; idx <= extra.slideEnd; idx++) {
+                        renderPdfPageCanvas(doc, idx + 1);
+                    }
+                }
+            }
+            setTimeout(initDrawCanvases, 60);
         }
 
         function escalateTA(doc, sectionId, qIdx) {
@@ -2008,7 +2113,7 @@
             document.querySelectorAll('.slide-frame').forEach(frame => {
                 const canvas = frame.querySelector('.draw-canvas');
                 if (!canvas) return;
-                
+
                 canvas.width = frame.offsetWidth || 800;
                 canvas.height = frame.offsetHeight || 450;
 
@@ -2100,31 +2205,31 @@
         }
 
         function initTextHighlight() {
-            document.addEventListener('mouseup', function() {
+            document.addEventListener('mouseup', function () {
                 if (currentToolMode !== 'highlight') return;
-                
+
                 const selection = window.getSelection();
                 if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
-                
+
                 const selectedText = selection.toString().trim();
                 if (selectedText.length === 0) return;
 
                 const range = selection.getRangeAt(0);
                 let container = range.commonAncestorContainer;
                 if (container.nodeType === 3) container = container.parentNode;
-                
+
                 if (!container.closest('.slide-frame')) return;
 
                 const mark = document.createElement('mark');
                 mark.className = 'custom-text-highlight';
-                
+
                 let bgMap = {
                     '#f43f5e': 'rgba(253, 164, 175, 0.7)',
                     '#2563eb': 'rgba(147, 197, 253, 0.7)',
                     '#f59e0b': 'rgba(253, 224, 71, 0.8)',
                     '#10b981': 'rgba(110, 231, 183, 0.7)'
                 };
-                
+
                 mark.style.backgroundColor = bgMap[currentDrawColor] || 'rgba(253, 224, 71, 0.8)';
                 mark.style.color = '#0f172a';
                 mark.style.padding = '2px 4px';
@@ -2397,6 +2502,13 @@
                 sendBtn.disabled = false;
             }
         }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            renderDocProgressive('d1');
+            renderDocProgressive('d2');
+            initDrawCanvases();
+            initTextHighlight();
+        });
     </script>
 </body>
 
