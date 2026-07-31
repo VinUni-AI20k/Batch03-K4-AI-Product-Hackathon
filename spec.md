@@ -20,11 +20,11 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   | Ứng viên | Số người gặp | Tần suất | Chi phí hao tổn mỗi lần | Khả thi | Chọn? |
   |---|---|---|---|---|---|
   | **1. Trợ lý tự động trả lời dựa trên tài liệu (Grounding + Fallback)** | ~1000 học viên | Hàng ngày | 15-30 phút chờ đợi TA phản hồi | Rất cao | **Chọn** |
-  | **2. Bản tin tổng hợp câu hỏi tồn cho TA** | ~10 TA | Hàng ngày | 20 phút tổng hợp thủ công | Trung bình | Loại (Impact hẹp) |
+  | **2. Bản tin tổng hợp câu hỏi tồn cho TA (EOD Digest)** | ~10 TA | Hàng ngày | 20 phút tổng hợp thủ công | Trung bình | **Chọn** |
   | **3. Chủ động phát hiện học viên bị stuck** | ~100 học viên | Hàng tuần | Mất động lực học, bỏ dở khóa học | Thấp (Phức tạp) | Loại (Khó build nhanh) |
 
 - **Ứng viên ĐÃ LOẠI + vì sao:** Ứng viên 3 bị loại do việc phát hiện chủ động trạng thái stuck yêu cầu theo dõi hành vi chi tiết của học viên, tốn thời gian xây dựng mô hình và dễ gây phiền nhiễu cho học viên.
-- **Ứng viên CHỌN + vì sao (bằng số):** Chọn ứng viên 1 vì giải quyết trực tiếp painpoint của 1000 học viên, giảm tải đến 80% câu hỏi lặp cho TA và có thể build prototype hoạt động tốt ngay trong sự kiện.
+- **Ứng viên CHỌN + vì sao (bằng số):** Chọn ứng viên 1 vì giải quyết trực tiếp painpoint của 1000 học viên, giảm tải đến 80% câu hỏi lặp cho TA. Chọn thêm ứng viên 2 (Bản tin EOD Digest qua lệnh `!digest`) vì dễ triển khai bằng file JSON local và giúp TA tiết kiệm rất nhiều thời gian lọc tin nhắn tồn đọng.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 - **NotebookLM:** 
@@ -98,5 +98,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | 31/07/2026 12:54 | Sửa lỗi parameter shifting của `callLLM` và thêm cơ chế exponential backoff retry cho API fallback | Hỗ trợ các cuộc gọi 2 tham số của runner `run_eval.js` và tăng tính bền bỉ chống lỗi rate limit 429 trên các API miễn phí. |
 | 31/07/2026 13:27 | Đổi System Prompt và `executeDiscordQuery` để ngừng dùng Markdown link `[Text](Url)` | Cú pháp Markdown link bị lỗi click trên nhiều client Discord, xuất raw URL giúp Discord tự động nhận diện chính xác và link hoạt động bình thường. |
 | 31/07/2026 13:34 | Nâng cấp thuật toán tìm kiếm Discord (`executeDiscordQuery`) sang dạng Token Matching | Khắc phục lỗi Bot không tìm thấy bài viết khi học viên gõ từ khóa dài hoặc không khớp chính xác 100% (như "con mèo và hổ"). |
-
-
+| 31/07/2026 14:22 | Tích hợp "Activity Tracker" & Lệnh `!digest` | Cho phép bot ghi log toàn bộ câu hỏi vào `daily_activity.json` và hỗ trợ lệnh `!digest` giúp TA xem nhanh top chủ đề và câu hỏi chưa được giải quyết cuối ngày. |
+| 31/07/2026 14:22 | Nâng cấp System Prompt với Guardrails & Tiered Knowledge | Bot biết phân cấp nguồn dữ liệu (Official vs UGC), ép thêm cảnh báo cho tin tức từ cộng đồng. Từ chối trả lời và chuyển tiếp tự động các câu chửi bậy, xin API Key hay xin sửa điểm/deadline. |
+| 31/07/2026 14:43 | Nâng cấp Token Matching sang dạng "Thoáng hơn" (OR Logic) và Fallback Regex | Thay vì bắt buộc khớp TẤT CẢ từ khóa (`every`), bot chỉ cần khớp MỘT từ khóa (`some`). Nhận diện cả các câu lệnh tắt như `!ask tìm con mèo` mà không bắt buộc gõ chính xác chữ `về`. |
+| 31/07/2026 14:57 | Xử lý sự cố bảo mật lộ API Key trên Git (GitHub Secret Scanning) | Chỉnh sửa nội dung file log và squash lại lịch sử commit để xoá vĩnh viễn đoạn OpenRouter API Key do user gõ nhầm trên Discord, giúp code push thành công lên GitHub. |

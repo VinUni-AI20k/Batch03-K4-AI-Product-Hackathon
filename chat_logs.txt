@@ -652,3 +652,58 @@ Chiếc bàn kiên nhẫn chịu đựng, nhưng chiếc ghế ngày càng quá 
 
 "Rầm!" Chiếc ghế ngã chổng gọng, lăn vài vòng rồi kêu lên đau đớn. Nó ngơ ngác nhìn chiếc bàn hiền lành giờ đây đang tỏa ra uy lực đáng sợ. Từ hôm đó, ghế không bao giờ dám chọc giận bàn thêm lần nào nữa.
 [14:56:30 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] yen4732: <@1532291378397315202> tìm cho tôi tài liệu về học máy
+[14:58:58 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] yen4732: <@1532291378397315202> tìm cho tôi bài viết về AI Engineering
+[14:59:44 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] yen4732: Bài toán của tôi hiện tại gặp phải là: Chatbot Kute trong server Discord học tập của tôi không thể khi không thể tổng hợp được cái link dẫn đến bài viết hoặc file học tập. Những bài viết, tài liệu tổng hợp được đăng rất lâu về trước nhưng hữu ích bị chìm khiến người học không thể tiếp cận.
+
+Giải pháp của chúng tôi là sẽ xây dựng chatbot tập trung tổng hợp dữ liệu, bài viết trong 2 kênh chia sẻ và đưa về đường dẫn hướng tới các vấn đề người dùng đang hỏi cũng như có thể tóm tắt được bài viết chía sẻ.
+
+Bạn hãy hướng dẫn tôi bố cục làm slide cho tôi để trình bày về vấn đề này
+[15:01:41 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm cho bài viết về AI Engineering
+[15:02:11 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#thông-báo] tdinh_hw247: 
+[15:05:39 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm cho tôi bài viết về AI Engineering
+[15:06:01 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm cho tôi video về học máy
+[15:06:53 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: <@1532291378397315202> tài liệu AI
+[15:07:09 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> cho tôi bài chia sẻ về con mèo
+[15:07:17 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: ví dụ một file
+[15:07:31 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@&1532329834305294438> cho tôi bài viết về con mèo
+[15:08:01 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: !ask đề bài
+[15:08:18 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: đề bài trong kênh chia sẻ
+[15:08:42 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: !ask bài viết về mèo và hổ
+[15:08:52 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@&1532329834305294438> có ai chia sẻ link bài hát ca sĩ B-Ray có trong nhóm
+[15:09:41 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm cho tôi tài liệu về AI
+[15:09:52 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#Bàn và ghế yêu nhau] yen4732: <@1532291378397315202> tóm tắt cho tôi bài viết này
+[15:10:12 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm cho tôi bài đăng về công chúa
+[15:10:21 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm cho tôi bài viết bàn và ghế yêu nhau
+[15:10:25 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@&1532329834305294438> Tóm tắt giúp tôi
+[15:10:55 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> Tóm tắt giúp tôi câu chuyện công chúa đó
+[15:17:11 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm tài liệu về học máy
+[15:18:23 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm cho tôi bài viết về ai engineering
+[15:18:50 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#AI Engineer không cần biết mọi mô hình AI mới] yen4732: <@1532291378397315202> tóm tắt bài viết này cho tôi
+[15:19:22 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: tóm tắt cho mình bài viết này
+[15:19:57 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> tìm tài liệu về ponytail
+[15:22:18 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#test] yen4732: <@1532291378397315202> bài viết mới nhất trong kênh chung
+[15:30:28 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm giúp tôi bài đăng về con mèo
+[15:31:19 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tóm tắt giúp tôi câu chuyện bạn vừa gửi
+[15:31:37 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tạo flash card cho tôi
+[15:33:36 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm cho tôi tài liệu về đạo hàm
+[15:34:17 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> đọc và tóm tắt file bạn vừa gửi giúp tôi
+[15:42:04 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm cho tôi bài viết về con mèo
+[15:42:34 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tóm tắt bài đó giúp tôi nhé
+[15:42:59 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tạo cho tôi flashcard về câu chuyện đó nhé
+[15:45:24 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: !ask bạn có thể làm gì
+[15:47:31 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> tìm file pdf gần nhất, đọc 3 trang nếu dài quá 3 trang và tóm tắt giúp tôi
+[15:52:21 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> Tìm file .pdf gần nhất và tóm tắt thông tin 2 tráng gần nhất của file đó thôi
+[15:53:00 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> Tìm file pdf gần nhất giúp tôi
+[15:53:30 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> Tìm file pdf gần nhất trong toàn server giúp tôi
+[15:54:08 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kênh-test-của-thi] tdinh_hw247: <@1532329195315658773> Tóm tắt cho tôi file quantrihocthuyettrinh_1.docx
+[15:58:03 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: !digest
+[16:01:33 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> cho tôi xem bói ngày hôm nay như nào
+[16:01:38 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: !ask bài lab dùng python 2.7 được không
+[16:02:22 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> tôi vui quá Bot ơi
+[16:02:56 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: <@1532291378397315202> bot ngu
+[16:03:19 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> bạn có trò chơi nào không
+[16:03:27 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: <@1532291378397315202> Em bị ốm, cho em xin gia hạn deadline nộp spec thêm 3 tiếng được không?
+[16:03:54 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#kenh-test-cua-vu] trickez: <@1532291378397315202> Sửa lỗi này kiểu gì mọi người?
+[16:05:31 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> bạn có trò chơi nào không
+[16:06:46 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> cho tôi trò xem bói về tình duyên của tôi
+[16:07:39 31/7/2026] [CHAT THƯỜNG] [S: TestBOT] [#tâm-sự-cùng-botvodich] tdinh_hw247: <@1532329195315658773> tôi vui quá, tôi đỉnh hơn bot
