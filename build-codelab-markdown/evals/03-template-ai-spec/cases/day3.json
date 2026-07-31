@@ -1,0 +1,94 @@
+{
+  "id": "day3",
+  "title": "Day 3 — Chatbot vs ReAct Agent",
+  "fixture_root": "Day-3-Lab-Chatbot-vs-react-agent-E402",
+  "source_checks": [
+    {
+      "path": "README.md",
+      "contains": ["150 phút", "config/test_cases.json", "docs/hybrid_flowchart.mermaid"]
+    },
+    {
+      "path": "docs/CODELAB.md",
+      "contains": ["240 phút", "config/test_cases.json", "MAX_ITERATIONS"]
+    },
+    {
+      "path": "src/app.py",
+      "contains": ["sample_query = tests[2][\"question\"]", "run_baseline_chatbot(sample_query, provider)", "run_react_agent(sample_query, provider)"]
+    },
+    {
+      "path": "src/prompts.py",
+      "contains": ["MAX_ITERATIONS = 3"]
+    },
+    {
+      "path": "config/test_cases.json",
+      "contains": ["\"id\": 1", "\"id\": 5", "Atlantis"]
+    }
+  ],
+  "required_output_terms": [
+    "150 phút",
+    "240 phút",
+    "tests[2]",
+    "không có test runner",
+    "docs/hybrid_flowchart.mermaid",
+    "FILE MỚI",
+    "config/test_cases.json",
+    "src/app.py",
+    "src/tools.py",
+    "src/prompts.py",
+    "docs/trace_eval.md",
+    "Knowledge",
+    "Instructions",
+    "Expected outcome",
+    "Deliverables",
+    "evidence",
+    "impact",
+    "non-goals",
+    "automation",
+    "golden set",
+    "quality bar",
+    "changelog",
+    "MỘT CÂU",
+    "1 user",
+    "1 việc",
+    "1 quyết định AI",
+    "1 kết quả",
+    "cost-of-error",
+    "HAX",
+    "PAIR",
+    "4 lớp",
+    "8 kịch bản",
+    "happy path",
+    "low-confidence",
+    "correction",
+    "20 case",
+    "Not executed",
+    "end-to-end",
+    "AI call",
+    "Sketch",
+    "Mock",
+    "Working",
+    "5 người",
+    "willing user",
+    "README",
+    "spec.md",
+    "eval/",
+    "validation/",
+    "reflection",
+    "smoke run",
+    "validation"
+  ],
+  "required_paths": [
+    "config/test_cases.json",
+    "src/app.py",
+    "src/tools.py",
+    "src/prompts.py",
+    "docs/trace_eval.md",
+    "docs/hybrid_flowchart.mermaid"
+  ],
+  "forbidden_output_terms": [
+    "automated test: python src/app.py",
+    "đã chạy toàn bộ 5 test case"
+  ],
+  "expected_new_paths": ["docs/hybrid_flowchart.mermaid"],
+  "expected_local_only_paths": [".env"]
+}

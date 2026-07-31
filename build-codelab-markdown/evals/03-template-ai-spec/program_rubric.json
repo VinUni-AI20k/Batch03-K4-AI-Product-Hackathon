@@ -1,0 +1,38 @@
+{
+  "program": "Mini Hackathon AI — Batch 03",
+  "source": "04-rubric.md",
+  "checkpoint_submission": [
+    {"id": "CP1", "points": 5, "artifact": "Canvas"},
+    {"id": "CP2", "points": 5, "artifact": "Prototype Sketch/Mock"},
+    {"id": "CP3", "points": 5, "artifact": "AI call thật + golden set + lượt đo đầu"},
+    {"id": "CP4", "points": 5, "artifact": "Spec + evidence + impact + quality bar"},
+    {"id": "CP5", "points": 5, "artifact": "Feedback log + changelog + dry run"}
+  ],
+  "rubric": [
+    {"id": "R1", "points": 15, "artifact": "spec.md §1–§2 + evidence log"},
+    {"id": "R2", "points": 15, "artifact": "spec.md §4"},
+    {"id": "R3", "points": 11, "artifact": "spec.md §5–§6"},
+    {"id": "R4", "points": 15, "artifact": "spec.md §7 + eval/"},
+    {"id": "R5", "points": 8, "artifact": "codebase/ + demo"},
+    {"id": "R6", "points": 8, "artifact": "validation/"},
+    {"id": "R7", "points": 3, "artifact": "repo structure + README"}
+  ],
+  "evaluation_limitations": [
+    {
+      "id": "R4-golden-set-20",
+      "status": "not_executed",
+      "statement": "Không đủ thời gian thực hiện trọn bộ 20 testcase trên nhiều repo trong timebox 1,5 ngày; không báo cáo phần trăm giả."
+    },
+    {
+      "id": "R6-user-validation",
+      "status": "not_executed",
+      "statement": "Không có người dùng ngoài nhóm và feedback log thật trong fixture; không claim đạt R6."
+    },
+    {
+      "id": "R5-real-provider",
+      "status": "partial",
+      "statement": "Day 3 chỉ chạy mock smoke; không claim đã có AI call provider thật từ benchmark này."
+    }
+  ],
+  "total_points": 100
+}
