@@ -1,4 +1,22 @@
-# Mini Hackathon AI — Batch 03
+# Nhóm B2-1 - AI Thực Chiến - Hackathon AI Batch 03
+
+## Danh sách thành viên:
+1. Phan Văn Hoàng Nam - 2A202601160
+2. Trương Minh Hoàng - 2A202601262
+3. Tạ Kim Ngân - 2A202601258
+4. Phạm Thế Đăng - 2A202601766
+5. Đào Trung Hiếu - 2A202601238
+
+## Phân công công việc (Các thành viên tự chọn phần việc):
+- **Phan Văn Hoàng Nam**: prompt
+- **Trương Minh Hoàng**: spec
+- **Tạ Kim Ngân**: evidence
+- **Phạm Thế Đăng**: code
+- **Đào Trung Hiếu**: demo
+
+---
+
+# Thông tin chung của chương trình Mini Hackathon AI
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
