@@ -806,9 +806,6 @@ h1 span {
 .review-form-embedded .review-form-main { box-shadow: none; }
 .final-submit-button { background: #0b6b50 !important; }
 .submission-success { border-color: #8fc9b7 !important; background: #effaf6 !important; color: #07543f; }
-.agent-plan { margin: 10px 0; padding: 12px; border: 1px solid #b8d7cc; border-radius: 10px; background: #f1faf7; display: grid; gap: 5px; }
-.agent-plan ol { margin: 4px 0 4px 20px; padding: 0; columns: 2; }
-.agent-plan small { color: #51665f; }
 .security-banner { padding: 8px 10px; border: 1px solid #e5b4b4; border-radius: 8px; background: #fff3f3; color: #8a2020; }
 .markdown-message { line-height: 1.62; overflow-wrap: anywhere; }
 .markdown-message p { margin: 6px 0; white-space: normal; }

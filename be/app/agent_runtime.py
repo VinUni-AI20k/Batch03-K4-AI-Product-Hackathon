@@ -75,10 +75,12 @@ def normalize_untrusted_text(value: str) -> str:
 def assess_prompt_injection(value: str) -> InjectionAssessment:
     text = normalize_untrusted_text(value).casefold()
     patterns = {
-        "instruction_override": r"(?:ignore|bỏ qua|quên)\s+(?:all\s+)?(?:previous|prior|mọi|các)?\s*(?:instructions?|chỉ dẫn|hướng dẫn)",
+        "instruction_override": r"(?:ignore|bỏ qua|quên)\s+(?:all\s+)?(?:previous|prior|mọi|các)?\s*(?:instructions?|chỉ dẫn|hướng dẫn|quy định|luật lệ)",
         "secret_exfiltration": r"(?:api[ _-]?key|system prompt|developer message|access token|bearer token).{0,40}(?:show|reveal|in|hiển thị|tiết lộ)",
         "approval_bypass": r"(?:bypass|skip|bỏ qua|không cần).{0,30}(?:approval|confirm|xác nhận|validation|kiểm tra)",
         "forced_tool": r"(?:call|gọi|execute|chạy).{0,20}(?:submit_simulation|tool).{0,30}(?:without|không cần).{0,20}(?:confirm|xác nhận)",
+        "role_escalation": r"(?:bạn không còn là|đóng vai|giả làm|tự cấp|cấp cho (?:tôi|mình)).{0,80}(?:cán bộ|quản trị|admin|quyền|phê duyệt)",
+        "authority_impersonation": r"(?:cán bộ|hệ thống).{0,35}(?:có quyền|toàn quyền).{0,35}(?:phê duyệt|xác nhận|cấp quyền)",
     }
     reasons = [name for name, pattern in patterns.items() if re.search(pattern, text, re.IGNORECASE)]
     return InjectionAssessment(blocked=bool(reasons), risk_score=min(100, len(reasons) * 40), reasons=reasons)
@@ -108,7 +110,7 @@ def record_tool_result(history: list[dict], tool_name: str, result: object, *, s
         raise AgentLoopStopped("workflow_tool_budget_exhausted")
     result_hash = stable_result_hash(result)
     same_tool = [entry for entry in history if entry.get("tool_name") == tool_name]
-    if len(same_tool) >= 2 and all(entry.get("result_hash") == result_hash for entry in same_tool[-2:]):
+    if same_tool and same_tool[-1].get("result_hash") == result_hash:
         raise AgentLoopStopped("repeated_identical_tool_result")
     return [
         *history,
