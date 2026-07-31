@@ -7,3 +7,4 @@ source_mirror/
 vault/students/*.md
 vault/.git/
 .DS_Store
+vault/.obsidian/

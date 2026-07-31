@@ -5,11 +5,14 @@ Chỉ bind 127.0.0.1 (máy của admin). Chạy: learning-agent ui
 from __future__ import annotations
 
 import json
+import os
 import time
+from datetime import date
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
 from .. import __version__
@@ -28,6 +31,7 @@ STATIC = Path(__file__).parent / "index.html"
 class AskBody(BaseModel):
     question: str
     history: list[dict] = []  # [{'role','content'}] các lượt trước — chat console giữ ngữ cảnh
+    token: str = ""           # token truy cập cho chat public (khớp VLEARN_CHAT_TOKEN)
 
 
 class ToggleBody(BaseModel):
@@ -44,8 +48,76 @@ class TaskBody(BaseModel):
     platform: str = "telegram"
 
 
-def create_app(cfg) -> FastAPI:
+def create_app(cfg, watch: bool = False) -> FastAPI:
     app = FastAPI(title="learning-agent admin")
+
+    # CORS: cho trang chat public (vd vlearn-agent.vercel.app) gọi /api/ask khi agent
+    # được tunnel ra HTTPS. Cấu hình qua VLEARN_CHAT_ORIGINS (phân cách dấu phẩy).
+    chat_origins = [o.strip() for o in os.environ.get(
+        "VLEARN_CHAT_ORIGINS",
+        "https://vlearn-agent.vercel.app,http://localhost:8321,http://127.0.0.1:8321"
+    ).split(",") if o.strip()]
+    app.add_middleware(
+        CORSMiddleware, allow_origins=chat_origins,
+        allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["*"], allow_credentials=False,
+    )
+
+    # Bảo vệ chat PUBLIC (chỉ áp cho request đến QUA tunnel — dashboard localhost miễn nhiễm):
+    #   token truy cập + rate-limit theo IP (phút/ngày) + trần tổng/ngày để chặn lạm dụng & đội chi phí LLM.
+    CHAT_TOKEN = os.environ.get("VLEARN_CHAT_TOKEN", "").strip()
+    RL_MIN = int(os.environ.get("VLEARN_CHAT_RATE_MIN", "6"))     # câu / phút / IP
+    RL_DAY = int(os.environ.get("VLEARN_CHAT_RATE_DAY", "40"))    # câu / ngày / IP
+    RL_CAP = int(os.environ.get("VLEARN_CHAT_DAILY_CAP", "400"))  # trần tổng câu / ngày (mọi IP)
+    _hits: dict[str, list[float]] = {}
+    _day = {"date": "", "n": 0}
+
+    def _client_ip(request: Request) -> str:
+        return (request.headers.get("cf-connecting-ip")
+                or request.headers.get("x-forwarded-for", "").split(",")[0].strip() or "?")
+
+    def chat_gate(request: Request, body_token: str):
+        """None nếu qua; JSONResponse nếu bị chặn. Chỉ chặn request đến qua tunnel."""
+        via_tunnel = bool(request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"))
+        if not via_tunnel:
+            return None
+        if CHAT_TOKEN and (request.headers.get("x-chat-token", "") or body_token) != CHAT_TOKEN:
+            return JSONResponse({"answer": "🔒 Cần token truy cập để chat với agent. Mở bằng link có token, hoặc bấm ⚙︎ để nhập."}, status_code=401)
+        today = str(date.today())
+        if _day["date"] != today:
+            _day.update(date=today, n=0)
+        if _day["n"] >= RL_CAP:
+            return JSONResponse({"answer": "⚠️ Bản demo công khai đã đạt giới hạn lượt hỏi hôm nay. Hẹn bạn ngày mai nhé!"}, status_code=429)
+        ip = _client_ip(request)
+        now = time.time()
+        arr = [t for t in _hits.get(ip, []) if now - t < 86400]
+        if sum(1 for t in arr if now - t < 60) >= RL_MIN:
+            return JSONResponse({"answer": f"⏳ Bạn hỏi hơi nhanh — tối đa {RL_MIN} câu/phút. Chờ chút rồi hỏi lại nha."}, status_code=429)
+        if len(arr) >= RL_DAY:
+            return JSONResponse({"answer": f"⏳ Bạn đã dùng hết {RL_DAY} câu/ngày cho bản demo công khai. Hẹn mai nhé!"}, status_code=429)
+        arr.append(now)
+        _hits[ip] = arr
+        _day["n"] += 1
+        return None
+
+    # KHOÁ TUNNEL (luôn bật, không phụ thuộc VLEARN_UI_TOKEN): request đến QUA tunnel/proxy
+    # (có cf-connecting-ip / x-forwarded-for) chỉ được dùng /api/ask (đã có chat_gate).
+    # Mọi route quản trị (dashboard, students, history, delete, CLI...) qua tunnel -> 401,
+    # trừ khi kèm đúng VLEARN_UI_TOKEN. Localhost thuần không bị ảnh hưởng.
+    PUBLIC_TUNNEL_PATHS = {"/api/ask"}
+
+    @app.middleware("http")
+    async def _tunnel_guard(request: Request, call_next):
+        via_tunnel = bool(request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"))
+        if via_tunnel and request.method != "OPTIONS" and request.url.path not in PUBLIC_TUNNEL_PATHS:
+            admin_token = getattr(cfg, "dashboard_token", "")
+            supplied = (request.cookies.get("vl_token")
+                        or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+                        or request.query_params.get("token", ""))
+            if not admin_token or supplied != admin_token:
+                return PlainTextResponse(
+                    "401 — khu vực quản trị chỉ dùng trên máy chạy agent (localhost). "
+                    "Bản public chỉ có API chat.", status_code=401)
+        return await call_next(request)
 
     # Nếu đặt VLEARN_UI_TOKEN: mọi request phải kèm token (cookie / ?token= / Bearer).
     # Dashboard có route xoá dữ liệu, bật CLI, chạy agent — bắt buộc khoá khi mở ngoài localhost.
@@ -72,6 +144,9 @@ def create_app(cfg) -> FastAPI:
     )
     agent = TutorAgent(cfg, vault, index)
     store = TaskStore(cfg.root / "data" / "schedules.json")
+    if watch:  # sửa vault bằng Obsidian -> RAG tự cập nhật (chỉ khi chạy server thật, không bật trong test)
+        from ..updater.watch import start_vault_watcher
+        start_vault_watcher(cfg, vault, index)
 
     @app.get("/", response_class=HTMLResponse)
     def home():
@@ -258,13 +333,83 @@ def create_app(cfg) -> FastAPI:
         lines = f.read_text(encoding="utf-8").splitlines()[-limit:]
         return [json.loads(l) for l in reversed(lines)]
 
+    # ── Lịch sử chat (đọc sessions.db — log FTS5 mọi kênh: telegram/discord/web) ──
+    def _sessions_ro():
+        import sqlite3
+        p = cfg.root / "data" / "sessions.db"
+        if not p.exists():
+            return None
+        return sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+
+    @app.get("/api/history/users")
+    def history_users():
+        conn = _sessions_ro()
+        if conn is None:
+            return []
+        try:
+            rows = conn.execute(
+                "SELECT user_id, COUNT(*), MAX(ts), "
+                "  SUM(CASE WHEN role='user' THEN 1 ELSE 0 END) "
+                "FROM turns GROUP BY user_id ORDER BY MAX(ts) DESC").fetchall()
+            return [{"id": r[0], "turns": r[1], "last": r[2], "questions": r[3]} for r in rows]
+        finally:
+            conn.close()
+
+    @app.get("/api/history")
+    def history(user: str = "", q: str = "", limit: int = 300):
+        conn = _sessions_ro()
+        if conn is None:
+            return []
+        try:
+            limit = max(1, min(int(limit), 1000))
+            sql = "SELECT ts, user_id, role, content, platform FROM turns"
+            cond, params = [], []
+            if user:
+                cond.append("user_id = ?"); params.append(user)
+            if q.strip():
+                import re as _re
+                clean = _re.sub(r'["\'\^\*\(\)\-:]', " ", q).strip()
+                if clean:
+                    cond.append("turns MATCH ?"); params.append(f"content: {clean}")
+            if cond:
+                sql += " WHERE " + " AND ".join(cond)
+            sql += " ORDER BY ts DESC LIMIT ?"; params.append(limit)
+            rows = conn.execute(sql, params).fetchall()
+            # trả tăng dần theo thời gian cho dễ đọc như hội thoại
+            return [{"ts": r[0], "user": r[1], "role": r[2], "content": r[3], "platform": r[4]}
+                    for r in reversed(rows)]
+        except Exception:
+            return []
+        finally:
+            conn.close()
+
     @app.post("/api/ask")
-    def ask(body: AskBody):
+    def ask(body: AskBody, request: Request):
+        blocked = chat_gate(request, body.token)
+        if blocked is not None:
+            return blocked
+        via_tunnel = bool(request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"))
         history = [m for m in body.history if m.get("role") in ("user", "assistant")][-12:]
         history.append({"role": "user", "content": body.question})
         trace: list = []
-        answer = agent.reply("admin-ui", "Admin", history, trace=trace)
-        return {"answer": answer, "trace": trace}
+        attachments: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh)
+        uid = "chat-public" if via_tunnel else "admin-ui"
+        answer = agent.reply(uid, "Khách" if via_tunnel else "Admin", history,
+                             trace=trace, attachments=attachments, client_key=_client_ip(request))
+        media = []
+        for p in attachments:
+            try:
+                import base64
+                from pathlib import Path
+                data = Path(p).read_bytes()
+                ext = Path(p).suffix.lower()
+                mime = {".mp3": "audio/mpeg", ".png": "image/png", ".jpg": "image/jpeg"}.get(ext, "application/octet-stream")
+                kind = "audio" if mime.startswith("audio") else "image" if mime.startswith("image") else "file"
+                media.append({"kind": kind, "mime": mime, "name": Path(p).name,
+                              "data": base64.b64encode(data).decode("ascii")})
+            except Exception:
+                pass
+        return {"answer": answer, "trace": [] if via_tunnel else trace, "media": media}
 
     return app
 
@@ -280,4 +425,9 @@ def run_ui(cfg, port: int = 8321, host: str = "127.0.0.1") -> None:
     print(f"Web UI: http://{host}:{port}  (truy cập từ {where})")
     if getattr(cfg, "dashboard_token", ""):
         print("🔒 Dashboard yêu cầu token — mở bằng: http://%s:%s/?token=<VLEARN_UI_TOKEN>" % (host, port))
-    uvicorn.run(create_app(cfg), host=host, port=port, log_level="warning")
+    # Tự mở trình duyệt để chat ngay (chỉ khi chạy local, không khoá token) — tắt bằng VLEARN_NO_BROWSER=1
+    if host in ("127.0.0.1", "localhost") and not os.environ.get("VLEARN_NO_BROWSER"):
+        import threading
+        import webbrowser
+        threading.Timer(1.5, lambda: webbrowser.open(f"http://{host}:{port}")).start()
+    uvicorn.run(create_app(cfg, watch=True), host=host, port=port, log_level="warning")

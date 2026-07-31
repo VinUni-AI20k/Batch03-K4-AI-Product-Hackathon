@@ -58,6 +58,7 @@ class Config:
     allow_self_edit: bool = field(init=False, default=False)  # VLEARN_ALLOW_SELF_EDIT: cho phép tự ghi SOUL.md/MEMORY.md
 
     llm_provider: str = field(init=False, default="")
+    identity_aliases: dict[str, str] = field(init=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         # Chọn provider: llm.provider trong config.yaml. Nếu là preset -> lấy base_url + key
@@ -83,6 +84,18 @@ class Config:
         self.dashboard_token = os.environ.get("VLEARN_UI_TOKEN", "").strip()
         self.allow_all_users = os.environ.get("VLEARN_ALLOW_ALL", "").strip().lower() in _yes
         self.allow_self_edit = os.environ.get("VLEARN_ALLOW_SELF_EDIT", "").strip().lower() in _yes
+        # Cùng 1 người chat qua nhiều "danh tính" (dashboard local luôn là 'admin-ui',
+        # Discord/Telegram là ID riêng) -> gộp về 1 hồ sơ. Đặt trong .env (KHÔNG phải
+        # config.yaml — file đó public trên repo, ID cá nhân không được lộ ra đó).
+        # Cú pháp: IDENTITY_ALIASES=admin-ui=7283188121,khac=id-goc
+        aliases_raw = os.environ.get("IDENTITY_ALIASES", "").strip()
+        for pair in aliases_raw.split(","):
+            pair = pair.strip()
+            if "=" in pair:
+                alias, canonical = pair.split("=", 1)
+                alias, canonical = alias.strip(), canonical.strip()
+                if alias and canonical:
+                    self.identity_aliases[alias] = canonical
 
 
 def load_config(root: str | Path | None = None) -> Config:

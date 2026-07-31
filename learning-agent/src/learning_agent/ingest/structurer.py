@@ -5,10 +5,15 @@ markdown thô (pipeline vẫn chạy end-to-end được).
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 from openai import OpenAI
+
+# Ngưỡng chữ tối thiểu để chạy structure: dưới mức này coi như OCR/Docling không trích được
+# (vd slide toàn ảnh) — KHÔNG gọi LLM để nó khỏi bịa khung bài giả.
+MIN_MEANINGFUL_CHARS = 120
 
 STRUCTURE_PROMPT = """Bạn là biên tập viên giáo trình. Từ nội dung bài giảng dưới đây \
 (slide đã trích xuất + lời giảng có timestamp), hãy viết lại thành ghi chú bài học markdown tiếng Việt:
@@ -28,6 +33,16 @@ def structure_lesson(
 ) -> str:
     if client is None:
         return raw_markdown
+    # Chống hallucinate lúc nạp: nếu trích được quá ít chữ (slide dạng ảnh, scan…),
+    # LLM sẽ bịa "## Slide N — Tiêu đề N". Bỏ qua structure, giữ raw + đánh dấu cần OCR.
+    meaningful = re.sub(r"\s+", " ", raw_markdown or "").strip()
+    if len(meaningful) < MIN_MEANINGFUL_CHARS:
+        print(f"⚠️ Bỏ qua cấu trúc hoá: chỉ trích được {len(meaningful)} ký tự "
+              "(có thể slide dạng ảnh) — cần OCR, tránh bịa nội dung.")
+        return (raw_markdown or "").strip() + (
+            "\n\n> ⚠️ Trích xuất được rất ít văn bản (có thể slide dạng ảnh/scan). "
+            "Đã bỏ qua bước cấu trúc hoá để tránh bịa nội dung — cần OCR hoặc bản có chữ."
+        )
     try:
         resp = client.chat.completions.create(
             model=model,
