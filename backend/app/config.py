@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -27,7 +28,7 @@ class Settings(BaseSettings):
     ocr_runtime_dir: Path = Path("runtime/ocr")
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
-    cors_allowed_origins: list[str] = [
+    cors_allowed_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost:3000",

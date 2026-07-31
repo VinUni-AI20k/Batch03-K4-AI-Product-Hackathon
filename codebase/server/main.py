@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import uuid
 from pathlib import Path
@@ -59,9 +60,37 @@ INTEREST_RULES: dict[str, dict[str, Any]] = {
     "product": {"blockTokens": ["O2O", "RET", "VFO", "EDU"], "label": "Web / Product"},
     "education": {"blockTokens": ["EDU"], "label": "Giáo dục"},
     "finance": {"blockTokens": ["FIN", "BO"], "label": "Tài chính"},
-    "operations": {"blockTokens": ["MFG", "SC", "VHR", "RET", "RAV", "O2O"], "label": "Vận hành"},
+    # HC (y tế) thêm vào đây theo eval/run-01.md case L08 — trước đó 10 đề tài y tế
+    # rủi ro cao không bao giờ lọt candidate list dù hồ sơ có kỹ năng y tế. Không
+    # thêm interest "healthcare" riêng vào UI (post-CP4 không thêm feature mới) —
+    # "Vận hành" là lựa chọn gần nhất user y tế có thể tự chọn.
+    "operations": {"blockTokens": ["MFG", "SC", "VHR", "RET", "RAV", "O2O", "HC"], "label": "Vận hành"},
     "security": {"blockTokens": ["VSOC", "ITOPS", "AIP"], "label": "An ninh & hệ thống"},
 }
+
+# eval/run-01.md failure mode "confidence lạc quan giả": model tự báo confidence="high"
+# ngay cả khi hồ sơ không khớp field nào của top candidate. Ép lại ở tầng code thay vì
+# chỉ tin instruction trong SYSTEM_PROMPT — xem spec.md §7 hướng sửa #1.
+# Chỉ đếm skill khớp thật vào nội dung đề tài — KHÔNG đếm team_size, vì hầu hết
+# candidate đều có max_team>=team_size (gần như luôn true, không phải tín hiệu thật).
+MIN_SKILL_MATCHES_FOR_HIGH_CONFIDENCE = 1
+
+
+def _profile_skill_match_count(payload: "RecommendRequest", candidate: dict[str, Any]) -> int:
+    corpus = " ".join(
+        str(candidate.get(field, "") or "")
+        for field in ("ten_de_tai", "pain_point", "mo_ta_bai_toan", "tech_stack", "job_executor")
+    ).lower()
+    corpus_words = set(re.findall(r"[\w]+", corpus, re.UNICODE))
+    matches = 0
+    for skill in payload.skills:
+        tokens = [t for t in skill.lower().split() if len(t) > 2]
+        # Word-boundary match, not substring — "ảnh" (from "Chụp ảnh") is a
+        # substring of "cảnh báo" and would otherwise false-positive (found
+        # live via eval case L03 sau khi fix #1: VSOC-002 vẫn báo high sai).
+        if any(token in corpus_words for token in tokens):
+            matches += 1
+    return matches
 
 PROJECT_FIELDS_FOR_MODEL = [
     "ma_de", "ten_de_tai", "khoi", "job_executor", "pain_point", "mo_ta_bai_toan",
@@ -190,11 +219,27 @@ def recommend(payload: RecommendRequest) -> RecommendResponse:
         raise HTTPException(status_code=502, detail="Model returned invalid JSON") from exc
 
     candidate_codes = {c["ma_de"] for c in candidates}
+    candidates_by_code = {c["ma_de"]: c for c in candidates}
     valid_selections = [s for s in parsed.get("selections", []) if s.get("ma_de") in candidate_codes]
     if len(valid_selections) < len(parsed.get("selections", [])):
         parsed["confidence"] = "low"
         parsed["overall_note"] = (parsed.get("overall_note", "") + " [Đã loại đề tài không có trong danh sách ứng viên do model trả sai mã.]").strip()
     parsed["selections"] = valid_selections
+
+    # Downgrade an unearned "high": if NO selection has real overlap with the
+    # profile (skills / team_size), the model is guessing regardless of what
+    # it reported — eval/run-01.md case R01/L03/L04/R03 all showed this.
+    if parsed.get("confidence") == "high" and valid_selections:
+        best_match = max(
+            (_profile_skill_match_count(payload, candidates_by_code[s["ma_de"]]) for s in valid_selections),
+            default=0,
+        )
+        if best_match < MIN_SKILL_MATCHES_FOR_HIGH_CONFIDENCE:
+            parsed["confidence"] = "low"
+            parsed["overall_note"] = (
+                parsed.get("overall_note", "")
+                + " [Hạ xuống 'low' tự động: không có đề tài nào khớp rõ kỹ năng/quy mô nhóm trong hồ sơ.]"
+            ).strip()
 
     _log(trace_id, payload, candidates, raw_text, parsed, latency_ms)
 

@@ -117,7 +117,6 @@ class ReportWriter:
 ## 8. Final status
 - {final_status}
 """
-        content = self.redactor.redact(content).text
         path.write_text(content, encoding="utf-8")
         return report_id, path, content
 
@@ -184,6 +183,5 @@ class ReportWriter:
 ## 8. Final status
 - failed
 """
-        content = self.redactor.redact(content).text
         path.write_text(content, encoding="utf-8")
         return report_id, path, content
