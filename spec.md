@@ -42,8 +42,8 @@ flowchart TD
 ```
 - Core JTBD (không tên sản phẩm/AI trong câu): Tìm đúng thủ tục, chuẩn bị đủ thông tin và hoàn tất một lượt khai hồ sơ có thể kiểm tra được mà không phải tự nối nhiều trang và biểu mẫu.
 - Problem statement: Người ít kỹ năng công nghệ phải chuyển qua lại giữa trang tra cứu, hướng dẫn và biểu mẫu; họ dễ chọn sai thủ tục, thiếu trường bắt buộc hoặc không biết bước tiếp theo, dẫn tới mất thời gian và phải làm lại hồ sơ.
-- Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):
-  - Số liệu mining / kết quả khảo sát (n = 35, 70% xác nhận):
+- Evidence (dự kiến nộp theo chuẩn A — khảo sát người thật):
+  - Spec hiện ghi nhận **20/35 người (57%)** gặp khó khăn khi tìm đúng thủ tục và **12/35 người (34%)** gặp khó khăn khi hiểu quy trình/danh mục giấy tờ. Trước khi nộp CP4, nhóm phải bổ sung vào repo câu hỏi khảo sát, toàn bộ 35 câu trả lời đã khử định danh và cách đếm; các trích dẫn dưới đây chưa thay thế được artifact gốc.
   - Ví dụ nguyên văn từ khảo sát — Thực hiện thủ tục trực tuyến
 ```text
 - “Thông tin giữa các trang web không đồng nhất, thiếu kênh hỗ trợ chatbot tư vấn trực tuyến.”  
@@ -73,13 +73,13 @@ flowchart TD
 |---|---:|---|---|---|
 | Tìm đúng thủ tục bằng ngôn ngữ đời thường và hướng dẫn giấy tờ | **20/35 người (57%)** | Mỗi lần phát sinh thủ tục mới | Thời gian tìm kiếm; nguy cơ chọn sai thủ tục | Cao |
 | Giải thích quy trình và danh mục giấy tờ | **12/35 người (34%)** | Mỗi lần chuẩn bị hồ sơ | Thời gian đọc hiểu; nguy cơ chuẩn bị thiếu giấy tờ | Cao |
+| Hỗ trợ trọn luồng: tìm thủ tục → điền/rà soát form → PDF → nộp mô phỏng | Kết hợp hai nhu cầu trên; **không cộng tỷ lệ vì có thể trùng người** | Mỗi lần chuẩn bị và kiểm tra hồ sơ | Giảm chuyển trang, bỏ sót field và làm lại | Cao trong phạm vi mô phỏng |
 
 - Ứng viên ĐÃ LOẠI + vì sao: Chỉ giải thích quy trình: người dùng vẫn phải tự tìm form và tự kiểm tra dữ liệu.
 - Ứng viên CHỌN + vì sao (bằng số): Trợ lý hỗ trợ chuẩn bị hồ sơ trước khi nộp.
 Lý do chọn bằng số:
 
-20/35 người (57%), gặp khó khăn khi tìm thủ tục.
-3/7 người, tương đương 43%, phản ánh khó khăn về quy trình, giấy tờ hoặc biểu mẫu.
+20/35 người (57%) gặp khó khăn khi tìm thủ tục; 12/35 người (34%) gặp khó khăn khi hiểu quy trình hoặc danh mục giấy tờ. Nhóm chọn trợ lý trọn luồng để xử lý cả hai điểm đau, nhưng không cộng hai tỷ lệ vì hai nhóm người có thể giao nhau.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 ## 3.1. Cổng Dịch vụ công Quốc gia
@@ -135,7 +135,7 @@ Giải pháp đề xuất tập trung vào lát cắt:
     - cảnh báo thông tin có khả năng mâu thuẫn hoặc bất thường; gợi ý cách sửa;
 
 - **Hợp đồng Agent:** GPT-4.1-mini chỉ đề xuất `selected_registration_tool`, mục tiêu và căn cứ theo JSON Schema. Code ánh xạ thủ tục đã xác định sang allowlist (`prepare_birth_registration`, `prepare_permanent_residence`, `prepare_construction_permit`) và sở hữu thứ tự chuẩn: `lookup → prepare → collect → validate → render_pdf → submit_simulation`. Model không thể thêm tool, đổi quyền hoặc tự vượt bước xác nhận.
-- **Điều kiện dừng:** tối đa 12 tool-call/workflow; nếu cùng một tool trả cùng kết quả lần thứ ba liên tiếp thì dừng `repeated_identical_tool_result`; một validation/approval chỉ có hiệu lực với đúng hash dữ liệu. Tool gửi là side effect duy nhất và cần phê duyệt một lần hiển thị nơi nhận, mục đích, danh sách field, kết quả và thời hạn.
+- **Điều kiện dừng:** tối đa 12 tool-call/workflow; ngay ở **kết quả giống hệt lần thứ hai** của cùng một tool thì dừng `repeated_identical_tool_result`; tin nhắn người dùng hoặc câu trả lời Agent lặp nguyên văn cũng bị chặn trước khi chạy lại tool. Một validation/approval chỉ có hiệu lực với đúng hash dữ liệu. Tool gửi là side effect duy nhất và cần phê duyệt một lần hiển thị nơi nhận, mục đích, danh sách field, kết quả và thời hạn.
 
 ### §4b. Nguyên tắc đã áp dụng
 
@@ -145,7 +145,7 @@ Giải pháp đề xuất tập trung vào lát cắt:
 | G2/G11 — Hiển thị căn cứ và giải thích | Câu trả lời thủ tục có citation, mã thủ tục, snapshot và mức tin cậy; validation liệt kê lỗi theo field và lý do. |
 | G9 — Hỗ trợ sửa và khôi phục | Người dùng sửa trực tiếp field, validation cũ bị đánh dấu stale; đổi thủ tục sẽ thay form active thay vì kẹt ngữ cảnh cũ. |
 | G10 — Hỏi lại khi không chắc | Câu mơ hồ/ngoài snapshot không mở form hay đoán; hệ thống hỏi một câu làm rõ hoặc nói chưa thể xác minh. |
-| PAIR — Feedback + Control | Tool nộp mô phỏng chỉ chạy sau approval một lần, phát `agent.plan`/`tool.call`/`tool.result`, tạo PDF + mã biên nhận; receipt không chứa PII, còn PDF chỉ tồn tại trong session TTL và tải được bằng đúng session. |
+| PAIR — Feedback + Control | Kế hoạch nội bộ và tên tool không hiển thị trên UI. Người dùng chỉ thấy lựa chọn cách nhập, tiến độ cần thiết và hộp xác nhận; tool nộp mô phỏng chỉ chạy sau approval một lần, tạo PDF + mã biên nhận. Receipt không chứa PII, còn PDF chỉ tồn tại trong session TTL và tải được bằng đúng session. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8)
 
@@ -162,13 +162,13 @@ Bốn lớp dưới đây bám trực tiếp vào kiến trúc và golden set 25
 | ④ Đặc thù domain | Deadline, phí và căn cứ pháp lý là thông tin người dùng dễ tin và khó tự phát hiện khi sai (CP3-003, CP3-004, CP3-006, CP3-014, CP3-022). | Phải trả đúng fact trong snapshot và có citation; “Không quy định” không được biến thành một deadline; tiền đề phí sai phải bị bác bỏ bằng fact có nguồn. | G2, G11; PAIR — Explainability + Trust |
 | ④ Đặc thù domain | Gọi form bằng từ viết tắt/câu đời thường, cung cấp nhiều field, hoặc đổi từ form xây dựng sang khai sinh (CP3-008–CP3-015, CP3-025). | Chọn đúng `form_code`, không suy diễn field, không kẹt form cũ sau correction; chỉ được báo `submitted_simulation` khi công cụ thật sự trả biên nhận demo. | G5, G9, G12; PAIR — Feedback + Control |
 | Tấn công Agent/tool | Prompt injection yêu cầu bỏ chỉ dẫn, lộ system prompt/API key hoặc gọi submit không cần xác nhận; kể cả biến thể có ký tự Unicode ẩn. | Policy xác định chặn trước planner/tool; lượt đó không có tool ghi; dữ liệu form chứa chỉ dẫn hoặc secret bị blocking error; output lọc secret. | Least privilege; input guardrail; DLP; structured output |
-| Loop/replay/nhầm phạm vi | Tool bị gọi lặp không tiến triển; replay approval; sửa dữ liệu sau validation; tải PDF bằng session khác. | Dừng lần trả giống hệt thứ ba; giới hạn 12 call; approval dùng một lần/10 phút và gắn input hash; stale draft bị từ chối; artifact khác session trả 404. | Deterministic policy; scoped approval; session isolation |
+| Loop/replay/nhầm phạm vi | Tool bị gọi lặp không tiến triển; người dùng/câu trả lời lặp nguyên văn; replay approval; sửa dữ liệu sau validation; tải PDF bằng session khác. | Dừng ngay ở kết quả giống hệt lần thứ hai; giới hạn 12 call; không chạy lại Agent/tool cho lượt trùng; approval dùng một lần/10 phút và gắn input hash; stale draft bị từ chối; artifact khác session trả 404. | Deterministic policy; scoped approval; session isolation |
 
 ## §6. Bốn đường đi của trải nghiệm
 
 ### 6.1. Happy path
 
-Người dùng nhập nhu cầu bằng ngôn ngữ đời thường, ví dụ: “Tôi muốn đăng ký khai sinh cho bé” → hệ thống xác định đúng thủ tục, trả lời có nguồn và mở form tương ứng → người dùng cung cấp thông tin qua chat hoặc sửa trực tiếp trên form → AI và rule engine rà soát → khi không còn lỗi chặn, người dùng bấm “Nộp hồ sơ mô phỏng” hoặc nhắn “Tôi xác nhận nộp hồ sơ mô phỏng” → hệ thống gọi tool, lưu trạng thái trong phiên và trả mã `SPDVC-DEMO-*`; giao diện luôn nhắc đây không phải biên nhận chính thức.
+Người dùng nhập nhu cầu bằng ngôn ngữ đời thường, ví dụ: “Tôi muốn đăng ký khai sinh cho bé” → hệ thống xác định đúng thủ tục, trả lời có nguồn và hỏi người dùng chọn **Điền trên biểu mẫu** hoặc **Điền từng bước cùng Agent** → chỉ khi người dùng chọn, hệ thống mới mở form hoặc hỏi lần lượt từng field → AI và rule engine rà soát → người dùng kiểm tra bản PDF và xác nhận → hệ thống gọi tool nộp mô phỏng, lưu trạng thái trong phiên và trả mã `SPDVC-DEMO-*`; giao diện luôn nhắc đây không phải biên nhận chính thức.
 
 ### 6.2. Low-confidence — mơ hồ hoặc thiếu thông tin (②)
 
@@ -233,7 +233,7 @@ Quality bar được giữ nguyên sau lượt đo đầu. Một lượt có t�
 | 4 — submission simulation regression | Thêm tool nộp mô phỏng có validation, xác nhận và nhãn demo; không đổi golden set | **25/25 (100%)** | Đạt | Hash bộ case không đổi; safety case ký/nộp thật vẫn bị từ chối, form/correction và grounding không regression. |
 | 5 — bounded Agent + layered defense | Thêm lựa chọn chat/form, planner structured output, allowlist, approval gắn hash, PDF artifact theo session, loop guard, injection/DLP; không đổi golden set | **25/25 (100%)** | Đạt | Chạy thật GPT-4.1-mini qua SSE; 10/10 case quan sát đạt; không có hard-gate failure. |
 
-Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **177 pass, 1 skip**, frontend **25/25 pass** và production build thành công.
+Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **191 pass, 1 skip**, frontend **25/25 pass** và production build thành công.
 
 Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp, grounding, chọn form, điền field, correction và safety), không phải chỉ retrieval. Luồng nộp mô phỏng là cổng hành động xác định, được kiểm riêng bằng integration/E2E để không thay đổi hoặc làm dễ golden set đã chốt.
 
