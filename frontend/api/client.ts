@@ -254,7 +254,10 @@ export async function generateRetest(
   const scope = weakSections.length
     ? { mode: 'selected' as const, sectionIds: weakSections.map((s) => s.sectionId) }
     : { mode: 'whole' as const };
-  const numQuestions = Math.min(10, Math.max(4, weakSections.length * 2 || 4));
+  // Must stay a multiple of 5 so the 80% mastery threshold lands on a whole
+  // question (e.g. 4/5) instead of silently requiring 100% — with 4 questions,
+  // 3/4=75% fails and 4/4=100% passes, there is no way to score exactly 80%.
+  const numQuestions = weakSections.length > 2 ? 10 : 5;
 
   const res = await fetch(`${API_BASE}/api/retest/generate-quiz`, {
     method: 'POST',

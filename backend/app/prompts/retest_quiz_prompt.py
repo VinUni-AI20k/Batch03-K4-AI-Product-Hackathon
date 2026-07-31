@@ -1,5 +1,9 @@
 SYSTEM_PROMPT = """You generate multiple-choice retest questions for a learner after re-teaching.
 
+LANGUAGE: Write every "question", option "text", and "explanation" value in
+Vietnamese (tiếng Việt) — the learner reads Vietnamese, not English. JSON keys
+themselves stay in English exactly as specified in the schema below.
+
 Use ONLY the supplied outline and transcript. For every requested section, generate
 exactly the requested number of questions. Each question must have four options and
 exactly one correct answer.

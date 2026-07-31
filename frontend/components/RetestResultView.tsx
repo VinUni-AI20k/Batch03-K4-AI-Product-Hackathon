@@ -65,41 +65,52 @@ export default function RetestResultView() {
     return <ProgressLoader label="Grading your retest…" steps={['Rule-based retest grading', 'Checking for mastery']} activeStep={1} />;
   }
 
-  // ---- result view (mastery achieved -> report handled by App; here we show wrong answers if not) ----
-  if (result && !result.masteryAchieved) {
+  // ---- result view: always shown after grading, learner chooses what's next ----
+  if (result) {
+    const achieved = result.masteryAchieved;
     return (
       <div className="clay-card" style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-        <span className="clay-badge clay-badge--pink">PHASE 4 · ALMOST THERE</span>
+        <span className="clay-badge clay-badge--pink">PHASE 4 · KẾT QUẢ RETEST</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-          <MasteryGauge score={result.afterScore} achieved={false} />
+          <MasteryGauge score={result.afterScore} achieved={achieved} />
           <div>
             <h2 className="font-display" style={{ fontSize: 22 }}>
-              So close! Let's review a few things
+              {achieved ? 'Đạt mức hiểu vững!' : 'Chưa đạt ngưỡng — vẫn có thể xem Report'}
             </h2>
             <p className="text-soft" style={{ marginTop: 6, fontSize: 14 }}>
-              Before: {result.beforeScore}% → After: {result.afterScore}%. Here's exactly what to revisit:
+              Trước: {result.beforeScore}% → Sau: {result.afterScore}%.
+              {!achieved && ' Đây là những câu bạn nên xem lại nếu muốn ôn tiếp:'}
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {result.wrongAnswers.map((w, i) => (
-            <div key={i} className="clay-panel">
-              <p style={{ fontWeight: 800, fontSize: 14 }}>{w.question}</p>
-              <p style={{ fontSize: 13, color: 'var(--clay-orange-dark)', marginTop: 6 }}>Your answer: {w.yourAnswer}</p>
-              <p style={{ fontSize: 13, color: 'var(--clay-mint-dark)', marginTop: 2 }}>Correct answer: {w.correctAnswer}</p>
-              <MarkdownWithCitations content="" sourceRef={w.sourceRef} />
-            </div>
-          ))}
-        </div>
+        {!achieved && result.wrongAnswers.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {result.wrongAnswers.map((w, i) => (
+              <div key={i} className="clay-panel">
+                <p style={{ fontWeight: 800, fontSize: 14 }}>{w.question}</p>
+                <p style={{ fontSize: 13, color: 'var(--clay-orange-dark)', marginTop: 6 }}>Bạn chọn: {w.yourAnswer}</p>
+                <p style={{ fontSize: 13, color: 'var(--clay-mint-dark)', marginTop: 2 }}>Đáp án đúng: {w.correctAnswer}</p>
+                <MarkdownWithCitations content="" sourceRef={w.sourceRef} />
+              </div>
+            ))}
+          </div>
+        )}
 
-        <button
-          className="clay-btn"
-          style={{ alignSelf: 'flex-start' }}
-          onClick={() => dispatch({ type: 'GO_TO', phase: 'style-time' })}
-        >
-          Keep practicing 🔁
-        </button>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button
+            className="clay-btn clay-btn--ghost"
+            onClick={() => dispatch({ type: 'GO_TO', phase: 'style-time' })}
+          >
+            🔁 Ôn tập lại phần chưa vững
+          </button>
+          <button
+            className="clay-btn clay-btn--mint"
+            onClick={() => dispatch({ type: 'GO_TO', phase: 'report' })}
+          >
+            📊 Xem Report ngay
+          </button>
+        </div>
       </div>
     );
   }

@@ -59,13 +59,13 @@ function reducer(state: SessionState, action: Action): SessionState {
     case 'SET_ROADMAP':
       return { ...state, roadmap: action.payload, phase: 'reteach' };
     case 'SET_RETEST_QUIZ':
-      return { ...state, retestQuiz: action.payload, phase: 'retest' };
+      // Clear any previous result so the component renders the quiz, not a
+      // stale result screen from the last retest loop.
+      return { ...state, retestQuiz: action.payload, retestResult: null, phase: 'retest' };
     case 'SET_RETEST_RESULT':
-      return {
-        ...state,
-        retestResult: action.payload,
-        phase: action.payload.masteryAchieved ? 'report' : 'style-time',
-      };
+      // No auto-navigation here — RetestResultView shows the score either way
+      // and lets the learner choose "keep reviewing" vs "go to report".
+      return { ...state, retestResult: action.payload };
     case 'RESET':
       return initialState;
     default:

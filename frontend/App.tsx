@@ -14,17 +14,20 @@ function ReportScreen() {
   const before = state.diagnosis?.score ?? 0;
   const after = state.retestResult?.afterScore ?? before;
   const skipped = !state.diagnosis?.needsReteaching;
+  const achieved = state.retestResult?.masteryAchieved ?? skipped;
 
   return (
     <div className="clay-card" style={{ display: 'flex', flexDirection: 'column', gap: 22, textAlign: 'center' }}>
-      <div style={{ fontSize: 56 }}>🎉</div>
+      <div style={{ fontSize: 56 }}>{achieved ? '🎉' : '📊'}</div>
       <h2 className="font-display" style={{ fontSize: 28 }}>
-        {skipped ? 'Nice, you nailed it on the first try!' : 'Mastery achieved!'}
+        {skipped ? 'Nice, you nailed it on the first try!' : achieved ? 'Mastery achieved!' : 'Kết quả ôn tập của bạn'}
       </h2>
       <p className="text-soft" style={{ fontSize: 15 }}>
         {skipped
           ? `You scored ${before}% with no weak sections — no re-teaching needed.`
-          : `You went from ${before}% to ${after}% after your personalized re-teaching session.`}
+          : achieved
+            ? `You went from ${before}% to ${after}% after your personalized re-teaching session.`
+            : `Bạn đi từ ${before}% lên ${after}% — chưa đạt ngưỡng 80% nhưng bạn đã chọn dừng ôn tập tại đây.`}
       </p>
 
       {!skipped && (
