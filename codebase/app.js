@@ -40,7 +40,8 @@ const state = {
   quizType: "published", 
   focusTopics: [], 
   rewardGranted: false,
-  previousMastery: null // Track delta
+  previousMastery: null, // Track delta
+  fullscreenActive: false,
 };
 
 const modal = document.querySelector("#quiz-modal");
@@ -95,6 +96,7 @@ function openQuiz() {
   state.answers = [];
   state.rewardGranted = false;
   state.cheatCount = 0;
+  state.fullscreenActive = false;
   
   modal.classList.remove("hidden");
   document.getElementById("quiz-start-screen").classList.remove("hidden");
@@ -145,7 +147,10 @@ async function openReinforcementQuiz(topicIds) {
   }
 }
 
-function closeQuiz() { modal.classList.add("hidden"); }
+function closeQuiz() {
+  state.fullscreenActive = false;
+  modal.classList.add("hidden");
+}
 
 function renderQuestion() {
   const item = activeQuiz[state.index];
@@ -440,14 +445,26 @@ modal.addEventListener("click", (event) => {
 
 // Anti-Cheat: Start Fullscreen
 document.getElementById("start-fullscreen-btn").addEventListener("click", () => {
+  const startButton = document.getElementById("start-fullscreen-btn");
+  const fullscreenError = document.getElementById("fullscreen-error");
+  if (typeof document.documentElement.requestFullscreen !== "function") {
+    fullscreenError.classList.remove("hidden");
+    return;
+  }
   document.documentElement.requestFullscreen().then(() => {
+    state.fullscreenActive = true;
     document.getElementById("quiz-start-screen").classList.add("hidden");
     document.getElementById("quiz-layout-main").classList.remove("hidden");
     document.getElementById("cheat-log").classList.add("hidden");
     document.getElementById("cheat-log").innerHTML = "";
-    renderQuiz();
-  }).catch(err => {
-    alert("Trình duyệt từ chối Fullscreen. Bạn không thể làm Quiz.");
+    fullscreenError.classList.add("hidden");
+    startButton.innerHTML = '<i class="ph ph-arrows-out"></i> Bắt đầu làm bài';
+    renderQuestion();
+  }).catch(() => {
+    state.fullscreenActive = false;
+    fullscreenError.classList.remove("hidden");
+    startButton.innerHTML = '<i class="ph ph-arrows-out"></i> Cho phép mở Fullscreen và thử lại';
+    alert("Trình duyệt chưa cấp quyền Fullscreen. Nhấn OK, sau đó bấm lại nút Cho phép mở Fullscreen.");
   });
 });
 
@@ -466,13 +483,13 @@ function handleCheat(reason) {
 }
 
 document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement && !modal.classList.contains("hidden")) {
+  if (state.fullscreenActive && !document.fullscreenElement && !modal.classList.contains("hidden")) {
     handleCheat("Thoát chế độ Toàn màn hình");
   }
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden" && !modal.classList.contains("hidden")) {
+  if (state.fullscreenActive && document.visibilityState === "hidden" && !modal.classList.contains("hidden")) {
     handleCheat("Chuyển Tab / Ẩn trình duyệt");
   }
 });
