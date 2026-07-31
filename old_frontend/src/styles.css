@@ -743,3 +743,111 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Metadata & Outline Styling */
+.upload-success-msg {
+  color: #059669;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.metadata-outline {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(99, 102, 241, 0.12);
+  padding-top: 1rem;
+}
+
+.metadata-title {
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.outline-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.outline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.06);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.outline-item:hover {
+  background: #eef2ff;
+  transform: translateX(4px);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.outline-item-title {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.925rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.outline-bullet {
+  color: #6366f1;
+  font-size: 0.8rem;
+}
+
+.outline-item-pages {
+  font-size: 0.775rem;
+  color: #4f46e5;
+  background: #eef2ff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+/* Learning Units Styling */
+.learning-units-section {
+  margin-top: 1.25rem;
+  border-top: 1px solid rgba(99, 102, 241, 0.12);
+  padding-top: 1.25rem;
+}
+
+.learning-units-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.learning-unit-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  border-radius: 18px;
+  padding: 1.15rem;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.03);
+}
+
+.learning-unit-name {
+  margin: 0 0 0.85rem 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.unit-icon {
+  font-size: 1.1rem;
+}
+
+

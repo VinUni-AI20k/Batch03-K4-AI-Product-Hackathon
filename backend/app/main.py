@@ -17,6 +17,8 @@ from app.pipeline.align import align_sections
 from app.pipeline.classify import classify_with_llm
 from app.pipeline.quiz_bank import QuizGenerationError, generate_quiz
 from app.utils.pdf_extract import extract_pdf_pages, parse_slide_outline
+from app.api.routes_reteach import router as reteach_router
+from app.api.routes_upload import router as upload_router
 
 app = FastAPI(title="IllumiMATE API")
 app.add_middleware(
@@ -27,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(reteach_router)
+app.include_router(upload_router) 
 app.include_router(retest_quiz_router)
 app.include_router(saved_retest_router)
 app.include_router(diagnosis_router)

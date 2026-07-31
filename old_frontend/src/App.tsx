@@ -1,131 +1,174 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { SessionProvider } from "./context/SessionContext";
 import type {
-  AlignmentItem,
   McqQuestion,
   OutlineSection,
   Section,
   StudyContent,
-  CheckJudgement,
-  LLMStatus,
+  SelfCheckGrade,
+  SlideRange,
+  LearningUnit,
 } from "./api/client";
 import {
   MASTERY_THRESHOLD,
-  createSession,
-  askChat,
   generateQuiz,
-  generateQuizFromPdf,
-  generateRetestQuiz,
-  saveRetestQuiz,
-  judgeActiveModeAnswer,
+  generateRetest,
+  gradeSelfCheck,
   getStudyContent,
   gradeQuiz,
-  getLLMStatus,
   uploadSlide,
+  enrichKnowledge,
+  checkEnrichmentStatus,
 } from "./api/client";
 import UploadStep from "./components/UploadStep";
 import QuizView from "./components/QuizView";
 import RetestResultView from "./components/RetestResultView";
-import RetestConfigView from "./components/RetestConfigView";
-import type { RetestScope } from "./components/RetestConfigView";
 import StyleTimeSelect from "./components/StyleTimeSelect";
 import RoadmapView from "./components/RoadmapView";
 import ReviewList from "./components/ReviewList";
 import ReportView from "./components/ReportView";
 import ChatPanel from "./components/ChatPanel";
-import OpenAnswerView from "./components/OpenAnswerView";
 import type { Stage } from "./components/ChatPanel";
-import { analyzeWeakness } from "./weaknessAnalysis";
 import "./styles.css";
 
-type WrongItem = { question: McqQuestion; userAnswer: number };
+type WrongItem = { question: McqQuestion; userAnswer: string };
 type RetestSource = "verify" | "reteach";
 
+const getInitialState = <T,>(key: string, defaultValue: T): T => {
+  try {
+    const saved = localStorage.getItem("vlearn_state");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed[key] !== undefined) {
+        return parsed[key];
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load state from localStorage:", e);
+  }
+  return defaultValue;
+};
+
 function App() {
-  const [slideText, setSlideText] = useState<string>("");
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [stage, setStage] = useState<Stage>("upload");
+  const [slideText, setSlideText] = useState<string>(() => getInitialState("slideText", ""));
+  const [slideRanges, setSlideRanges] = useState<SlideRange[]>(() => getInitialState("slideRanges", []));
+  const [slideLearningUnits, setSlideLearningUnits] = useState<LearningUnit[]>(() => getInitialState("slideLearningUnits", []));
+  const [slideFilename, setSlideFilename] = useState<string>(() => getInitialState("slideFilename", ""));
+  const [stage, setStage] = useState<Stage>(() => getInitialState("stage", "upload"));
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const [outline, setOutline] = useState<OutlineSection[]>([]);
-  const [alignment, setAlignment] = useState<AlignmentItem[]>([]);
-  const [round1Questions, setRound1Questions] = useState<McqQuestion[]>([]);
+  const [outline, setOutline] = useState<OutlineSection[]>(() => getInitialState("outline", []));
+  const [round1Questions, setRound1Questions] = useState<McqQuestion[]>(() => getInitialState("round1Questions", []));
 
-  const [quizMode, setQuizMode] = useState<"round1" | "retest">("round1");
-  const [questions, setQuestions] = useState<McqQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [openAnswer, setOpenAnswer] = useState("");
+  const [quizMode, setQuizMode] = useState<"round1" | "retest">(() => getInitialState("quizMode", "round1"));
+  const [questions, setQuestions] = useState<McqQuestion[]>(() => getInitialState("questions", []));
+  const [currentIndex, setCurrentIndex] = useState<number>(() => getInitialState("currentIndex", 0));
+  const [answers, setAnswers] = useState<string[]>(() => getInitialState("answers", []));
 
-  const [round1Accuracy, setRound1Accuracy] = useState(0);
-  const [weakSections, setWeakSections] = useState<Section[]>([]);
-  const [goodSections, setGoodSections] = useState<Section[]>([]);
-  const [retestSource, setRetestSource] = useState<RetestSource>("reteach");
-  const [retestSections, setRetestSections] = useState<Section[]>([]);
-  const [savedRetestId, setSavedRetestId] = useState<string | null>(null);
-  const [finalAccuracy, setFinalAccuracy] = useState(0);
-  const [masteredSections, setMasteredSections] = useState<Section[]>([]);
+  const [round1Accuracy, setRound1Accuracy] = useState<number>(() => getInitialState("round1Accuracy", 0));
+  const [weakSections, setWeakSections] = useState<Section[]>(() => getInitialState("weakSections", []));
+  const [goodSections, setGoodSections] = useState<Section[]>(() => getInitialState("goodSections", []));
+  const [retestSource, setRetestSource] = useState<RetestSource>(() => getInitialState("retestSource", "reteach"));
+  const [finalAccuracy, setFinalAccuracy] = useState<number>(() => getInitialState("finalAccuracy", 0));
+  const [masteredSections, setMasteredSections] = useState<Section[]>(() => getInitialState("masteredSections", []));
 
-  const [studyContent, setStudyContent] = useState<StudyContent[]>([]);
-  const [activeMode, setActiveMode] = useState(true);
-  const [wrongItems, setWrongItems] = useState<WrongItem[]>([]);
-  const [chatAnswer, setChatAnswer] = useState("");
-  const [llmStatus, setLlmStatus] = useState<LLMStatus | null>(null);
-  const [sessionId, setSessionId] = useState("");
+  const [studyContent, setStudyContent] = useState<StudyContent[]>(() => getInitialState("studyContent", []));
+  const [activeMode, setActiveMode] = useState<boolean>(() => getInitialState("activeMode", true));
+  const [wrongItems, setWrongItems] = useState<WrongItem[]>(() => getInitialState("wrongItems", []));
+
+  // --- Persistence Effects ---
+  useEffect(() => {
+    const stateObj = {
+      slideText,
+      slideRanges,
+      slideLearningUnits,
+      slideFilename,
+      stage,
+      outline,
+      round1Questions,
+      quizMode,
+      questions,
+      currentIndex,
+      answers,
+      round1Accuracy,
+      weakSections,
+      goodSections,
+      retestSource,
+      finalAccuracy,
+      masteredSections,
+      studyContent,
+      activeMode,
+      wrongItems,
+    };
+    try {
+      localStorage.setItem("vlearn_state", JSON.stringify(stateObj));
+    } catch (e) {
+      console.error("Failed to save state to localStorage:", e);
+    }
+  }, [
+    slideText,
+    slideRanges,
+    slideLearningUnits,
+    slideFilename,
+    stage,
+    outline,
+    round1Questions,
+    quizMode,
+    questions,
+    currentIndex,
+    answers,
+    round1Accuracy,
+    weakSections,
+    goodSections,
+    retestSource,
+    finalAccuracy,
+    masteredSections,
+    studyContent,
+    activeMode,
+    wrongItems,
+  ]);
 
   useEffect(() => {
-    createSession().then((session) => setSessionId(session.session_id)).catch((error) => {
-      setErrorMessage(error instanceof Error ? error.message : String(error));
-    });
-    getLLMStatus().then(setLlmStatus).catch(() => setLlmStatus(null));
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isR = e.key?.toLowerCase() === "r";
+      const isF5 = e.key === "F5";
+      const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+      const isShift = e.shiftKey;
+
+      if ((isCtrlOrMeta && isShift && isR) || (isCtrlOrMeta && isShift && isF5)) {
+        localStorage.removeItem("vlearn_state");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const sectionTitle = (id: Section) =>
     outline.find((o) => o.section_id === id)?.title ?? id;
 
-  const handleChatAsk = async (question: string) => {
-    const chat = await askChat({
-      question,
-      session_id: sessionId,
-    });
-    setChatAnswer(chat.answer);
-  };
-
   const handleUpload = async (file: File) => {
-    if (!sessionId) {
-      setErrorMessage("Learning session is not ready yet.");
-      return;
-    }
     setIsLoading(true);
-    try {
-      const result = await uploadSlide(file, sessionId);
-      setUploadedFile(file);
-      setSlideText(result.textContent);
-      setOutline(result.outline);
-      setAlignment(result.alignment);
-      setStage("ready");
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
-    }
+    const result = await uploadSlide(file);
+    setSlideText(result.textContent);
+    setSlideRanges(result.ranges || []);
+    setSlideLearningUnits(result.learningUnits || []);
+    setSlideFilename(file.name);
+    setStage("ready");
+    setIsLoading(false);
   };
 
   const handleCreateQuiz = async () => {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const { outline: newOutline, questions: newQuestions, alignment: newAlignment } = uploadedFile
-        ? await generateQuizFromPdf(sessionId)
-        : await generateQuiz(sessionId);
+      const { outline: newOutline, questions: newQuestions } =
+        await generateQuiz();
       setOutline(newOutline);
-      if (newAlignment) setAlignment(newAlignment);
       setRound1Questions(newQuestions);
       setQuizMode("round1");
       setQuestions(newQuestions);
       setAnswers([]);
-      setOpenAnswer("");
       setCurrentIndex(0);
       setStage("quiz");
     } catch (err) {
@@ -134,64 +177,49 @@ function App() {
     setIsLoading(false);
   };
 
-  const handleAnswer = (answerIndex: number) => {
+  const handleAnswer = (answer: string) => {
     setAnswers((prev) => {
       const next = [...prev];
-      next[currentIndex] = answerIndex;
+      next[currentIndex] = answer;
       return next;
     });
   };
 
   // ---- Phase 2: G1 grading + D1 diagnosis ----
-  const finishRound1 = async (finalAnswers: number[]) => {
+  const finishRound1 = async (finalAnswers: string[]) => {
     setIsLoading(true);
     const result = await gradeQuiz(questions, finalAnswers);
     setRound1Accuracy(result.accuracy);
     setWeakSections(result.weakSections);
     setGoodSections(result.goodSections);
-    setStage("open-answer");
+
+    if (result.weakSections.length > 0 && slideFilename) {
+      // Start background enrichment of knowledge.md
+      enrichKnowledge(result.weakSections, slideFilename).catch(console.error);
+    }
+
+    setStage("diagnosis");
     setIsLoading(false);
   };
 
-  const submitOpenAnswer = async () => {
-    setIsLoading(true);
-    setErrorMessage("");
-    try {
-      const weaknesses = await analyzeWeakness(
-        round1Questions,
-        answers,
-        { answer: openAnswer },
-        outline,
-      );
-      const analyzedWeakSections = weaknesses.map((item) => item.outline_section_id);
-      setWeakSections(analyzedWeakSections);
-      setGoodSections((current) =>
-        current.filter((section) => !analyzedWeakSections.includes(section)),
-      );
-      setStage("diagnosis");
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // ---- Phase 4: GRADE + DEC2 ----
-  const finishRetest = async (finalAnswers: number[]) => {
+  const finishRetest = async (finalAnswers: string[]) => {
     setIsLoading(true);
     const result = await gradeQuiz(questions, finalAnswers);
     setFinalAccuracy(result.accuracy);
 
     if (result.accuracy >= MASTERY_THRESHOLD) {
       const mastered =
-        retestSections;
+        retestSource === "verify"
+          ? outline.map((o) => o.section_id)
+          : weakSections;
       setMasteredSections(mastered);
       setStage("report");
     } else {
       setWeakSections(result.weakSections);
       const wrong: WrongItem[] = questions
         .map((q, i) => ({ question: q, userAnswer: finalAnswers[i] }))
-        .filter((_item, i) => finalAnswers[i] !== questions[i].correct_index);
+        .filter((_item, i) => finalAnswers[i] !== questions[i].answer);
       setWrongItems(wrong);
       setStage("review");
     }
@@ -208,61 +236,17 @@ function App() {
   };
 
   // ---- Phase 4 (RET): generate retest questions ----
-  const startRetest = async (
-    source: RetestSource,
-    questionCount: number,
-    scope: RetestScope,
-    sections: Section[],
-    shouldSave: boolean,
-  ) => {
+  const startRetest = async (source: RetestSource, sections: Section[]) => {
     setIsLoading(true);
-    try {
     setRetestSource(source);
     setQuizMode("retest");
-    const selectedSections = scope === "whole"
-      ? outline.map((section) => section.section_id)
-      : sections;
-    setRetestSections(selectedSections);
-    const qs = await generateRetestQuiz(
-      sessionId,
-      scope === "whole"
-        ? { mode: "whole" }
-        : { mode: "selected", sectionIds: selectedSections },
-      questionCount,
-      [],
-      round1Questions
-        .filter((question) => selectedSections.includes(question.section_id))
-        .map((question) => question.question),
-    );
-    if (qs.length === 0) {
-      setErrorMessage("Không tìm thấy câu hỏi phù hợp trong quiz bank vòng 1.");
-      setIsLoading(false);
-      return;
-    }
-    if (shouldSave) {
-      try {
-        const saved = await saveRetestQuiz(qs, scope === "whole"
-          ? { mode: "whole" }
-          : { mode: "selected", sectionIds: selectedSections });
-        setSavedRetestId(saved.saved_quiz_id);
-      } catch (err) {
-        setErrorMessage(err instanceof Error ? err.message : String(err));
-        setIsLoading(false);
-        return;
-      }
-    } else {
-      setSavedRetestId(null);
-    }
+    const perSection = source === "verify" ? 1 : 2;
+    const qs = await generateRetest(sections, perSection, round1Questions);
     setQuestions(qs);
     setAnswers([]);
-    setOpenAnswer("");
     setCurrentIndex(0);
     setStage("quiz");
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
   };
 
   // ---- DEC1 branching ----
@@ -270,58 +254,66 @@ function App() {
     if (weakSections.length > 0) {
       setStage("style");
     } else {
-      setRetestSource("verify");
-      setStage("retest-config");
+      startRetest(
+        "verify",
+        outline.map((o) => o.section_id),
+      );
     }
   };
 
   // ---- Phase 3: STYLE -> AL + RM -> Roadmap ----
   const handleStyleSubmit = async (
-    level: string,
-    style: string,
-    timeframe: string,
+    _style: string,
+    _timeframe: string,
+    selectedActiveMode: boolean,
   ) => {
     setIsLoading(true);
+
+    // Wait for enrichment process to finish if it's running
+    try {
+      let isRunning = true;
+      let attempts = 0;
+      const maxAttempts = 30; // Max 30 seconds wait (1s interval)
+
+      while (isRunning && attempts < maxAttempts) {
+        const status = await checkEnrichmentStatus();
+        isRunning = status.is_running;
+        if (isRunning) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          attempts++;
+        }
+      }
+    } catch (err) {
+      console.error("Error checking enrichment status, proceeding anyway:", err);
+    }
+
     const content = await getStudyContent(
       weakSections,
       outline,
       round1Questions,
-      level,
-      style,
-      Number.parseInt(timeframe, 10) || 15,
-      uploadedFile,
-      activeMode,
-      sessionId,
     );
     setStudyContent(content);
-    try {
-      const chat = await askChat({
-        question: "Điểm này cần nhớ gì để làm bài retest?",
-        session_id: sessionId,
-      });
-      setChatAnswer(chat.answer);
-    } catch (err) {
-      setChatAnswer(`# TODO-DEMO: chat unavailable (${String(err)})`);
-    }
     setStage("roadmap");
     setIsLoading(false);
   };
 
-  const handleJudgeSelfCheck = (input: { sectionId: string; answer: string }): Promise<CheckJudgement> =>
-    judgeActiveModeAnswer({
-      session_id: sessionId,
-      section_id: input.sectionId,
+  const handleGradeSelfCheck = (input: {
+    section: Section;
+    question: string;
+    answer: string;
+    sourceContext: string;
+  }): Promise<SelfCheckGrade> =>
+    gradeSelfCheck({
+      section_id: input.section,
+      question: input.question,
       learner_answer: input.answer,
+      source_context: input.sourceContext,
     });
 
   // ---- FINISH -> RET ----
   const handleFinishLearning = () => {
-    setRetestSource("reteach");
-    setStage("retest-config");
+    startRetest("reteach", weakSections);
   };
-
-  const initialRetestSections =
-    retestSource === "verify" ? outline.map((section) => section.section_id) : weakSections;
 
   // ---- REVIEW -> STYLE loop ----
   const handleLoopToStyle = () => {
@@ -330,28 +322,29 @@ function App() {
 
   const handleReset = () => {
     setSlideText("");
-    setUploadedFile(null);
+    setSlideRanges([]);
+    setSlideLearningUnits([]);
     setStage("upload");
     setOutline([]);
-    setAlignment([]);
     setRound1Questions([]);
     setQuizMode("round1");
     setQuestions([]);
     setCurrentIndex(0);
     setAnswers([]);
-    setOpenAnswer("");
     setRound1Accuracy(0);
     setWeakSections([]);
     setGoodSections([]);
-    setRetestSections([]);
-    setSavedRetestId(null);
     setFinalAccuracy(0);
     setMasteredSections([]);
     setStudyContent([]);
     setActiveMode(true);
     setWrongItems([]);
     setErrorMessage("");
-    setChatAnswer("");
+    try {
+      localStorage.removeItem("vlearn_state");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const studyContentBySection = Object.fromEntries(
@@ -371,20 +364,14 @@ function App() {
               mức hiểu vững.
             </p>
           </div>
-          <ChatPanel
-            stage={stage}
-            quizMode={quizMode}
-            answer={chatAnswer}
-            providerStatus={llmStatus}
-            onAsk={handleChatAsk}
-          />
+          <ChatPanel stage={stage} quizMode={quizMode} />
         </div>
 
         {errorMessage && (
           <section className="card">
             <p className="hint" style={{ color: "#dc2626" }}>
               Lỗi: {errorMessage} — kiểm tra backend đã chạy ở
-              http://127.0.0.1:8001 chưa.
+              http://127.0.0.1:8000 chưa.
             </p>
           </section>
         )}
@@ -407,18 +394,51 @@ function App() {
               {slideText && (
                 <div className="preview-box">
                   <h3>Nội dung slide (Knowledge Package)</h3>
-                   <p>{slideText}</p>
-                   {alignment.length > 0 && (
-                     <div className="alignment-preview">
-                       <h4>Semantic alignment</h4>
-                       {alignment.map((item) => (
-                         <p key={item.section_id}>
-                           <strong>{sectionTitle(item.section_id)}</strong>: {item.related_segment_ids.length} transcript segment(s)
-                           {item.matches[0] ? ` · best score ${item.matches[0].score.toFixed(2)}` : " · unmatched"}
-                         </p>
-                       ))}
-                     </div>
-                   )}
+                  <p className="upload-success-msg">{slideText}</p>
+                  {slideLearningUnits.length > 0 ? (
+                    <div className="learning-units-section">
+                      <p className="metadata-title">Đơn vị học tập (Learning Units từ AI):</p>
+                      <div className="learning-units-list">
+                        {slideLearningUnits.map((lu, luIdx) => (
+                          <div key={luIdx} className="learning-unit-card">
+                            <h4 className="learning-unit-name">
+                              <span className="unit-icon">📚</span> {lu.unit}
+                            </h4>
+                            <ul className="outline-list">
+                              {lu.slides.map((slideNum) => {
+                                const slide = slideRanges[slideNum - 1];
+                                if (!slide) return null;
+                                return (
+                                  <li key={slideNum} className="outline-item">
+                                    <span className="outline-item-title">
+                                      <span className="outline-bullet">✦</span> {slide.title}
+                                    </span>
+                                    <span className="outline-item-pages">Trang {slide.start_page} - {slide.end_page}</span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    slideRanges.length > 0 && (
+                      <div className="metadata-outline">
+                        <p className="metadata-title">Khung nội dung trích xuất (Outline & Metadata):</p>
+                        <ul className="outline-list">
+                          {slideRanges.map((r, idx) => (
+                            <li key={idx} className="outline-item">
+                              <span className="outline-item-title">
+                                <span className="outline-bullet">✦</span> {r.title}
+                              </span>
+                              <span className="outline-item-pages">Trang {r.start_page} - {r.end_page}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
             </section>
@@ -442,16 +462,11 @@ function App() {
 
         {stage === "quiz" && questions.length > 0 && !isLoading && (
           <section className="card quiz-card">
-            {savedRetestId && quizMode === "retest" && (
-              <p className="saved-retest-status">
-                ✓ Bài retest đã được lưu (mã: {savedRetestId})
-              </p>
-            )}
             <QuizView
               question={questions[currentIndex]}
               index={currentIndex + 1}
               total={questions.length}
-              selected={answers[currentIndex]}
+              selected={answers[currentIndex] || ""}
               modeLabel={
                 quizMode === "round1"
                   ? "Phase 2 — Quiz chẩn đoán ban đầu"
@@ -478,24 +493,12 @@ function App() {
           </section>
         )}
 
-        {stage === "open-answer" && !isLoading && (
-          <section className="card result-card">
-            <OpenAnswerView
-              value={openAnswer}
-              onChange={setOpenAnswer}
-              onSubmit={submitOpenAnswer}
-            />
-          </section>
-        )}
-
         {stage === "style" && (
           <section className="card review-card">
             <p className="eyebrow">Phase 3 — Adaptive Re-teaching</p>
             <h2>Bạn muốn ôn theo cách nào?</h2>
             <StyleTimeSelect
               weakTitles={weakSections.map(sectionTitle)}
-              activeMode={activeMode}
-              onActiveModeChange={setActiveMode}
               onSubmit={handleStyleSubmit}
             />
             {isLoading && (
@@ -506,26 +509,12 @@ function App() {
           </section>
         )}
 
-        {stage === "retest-config" && !isLoading && (
-          <section className="card review-card">
-            <RetestConfigView
-              outline={outline}
-              questionPool={round1Questions}
-              initialSections={initialRetestSections}
-                onStart={(questionCount, scope, sections, shouldSave) =>
-                startRetest(retestSource, questionCount, scope, sections, shouldSave)
-              }
-            />
-          </section>
-        )}
-
         {stage === "roadmap" && studyContent.length > 0 && (
           <section className="card review-card">
-              <RoadmapView
+            <RoadmapView
               content={studyContent}
               activeMode={activeMode}
-                sessionId={sessionId}
-              onJudgeSelfCheck={handleJudgeSelfCheck}
+              onGradeSelfCheck={handleGradeSelfCheck}
               onFinish={handleFinishLearning}
             />
           </section>

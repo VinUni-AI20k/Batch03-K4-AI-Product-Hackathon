@@ -2,6 +2,8 @@
 
 import json
 import re
+from typing import List, Dict
+from pydantic import BaseModel
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -19,8 +21,67 @@ from app.pipeline.align import align_sections
 from app.pipeline.rewrite import CheckSessionNotFound, generate_study_note, judge_answer
 from app.prompts.self_check_prompt import SELF_CHECK_PROMPT
 from app.utils.pdf_extract import extract_pdf_pages, parse_slide_outline
+from app.core.llm_client_openai import call_json
 
 router = APIRouter(prefix="/api/reteach", tags=["reteach"])
+
+
+class SectionInput(BaseModel):
+    section_id: str
+    title: str
+    summary: str
+
+
+class GenerateExamplesRequest(BaseModel):
+    sections: List[SectionInput]
+
+
+class GenerateExamplesResponse(BaseModel):
+    examples: Dict[str, str]
+
+
+SYSTEM_EXAMPLE_PROMPT = (
+    "You are an expert AI teaching assistant. "
+    "Your task is to generate a relatable, practical real-world example (ví dụ thực tế) in Vietnamese for a lesson section. "
+    "The example should explain the technical concept using a clear analogy or real-life application that is easy to understand. "
+    "Return ONLY valid JSON in this exact shape:\n"
+    "{\"example\": \"your_example_here\"}"
+)
+
+USER_EXAMPLE_PROMPT_TEMPLATE = (
+    "Generate a real-world example for the following section:\n"
+    "Section Title: {title}\n"
+    "Concepts/Summary: {summary}\n"
+)
+
+
+class SectionInput(BaseModel):
+    section_id: str
+    title: str
+    summary: str
+
+
+class GenerateExamplesRequest(BaseModel):
+    sections: List[SectionInput]
+
+
+class GenerateExamplesResponse(BaseModel):
+    examples: Dict[str, str]
+
+
+SYSTEM_EXAMPLE_PROMPT = (
+    "You are an expert AI teaching assistant. "
+    "Your task is to generate a relatable, practical real-world example (ví dụ thực tế) in Vietnamese for a lesson section. "
+    "The example should explain the technical concept using a clear analogy or real-life application that is easy to understand. "
+    "Return ONLY valid JSON in this exact shape:\n"
+    "{\"example\": \"your_example_here\"}"
+)
+
+USER_EXAMPLE_PROMPT_TEMPLATE = (
+    "Generate a real-world example for the following section:\n"
+    "Section Title: {title}\n"
+    "Concepts/Summary: {summary}\n"
+)
 
 
 class StudyNoteRequest(BaseModel):
@@ -216,3 +277,21 @@ def judge_active_mode_answer(payload: JudgeAnswerRequest) -> CheckJudgementRespo
         raise HTTPException(status_code=502, detail="LLM returned an invalid active-mode judgement.") from error
     except Exception as error:  # noqa: BLE001 - do not expose provider details
         raise HTTPException(status_code=503, detail="Active-mode judging is temporarily unavailable.") from error
+
+
+@router.post("/examples", response_model=GenerateExamplesResponse)
+def generate_examples(payload: GenerateExamplesRequest) -> GenerateExamplesResponse:
+    """Generate real-world examples using AI for each section."""
+    examples = {}
+    for section in payload.sections:
+        try:
+            user_prompt = USER_EXAMPLE_PROMPT_TEMPLATE.format(
+                title=section.title,
+                summary=section.summary
+            )
+            response = call_json(SYSTEM_EXAMPLE_PROMPT, user_prompt)
+            examples[section.section_id] = response.get("example", "")
+        except Exception as exc:
+            examples[section.section_id] = f"(Không thể sinh ví dụ tự động: {str(exc)})"
+    return GenerateExamplesResponse(examples=examples)
+
