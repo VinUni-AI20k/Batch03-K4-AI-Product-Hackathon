@@ -36,28 +36,13 @@ fi
 # ── cấu hình ──
 [[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env"; }
 
-# Ghi/ghi đè KEY=value trong .env (awk: an toàn với ký tự đặc biệt trong value)
-_set_env() {
-  local k="$1" v="$2"
-  if grep -qE "^${k}=" .env; then
-    awk -v k="$k" -v v="$v" 'BEGIN{FS="="} $1==k{print k"="v; next} {print}' .env > .env.tmp && mv .env.tmp .env
-  else
-    printf '%s=%s\n' "$k" "$v" >> .env
-  fi
-}
-# Hỏi bí mật (ẩn khi gõ), đọc từ /dev/tty để chạy được cả khi cài qua `curl | bash`
-_ask() { local v=""; printf "%s" "$1" >/dev/tty; read -rs v </dev/tty; printf "\n" >/dev/tty; printf "%s" "$v"; }
-
-# Điền key ngay trong lúc cài — xong là chat được, không phải mở .env sửa tay
-if [[ -r /dev/tty ]] && ! grep -qE '^OPENAI_API_KEY=.+' .env; then
-  printf "\n\033[1;35m── Điền API key (dán vào rồi Enter; để trống + Enter = bỏ qua, sửa sau trong .env) ──\033[0m\n" >/dev/tty
-  k="$(_ask '1) OpenAI API key (bắt buộc để chat, dạng sk-...): ')"; [[ -n "$k" ]] && { _set_env OPENAI_API_KEY "$k"; say "✓ Đã lưu OPENAI_API_KEY (${#k} ký tự)"; }
-  k="$(_ask '2) VOYAGE_API_KEY (Enter = bỏ, dùng embedding local miễn phí): ')"; [[ -n "$k" ]] && { _set_env VOYAGE_API_KEY "$k"; say "✓ Đã lưu VOYAGE_API_KEY"; }
-  k="$(_ask '3) TELEGRAM_BOT_TOKEN (Enter nếu không dùng Telegram): ')"; [[ -n "$k" ]] && { _set_env TELEGRAM_BOT_TOKEN "$k"; say "✓ Đã lưu TELEGRAM_BOT_TOKEN"; }
-  k="$(_ask '4) DISCORD_BOT_TOKEN (Enter nếu không dùng Discord): ')"; [[ -n "$k" ]] && { _set_env DISCORD_BOT_TOKEN "$k"; say "✓ Đã lưu DISCORD_BOT_TOKEN"; }
-  chmod 600 .env
+# Wizard tương tác: chọn provider bằng mũi tên + dán key (mask ***). Cần bàn phím (/dev/tty)
+# vì khi cài qua `curl | bash` thì stdin đang là script, phải trỏ input về terminal thật.
+if [ -e /dev/tty ]; then
+  say "Cấu hình nhanh (chọn provider LLM + dán API key)"
+  learning-agent config </dev/tty || say "Bỏ qua wizard — chạy lại sau: learning-agent config"
 else
-  say "Bỏ qua hỏi key (đã có OPENAI_API_KEY hoặc không có bàn phím) — chỉnh trong .env nếu cần."
+  say "Không có bàn phím tương tác — cấu hình sau bằng: learning-agent config"
 fi
 
 learning-agent onboard || true

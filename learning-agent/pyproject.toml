@@ -14,6 +14,7 @@ dependencies = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
     "ddgs>=6.0",                  # web search cho tool nghiên cứu (Reddit/GitHub dùng stdlib)
+    "questionary>=2.0",           # wizard cấu hình tương tác (learning-agent config)
 ]
 
 [project.optional-dependencies]

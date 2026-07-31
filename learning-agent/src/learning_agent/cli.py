@@ -56,6 +56,7 @@ def main() -> None:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("onboard")
+    sub.add_parser("config")
     sub.add_parser("update")
     ui = sub.add_parser("ui")
     ui.add_argument("--port", type=int, default=8321)
@@ -71,6 +72,10 @@ def main() -> None:
 
     if args.cmd == "onboard":
         _onboard(cfg)
+        return
+
+    if args.cmd == "config":
+        _config_wizard(cfg)
         return
 
     if args.cmd == "update":
@@ -175,6 +180,166 @@ def _onboard(cfg) -> None:
         "  2. Trong chat: /sethome để nhận báo cáo học tập hằng ngày (cron trong config.yaml)\n"
         "  3. Giới hạn người dùng: DISCORD_ALLOWED_USERS / TELEGRAM_ALLOWED_USERS trong .env"
     )
+
+
+# ─────────────────────────── wizard cấu hình tương tác ───────────────────────────
+_PROVIDERS = [
+    ("openai",     "OpenAI — GPT (gpt-4o-mini, gpt-5.4-mini)"),
+    ("openrouter", "OpenRouter — Claude / Gemini / Llama qua 1 key"),
+    ("gemini",     "Google Gemini"),
+    ("groq",       "Groq — siêu nhanh, có bậc miễn phí"),
+    ("together",   "Together AI"),
+    ("ollama",     "Ollama — chạy local, KHÔNG cần key"),
+]
+
+
+def _env_set(path, key: str, value: str) -> None:
+    """Ghi/ghi đè KEY=value trong .env, giữ nguyên các dòng khác."""
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    out, found = [], False
+    for ln in lines:
+        if ln.startswith(key + "="):
+            out.append(f"{key}={value}")
+            found = True
+        else:
+            out.append(ln)
+    if not found:
+        out.append(f"{key}={value}")
+    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
+def _yaml_set(path, key: str, value: str) -> None:
+    """Thay dòng '  key: ...' ĐẦU TIÊN trong config.yaml, giữ indent + comment inline."""
+    import re
+    if not path.exists():
+        return
+    lines = path.read_text(encoding="utf-8").splitlines()
+    pat = re.compile(rf"^(\s*){re.escape(key)}:\s*.*?(\s*#.*)?$")
+    for i, ln in enumerate(lines):
+        m = pat.match(ln)
+        if m:
+            indent, comment = m.group(1), m.group(2) or ""
+            lines[i] = f"{indent}{key}: {value}{comment}"
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            return
+
+
+def _config_wizard(cfg) -> None:
+    """Wizard tương tác (kiểu `openclaw config`): chọn provider, dán key (mask), model, embedding, kênh."""
+    from .config import LLM_PROVIDERS
+
+    env_path = cfg.root / ".env"
+    if not env_path.exists():
+        ex = cfg.root / ".env.example"
+        if ex.exists():
+            shutil.copy(ex, env_path)
+    cur_provider = cfg.llm_provider if cfg.llm_provider in LLM_PROVIDERS else "openai"
+    cur_model = str((cfg.raw.get("llm") or {}).get("model", "") or "")
+
+    try:
+        import questionary
+        from questionary import Choice, Style
+    except Exception:
+        return _config_simple(cfg, env_path)
+    if not sys.stdin.isatty():
+        return _config_simple(cfg, env_path)
+
+    style = Style([
+        ("qmark", "fg:#F59E0B bold"), ("question", "bold"),
+        ("pointer", "fg:#F59E0B bold"), ("highlighted", "fg:#F59E0B bold"),
+        ("selected", "fg:#10B981"), ("answer", "fg:#10B981 bold"),
+    ])
+
+    print("\n\033[1;35m🎓 Vlearn Agent — Cấu hình\033[0m")
+    print(f"  Hiện tại: provider=\033[36m{cfg.llm_provider}\033[0m"
+          f"  model=\033[36m{cur_model or '—'}\033[0m"
+          f"  key={'✓' if cfg.llm_api_key else '✗ chưa có'}"
+          f"  embedding={'Voyage' if cfg.voyage_api_key else 'local'}\n")
+
+    provider = questionary.select(
+        "Nhà cung cấp LLM (model để chat)?",
+        choices=[Choice(label, value=pid) for pid, label in _PROVIDERS],
+        default=next((c for c in _PROVIDERS if c[0] == cur_provider), _PROVIDERS[0])[0],
+        style=style, qmark="▸",
+    ).ask()
+    if provider is None:
+        print("Đã huỷ."); return
+    preset = LLM_PROVIDERS[provider]
+
+    if provider != "ollama":
+        key = questionary.password(
+            f"API key cho {provider} (dán vào — hiện dạng ***, Enter để giữ nguyên):",
+            style=style, qmark="▸",
+        ).ask()
+        if key and key.strip():
+            _env_set(env_path, preset["key_env"], key.strip())
+
+    model = questionary.text(
+        "Model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
+    ).ask()
+
+    use_voyage = questionary.confirm(
+        "Dùng Voyage AI embedding? (No = local, miễn phí, không cần key)",
+        default=bool(cfg.voyage_api_key), style=style, qmark="▸",
+    ).ask()
+    if use_voyage:
+        vk = questionary.password("VOYAGE_API_KEY (dán vào):", style=style, qmark="▸").ask()
+        if vk and vk.strip():
+            _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
+
+    channels = questionary.checkbox(
+        "Kênh chat nào? (Space chọn · Enter xong · Dashboard web luôn bật)",
+        choices=[Choice("Telegram", "telegram"), Choice("Discord", "discord")],
+        style=style, qmark="▸",
+    ).ask() or []
+    if "telegram" in channels:
+        t = questionary.password("TELEGRAM_BOT_TOKEN:", style=style, qmark="▸").ask()
+        if t and t.strip():
+            _env_set(env_path, "TELEGRAM_BOT_TOKEN", t.strip())
+    if "discord" in channels:
+        d = questionary.password("DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask()
+        if d and d.strip():
+            _env_set(env_path, "DISCORD_BOT_TOKEN", d.strip())
+
+    _yaml_set(cfg.root / "config.yaml", "provider", provider)
+    if model and model.strip():
+        _yaml_set(cfg.root / "config.yaml", "model", model.strip())
+    env_path.chmod(0o600)
+
+    print("\n\033[1;32m✅ Đã lưu cấu hình.\033[0m Chạy:  \033[36mlearning-agent ui\033[0m "
+          "(dashboard http://127.0.0.1:8321)  ·  hoặc  \033[36mlearning-agent bot\033[0m")
+
+
+def _config_simple(cfg, env_path) -> None:
+    """Fallback không TUI (questionary thiếu / không phải terminal): nhập HIỆN rõ để dán được."""
+    from .config import LLM_PROVIDERS
+    print("\n🎓 Vlearn Agent — Cấu hình (nhập tay)")
+    for i, (pid, label) in enumerate(_PROVIDERS, 1):
+        print(f"  {i}) {label}")
+    sel = input("Chọn provider [1]: ").strip() or "1"
+    try:
+        provider = _PROVIDERS[int(sel) - 1][0]
+    except (ValueError, IndexError):
+        provider = "openai"
+    preset = LLM_PROVIDERS[provider]
+    if provider != "ollama":
+        key = input(f"API key cho {provider} (dán vào, hiện rõ; Enter bỏ qua): ").strip()
+        if key:
+            _env_set(env_path, preset["key_env"], key)
+    model = input(f"Model [{preset['example_model']}]: ").strip() or preset["example_model"]
+    vk = input("VOYAGE_API_KEY (Enter = dùng local miễn phí): ").strip()
+    if vk:
+        _env_set(env_path, "VOYAGE_API_KEY", vk)
+    t = input("TELEGRAM_BOT_TOKEN (Enter nếu không dùng): ").strip()
+    if t:
+        _env_set(env_path, "TELEGRAM_BOT_TOKEN", t)
+    d = input("DISCORD_BOT_TOKEN (Enter nếu không dùng): ").strip()
+    if d:
+        _env_set(env_path, "DISCORD_BOT_TOKEN", d)
+    _yaml_set(cfg.root / "config.yaml", "provider", provider)
+    _yaml_set(cfg.root / "config.yaml", "model", model)
+    env_path.chmod(0o600)
+    print("✅ Đã lưu. Chạy: learning-agent ui  (hoặc learning-agent bot)")
 
 
 if __name__ == "__main__":

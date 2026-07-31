@@ -30,28 +30,9 @@ if ($Ingest) {
 
 if (-not (Test-Path .env)) { Copy-Item .env.example .env; Say "Đã tạo .env" }
 
-function Set-EnvVar($k, $v) {
-  $out = @(); $found = $false
-  foreach ($l in Get-Content .env) {
-    if ($l -match "^$k=") { $out += "$k=$v"; $found = $true } else { $out += $l }
-  }
-  if (-not $found) { $out += "$k=$v" }
-  Set-Content -Path .env -Value $out
-}
-function Ask-Secret($p) {
-  $s = Read-Host -AsSecureString $p
-  $b = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($s)
-  try { [Runtime.InteropServices.Marshal]::PtrToStringBSTR($b) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
-}
-
-# Điền key ngay trong lúc cài — xong là chat được, không phải mở .env sửa tay
-if (-not ((Get-Content .env) -match '^OPENAI_API_KEY=.+')) {
-  Write-Host "`n── Điền API key (dán vào rồi Enter; để trống + Enter = bỏ qua, sửa sau trong .env) ──" -ForegroundColor Magenta
-  $k = Ask-Secret "1) OpenAI API key (bắt buộc để chat, dạng sk-...)"; if ($k) { Set-EnvVar OPENAI_API_KEY $k; Say "✓ Đã lưu OPENAI_API_KEY" }
-  $k = Ask-Secret "2) VOYAGE_API_KEY (Enter = bỏ, dùng embedding local miễn phí)"; if ($k) { Set-EnvVar VOYAGE_API_KEY $k; Say "✓ Đã lưu VOYAGE_API_KEY" }
-  $k = Ask-Secret "3) TELEGRAM_BOT_TOKEN (Enter nếu không dùng Telegram)"; if ($k) { Set-EnvVar TELEGRAM_BOT_TOKEN $k; Say "✓ Đã lưu TELEGRAM_BOT_TOKEN" }
-  $k = Ask-Secret "4) DISCORD_BOT_TOKEN (Enter nếu không dùng Discord)"; if ($k) { Set-EnvVar DISCORD_BOT_TOKEN $k; Say "✓ Đã lưu DISCORD_BOT_TOKEN" }
-}
+# Wizard tương tác: chọn provider bằng mũi tên + dán key (mask ***)
+Say "Cấu hình nhanh (chọn provider LLM + dán API key)"
+& .\.venv\Scripts\learning-agent.exe config
 
 & .\.venv\Scripts\learning-agent.exe onboard
 
