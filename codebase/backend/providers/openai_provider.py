@@ -4,7 +4,9 @@ import json
 import os
 from typing import Any
 
-from providers.base import ModelResponse, ToolCall
+from providers.base import ModelResponse, ResponseModel, ToolCall
+
+DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
 
 
 class OpenAIProvider:
@@ -15,11 +17,23 @@ class OpenAIProvider:
         *,
         api_key_env: str = "OPENAI_API_KEY",
         base_url: str | None = None,
-        default_model: str = "gpt-4o-mini",
+        default_model: str = "gpt-4o",
     ) -> None:
         self.api_key_env = api_key_env
         self.base_url = base_url
         self.default_model = default_model
+
+    def _client(self) -> Any:
+        try:
+            from openai import OpenAI
+        except ImportError as exc:
+            raise RuntimeError("Install live provider dependency first: pip install openai") from exc
+
+        api_key = os.getenv(self.api_key_env)
+        if not api_key:
+            raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
+
+        return OpenAI(api_key=api_key, base_url=self.base_url)
 
     def complete(
         self,
@@ -30,16 +44,7 @@ class OpenAIProvider:
         temperature: float = 0.0,
         tool_choice: Any | None = None,
     ) -> ModelResponse:
-        try:
-            from openai import OpenAI
-        except ImportError as exc:
-            raise RuntimeError("Install live provider dependency first: pip install openai") from exc
-
-        api_key = os.getenv(self.api_key_env)
-        if not api_key:
-            raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
-
-        client = OpenAI(api_key=api_key, base_url=self.base_url)
+        client = self._client()
         kwargs: dict[str, Any] = {
             "model": model or self.default_model,
             "messages": messages,
@@ -57,3 +62,32 @@ class OpenAIProvider:
             args = json.loads(call.function.arguments or "{}")
             calls.append(ToolCall(name=call.function.name, args=args))
         return ModelResponse(text=msg.content, tool_calls=calls, raw=resp)
+
+    def parse(
+        self,
+        messages: list[dict[str, str]],
+        response_format: type[ResponseModel],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+    ) -> ResponseModel:
+        """Structured-output completion — the OpenAI-native equivalent of
+        LangChain's `.with_structured_output(response_format)`, used by
+        studypulse/ nodes so they don't need a LangChain chat model."""
+        client = self._client()
+        resp = client.chat.completions.parse(
+            model=model or self.default_model,
+            messages=messages,
+            temperature=temperature,
+            response_format=response_format,
+        )
+        parsed = resp.choices[0].message.parsed
+        if parsed is None:
+            refusal = resp.choices[0].message.refusal
+            raise RuntimeError(f"Model declined to produce {response_format.__name__}: {refusal}")
+        return parsed
+
+    def embed(self, texts: list[str], *, model: str | None = None) -> list[list[float]]:
+        client = self._client()
+        resp = client.embeddings.create(model=model or DEFAULT_EMBEDDING_MODEL, input=texts)
+        return [item.embedding for item in resp.data]

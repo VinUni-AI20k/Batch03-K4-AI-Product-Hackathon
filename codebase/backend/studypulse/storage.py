@@ -220,6 +220,43 @@ class StudyPulseDB:
         except Exception:
             return 0
 
+    def get_timeline_item(self, item_id: str) -> Optional[Dict[str, Any]]:
+        """Single item by id, for the FE's edit/feedback/calendar actions."""
+        if not self._ensure_conn():
+            return None
+        try:
+            cursor = self._conn.execute("SELECT raw_json FROM timeline_items WHERE id = ?", (item_id,))
+            row = cursor.fetchone()
+            return json.loads(row[0]) if row else None
+        except Exception as e:
+            logger.error(f"Failed to read timeline item {item_id}: {e}")
+            return None
+
+    def update_timeline_item(self, item_id: str, patch: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Merge `patch` into the stored item and re-save (INSERT OR REPLACE
+        keeps both the individual columns and raw_json in sync)."""
+        item = self.get_timeline_item(item_id)
+        if item is None:
+            return None
+        item.update(patch)
+        if not self.save_timeline_item(item):
+            return None
+        return item
+
+    def delete_timeline_item(self, item_id: str) -> bool:
+        """Used by the FE's 'mark incorrect' feedback action — removes the
+        item outright rather than just flagging it, matching the old
+        in-memory timeline_store's behavior."""
+        if not self._ensure_conn():
+            return False
+        try:
+            cursor = self._conn.execute("DELETE FROM timeline_items WHERE id = ?", (item_id,))
+            self._conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Failed to delete timeline item {item_id}: {e}")
+            return False
+
     def get_pending_alerts(self, window_minutes: int = 10) -> List[Dict[str, Any]]:
         """Find items due within window_minutes from now that haven't been alerted."""
         if not self._ensure_conn():

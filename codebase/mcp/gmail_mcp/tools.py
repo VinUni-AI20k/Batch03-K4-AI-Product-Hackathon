@@ -1,5 +1,6 @@
 import base64
 import html
+import json
 import re
 from typing import Optional
 
@@ -67,11 +68,39 @@ def _format_thread_summary(thread: dict) -> str:
     return f"- (thread_id: {thread['id']}) **{subject}** from {sender} · {date}\n  {snippet}"
 
 
+def _thread_summary_json(thread: dict) -> dict:
+    """Structured summary for ingestion callers — unlike
+    _format_thread_summary, surfaces labelIds/internalDate, which the Gmail
+    API already returns on every message regardless of `format`, but which
+    the text summary never exposed."""
+    messages = thread.get("messages", [])
+    last = messages[-1] if messages else {}
+    headers = last.get("payload", {}).get("headers", [])
+    return {
+        "thread_id": thread.get("id", ""),
+        "message_id": last.get("id", ""),
+        "subject": _header(headers, "Subject") or "(no subject)",
+        "from": _header(headers, "From") or "?",
+        "date": _header(headers, "Date") or "?",
+        "internal_date": last.get("internalDate", ""),  # epoch ms, string
+        "is_unread": "UNREAD" in (last.get("labelIds") or []),
+        "label_ids": last.get("labelIds") or [],
+        "snippet": thread.get("snippet", ""),
+    }
+
+
 @mcp.tool(
     name="search_threads",
-    description="Search Gmail threads using Gmail search syntax (e.g. 'is:unread newer_than:7d', 'from:...').",
+    description=(
+        "Search Gmail threads using Gmail search syntax (e.g. 'is:unread newer_than:7d', 'from:...'). "
+        "output='text' (default) returns a formatted listing for chat; output='json' returns structured "
+        "records (thread_id, is_unread, internal_date, label_ids, ...) for ingestion callers."
+    ),
 )
-async def search_threads(query: str = "", max_results: Optional[str] = None) -> str:
+async def search_threads(query: str = "", max_results: Optional[str] = None, output: str = "text") -> str:
+    if output not in ("text", "json"):
+        raise ValueError("output must be 'text' or 'json'")
+
     limit = _parse_max_results(max_results)
     service = gmail_client.get_service()
     result = await gmail_client.execute(
@@ -79,15 +108,22 @@ async def search_threads(query: str = "", max_results: Optional[str] = None) -> 
     )
     thread_stubs = result.get("threads", [])
     if not thread_stubs:
-        return "No threads found."
-    lines = [f"**Found {len(thread_stubs)} thread(s):**"]
+        return "No threads found." if output == "text" else "[]"
+
+    threads = []
     for stub in thread_stubs:
         thread = await gmail_client.execute(
             service.users()
             .threads()
             .get(userId="me", id=stub["id"], format="metadata", metadataHeaders=["Subject", "From", "Date"])
         )
-        lines.append(_format_thread_summary(thread))
+        threads.append(thread)
+
+    if output == "json":
+        return json.dumps([_thread_summary_json(t) for t in threads], ensure_ascii=False)
+
+    lines = [f"**Found {len(threads)} thread(s):**"]
+    lines.extend(_format_thread_summary(t) for t in threads)
     return "\n".join(lines)
 
 
