@@ -36,4 +36,20 @@ const quizResponseSchema = {
     required: ["questions"]
 };
 
-module.exports = { quizResponseSchema };
+// Response shape for buildExplainAnswerPrompt (server.js /api/explain-answer
+// and eval/run_eval.js) — kept identical between the live endpoint and the
+// eval runner so a golden-set score change reflects a real prompt change,
+// not a schema drift between the two call sites.
+const explainAnswerResponseSchema = {
+    type: Type.OBJECT,
+    properties: {
+        restatedUnderstanding: { type: Type.STRING },
+        verdict: { type: Type.STRING },
+        misconceptionName: { type: Type.STRING },
+        citation: { type: Type.STRING },
+        feedbackToStudent: { type: Type.STRING }
+    },
+    required: ["restatedUnderstanding", "verdict", "citation", "feedbackToStudent"]
+};
+
+module.exports = { quizResponseSchema, explainAnswerResponseSchema };

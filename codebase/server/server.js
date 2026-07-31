@@ -4,8 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const { GoogleGenAI } = require("@google/genai");
 const { getSection, getSectionGroundingText, getDocGroundingText } = require("./data/knowledge");
-const { buildQuizPrompt, buildChatPrompt } = require("./prompts");
-const { quizResponseSchema } = require("./quizSchema");
+const { buildQuizPrompt, buildChatPrompt, buildExplainAnswerPrompt } = require("./prompts");
+const { quizResponseSchema, explainAnswerResponseSchema } = require("./quizSchema");
 
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -129,9 +129,71 @@ app.post("/api/generate-quiz", async (req, res) => {
     }
 });
 
+// Live "AI phân tích sâu hơn" — unlike the static per-option feedback baked
+// into the question bank at generation time, this calls Gemini fresh with the
+// exact question the student answered, using the same verdict schema as
+// eval/prompts.md Prompt B (see buildExplainAnswerPrompt for the fixes applied
+// after eval/results_run1.md's 70% run). Grounding text is always looked up
+// server-side from the section id — never trusts client-supplied slide text.
+app.post("/api/explain-answer", async (req, res) => {
+    try {
+        const { day, sectionId, question, options, selectedKey } = req.body || {};
+
+        if (!day || !sectionId || !question || !Array.isArray(options) || !selectedKey) {
+            return res.status(400).json({ error: "day, sectionId, question, options and selectedKey are required" });
+        }
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({ error: "Server missing GEMINI_API_KEY — see codebase/server/.env.example" });
+        }
+
+        const section = getSection(day, sectionId);
+        if (!section) {
+            return res.status(404).json({ error: `Unknown section ${day}/${sectionId}` });
+        }
+
+        const chosen = options.find((o) => o.key === selectedKey);
+        if (!chosen) {
+            return res.status(400).json({ error: `selectedKey ${selectedKey} not found in options` });
+        }
+
+        const groundingText = getSectionGroundingText(day, sectionId);
+        const studentAnswerText = `(Trắc nghiệm, chọn đáp án ${chosen.key}) ${chosen.text}`;
+
+        const prompt = buildExplainAnswerPrompt({
+            day,
+            sectionTitle: section.title,
+            groundingText,
+            question,
+            studentAnswerText
+        });
+
+        // Uses CHAT_MODEL, not MODEL: MODEL (gemini-flash-latest) only gets a 20
+        // requests/day free-tier quota, already spent 1:1 by the 20-case golden set
+        // in eval/results_run1.md and easily exhausted by normal quiz generation
+        // traffic too. CHAT_MODEL (gemini-flash-lite-latest, already used by
+        // /api/chat-ask) has separate, higher headroom and doesn't need tool support
+        // here, so JSON/responseSchema mode works the same as it does for MODEL.
+        const response = await ai.models.generateContent({
+            model: CHAT_MODEL,
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: explainAnswerResponseSchema,
+                temperature: 0.3
+            }
+        });
+
+        const parsed = JSON.parse(response.text);
+        res.json(parsed);
+    } catch (err) {
+        console.error("explain-answer failed:", err);
+        res.status(502).json({ error: "AI phân tích thất bại, thử lại.", detail: String(err.message || err) });
+    }
+});
+
 app.post("/api/chat-ask", async (req, res) => {
     try {
-        const { day, message } = req.body || {};
+        const { day, message, history } = req.body || {};
 
         if (!day || !message) {
             return res.status(400).json({ error: "day and message are required" });
@@ -146,6 +208,22 @@ app.post("/api/chat-ask", async (req, res) => {
         }
 
         const prompt = buildChatPrompt({ day, groundingText, message });
+
+        // Multi-turn context memory: earlier turns of this chat session (sent by the
+        // client, see chatHistory in index.html) go in as plain conversation turns so
+        // the model can reference what was already said ("như mình vừa giải thích ở
+        // trên..."). Only the LATEST turn carries the full grounding + source-priority
+        // rules from buildChatPrompt — prior answers were already generated under those
+        // same rules, so repeating them every turn is unnecessary. Capped to the last 8
+        // turns (~4 exchanges) so a long conversation doesn't blow up token cost.
+        const MAX_HISTORY_TURNS = 8;
+        const priorTurns = Array.isArray(history)
+            ? history
+                .filter((h) => h && typeof h.text === "string" && (h.role === "user" || h.role === "ai"))
+                .slice(-MAX_HISTORY_TURNS)
+                .map((h) => ({ role: h.role === "ai" ? "model" : "user", parts: [{ text: h.text.slice(0, 2000) }] }))
+            : [];
+        const contents = [...priorTurns, { role: "user", parts: [{ text: prompt }] }];
 
         // googleSearch is a built-in tool: the model decides for itself whether it
         // needs to search, per the source-priority rules in buildChatPrompt (slide
@@ -163,7 +241,7 @@ app.post("/api/chat-ask", async (req, res) => {
         try {
             response = await ai.models.generateContent({
                 model: CHAT_MODEL,
-                contents: prompt,
+                contents,
                 config: {
                     tools: [{ googleSearch: {} }],
                     temperature: 0.3
@@ -174,7 +252,7 @@ app.post("/api/chat-ask", async (req, res) => {
             usedWebSearch = false;
             response = await ai.models.generateContent({
                 model: CHAT_MODEL,
-                contents: prompt,
+                contents,
                 config: { temperature: 0.3 }
             });
         }
