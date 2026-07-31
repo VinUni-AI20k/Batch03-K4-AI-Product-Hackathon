@@ -36,9 +36,13 @@ KET_QUA_DIR = REPO / "eval" / "ket-qua"
 #   gemini-3.5-flash      503  — "model is currently experiencing high demand"
 #   gemini-3.6-flash      3.7s — tim_thay=True, neo đúng 1 message_id  <- đổi sang cái này
 #   gemini-flash-latest   4.8s — sát mốc <5s quá
-#   gemini-3.1-flash-lite 1.1s — nhanh nhất nhưng chưa đo trên 22 case, chưa dám đổi
+#   gemini-3.1-flash-lite 1.1s — nhanh nhất  <- CHỐT dùng cái này
+# Chốt 3.1-flash-lite sau khi nó là model DUY NHẤT chạy hết được trọn bộ 22 case
+# (eval/ket-qua/luot-2.md: 81.8% pass, 0 case bịa nguồn). Model chạy trong Discord
+# phải đúng bằng model đã đo, nếu không thì con số ở luot-2.md không nói gì về bot
+# đang chạy — và 3.6-flash thì đã cạn 20 lời gọi/ngày ngay trong lượt đo đó.
 # Quality bar ở spec §7 KHÔNG đổi theo — bar đã chốt 23:59 N1, model chỉ là phương tiện.
-MODEL = "gemini-3.6-flash"               # free tier của Google AI Studio
+MODEL = "gemini-3.1-flash-lite"          # free tier của Google AI Studio
 MAX_TOKENS = 8000
 SO_UNG_VIEN = 30                         # FTS5 trả top-N cho LLM chọn
 
@@ -62,6 +66,11 @@ GUILD_ID = _env("GUILD_ID")
 
 # Danh sách kênh được index. Rỗng = mọi kênh bot đọc được.
 KENH_INDEX: list[str] = [k.strip() for k in _env("KENH_INDEX").split(",") if k.strip()]
+
+# Kênh mà MỌI tin nhắn của người đều được coi là câu hỏi cho bot (không cần @mention).
+# Rỗng = tắt. Đừng đưa 5 kênh ở KENH_INDEX vào đây: đó là kênh thông báo/tài nguyên,
+# bật lên thì bot trả lời cả thông báo của LabCoach và đốt hết 20 lời gọi/ngày.
+KENH_TU_DONG: list[str] = [k.strip() for k in _env("KENH_TU_DONG").split(",") if k.strip()]
 
 
 def can_discord() -> str:

@@ -130,8 +130,44 @@ Bot cần **MESSAGE CONTENT INTENT** (Developer Portal → tab Bot) và quyền
 ### C. Bot chạy thật
 
 ```powershell
-python -m timlai.bot                # rồi gõ /timlai trong Discord
+python -m timlai.bot
 ```
+
+**Ba cách hỏi**, cùng chạy qua một hàm `bot.hoi()` nên hành vi giống hệt nhau:
+
+| Cách | Gõ gì trong Discord | Dùng khi |
+|---|---|---|
+| Slash command | `/timlai link slide buổi 5` | có gợi ý tham số, không sợ gõ nhầm |
+| @mention | `@Spidey link slide buổi 5` | gõ tự nhiên, không cần nhớ tên lệnh |
+| Reply | reply vào tin của bot rồi gõ `ý mình là bài 2 của build` | đường **correction** ở spec §6 — hỏi lại không cần bắt đầu lại |
+
+**Câu trả lời là công khai** — cả kênh cùng thấy, không còn `ephemeral`. Một người hỏi thì
+cả lớp đỡ phải hỏi lại. Đánh đổi: bot sai thì cũng sai trước mặt mọi người, nên footer
+"đã bỏ N kết luận không neo được" cũng hiện công khai — đó là chủ ý, không phải rò rỉ debug.
+
+**Tự động trả lời mọi tin trong một kênh** (mặc định TẮT): điền tên kênh vào `KENH_TU_DONG`
+trong `.env`. Đừng điền 5 kênh ở `KENH_INDEX` — đó là kênh thông báo/tài nguyên, bật lên thì
+bot trả lời cả thông báo của LabCoach và đốt sạch hạn mức **20 lời gọi/ngày/model** của free
+tier. Nên tạo riêng một kênh `#hoi-bot`. Tin ngắn dưới 5 ký tự bị bỏ qua để khỏi tốn lời gọi
+cho "ok", "vâng".
+
+Vòng lặp bot-trả-lời-bot bị chặn ở đúng một dòng: `on_message` thoát ngay nếu `msg.author.bot`.
+Nhờ vậy câu trả lời của chính bot cũng không lọt vào index.
+
+> **Tin mới tự vào index** qua `on_message` — không cần chạy lại `backfill.py`. Nhưng
+> `backfill.py` **không xoá** tin cũ trong `index.db`: `them()` chỉ `DELETE` đúng dòng trùng
+> `id`. Chạy backfill lên index đang có tin giả thì thành **lẫn lộn** — 20 tin giả của
+> `seed_gia.py` (link chết `channels/111/222/…`) vẫn nằm đó và có thể bị trả về giữa lúc demo.
+>
+> ```powershell
+> python scripts/backfill.py --sach   # xoá index.db rồi dựng lại, chỉ còn tin thật
+> ```
+>
+> Kiểm nhanh index đang chứa gì:
+>
+> ```powershell
+> python -c "from timlai import index; db=index.mo_db(); print(index.dem(db), 'tin;', db.execute(\"SELECT count(*) FROM tin_nhan WHERE id LIKE '10000000000000%'\").fetchone()[0], 'tin gia')"
+> ```
 
 ## 4. Test — ba tầng, dùng đúng tầng cho đúng việc
 
