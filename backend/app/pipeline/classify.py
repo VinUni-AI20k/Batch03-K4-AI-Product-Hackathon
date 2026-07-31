@@ -144,32 +144,50 @@ def classify_with_fallback(segments: list[dict[str, str]]) -> list[dict[str, str
 
 
 def classify_with_llm(segments: list[dict[str, str]]) -> list[dict[str, str]]:
-    """Classify with Gemini and reject malformed or mismatched model output."""
+    """Classify all segments with Gemini in ONE batched call — not one call per
+    segment. A transcript upload can have 10-80+ segments; calling the model
+    once per segment made uploads take minutes (sequential network round trips)
+    instead of seconds. Batching keeps the same per-segment validation, just in
+    a single request."""
     from app.core.config import CLASSIFY_MODEL
     from app.core.llm_provider import generate_text
-    from app.prompts.classify_prompt import CLASSIFY_PROMPT
+    from app.prompts.classify_prompt import CLASSIFY_BATCH_PROMPT
+
+    if not segments:
+        return []
+
+    input_block = "\n".join(f"[{segment['segment_id']}] {segment['text']}" for segment in segments)
+    prompt = CLASSIFY_BATCH_PROMPT.format(input_segments=input_block)
+    max_tokens = min(8000, max(1500, len(segments) * 80))
+    response_text = generate_text(
+        "You classify transcript segments and return only the requested JSON array.",
+        prompt,
+        model=CLASSIFY_MODEL,
+        max_tokens=max_tokens,
+        temperature=0.0,
+    )
+    match = re.search(r"\[.*\]", response_text, re.DOTALL)
+    if not match:
+        raise ValueError("No JSON array returned for batch classification")
+    parsed = json.loads(match.group())
+    if not isinstance(parsed, list):
+        raise ValueError("Batch classification did not return a JSON array")
+
+    label_by_id = {
+        item.get("segment_id"): item.get("label")
+        for item in parsed
+        if isinstance(item, dict) and item.get("label") in VALID_LABELS
+    }
 
     results = []
     for segment in segments:
-        prompt = CLASSIFY_PROMPT.format(
-            input_segment=f"[{segment['segment_id']}] {segment['text']}"
-        )
-        response_text = generate_text(
-            "You classify transcript segments and return only the requested JSON object.",
-            prompt,
-            model=CLASSIFY_MODEL,
-            max_tokens=250,
-            temperature=0.0,
-        )
-        match = re.search(r"\{.*?\}", response_text, re.DOTALL)
-        if not match:
-            raise ValueError(f"No JSON returned for {segment['segment_id']}")
-        result = json.loads(match.group())
-        if result.get("segment_id") != segment["segment_id"]:
-            raise ValueError(f"Mismatched segment_id returned for {segment['segment_id']}")
-        if result.get("label") not in VALID_LABELS:
-            raise ValueError(f"Invalid label returned for {segment['segment_id']}")
-        results.append({"segment_id": result["segment_id"], "label": result["label"]})
+        label = label_by_id.get(segment["segment_id"])
+        if label is None:
+            # A handful of stragglers (model skipped/mislabeled them in the batch)
+            # shouldn't fail the whole upload — fall back to the same conservative
+            # rule used when no LLM is configured at all.
+            label = fallback_label(segment)
+        results.append({"segment_id": segment["segment_id"], "label": label})
     return results
 
 

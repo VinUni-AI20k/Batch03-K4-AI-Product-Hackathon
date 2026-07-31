@@ -97,6 +97,7 @@ def generate_text(
             return LLMClient(model_name=model or GEMINI_MODEL).generate_text(
                 f"SYSTEM INSTRUCTIONS:\n{system_prompt}\n\nUSER REQUEST:\n{user_prompt}",
                 temperature=temperature,
+                max_output_tokens=max_tokens,
             )
         raise LLMProviderError(f"Unsupported LLM_PROVIDER={status['provider']}")
     except Exception as error:  # noqa: BLE001

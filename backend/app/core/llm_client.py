@@ -19,10 +19,13 @@ class LLMClient:
             self._model = genai.GenerativeModel(self.model_name)
         return self._model
 
-    def generate_text(self, prompt: str, temperature=0.0):
+    def generate_text(self, prompt: str, temperature=0.0, max_output_tokens: int | None = None):
+        config_kwargs = {"temperature": temperature}
+        if max_output_tokens is not None:
+            config_kwargs["max_output_tokens"] = max_output_tokens
         response = self._get_model().generate_content(
             prompt,
-            generation_config=genai.types.GenerationConfig(temperature=temperature),
+            generation_config=genai.types.GenerationConfig(**config_kwargs),
         )
         if not response.candidates:
             raise ValueError(f"No response candidates (possibly blocked): {response.prompt_feedback}")

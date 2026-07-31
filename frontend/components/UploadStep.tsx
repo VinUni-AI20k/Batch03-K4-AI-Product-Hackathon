@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { uploadKnowledge } from '../api/client';
 import { useSession } from '../context/SessionContext';
 import ProgressLoader from './shared/ProgressLoader';
 
 const AI_STEPS = ['Classifying transcript (teaching vs. noise)', 'Extracting section outline', 'Generating your 20-question quiz'];
-const AUTO_START_DELAY_MS = 1200;
 
 export default function UploadStep() {
   const { dispatch } = useSession();
@@ -13,37 +12,13 @@ export default function UploadStep() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
-  const [countdown, setCountdown] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autoStartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasSlides = files.some((file) => file.name.toLowerCase().endsWith('.pdf'));
   const hasTranscript = files.some((file) => {
     const name = file.name.toLowerCase();
     return name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.vtt') || name.endsWith('.srt');
   });
   const readyToGenerate = hasSlides || hasTranscript;
-
-  // Auto-trigger: once files are added, processing starts on its own after a
-  // short debounce (so adding several files doesn't fire the pipeline early).
-  // No "Generate" button to click — matches "bỏ trigger thủ công" feedback.
-  useEffect(() => {
-    if (autoStartTimer.current) clearTimeout(autoStartTimer.current);
-    if (!readyToGenerate || loading) {
-      setCountdown(null);
-      return;
-    }
-    setCountdown(AUTO_START_DELAY_MS / 1000);
-    const tick = setInterval(() => setCountdown((c) => (c && c > 0 ? c - 1 : c)), 1000);
-    autoStartTimer.current = setTimeout(() => {
-      clearInterval(tick);
-      handleGenerate();
-    }, AUTO_START_DELAY_MS);
-    return () => {
-      clearInterval(tick);
-      if (autoStartTimer.current) clearTimeout(autoStartTimer.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, readyToGenerate, loading]);
 
   function addFiles(list: FileList | null) {
     if (!list) return;
@@ -55,6 +30,8 @@ export default function UploadStep() {
     setLoading(true);
     setError(null);
     setActiveStep(0);
+    // Cosmetic pacing only — the real work is one combined backend round trip
+    // (classify + align + quiz generation) with no incremental progress events.
     const t1 = setTimeout(() => setActiveStep(1), 500);
     const t2 = setTimeout(() => setActiveStep(2), 900);
     try {
@@ -71,7 +48,7 @@ export default function UploadStep() {
   }
 
   if (loading) {
-    return <ProgressLoader label="Turning your lecture into a Knowledge Package…" steps={AI_STEPS} activeStep={activeStep} />;
+    return <ProgressLoader label="Turning your lecture into a Knowledge Package… (thường mất 1-2 phút cho slide + transcript đầy đủ, đừng tải lại trang)" steps={AI_STEPS} activeStep={activeStep} />;
   }
 
   return (
@@ -82,7 +59,7 @@ export default function UploadStep() {
             Bring your lecture to life 🎓
           </h2>
           <p className="text-soft" style={{ marginTop: 6, fontSize: 15 }}>
-            Drop in your slides and the class transcript — I'll start turning them into a study package automatically.
+            Drop in your slides and/or the class transcript, then press Generate when you're ready.
           </p>
         </div>
 
@@ -141,9 +118,6 @@ export default function UploadStep() {
                 </button>
               </span>
             ))}
-            {countdown !== null && (
-              <span className="clay-badge clay-badge--mint">⚡ Auto-processing in {countdown}s…</span>
-            )}
             {!readyToGenerate && (
               <span className="clay-badge" style={{ color: 'var(--clay-orange-dark)' }}>
                 Import ít nhất 1 file slide (.pdf) hoặc 1 file transcript (.md, .txt, .vtt, .srt) để Generate MCQ.
@@ -151,6 +125,16 @@ export default function UploadStep() {
             )}
           </div>
         )}
+
+        <button
+          className="clay-btn clay-btn--mint"
+          disabled={!readyToGenerate}
+          onClick={handleGenerate}
+          style={{ alignSelf: 'flex-start' }}
+        >
+          Generate MCQ →
+        </button>
+
         {error && (
           <div className="clay-panel" style={{ color: 'var(--clay-orange-dark)', fontSize: 13 }}>
             <strong>Processing failed.</strong> {error}
