@@ -31,10 +31,6 @@ export default function StyleTimeSelect() {
     dispatch({ type: 'SET_ROADMAP', payload: roadmap });
   }
 
-  function skipReteaching() {
-    dispatch({ type: 'GO_TO', phase: 'report' });
-  }
-
   if (building) {
     return (
       <ProgressLoader
@@ -50,10 +46,10 @@ export default function StyleTimeSelect() {
       <div>
         <span className="clay-badge clay-badge--pink">DIAGNOSIS</span>
         <h2 className="font-display" style={{ fontSize: 24, marginTop: 10 }}>
-          You scored {diagnosis.score}% — nice work!
+          Let’s build your personalized review
         </h2>
         <p className="text-soft" style={{ marginTop: 6, fontSize: 15 }}>
-          {diagnosis.correctCount} of {diagnosis.totalQuestions} correct. Here's where a little more practice will help most:
+          Your score is {diagnosis.score}% ({diagnosis.correctCount} of {diagnosis.totalQuestions}). Choose how you want to revisit the weak sections.
         </p>
       </div>
 
@@ -71,23 +67,6 @@ export default function StyleTimeSelect() {
       </div>
 
       <hr style={{ border: 'none', borderTop: '2px dashed var(--ink-faint)', opacity: 0.4 }} />
-
-      <div>
-        <h3 className="font-display" style={{ fontSize: 18 }}>
-          Want a personalized re-teaching session?
-        </h3>
-        <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-          <button className="clay-btn clay-btn--mint" onClick={() => {}} disabled>
-            Yes, help me review ✅
-          </button>
-          <button className="clay-btn clay-btn--ghost" onClick={skipReteaching}>
-            No, I'm confident →
-          </button>
-        </div>
-        <p className="text-faint" style={{ fontSize: 12, marginTop: 6 }}>
-          Pick a learning style and daily time below, then hit "Yes" to build your roadmap.
-        </p>
-      </div>
 
       <div>
         <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>Learning style</p>
@@ -145,7 +124,7 @@ export default function StyleTimeSelect() {
       </div>
 
       <button className="clay-btn" disabled={!style || !timeGroup} onClick={handleBuildRoadmap} style={{ alignSelf: 'flex-start' }}>
-        Build my roadmap 🗺️
+        Build my review plan →
       </button>
     </div>
   );

@@ -129,7 +129,7 @@ Ngưỡng mastery: **≥ 80%** số câu đúng trong bài retest.
 
 ## 7. Kiến trúc kỹ thuật
 
-- **Frontend:** React + TypeScript + Vite (`frontend/`). State machine chính nằm ở `App.tsx`, tách theo `stage`: `upload → ready → quiz → diagnosis → style → roadmap → review/report`. Gọi backend thật qua `fetch` tới `http://127.0.0.1:8000`.
+- **Frontend:** React + TypeScript + Vite (`new_frontend/`). State machine chính nằm ở `App.tsx`, tách theo `phase`: `upload → quiz → diagnosis/style-time → reteach → retest → report`. Gọi backend qua `http://127.0.0.1:8001`.
 - **Backend:** FastAPI (`backend/app/`) — `main.py` (2 endpoint: `/api/outline`, `/api/quiz/generate`), `pipeline/outline.py` (parse transcript thật, rule-based), `pipeline/quiz_bank.py` (gọi AI thật — quyết định trung tâm), `core/llm_client.py` (wrapper OpenAI), `prompts/quiz_bank_prompt.py`. Setup: xem `backend/README.md`.
 - **Eval:** `eval/cases.py` (22 case golden set) + `eval/run_golden_set.py` (script chạy thật) + `eval/results-round1.md` (kết quả lượt 1) + `eval/golden_set.md` (mô tả phương pháp + quality bar).
 - **Prototype tĩnh song song:** `codebase/index.html` — bản HTML/JS thuần, dùng để demo nhanh/dự phòng, độc lập với frontend React (vẫn 100% mock, chưa nối bản cập nhật này).

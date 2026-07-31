@@ -13,6 +13,7 @@ export interface QuizQuestion {
 
 export interface KnowledgePackage {
   id: string;
+  sessionId?: string;
   fileNames: string[];
   sectionCount: number;
   quiz: QuizQuestion[];
@@ -55,6 +56,7 @@ export interface RetestResult {
 }
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8001';
 
 export interface AgentStep {
   label: string;
@@ -108,25 +110,43 @@ export async function askKnowledgeBase(
   };
 }
 
-/** Phase 1 — upload slides + transcript, get back a generated 20Q quiz */
+/** Phase 1 — upload slides + transcript, then run the real backend pipeline. */
 export async function uploadKnowledge(files: File[]): Promise<KnowledgePackage> {
-  await delay(1200);
-  const sections = ['Intro & Motivation', 'Core Mechanism', 'Worked Example', 'Edge Cases', 'Summary'];
+  const slides = files.find((file) => file.name.toLowerCase().endsWith('.pdf'));
+  const transcript = files.find((file) => {
+    const name = file.name.toLowerCase();
+    return name.endsWith('.md') || name.endsWith('.txt') || name.endsWith('.vtt') || name.endsWith('.srt');
+  });
+  if (!slides || !transcript) throw new Error('A PDF slide file and a transcript file are required.');
+
+  const sessionResponse = await fetch(`${API_BASE}/api/sessions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  if (!sessionResponse.ok) throw new Error(`Could not create learning session (${sessionResponse.status}).`);
+  const session = await sessionResponse.json() as { session_id: string };
+
+  const form = new FormData();
+  form.append('slides', slides);
+  form.append('transcript', transcript);
+  form.append('session_id', session.session_id);
+  const uploadResponse = await fetch(`${API_BASE}/api/knowledge/upload`, { method: 'POST', body: form });
+  if (!uploadResponse.ok) throw new Error(await uploadResponse.text());
+
+  const quizResponse = await fetch(`${API_BASE}/api/quiz/generate/pdf?session_id=${encodeURIComponent(session.session_id)}&n_questions=20`, { method: 'POST' });
+  if (!quizResponse.ok) throw new Error(await quizResponse.text());
+  const result = await quizResponse.json() as { outline: Array<{ section_id: string; title: string }>; questions: Array<Record<string, unknown>> };
+
   return {
-    id: 'kp_' + Date.now(),
+    id: `kp_${session.session_id}`,
+    sessionId: session.session_id,
     fileNames: files.map((f) => f.name),
-    sectionCount: sections.length,
-    quiz: Array.from({ length: 20 }).map((_, i) => {
-      const section = sections[i % sections.length];
-      return {
-        id: `q${i + 1}`,
-        sectionId: section.toLowerCase().replace(/\s+/g, '-'),
-        sectionTitle: section,
-        prompt: `Question ${i + 1}: which statement best matches "${section}"?`,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        correctIndex: i % 4,
-      };
-    }),
+    sectionCount: result.outline.length,
+    quiz: result.questions.map((question, index) => ({
+      id: String(question.id ?? `q${index + 1}`),
+      sectionId: String(question.section_id ?? ''),
+      sectionTitle: result.outline.find((section) => section.section_id === question.section_id)?.title ?? String(question.section_id ?? 'Section'),
+      prompt: String(question.question ?? ''),
+      options: Array.isArray(question.options) ? question.options.map(String) : [],
+      correctIndex: Number(question.correct_index ?? 0),
+    })),
   };
 }
 

@@ -53,8 +53,18 @@ def _load_transcript_segments(transcript_file: str = "transcript-01-clean.md"):
     ]
 
 
-def _pdf_alignment(sections):
-    transcript_segments = _load_transcript_segments()
+def _pdf_alignment(sections, transcript_text: str):
+    transcript_sections = parse_transcript(transcript_text)
+    transcript_segments = [
+        segment
+        for section in transcript_sections
+        for segment in section.segments
+    ]
+    if not transcript_segments:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract transcript segments. Use Markdown with [Txx-NNN] segment markers.",
+        )
     try:
         # Uploads must use the same validated classifier/provider path as the
         # offline preparation CLI. Do not silently substitute the demo heuristic here:
@@ -94,9 +104,9 @@ def _require_session(session_id: str):
     return session
 
 
-def _persist_pdf_context(session_id: str, pdf_bytes: bytes, sections) -> None:
+def _persist_pdf_context(session_id: str, pdf_bytes: bytes, sections, transcript_text: str) -> None:
     session = _require_session(session_id)
-    transcript_segments, classified, alignment = _pdf_alignment(sections)
+    transcript_segments, classified, alignment = _pdf_alignment(sections, transcript_text)
     pages = extract_pdf_pages(pdf_bytes)
     slides = [
         Slide(
@@ -173,13 +183,44 @@ async def get_outline_from_pdf(
     sections = parse_slide_outline(pdf_bytes)
     if not sections:
         raise HTTPException(status_code=422, detail="Could not extract text from PDF slides")
-    _persist_pdf_context(session_id, pdf_bytes, sections)
+    return {
+        "outline": outline_json(sections),
+        "alignment": [],
+        "slides": [],
+        "source": "slide_pdf",
+    }
+
+
+@app.post("/api/knowledge/upload")
+async def upload_knowledge(
+    slides: UploadFile = File(...),
+    transcript: UploadFile = File(...),
+    session_id: str = Form(...),
+):
+    """Persist the user's slide + transcript pair before quiz generation."""
+    if not slides.filename or not slides.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=415, detail="Slides must be a PDF file")
+    if not transcript.filename or not transcript.filename.lower().endswith((".md", ".txt", ".vtt", ".srt")):
+        raise HTTPException(status_code=415, detail="Transcript must be .md, .txt, .vtt, or .srt")
+
+    pdf_bytes = await slides.read()
+    transcript_bytes = await transcript.read()
+    try:
+        transcript_text = transcript_bytes.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise HTTPException(status_code=415, detail="Transcript must be UTF-8 text") from exc
+
+    sections = parse_slide_outline(pdf_bytes)
+    if not sections:
+        raise HTTPException(status_code=422, detail="Could not extract text from PDF slides")
+    _persist_pdf_context(session_id, pdf_bytes, sections, transcript_text)
     session = _require_session(session_id)
     return {
-        "outline": session.outline,
+        "session_id": session_id,
+        "outline": session.outline or [],
         "alignment": session.alignment or [],
         "slides": session.slides or [],
-        "source": "slide_pdf",
+        "source": "uploaded_slides_and_transcript",
     }
 
 

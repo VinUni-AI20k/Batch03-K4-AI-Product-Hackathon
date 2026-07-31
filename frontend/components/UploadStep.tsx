@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { uploadKnowledge } from '../api/client';
 import { useSession } from '../context/SessionContext';
-// AskPanel is now rendered by the parent layout; removed local import to avoid duplicate panels
 import ProgressLoader from './shared/ProgressLoader';
 
 const AI_STEPS = ['Classifying transcript (teaching vs. noise)', 'Extracting section outline', 'Generating your 20-question quiz'];
@@ -12,6 +11,7 @@ export default function UploadStep() {
   const [files, setFiles] = useState<File[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +19,7 @@ export default function UploadStep() {
   const hasSlides = files.some((file) => file.name.toLowerCase().endsWith('.pdf'));
   const hasTranscript = files.some((file) => {
     const name = file.name.toLowerCase();
-    return name.endsWith('.txt') || name.endsWith('.vtt') || name.endsWith('.srt');
+    return name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.vtt') || name.endsWith('.srt');
   });
   const readyToGenerate = hasSlides && hasTranscript;
 
@@ -53,13 +53,21 @@ export default function UploadStep() {
   async function handleGenerate() {
     if (!readyToGenerate) return;
     setLoading(true);
+    setError(null);
     setActiveStep(0);
     const t1 = setTimeout(() => setActiveStep(1), 500);
     const t2 = setTimeout(() => setActiveStep(2), 900);
-    const kp = await uploadKnowledge(files);
-    clearTimeout(t1);
-    clearTimeout(t2);
-    dispatch({ type: 'SET_KNOWLEDGE_PACKAGE', payload: kp });
+    try {
+      const kp = await uploadKnowledge(files);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      dispatch({ type: 'SET_KNOWLEDGE_PACKAGE', payload: kp });
+    } catch (err) {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Could not process the uploaded materials.');
+    }
   }
 
   if (loading) {
@@ -104,7 +112,7 @@ export default function UploadStep() {
             Drop PDF slides + transcript here
           </p>
           <p className="text-soft" style={{ fontSize: 13, marginTop: 4 }}>
-            or click to browse — .pdf, .txt, .vtt
+            or click to browse — .pdf, .md, .txt, .vtt, .srt
           </p>
           <input
             ref={inputRef}
@@ -112,7 +120,7 @@ export default function UploadStep() {
             multiple
             hidden
             onChange={(e) => addFiles(e.target.files)}
-            accept=".pdf,.txt,.vtt,.srt"
+            accept=".pdf,.md,.txt,.vtt,.srt"
           />
         </div>
 
@@ -138,9 +146,15 @@ export default function UploadStep() {
             )}
             {!readyToGenerate && (
               <span className="clay-badge" style={{ color: 'var(--clay-orange-dark)' }}>
-                Import đủ 1 file slide (.pdf) và 1 file transcript (.txt, .vtt hoặc .srt) để Generate MCQ.
+                Import đủ 1 file slide (.pdf) và 1 file transcript (.md, .txt, .vtt hoặc .srt) để Generate MCQ.
               </span>
             )}
+          </div>
+        )}
+        {error && (
+          <div className="clay-panel" style={{ color: 'var(--clay-orange-dark)', fontSize: 13 }}>
+            <strong>Processing failed.</strong> {error}
+            <p style={{ marginTop: 5 }}>Check that the backend is running and the transcript is Markdown with lecture segment markers such as [T01-001].</p>
           </div>
         )}
       </div>

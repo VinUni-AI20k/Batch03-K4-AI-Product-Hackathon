@@ -2,10 +2,10 @@ import React from 'react';
 import ChatPanel from './components/ChatPanel';
 import JourneyPath from './components/shared/JourneyPath';
 import QuizView from './components/QuizView';
+import DiagnosisView from './components/DiagnosisView';
 import RetestResultView from './components/RetestResultView';
 import StyleTimeSelect from './components/StyleTimeSelect';
 import UploadStep from './components/UploadStep';
-import AskPanel from './components/AskPanel';
 import headerIcon from './assets/DrawKit Vector Illustration Team Work (6).png';
 import { useSession } from './context/SessionContext';
 
@@ -81,16 +81,14 @@ export default function App() {
               <UploadStep />
             </div>
 
-            <div className="flat-card">
-              <AskPanel />
-            </div>
           </div>
 
           {/* decorative corner image removed per request; header now shows the app icon */}
         </section>
       )}
       {state.phase === 'quiz' && <QuizView />}
-      {(state.phase === 'diagnosis' || state.phase === 'style-time') && <StyleTimeSelect />}
+      {state.phase === 'diagnosis' && <DiagnosisView />}
+      {state.phase === 'style-time' && <StyleTimeSelect />}
       {state.phase === 'reteach' && <ChatPanel />}
       {state.phase === 'retest' && <RetestResultView />}
       {state.phase === 'report' && <ReportScreen />}
