@@ -13,8 +13,7 @@ if APP_DIR not in sys.path:
     sys.path.insert(0, APP_DIR)
 
 from langgraph.graph import StateGraph, START, END
-from langchain_core.messages import SystemMessage, HumanMessage
-from services.model_factory import get_llm_model, list_available_models
+from services.model_factory import call_llm
 from services.rag_engine import get_rag_instance
 from lightrag import QueryParam
 
@@ -85,8 +84,6 @@ def generate_quiz_node(state: QuizState) -> Dict[str, Any]:
 
     print(f"\n[LANGGRAPH NODE 2] Generating Quiz via Model '{model_name}' (Temp: {temp})...")
 
-    llm = get_llm_model(model_name=model_name, temperature=temp)
-
     combined_context = f"--- NỘI DUNG TÀI LIỆU PDF GỐC ---\n{content}"
     if rag_context:
         combined_context += f"\n\n--- ĐỒ THỊ TRI THỨC VÀ THỰC THỂ (LIGHTRAG GRAPH CONTEXT) ---\n{rag_context}"
@@ -117,15 +114,11 @@ def generate_quiz_node(state: QuizState) -> Dict[str, Any]:
     CHỈ TRẢ VỀ DỮ LIỆU JSON HỢP LỆ, KHÔNG CHỨA BẤT KỲ VĂN BẢN NÀO KHÁC BÊN NGOÀI.
     """
 
-    messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=combined_context)
-    ]
-
-    response = llm.invoke(messages)
+    full_prompt = system_prompt + "\n\n" + combined_context
+    quiz_text = call_llm(full_prompt, temperature=temp, model_name=model_name)
 
     return {
-        "quiz_result": response.content,
+        "quiz_result": quiz_text,
         "status": "COMPLETED"
     }
 

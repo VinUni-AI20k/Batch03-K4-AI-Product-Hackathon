@@ -9,5 +9,5 @@ tenacity
 openai
 google-genai
 json_repair
-langchain-openai
 langgraph
+litellm

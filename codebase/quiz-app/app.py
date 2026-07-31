@@ -39,30 +39,19 @@ import requests
 load_dotenv()
 
 # ============================================================================
-# GHI CHÚ — cấu hình Gemini cũ (KHÔNG còn dùng, giữ lại tham khảo):
-#
-# API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-# MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
-# GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+# CẤU HÌNH PROVIDER — dùng chung services/model_factory.py (LiteLLM) để gộp
+# OpenAI / DeepSeek / Claude / Gemini vào 1 interface duy nhất, thay vì mỗi
+# provider có 1 đoạn code request/response riêng (cách cũ chỉ chạy đúng với
+# OpenAI/DeepSeek vì 2 API này giống hệt nhau — Claude/Gemini format khác hẳn,
+# không thể chỉ đổi base_url). Chọn provider bằng biến PROVIDER trong .env,
+# hoặc để trống cho tự suy đoán qua tên model (xem model_factory.py).
 # ============================================================================
-# CẤU HÌNH CORE MODEL (MẶC ĐỊNH: DEEPSEEK V4 FLASH)
-# ============================================================================
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", os.environ.get("LLM_BINDING_API_KEY", "")).strip()
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", DEEPSEEK_API_KEY).strip()
+from services.model_factory import resolve_provider_and_model, resolve_api_key, call_llm
 
-LLM_MODEL = os.environ.get("LLM_MODEL", os.environ.get("OPENAI_MODEL", "deepseek-v4-flash")).strip()
-LLM_BASE_URL = os.environ.get("LLM_BINDING_HOST", "https://api.deepseek.com").rstrip("/")
-
-if "deepseek" in LLM_MODEL.lower() or "deepseek" in LLM_BASE_URL.lower():
-    OPENAI_URL = f"{LLM_BASE_URL}/chat/completions" if not LLM_BASE_URL.endswith("/chat/completions") else LLM_BASE_URL
-    ACTIVE_API_KEY = DEEPSEEK_API_KEY or OPENAI_API_KEY
-else:
-    OPENAI_URL = "https://api.openai.com/v1/chat/completions"
-    ACTIVE_API_KEY = OPENAI_API_KEY or DEEPSEEK_API_KEY
-
-OPENAI_API_KEY = ACTIVE_API_KEY
-OPENAI_MODEL = LLM_MODEL
-MODEL = LLM_MODEL  # dùng chung cho hiển thị UI + response JSON
+PROVIDER, _LITELLM_MODEL = resolve_provider_and_model()
+OPENAI_API_KEY, _ACTIVE_KEY_ENV = resolve_api_key(PROVIDER)
+OPENAI_MODEL = _LITELLM_MODEL.split("/", 1)[-1]  # tên model gốc (bỏ prefix provider) để hiển thị UI cho gọn
+MODEL = OPENAI_MODEL  # dùng chung cho hiển thị UI + response JSON
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30MB, khớp copy trên UI
@@ -381,96 +370,41 @@ def parse_markdown_quiz(text: str) -> list[dict]:
 
 
 def call_openai(prompt: str, mode: str) -> dict:
+    """Gọi LLM qua services/model_factory.call_llm() — 1 interface duy nhất cho
+    OpenAI/DeepSeek/Claude/Gemini (LiteLLM), thay vì tự requests.post() riêng
+    cho từng provider. Giữ nguyên tên hàm để các chỗ gọi cũ không phải sửa."""
     if not OPENAI_API_KEY:
         raise RuntimeError(
-            "Chưa cấu hình API Key. Mở file .env trong thư mục quiz-app/ và dán API key vào."
+            f"Chưa cấu hình API key cho provider '{PROVIDER}'. Mở file .env trong thư mục "
+            f"quiz-app/ và dán API key vào (biến {_ACTIVE_KEY_ENV or 'tương ứng provider'})."
         )
 
     temperature = 1.4 if mode == "stress" else 0.25
 
-    # Đánh giá xem endpoint đang gọi là DeepSeek hay OpenAI
-    is_deepseek = "deepseek" in OPENAI_MODEL.lower() or "deepseek" in OPENAI_URL.lower()
-
-    if is_deepseek:
-        # DeepSeek API hỗ trợ format {"type": "json_object"}
-        response_format = {"type": "json_object"}
-    else:
-        # OpenAI hỗ trợ Strict JSON Schema
-        response_format = {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "quiz_schema",
-                "schema": to_openai_strict_schema(QUIZ_SCHEMA),
-                "strict": True,
-            },
-        }
-
-    payload = {
-        "model": OPENAI_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": temperature,
-        "max_tokens": 8192,
-        "response_format": response_format,
-    }
-
-    def do_post(body: dict):
-        try:
-            return requests.post(
-                OPENAI_URL,
-                headers={"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"},
-                json=body,
-                timeout=90,
-            )
-        except requests.exceptions.RequestException as e:
-            raise RuntimeError(
-                f"Không kết nối được tới OpenAI API (kiểm tra internet/firewall/proxy). Chi tiết: {e}"
-            )
-
-    resp = do_post(payload)
-
-    # Nếu API từ chối response_format (ví dụ 400: response_format type is unavailable)
-    if resp.status_code == 400 and "response_format" in resp.text.lower():
-        payload.pop("response_format", None)
-        resp = do_post(payload)
-
-    # Một số model reasoning (dòng gpt-5.x) không nhận tham số temperature tuỳ chỉnh
-    # -> nếu bị từ chối vì lý do này, bỏ temperature và gọi lại thay vì lỗi luôn.
-    if resp.status_code == 400 and "temperature" in resp.text.lower():
-        payload.pop("temperature", None)
-        resp = do_post(payload)
-
-    # 429 (rate limit) / 5xx (lỗi tạm thời phía OpenAI) -> tự thử lại thay vì bắt người
-    # dùng tự bấm lại, giống cơ chế đã làm cho Gemini trước đây.
-    RETRY_STATUSES = (429, 500, 502, 503, 504)
+    RETRY_STATUSES_HINTS = ("429", "rate limit", "overloaded", "503", "502")
     max_retries = 3
     attempt = 0
-    while resp.status_code in RETRY_STATUSES and attempt < max_retries:
-        attempt += 1
-        time.sleep(attempt * 2)  # 2s, 4s, 6s
-        resp = do_post(payload)
-
-    if resp.status_code != 200:
+    last_err = None
+    while attempt <= max_retries:
         try:
-            err = resp.json().get("error", {}).get("message", resp.text)
-        except Exception:
-            err = resp.text
-        if resp.status_code in RETRY_STATUSES:
-            raise RuntimeError(
-                f"OpenAI đang quá tải/giới hạn tần suất (lỗi {resp.status_code}) — đã tự thử lại {max_retries} lần "
-                f"nhưng vẫn chưa được. Đây là lỗi tạm thời phía OpenAI, không phải lỗi cấu hình. "
-                f"Đợi 1-2 phút rồi bấm Tạo Quiz lại. Chi tiết: {err}"
-            )
-        raise RuntimeError(f"OpenAI API lỗi ({resp.status_code}): {err}")
+            text = call_llm(prompt, temperature=temperature, model_name=_LITELLM_MODEL)
+            last_err = None
+            break
+        except RuntimeError as e:
+            last_err = e
+            msg = str(e).lower()
+            if attempt < max_retries and any(h in msg for h in RETRY_STATUSES_HINTS):
+                attempt += 1
+                time.sleep(attempt * 2)  # 2s, 4s, 6s
+                continue
+            raise
 
-    data = resp.json()
-    try:
-        text = data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError):
-        raise RuntimeError(f"Phản hồi OpenAI không đúng định dạng mong đợi: {data}")
+    if last_err:
+        raise last_err
 
     # Ghi log toàn bộ Raw Output của Model ra Terminal để dễ dàng kiểm tra / debug
     print("\n" + "=" * 70)
-    print(f"[RAW MODEL OUTPUT - Model: {OPENAI_MODEL} | Length: {len(text)} chars]")
+    print(f"[RAW MODEL OUTPUT - Provider: {PROVIDER} | Model: {OPENAI_MODEL} | Length: {len(text)} chars]")
     print("=" * 70)
     try:
         sys.stdout.buffer.write((text + "\n").encode("utf-8"))
