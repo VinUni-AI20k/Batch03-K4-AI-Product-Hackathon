@@ -8,9 +8,9 @@
 
 ## Loại bằng chứng
 
-**Chỉ chọn A — Đã khảo sát người thật sau khi đã commit file chứa toàn bộ 45 câu trả lời đã khử định danh và xác nhận họ đều ở ngoài nhóm. Không chọn B:** repo hiện chưa có một phép mining chatlog chứng minh pain theo chuẩn B.
+**Chọn A — Đã khảo sát người thật. Không chọn B:** repo đã có đủ 45 phản hồi khử định danh, cách đếm và hash nguồn, nhưng chưa có một phép mining chatlog/log độc lập chứng minh pain theo chuẩn B.
 
-> Trạng thái hiện tại: câu hỏi, cách đếm và sáu biểu đồ tổng hợp 45 phản hồi đã có trong `evidence/cp4-survey/`; còn thiếu bản xuất đủ 45 hàng đã khử định danh và xác nhận người trả lời ở ngoài nhóm.
+> Artifact kiểm chứng nằm trong `evidence/cp4-survey/`: đủ 45 hàng đã khử định danh, bảng tổng hợp, script tái lập, hash ZIP nguồn và sáu biểu đồ. Nhóm cần bảo đảm 45 người trả lời đều ở ngoài nhóm.
 
 ## Con số bằng chứng mạnh nhất
 
@@ -30,13 +30,13 @@
 
 ## Nhóm còn thiếu gì, cần hỗ trợ gì
 
-**Nhóm còn thiếu bản xuất đủ 45 hàng khảo sát đã xóa tên/email và xác nhận người trả lời đều ngoài nhóm; cần TA xác nhận cách khử định danh có đạt chuẩn A hay không. Nhóm cũng cần BTC/TA cung cấp mã Zone của SPDVC vì repo không có bảng phân zone. Về kỹ thuật, nhóm muốn TA review ngưỡng abstain/retrieval để hệ thống không chọn thủ tục gần giống khi nguồn hiện có không đủ.**
+**Nhóm cần TA xác nhận cách khử định danh khảo sát hiện tại đáp ứng chuẩn A và BTC/TA cung cấp mã Zone của SPDVC vì repo không có bảng phân zone. Về kỹ thuật, nhóm muốn được review ngưỡng abstain/retrieval để hệ thống không chọn thủ tục gần giống khi nguồn hiện có không đủ căn cứ.**
 
 ## Trạng thái checklist CP4
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Evidence chuẩn A/B có log | **Gần đạt** — đã có câu hỏi, bảng đếm và biểu đồ; thiếu đủ 45 hàng đã khử định danh và xác nhận ngoài nhóm |
+| Evidence chuẩn A/B có log | **Đạt chuẩn A về artifact** — đủ câu hỏi, 45 hàng khử định danh, cách đếm, hash nguồn và biểu đồ; nhóm xác nhận người trả lời ngoài nhóm |
 | Bảng impact + ứng viên bị loại | **Đạt về cấu trúc** — 3 ứng viên, có phương án loại và lý do |
 | 4 lớp tình huống cụ thể | **Đạt** — mỗi lớp có ít nhất 2 ví dụ |
 | ≥4 nguyên tắc có nơi áp dụng | **Đạt** |

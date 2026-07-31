@@ -44,7 +44,7 @@ flowchart TD
 - Problem statement: Người ít kỹ năng công nghệ phải chuyển qua lại giữa trang tra cứu, hướng dẫn và biểu mẫu; họ dễ chọn sai thủ tục, thiếu trường bắt buộc hoặc không biết bước tiếp theo, dẫn tới mất thời gian và phải làm lại hồ sơ.
 - Evidence (dự kiến nộp theo chuẩn A — khảo sát người thật):
   - Google Forms ghi nhận **45 phản hồi**. Bằng chứng mạnh nhất gắn với sản phẩm: **26/45 người (57,8%)** chọn “Phải đi lại nhiều lần do hồ sơ thiếu/sai sót”; **25/45 (55,6%)** xem quy trình/giấy tờ rườm rà, chồng chéo là khó khăn tổng quan lớn nhất; **24/45 (53,3%)** gặp khó khi tìm tên thủ tục phức tạp.
-  - Câu hỏi, bảng đếm, cách kiểm chứng và sáu biểu đồ không chứa PII nằm tại [`evidence/cp4-survey/`](evidence/cp4-survey/). Trước khi tích chuẩn A, nhóm vẫn phải bổ sung đủ 45 hàng phản hồi đã khử định danh và xác nhận người trả lời đều ở ngoài nhóm.
+  - Câu hỏi, đủ **45 hàng phản hồi đã khử định danh**, bảng đếm tái lập được, hash ZIP nguồn và sáu biểu đồ không chứa PII nằm tại [`evidence/cp4-survey/`](evidence/cp4-survey/). Tên và timestamp đã bị loại; nhóm xác nhận người trả lời ở ngoài nhóm khi tích chuẩn A. Không tích B vì đây vẫn là dữ liệu khảo sát, không phải chatlog/log độc lập.
   - Ví dụ nguyên văn từ khảo sát — Thực hiện thủ tục trực tuyến
 ```text
 - “Thông tin giữa các trang web không đồng nhất, thiếu kênh hỗ trợ chatbot tư vấn trực tuyến.”  

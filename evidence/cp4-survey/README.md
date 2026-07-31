@@ -5,7 +5,7 @@
 - Google Forms ghi nhận **45 phản hồi**.
 - Form giới thiệu khảo sát là vô danh nhưng có trường “Họ và tên”. Vì vậy, trước khi commit bản xuất chi tiết, nhóm phải xóa tên, email và mọi dữ liệu nhận dạng; chỉ giữ mã `R001`–`R045`.
 - Sáu ảnh trong thư mục này là biểu đồ tổng hợp do Google Forms tạo và không chứa thông tin nhận dạng.
-- Nhóm cần xác nhận 45 người trả lời đều là người ngoài nhóm. Biểu đồ tổng hợp không tự chứng minh điều kiện này.
+- File `responses-deidentified.csv` chứa đủ 45 hàng sau khi đã loại tên và timestamp. Nhóm chịu trách nhiệm xác nhận 45 người trả lời đều là người ngoài nhóm khi tích bằng chứng A.
 
 ## Câu hỏi khảo sát
 
@@ -40,10 +40,12 @@ Mẫu số của mỗi tỷ lệ là 45 phản hồi. Với câu nhiều lựa c
 
 ## Cách kiểm chứng
 
-1. Mở ảnh `03-online-pain-points.png`, `04-travel-pain-points.png` và `06-overall-pain.png`.
-2. Đọc số ở cuối từng thanh; mẫu số “45 responses” hiển thị phía trên biểu đồ.
-3. Kiểm tra tỷ lệ bằng công thức `số lựa chọn / 45 × 100`, làm tròn một chữ số thập phân.
-4. Không cộng các lựa chọn của câu checkbox vì một người có thể chọn nhiều đáp án.
+1. Mở `responses-deidentified.csv` để kiểm tra đủ 45 hàng và từng lựa chọn nguyên văn.
+2. Chạy `python evidence/cp4-survey/analyze_survey.py <file-zip-goc> evidence/cp4-survey` để tái tạo `aggregate-results.csv` và `analysis.json`.
+3. Đối chiếu các số đếm với ảnh `03-online-pain-points.png`, `04-travel-pain-points.png` và `06-overall-pain.png`.
+4. Kiểm tra tỷ lệ bằng công thức `số lựa chọn / 45 × 100`, làm tròn một chữ số thập phân. Không cộng các lựa chọn vì một người có thể chọn nhiều đáp án.
+
+SHA-256 của ZIP nguồn: `633C4BF6DAD9A77856FD52799BC03EF16EF71D1ED54534FDDA17C77148220874`.
 
 ## Trích dẫn mở đã khử định danh
 
@@ -54,6 +56,11 @@ Mẫu số của mỗi tỷ lệ là 45 phản hồi. Với câu nhiều lựa c
 - “Bổ sung chức năng lưu tạm hồ sơ để người dùng có thể hoàn thành sau.”
 - “Thông báo lỗi cần rõ ràng, dễ hiểu để người dùng biết cách xử lý.”
 
-## Artifact còn phải bổ sung để đạt trọn chuẩn A
+## Artifact phân tích
 
-Xuất toàn bộ 45 hàng phản hồi từ Google Forms sang CSV, xóa cột họ tên/email, thay bằng `respondent_id`, rồi lưu tại `evidence/cp4-survey/responses-deidentified.csv`. Không dùng phần “Response Summary” do Gemini tạo làm dữ liệu gốc.
+- `responses-deidentified.csv`: đủ 45 phản hồi, không có họ tên hoặc timestamp.
+- `aggregate-results.csv`: số đếm và tỷ lệ theo từng lựa chọn.
+- `analysis.json`: kết quả máy đọc được, cột đã loại và hash nguồn.
+- `outputs/cp4-survey-analysis/survey-analysis.xlsx`: workbook kiểm tra nhanh gồm dashboard, bảng tổng hợp và 45 phản hồi.
+
+Không dùng phần “Response Summary” do Gemini tạo làm dữ liệu gốc. Phần phân tích này vẫn thuộc **chuẩn A — khảo sát người thật**; không tự động trở thành chuẩn B vì không phải chatlog/log độc lập.
