@@ -11,23 +11,25 @@ const statusLabels = {
   uploading: "Đang tải lên",
 };
 
-export default function Sidebar({ lectures, activeId, isLoading, uploadError, onUpload, onSelect, onDelete }: {
+export default function Sidebar({ lectures, activeId, isLoading, isOpen, uploadError, onUpload, onSelect, onDelete, onToggle }: {
   lectures: Lecture[];
   activeId?: string;
   isLoading: boolean;
+  isOpen: boolean;
   uploadError?: string;
   onUpload: (file: File) => void;
   onSelect: (lecture: Lecture) => void;
   onDelete: (id: string) => void;
+  onToggle: () => void;
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const isUploading = lectures.some((lecture) => lecture.status === "uploading");
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? "is-open" : "is-closed"}`} aria-hidden={!isOpen}>
       <header className="brand-row">
         <div className="brand-mark">V</div>
         <div><strong>VLearn</strong><span>AI learning space</span></div>
-        <button className="icon-button sidebar-toggle" aria-label="Thu gọn sidebar">‹</button>
+        <button className="icon-button sidebar-toggle" onClick={onToggle} aria-label="Thu gọn danh sách tài liệu" title="Thu gọn danh sách tài liệu">‹</button>
       </header>
       <div className="sidebar-body">
         <UploadLecture onUpload={onUpload} disabled={isUploading} />
@@ -62,7 +64,7 @@ export default function Sidebar({ lectures, activeId, isLoading, uploadError, on
           })}
         </div>
       </div>
-      <footer className="sidebar-footer"><div className="avatar">NH</div><div><strong>Nguyễn Hoàng</strong><span>Học viên</span></div><button className="icon-button">⌄</button></footer>
+      <footer className="sidebar-footer"><div className="avatar">NH</div><div><strong>Nguyễn Hoàng</strong><span>Học viên</span></div></footer>
     </aside>
   );
 }
