@@ -1954,46 +1954,18 @@ async function handleTypedMessage() {
   autoResizeComposer();
   addUserMessage(escapeHtml(text));
 
-  const lower = normalize(text);
-  if (!state.profileLoaded) {
-    addAssistantMessage(`
-      <p>Hãy hoàn tất cửa sổ <strong>Thiết lập hồ sơ</strong> trước để mình có đủ thông tin tạo gợi ý.</p>
-    `);
-    window.setTimeout(() => openOnboarding(1), 300);
-    return;
-  }
-
-  if (state.stage !== "results") {
-    addAssistantMessage(`
-      <p>Mình đã ghi nhận câu trả lời. Bạn có thể dùng các lựa chọn ngay phía trên để tiếp tục đến bước gợi ý đề tài.</p>
-    `);
-    return;
-  }
-
-  const isSetupCommand =
-    lower === "setup" ||
-    lower === "bat dau" ||
-    lower.includes("huong dan bat dau") ||
-    lower.includes("cach bat dau");
-  if (isSetupCommand && state.recommendations.length) {
-    openProjectDetail(state.recommendations[0], true);
-    return;
-  }
-
-  if (lower === "gop y de tai" || lower === "y tuong moi") {
-    openSuggestModal();
-    return;
-  }
-
+  // Mọi tin nhắn đều đi thẳng tới agent — không chặn bằng if/else, không khớp
+  // chuỗi cứng. Agent tự quyết định trả lời hay gọi tool tìm đề tài, kể cả khi
+  // người dùng chưa điền hồ sơ (nó sẽ tự hỏi lại nếu cần thông tin).
   refs.chatInput.disabled = true;
   refs.sendMessage.disabled = true;
-  refs.chatInput.placeholder = "Agent đang xếp hạng lại theo yêu cầu của bạn...";
+  refs.chatInput.placeholder = "Agent đang trả lời...";
   try {
     await resolveAndRenderRecommendations({ userQuery: text, fromChat: true });
   } finally {
     refs.chatInput.disabled = false;
     refs.sendMessage.disabled = false;
-    refs.chatInput.placeholder = "Bổ sung preference để agent xếp hạng lại...";
+    refs.chatInput.placeholder = "Nhắn cho Ideora...";
     refs.chatInput.focus();
   }
 }

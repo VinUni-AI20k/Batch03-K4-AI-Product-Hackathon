@@ -15,15 +15,72 @@ sys.path.insert(0, str(SERVER_DIR))
 import main  # noqa: E402
 
 
+def _tool_call(call_id: str, name: str, args: dict) -> SimpleNamespace:
+    return SimpleNamespace(
+        id=call_id,
+        type="function",
+        function=SimpleNamespace(name=name, arguments=json.dumps(args, ensure_ascii=False)),
+    )
+
+
+def _reply(content, tool_calls=None) -> SimpleNamespace:
+    return SimpleNamespace(
+        choices=[SimpleNamespace(message=SimpleNamespace(content=content, tool_calls=tool_calls))]
+    )
+
+
 class FakeCompletions:
-    def __init__(self, include_invalid_code: bool = False) -> None:
+    """Mô phỏng agent loop nhiều bước.
+
+    `mode` quyết định agent hành xử ra sao ở lượt đầu:
+    - "search" → gọi `search_topics` rồi trả JSON xếp hạng
+    - "chat"   → trả lời thẳng, không gọi tool nào
+    - "detail" → gọi `get_topic_detail` rồi trả lời hội thoại (không xếp hạng)
+    """
+
+    def __init__(
+        self,
+        include_invalid_code: bool = False,
+        call_tool: bool = True,
+        mode: str | None = None,
+        detail_code: str = "VSOC-001",
+    ) -> None:
         self.include_invalid_code = include_invalid_code
+        self.mode = mode or ("search" if call_tool else "chat")
+        self.detail_code = detail_code
         self.last_request: dict | None = None
+        self.first_request: dict | None = None
+        self.tool_query: str | None = None
+        self.detail_result: dict | None = None
 
     def create(self, **kwargs):
         self.last_request = kwargs
-        prompt = json.loads(kwargs["messages"][-1]["content"])
-        codes = [candidate["ma_de"] for candidate in prompt["candidates"][:3]]
+        tool_messages = [m for m in kwargs["messages"] if m.get("role") == "tool"]
+
+        if not tool_messages:
+            self.first_request = kwargs
+            if self.mode == "chat":
+                return _reply("Chào bạn! Mình là Ideora, bạn cần mình giúp gì?")
+            if self.mode == "detail":
+                return _reply(
+                    None, [_tool_call("call_d", "get_topic_detail", {"ma_de": self.detail_code})]
+                )
+            self.tool_query = "đề tài phù hợp với hồ sơ đã xác nhận"
+            return _reply(None, [_tool_call("call_1", "search_topics", {"query": self.tool_query})])
+
+        last_payload = json.loads(tool_messages[-1]["content"])
+
+        # Sau get_topic_detail → agent trả lời hội thoại, không xếp hạng.
+        if "topic" in last_payload or "error" in last_payload:
+            self.detail_result = last_payload
+            return _reply("Đây là thông tin chi tiết bạn hỏi về đề tài đó.")
+
+        # Sau search_topics: lượt còn `tools=` → thoát vòng lặp bằng text rỗng;
+        # lượt có `response_format=` → trả JSON theo RECOMMENDATION_SCHEMA.
+        if "response_format" not in kwargs:
+            return _reply("")
+
+        codes = [topic["ma_de"] for topic in last_payload["topics"][:3]]
         if self.include_invalid_code:
             codes[0] = "FAKE-999"
         response = {
@@ -36,16 +93,9 @@ class FakeCompletions:
                 for code in codes
             ],
             "confidence": "high",
-            "overall_note": "Đã xếp hạng trên candidate retrieval.",
             "assistant_message": "Mình đã dùng yêu cầu mới nhất để xếp hạng lại.",
         }
-        return SimpleNamespace(
-            choices=[
-                SimpleNamespace(
-                    message=SimpleNamespace(content=json.dumps(response, ensure_ascii=False))
-                )
-            ]
-        )
+        return _reply(json.dumps(response, ensure_ascii=False))
 
 
 class FakeClient:
@@ -147,18 +197,20 @@ class RecommendationEngineTests(unittest.TestCase):
             ):
                 result = main.recommend(payload)
 
-            prompt = json.loads(completions.last_request["messages"][-1]["content"])
-            self.assertEqual(prompt["profile"]["skills"], ["React", "UX"])
-            self.assertEqual(
-                prompt["profile"]["profile_projects"],
-                ["Ứng dụng quản lý câu lạc bộ"],
-            )
-            self.assertEqual(prompt["profile"]["experience_level"], "intermediate")
-            self.assertEqual(
-                prompt["latest_user_query"],
-                "Ưu tiên scope nhỏ, không dùng machine learning.",
-            )
-            self.assertEqual(prompt["conversation_context"], ["Mình muốn làm web."])
+            # Lượt 1 của agent nhận hồ sơ + ngữ cảnh dạng text tự nhiên (không
+            # phải JSON như kiến trúc single-shot cũ) để nó tự quyết định gọi tool.
+            first_turn = completions.first_request["messages"][-1]["content"]
+            self.assertIn("React", first_turn)
+            self.assertIn("Ứng dụng quản lý câu lạc bộ", first_turn)
+            self.assertIn("intermediate", first_turn)
+            self.assertIn("Ưu tiên scope nhỏ, không dùng machine learning.", first_turn)
+            self.assertIn("Mình muốn làm web.", first_turn)
+            # Agent phải được cấp tool search_topics ở lượt quyết định.
+            tool_names = [
+                tool["function"]["name"] for tool in completions.first_request["tools"]
+            ]
+            self.assertIn("search_topics", tool_names)
+            self.assertEqual(result.response_type, "recommendation")
             self.assertEqual(result.candidate_count, 24)
             self.assertIn("Yêu cầu mới nhất trong chat", result.applied_profile_signals)
 
@@ -183,6 +235,72 @@ class RecommendationEngineTests(unittest.TestCase):
 
         self.assertNotIn("FAKE-999", [selection.ma_de for selection in result.selections])
         self.assertEqual(result.confidence, "low")
+
+    def test_agent_answers_without_calling_tool_for_offtopic_question(self) -> None:
+        """Hành vi agent cốt lõi: câu hỏi ngoài lề KHÔNG kích hoạt retrieval.
+
+        Kiến trúc cũ luôn chạy retrieval rồi ép model chọn trong 24 đề tài, nên
+        mọi tin nhắn (kể cả "xin chào") đều bị trả lời như đang xếp hạng đề tài.
+        """
+        completions = FakeCompletions(call_tool=False)
+        payload = main.RecommendRequest(
+            interest="data",
+            skills=["Python"],
+            user_query="Xin chào, bạn là ai vậy?",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(main, "_client", return_value=FakeClient(completions)), patch.object(
+                main, "LOG_PATH", Path(directory) / "recommend.jsonl"
+            ):
+                result = main.recommend(payload)
+
+        self.assertEqual(result.response_type, "conversational")
+        self.assertEqual(result.selections, [])
+        self.assertEqual(result.candidate_count, 0)
+        self.assertIn("Ideora", result.assistant_message)
+        # Chỉ gọi model đúng 1 lượt — không có lượt xếp hạng nào theo sau.
+        self.assertFalse(
+            any(message.get("role") == "tool" for message in completions.last_request["messages"])
+        )
+
+    def test_agent_reads_topic_detail_from_real_data(self) -> None:
+        """Agent gọi `get_topic_detail` và nhận đúng field thật của đề tài."""
+        completions = FakeCompletions(mode="detail", detail_code="VSOC-001")
+        payload = main.RecommendRequest(
+            interest="security",
+            skills=["Network"],
+            user_query="Đề tài VSOC-001 cần dữ liệu gì và ai duyệt kết quả?",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(main, "_client", return_value=FakeClient(completions)), patch.object(
+                main, "LOG_PATH", Path(directory) / "recommend.jsonl"
+            ):
+                result = main.recommend(payload)
+
+        # Tool trả về dữ liệu thật từ mock-data.json, không phải model bịa.
+        topic = completions.detail_result["topic"]
+        self.assertEqual(topic["ma_de"], "VSOC-001")
+        self.assertTrue(topic["nguon_su_that"])
+        self.assertTrue(topic["hitl"])
+        # Hỏi sâu một đề tài là hội thoại, không phải yêu cầu xếp hạng lại.
+        self.assertEqual(result.response_type, "conversational")
+        self.assertEqual(result.candidate_count, 0)
+
+    def test_agent_rejects_unknown_topic_code(self) -> None:
+        """Mã đề tài không có thật → tool trả lỗi rõ ràng thay vì dữ liệu bịa."""
+        completions = FakeCompletions(mode="detail", detail_code="FAKE-999")
+        payload = main.RecommendRequest(interest="data", user_query="Cho mình xem FAKE-999")
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(main, "_client", return_value=FakeClient(completions)), patch.object(
+                main, "LOG_PATH", Path(directory) / "recommend.jsonl"
+            ):
+                main.recommend(payload)
+
+        self.assertIn("error", completions.detail_result)
+        self.assertNotIn("topic", completions.detail_result)
 
 
 if __name__ == "__main__":
