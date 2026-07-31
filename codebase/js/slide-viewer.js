@@ -34,7 +34,6 @@ const slideFrame = document.getElementById('slide-aspect-frame');
  */
 async function renderPage(num) {
   pageRendering = true;
-  showLoading(true);
 
   try {
     const page = await pdfDoc.getPage(num);
@@ -121,7 +120,15 @@ function queueRenderPage(num) {
 /**
  * Load a PDF document from the given path
  */
+let loadedPdfPath = null;
+
 async function loadPdfDocument(pdfPath) {
+  if (pdfDoc && loadedPdfPath === pdfPath) {
+    showLoading(false);
+    queueRenderPage(currentPage);
+    return;
+  }
+
   showLoading(true);
   try {
     const loadingTask = pdfjsLib.getDocument({
@@ -131,6 +138,7 @@ async function loadPdfDocument(pdfPath) {
       disableStream: false,
     });
     pdfDoc = await loadingTask.promise;
+    loadedPdfPath = pdfPath;
     totalPages = pdfDoc.numPages;
 
     // Update total pages in all UI elements
@@ -141,6 +149,7 @@ async function loadPdfDocument(pdfPath) {
 
     // Render the first (or current) page
     queueRenderPage(currentPage);
+    showLoading(false);
   } catch (err) {
     console.error('Error loading PDF:', err);
     showLoading(false);
@@ -699,11 +708,23 @@ function sendTutorMsg(e) {
   input.value = '';
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  // Hiển thị trạng thái đang trả lời (loading)
-  const loadingTag = document.createElement('div');
-  loadingTag.className = 'chat-context-tag';
-  loadingTag.textContent = `VLearn AI Tutor đang xử lý...`;
-  chatBody.appendChild(loadingTag);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  // Hiển thị hiệu ứng AI đang suy nghĩ (Thinking Indicator Animation)
+  const thinkingCard = document.createElement('div');
+  thinkingCard.className = 'chat-thinking-indicator';
+  thinkingCard.innerHTML = `
+    <div class="thinking-avatar">
+      <img src="brand/vinuni-mark.svg" alt="VLearn AI" />
+    </div>
+    <div class="thinking-bubble">
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="thinking-text">VLearn AI Tutor đang suy nghĩ...</span>
+    </div>
+  `;
+  chatBody.appendChild(thinkingCard);
   chatBody.scrollTop = chatBody.scrollHeight;
 
   // Gọi REST API tới Python RAG Backend hoặc Fallback Direct API
@@ -749,7 +770,7 @@ function sendTutorMsg(e) {
         body: JSON.stringify({
           model: 'phatchau036/gpt-5.4',
           messages: [
-            { role: 'system', content: 'Bạn là VLearn AI Tutor định vị trang slide. Trả lời súc tích tiếng Việt kèm [Trang N].' },
+            { role: 'system', content: 'Bạn là VLearn AI Tutor định vị trang slide. Trả lời bằng Markdown tiếng Việt kèm [Trang N].' },
             { role: 'user', content: fullUserPrompt }
           ]
         })
@@ -768,7 +789,9 @@ function sendTutorMsg(e) {
 
       renderBotResponse(ans);
     } catch (err) {
-      loadingTag.remove();
+      if (thinkingCard && thinkingCard.parentNode) {
+        thinkingCard.remove();
+      }
       const botMsg = document.createElement('div');
       botMsg.className = 'tutor-msg assistant';
       botMsg.innerHTML = `⚠️ Lỗi kết nối AI: ${err.message}`;
@@ -778,7 +801,9 @@ function sendTutorMsg(e) {
   });
 
   function renderBotResponse(answerText) {
-    loadingTag.remove();
+    if (thinkingCard && thinkingCard.parentNode) {
+      thinkingCard.remove();
+    }
     const contextTag = document.createElement('div');
     contextTag.className = 'chat-context-tag';
     contextTag.textContent = `Ngữ cảnh: Slide trang ${currentPage}`;
@@ -786,15 +811,44 @@ function sendTutorMsg(e) {
 
     const botMsg = document.createElement('div');
     botMsg.className = 'tutor-msg assistant';
-    
-    let formattedText = (answerText || '')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      
-    botMsg.innerHTML = formattedText;
     chatBody.appendChild(botMsg);
-    chatBody.scrollTop = chatBody.scrollHeight;
+
+    // Markdown parsing
+    let parsedHtml = '';
+    if (window.marked && typeof window.marked.parse === 'function') {
+      parsedHtml = window.marked.parse(answerText || '');
+    } else {
+      parsedHtml = (answerText || '')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    // Typewriter / Smooth Reveal Effect
+    const rawText = answerText || '';
+    if (rawText.length > 0) {
+      let charIndex = 0;
+      const step = Math.max(1, Math.floor(rawText.length / 45));
+      const interval = setInterval(() => {
+        charIndex += step;
+        if (charIndex >= rawText.length) {
+          charIndex = rawText.length;
+          clearInterval(interval);
+          botMsg.innerHTML = parsedHtml;
+        } else {
+          const partialText = rawText.substring(0, charIndex);
+          if (window.marked && typeof window.marked.parse === 'function') {
+            botMsg.innerHTML = window.marked.parse(partialText);
+          } else {
+            botMsg.innerHTML = partialText.replace(/\n/g, '<br>');
+          }
+        }
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 25);
+    } else {
+      botMsg.innerHTML = parsedHtml;
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
   }
 }
 
@@ -897,11 +951,21 @@ document.addEventListener('keydown', (e) => {
 // ============================================
 
 let resizeTimeout;
+let lastFrameWidth = 0;
+let lastFrameHeight = 0;
+
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    if (pdfDoc) queueRenderPage(currentPage);
-  }, 250);
+    if (!slideFrame) return;
+    const curW = slideFrame.clientWidth;
+    const curH = slideFrame.clientHeight;
+    if (Math.abs(curW - lastFrameWidth) > 10 || Math.abs(curH - lastFrameHeight) > 10) {
+      lastFrameWidth = curW;
+      lastFrameHeight = curH;
+      if (pdfDoc) queueRenderPage(currentPage);
+    }
+  }, 300);
 });
 
 // ============================================
@@ -930,3 +994,4 @@ window.askTutorAboutNote = askTutorAboutNote;
 // ============================================
 
 loadPdfDocument(currentPdfPath);
+updateNotesPanelUI();

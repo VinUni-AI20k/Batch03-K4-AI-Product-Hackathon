@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/slide-viewer.css" />
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- PDF.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 </head>
@@ -54,18 +56,18 @@
     <!-- LEFT SIDEBAR: Course Materials & Personal Slide Notes -->
     <aside class="materials-sidebar">
       <div class="sidebar-tabs-header">
-        <button class="sidebar-tab-btn active" id="tab-btn-docs" onclick="switchSidebarTab('docs')" title="Danh sách Học liệu môn học">
+        <button class="sidebar-tab-btn" id="tab-btn-docs" onclick="switchSidebarTab('docs')" title="Danh sách Học liệu môn học">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
           <span>Học liệu</span>
         </button>
-        <button class="sidebar-tab-btn" id="tab-btn-notes" onclick="switchSidebarTab('notes')" title="Ghi chú bài giảng cá nhân">
+        <button class="sidebar-tab-btn active" id="tab-btn-notes" onclick="switchSidebarTab('notes')" title="Ghi chú bài giảng cá nhân">
           <span>Ghi chú</span>
           <span class="notes-count-badge" id="sidebar-notes-badge">0</span>
         </button>
       </div>
 
       <!-- PANEL 1: HỌC LIỆU MÔN HỌC -->
-      <div class="sidebar-panel active" id="panel-docs">
+      <div class="sidebar-panel" id="panel-docs">
         <div class="sidebar-top-header">
           <div class="sidebar-title">Học liệu môn học</div>
           <div class="sidebar-subtitle">Chương, slide và tài liệu đã upload</div>
@@ -184,7 +186,7 @@
       </div>
 
       <!-- PANEL 2: GHI CHÚ BÀI GIẢNG -->
-      <div class="sidebar-panel" id="panel-notes">
+      <div class="sidebar-panel active" id="panel-notes">
         <div class="sidebar-top-header" style="display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div class="sidebar-title">Ghi chú bài giảng</div>
@@ -332,19 +334,6 @@
 
       <!-- Chat History -->
       <div class="tutor-chat-body" id="tutor-chat-body">
-        <div class="chat-context-tag">Ngữ cảnh: Slide trang 1</div>
-        <div class="tutor-msg assistant">
-          Xin chào! Mình là VLearn Tutor. Bạn có thể bôi đen một đoạn trên slide để hỏi hoặc gửi câu hỏi tự do nhé!
-        </div>
-
-        <div class="tutor-msg user">
-          tóm tắt lại nội dung slide này cho tôi
-        </div>
-
-        <div class="chat-context-tag">Ngữ cảnh: Slide trang 1</div>
-        <div class="tutor-msg assistant">
-          Slide này tổng quan về môn AI & LLM Foundation thuộc VinUni AI Thực Chiến. Nội dung giải thích nguyên lý hoạt động căn bản của AI và ứng dụng thực tế trong công nghiệp.
-        </div>
       </div>
 
       <!-- Input Bar -->
