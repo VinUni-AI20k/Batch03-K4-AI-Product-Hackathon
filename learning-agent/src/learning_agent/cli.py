@@ -308,6 +308,46 @@ def _telegram_capture_id(token: str):
     return uid
 
 
+def _build_soul(name: str, address: str, tone: str, focus: str) -> str:
+    """Sinh SOUL.md theo lựa chọn persona. Các NGUYÊN TẮC CỨNG (thật thà, trích nguồn,
+    không làm hộ thi) LUÔN có trong mọi persona — chỉ đổi tên/xưng hô/giọng điệu."""
+    A = {
+        "friendly": ('xưng "mình", gọi học viên là "bạn"', "thân thiện, gần gũi"),
+        "homie":    ('xưng "tui/mình", gọi "ông/bro" — homie học chung, cà khịa vui vừa phải', "chill kiểu bạn bè"),
+        "polite":   ('xưng "em", gọi "anh/chị"', "lễ phép, nhã nhặn"),
+        "formal":   ('xưng "tôi", gọi "bạn"', "trang trọng, chuyên nghiệp"),
+    }
+    T = {
+        "fun":      "Vui vẻ, hype vừa đủ, khen thật khi làm đúng. Emoji có gu (🔥 📖 ✅), không rải.",
+        "academic": "Nghiêm túc, chính xác, đi thẳng vào bản chất; ít đùa, ưu tiên định nghĩa rõ ràng.",
+        "concise":  "Ngắn gọn, thẳng vào việc, không rào đón; trả lời tối giản, cần thì mới mở rộng.",
+    }
+    addr, addr_tone = A.get(address, A["friendly"])
+    persona = T.get(tone, T["fun"])
+    focus_line = (f"\n- Ưu tiên lĩnh vực học viên đang học: **{focus.strip()}**." if focus.strip() else "")
+    return f"""# SOUL — {name}
+
+## Bạn là ai
+Bạn là **{name}** — trợ giảng AI cá nhân đồng hành cùng học viên, {addr_tone}.
+Cách {addr}. Ai hỏi thì giới thiệu mình là {name}.
+
+## Tính cách
+- {persona}
+- **THẬT THÀ tuyệt đối**: không biết / tài liệu chưa có thì nói thẳng, TUYỆT ĐỐI không bịa cho vui lòng. Ranh giới không đổi dù giọng thế nào.
+- Đọc không khí: học viên căng thẳng trước thi thì bớt đùa, vào việc ngay.{focus_line}
+
+## Cách dạy
+- Ví dụ đời thường trước, thuật ngữ sau. Thuật ngữ tiếng Anh giữ nguyên + giải nghĩa Việt lần đầu.
+- Trả lời gọn (dưới 10 dòng); muốn sâu thì mời hỏi tiếp.
+- **Trình bày thoáng**: mỗi ý xuống dòng riêng; liệt kê dùng `- ` MỖI Ý MỘT DÒNG; chừa dòng trống giữa các mục lớn; in đậm **thuật ngữ khoá**; dòng trích nguồn 📖 để riêng ở cuối.
+- Luôn **trích nguồn** từ tài liệu đã học (Bài · Slide · phút video); nhớ điểm yếu của học viên để gài ôn lại.
+
+## Giới hạn
+- Bài kiểm tra/thi ĐANG diễn ra thì không làm hộ — chỉ gợi ý cách nghĩ.
+- Ngoài học tập (y tế, tiền bạc, pháp lý) thì không tư vấn — khuyên tìm người chuyên môn.
+"""
+
+
 def _config_wizard(cfg) -> None:
     """Wizard tương tác (kiểu `openclaw config`): chọn provider, dán key (mask), model, embedding, kênh."""
     from .config import LLM_PROVIDERS
@@ -402,6 +442,28 @@ def _config_wizard(cfg) -> None:
             dc_allow = questionary.text(
                 "Discord user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
                 style=style, qmark="▸").ask()
+
+        # ── cá nhân hoá persona (SOUL.md) — lần đầu gặp nhau, vài câu hỏi nhanh ──
+        soul_vals = None
+        marker = cfg.root / "data" / ".personalized"
+        if questionary.confirm("Cá nhân hoá trợ giảng (tên · xưng hô · phong cách)?",
+                               default=not marker.exists(), style=style, qmark="▸").ask():
+            s_name = questionary.text("Tên trợ giảng:", default="Vlearn", style=style, qmark="▸").ask()
+            s_addr = questionary.select("Xưng hô với học viên:", choices=[
+                Choice("mình – bạn (thân thiện)", value="friendly"),
+                Choice("tui/bro – ông/bro (homie, cà khịa vui)", value="homie"),
+                Choice("em – anh/chị (lễ phép)", value="polite"),
+                Choice("tôi – bạn (trang trọng)", value="formal"),
+            ], default="friendly", style=style, qmark="▸").ask()
+            s_tone = questionary.select("Phong cách:", choices=[
+                Choice("Vui vẻ, gần gũi", value="fun"),
+                Choice("Nghiêm túc, học thuật", value="academic"),
+                Choice("Ngắn gọn, thẳng vào việc", value="concise"),
+            ], default="fun", style=style, qmark="▸").ask()
+            s_focus = questionary.text("Môn/lĩnh vực đang học (Enter bỏ qua):",
+                                       default="", style=style, qmark="▸").ask()
+            if s_name and s_addr and s_tone:
+                soul_vals = (s_name.strip() or "Vlearn", s_addr, s_tone, s_focus or "")
     except KeyboardInterrupt:
         print("Đã huỷ."); return
     except Exception:
@@ -430,6 +492,13 @@ def _config_wizard(cfg) -> None:
         _yaml_set(cfg.root / "config.yaml", "model", model.strip())
     env_path.chmod(0o600)
 
+    if soul_vals:
+        (cfg.root / "SOUL.md").write_text(_build_soul(*soul_vals), encoding="utf-8")
+        (cfg.root / "data").mkdir(parents=True, exist_ok=True)
+        (cfg.root / "data" / ".personalized").write_text("1", encoding="utf-8")
+        print(f"🎭 Đã cá nhân hoá trợ giảng '{soul_vals[0]}' (SOUL.md) — "
+              "nguyên tắc gốc của agent (thật thà, trích nguồn, không làm hộ thi) giữ nguyên.")
+
     print("\n\033[1;32m✅ Đã lưu cấu hình.\033[0m")
     if open_bot:
         print("\033[1;33m⚠️ Kênh bot đang MỞ cho mọi người (allowlist trống). "
@@ -438,8 +507,8 @@ def _config_wizard(cfg) -> None:
     # ── chọn khởi động ngay ──
     has_bot = bool((tg and tg.strip()) or (dc and dc.strip()) or cfg.telegram_token or cfg.discord_token)
     launch_choices = [
-        Choice("💬 Chat thử ngay trong Terminal", value="chat"),
-        Choice("🌐 Dashboard web  (http://127.0.0.1:8321)", value="ui"),
+        Choice("🌐 Dashboard web — tự mở trình duyệt chat ngay (khuyên dùng)", value="ui"),
+        Choice("💬 Chat trong Terminal", value="chat"),
     ]
     if has_bot:
         launch_choices.append(Choice("🤖 Chạy bot Telegram/Discord đã cấu hình", value="bot"))
@@ -447,7 +516,7 @@ def _config_wizard(cfg) -> None:
     try:
         launch = questionary.select(
             "Khởi động Vlearn Agent ở đâu bây giờ?", choices=launch_choices,
-            style=style, qmark="▸",
+            default="ui", style=style, qmark="▸",
         ).ask()
     except Exception:
         launch = None
