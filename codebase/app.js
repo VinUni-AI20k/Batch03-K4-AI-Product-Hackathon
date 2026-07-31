@@ -814,7 +814,7 @@ async function resolveAndRenderRecommendations({ userQuery = null, fromChat = fa
     loadingBlock.remove();
     if (userQuery) {
       state.preferenceQuery = userQuery;
-      state.conversationContext = [...state.conversationContext, userQuery].slice(-6);
+      recordTurn("user", userQuery);
     }
     // Bug đã sửa: mọi tin nhắn tự do trước đây đều bị ép qua recommend engine
     // và luôn hiển thị như đang tìm/không tìm được đề tài, kể cả khi user chỉ
@@ -822,31 +822,43 @@ async function resolveAndRenderRecommendations({ userQuery = null, fromChat = fa
     // phải yêu cầu xếp hạng (response_type="conversational"), chỉ trả lời
     // đúng ngữ cảnh, không đụng vào state.recommendations hiện có.
     if (meta.responseType === "conversational") {
+      recordTurn("assistant", meta.assistantMessage);
       renderConversationalReply(meta);
       return;
     }
     if (!recommendations.length) {
       state.recommendations = [];
       state.recommendationMeta = meta;
+      recordTurn("assistant", meta.assistantMessage || "Chưa tìm được đề tài phù hợp.");
       renderRecommendationEmpty(meta, { fromChat });
       renderTopicCatalog();
       return;
     }
     state.recommendations = recommendations;
     state.recommendationMeta = meta;
+    recordTurn("assistant", meta.assistantMessage);
     renderRecommendations({ fromChat });
     renderTopicCatalog();
   } catch (error) {
     loadingBlock.remove();
     if (userQuery) {
       state.preferenceQuery = userQuery;
-      state.conversationContext = [...state.conversationContext, userQuery].slice(-6);
+      recordTurn("user", userQuery);
     }
     state.recommendations = getRecommendations(userQuery);
     state.recommendationMeta = { source: "fallback_rule", error: error.message };
     renderRecommendations({ fromChat });
     renderTopicCatalog();
   }
+}
+
+// Lịch sử hội thoại có ghi rõ ai nói — trước đây chỉ lưu tin nhắn user nên
+// agent không biết mình đã trả lời gì, không "tóm tắt lại" được.
+function recordTurn(role, text) {
+  const content = String(text || "").trim();
+  if (!content) return;
+  const prefix = role === "user" ? "Người dùng" : "Ideora";
+  state.conversationContext = [...state.conversationContext, `${prefix}: ${content}`].slice(-8);
 }
 
 function renderRecommendationLoading() {
@@ -1527,7 +1539,13 @@ async function getRecommendationsFromAI(userQuery = null) {
       experience_level: state.experienceLevel || "unknown",
       profile_projects: state.extractedProjects.slice(0, 10),
       user_query: userQuery || null,
-      conversation_context: state.conversationContext.slice(-6),
+      conversation_context: state.conversationContext.slice(-8),
+      // Đề tài đang hiển thị trên màn hình — để agent trả lời được các câu
+      // tham chiếu ngược ("tóm tắt lại", "cái thứ 2 khác gì cái đầu").
+      current_recommendations: state.recommendations.map((project) => ({
+        ma_de: project.ma_de,
+        ten_de_tai: project.ten_de_tai,
+      })),
     }),
   });
 
@@ -1656,22 +1674,23 @@ function renderRecommendations({ fromChat = false } = {}) {
     ? `<p><small>Tín hiệu đã dùng: ${escapeHtml(meta.appliedSignals.join(" · "))}</small></p>`
     : "";
 
+  // Chỉ một đoạn dẫn ngắn — lời của chính agent. Trước đây mỗi lần render đều
+  // kèm thêm câu template "Mình đã tìm thấy N đề tài phù hợp nhất..." lặp lại
+  // y hệt ở mọi lượt, đọc rất máy móc.
   let introHtml;
   if (isFallback) {
     introHtml = `
-      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong> bằng bộ xếp hạng dự phòng — model AI hiện không phản hồi được (${escapeHtml(meta.error || "lỗi không rõ")}). Kết quả này chỉ giúp tiếp tục demo và không phải recommendation của model.</p>
+      <p>Model AI hiện không phản hồi được (${escapeHtml(meta.error || "lỗi không rõ")}) — đây là kết quả từ bộ xếp hạng dự phòng, không phải recommendation của model.</p>
     `;
   } else if (isLowConfidence) {
     introHtml = `
-      ${assistantMessage}
-      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong>, nhưng chưa chắc đây là lựa chọn tốt nhất${meta.overallNote ? `: ${escapeHtml(meta.overallNote)}` : " — hồ sơ chưa cho đủ tín hiệu để phân biệt rõ giữa các đề tài."}</p>
-      <p>Bạn nên đọc kỹ lý do từng đề tài trước khi chọn, hoặc bổ sung thêm kỹ năng cụ thể để mình xếp hạng chính xác hơn.</p>
+      ${assistantMessage || "<p>Mình chưa chắc đây là lựa chọn tốt nhất cho bạn.</p>"}
+      ${meta.overallNote ? `<p><small>${escapeHtml(meta.overallNote)}</small></p>` : ""}
       ${appliedSignals}
     `;
   } else {
     introHtml = `
-      ${assistantMessage}
-      <p>${fromChat ? "Mình đã xếp hạng lại" : "Mình đã tìm thấy"} <strong>${state.recommendations.length} đề tài phù hợp nhất</strong>. Lý do được model AI sinh từ hồ sơ, yêu cầu chat và dữ liệu thật của từng đề tài.</p>
+      ${assistantMessage || "<p>Đây là những đề tài mình thấy phù hợp nhất với bạn.</p>"}
       ${appliedSignals}
     `;
   }

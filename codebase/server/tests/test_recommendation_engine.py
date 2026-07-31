@@ -36,6 +36,7 @@ class FakeCompletions:
     - "search" → gọi `search_topics` rồi trả JSON xếp hạng
     - "chat"   → trả lời thẳng, không gọi tool nào
     - "detail" → gọi `get_topic_detail` rồi trả lời hội thoại (không xếp hạng)
+    - "browse" → gọi `browse_catalogue` rồi trả lời hội thoại
     """
 
     def __init__(
@@ -44,14 +45,19 @@ class FakeCompletions:
         call_tool: bool = True,
         mode: str | None = None,
         detail_code: str = "VSOC-001",
+        search_args: dict | None = None,
+        browse_khoi: str | None = None,
     ) -> None:
         self.include_invalid_code = include_invalid_code
         self.mode = mode or ("search" if call_tool else "chat")
         self.detail_code = detail_code
+        self.search_args = search_args
+        self.browse_khoi = browse_khoi
         self.last_request: dict | None = None
         self.first_request: dict | None = None
         self.tool_query: str | None = None
         self.detail_result: dict | None = None
+        self.browse_result: dict | None = None
 
     def create(self, **kwargs):
         self.last_request = kwargs
@@ -65,10 +71,19 @@ class FakeCompletions:
                 return _reply(
                     None, [_tool_call("call_d", "get_topic_detail", {"ma_de": self.detail_code})]
                 )
+            if self.mode == "browse":
+                args = {"khoi": self.browse_khoi} if self.browse_khoi else {}
+                return _reply(None, [_tool_call("call_b", "browse_catalogue", args)])
             self.tool_query = "đề tài phù hợp với hồ sơ đã xác nhận"
-            return _reply(None, [_tool_call("call_1", "search_topics", {"query": self.tool_query})])
+            args = {"query": self.tool_query, **(self.search_args or {})}
+            return _reply(None, [_tool_call("call_1", "search_topics", args)])
 
         last_payload = json.loads(tool_messages[-1]["content"])
+
+        # Sau browse_catalogue → agent trả lời hội thoại.
+        if "blocks" in last_payload or "total_topics" in last_payload:
+            self.browse_result = last_payload
+            return _reply("Kho hiện có các lĩnh vực như trên.")
 
         # Sau get_topic_detail → agent trả lời hội thoại, không xếp hạng.
         if "topic" in last_payload or "error" in last_payload:
@@ -301,6 +316,61 @@ class RecommendationEngineTests(unittest.TestCase):
 
         self.assertIn("error", completions.detail_result)
         self.assertNotIn("topic", completions.detail_result)
+
+    def test_browse_catalogue_returns_real_counts(self) -> None:
+        """"Kho có những lĩnh vực nào" → số liệu đếm thật, không để model đoán."""
+        completions = FakeCompletions(mode="browse")
+        payload = main.RecommendRequest(interest="data", user_query="kho có lĩnh vực nào?")
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(main, "_client", return_value=FakeClient(completions)), patch.object(
+                main, "LOG_PATH", Path(directory) / "recommend.jsonl"
+            ):
+                result = main.recommend(payload)
+
+        browse = completions.browse_result
+        self.assertEqual(browse["total_topics"], len(self.projects))
+        codes = {block["khoi"] for block in browse["blocks"]}
+        self.assertIn("HC", codes)
+        self.assertIn("VSOC", codes)
+        # Tổng số đề tài theo khối phải khớp tổng kho — không được bịa.
+        self.assertEqual(sum(b["count"] for b in browse["blocks"]), len(self.projects))
+        self.assertEqual(result.response_type, "conversational")
+
+    def test_search_filters_hard_by_block(self) -> None:
+        """`khoi` là lọc CỨNG: hỏi đề tài y tế thì chỉ được trả đề tài khối HC."""
+        completions = FakeCompletions(search_args={"khoi": "HC"})
+        payload = main.RecommendRequest(
+            interest="data",  # cố tình lệch khối để chắc chắn filter thắng
+            skills=["Python"],
+            user_query="chỉ cho tôi đề tài về y tế",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(main, "_client", return_value=FakeClient(completions)), patch.object(
+                main, "LOG_PATH", Path(directory) / "recommend.jsonl"
+            ):
+                result = main.recommend(payload)
+
+        self.assertTrue(result.selections)
+        for selection in result.selections:
+            self.assertTrue(
+                selection.ma_de.startswith("HC-"),
+                f"{selection.ma_de} không thuộc khối HC dù đã lọc cứng",
+            )
+
+    def test_randomize_varies_results(self) -> None:
+        """`randomize=true` phải cho tập kết quả khác nhau giữa các lần gọi."""
+        payload = main.RecommendRequest(
+            interest="data", skills=["Python", "SQL"], user_query="gợi ý ngẫu nhiên gì đó đi"
+        )
+        seen = set()
+        for _ in range(6):
+            picked = main._retrieve_candidates(
+                self.projects, payload, limit=3, agent_query="đề tài bất kỳ", randomize=True
+            )
+            seen.add(tuple(p["ma_de"] for p in picked))
+        self.assertGreater(len(seen), 1, "randomize luôn trả cùng một bộ đề tài")
 
 
 if __name__ == "__main__":
