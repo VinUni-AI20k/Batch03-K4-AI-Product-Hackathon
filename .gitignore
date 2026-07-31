@@ -1,3 +1,11 @@
 .DS_Store
 node_modules/
 *.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Hoặc nếu muốn ghi rõ
+codebase/core/__pycache__/
+codebase/prompts/__pycache__/
