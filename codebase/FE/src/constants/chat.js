@@ -1,4 +1,4 @@
-export const REVOCABLE_PLATFORM_IDS = new Set(["gmail"]);
+export const REVOCABLE_PLATFORM_IDS = new Set(["gmail", "outlook"]);
 
 export const QUICK_ACTION_QUERIES = {
   important: "Kiểm tra giúp mình email quan trọng gần đây trên Gmail.",

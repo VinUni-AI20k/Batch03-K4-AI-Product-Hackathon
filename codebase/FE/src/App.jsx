@@ -5,9 +5,19 @@ import { initialMessages, initialPlatforms } from "./data.js";
 import { ApiError } from "./api/client.js";
 import { sendChatMessage } from "./api/chat.js";
 import { TIMELINE_KEY, confirmCalendar, flagTimelineItem, getTimeline, patchTimelineItem } from "./api/timeline.js";
-import { disconnectDiscord, disconnectGoogle, getConnections, getDiscordInviteUrl, getGoogleAuthUrl } from "./api/connections.js";
+import {
+  disconnectDiscord,
+  disconnectGoogle,
+  disconnectOutlook,
+  getConnections,
+  getDiscordInviteUrl,
+  getGoogleAuthUrl,
+  getOutlookConnectStatus,
+  startOutlookConnect,
+} from "./api/connections.js";
 import { formatTime } from "./utils/formatters.js";
 import { generateUUID } from "./utils/uuid.js";
+import { parseOutlookDeviceCode } from "./utils/outlookDeviceCode.js";
 import { QUICK_ACTION_QUERIES } from "./constants/chat.js";
 import { Icon } from "./components/common/Icon.jsx";
 import { Toast } from "./components/common/Toast.jsx";
@@ -15,6 +25,7 @@ import { Header } from "./components/layout/Header.jsx";
 import { ChatPanel } from "./components/chat/ChatPanel.jsx";
 import { Dashboard } from "./components/dashboard/Dashboard.jsx";
 import { EditDialog } from "./components/dashboard/EditDialog.jsx";
+import { OutlookDeviceCodeDialog } from "./components/dashboard/OutlookDeviceCodeDialog.jsx";
 
 export default function App() {
   const [conversationId] = useState(() => generateUUID());
@@ -27,6 +38,8 @@ export default function App() {
   const [mobileView, setMobileView] = useState("dashboard");
   const [seededActions, setSeededActions] = useState(() => new Set());
   const [busyItemId, setBusyItemId] = useState(null);
+  const [outlookConnecting, setOutlookConnecting] = useState(false);
+  const [outlookDeviceCode, setOutlookDeviceCode] = useState(null);
 
   const {
     data: events = [],
@@ -49,11 +62,55 @@ export default function App() {
         current.map((platform) => {
           if (platform.id === "gmail") return { ...platform, connected: data.google.connected };
           if (platform.id === "discord") return { ...platform, connected: data.discord.connected, guilds: data.discord.guilds };
+          if (platform.id === "outlook") return { ...platform, connected: data.outlook.connected };
           return platform;
         }),
       );
     } catch {
       // Backend may be offline; leave platforms as-is (mock state).
+    }
+  };
+
+  // "pending"/"starting" mean the backend still has the sign-in container
+  // open, waiting on the device-code login to finish — anything else is terminal.
+  const applyOutlookConnectResult = (result) => {
+    if (result.status === "connected") {
+      setPlatforms((current) => current.map((platform) => (platform.id === "outlook" ? { ...platform, connected: true } : platform)));
+      notify(result.message || "Outlook đã kết nối.", "success");
+      setOutlookConnecting(false);
+      setOutlookDeviceCode(null);
+    } else if (result.status === "failed" || result.status === "timeout") {
+      notify(result.message || "Kết nối Outlook thất bại, thử lại sau.", "error");
+      setOutlookConnecting(false);
+      setOutlookDeviceCode(null);
+    } else if (result.status === "pending") {
+      setOutlookConnecting(true);
+      const parsed = parseOutlookDeviceCode(result.message);
+      if (parsed) {
+        setOutlookDeviceCode((current) => {
+          if (current?.code === parsed.code) return current; // same code already shown/opened
+          window.open(parsed.url, "_blank", "noopener,noreferrer");
+          return parsed;
+        });
+      } else {
+        notify(result.message || "Cần đăng nhập Outlook.", "info");
+      }
+    } else {
+      setOutlookConnecting(true);
+    }
+  };
+
+  const pollOutlookConnectStatus = async () => {
+    for (;;) {
+      await new Promise((resolve) => window.setTimeout(resolve, 4000));
+      let result;
+      try {
+        result = await getOutlookConnectStatus();
+      } catch {
+        continue; // backend hiccup mid-poll — keep trying, don't give up the wait
+      }
+      applyOutlookConnectResult(result);
+      if (result.status !== "pending" && result.status !== "starting") return;
     }
   };
 
@@ -163,6 +220,41 @@ export default function App() {
       return;
     }
 
+    if (id === "outlook") {
+      const outlook = platforms.find((platform) => platform.id === "outlook");
+      if (outlook?.connected) {
+        const confirmed = window.confirm(
+          "Hủy kết nối Outlook?\n\nStudyPulse sẽ không thể đọc email hoặc lịch Outlook của bạn cho đến khi bạn kết nối lại.",
+        );
+        if (!confirmed) return;
+        try {
+          await disconnectOutlook();
+          setPlatforms((current) => current.map((platform) => (platform.id === "outlook" ? { ...platform, connected: false } : platform)));
+          notify("Đã hủy kết nối Outlook", "info");
+        } catch (err) {
+          notify(err instanceof ApiError ? err.message : "Không thể hủy kết nối, thử lại sau.", "error");
+        }
+        return;
+      }
+
+      // No browser-redirect OAuth here — outlook-local-mcp's Docker container
+      // owns its own device-code sign-in. Clicking this actually triggers
+      // that sign-in (backend keeps one container open across the wait, see
+      // outlook_connection.py) rather than just checking a cached status.
+      setOutlookConnecting(true);
+      try {
+        const initial = await startOutlookConnect();
+        applyOutlookConnectResult(initial);
+        if (initial.status === "pending" || initial.status === "starting") {
+          await pollOutlookConnectStatus();
+        }
+      } catch (err) {
+        notify(err instanceof ApiError ? err.message : "Không thể bắt đầu đăng nhập Outlook, kiểm tra backend.", "error");
+        setOutlookConnecting(false);
+      }
+      return;
+    }
+
     if (id === "discord") {
       // Bots can be in several servers at once, so the row's main button
       // always opens the invite flow (to add another one) — disconnecting a
@@ -252,6 +344,7 @@ export default function App() {
     onFlag: flagEvent,
     onTogglePlatform: togglePlatform,
     onDisconnectGuild: disconnectDiscordGuild,
+    outlookConnecting,
     showConnections,
     setShowConnections,
   };
@@ -275,6 +368,7 @@ export default function App() {
         <button onClick={() => setMobileView("chat")} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${mobileView === "chat" ? "text-blue-600" : "text-slate-400"}`}><Icon>smart_toy</Icon>Trợ lý AI</button>
       </nav>
       <EditDialog event={editingEvent} onClose={() => setEditingEvent(null)} onSave={saveEvent} />
+      <OutlookDeviceCodeDialog deviceCode={outlookDeviceCode} onClose={() => setOutlookDeviceCode(null)} />
       {toast ? <Toast text={toast.text} type={toast.type} /> : null}
     </main>
   );

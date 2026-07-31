@@ -1,7 +1,7 @@
 import { Icon } from "../common/Icon.jsx";
 import { REVOCABLE_PLATFORM_IDS } from "../../constants/chat.js";
 
-export function Connections({ platforms, onToggle, onDisconnectGuild }) {
+export function Connections({ platforms, onToggle, onDisconnectGuild, outlookConnecting }) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-panel">
       <div className="flex items-start justify-between gap-3">
@@ -15,7 +15,17 @@ export function Connections({ platforms, onToggle, onDisconnectGuild }) {
       <div className="mt-6 divide-y divide-slate-100">
         {platforms.map((platform) => {
           const isDiscord = platform.id === "discord";
-          const buttonLabel = platform.connected ? (isDiscord ? "Kết nối" : REVOCABLE_PLATFORM_IDS.has(platform.id) ? "Hủy kết nối" : "Quản lý") : "Kết nối";
+          const isOutlook = platform.id === "outlook";
+          const buttonLabel =
+            isOutlook && outlookConnecting
+              ? "Đang chờ đăng nhập…"
+              : platform.connected
+                ? isDiscord
+                  ? "Kết nối"
+                  : REVOCABLE_PLATFORM_IDS.has(platform.id)
+                    ? "Hủy kết nối"
+                    : "Quản lý"
+                : "Kết nối";
           const isDanger = platform.connected && !isDiscord && REVOCABLE_PLATFORM_IDS.has(platform.id);
           return (
             <div key={platform.id} className="py-4">
@@ -32,7 +42,7 @@ export function Connections({ platforms, onToggle, onDisconnectGuild }) {
                 </div>
                 <button
                   onClick={() => onToggle(platform.id)}
-                  disabled={platform.id === "zalo"}
+                  disabled={platform.id === "zalo" || (isOutlook && outlookConnecting)}
                   className={`rounded-xl px-3 py-2 text-xs font-bold transition-colors ${
                     isDanger
                       ? "bg-red-50 text-red-600 hover:bg-red-100"

@@ -20,6 +20,7 @@ export function Dashboard({
   onFlag,
   onTogglePlatform,
   onDisconnectGuild,
+  outlookConnecting,
   showConnections,
   setShowConnections,
 }) {
@@ -54,7 +55,7 @@ export function Dashboard({
         </div>
 
         {showConnections ? (
-          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} onDisconnectGuild={onDisconnectGuild} /></div>
+          <div className="mt-6"><Connections platforms={platforms} onToggle={onTogglePlatform} onDisconnectGuild={onDisconnectGuild} outlookConnecting={outlookConnecting} /></div>
         ) : (
           <>
             <div className="mt-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
