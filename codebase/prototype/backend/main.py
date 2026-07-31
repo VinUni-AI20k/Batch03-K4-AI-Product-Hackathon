@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from core import db
@@ -12,6 +13,7 @@ from core.ingest import ingest_document
 from core.tree_summary import find_node, get_or_create_tree
 
 RAW_PDF_DIR = os.path.join(os.path.dirname(__file__), "data", "raw_pdfs")
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 
 app = FastAPI()
 db.init_db()
@@ -26,8 +28,10 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/healthz")
 def read_root():
+    # Not "/" -- that path must fall through to the StaticFiles mount at the
+    # bottom of this file so it serves the built frontend's index.html.
     return {"status": "ok"}
 
 
@@ -178,3 +182,15 @@ def create_quiz_endpoint(payload: QuizRequest):
         payload.document_id, payload.session_id, payload.user_request, background, payload.num_questions
     )
     return {"quiz_id": quiz_id, "questions": questions}
+
+
+# --- Frontend (production build only) -----------------------------------------
+#
+# Local dev serves the frontend separately via `npm run dev` (Vite on :5173),
+# so FRONTEND_DIST won't exist yet -- mounting StaticFiles on a missing
+# directory raises at startup, hence the guard. In production, `npm run
+# build` runs first (see DEPLOY.md) and this becomes the only way the
+# frontend is served, single-origin with the API above -- must be declared
+# last so it only catches paths none of the API routes matched.
+if os.path.isdir(FRONTEND_DIST):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")

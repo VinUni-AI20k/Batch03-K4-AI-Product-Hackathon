@@ -1,6 +1,12 @@
-// Backend runs on 8020 in this dev environment (port 8000 has a persistent
-// Windows stale-socket issue on this machine -- see backend PHASE2_NOTES.md).
-export const API_BASE = 'http://localhost:8020'
+// VITE_API_BASE overrides the default when set (e.g. a separate-service
+// deploy pointing at a different domain). Unset, it defaults by build mode:
+// - dev (`vite dev`): localhost:8020, since the Vite dev server (:5173) and
+//   FastAPI are two separate processes here (port 8000 has a persistent
+//   Windows stale-socket issue on this machine).
+// - prod (`vite build`): '' (same-origin relative paths), because the
+//   single-service deploy has FastAPI serve this build's static files
+//   itself -- see DEPLOY.md.
+export const API_BASE = import.meta.env.VITE_API_BASE ?? (import.meta.env.DEV ? 'http://localhost:8020' : '')
 
 async function request(path, options) {
   const res = await fetch(`${API_BASE}${path}`, {
