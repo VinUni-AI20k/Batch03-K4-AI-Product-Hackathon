@@ -1,0 +1,438 @@
+{
+  "meta": {
+    "version": "1.0",
+    "created": "2026-07-31",
+    "description": "Golden set cho đánh giá AI Quiz Generator - 20 test cases theo taxonomy 4 lớp chỗ khó",
+    "quality_bar": {
+      "grounding": "≥90% cases phải có source_snippet trace được về PDF",
+      "application_level": "≥80% cases đạt mức ≥4/5 (ứng dụng thật)",
+      "correctness": "100% cases phải có đáp án đúng"
+    }
+  },
+  "test_cases": [
+    {
+      "id": "TC001",
+      "category": "happy_path",
+      "difficulty": "easy",
+      "input": {
+        "pdf_content": "AI (Artificial Intelligence) là khả năng của máy tính thực hiện các tác vụ thông minh như con người. Machine Learning là nhánh con của AI, cho phép máy học từ dữ liệu.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "easy"
+      },
+      "expected_output": {
+        "has_scenario": true,
+        "question_type": "application",
+        "grounding_required": true,
+        "correct_answer_exists": true
+      },
+      "scoring_criteria": {
+        "grounding": "source_snippet phải chứa 'AI', 'Machine Learning' hoặc 'học từ dữ liệu'",
+        "application_level": "≥3 (có tình huống hoặc yêu cầu phân tích)",
+        "correctness": "đáp án phải khớp với nội dung PDF"
+      }
+    },
+    {
+      "id": "TC002",
+      "category": "layer_1_grounding",
+      "difficulty": "medium",
+      "layer": "① Nguồn sự thật",
+      "input": {
+        "pdf_content": "RAG (Retrieval-Augmented Generation) kết hợp retrieval và generation. Nó truy xuất tài liệu liên quan trước khi sinh câu trả lời.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "must_not_hallucinate": true,
+        "source_snippet_required": true,
+        "no_external_facts": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu source_snippet là substring của PDF, FAIL nếu bịa thêm số liệu/tên công ty không có trong PDF",
+        "application_level": "≥4",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC003",
+      "category": "layer_1_grounding",
+      "difficulty": "hard",
+      "layer": "① Nguồn sự thật",
+      "input": {
+        "pdf_content": "LLM (Large Language Model) như GPT, Claude được huấn luyện trên hàng tỷ từ. Chúng có thể sinh văn bản, code, và trả lời câu hỏi.",
+        "num_questions": 1,
+        "mode": "stress",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "may_hallucinate": true,
+        "warning_banner_shown": true
+      },
+      "scoring_criteria": {
+        "grounding": "Chấp nhận FAIL trong stress mode - dùng để minh hoạ rủi ro",
+        "application_level": "≥4",
+        "correctness": "Kiểm tra xem có gắn cờ 'source_verified=false' không"
+      }
+    },
+    {
+      "id": "TC004",
+      "category": "layer_2_ambiguous",
+      "difficulty": "easy",
+      "layer": "② Mơ hồ/thiếu thông tin",
+      "input": {
+        "pdf_content": "Neural network gồm input layer, hidden layers, output layer. Học sâu dùng nhiều hidden layers.",
+        "num_questions": 2,
+        "mode": "standard",
+        "difficulty_level": "easy"
+      },
+      "expected_output": {
+        "should_handle_short_content": true,
+        "may_downgrade_to_comprehension": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu chỉ hỏi về neural network/layers, không bịa thêm ví dụ ứng dụng không có",
+        "application_level": "≥3 (chấp nhận hạ xuống comprehension nếu thiếu ví dụ)",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC005",
+      "category": "layer_2_ambiguous",
+      "difficulty": "medium",
+      "layer": "② Mơ hồ/thiếu thông tin",
+      "input": {
+        "pdf_content": "Transformer architecture uses self-attention. BERT là bidirectional, GPT là autoregressive model.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "should_keep_english_terms": true,
+        "no_translation": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu giữ nguyên 'Transformer', 'self-attention', 'BERT', 'GPT' (không dịch sai)",
+        "application_level": "≥4",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC006",
+      "category": "layer_3_out_of_scope",
+      "difficulty": "easy",
+      "layer": "③ Ngoài phạm vi",
+      "input": {
+        "pdf_content": "Supervised learning cần labeled data. Unsupervised learning không cần labels.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "easy"
+      },
+      "expected_output": {
+        "should_generate_quiz": true,
+        "no_ranking_feature": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥3",
+        "correctness": "PASS - quiz được tạo bình thường, không từ chối"
+      }
+    },
+    {
+      "id": "TC007",
+      "category": "layer_3_out_of_scope",
+      "difficulty": "medium",
+      "layer": "③ Ngoài phạm vi",
+      "input": {
+        "pdf_content": "Agent AI có khả năng lập kế hoạch, thực thi hành động, và tự đánh giá kết quả.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "should_not_compare_students": true,
+        "individual_quiz_only": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4",
+        "correctness": "PASS - không có tính năng so sánh/xếp hạng trong quiz"
+      }
+    },
+    {
+      "id": "TC008",
+      "category": "layer_4_domain_specific",
+      "difficulty": "medium",
+      "layer": "④ Đặc thù domain",
+      "input": {
+        "pdf_content": "Fine-tuning là kỹ thuật điều chỉnh mô hình pre-trained cho task cụ thể. Cần ít dữ liệu hơn training from scratch.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "scenario_must_be_realistic": true,
+        "requires_human_review": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4 - tình huống phải hợp lý về mặt thực tế ngành",
+        "correctness": "PASS - cần TA/giảng viên review tính hợp lý"
+      }
+    },
+    {
+      "id": "TC009",
+      "category": "layer_4_domain_specific",
+      "difficulty": "hard",
+      "layer": "④ Đặc thù domain",
+      "input": {
+        "pdf_content": "Prompt engineering là kỹ thuật thiết kế câu hỏi hiệu quả cho LLM. Bao gồm: zero-shot, few-shot, chain-of-thought.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "citation_must_match": true,
+        "source_snippet_accurate": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu source_snippet khớp chính xác với PDF (không trích sai đoạn)",
+        "application_level": "≥4",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC010",
+      "category": "happy_path",
+      "difficulty": "medium",
+      "input": {
+        "pdf_content": "Overfitting xảy ra khi mô hình học quá khớp với training data. Giải pháp: regularization, dropout, early stopping.",
+        "num_questions": 2,
+        "mode": "standard",
+        "difficulty_level": "mixed"
+      },
+      "expected_output": {
+        "questions_sorted_by_difficulty": true,
+        "has_easy_and_hard": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS cho cả 2 câu",
+        "application_level": "Câu 1 ≥3, Câu 2 ≥4",
+        "correctness": "PASS cho cả 2 câu"
+      }
+    },
+    {
+      "id": "TC011",
+      "category": "happy_path",
+      "difficulty": "easy",
+      "input": {
+        "pdf_content": "Embedding chuyển đổi text thành vector số. Word2Vec, GloVe, BERT embeddings là các phương pháp phổ biến.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "easy"
+      },
+      "expected_output": {
+        "has_explanation": true,
+        "has_source_snippet": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥3",
+        "correctness": "PASS - explanation phải nhất quán với đáp án đúng"
+      }
+    },
+    {
+      "id": "TC012",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "input": {
+        "pdf_content": "AI Ethics bao gồm: fairness, transparency, privacy, accountability.",
+        "num_questions": 3,
+        "mode": "standard",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "may_show_warning": true,
+        "short_content_handled": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu tất cả 3 câu đều về AI Ethics, không bịa thêm chủ đề khác",
+        "application_level": "≥4 cho ít nhất 2/3 câu",
+        "correctness": "PASS cho 3/3 câu"
+      }
+    },
+    {
+      "id": "TC013",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "input": {
+        "pdf_content": "Reinforcement Learning: agent học bằng trial-and-error. Reward signal định hướng hành vi.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "scenario_based": true,
+        "no_pure_definition": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4 - phải có tình huống, không hỏi định nghĩa thuần",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC014",
+      "category": "happy_path",
+      "difficulty": "hard",
+      "input": {
+        "pdf_content": "CNN (Convolutional Neural Network) hiệu quả cho xử lý ảnh. Gồm: convolution layers, pooling layers, fully connected layers.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "technical_accuracy_required": true,
+        "correct_architecture_understanding": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4",
+        "correctness": "PASS - đáp án phải chính xác về kiến trúc CNN"
+      }
+    },
+    {
+      "id": "TC015",
+      "category": "edge_case",
+      "difficulty": "easy",
+      "input": {
+        "pdf_content": "Transfer learning tái sử dụng mô hình đã học. Tiết kiệm thời gian và tài nguyên.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "easy"
+      },
+      "expected_output": {
+        "simple_scenario_acceptable": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥3 - mức easy chấp nhận tình huống đơn giản",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC016",
+      "category": "happy_path",
+      "difficulty": "medium",
+      "input": {
+        "pdf_content": "Attention mechanism cho phép mô hình tập trung vào phần quan trọng của input. Transformer dùng self-attention để xử lý song song.",
+        "num_questions": 2,
+        "mode": "standard",
+        "difficulty_level": "mixed"
+      },
+      "expected_output": {
+        "multiple_questions_coherent": true,
+        "increasing_difficulty": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS cho cả 2 câu",
+        "application_level": "Câu 1 ≥3, Câu 2 ≥4",
+        "correctness": "PASS cho cả 2 câu - câu 2 khó hơn câu 1"
+      }
+    },
+    {
+      "id": "TC017",
+      "category": "layer_1_grounding",
+      "difficulty": "hard",
+      "layer": "① Nguồn sự thật",
+      "input": {
+        "pdf_content": "Vector database lưu trữ embeddings hiệu quả. Hỗ trợ similarity search nhanh.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "no_specific_db_names": true,
+        "generic_concepts_only": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS nếu KHÔNG nhắc tên cụ thể (Pinecone, Weaviate...) vì PDF không có",
+        "application_level": "≥4",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC018",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "input": {
+        "pdf_content": "Batch size ảnh hưởng tốc độ training. Learning rate điều chỉnh mức độ cập nhật weights.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "hard"
+      },
+      "expected_output": {
+        "practical_scenario_required": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "5 - phải có tình huống thực tế về tuning hyperparameters",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC019",
+      "category": "happy_path",
+      "difficulty": "medium",
+      "input": {
+        "pdf_content": "Gradient descent tối ưu loss function. SGD, Adam, RMSprop là các biến thể phổ biến.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "algorithm_understanding_tested": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4 - phải test hiểu cách hoạt động, không chỉ nhớ tên",
+        "correctness": "PASS"
+      }
+    },
+    {
+      "id": "TC020",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "input": {
+        "pdf_content": "API rate limiting bảo vệ server. Token bucket, sliding window là các thuật toán phổ biến.",
+        "num_questions": 1,
+        "mode": "standard",
+        "difficulty_level": "medium"
+      },
+      "expected_output": {
+        "cross_domain_concepts": true
+      },
+      "scoring_criteria": {
+        "grounding": "PASS",
+        "application_level": "≥4 - test ứng dụng vào tình huống hệ thống thực tế",
+        "correctness": "PASS"
+      }
+    }
+  ],
+  "statistics": {
+    "total_cases": 20,
+    "by_category": {
+      "happy_path": 6,
+      "layer_1_grounding": 3,
+      "layer_2_ambiguous": 2,
+      "layer_3_out_of_scope": 2,
+      "layer_4_domain_specific": 2,
+      "edge_case": 5
+    },
+    "by_difficulty": {
+      "easy": 6,
+      "medium": 9,
+      "hard": 5
+    }
+  }
+}
