@@ -4,8 +4,11 @@ from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
 
-# Thêm thư mục gốc vào sys.path
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+# Thêm thư mục backend và thư mục gốc vào sys.path
+BACKEND_DIR = Path(__file__).resolve().parent
+ROOT_DIR = BACKEND_DIR.parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
