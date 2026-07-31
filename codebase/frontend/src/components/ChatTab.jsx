@@ -86,6 +86,8 @@ export default function ChatTab({
             msg.text.includes('Rất xin lỗi bạn') ||
             msg.text.includes('không có thông tin về sản phẩm');
 
+          const msgCitations = msg.meta?.citations || (isLatestAgent ? citations : []);
+
           return (
             <div
               key={idx}
@@ -103,18 +105,33 @@ export default function ChatTab({
                     <p key={i}>{line || '\u00A0'}</p>
                   ))}
 
-                  {/* Hiển thị Citation Source ngay bên trong hoặc ngay cuối bubble nếu có */}
-                  {isLatestAgent && citations.length > 0 && !isOutOfScope && (
-                    <div className="inline-source-tags">
-                      {citations.slice(0, 2).map((cit, citIdx) => (
-                        <button
-                          key={citIdx}
-                          type="button"
-                          className="source-tag-btn"
-                          onClick={() => onSelectCitation?.(cit)}
-                        >
-                          [Nguồn: {cit.title ? cit.title.replace(/^Sổ tay chương trình -\s*/i, '').slice(0, 35) : `Tài liệu ${citIdx + 1}`}]
-                        </button>
+                  {/* Nguồn trích dẫn hiển thị trực tiếp bên trong đoạn chat */}
+                  {msgCitations && msgCitations.length > 0 && !isOutOfScope && (
+                    <div className="inline-chat-citations">
+                      <div className="citations-header">📚 Nguồn tài liệu tham khảo:</div>
+                      {msgCitations.map((cit, citIdx) => (
+                        <div key={citIdx} className="citation-inline-card">
+                          <div className="cit-title-row">
+                            <span className="cit-title">
+                              • {cit.title ? cit.title.replace(/^Sổ tay chương trình -\s*/i, '') : `Nguồn ${citIdx + 1}`}
+                            </span>
+                            {cit.url && (
+                              <a
+                                href={cit.url.startsWith('http') ? cit.url : `file:///${cit.url}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cit-link"
+                              >
+                                🔗 Xem link nguồn
+                              </a>
+                            )}
+                          </div>
+                          {cit.content && (
+                            <div className="cit-snippet">
+                              "{cit.content.slice(0, 220)}..."
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}

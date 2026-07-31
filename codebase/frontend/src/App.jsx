@@ -57,6 +57,7 @@ export default function App() {
           meta: {
             guardrails: data.guardrails_triggered || [],
             confidence: data.confidence_score || 0,
+            citations: newCitations,
           },
         },
       ]);
@@ -97,13 +98,6 @@ export default function App() {
           </div>
         </div>
       </div>
-
-      {selectedCitation && (
-        <CitationModal
-          citation={selectedCitation}
-          onClose={() => setSelectedCitation(null)}
-        />
-      )}
     </>
   );
 }
