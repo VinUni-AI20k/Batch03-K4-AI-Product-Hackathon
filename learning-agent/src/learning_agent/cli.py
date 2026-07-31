@@ -256,51 +256,52 @@ def _config_wizard(cfg) -> None:
           f"  key={'✓' if cfg.llm_api_key else '✗ chưa có'}"
           f"  embedding={'Voyage' if cfg.voyage_api_key else 'local'}\n")
 
-    provider = questionary.select(
-        "Nhà cung cấp LLM (model để chat)?",
-        choices=[Choice(label, value=pid) for pid, label in _PROVIDERS],
-        default=next((c for c in _PROVIDERS if c[0] == cur_provider), _PROVIDERS[0])[0],
-        style=style, qmark="▸",
-    ).ask()
-    if provider is None:
-        print("Đã huỷ."); return
-    preset = LLM_PROVIDERS[provider]
-
-    if provider != "ollama":
-        key = questionary.password(
-            f"API key cho {provider} (dán vào — hiện dạng ***, Enter để giữ nguyên):",
+    try:
+        provider = questionary.select(
+            "Nhà cung cấp LLM (model để chat)?",
+            choices=[Choice(label, value=pid) for pid, label in _PROVIDERS],
+            default=next((c for c in _PROVIDERS if c[0] == cur_provider), _PROVIDERS[0])[0],
             style=style, qmark="▸",
         ).ask()
-        if key and key.strip():
-            _env_set(env_path, preset["key_env"], key.strip())
+        if provider is None:
+            print("Đã huỷ."); return
+        preset = LLM_PROVIDERS[provider]
+        key = None
+        if provider != "ollama":
+            key = questionary.password(
+                f"API key cho {provider} (dán vào — hiện dạng ***, Enter để giữ nguyên):",
+                style=style, qmark="▸",
+            ).ask()
+        model = questionary.text(
+            "Model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
+        ).ask()
+        use_voyage = questionary.confirm(
+            "Dùng Voyage AI embedding? (No = local, miễn phí, không cần key)",
+            default=bool(cfg.voyage_api_key), style=style, qmark="▸",
+        ).ask()
+        vk = questionary.password("VOYAGE_API_KEY (dán vào):", style=style, qmark="▸").ask() if use_voyage else None
+        channels = questionary.checkbox(
+            "Kênh chat nào? (Space chọn · Enter xong · Dashboard web luôn bật)",
+            choices=[Choice("Telegram", "telegram"), Choice("Discord", "discord")],
+            style=style, qmark="▸",
+        ).ask() or []
+        tg = questionary.password("TELEGRAM_BOT_TOKEN:", style=style, qmark="▸").ask() if "telegram" in channels else None
+        dc = questionary.password("DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask() if "discord" in channels else None
+    except KeyboardInterrupt:
+        print("Đã huỷ."); return
+    except Exception:
+        # prompt_toolkit không mở được TUI (vd chạy trong script/không có tty chuẩn) -> nhập tay
+        print("⚠️ Không mở được giao diện chọn — chuyển sang nhập tay (dán vào được).")
+        return _config_simple(cfg, env_path)
 
-    model = questionary.text(
-        "Model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
-    ).ask()
-
-    use_voyage = questionary.confirm(
-        "Dùng Voyage AI embedding? (No = local, miễn phí, không cần key)",
-        default=bool(cfg.voyage_api_key), style=style, qmark="▸",
-    ).ask()
-    if use_voyage:
-        vk = questionary.password("VOYAGE_API_KEY (dán vào):", style=style, qmark="▸").ask()
-        if vk and vk.strip():
-            _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
-
-    channels = questionary.checkbox(
-        "Kênh chat nào? (Space chọn · Enter xong · Dashboard web luôn bật)",
-        choices=[Choice("Telegram", "telegram"), Choice("Discord", "discord")],
-        style=style, qmark="▸",
-    ).ask() or []
-    if "telegram" in channels:
-        t = questionary.password("TELEGRAM_BOT_TOKEN:", style=style, qmark="▸").ask()
-        if t and t.strip():
-            _env_set(env_path, "TELEGRAM_BOT_TOKEN", t.strip())
-    if "discord" in channels:
-        d = questionary.password("DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask()
-        if d and d.strip():
-            _env_set(env_path, "DISCORD_BOT_TOKEN", d.strip())
-
+    if key and key.strip():
+        _env_set(env_path, preset["key_env"], key.strip())
+    if vk and vk.strip():
+        _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
+    if tg and tg.strip():
+        _env_set(env_path, "TELEGRAM_BOT_TOKEN", tg.strip())
+    if dc and dc.strip():
+        _env_set(env_path, "DISCORD_BOT_TOKEN", dc.strip())
     _yaml_set(cfg.root / "config.yaml", "provider", provider)
     if model and model.strip():
         _yaml_set(cfg.root / "config.yaml", "model", model.strip())
@@ -313,6 +314,9 @@ def _config_wizard(cfg) -> None:
 def _config_simple(cfg, env_path) -> None:
     """Fallback không TUI (questionary thiếu / không phải terminal): nhập HIỆN rõ để dán được."""
     from .config import LLM_PROVIDERS
+    if not sys.stdin.isatty():
+        print("⚠️ Không có bàn phím tương tác. Mở terminal rồi chạy: learning-agent config")
+        return
     print("\n🎓 Vlearn Agent — Cấu hình (nhập tay)")
     for i, (pid, label) in enumerate(_PROVIDERS, 1):
         print(f"  {i}) {label}")

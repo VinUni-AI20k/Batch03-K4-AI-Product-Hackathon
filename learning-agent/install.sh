@@ -36,15 +36,15 @@ fi
 # ── cấu hình ──
 [[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env"; }
 
-# Wizard tương tác: chọn provider bằng mũi tên + dán key (mask ***). Cần bàn phím (/dev/tty)
-# vì khi cài qua `curl | bash` thì stdin đang là script, phải trỏ input về terminal thật.
-if [ -e /dev/tty ]; then
+# Wizard tương tác (chọn provider + dán key). CHỈ chạy khi stdin là terminal thật (`bash install.sh`).
+# Khi cài qua `curl | bash`, stdin là ống dẫn script -> không có tty -> bỏ qua, nhắc chạy tay
+# (redirect </dev/tty làm prompt_toolkit bị EOFError, nên không dùng).
+if [ -t 0 ]; then
   say "Cấu hình nhanh (chọn provider LLM + dán API key)"
-  learning-agent config </dev/tty || say "Bỏ qua wizard — chạy lại sau: learning-agent config"
+  learning-agent config || say "Bỏ qua wizard — chạy lại sau: learning-agent config"
 else
-  say "Không có bàn phím tương tác — cấu hình sau bằng: learning-agent config"
+  say "Cấu hình sau khi cài xong bằng lệnh:  learning-agent config"
 fi
-
 learning-agent onboard || true
 
 cat <<'EOF'
