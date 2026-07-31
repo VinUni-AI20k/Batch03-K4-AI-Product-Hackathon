@@ -1,0 +1,353 @@
+/* ==========================================================================
+   Learning Buddy — Playful Claymorphism theme
+   Signature element: the "Journey Path" clay stepper (see JourneyPath.tsx)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap');
+
+:root {
+  /* --- palette --- */
+  --clay-bg-1: #EDE9FE;      /* soft lavender */
+  --clay-bg-2: #FDF3E7;      /* warm cream */
+  --clay-surface: #F8F6FF;   /* card base */
+  --clay-surface-alt: #FFFFFF;
+
+  --clay-purple: #7C5CFC;
+  --clay-purple-dark: #5B3DE0;
+  --clay-orange: #FF8B5E;
+  --clay-orange-dark: #E5673A;
+  --clay-mint: #2EC4B6;
+  --clay-mint-dark: #1FA398;
+  --clay-yellow: #FFC857;
+  --clay-yellow-dark: #EDA92E;
+  --clay-pink: #FF6FA5;
+  --clay-pink-dark: #E24F86;
+
+  --ink: #322A5E;
+  --ink-soft: #6E668F;
+  --ink-faint: #A79FC7;
+
+  --shadow-light: rgba(255, 255, 255, 0.85);
+  --shadow-dark: rgba(91, 61, 224, 0.18);
+
+  --radius-lg: 32px;
+  --radius-md: 22px;
+  --radius-sm: 14px;
+
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255, 111, 165, 0.18), transparent 40%),
+    radial-gradient(circle at 92% 8%, rgba(46, 196, 182, 0.16), transparent 38%),
+    radial-gradient(circle at 85% 90%, rgba(255, 200, 87, 0.18), transparent 42%),
+    linear-gradient(160deg, var(--clay-bg-1), var(--clay-bg-2));
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 0;
+}
+
+p { margin: 0; }
+
+/* ---------- clay building blocks ---------- */
+
+.clay-card {
+  background: var(--clay-surface);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow:
+    10px 10px 22px var(--shadow-dark),
+    -8px -8px 18px var(--shadow-light),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.7),
+    inset -2px -2px 6px rgba(91, 61, 224, 0.05);
+}
+
+.clay-card--sunken {
+  box-shadow:
+    inset 6px 6px 14px rgba(91, 61, 224, 0.12),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.7);
+}
+
+.clay-panel {
+  background: var(--clay-surface-alt);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow:
+    6px 6px 14px var(--shadow-dark),
+    -6px -6px 14px var(--shadow-light);
+}
+
+.clay-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 14px 28px;
+  background: linear-gradient(150deg, var(--clay-orange), var(--clay-orange-dark));
+  box-shadow:
+    6px 6px 14px rgba(229, 103, 58, 0.4),
+    -4px -4px 10px rgba(255, 255, 255, 0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.clay-btn:hover { filter: brightness(1.05); }
+.clay-btn:active {
+  transform: translateY(3px);
+  box-shadow: 2px 2px 6px rgba(229, 103, 58, 0.4);
+}
+.clay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.clay-btn--purple {
+  background: linear-gradient(150deg, var(--clay-purple), var(--clay-purple-dark));
+  box-shadow: 6px 6px 14px rgba(91, 61, 224, 0.4), -4px -4px 10px rgba(255, 255, 255, 0.55);
+}
+.clay-btn--mint {
+  background: linear-gradient(150deg, var(--clay-mint), var(--clay-mint-dark));
+  box-shadow: 6px 6px 14px rgba(31, 163, 152, 0.4), -4px -4px 10px rgba(255, 255, 255, 0.55);
+}
+.clay-btn--ghost {
+  background: var(--clay-surface);
+  color: var(--ink);
+  box-shadow:
+    6px 6px 14px var(--shadow-dark),
+    -6px -6px 14px var(--shadow-light);
+}
+
+.clay-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--clay-surface-alt);
+  box-shadow:
+    4px 4px 10px var(--shadow-dark),
+    -4px -4px 10px var(--shadow-light);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.clay-chip:hover { transform: translateY(-2px); }
+.clay-chip--selected {
+  color: #fff;
+  background: linear-gradient(150deg, var(--clay-purple), var(--clay-purple-dark));
+  box-shadow: 4px 4px 10px rgba(91, 61, 224, 0.4), -3px -3px 8px rgba(255, 255, 255, 0.5);
+  transform: translateY(1px);
+}
+
+.clay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+}
+.clay-badge--mint { background: var(--clay-mint); }
+.clay-badge--pink { background: var(--clay-pink); }
+.clay-badge--yellow { background: var(--clay-yellow-dark); }
+.clay-badge--purple { background: var(--clay-purple); }
+
+.clay-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  background: var(--clay-surface);
+  box-shadow:
+    inset 4px 4px 10px var(--shadow-dark),
+    inset -4px -4px 10px var(--shadow-light);
+}
+.clay-input:focus {
+  outline: 3px solid var(--clay-purple);
+  outline-offset: 2px;
+}
+
+.clay-progress-track {
+  width: 100%;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--clay-surface);
+  box-shadow: inset 3px 3px 8px var(--shadow-dark), inset -3px -3px 8px var(--shadow-light);
+  overflow: hidden;
+}
+.clay-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--clay-mint), var(--clay-purple));
+  transition: width 0.4s ease;
+}
+
+/* ---------- misc ---------- */
+
+.text-soft { color: var(--ink-soft); }
+.text-faint { color: var(--ink-faint); }
+
+@keyframes clay-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes clay-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes clay-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   FLAT-ILLUSTRATION variant — "Bring your savings to 21st century" reference
+   Use these classes instead of the clay-* ones on any screen/section where
+   you want the flat pastel-block + line-art-illustration look instead of
+   the puffy clay look. Both systems share the same color tokens above them
+   (--clay-purple etc.) so illustrations and app screens still feel related.
+   ========================================================================== */
+
+:root {
+  --flat-ink: #17162B;          /* near-black text, not the soft purple-ink */
+  --flat-pink-bg: #F9D8E6;      /* section background, e.g. hero */
+  --flat-blue-bg: #C9DCF0;      /* section background, e.g. slides strip */
+  --flat-yellow-bg: #FDECC8;
+  --flat-white: #FFFFFF;
+  --flat-shadow: 0 18px 40px rgba(23, 22, 43, 0.10);
+  --font-flat-display: 'Poppins', var(--font-display);
+}
+
+/* full-bleed pastel section, e.g. <section className="flat-section flat-section--pink"> */
+.flat-section {
+  padding: 56px 24px;
+}
+.flat-section--pink { background: var(--flat-pink-bg); }
+.flat-section--blue { background: var(--flat-blue-bg); }
+.flat-section--yellow { background: var(--flat-yellow-bg); }
+
+/* the big white rounded panel that floats on the pastel section */
+.flat-card {
+  background: var(--flat-white);
+  border-radius: 28px;
+  box-shadow: var(--flat-shadow);
+  padding: 40px;
+}
+
+/* bold, tight, near-black headline — the opposite of the soft clay headline */
+.flat-heading {
+  font-family: var(--font-flat-display);
+  font-weight: 800;
+  color: var(--flat-ink);
+  line-height: 1.08;
+  letter-spacing: -0.5px;
+}
+
+/* text-only CTA link with underline, e.g. "SIGN UP TODAY" */
+.flat-link {
+  font-family: var(--font-flat-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--flat-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.flat-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.flat-nav a, .flat-nav-link {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--flat-ink);
+  text-decoration: none;
+}
+
+/* ---- onboarding "phone slide" cards (Time to Launch / Fruits of Work / ...) ---- */
+
+.slide-phone {
+  background: var(--flat-white);
+  border-radius: 26px;
+  box-shadow: var(--flat-shadow);
+  padding: 20px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.slide-phone__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.slide-phone__logo {
+  font-family: var(--font-flat-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--flat-ink);
+}
+.slide-phone__illustration {
+  flex: 1;
+  min-height: 180px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.slide-phone__title {
+  font-family: var(--font-flat-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--flat-ink);
+}
+.slide-phone__dots {
+  display: flex;
+  gap: 6px;
+}
+.slide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #D8D6E3;
+}
+.slide-dot--active {
+  background: var(--flat-ink);
+  width: 16px;
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
