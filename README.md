@@ -9,10 +9,13 @@
 
 ## 👥 THÀNH VIÊN & PHÂN CÔNG
 
-- **Thành viên 1:** [Mã HV] - [Tên] - Phân công: [Phần đảm nhận]
-- **Thành viên 2:** [Mã HV] - [Tên] - Phân công: [Phần đảm nhận]
-- **Thành viên 3:** [Mã HV] - [Tên] - Phân công: [Phần đảm nhận]
-- **Thành viên 4:** [Mã HV] - [Tên] - Phân công: [Phần đảm nhận]
+- **Thành viên 1:** 2A202601486 - Đặng Nguyên Giáp - Phân công: Spec (`spec.md` §1-§9) + điều phối checkpoint + demo script/slide
+- **Thành viên 2:** 2A202601172 - Nguyễn Thị Thu Trang - Phân công: Evidence — mining chatlog (Đường B) + bảng impact
+- **Thành viên 3:** 2A202601562 - Phạm Minh Hiếu - Phân công: Code backend (`codebase/backend/app/agents/*.py`, `main.py`) — pipeline outline + lời gọi AI thật
+- **Thành viên 4:** 2A202601632 - Nguyễn Thế Sơn - Phân công: Code frontend/tích hợp (`codebase/frontend/`) — nối flow FE↔API, đảm bảo bấm được end-to-end
+- **Thành viên 5:** 2A202601484 - Mai Tuấn Quang - Phân công: Prompt engineering + `eval/golden-set.md` + chạy đo & ghi kết quả
+
+*(Chi tiết phân công đầy đủ xem `spec.md` §8.)*
 
 ---
 

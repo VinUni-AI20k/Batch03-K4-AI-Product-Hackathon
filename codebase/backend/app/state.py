@@ -13,6 +13,7 @@ class BaseAgentState(TypedDict, total=False):
     # ---- input ----
     index: int
     raw_content: str          # content thô lấy từ outline block
+    input_block: Optional[Any]  # OutlineBlockInput gốc (khi agent cần dữ liệu ngoài content, vd grounding slide gốc)
 
     # ---- xử lý trung gian (team tự bổ sung khi cần) ----
     parsed_context: Optional[str]   # vd: sau khi làm sạch / trích ý chính từ raw_content

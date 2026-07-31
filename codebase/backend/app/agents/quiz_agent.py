@@ -1,20 +1,25 @@
 """
 quiz_agent.py
 -------------
-LangGraph agent sinh nội dung QUIZ từ 1 block outline.
+LangGraph agent sinh nội dung QUIZ TRẮC NGHIỆM (multiple_choice) từ 1 block outline.
+Đáp án đúng được sinh kèm ngay trong câu hỏi, nên việc chấm điểm được FE tự so khớp trực
+tiếp với "correct_answer" — không cần gọi thêm API/LLM nào sau khi người dùng trả lời.
 
 Luồng xử lý (graph):
     parse_input -> generate_quiz -> validate_quiz -> format_output -> END
                          ^________________|
                      (retry nếu validate fail, tối đa MAX_RETRY lần)
-
-Team chỉ cần điền phần TODO trong từng hàm node, KHÔNG cần đổi cấu trúc graph
-trừ khi thực sự cần thêm bước xử lý.
 """
 
+import json
+import logging
+import os
+
 from langgraph.graph import StateGraph, END
-from state import BaseAgentState
-from schemas import QuizOutput, QuizOption
+from app.state import BaseAgentState
+from app.schemas import QuizOutput, QuizOption
+
+logger = logging.getLogger("quiz-agent")
 
 MAX_RETRY = 2
 
@@ -23,13 +28,7 @@ MAX_RETRY = 2
 # NODE 1: parse_input
 # ----------------------------------------------------------------------
 def parse_input(state: BaseAgentState) -> BaseAgentState:
-    """
-    TODO (team điền):
-    - Làm sạch raw_content (bỏ ký tự thừa, chuẩn hoá xuống dòng...)
-    - Có thể tách phần "content chính" ra khỏi phần "Gợi ý: ..." nếu cần
-    - Lưu kết quả vào state["parsed_context"]
-    """
-    state["parsed_context"] = state["raw_content"]  # placeholder: chưa xử lý gì
+    state["parsed_context"] = (state.get("raw_content") or "").strip()
     state["retry_count"] = 0
     return state
 
@@ -37,28 +36,96 @@ def parse_input(state: BaseAgentState) -> BaseAgentState:
 # ----------------------------------------------------------------------
 # NODE 2: generate_quiz  (gọi LLM ở đây)
 # ----------------------------------------------------------------------
-def generate_quiz(state: BaseAgentState) -> BaseAgentState:
-    """
-    TODO (team điền):
-    - Gọi LLM (OpenAI / Anthropic / model nội bộ...) với prompt phù hợp,
-      dựa trên state["parsed_context"]
-    - Parse kết quả trả về thành dict giống cấu trúc QuizOutput (chưa cần validate)
-    - Lưu vào state["draft_output"]
+def _build_quiz_prompt(content: str) -> str:
+    return f"""Bạn là một GIÁO VIÊN AI đang soạn MỘT CÂU HỎI TRẮC NGHIỆM ôn tập dựa trên nội dung
+sau đây:
 
-    ---- MOCK OUTPUT (xoá khi đã có logic thật) ----
-    """
-    state["draft_output"] = {
-        "question": "Theo nội dung trên, vai trò công việc của Phạm Minh Hiếu là gì?",
+{content[:4000]}
+
+Nhiệm vụ:
+1. "question": câu hỏi bằng tiếng Việt, bám sát 1 chi tiết cụ thể trong nội dung (số liệu, định
+   nghĩa, mốc thời gian, điều kiện...), không bịa thêm số liệu/sự kiện không có trong nội dung.
+2. "options": đúng 4 đáp án, mỗi đáp án là object {{"key": "A", "text": "..."}} với key lần lượt
+   A/B/C/D, chỉ có DUY NHẤT 1 đáp án đúng, 3 đáp án còn lại là phương án gây nhiễu hợp lý (không
+   quá dễ loại trừ).
+3. "correct_answer": đúng bằng 1 trong các "key" của options (vd "B").
+4. "explanation": giải thích ngắn gọn tại sao đáp án đó đúng, bám sát nội dung gốc.
+
+CHỈ trả về DUY NHẤT một JSON hợp lệ (không markdown formatting ```, không giải thích thêm),
+đúng cấu trúc:
+{{
+  "question": "...",
+  "question_format": "multiple_choice",
+  "options": [
+    {{"key": "A", "text": "..."}},
+    {{"key": "B", "text": "..."}},
+    {{"key": "C", "text": "..."}},
+    {{"key": "D", "text": "..."}}
+  ],
+  "correct_answer": "B",
+  "explanation": "..."
+}}
+"""
+
+
+def _call_llm(content: str) -> dict | None:
+    api_key = os.getenv("API_KEY", "")
+    if not api_key:
+        logger.warning("Không có API_KEY -> bỏ qua gọi LLM, dùng fallback cho quiz")
+        return None
+
+    try:
+        from openai import OpenAI
+
+        client_kwargs = {"api_key": api_key}
+        base_url = os.getenv("BASE_URL", "")
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        client = OpenAI(**client_kwargs)
+
+        completion = client.chat.completions.create(
+            model=os.getenv("MODEL_NAME", "") or "gpt-4o-mini",
+            messages=[{"role": "user", "content": _build_quiz_prompt(content)}],
+            temperature=0.4,
+        )
+        raw_text = (completion.choices[0].message.content or "").strip()
+
+        json_str = raw_text
+        if json_str.startswith("```json"):
+            json_str = json_str[7:]
+        if json_str.startswith("```"):
+            json_str = json_str[3:]
+        if json_str.endswith("```"):
+            json_str = json_str[:-3]
+
+        return json.loads(json_str.strip())
+    except Exception as e:
+        logger.error(f"Lỗi khi gọi LLM sinh quiz: {e}", exc_info=True)
+        return None
+
+
+def _fallback_draft(content: str) -> dict:
+    """Không gọi được LLM: dựng 1 câu hỏi trắc nghiệm placeholder từ dòng đầu tiên của nội dung."""
+    lines = [line.strip() for line in (content or "").splitlines() if line.strip()]
+    first_line = lines[0] if lines else "nội dung trên"
+
+    return {
+        "question": f"Nội dung sau đây nói về điều gì: \"{first_line[:100]}\"?",
         "question_format": "multiple_choice",
         "options": [
-            {"key": "A", "text": "Data Scientist"},
-            {"key": "B", "text": "Fullstack Developer"},
-            {"key": "C", "text": "UI/UX Designer"},
-            {"key": "D", "text": "Project Manager"},
+            {"key": "A", "text": first_line[:60] or "Không xác định"},
+            {"key": "B", "text": "Không liên quan đến nội dung đã học"},
+            {"key": "C", "text": "Chưa đủ dữ liệu để xác định"},
+            {"key": "D", "text": "Một chủ đề khác ngoài tài liệu"},
         ],
-        "correct_answer": "B",
-        "explanation": "Nội dung ghi rõ vai trò là 'Fullstack developer'.",
+        "correct_answer": "A",
+        "explanation": "Không thể gọi LLM để sinh câu hỏi chi tiết, dùng câu hỏi mặc định.",
     }
+
+
+def generate_quiz(state: BaseAgentState) -> BaseAgentState:
+    content = state.get("parsed_context") or ""
+    state["draft_output"] = _call_llm(content) or _fallback_draft(content)
     return state
 
 
@@ -66,14 +133,14 @@ def generate_quiz(state: BaseAgentState) -> BaseAgentState:
 # NODE 3: validate_quiz
 # ----------------------------------------------------------------------
 def validate_quiz(state: BaseAgentState) -> BaseAgentState:
-    """
-    TODO (team điền):
-    - Kiểm tra draft_output có đủ field bắt buộc không
-    - Kiểm tra correct_answer có nằm trong options không (nếu multiple_choice)
-    - Nếu không đạt: is_valid = False (để graph tự động quay lại generate_quiz)
-    """
     draft = state.get("draft_output") or {}
-    is_valid = bool(draft.get("question")) and bool(draft.get("correct_answer"))
+
+    question = draft.get("question")
+    correct_answer = draft.get("correct_answer")
+    options = draft.get("options") or []
+    keys = {o.get("key") for o in options}
+
+    is_valid = bool(question) and bool(options) and correct_answer in keys
     state["is_valid"] = is_valid
     return state
 
@@ -94,12 +161,12 @@ def should_retry(state: BaseAgentState) -> str:
 def format_output(state: BaseAgentState) -> BaseAgentState:
     """Map draft_output -> QuizOutput chuẩn để trả về API."""
     draft = state["draft_output"]
-    options = [QuizOption(**o) for o in draft.get("options", [])] if draft.get("options") else None
+    options = [QuizOption(**o) for o in draft.get("options", [])]
 
     output = QuizOutput(
         index=state["index"],
         question=draft["question"],
-        question_format=draft["question_format"],
+        question_format="multiple_choice",
         options=options,
         correct_answer=draft["correct_answer"],
         explanation=draft.get("explanation", ""),

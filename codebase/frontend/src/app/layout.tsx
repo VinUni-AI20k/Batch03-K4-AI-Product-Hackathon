@@ -18,7 +18,7 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenMAIC · Welcome to Python",
+  title: "50s · Welcome to Python",
   description: "Interactive classroom slide viewer powered by AI Teacher",
 };
 

@@ -6,37 +6,121 @@ LangGraph agent sinh mô tả các bước animation/timeline từ 1 block outli
 Luồng: parse_input -> generate_animation -> format_output -> END
 """
 
+import json
+import logging
+import os
+
 from langgraph.graph import StateGraph, END
-from state import BaseAgentState
-from schemas import AnimationOutput, AnimationStep
+from app.state import BaseAgentState
+from app.schemas import AnimationOutput, AnimationStep
+
+logger = logging.getLogger("animation-agent")
 
 
 def parse_input(state: BaseAgentState) -> BaseAgentState:
-    """
-    TODO (team điền): tách các mốc/bước từ raw_content (vd tách theo "->" hoặc theo câu).
-    """
-    state["parsed_context"] = state["raw_content"]
+    state["parsed_context"] = (state.get("raw_content") or "").strip()
     return state
 
 
-def generate_animation(state: BaseAgentState) -> BaseAgentState:
-    """
-    TODO (team điền):
-    - Gọi LLM để xác định animation_type phù hợp (timeline / flow / comparison)
-    - Tách thành danh sách các step có order, label, description
-    - Lưu vào state["draft_output"]
+def _build_prompt(content: str) -> str:
+    return f"""Bạn là một GIÁO VIÊN AI kiêm THIẾT KẾ UI, đang dựng một đoạn ANIMATION MINH HOẠ
+trực quan để giảng cho học viên, dựa trên nội dung sau đây:
 
-    ---- MOCK OUTPUT ----
-    """
-    state["draft_output"] = {
-        "animation_type": "timeline",
-        "title": "Timeline: Quá trình liên hệ ứng viên",
-        "steps": [
-            {"order": 1, "label": "Xem hồ sơ", "description": "Nhà tuyển dụng xem thông tin CV.", "duration_ms": 1500},
-            {"order": 2, "label": "Gọi điện", "description": "Liên hệ qua SĐT +84 916561440.", "duration_ms": 1500},
-            {"order": 3, "label": "Gửi email", "description": "Trao đổi chi tiết qua email.", "duration_ms": 1500},
-        ],
-    }
+{content[:4000]}
+
+Nhiệm vụ:
+1. Chọn "animation_type" phù hợp nhất với nội dung, chỉ được chọn 1 trong 3 giá trị:
+   - "timeline": các mốc/bước diễn ra theo trình tự thời gian.
+   - "flow": quy trình/luồng xử lý nối tiếp nhau (không nhất thiết gắn mốc thời gian).
+   - "comparison": so sánh giữa các đối tượng/khái niệm.
+2. "title": tiêu đề ngắn gọn cho animation.
+3. "steps": danh sách các bước theo đúng thứ tự, mỗi bước gồm:
+   - "order": số thứ tự bắt đầu từ 1.
+   - "label": nhãn ngắn gọn của bước.
+   - "description": mô tả chi tiết bước đó bằng tiếng Việt, bám sát nội dung gốc, không bịa
+     thêm số liệu/sự kiện không có trong nội dung.
+   - "duration_ms": thời lượng hiển thị gợi ý cho bước này (mili giây), mặc định 1500 nếu
+     không có lý do để khác.
+4. "html": MỘT ĐOẠN HTML TỰ CHỨA (không phải toàn bộ trang <html>, chỉ phần bên trong <body>)
+   để render trực tiếp animation này, dựng theo đúng nội dung "steps" ở trên. Yêu cầu bắt buộc:
+   - Dùng class Tailwind CSS cho layout/màu sắc/spacing (Tailwind đã được nạp sẵn ở trang bao
+     ngoài, không cần <link>/<script> CDN nào).
+   - Animation CHUYỂN ĐỘNG THẬT SỰ (không chỉ tĩnh): dùng 1 thẻ <style> chứa @keyframes +
+     class animation, ví dụ mỗi step xuất hiện nối tiếp nhau (fade-in/slide-in) với
+     animation-delay tăng dần theo "order", hoặc với "timeline" vẽ 1 đường timeline có chấm
+     tròn sáng dần từng mốc; với "flow" vẽ các khối nối bằng mũi tên; với "comparison" vẽ 2+
+     cột song song.
+   - Toàn bộ text hiển thị PHẢI lấy đúng từ "label"/"description" của "steps", không bịa thêm.
+   - Nền trong suốt hoặc trắng, không dùng màu chữ trắng trên nền trắng.
+   - Không dùng <script> chứa logic phức tạp/network call — chỉ HTML + Tailwind class + 1
+     <style> khối @keyframes thuần CSS.
+
+CHỈ trả về DUY NHẤT một JSON hợp lệ (không markdown formatting ```, không giải thích thêm),
+đúng cấu trúc:
+{{
+  "animation_type": "timeline",
+  "title": "...",
+  "steps": [
+    {{"order": 1, "label": "...", "description": "...", "duration_ms": 1500}}
+  ],
+  "html": "<div class=\\"...\\">...</div><style>@keyframes ...</style>"
+}}
+"""
+
+
+def _call_llm(content: str) -> dict | None:
+    api_key = os.getenv("API_KEY", "")
+    if not api_key:
+        logger.warning("Không có API_KEY -> bỏ qua gọi LLM, dùng fallback cho animation")
+        return None
+
+    try:
+        from openai import OpenAI
+
+        client_kwargs = {"api_key": api_key}
+        base_url = os.getenv("BASE_URL", "")
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        client = OpenAI(**client_kwargs)
+
+        completion = client.chat.completions.create(
+            model=os.getenv("MODEL_NAME", "") or "gpt-4o-mini",
+            messages=[{"role": "user", "content": _build_prompt(content)}],
+            temperature=0.4,
+        )
+        raw_text = completion.choices[0].message.content.strip()
+
+        json_str = raw_text
+        if json_str.startswith("```json"):
+            json_str = json_str[7:]
+        if json_str.startswith("```"):
+            json_str = json_str[3:]
+        if json_str.endswith("```"):
+            json_str = json_str[:-3]
+
+        return json.loads(json_str.strip())
+    except Exception as e:
+        logger.error(f"Lỗi khi gọi LLM sinh animation: {e}", exc_info=True)
+        return None
+
+
+def _fallback_draft(content: str) -> dict:
+    """Không gọi được LLM: tách nội dung theo dòng/câu để dựng steps đơn giản."""
+    lines = [line.strip() for line in content.replace("->", "\n").splitlines() if line.strip()]
+    if not lines:
+        lines = ["Không có nội dung"]
+
+    steps = [
+        {"order": i, "label": line[:40], "description": line, "duration_ms": 1500}
+        for i, line in enumerate(lines[:8], start=1)
+    ]
+    title = lines[0][:80] if lines else "Animation"
+    return {"animation_type": "timeline", "title": title, "steps": steps}
+
+
+def generate_animation(state: BaseAgentState) -> BaseAgentState:
+    content = state.get("parsed_context") or ""
+    state["draft_output"] = _call_llm(content) or _fallback_draft(content)
     return state
 
 
@@ -46,8 +130,9 @@ def format_output(state: BaseAgentState) -> BaseAgentState:
     output = AnimationOutput(
         index=state["index"],
         animation_type=draft.get("animation_type", "timeline"),
-        title=draft["title"],
+        title=draft.get("title", "Animation"),
         steps=steps,
+        html=draft.get("html"),
     )
     state["final_output"] = output
     return state
