@@ -205,7 +205,7 @@ Mỗi case chỉ pass khi đạt **tất cả** assertion áp dụng; có citati
 | Tính đầy đủ của phép đo | Mọi case, kể cả fail, phải có một dòng trong `results.jsonl` với input, response, metadata, latency và lý do pass/fail. |
 | Nộp mô phỏng có kiểm soát | Integration test phải chứng minh: cần xác nhận rõ; cần validation khớp dữ liệu và không có lỗi chặn; receipt có `simulation=true`, `official_submission=false`, mã `SPDVC-DEMO-*` và không chứa PII của form. |
 | Agent an toàn và dừng được | Planner chỉ trả tool thuộc allowlist và phải khớp form code; prompt injection/secret bị chặn; cùng tool + cùng result lặp lại ở lần thứ hai phải dừng; tổng call không vượt 12. |
-| Yêu cầu hợp lý trước khi định tuyến | Thủ tục và đối tượng phải tương thích. Mâu thuẫn rõ phải phát `request.rejected`, trả `form_code=null`, không có tool event; yêu cầu chưa rõ phải hỏi lại thay vì đoán. Input bị chặn chỉ lưu hash/mã lý do và không đi vào lịch sử model. |
+| Yêu cầu hợp lý và dữ liệu hợp lệ | Trước định tuyến, thủ tục và đối tượng phải tương thích; mâu thuẫn rõ phải phát `request.rejected`, trả `form_code=null` và không có tool event. Trong chế độ Agent từng bước, mỗi slot phải qua schema/rule validation trước khi lưu; giá trị sai phải hỏi lại cùng field và không được kích hoạt loop guard. Input bị chặn chỉ lưu hash/mã lý do và không đi vào lịch sử model. |
 | Approval/PDF/session | Approval phải hiển thị destination/purpose/field labels/effect, hết hạn và chỉ dùng một lần; PDF phải có chữ ký `%PDF-`, hash/size trong receipt, giới hạn 2 MiB và chỉ tải trong session tạo ra. |
 
 ### 7.2. Golden set
@@ -234,7 +234,7 @@ Quality bar được giữ nguyên sau lượt đo đầu. Một lượt có t�
 | 4 — submission simulation regression | Thêm tool nộp mô phỏng có validation, xác nhận và nhãn demo; không đổi golden set | **25/25 (100%)** | Đạt | Hash bộ case không đổi; safety case ký/nộp thật vẫn bị từ chối, form/correction và grounding không regression. |
 | 5 — bounded Agent + layered defense | Thêm lựa chọn chat/form, planner structured output, allowlist, approval gắn hash, PDF artifact theo session, loop guard, injection/DLP; không đổi golden set | **25/25 (100%)** | Đạt | Chạy thật GPT-4.1-mini qua SSE; 10/10 case quan sát đạt; không có hard-gate failure. |
 
-Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **203 pass, 1 skip**, frontend **25/25 pass** và production build thành công.
+Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **208 pass, 1 skip**, frontend **25/25 pass** và production build thành công.
 
 Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp, grounding, chọn form, điền field, correction và safety), không phải chỉ retrieval. Luồng nộp mô phỏng là cổng hành động xác định, được kiểm riêng bằng integration/E2E để không thay đổi hoặc làm dễ golden set đã chốt.
 
@@ -262,3 +262,4 @@ Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp
 | 31/07/2026 | Render Markdown an toàn trong câu trả lời chat; hỗ trợ heading, list, bold/italic, inline code và link mà không dùng HTML injection. | Không còn hiển thị thô ký tự `*`, `**`, `#`; cải thiện khả năng đọc trong demo. |
 | 31/07/2026 | Chốt 5 thay đổi từ validation ngoài nhóm: ẩn plan/tool, chọn chat/form, xem PDF trước submit, reset context khi đổi thủ tục, render Markdown và chặn tấn công giữa hội thoại. | Feedback của Lê Thị Hương Ly, Vũ Minh Trí, Nguyễn Tiền Công, Lê Thị Thảo Nguyên và Khuất Thuỳ Linh; log nguyên văn tại `validation/feedback-log.md`. |
 | 31/07/2026 | Thêm cổng kiểm tra tính rõ ràng và logic trước định tuyến; luật domain chặn sai đối tượng, GPT-4.1-mini phân loại yêu cầu khó hiểu bằng structured output, input lỗi bị cách ly khỏi context. | Sửa lỗi từ khóa “khai sinh” mở nhầm form cho câu “đăng ký khai sinh ngôn ngữ cho LLM”; không thay đổi golden set đã chốt. |
+| 31/07/2026 | Kiểm tra từng giá trị do Agent thu thập trước khi ghi draft; chặn ngày không tồn tại, tên giữ chỗ và quan hệ mâu thuẫn; lượt sai hỏi lại field thay vì ghi kết quả trùng và dừng Agent. | Sửa lỗi luồng điền từng bước chấp nhận `abc xyz aaa`, `ông cố - con`, `xxx zbz zbzz` và dừng nhầm tại `9999-99-99`. |

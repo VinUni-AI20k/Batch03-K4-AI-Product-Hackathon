@@ -3,6 +3,8 @@ from fakeredis.aioredis import FakeRedis
 from httpx import ASGITransport, AsyncClient
 
 from app.config import Settings
+from app.agent_runtime import record_tool_result
+from app.form_llm import FormFillingReply
 from app.main import create_app
 from app.schemas import ChatRequest
 
@@ -262,6 +264,59 @@ async def test_agent_chat_mode_asks_for_one_field_without_opening_the_form(app) 
     payload = _complete_payload(response.text)
     assert payload["form_code"] is None
     assert "Bạn vui lòng cho biết" in _streamed_answer(response.text)
+
+
+@pytest.mark.asyncio
+async def test_invalid_agent_slot_is_reprompted_without_triggering_loop_guard(app, monkeypatch) -> None:
+    async def fake_fill_form(_settings, messages, _language_code, _candidate, _known_fields):
+        value = messages[-1]["content"]
+        if value in {"9999-99-99", "2026-01-01"}:
+            return FormFillingReply(
+                answer="Tiếp tục sang trường sau.",
+                extracted_fields={"child_birth_date": value},
+            )
+        return FormFillingReply(answer="Vui lòng nhập ngày sinh.")
+
+    monkeypatch.setattr("app.form_conversation.fill_form", fake_fill_form)
+    known_fields = {
+        "applicant_full_name": "Nguyễn Văn An",
+        "relationship_to_child": "Cha",
+        "child_full_name": "Nguyễn Minh Anh",
+    }
+    history = record_tool_result([], "collect_form_data", {"fields": known_fields})
+    async with app.router.lifespan_context(app):
+        app.state.procedure_pipeline.rag_service = None
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await client.post("/api/v1/sessions")
+            session_id = client.cookies.get("icivi_session")
+            state = await app.state.store.get(session_id)
+            await app.state.store.save(session_id, {
+                **state,
+                "active_scenario_code": "BIRTH_REGISTRATION_FORM",
+                "form_draft": {"BIRTH_REGISTRATION_FORM": known_fields},
+                "agent_workflow": {
+                    "form_code": "BIRTH_REGISTRATION_FORM",
+                    "status": "collecting",
+                    "mode": "agent_chat",
+                    "tool_history": history,
+                },
+            })
+
+            invalid = await client.post(
+                "/api/v1/chat/stream", json={"message": "9999-99-99", "language_code": "vi"},
+            )
+            state_after_invalid = await app.state.store.get(session_id)
+            valid = await client.post(
+                "/api/v1/chat/stream", json={"message": "2026-01-01", "language_code": "vi"},
+            )
+            state_after_valid = await app.state.store.get(session_id)
+
+    assert "event: agent.stopped" not in invalid.text
+    assert '"name": "validate_form", "ok": false' in invalid.text
+    assert "Định dạng ngày" in _streamed_answer(invalid.text)
+    assert "child_birth_date" not in state_after_invalid["form_draft"]["BIRTH_REGISTRATION_FORM"]
+    assert "event: agent.stopped" not in valid.text
+    assert state_after_valid["form_draft"]["BIRTH_REGISTRATION_FORM"]["child_birth_date"] == "2026-01-01"
 
 
 @pytest.mark.asyncio

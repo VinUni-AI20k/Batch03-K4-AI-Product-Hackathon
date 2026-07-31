@@ -11,6 +11,7 @@ from typing import Any
 
 from app.config import Settings
 from app.form_llm import fill_form
+from app.form_validation import validate_field_updates
 from app.procedure_catalog import normalize_text
 from app.procedure_settings import FormMapping, ProcedureSettings
 from app.request_quality import deterministic_request_quality
@@ -70,6 +71,27 @@ async def maybe_fill_form(
         for field_code, value in form_reply.extracted_fields.items()
         if value and candidate.field_by_code(field_code) is not None
     }
-    merged_fields = {**known_fields, **newly_extracted}
+    accepted_fields: dict[str, str] = {}
+    rejected_issues = []
+    for field_code, value in newly_extracted.items():
+        issues = validate_field_updates(candidate, {**known_fields, **accepted_fields}, {field_code: value})
+        blocking_issues = [issue for issue in issues if issue.severity == "blocking_error"]
+        if blocking_issues:
+            rejected_issues.extend(blocking_issues)
+        else:
+            accepted_fields[field_code] = value
+    merged_fields = {**known_fields, **accepted_fields}
+    if rejected_issues:
+        issue = rejected_issues[0]
+        field = candidate.field_by_code(issue.field_code or "")
+        label = field.label_vi.lower() if field else "thông tin này"
+        guidance = f" {issue.suggestion_vi}" if issue.suggestion_vi else ""
+        form_reply.answer = f"Thông tin vừa nhập chưa hợp lệ. {issue.message_vi}{guidance} Vui lòng nhập lại {label}."
+        form_reply.quick_replies = list(field.validation.enum_values) if field and field.validation.enum_values else []
     new_reply = AssistantReply(intent="form_guidance", answer=form_reply.answer, quick_replies=form_reply.quick_replies)
-    return new_reply, {"form_code": form_code, "fields": merged_fields}
+    return new_reply, {
+        "form_code": form_code,
+        "fields": merged_fields,
+        "accepted_field_codes": list(accepted_fields),
+        "rejected_issues": [issue.model_dump() for issue in rejected_issues],
+    }

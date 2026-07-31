@@ -12,12 +12,18 @@ from datetime import UTC, date, datetime
 from uuid import uuid4
 
 from app.agent_runtime import assess_prompt_injection
+from app.procedure_catalog import normalize_text
 from app.procedure_settings import CrossFieldRule, FormCandidate, FormField
 from app.schemas import ValidationIssue, ValidationResult, ValidationSummary
 
 _EMPTY_VALUES = (None, "", [], {})
 _SECRET_VALUE = re.compile(r"(?i)(?:\bsk-[A-Za-z0-9_-]{16,}\b|\bBearer\s+[A-Za-z0-9._~+/-]{12,}=*)")
 _PLACEHOLDER_VALUES = {"test", "testing", "xxx", "fake", "không biết", "chưa biết"}
+_PLACEHOLDER_NAME_TOKENS = {"abc", "aaa", "xxx", "xyz", "zzz", "test", "testing", "fake", "demo"}
+_RELATIONSHIP_MARKERS = (
+    "cha", "bo", "me", "con", "ong", "ba", "anh", "chi", "em", "vo", "chong",
+    "nguoi giam ho", "nguoi than", "nguoi duoc khai sinh",
+)
 
 
 def canonical_input_hash(values: dict) -> str:
@@ -84,6 +90,34 @@ def _check_field(field: FormField, value: object) -> ValidationIssue | None:
                 message_vi=f"{field.label_vi} đang chứa dữ liệu giữ chỗ, chưa thể dùng để nộp.",
                 suggestion_vi="Thay bằng thông tin thực tế và kiểm tra lại.",
             )
+        if field.field_code.endswith("full_name"):
+            name_tokens = set(re.findall(r"[a-z]+", normalize_text(stripped)))
+            if name_tokens & _PLACEHOLDER_NAME_TOKENS:
+                return ValidationIssue(
+                    issue_code="NAME_PLACEHOLDER_BLOCKED",
+                    rule_code="DATA_NAME_SANITY",
+                    field_code=field.field_code,
+                    severity="blocking_error",
+                    message_vi=f"{field.label_vi} có dấu hiệu là dữ liệu thử hoặc chuỗi giữ chỗ.",
+                    suggestion_vi="Nhập họ tên đúng như trên giấy tờ hoặc thông tin thực tế cần đăng ký.",
+                )
+        if field.field_code == "relationship_to_child":
+            relationship = normalize_text(stripped)
+            matched_relations = {
+                marker for marker in _RELATIONSHIP_MARKERS
+                if re.search(rf"(?<![a-z0-9]){re.escape(marker)}(?![a-z0-9])", relationship)
+            }
+            # A single requester cannot simultaneously have two conflicting
+            # relationships such as "ông cố - con" to the same person.
+            if len(matched_relations) > 1:
+                return ValidationIssue(
+                    issue_code="RELATIONSHIP_CONTRADICTORY",
+                    rule_code="DATA_RELATIONSHIP_SANITY",
+                    field_code=field.field_code,
+                    severity="blocking_error",
+                    message_vi="Quan hệ với người được khai sinh đang chứa nhiều vai trò mâu thuẫn.",
+                    suggestion_vi="Chỉ nhập một quan hệ của người yêu cầu, ví dụ: cha, mẹ, ông, bà hoặc người giám hộ.",
+                )
         if "citizen_id" in field.field_code and re.fullmatch(r"(\d)\1{8,11}", stripped):
             return ValidationIssue(
                 issue_code="IDENTIFIER_REPEATED_DIGIT",
@@ -109,6 +143,27 @@ def _check_field(field: FormField, value: object) -> ValidationIssue | None:
         if int(value.strip()) > date.today().year:
             return _issue(field, "FIELD_YEAR_IN_FUTURE", severity="blocking_error")
     return None
+
+
+def validate_field_updates(
+    candidate: FormCandidate,
+    known_values: dict,
+    updates: dict[str, object],
+) -> list[ValidationIssue]:
+    """Validate newly extracted chat slots before they enter the trusted draft."""
+
+    values = {**known_values, **updates}
+    issues: list[ValidationIssue] = []
+    for field_code, value in updates.items():
+        field = candidate.field_by_code(field_code)
+        if field is not None and (issue := _check_field(field, value)) is not None:
+            issues.append(issue)
+    updated_codes = set(updates)
+    for rule in candidate.cross_field_rules:
+        involved = {rule.older_field_code, rule.younger_field_code, rule.anchor_field_code}
+        if updated_codes & involved and (issue := _check_cross_field_rule(rule, values)) is not None:
+            issues.append(issue)
+    return issues
 
 
 def _extract_year(value: object) -> int | None:

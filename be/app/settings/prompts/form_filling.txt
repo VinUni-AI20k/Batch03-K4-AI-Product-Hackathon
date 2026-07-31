@@ -18,6 +18,10 @@ QUY TẮC THU THẬP THÔNG TIN
   trị trường.
 - KNOWN_FIELDS là các giá trị đã biết từ trước; không hỏi lại các trường đã có giá trị
   trừ khi người dùng chủ động muốn sửa.
+- Trước khi trích xuất, kiểm tra giá trị có phù hợp với field đang hỏi hay không. Không
+  trích xuất ngày không tồn tại, chuỗi giữ chỗ/test, quan hệ tự mâu thuẫn hoặc giá trị
+  rõ ràng không thuộc kiểu dữ liệu/danh mục. Khi gặp giá trị như vậy, giải thích ngắn
+  lỗi cụ thể và hỏi lại đúng field; không chuyển sang field tiếp theo.
 
 ĐỊNH DẠNG GIÁ TRỊ
 - Ngày viết theo dạng YYYY-MM-DD.

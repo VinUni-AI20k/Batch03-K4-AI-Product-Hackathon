@@ -332,7 +332,10 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     return
 
                 workflow = state.get("agent_workflow") or {}
-                if repeated_user_message:
+                repeated_agent_slot = bool(
+                    workflow.get("status") == "collecting" and workflow.get("mode") == "agent_chat"
+                )
+                if repeated_user_message and not repeated_agent_slot:
                     answer = (
                         "Bạn vừa gửi lại đúng nội dung của lượt trước. Tôi không chạy lại Agent hoặc tool để tránh lặp vô hạn. "
                         "Hãy cung cấp thông tin mới, chọn một hướng đang được đề xuất hoặc diễn đạt rõ phần bạn muốn hỏi lại."
@@ -435,6 +438,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                 form_code = form_patch["form_code"] if form_patch else None
                 workflow = turn_state.get("agent_workflow") or {}
                 is_new_workflow = bool(form_code and workflow.get("form_code") != form_code)
+                validation_rejected = bool(form_patch and form_patch.get("rejected_issues"))
                 if is_new_workflow:
                     form_candidate = app.state.procedure_pipeline.procedure_settings.form_candidates[form_code]
                     required_data = [
@@ -456,25 +460,37 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     reply.quick_replies = ["Điền trên biểu mẫu", "Điền từng bước cùng Agent"]
                 elif form_patch and workflow.get("mode") == "agent_chat":
                     try:
-                        workflow = {
-                            **workflow,
-                            "tool_history": record_tool_result(
-                                workflow.get("tool_history", []), "collect_form_data", {"fields": form_patch["fields"]},
-                            ),
-                        }
+                        accepted_field_codes = form_patch.get("accepted_field_codes", [])
+                        if validation_rejected:
+                            yield sse("tool.result", {
+                                "name": "validate_form",
+                                "ok": False,
+                                "issues": [
+                                    {"issue_code": issue["issue_code"], "field_code": issue.get("field_code")}
+                                    for issue in form_patch["rejected_issues"]
+                                ],
+                            })
+                        elif accepted_field_codes:
+                            workflow = {
+                                **workflow,
+                                "tool_history": record_tool_result(
+                                    workflow.get("tool_history", []), "collect_form_data", {"fields": form_patch["fields"]},
+                                ),
+                            }
                         form_candidate = app.state.procedure_pipeline.procedure_settings.form_candidates[form_code]
                         missing_required = [
                             field.field_code for field in form_candidate.fields
                             if field.required and not form_patch["fields"].get(field.field_code)
                         ]
-                        if not missing_required:
+                        if not missing_required and not validation_rejected:
                             workflow = {**workflow, "status": "ready_for_review"}
                             reply.answer = (
                                 "Tôi đã thu thập đủ thông tin bắt buộc. Hãy mở biểu mẫu để kiểm tra toàn bộ dữ liệu, "
                                 "thẩm định và xác nhận trước khi tạo PDF."
                             )
                             reply.quick_replies = ["Mở biểu mẫu để kiểm tra"]
-                        yield sse("tool.result", {"name": "collect_form_data", "ok": True, "field_count": len(form_patch["fields"])})
+                        if accepted_field_codes:
+                            yield sse("tool.result", {"name": "collect_form_data", "ok": True, "field_count": len(form_patch["fields"])})
                     except AgentLoopStopped:
                         reply.answer = "Agent đã dừng vì tool thu thập dữ liệu trả cùng một kết quả hai lần liên tiếp. Hãy cung cấp thông tin mới hoặc chuyển sang biểu mẫu."
                         reply.quick_replies = ["Mở biểu mẫu và rà soát"]
@@ -482,7 +498,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                         yield sse("agent.stopped", {"reason": "repeated_identical_tool_result"})
                 canonical_answer = redact_known_secrets(reply.answer)
                 normalized_answer = normalize_untrusted_text(canonical_answer).casefold()
-                if normalized_answer and normalized_answer == turn_state.get("last_assistant_answer_normalized"):
+                if normalized_answer and normalized_answer == turn_state.get("last_assistant_answer_normalized") and not validation_rejected:
                     canonical_answer = (
                         "Câu trả lời dự kiến trùng hoàn toàn với lượt trước nên Agent đã dừng để tránh lặp. "
                         "Bạn hãy bổ sung dữ liệu mới hoặc chọn một thao tác khác."

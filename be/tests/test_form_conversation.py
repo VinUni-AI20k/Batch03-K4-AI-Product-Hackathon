@@ -4,6 +4,7 @@ from app.config import Settings
 from app.form_conversation import maybe_fill_form, resolve_form_code
 from app.procedure_settings import load_procedure_settings
 from app.schemas import AssistantReply
+from app.form_llm import FormFillingReply
 
 SETTINGS = load_procedure_settings()
 
@@ -118,3 +119,31 @@ async def test_maybe_fill_form_does_not_override_a_safety_refusal() -> None:
 
     assert reply is refusal
     assert patch is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("field_code", "value", "issue_code"),
+    [
+        ("applicant_full_name", "abc xyz aaa", "NAME_PLACEHOLDER_BLOCKED"),
+        ("relationship_to_child", "ông cố - con", "RELATIONSHIP_CONTRADICTORY"),
+        ("child_full_name", "xxx zbz zbzz", "NAME_PLACEHOLDER_BLOCKED"),
+        ("child_birth_date", "9999-99-99", "FIELD_DATE_UNPARSEABLE"),
+    ],
+)
+async def test_agent_rejects_invalid_extracted_slot_before_saving(monkeypatch, field_code: str, value: str, issue_code: str) -> None:
+    async def fake_fill_form(*_args, **_kwargs) -> FormFillingReply:
+        return FormFillingReply(answer="Tiếp tục", extracted_fields={field_code: value})
+
+    monkeypatch.setattr("app.form_conversation.fill_form", fake_fill_form)
+    state = {"active_scenario_code": "BIRTH_REGISTRATION_FORM", "form_draft": {}, "language_code": "vi"}
+    result = {"reply": AssistantReply(intent="general", answer="ok"), "active_procedure_code": None}
+    reply, patch = await maybe_fill_form(
+        state, result, Settings(llm_api_key="", llm_model=""), SETTINGS,
+        [{"role": "user", "content": value}],
+    )
+
+    assert patch is not None
+    assert field_code not in patch["fields"]
+    assert patch["rejected_issues"][0]["issue_code"] == issue_code
+    assert "Vui lòng nhập lại" in reply.answer
