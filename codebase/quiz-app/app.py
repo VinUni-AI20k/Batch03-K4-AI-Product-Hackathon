@@ -200,6 +200,141 @@ def verify_source(snippet: str, full_text_norm: str) -> bool:
     return True
 
 
+def validate_question_structure(q: dict) -> tuple[bool, str]:
+    """Kiểm tra CẤU TRÚC câu hỏi hợp lệ trước khi hiển thị — khác với verify_source()
+    (chống bịa nội dung so với PDF). Đây là lớp chặn output HỎNG VỀ FORMAT: câu hỏi
+    quá ngắn/rỗng, thiếu đủ 4 đáp án, đáp án rỗng hoặc chỉ còn placeholder kiểu "A"/"-"
+    sau khi bóc bỏ tiền tố "A. ", đáp án trùng lặp... Các lỗi này từng thấy thực tế khi
+    model trả JSON đúng cú pháp nhưng nội dung bên trong bị thiếu/hỏng.
+    Trả về (is_valid, lý_do_nếu_không_hợp_lệ). Có side-effect: tự vá field "difficulty"
+    nếu thiếu/sai giá trị (không coi là lỗi nghiêm trọng đủ để loại cả câu)."""
+    question_text = str(q.get("question", "")).strip()
+    if len(question_text) < 15:
+        return False, "câu hỏi quá ngắn hoặc thiếu nội dung"
+
+    options = q.get("options")
+    if not isinstance(options, list) or len(options) != 4:
+        got = len(options) if isinstance(options, list) else 0
+        return False, f"thiếu đáp án (cần đúng 4, có {got})"
+
+    cleaned_opts = []
+    for opt in options:
+        opt_str = str(opt).strip()
+        # Bóc tiền tố "A. "/"B) "/"C: " ... để so nội dung thật bên trong đáp án,
+        # tránh trường hợp options=["A", "B", "C", "D"] (chỉ có nhãn, không có nội dung)
+        # lọt qua vì opt_str có độ dài > 0.
+        opt_body = re.sub(r'^[A-D][\.\)\:]?\s*', '', opt_str).strip()
+        if len(opt_body) < 2:
+            return False, f"đáp án rỗng/không có nội dung thật (\"{opt_str}\")"
+        cleaned_opts.append(opt_body.lower())
+
+    if len(set(cleaned_opts)) < len(cleaned_opts):
+        return False, "đáp án bị trùng lặp"
+
+    if not isinstance(q.get("difficulty"), str) or q.get("difficulty") not in DIFFICULTY_RANK:
+        q["difficulty"] = "medium"
+
+    return True, ""
+
+
+def check_questions_coherence(questions: list[dict]) -> dict[int, str]:
+    """Rà lỗi VĂN BẢN mà validate_question_structure() (đếm ký tự/đáp án) không bắt
+    được: câu hỏi/đáp án tồn tại đủ 4 lựa chọn, đủ độ dài, nhưng nội dung bị xáo trộn/
+    gãy ngữ pháp/lẫn lộn ngôn ngữ tới mức không đọc hiểu được — từng thấy thực tế ở chế
+    độ nhiệt độ cao (mode="stress") hoặc khi model bị lỗi sinh token giữa chừng, ví dụ:
+    'điều nào khác biệt "business nghệ" đã giúp +xử hùng thể this vẹo sang LL app...'.
+    Gửi 1 lệnh AI duy nhất cho CẢ LÔ câu hỏi (không phải từng câu) để đỡ tốn token/thời
+    gian. Trả {index: lý do} cho các câu bị đánh giá lỗi; trả {} nếu gọi AI thất bại
+    (không chặn cả quiz chỉ vì bước rà soát phụ này lỗi)."""
+    if not questions:
+        return {}
+
+    numbered = "\n\n".join(
+        f"[{i}] CÂU HỎI: {q.get('question', '')}\n"
+        f"ĐÁP ÁN: {' | '.join(str(o) for o in q.get('options', []))}"
+        for i, q in enumerate(questions)
+    )
+
+    prompt = f"""Bạn là người rà soát chất lượng quiz trắc nghiệm. Dưới đây là danh sách câu hỏi,
+đánh số [0], [1], ... Nhiệm vụ: tìm những câu bị LỖI VĂN BẢN nghiêm trọng khiến người
+đọc KHÔNG THỂ hiểu câu hỏi/đáp án đang nói gì — ví dụ: câu chữ bị xáo trộn/gãy ngữ pháp,
+lẫn lộn từ tiếng Anh/Việt thành cụm vô nghĩa, đáp án chỉ là placeholder không nội dung
+thật. TUYỆT ĐỐI KHÔNG đánh giá câu hỏi khó/dễ hay đúng/sai về mặt kiến thức — chỉ đánh
+giá câu đó có ĐỌC HIỂU ĐƯỢC hay không.
+
+{numbered}
+
+Trả về DUY NHẤT 1 JSON object dạng {{"loi": [{{"index": 0, "ly_do": "..."}}]}} liệt kê
+CHỈ những câu bị lỗi (index khớp số trong ngoặc vuông ở trên). Nếu không câu nào lỗi,
+trả {{"loi": []}}. Không kèm chữ nào khác ngoài JSON."""
+
+    try:
+        raw_text, _usage = call_llm_with_usage(prompt, temperature=0.0, max_tokens=800, response_json=True)
+    except Exception as e:
+        print(f"[QUALITY CHECK] Bỏ qua bước rà lỗi văn bản do lỗi gọi LLM: {e}")
+        return {}
+
+    cleaned = re.sub(r"^```(?:json)?\s*", "", raw_text.strip(), flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned).strip()
+    try:
+        obj = json.loads(cleaned)
+    except json.JSONDecodeError:
+        try:
+            from json_repair import repair_json
+            obj = json.loads(repair_json(cleaned))
+        except Exception:
+            print("[QUALITY CHECK] Không parse được JSON từ bước rà lỗi văn bản, bỏ qua bước này.")
+            return {}
+
+    if not isinstance(obj, dict):
+        return {}
+
+    result = {}
+    for item in obj.get("loi", []):
+        if isinstance(item, dict) and isinstance(item.get("index"), int):
+            result[item["index"]] = str(item.get("ly_do", "nội dung không mạch lạc")).strip()
+    return result
+
+
+def process_raw_questions(raw_questions: list[dict], mode: str, full_text_norm: str) -> tuple[list[dict], int, int]:
+    """Áp correct_index (bóc từ 'answer'/'correct_answer' dạng chữ A-D hoặc số) + chống
+    bịa (verify_source) + kiểm tra cấu trúc (validate_question_structure) lên 1 lô câu
+    hỏi thô từ LLM — dùng chung cho cả lô sinh ban đầu lẫn các lô "sinh bù" khi có câu
+    bị loại. KHÔNG chạy check_questions_coherence() ở đây (tốn 1 lệnh AI, gọi riêng ở
+    nơi cần để không lặp lại không cần thiết qua từng vòng regen).
+    Trả về (câu hợp lệ về cấu trúc, số câu bị gắn cờ unverified, số câu bị loại cấu trúc)."""
+    flagged_unverified = 0
+    for q in raw_questions:
+        raw_ans = str(q.get("answer") or q.get("correct_answer") or q.get("correct_index") or "").strip()
+        ans_letter = raw_ans.upper()[:1]
+        letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
+        if ans_letter in letter_map:
+            q["correct_index"] = letter_map[ans_letter]
+        elif isinstance(q.get("correct_index"), int):
+            pass
+        else:
+            q["correct_index"] = 0
+
+        raw_q = q.get("raw_quote") or q.get("source_snippet") or ""
+        q["source_snippet"] = raw_q
+        q["source_verified"] = verify_source(raw_q, full_text_norm)
+        if mode == "standard" and not q["source_verified"]:
+            flagged_unverified += 1
+            q["flagged_unverified"] = True
+
+    struct_valid = []
+    struct_dropped = 0
+    for q in raw_questions:
+        ok, reason = validate_question_structure(q)
+        if ok:
+            struct_valid.append(q)
+        else:
+            struct_dropped += 1
+            print(f"[QUALITY CHECK] Loại câu lỗi cấu trúc ({reason}): \"{str(q.get('question', ''))[:60]}\"")
+
+    return struct_valid, flagged_unverified, struct_dropped
+
+
 def extract_pdf_text(file_stream) -> list[dict]:
     """Trả về list [{'page': int, 'text': str}] — giữ mã trang để trích dẫn ngược (giống transcript có mã đoạn)."""
     reader = PdfReader(file_stream)
@@ -846,14 +981,11 @@ def generate_quiz():
     except Exception as err:
         return jsonify({"error": f"Lỗi không lường trước: {err}"}), 500
 
-    wall_clock_elapsed = round(time.time() - t0, 2)  # thời gian thực tế người dùng phải chờ (đã chạy song song)
-
-    # ---- Gộp kết quả các lô + log ra console: token đã dùng, số câu, thời gian ----
+    # ---- Gộp kết quả các lô ban đầu ----
     questions = []
     total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-    total_quiz_time = 0.0  # "Tổng thời gian tạo quiz" = CỘNG DỒN thời gian từng lô (kiểu tuần tự,
-                            # vd 5 câu dễ mỗi câu 5s -> tổng 25s), KHÔNG phải thời gian chờ thực tế
-                            # (thời gian chờ thực tế ngắn hơn vì các lô chạy song song).
+    total_quiz_time = 0.0  # "Tổng thời gian tạo quiz" = CỘNG DỒN thời gian từng lô/lượt sinh bù (kiểu
+                            # tuần tự), KHÔNG phải thời gian chờ thực tế (các lô ban đầu chạy song song).
     print("\n" + "=" * 70)
     print(f"[QUIZ GENERATION LOG] Provider: {PROVIDER} | Model: {OPENAI_MODEL} | {len(batches_plan)} lô chạy song song")
     for qs, usage, batch_elapsed, label in batch_results:
@@ -863,48 +995,88 @@ def generate_quiz():
             total_usage[k] += usage.get(k, 0)
         print(f"  - {label}: {batch_elapsed:.2f}s | {len(qs)} câu | token: {usage.get('total_tokens', 0)} "
               f"(prompt {usage.get('prompt_tokens', 0)} + completion {usage.get('completion_tokens', 0)})")
-    print(f"  => Tổng số câu hỏi tạo ra   : {len(questions)}")
+    print(f"  => Số câu hỏi thô ban đầu   : {len(questions)}")
+
+    # ---- Chống bịa (verify_source) + kiểm tra CHẤT LƯỢNG nội dung (cấu trúc + mạch lạc
+    # văn bản) rồi SINH BÙ thay thế câu bị loại, thay vì chỉ loại đi và trả về ít câu hơn
+    # số người dùng yêu cầu. Lặp tối đa MAX_REGEN_ROUNDS lượt bù để tránh gọi AI vô hạn
+    # nếu model liên tục lỗi (vd hết ngân sách token, hoặc luôn sinh gibberish ở mode
+    # "stress" do nhiệt độ cao).
+    MAX_REGEN_ROUNDS = 2
+    full_text_norm = normalize_text(" ".join(p["text"] for p in pages))
+    diff_for_regen = difficulty_level if difficulty_level in ("easy", "medium", "hard") else "mixed"
+
+    accepted_questions = []
+    total_flagged_unverified = 0
+    total_struct_dropped = 0
+    total_coherence_dropped = 0
+    regen_rounds_used = 0
+    pending_raw = questions
+
+    for round_idx in range(MAX_REGEN_ROUNDS + 1):
+        struct_valid, flagged, s_dropped = process_raw_questions(pending_raw, mode, full_text_norm)
+        total_flagged_unverified += flagged
+        total_struct_dropped += s_dropped
+
+        coherence_errors = check_questions_coherence(struct_valid)
+        for i, q in enumerate(struct_valid):
+            if i in coherence_errors:
+                total_coherence_dropped += 1
+                print(f"[QUALITY CHECK] Loại câu lỗi nội dung ({coherence_errors[i]}): "
+                      f"\"{str(q.get('question', ''))[:60]}\"")
+            else:
+                accepted_questions.append(q)
+
+        missing = num_questions - len(accepted_questions)
+        if missing <= 0 or round_idx == MAX_REGEN_ROUNDS:
+            if missing > 0:
+                print(f"[QUALITY CHECK] Hết {MAX_REGEN_ROUNDS} lượt sinh bù, vẫn thiếu {missing} câu "
+                      f"-> trả về {len(accepted_questions)}/{num_questions} câu hợp lệ hiện có.")
+            break
+
+        regen_rounds_used += 1
+        label = f"Sinh bù lần {regen_rounds_used} ({missing} câu, thay cho câu bị loại lỗi)"
+        print(f"[QUALITY CHECK] Thiếu {missing}/{num_questions} câu hợp lệ -> {label}...")
+        try:
+            extra_qs, extra_usage, extra_elapsed, _label = generate_batch(pages, missing, mode, diff_for_regen, label)
+        except RuntimeError as err:
+            print(f"[QUALITY CHECK] Sinh bù thất bại ({err}) -> dừng, dùng tạm {len(accepted_questions)} câu hiện có.")
+            break
+        total_quiz_time += extra_elapsed
+        for k in total_usage:
+            total_usage[k] += extra_usage.get(k, 0)
+        pending_raw = extra_qs
+
+    questions = accepted_questions
+    dropped = total_flagged_unverified
+    quality_dropped = total_struct_dropped + total_coherence_dropped
+
+    wall_clock_elapsed = round(time.time() - t0, 2)  # thời gian thực tế người dùng phải chờ,
+                                                       # TÍNH CẢ các lượt sinh bù (nếu có)
+    elapsed = wall_clock_elapsed
+
+    print(f"  => Số câu hỏi hợp lệ cuối cùng: {len(questions)}/{num_questions} "
+          f"(sau {regen_rounds_used} lượt sinh bù)")
     print(f"  => Tổng token đã dùng       : {total_usage['total_tokens']} "
           f"(prompt {total_usage['prompt_tokens']} + completion {total_usage['completion_tokens']})")
     print(f"  => Tổng thời gian tạo quiz  : {total_quiz_time:.2f}s (cộng dồn từng lô, kiểu chạy tuần tự)")
-    print(f"  => Thời gian chờ thực tế    : {wall_clock_elapsed}s (nhờ chạy song song nên ngắn hơn tổng ở trên)")
+    print(f"  => Thời gian chờ thực tế    : {wall_clock_elapsed}s")
     print("=" * 70 + "\n")
-
-    elapsed = wall_clock_elapsed  # dùng cho response JSON bên dưới (elapsed_seconds) — vẫn là thời gian
-                                  # người dùng thực sự phải chờ, không phải tổng cộng dồn ở log console
-
-    # Kiểm tra chống bịa (spec §5 kịch bản #1, #8): source_snippet phải trace được
-    # về text đã trích từ PDF. Chế độ chuẩn -> loại câu không verify được trước khi
-    # hiển thị. Chế độ thử nghiệm -> vẫn giữ nhưng gắn cờ để minh hoạ rủi ro.
-    full_text_norm = normalize_text(" ".join(p["text"] for p in pages))
-    verified_questions = []
-    dropped = 0
-    for q in questions:
-        raw_ans = str(q.get("answer") or q.get("correct_answer") or q.get("correct_index") or "").strip()
-        ans_letter = raw_ans.upper()[:1]
-        letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
-        if ans_letter in letter_map:
-            q["correct_index"] = letter_map[ans_letter]
-        elif isinstance(q.get("correct_index"), int):
-            pass
-        else:
-            q["correct_index"] = 0
-
-        raw_q = q.get("raw_quote") or q.get("source_snippet") or ""
-        q["source_snippet"] = raw_q
-        q["source_verified"] = verify_source(raw_q, full_text_norm)
-        if mode == "standard" and not q["source_verified"]:
-            dropped += 1
-            q["flagged_unverified"] = True
-            verified_questions.append(q)
-        else:
-            verified_questions.append(q)
-
-    questions = verified_questions
 
     if dropped:
         drop_note = f"Lưu ý: Có {dropped} câu hỏi có trích dẫn cần đối chiếu lại với file PDF."
         warning = f"{warning} {drop_note}" if warning else drop_note
+
+    if quality_dropped:
+        quality_note = (
+            f"Đã tự động loại {quality_dropped} câu lỗi định dạng/nội dung khó hiểu"
+            + (f" và sinh bù thay thế ({regen_rounds_used} lượt)." if regen_rounds_used else ".")
+        )
+        warning = f"{warning} {quality_note}" if warning else quality_note
+
+    if len(questions) < num_questions:
+        short_note = f"Chỉ tạo được {len(questions)}/{num_questions} câu hợp lệ sau khi lọc và sinh bù."
+        warning = f"{warning} {short_note}" if warning else short_note
 
     # Ép cứng độ khó phía server khi người dùng chọn 1 mức cố định (easy/medium/hard):
     # không phụ thuộc AI có tuân đúng lệnh trong prompt hay không — đảm bảo tính năng
@@ -917,8 +1089,9 @@ def generate_quiz():
 
     if not questions:
         return jsonify({
-            "error": "OpenAI không sinh được câu nào bám sát tài liệu (tất cả bị loại ở bước chống bịa). "
-                     "Thử lại, hoặc dùng chế độ Thử nghiệm để xem AI đã suy diễn ra gì."
+            "error": "Không còn câu hỏi nào hợp lệ sau khi lọc (bị loại ở bước chống bịa và/hoặc "
+                     "bước kiểm tra chất lượng nội dung). Thử lại, hoặc dùng chế độ Thử nghiệm để "
+                     "xem AI đã suy diễn/sinh lỗi ra gì."
         }), 502
 
     return jsonify({
@@ -930,6 +1103,8 @@ def generate_quiz():
         "total_chars": total_chars,
         "warning": warning,
         "dropped_unverified": dropped,
+        "dropped_quality": quality_dropped,
+        "regen_rounds_used": regen_rounds_used,
         "questions": questions,
     })
 
