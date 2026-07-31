@@ -9,6 +9,7 @@ Neu doi field/shape o day, phai bao ca 4 nguoi truoc khi sua.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 from typing import List, Literal, Optional
 
@@ -170,6 +171,52 @@ class AlignmentItem(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# active_mode - server-side self-check contracts
+# ---------------------------------------------------------------------------
+
+@dataclass
+class RubricPoint:
+    point: str
+    citation: str | None
+
+
+@dataclass
+class CheckQuestion:
+    section_id: str
+    question: str
+    # Deliberately not part of StudyNoteSection/API serialization.
+    rubric_points: list[RubricPoint]
+
+
+@dataclass
+class CheckJudgement:
+    section_id: str
+    verdict: str
+    feedback_markdown: str
+    missed_points: list[RubricPoint]
+
+
+class JudgeAnswerRequest(BaseModel):
+    """Payload for grading a server-retained active-mode check."""
+    session_id: str = Field(..., min_length=1)
+    section_id: str = Field(..., min_length=1)
+    learner_answer: str = Field(..., min_length=1, max_length=4000)
+
+
+class MissedRubricPoint(BaseModel):
+    point: str
+    citation: str | None = None
+
+
+class CheckJudgementResponse(BaseModel):
+    """Public representation of a grounded active-mode judgement."""
+    section_id: str
+    verdict: Literal["correct", "partial", "incorrect"]
+    feedback_markdown: str
+    missed_points: List[MissedRubricPoint] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # rewrite.py
 # ---------------------------------------------------------------------------
 
@@ -178,6 +225,7 @@ class StudyNoteSection(BaseModel):
     title: str
     content_md: str
     citations: List[Citation] = Field(default_factory=list)
+    check_question: str | None = None
 
 
 class StudyNote(BaseModel):

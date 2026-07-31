@@ -11,6 +11,8 @@ from typing import Any
 from app.core.llm_client_openai import call_text
 from app.core.schemas import (
     Citation,
+    CheckJudgement,
+    CheckQuestion,
     Level,
     OutlineSection,
     SectionContext,
@@ -18,6 +20,7 @@ from app.core.schemas import (
     SectionContextTranscript,
     Slide,
     Style,
+    RubricPoint,
     StudyNote,
     StudyNoteSection,
     TranscriptSegment,
@@ -27,6 +30,12 @@ from app.core.schemas import (
 SOURCE_THIN_CHARACTER_LIMIT = 200
 MINUTES_PER_SECTION = 2
 GROUNDING_LOGGER = logging.getLogger("illumimate.grounding")
+session_store: dict[tuple[str, str], dict[str, Any]] = {}
+
+
+class CheckSessionNotFound(LookupError):
+    """Raised when an active-mode check was not retained for grading."""
+
 _CITATION_MARKER_RE = re.compile(r"\[(?P<marker_type>S|T)-(?P<source_id>[\w-]+)\]")
 _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+|\n+")
 _WORD_RE = re.compile(r"\b[\wÀ-ỹ-]+\b", re.UNICODE)
@@ -113,6 +122,7 @@ def render_rewrite_prompt(
     level: Level | str,
     style: Style | str,
     time_budget_minutes: int,
+    active_mode: bool = False,
 ) -> str:
     """Render the grounded rewrite prompt without adding or transforming source text."""
     level_value = level.value if isinstance(level, Level) else level
@@ -125,6 +135,20 @@ def render_rewrite_prompt(
     transcript_content = "\n".join(
         f"[T-{segment.id}]: {segment.text}" for segment in context.transcript
     )
+    active_mode_instruction = ""
+    if active_mode:
+        active_mode_instruction = f'''\n\n9. SAU KHI viết xong nội dung chính, thêm đúng định dạng dưới đây ở cuối cùng, không viết
+   gì thêm sau đó:
+
+---CHECK_START---
+QUESTION: <1 câu hỏi mở, ngắn, chỉ trả lời được nếu học viên thực sự hiểu đúng phần vừa đọc.
+KHÔNG phải câu hỏi trắc nghiệm, KHÔNG hỏi lại nguyên văn định nghĩa — hỏi theo hướng áp dụng
+hoặc phân biệt, ưu tiên nhắm đúng lý do section này được chọn để dạy lại: {weak_reason}>
+RUBRIC:
+- <ý chính 1 câu trả lời đúng cần có> [S-xx hoặc T-xx nếu có nguồn cụ thể]
+- <ý chính 2>
+- <tối đa 4 ý, đủ dùng, đừng liệt kê thừa>
+---CHECK_END---'''
 
     return f'''Bạn là trợ giảng cá nhân hóa. Nhiệm vụ: VIẾT LẠI phần bài giảng "{context.title}" để giúp học viên
 hiểu rõ phần họ đang yếu — level={level_value}, style={style_value}.
@@ -161,12 +185,184 @@ LÝ DO SECTION NÀY ĐƯỢC CHỌN ĐỂ DẠY LẠI:
 --- TRANSCRIPT LIÊN QUAN ---
 {transcript_content}
 
-Viết lại phần "{context.title}" theo đúng yêu cầu trên.'''
+Viết lại phần "{context.title}" theo đúng yêu cầu trên.{active_mode_instruction}'''
 
 
 def call_rewrite_llm(prompt: str) -> str:
     """Generate one rewritten section as raw Markdown using the shared LLM client."""
     return call_text(prompt, max_tokens=1000, temperature=0.2)
+
+
+def parse_rewrite_output(raw_text: str, active_mode: bool) -> tuple[str, CheckQuestion | None]:
+    """Separate the rewritten content from its optional active-mode self-check."""
+    if not active_mode:
+        return raw_text, None
+
+    section_id = "unknown"
+    start_marker = "---CHECK_START---"
+    end_marker = "---CHECK_END---"
+    if start_marker not in raw_text:
+        GROUNDING_LOGGER.warning("active_mode check parse failed for section %s", section_id)
+        return raw_text.strip(), None
+
+    content_markdown, check_text = raw_text.split(start_marker, 1)
+    if end_marker not in check_text:
+        GROUNDING_LOGGER.warning("active_mode check parse failed for section %s", section_id)
+        return raw_text.strip(), None
+    check_text = check_text.split(end_marker, 1)[0]
+
+    question = ""
+    rubric_started = False
+    rubric_points: list[RubricPoint] = []
+    for line in check_text.splitlines():
+        stripped_line = line.strip()
+        if stripped_line.startswith("QUESTION:"):
+            question = stripped_line.split(":", 1)[1].strip()
+        elif stripped_line == "RUBRIC:":
+            rubric_started = True
+        elif rubric_started and stripped_line.startswith("- "):
+            rubric_line = stripped_line[2:].strip()
+            citation_match = _CITATION_MARKER_RE.search(rubric_line)
+            citation = citation_match.group(0) if citation_match else None
+            point = _CITATION_MARKER_RE.sub("", rubric_line).strip()
+            if point:
+                rubric_points.append(RubricPoint(point=point, citation=citation))
+
+    if not question or not rubric_points:
+        GROUNDING_LOGGER.warning("active_mode check parse failed for section %s", section_id)
+        return raw_text.strip(), None
+
+    return content_markdown.strip(), CheckQuestion(
+        section_id=section_id,
+        question=question,
+        rubric_points=rubric_points,
+    )
+
+
+def render_judge_prompt(
+    question: str,
+    rubric_points: Iterable[RubricPoint],
+    learner_answer: str,
+    section_context: SectionContext,
+) -> str:
+    """Render the grounded active-mode prompt used to judge one self-check."""
+    rubric_lines = []
+    for rubric_point in rubric_points:
+        if isinstance(rubric_point, str):
+            point, citation = rubric_point, None
+        else:
+            point = _field(rubric_point, "point", "")
+            citation = _field(rubric_point, "citation")
+        citation_suffix = f" {citation}" if citation else ""
+        rubric_lines.append(f"- {point}{citation_suffix}")
+
+    slides = _field(section_context, "slides", []) or []
+    transcript = _field(section_context, "transcript", []) or []
+    source_lines = [
+        f"[S-{_field(slide, 'id')}] (trang {_field(slide, 'page')}): {_field(slide, 'text')}"
+        for slide in slides
+    ]
+    source_lines.extend(
+        f"[T-{_field(segment, 'id')}]: {_field(segment, 'text')}"
+        for segment in transcript
+    )
+    source = "\n".join(source_lines) or "(không có source excerpt)"
+    rubric = "\n".join(rubric_lines) or "(không có rubric point)"
+
+    return f'''Bạn là giám khảo, nhiệm vụ: đánh giá câu trả lời của học viên cho câu hỏi kiểm tra nhanh,
+CHỈ dựa trên RUBRIC và SOURCE bên dưới — không dùng kiến thức ngoài, không suy diễn thêm.
+
+CÂU HỎI: {question}
+
+RUBRIC (ý chính câu trả lời đúng cần có):
+{rubric}
+
+SOURCE (dùng để trích dẫn khi feedback):
+{source}
+
+CÂU TRẢ LỜI CỦA HỌC VIÊN:
+"{learner_answer}"
+
+YÊU CẦU:
+1. Xác định verdict:
+   - "correct": bao phủ gần hết ý chính trong rubric.
+   - "partial": đúng một phần, thiếu ít nhất 1 ý quan trọng.
+   - "incorrect": sai hoặc lạc đề, không bao phủ ý nào đáng kể.
+2. Feedback: giọng điềm tĩnh, xây dựng, KHÔNG chê bai, KHÔNG overclaim
+   ("bạn chắc chắn đã hiểu 100%" là cấm dùng). Nếu thiếu ý, nêu rõ ý nào thiếu và trích dẫn
+   [S-xx]/[T-xx] để học viên tự xem lại — không giảng lại toàn bộ nội dung, chỉ point to nguồn.
+3. Trả lời ĐÚNG format sau, không thêm gì khác:
+VERDICT: <correct|partial|incorrect>
+FEEDBACK: <nội dung feedback>
+MISSED: <mỗi ý thiếu 1 dòng bắt đầu bằng "- ", hoặc ghi "không có" nếu đầy đủ>'''
+
+
+def _normalise_rubric_text(value: str) -> str:
+    """Normalise only whitespace/citations for rubric-point matching."""
+    without_citations = _CITATION_MARKER_RE.sub("", value)
+    return " ".join(without_citations.split()).casefold()
+
+
+def judge_answer(session_id: str, section_id: str, learner_answer: str) -> CheckJudgement:
+    """Judge an active-mode answer using the retained rubric and source context."""
+    stored = session_store.get((session_id, section_id))
+    if stored is None:
+        raise CheckSessionNotFound(
+            f"Active-mode check session not found for session_id={session_id!r}, "
+            f"section_id={section_id!r}; generate the section with active_mode=true "
+            "or start a new session."
+        )
+
+    question = stored["question"]
+    rubric_points: list[RubricPoint] = stored["rubric"]
+    section_context: SectionContext = stored["context"]
+    prompt = render_judge_prompt(question, rubric_points, learner_answer, section_context)
+    raw_response = call_text(prompt, max_tokens=400, temperature=0.1)
+
+    verdict = ""
+    feedback = ""
+    missed_lines: list[str] = []
+    feedback_started = False
+    missed_started = False
+    for line in raw_response.strip().splitlines():
+        stripped_line = line.strip()
+        if stripped_line.startswith("VERDICT:"):
+            verdict = stripped_line.split(":", 1)[1].strip().lower()
+        elif stripped_line.startswith("FEEDBACK:"):
+            feedback = stripped_line.split(":", 1)[1].strip()
+            feedback_started = True
+            missed_started = False
+        elif stripped_line.startswith("MISSED:"):
+            first_missed = stripped_line.split(":", 1)[1].strip()
+            if first_missed and first_missed.casefold() not in {"không có", "khong co"}:
+                missed_lines.append(first_missed.removeprefix("- ").strip())
+            missed_started = True
+            feedback_started = False
+        elif missed_started and stripped_line.startswith("- "):
+            missed_lines.append(stripped_line[2:].strip())
+        elif feedback_started and stripped_line:
+            feedback = f"{feedback}\n{stripped_line}" if feedback else stripped_line
+
+    if verdict not in {"correct", "partial", "incorrect"}:
+        raise ValueError("LLM returned an invalid VERDICT in active-mode judgement")
+    if not feedback:
+        raise ValueError("LLM returned no FEEDBACK in active-mode judgement")
+
+    missed_points: list[RubricPoint] = []
+    rubric_by_text = {_normalise_rubric_text(point.point): point for point in rubric_points}
+    for missed_line in missed_lines:
+        matched_point = rubric_by_text.get(_normalise_rubric_text(missed_line))
+        if matched_point is not None and matched_point not in missed_points:
+            missed_points.append(matched_point)
+
+    feedback_citations = validate_citations(feedback, section_context)
+    grounded_feedback = postprocess(feedback, feedback_citations)
+    return CheckJudgement(
+        section_id=section_id,
+        verdict=verdict,
+        feedback_markdown=grounded_feedback,
+        missed_points=missed_points,
+    )
 
 
 def _is_substantive_sentence(sentence: str) -> bool:
@@ -258,6 +454,8 @@ def _generate_study_note_section(
     level: Level | str,
     style: Style | str,
     time_budget_minutes: int,
+    active_mode: bool = False,
+    session_id: str = "",
 ) -> StudyNoteSection:
     section = next(
         (item for item in outline if item.section_id == weak_section.section_id), None
@@ -271,14 +469,24 @@ def _generate_study_note_section(
         transcript_segments,
         weak_section,
     )
-    prompt = render_rewrite_prompt(context, level, style, time_budget_minutes)
+    prompt = render_rewrite_prompt(context, level, style, time_budget_minutes, active_mode)
     generated_markdown = call_rewrite_llm(prompt)
-    citations = validate_citations(generated_markdown, context)
+    content_markdown, check_question = parse_rewrite_output(generated_markdown, active_mode)
+    if check_question is not None:
+        check_question.section_id = section.section_id
+        session_store[(session_id, section.section_id)] = {
+            "question": check_question.question,
+            "rubric": check_question.rubric_points,
+            "context": context,
+        }
+    citations = validate_citations(content_markdown, context)
     return StudyNoteSection(
         section_id=section.section_id,
         title=section.title,
-        content_md=postprocess(generated_markdown, citations),
+        content_md=postprocess(content_markdown, citations),
         citations=citations,
+        # Rubric points remain server-side in session_store.
+        check_question=check_question.question if check_question is not None else None,
     )
 
 
@@ -290,6 +498,8 @@ def generate_study_note(
     level: Level | str,
     style: Style | str,
     time_budget_minutes: int,
+    active_mode: bool = False,
+    session_id: str = "",
 ) -> StudyNote:
     """Generate grounded study notes concurrently, preserving weakness priority.
 
@@ -319,6 +529,8 @@ def generate_study_note(
                     level,
                     style,
                     per_section_minutes,
+                    active_mode,
+                    session_id,
                 ),
                 selected_weak_sections,
             )

@@ -1,5 +1,6 @@
 import type {
   GradeResult,
+  CheckJudgement,
   McqQuestion,
   OutlineSection,
   QuizPayload,
@@ -10,6 +11,7 @@ import type {
 
 export type {
   GradeResult,
+  CheckJudgement,
   McqQuestion,
   OutlineSection,
   QuizPayload,
@@ -34,6 +36,20 @@ export async function gradeSelfCheck(payload: {
     body: JSON.stringify(payload),
   });
   if (!response.ok) throw new Error("Self-check grading unavailable");
+  return response.json();
+}
+
+export async function judgeActiveModeAnswer(payload: {
+  session_id: string;
+  section_id: string;
+  learner_answer: string;
+}): Promise<CheckJudgement> {
+  const response = await fetch(`${BACKEND_URL}/api/reteach/self-check/judge`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error("Active-mode judging unavailable");
   return response.json();
 }
 

@@ -53,6 +53,7 @@ export type StudyNoteSection = {
   title: string;
   content_md: string;
   citations: Citation[];
+  check_question: string | null;
 };
 
 export type StudyNote = {
@@ -117,6 +118,13 @@ export type SelfCheckGrade = {
   score: number;
   feedback: string;
   next_step: string;
+};
+
+export type CheckJudgement = {
+  section_id: string;
+  verdict: "correct" | "partial" | "incorrect";
+  feedback_markdown: string;
+  missed_points: { point: string; citation: string | null }[];
 };
 
 export type ReteachRequest = {

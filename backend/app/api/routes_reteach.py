@@ -8,12 +8,13 @@ from pydantic import BaseModel, Field
 
 from app.core.config import TRANSCRIPT_DIR
 from app.core.schemas import (
-    Citation, Level, OutlineSection, ReteachContent, ReteachRequest,
-    SelfCheckGrade, SelfCheckGradeRequest, Slide, StudyNote, Style,
+    CheckJudgementResponse, Citation, JudgeAnswerRequest, Level, OutlineSection,
+    ReteachContent, ReteachRequest, SelfCheckGrade, SelfCheckGradeRequest, Slide,
+    StudyNote, Style,
     TranscriptSegment, WeakSection,
 )
 from app.pipeline.outline import parse_transcript
-from app.pipeline.rewrite import generate_study_note
+from app.pipeline.rewrite import CheckSessionNotFound, generate_study_note, judge_answer
 from app.prompts.self_check_prompt import SELF_CHECK_PROMPT
 from app.utils.pdf_extract import extract_pdf_pages, parse_slide_outline
 
@@ -25,6 +26,8 @@ class StudyNoteRequest(BaseModel):
     level: Level = Level.INTERMEDIATE
     style: Style = Style.BOTH
     time_budget_minutes: int = Field(default=15, gt=0)
+    active_mode: bool = False
+    session_id: str = ""
     transcript_file: str = "transcript-01-clean.md"
 
 
@@ -83,6 +86,8 @@ def _generate_note(
         return generate_study_note(
             payload.weak_sections, outline, slides, transcript_segments,
             payload.level, payload.style, payload.time_budget_minutes,
+            active_mode=payload.active_mode,
+            session_id=payload.session_id,
         )
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
@@ -176,3 +181,29 @@ def grade_self_check(payload: SelfCheckGradeRequest) -> SelfCheckGrade:
         raise HTTPException(status_code=502, detail="LLM returned an invalid self-check grade.") from error
     except Exception as error:
         raise HTTPException(status_code=503, detail="Self-check grading is temporarily unavailable.") from error
+
+
+@router.post("/self-check/judge", response_model=CheckJudgementResponse)
+def judge_active_mode_answer(payload: JudgeAnswerRequest) -> CheckJudgementResponse:
+    """Grade an active-mode answer against the rubric retained for its session."""
+    try:
+        judgement = judge_answer(
+            payload.session_id,
+            payload.section_id,
+            payload.learner_answer,
+        )
+        return CheckJudgementResponse(
+            section_id=judgement.section_id,
+            verdict=judgement.verdict,
+            feedback_markdown=judgement.feedback_markdown,
+            missed_points=[
+                {"point": point.point, "citation": point.citation}
+                for point in judgement.missed_points
+            ],
+        )
+    except CheckSessionNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=502, detail="LLM returned an invalid active-mode judgement.") from error
+    except Exception as error:  # noqa: BLE001 - do not expose provider details
+        raise HTTPException(status_code=503, detail="Active-mode judging is temporarily unavailable.") from error
