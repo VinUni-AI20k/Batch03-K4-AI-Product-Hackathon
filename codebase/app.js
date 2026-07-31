@@ -440,15 +440,30 @@ modal.addEventListener("click", (event) => {
 
 // Anti-Cheat: Start Fullscreen
 document.getElementById("start-fullscreen-btn").addEventListener("click", () => {
-  document.documentElement.requestFullscreen().then(() => {
+  const el = document.documentElement;
+  const requestFS = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+
+  const startQuiz = () => {
     document.getElementById("quiz-start-screen").classList.add("hidden");
     document.getElementById("quiz-layout-main").classList.remove("hidden");
     document.getElementById("cheat-log").classList.add("hidden");
     document.getElementById("cheat-log").innerHTML = "";
     renderQuiz();
-  }).catch(err => {
-    alert("Trình duyệt từ chối Fullscreen. Bạn không thể làm Quiz.");
-  });
+  };
+
+  if (requestFS) {
+    requestFS.call(el).then(() => {
+      startQuiz();
+    }).catch(err => {
+      console.warn("Fullscreen denied:", err);
+      // Fallback cho quá trình test (Hackathon) nếu Edge/Iframe chặn
+      alert("Trình duyệt từ chối Fullscreen, nhưng vì đang test nên vẫn cho phép làm Quiz.");
+      startQuiz();
+    });
+  } else {
+    alert("Trình duyệt không hỗ trợ Fullscreen. Tiếp tục làm Quiz.");
+    startQuiz();
+  }
 });
 
 // Anti-Cheat: Fullscreen Exit and Visibility Change
