@@ -1,7 +1,6 @@
 # gmail-mcp (Python)
 
 A local MCP server for Gmail, built the same way as
-[`../google_calendar_mcp`](../google_calendar_mcp/README.md) and
 [`../discord_mcp`](../discord_mcp/README.md): `FastMCP` decorator-based
 tools, served over streamable-http, calling the real Gmail API
 (`gmail.googleapis.com`) on demand.
@@ -21,18 +20,20 @@ place when expired. Connect Gmail once through the app before starting this
 server (or before calling its tools — the server itself starts fine either
 way, tool calls just fail until the token exists).
 
-Point `GOOGLE_CALENDAR_TOKEN_FILE` (in `codebase/mcp/.env`, shared with
-`google_calendar_mcp`) at that file — see `codebase/mcp/.env.example`.
+Point `GOOGLE_CALENDAR_TOKEN_FILE` (in `codebase/mcp/.env`) at that file —
+see `codebase/mcp/.env.example`. The var keeps its Calendar-era name because
+it is the one shared Gmail+Calendar token; Google Calendar itself now goes
+through Google's hosted MCP server, not a local one.
 
 ## Setup
 
 ```bash
 cd mcp
-source .venv/bin/activate   # same venv as discord_mcp / google_calendar_mcp
+source .venv/bin/activate   # same venv as discord_mcp
 pip install -r requirements.txt
 ```
 
-`.env` (shared with discord_mcp / google_calendar_mcp):
+`.env` (shared with discord_mcp):
 
 ```bash
 GMAIL_LOCAL_MCP_HOST=0.0.0.0

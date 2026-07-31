@@ -2,9 +2,9 @@
 
 A real tool-calling agent (system prompt + `tools.yaml` + a tool-execution
 loop, in the style of `example/Day04-.../starter_v0`) wired to the MCP
-integrations in `codebase/mcp/`: **Gmail** (`gmail_mcp`), **Discord**
-(`discord_mcp`), and **Google Calendar** (`google_calendar_mcp`). Outlook is
-intentionally not wired up yet.
+integrations in `codebase/mcp/`: **Gmail** (`gmail_mcp`) and **Discord**
+(`discord_mcp`), plus **Google Calendar** via Google's own hosted MCP server.
+Outlook is intentionally not wired up yet.
 
 `studypulse/` (moved here unchanged) is a separate LangGraph pipeline with a
 mocked LLM/extraction step — a different, not-yet-real batch-ingestion
@@ -13,7 +13,8 @@ tool-calling path.
 
 ## How the 3 MCPs are reached
 
-- **Gmail**, **Discord**, and **Google Calendar**: all ship as local MCP servers (`gmail_mcp`, `discord_mcp`, `google_calendar_mcp`). Run each as its own process, and this agent connects to them over streamable-HTTP (`mcp_bridge/http_mcp_client.py`).
+- **Gmail** and **Discord**: local MCP servers (`gmail_mcp`, `discord_mcp`). Run each as its own process; this agent connects over streamable-HTTP (`mcp_bridge/http_mcp_client.py`).
+- **Google Calendar**: Google's first-party hosted MCP server at `calendarmcp.googleapis.com/mcp/v1` — nothing to run locally. Auth is a bearer token from the unified Google connection (`google_connection.py`), attached per call by `mcp_bridge/google_calendar_client.py`. Requires Developer Preview enrollment and both `calendar-json` + `calendarmcp` APIs enabled — see [the MCP reference](https://developers.google.com/workspace/calendar/api/v3/reference/mcp).
 
 ## Setup
 
@@ -25,22 +26,18 @@ pip install -r requirements.txt
 test -f .env || cp .env.example .env
 ```
 
-Fill in `OPENAI_API_KEY` in `codebase/backend/.env`. Discord/Calendar/Gmail
-credentials go in `codebase/mcp/.env` (see `codebase/mcp/discord_mcp/README.md`,
-`codebase/mcp/google_calendar_mcp/README.md`, `codebase/mcp/gmail_mcp/README.md`
-for how to obtain each).
+Fill in `OPENAI_API_KEY` in `codebase/backend/.env`. Discord/Gmail
+credentials go in `codebase/mcp/.env` (see `codebase/mcp/discord_mcp/README.md`
+and `codebase/mcp/gmail_mcp/README.md` for how to obtain each). Google Calendar
+needs no credentials of its own — it reuses the unified Google connection token
+from the FE's "Quản lý kết nối" > Gmail flow.
 
-In three other terminals (same `codebase/mcp/.venv`), start the servers this
+In two other terminals (same `codebase/mcp/.venv`), start the servers this
 agent needs:
 
 ```bash
 cd codebase/mcp && source .venv/bin/activate
 python -m discord_mcp            # http://localhost:8085/mcp
-```
-
-```bash
-cd codebase/mcp && source .venv/bin/activate
-python -m google_calendar_mcp    # http://localhost:8086/mcp
 ```
 
 ```bash

@@ -1,6 +1,6 @@
 """stdio MCP client for outlook_mcp's Dockerized Go server (outlook-local-mcp).
 
-Unlike discord_mcp/google_calendar_mcp/gmail_mcp (streamable-HTTP servers —
+Unlike discord_mcp/gmail_mcp (streamable-HTTP servers —
 see http_mcp_client.py), outlook-local-mcp only speaks MCP over stdio, no
 HTTP mode exists in the binary (see codebase/mcp/outlook_mcp/README.md).
 

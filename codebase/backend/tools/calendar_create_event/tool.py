@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from typing import Any
 
-from mcp_bridge.http_mcp_client import call_tool_text
-from tools._shared import GOOGLE_CALENDAR_MCP_URL, err
+from mcp_bridge.google_calendar_client import call
+from tools._calendar_format import attachments_arg, format_event
+from tools._shared import err
+
+_DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def calendar_create_event(
@@ -36,22 +40,31 @@ def calendar_create_event(
             "message": "Restate the event (summary/start/end) and get explicit yes/no confirmation via clarify before calling this again with confirmed=true.",
         }
     try:
-        args: dict[str, Any] = {"summary": summary, "start": start, "end": end}
+        args: dict[str, Any] = {"summary": summary, "startTime": start, "endTime": end}
+        # Google takes ISO 8601 timestamps plus an explicit allDay flag, where
+        # this tool's contract accepts a bare "YYYY-MM-DD" to mean all-day.
+        # Widen those to midnight timestamps so both ends stay valid ISO 8601.
+        if _DATE_ONLY_RE.fullmatch(start.strip()) and _DATE_ONLY_RE.fullmatch(end.strip()):
+            args["allDay"] = True
+            args["startTime"] = f"{start.strip()}T00:00:00"
+            args["endTime"] = f"{end.strip()}T00:00:00"
         if description:
             args["description"] = description
         if location:
             args["location"] = location
         if timezone:
-            args["timezone"] = timezone
+            args["timeZone"] = timezone
         if calendar_id:
-            args["calendar_id"] = calendar_id
+            args["calendarId"] = calendar_id
         if add_meet_link:
-            args["add_meet_link"] = True
+            args["addGoogleMeetUrl"] = True
         if document_url:
-            args["document_url"] = document_url
-        if document_title:
-            args["document_title"] = document_title
-        text = asyncio.run(call_tool_text(GOOGLE_CALENDAR_MCP_URL, "create_event", args))
-        return {"tool": "calendar_create_event", "status": "created", "text": text}
+            args["attachments"] = attachments_arg(document_url, document_title)
+        event = asyncio.run(call("create_event", args))
+        return {
+            "tool": "calendar_create_event",
+            "status": "created",
+            "text": f"Event created successfully.\n{format_event(event)}",
+        }
     except Exception as exc:
         return err("calendar_create_event", exc)

@@ -6,8 +6,9 @@ from typing import Any
 TIMEOUT = 30
 
 DISCORD_MCP_URL = os.environ.get("DISCORD_MCP_URL", "http://localhost:8085/mcp")
-GOOGLE_CALENDAR_MCP_URL = os.environ.get("GOOGLE_CALENDAR_MCP_URL", "http://localhost:8086/mcp")
 GMAIL_MCP_URL = os.environ.get("GMAIL_MCP_URL", "http://localhost:8087/mcp")
+# Google Calendar is not a local server — it's Google's hosted MCP endpoint.
+# See mcp_bridge/google_calendar_client.py for its URL and auth.
 
 
 def _innermost(exc: BaseException) -> BaseException:

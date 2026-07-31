@@ -1,15 +1,23 @@
-"""Unified Google OAuth connection shared by google_calendar_mcp and
-gmail_mcp. One consent screen grants both Gmail and Calendar scopes; the
-resulting token is written to codebase/backend/credentials/token.json.
-Both are separate local MCP server processes that read this same file
-directly (point their GOOGLE_CALENDAR_TOKEN_FILE / GOOGLE_CLIENT_SECRETS_FILE
-env vars at this directory — see codebase/mcp/.env.example) instead of
-running their own separate OAuth handshakes.
+"""Unified Google OAuth connection shared by the Calendar tools and gmail_mcp.
+One consent screen grants both Gmail and Calendar scopes; the resulting token
+is written to codebase/backend/credentials/token.json.
+
+gmail_mcp is a separate local MCP server process that reads this same file
+directly (point its GOOGLE_CALENDAR_TOKEN_FILE / GOOGLE_CLIENT_SECRETS_FILE
+env vars at this directory — see codebase/mcp/.env.example) instead of running
+its own separate OAuth handshake. Calendar needs no local server at all: the
+backend calls Google's hosted Calendar MCP server with the token loaded here
+(see mcp_bridge/google_calendar_client.py).
 
 Setup: create an OAuth client (Application type: Web application) in Google
 Cloud Console with redirect URI matching GOOGLE_OAUTH_REDIRECT_URI (default
 http://localhost:8000/api/v1/connections/google/callback), download its JSON,
 and save it at the path CLIENT_SECRETS_FILE resolves to below.
+
+NOTE: if a token.json predates the Calendar-MCP scopes added to SCOPES below,
+it was granted fewer scopes than the MCP server requires and Calendar calls
+will fail with a permission error. Disconnect and reconnect in the FE
+("Quản lý kết nối" > Gmail) to re-consent with the full list.
 """
 
 from __future__ import annotations
@@ -26,7 +34,16 @@ from google_auth_oauthlib.flow import Flow
 _CREDENTIALS_DIR = Path(__file__).resolve().parent / "credentials"
 
 SCOPES = [
+    # Full Calendar access — needed for the write tools (create_event) that
+    # Google's Calendar MCP server exposes.
     "https://www.googleapis.com/auth/calendar",
+    # The three scopes Google's Calendar MCP server documents for itself.
+    # `.../auth/calendar` above is a superset of the read ones, but the MCP
+    # server checks for these specific scopes, so request them explicitly.
+    # https://developers.google.com/workspace/calendar/api/guides/configure-mcp-server
+    "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
+    "https://www.googleapis.com/auth/calendar.events.freebusy",
+    "https://www.googleapis.com/auth/calendar.events.readonly",
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.compose",
     "openid",
