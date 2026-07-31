@@ -3,7 +3,7 @@ node_modules/
 *.env
 __pycache__/
 *.py[cod]
-tmp/pytest-*/
+tmp/
 .pytest_codex_*/
-be/.pytest_codex_*/
-docs/vps-deployment-handoff.md
+codebase/backend/.pytest_codex_*/
+codebase/docs/vps-deployment-handoff.md
