@@ -7,6 +7,18 @@
 const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
 
+// Import TextLayer — thử từ pdfjsLib trước, nếu không có thì lấy từ pdf_viewer
+let TextLayerClass = pdfjsLib.TextLayer;
+if (!TextLayerClass) {
+  try {
+    const viewer = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf_viewer.mjs');
+    TextLayerClass = viewer.TextLayer || viewer.TextLayerBuilder;
+    console.log('[VLearn] TextLayer loaded from pdf_viewer.mjs');
+  } catch(e) { console.warn('[VLearn] Could not load pdf_viewer.mjs for TextLayer', e); }
+} else {
+  console.log('[VLearn] TextLayer available from pdfjsLib');
+}
+
 // --- State ---
 let currentPage = 1;
 let totalPages = 83;
@@ -70,26 +82,53 @@ async function renderPage(num) {
     pageRendering = false;
     showLoading(false);
 
+    // Đồng bộ kích thước draw-canvas với canvas của PDF
+    resizeDrawCanvas();
+
     // --- Render Text Layer asynchronously in background ---
     setTimeout(async () => {
       try {
         textLayerDiv.innerHTML = '';
         textLayerDiv.style.width = viewport.width + 'px';
         textLayerDiv.style.height = viewport.height + 'px';
+        // Set --scale-factor for pdf_viewer.min.css to position spans correctly
+        textLayerDiv.style.setProperty('--scale-factor', viewport.scale);
 
         const textContent = await page.getTextContent();
-        currentPageTextContent = textContent.items.map(item => item.str).join(' ');
+        currentPageTextContent = textContent.items
+          .filter(item => {
+            if (!item.transform) return true;
+            const [a, b, c, d] = item.transform;
+            return Math.abs(b) < 0.01 && Math.abs(c) < 0.01;
+          })
+          .map(item => item.str).join(' ');
 
-        if (pdfjsLib.TextLayer) {
-          const textLayer = new pdfjsLib.TextLayer({
+        console.log('[VLearn] TextLayerClass available:', !!TextLayerClass, '| Text items:', textContent.items.length, '| scale:', viewport.scale);
+        if (TextLayerClass) {
+          const textLayer = new TextLayerClass({
             textContentSource: textContent,
             container: textLayerDiv,
             viewport: viewport,
           });
           await textLayer.render();
+
+          // Ẩn các span watermark (bị xoay) — vẫn giữ trong DOM để multi-line selection hoạt động
+          textLayerDiv.querySelectorAll('span').forEach(span => {
+            const style = span.style;
+            const transform = style.transform || '';
+            // Span có rotate() hoặc matrix với rotation → là watermark
+            if (transform.includes('rotate') || 
+                (transform.includes('matrix') && !/matrix\(\s*[\d.-]+,\s*0,\s*0,/.test(transform))) {
+              span.style.pointerEvents = 'none';
+              span.style.userSelect = 'none';
+              span.style.opacity = '0';
+            }
+          });
+
+          console.log('[VLearn] TextLayer rendered, spans:', textLayerDiv.children.length);
         }
       } catch (tErr) {
-        // Non-blocking text layer error
+        console.error("Text layer render error:", tErr);
       }
     }, 20);
 
@@ -1021,19 +1060,25 @@ document.addEventListener('mouseup', (e) => {
   // Only handle selections within the text layer
   const sel = window.getSelection();
   const text = sel ? sel.toString().trim() : '';
+  const anchorNode = sel ? sel.anchorNode : null;
+  const isInsideTextLayer = anchorNode && (
+    textLayerDiv.contains(anchorNode) || 
+    (anchorNode.nodeType === Node.ELEMENT_NODE && anchorNode.closest('.textLayer')) ||
+    (anchorNode.parentNode && anchorNode.parentNode.closest('.textLayer'))
+  );
 
-  if (text.length > 2 && textLayerDiv.contains(sel.anchorNode)) {
+  if (text.length > 2 && isInsideTextLayer) {
     selectedText = text;
 
     // Position the tooltip near the selection
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    selectionTooltip.style.top = (rect.top - 48 + window.scrollY) + 'px';
+    selectionTooltip.style.top = (rect.top - 48) + 'px';
     selectionTooltip.style.left = (rect.left + rect.width / 2) + 'px';
     selectionTooltip.classList.add('visible');
   } else {
     // If click is outside tooltip, hide it
-    if (!selectionTooltip.contains(e.target)) {
+    if (selectionTooltip && !selectionTooltip.contains(e.target)) {
       selectionTooltip.classList.remove('visible');
       selectedText = '';
     }
@@ -1041,29 +1086,43 @@ document.addEventListener('mouseup', (e) => {
 });
 
 // Tooltip button handlers
-document.getElementById('btn-ask-selection').addEventListener('click', () => {
-  if (selectedText) {
-    sendTutorMsgWithText(`Hỏi về đoạn này (trang ${currentPage}): "${selectedText}"`);
-    selectionTooltip.classList.remove('visible');
-    window.getSelection().removeAllRanges();
-  }
-});
+if (document.getElementById('btn-ask-selection')) {
+  document.getElementById('btn-ask-selection').addEventListener('click', () => {
+    if (selectedText) {
+      sendTutorMsgWithText(`Giải thích giúp em phần bôi đen này ở trang ${currentPage}: "${selectedText}"`);
+      selectionTooltip.classList.remove('visible');
+      window.getSelection().removeAllRanges();
+    }
+  });
+}
 
-document.getElementById('btn-explain-selection').addEventListener('click', () => {
-  if (selectedText) {
-    sendTutorMsgWithText(`Giải thích chi tiết đoạn sau (trang ${currentPage}): "${selectedText}"`);
-    selectionTooltip.classList.remove('visible');
-    window.getSelection().removeAllRanges();
-  }
-});
+if (document.getElementById('btn-confuse-selection')) {
+  document.getElementById('btn-confuse-selection').addEventListener('click', () => {
+    if (selectedText) {
+      sendTutorMsgWithText(`Em cảm thấy bối rối/chưa hiểu rõ phần bôi đen này ở trang ${currentPage}: "${selectedText}". Trợ lý giải thích chi tiết và trực quan hơn giúp em nhé!`);
+      selectionTooltip.classList.remove('visible');
+      window.getSelection().removeAllRanges();
+    }
+  });
+}
 
-document.getElementById('btn-summarize-selection').addEventListener('click', () => {
-  if (selectedText) {
-    sendTutorMsgWithText(`Tóm tắt đoạn sau (trang ${currentPage}): "${selectedText}"`);
-    selectionTooltip.classList.remove('visible');
-    window.getSelection().removeAllRanges();
-  }
-});
+if (document.getElementById('btn-note-selection')) {
+  document.getElementById('btn-note-selection').addEventListener('click', () => {
+    if (selectedText) {
+      const textareaInput = document.getElementById('note-textarea-input');
+      if (textareaInput) {
+        const currentVal = textareaInput.value.trim();
+        const appendStr = (currentVal ? "\n- " : "- ") + selectedText;
+        textareaInput.value = currentVal + appendStr;
+        autoSaveCurrentNote();
+        updateNotesPanelUI();
+        switchSidebarTab('notes');
+      }
+      selectionTooltip.classList.remove('visible');
+      window.getSelection().removeAllRanges();
+    }
+  });
+}
 
 // ============================================
 // Keyboard Navigation
