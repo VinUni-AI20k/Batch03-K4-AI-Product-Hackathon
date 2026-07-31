@@ -365,17 +365,24 @@ function stripMarkdownForNote(text) {
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .trim();
 
-  // Loại bỏ các câu hội thoại giao tiếp thừa
+  // Loại bỏ các câu hội thoại giao tiếp thừa và dòng gợi ý format
   let lines = cleaned.split('\n');
+  const seenLines = new Set();
   let filtered = lines.filter(line => {
     const trimmed = line.trim();
     if (!trimmed) return false;
-    if (/^(tiêu đề slide là|dưới đây là|bạn có thể|nếu bạn muốn|rất tiếc|hi vọng|dựa vào slide|ngữ cảnh chỉ nói về)/i.test(trimmed)) {
+    // Lọc các câu mở đầu hội thoại thừa
+    if (/^(tiêu đề slide là|tiêu đề slide để ghi vào note|dưới đây là|bạn có thể|nếu bạn muốn|rất tiếc|hi vọng|dựa vào slide|ngữ cảnh chỉ nói về|mình có thể ghi luôn|chủ đề:)/i.test(trimmed)) {
       return false;
     }
+    // Lọc dòng chỉ là tiêu đề nhãn kết thúc bằng dấu :
     if (trimmed.endsWith(':') && !trimmed.includes('-') && !trimmed.includes('•')) {
       return false;
     }
+    // Loại bỏ dòng trùng lặp (ghi 2 lần)
+    const normalizedLine = trimmed.replace(/^[-•*]\s*/, '').toLowerCase();
+    if (seenLines.has(normalizedLine)) return false;
+    seenLines.add(normalizedLine);
     return true;
   });
 
@@ -963,15 +970,14 @@ function sendTutorMsg(e) {
       thinkingCard.remove();
     }
 
-    // Kiểm tra thẻ lệnh [WRITE_NOTE: ...] hoặc tự động lưu note nếu đây là yêu cầu ghi chú
+    // Chỉ ghi note khi AI dùng thẻ [WRITE_NOTE:] tường minh
+    // Không tự động ghi toàn bộ answerText để tránh ghi trùng 2 lần
     const noteMatch = (answerText || '').match(/\[WRITE_NOTE:\s*([\s\S]*?)\]/i);
     let noteContentToSave = '';
 
     if (noteMatch) {
       noteContentToSave = noteMatch[1].trim();
       answerText = (answerText || '').replace(/\[WRITE_NOTE:\s*[\s\S]*?\]/gi, '').trim();
-    } else if (isNoteRequest) {
-      noteContentToSave = (answerText || '').trim();
     }
 
     if (noteContentToSave) {
