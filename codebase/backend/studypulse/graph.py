@@ -30,6 +30,7 @@ from .nodes import (
     response_formatter_node,
     spam_rescue_node,
     daily_reminder_node,
+    emergency_alert_node,
 )
 from .guardrail import guardrail_node
 
@@ -76,6 +77,7 @@ def route_by_flow_type(state: StudyPulseState) -> str:
         "survey_log": "user_evidence_log",
         "spam_rescue": "spam_rescue",
         "daily_reminder": "daily_reminder",
+        "emergency_alert": "emergency_alert",
     }
     return route_map.get(flow, "rag_chatbot")
 
@@ -128,6 +130,7 @@ def build_studypulse_graph() -> StateGraph:
     graph.add_node("response_formatter", response_formatter_node)
     graph.add_node("spam_rescue", spam_rescue_node)
     graph.add_node("daily_reminder", daily_reminder_node)
+    graph.add_node("emergency_alert", emergency_alert_node)
 
     # ── STATIC PIPELINE: Ingestion → Guardrail → Conditional Gate ──
     graph.set_entry_point("ingestion")
@@ -160,6 +163,7 @@ def build_studypulse_graph() -> StateGraph:
             "user_evidence_log": "user_evidence_log",
             "spam_rescue": "spam_rescue",
             "daily_reminder": "daily_reminder",
+            "emergency_alert": "emergency_alert",
         },
     )
 
@@ -193,6 +197,7 @@ def build_studypulse_graph() -> StateGraph:
     graph.add_edge("user_evidence_log", "response_formatter")
     graph.add_edge("spam_rescue", "response_formatter")
     graph.add_edge("daily_reminder", "response_formatter")
+    graph.add_edge("emergency_alert", "response_formatter")
 
     # ── TERMINAL: Formatter → END ──
     graph.add_edge("response_formatter", END)
@@ -236,8 +241,8 @@ def compile_graph(
 
 GRAPH_METADATA = {
     "name": "StudyPulse AI — EduCentral Agent",
-    "version": "2.0.0",
-    "nodes": 13,
+    "version": "2.1.0",
+    "nodes": 14,
     "decision_gates": 4,
     "safeguards": {
         "max_retries": 3,
