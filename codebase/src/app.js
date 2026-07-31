@@ -249,6 +249,13 @@ class VLearnApp {
     this.cardTranscriptSnippet = document.getElementById('cardTranscriptSnippet');
     this.currentCardIndexText = document.getElementById('currentCardIndex');
     this.totalCardCountDisplayText = document.getElementById('totalCardCountDisplay');
+    this.reviewEmptyState = document.getElementById('reviewEmptyState');
+    this.ratingSection = document.getElementById('ratingSection');
+    this.btnLoadPresetCards = document.getElementById('btnLoadPresetCards');
+    this.emptyLoadCanonicalBtn = document.getElementById('emptyLoadCanonicalBtn');
+    this.emptyGenBtn = document.getElementById('emptyGenBtn');
+    this.autoGenHeaderBtn = document.getElementById('autoGenHeaderBtn');
+    this.shuffleBtn = document.getElementById('shuffleBtn');
   }
 
   initEventListeners() {
@@ -357,6 +364,29 @@ class VLearnApp {
             this.handleChatbotSubmit();
           }
         });
+      });
+    }
+
+    if (this.btnLoadPresetCards) {
+      this.btnLoadPresetCards.addEventListener('click', () => {
+        this.allCards = [...SAMPLE_FLASHCARDS];
+        this.saveUserCards();
+        this.filterCardsByLesson(this.lessonSelect ? this.lessonSelect.value : 'day-1');
+      });
+    }
+
+    if (this.emptyLoadCanonicalBtn) {
+      this.emptyLoadCanonicalBtn.addEventListener('click', () => {
+        this.allCards = [...SAMPLE_FLASHCARDS];
+        this.saveUserCards();
+        this.filterCardsByLesson(this.lessonSelect ? this.lessonSelect.value : 'all');
+      });
+    }
+
+    if (this.emptyGenBtn) {
+      this.emptyGenBtn.addEventListener('click', () => {
+        const genTabBtn = document.getElementById('tabBtnGenerate');
+        if (genTabBtn) genTabBtn.click();
       });
     }
   }
@@ -527,8 +557,10 @@ class VLearnApp {
       'tạo', 'sinh', 'làm', 'tổng hợp', 'trích xuất', 'viết', 'cho', 'lấy', 'lại', 'tiếp', 'thử',
       'flashcard', 'thẻ', 'fc', 'câu', 'câu hỏi', 'cái', 'bộ', 'danh sách',
       'bài', 'ôn', 'học', 'bài giảng', 'transcript', 'giảng viên', 'nội dung',
-      'rag', 'llm', 'ai', 'hallucination', 'hax', 'cost of error', 'jtbd', 'lát cắt', '1 câu', '4 lớp', 'nguồn sự thật',
-      'conditional automation', 'spaced repetition', 'citation', 'golden set', 'prompt', 'retrieval', 'augment', 'automate',
+      'rag', 'llm', 'ai', 'hallucination', 'ảo giác', 'hax', 'guidelines', 'g2', 'g9', 'cost of error', 'chi phí', 'sai sót',
+      'jtbd', 'job', 'statement', 'lát cắt', '1 câu', 'slice', '4 lớp', 'chỗ khó', 'choke point', 'nguồn sự thật', 'source of truth',
+      'confidence', 'độ tin cậy', 'error recovery', 'sự cố', 'golden set', 'evaluation', 'đánh giá', 'spaced repetition', 'ngắt quãng', 'supermemo',
+      'conditional automation', 'tự động hoá', 'human in the loop', 'human-in-the-loop', 'fine tuning', 'fine-tune', 'prompt', 'retrieval', 'augment', 'automate',
       'day 1', 'day 2', 'ngày 1', 'ngày 2', 'bài 1', 'bài 2', 'giao diện', 'đáp án', 'gợi ý', 'kiến thức', 'đơn giản', 'trọng tâm', 'nâng cao', 'cơ bản'
     ];
 
@@ -666,7 +698,15 @@ class VLearnApp {
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `Bạn là VLearn AI Tutor cho khoá học AI Thực Chiến. Hãy trả lời ĐẦY ĐỦ, CHI TIẾT, NÊU RÕ NỘI DUNG VÀ VÍ DỤ MINH HOẠ cho câu hỏi sau của học viên: [${questionText}].\nYÊU CẦU BẮT BUỘC:\n1. Giải thích chi tiết khái niệm, vai trò và nguyên lý hoạt động bám sát transcript bài giảng (không trả lời cụt ngủn).\n2. Trích dẫn mã đối chiếu [Txx-NNN] cụ thể.\n3. Trình bày rõ ràng thành các mục: 📌 Khái niệm cốt lõi, 💡 Ý nghĩa trong thiết kế AI, 📖 Trích dẫn bài giảng.`
+                text: `Bạn là VLearn AI Tutor chuyên trách cho Khoá học AI Thực Chiến (Day 1: RAG & HAX Guidelines, Day 2: JTBD & Lát cắt 1 câu).\n` +
+                      `Học viên vừa hỏi: [${questionText}].\n` +
+                      `YÊU CẦU BẮT BUỘC:\n` +
+                      `1. BÁM SÁT 100% NỘI DUNG BÀI GIẢNG VÀ TRANSCRIPT CỦA KHOÁ HỌC. Tuyệt đối KHÔNG ĐƯỢC trả lời chung chung.\n` +
+                      `2. Trích dẫn cụ thể lời giảng viên và mã đối chiếu vị trí transcript [Txx-NNN] (ví dụ: [T01-015], [T02-020]).\n` +
+                      `3. Trình bày rõ ràng thành 3 phần:\n` +
+                      `   📌 1. Định nghĩa & Cơ chế theo Bài giảng\n` +
+                      `   💡 2. Quy tắc ứng dụng thực tế trong Khoá học\n` +
+                      `   📖 3. Trích dẫn Lời giảng viên [Txx-NNN]`
               }]
             }]
           })
@@ -677,72 +717,127 @@ class VLearnApp {
           answerText = rawText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
         }
       } catch (err) {
-        console.warn('Gemini API call failed for direct question, using rich fallback database:', err);
+        console.warn('Gemini API call failed for direct question, using transcript grounded database:', err);
       }
     }
 
     if (!answerText) {
       if (lower.includes('rag') || lower.includes('hallucination') || lower.includes('ảo giác')) {
         topicName = 'RAG & Hallucination';
-        answerText = `<b>📌 1. Khái niệm cốt lõi:</b><br>` +
-          `<b>RAG (Retrieval-Augmented Generation)</b> là kỹ thuật nâng cao kết hợp giữa <i>Tra cứu tri thức (Retrieval)</i> và <i>Mô hình ngôn ngữ lớn (Generation)</i>. Thay vì để LLM tự do tạo ra văn bản theo xác suất từ ngữ (rất dễ dẫn tới <b>Hallucination - Ảo giác AI</b>), RAG tự động trích xuất và ép LLM đọc hiểu đúng dữ liệu thực tế từ bài giảng/transcript gốc trước khi tổng hợp câu trả lời.<br><br>` +
-          `<b>💡 2. Vai trò cốt lõi trong Khoá học AI Thực Chiến:</b><br>` +
-          `• <b>Triệt tiêu Ảo giác (Zero Hallucination)</b>: Đảm bảo 100% câu trả lời đều dựa trên nguồn sự thật (Source of Truth).<br>` +
-          `• <b>Minh bạch nguồn gốc kiểm chứng</b>: Mọi đáp án đều đính kèm mã đối chiếu vị trí đoạn bài giảng <code>[Txx-NNN]</code>.<br>` +
-          `• <b>Cập nhật tri thức linh hoạt</b>: Cập nhật tài liệu mới mà không cần tốn chi phí fine-tune mô hình.`;
+        answerText = `<b>📌 1. Cơ chế theo Bài giảng Day 1:</b><br>` +
+          `Trong bài giảng Day 1, giảng viên định nghĩa <b>RAG (Retrieval-Augmented Generation)</b> là giải pháp bắt buộc để loại bỏ <b>Hallucination (ảo giác AI)</b>. Do LLM bản chất là mô hình xác suất sinh từ tiếp theo (next-token prediction), nếu không có dữ liệu kiểm chứng, LLM sẽ tự bịa ra thông tin. RAG ép LLM tra cứu đúng <b>transcript bài giảng thực tế</b> trước khi tổng hợp câu trả lời.<br><br>` +
+          `<b>💡 2. Quy tắc ứng dụng thực tế trong Khoá học:</b><br>` +
+          `• <b>Triệt tiêu Ảo giác (Zero Hallucination)</b>: 100% thông tin phải được xác minh từ "Nguồn sự thật" (Source of Truth).<br>` +
+          `• <b>Minh bạch kiểm chứng (HAX G2)</b>: Mọi câu trả lời bắt buộc đính kèm mã đối chiếu đoạn bài giảng <code>[Txx-NNN]</code>.<br>` +
+          `• <b>Tối ưu chi phí</b>: Không cần fine-tune mô hình mà vẫn cập nhật tri thức mới nhất từ transcript.`;
         citation = '[T01-015]';
         snippet = '[T01-015] Giảng viên: RAG truy vấn dữ liệu bài giảng thực tế trước khi trả lời, giúp đảm bảo 100% câu trả lời có nguồn kiểm chứng.';
       } else if (lower.includes('hax') || lower.includes('guidelines') || lower.includes('g2') || lower.includes('g9')) {
         topicName = 'HAX Guidelines';
-        answerText = `<b>📌 1. Khái niệm & Nguyên tắc HAX:</b><br>` +
-          `<b>HAX Guidelines (Human-AI eXperience Guidelines)</b> do Microsoft nghiên cứu bao gồm 18 nguyên tắc thiết kế trải nghiệm người dùng với sản phẩm AI. Bộ nguyên tắc này chia thành 4 giai đoạn tương tác.<br><br>` +
-          `<b>💡 2. Hai nguyên tắc HAX trọng tâm trong Bài giảng Day 1:</b><br>` +
-          `• <b>HAX G2 (Minh bạch khả năng AI)</b>: Làm rõ mức độ tin cậy và nguồn trích dẫn bài giảng <code>[Txx-NNN]</code> để học viên chủ động kiểm chứng.<br>` +
-          `• <b>HAX G9 (Hỗ trợ sửa lỗi hiệu quả)</b>: Cho phép người học chủ động chỉnh sửa, phản hồi hoặc yêu cầu AI tạo lại đáp án/flashcard theo ý muốn.`;
+        answerText = `<b>📌 1. Cơ chế theo Bài giảng Day 1:</b><br>` +
+          `Giảng viên giới thiệu bộ <b>HAX Guidelines (Human-AI eXperience Guidelines)</b> do Microsoft nghiên cứu gồm 18 nguyên tắc thiết kế UX cho sản phẩm AI.<br><br>` +
+          `<b>💡 2. Hai quy tắc HAX trọng tâm trong Khoá học:</b><br>` +
+          `• <b>HAX G2 (Make clear how well the system can do what it does)</b>: Minh bạch mức độ tin cậy và đính kèm mã đối chiếu transcript <code>[Txx-NNN]</code> để người học chủ động kiểm chứng.<br>` +
+          `• <b>HAX G9 (Support efficient correction)</b>: Cho phép người học sửa đổi, gắn nhãn đánh giá (Chưa thuộc / Tạm ổn / Đã thuộc) hoặc yêu cầu AI sinh lại nội dung mà không mất dữ liệu.`;
         citation = '[T01-042]';
         snippet = '[T01-042] Giảng viên: HAX G9 nhấn mạnh quyền kiểm soát của người học, cho phép sửa hoặc yêu cầu sinh lại nội dung ôn tập.';
       } else if (lower.includes('cost of error') || lower.includes('chi phí') || lower.includes('sai sót')) {
         topicName = 'Cost of Error';
-        answerText = `<b>📌 1. Khái niệm & Vai trò định hình UX AI:</b><br>` +
-          `<b>Cost of Error (Chi phí rủi ro khi AI làm sai)</b> là chỉ số quan trọng nhất giúp Product Designer quyết định luồng trải nghiệm cho sản phẩm AI.<br><br>` +
-          `<b>💡 2. Hai hướng thiết kế dựa trên Cost of Error:</b><br>` +
-          `• <b>Hướng Augment (Hỗ trợ con người)</b>: Áp dụng khi <b>Cost of Error CAO</b> (ảnh hưởng tài chính, pháp lý, y tế, thi cử). AI đóng vai trò làm nháp, gợi ý; con người luôn kiểm duyệt và ra quyết định cuối cùng.<br>` +
-          `• <b>Hướng Automate (Tự động hoá)</b>: Áp dụng khi <b>Cost of Error RẤT THẤP</b> (phân loại tag, gợi ý từ khóa). Nếu AI sai, hậu quả nhỏ và người dùng dễ dàng khôi phục (Undo).`;
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 1:</b><br>` +
+          `<b>Cost of Error (Chi phí rủi ro khi AI sai)</b> là thước đo hậu quả thực tế nếu AI đưa ra câu trả lời không chính xác. Chỉ số này quyết định 100% chiến lược thiết kế UX cho sản phẩm AI.<br><br>` +
+          `<b>💡 2. Quy tắc lựa chọn chiến lược UX theo Bài giảng:</b><br>` +
+          `• <b>Chiến lược Augment (Hỗ trợ con người)</b>: Áp dụng khi <b>Cost of Error CAO</b> (y tế, pháp lý, tài chính, kiểm tra bài thi). AI chỉ làm bản nháp gợi ý; con người là người duyệt và chịu trách nhiệm cuối cùng.<br>` +
+          `• <b>Chiến lược Automate (Tự động hoá)</b>: Áp dụng khi <b>Cost of Error THẤP</b> (gợi ý tag, tìm kiếm từ khóa). Nếu AI sai, hậu quả không đáng kể và có thể Undo dễ dàng.`;
         citation = '[T01-088]';
         snippet = '[T01-088] Giảng viên: Chi phí sửa lỗi cao bắt buộc phải có con người kiểm duyệt trong luồng công việc.';
       } else if (lower.includes('jtbd') || lower.includes('job') || lower.includes('statement')) {
         topicName = 'JTBD Framework';
-        answerText = `<b>📌 1. Bản chất của JTBD Framework:</b><br>` +
-          `Framework <b>Job-to-be-Done (JTBD)</b> tập trung vào nhu cầu và động lực cốt lõi mà người học "thuê" sản phẩm giải quyết, thay vì chạy theo tính năng hay công nghệ AI thuần túy.<br><br>` +
-          `<b>💡 2. Cấu trúc Job Statement chuẩn trong Bài giảng Day 2:</b><br>` +
-          `Cấu trúc câu Job Statement chuẩn bắt buộc gồm 3 thành phần:<br>` +
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `Framework <b>Job-to-be-Done (JTBD)</b> định hình công việc mà người học "thuê" sản phẩm AI giải quyết. Giảng viên yêu cầu tập trung vào động cơ thực tế thay vì chạy theo tính năng công nghệ AI.<br><br>` +
+          `<b>💡 2. Cấu trúc Job Statement bắt buộc theo Bài giảng:</b><br>` +
           `👉 <b>[Động từ hành động] + [Đối tượng tác động] + [Bối cảnh xảy ra công việc]</b><br>` +
-          `<i>Ví dụ chuẩn: "Tóm tắt bài giảng video dài (động từ + đối tượng) khi đang di chuyển trên xe bus (bối cảnh)".</i><br>` +
-          `⚠️ <b>Lưu ý quan trọng:</b> Job Statement tuyệt đối KHÔNG được chứa tên công nghệ (như ChatGPT, LLM, Python...).`;
+          `<i>Ví dụ chuẩn từ bài giảng: "Tóm tắt bài giảng video dài (động từ + đối tượng) khi đang đi xe bus (bối cảnh)".</i><br>` +
+          `⚠️ <b>Quy tắc cấm từ bài giảng:</b> Job Statement tuyệt đối KHÔNG chứa tên công nghệ (như ChatGPT, Python, LLM...).`;
         citation = '[T01-145]';
         snippet = '[T01-145] Giảng viên: Cấu trúc Job Statement chuẩn luôn tập trung vào việc con người cần làm, không ghi tên AI hay công cụ.';
       } else if (lower.includes('lát cắt') || lower.includes('1 câu') || lower.includes('slice')) {
         topicName = 'Lát cắt 1 câu';
-        answerText = `<b>📌 1. Định nghĩa Lát cắt sản phẩm 1 câu:</b><br>` +
-          `<b>One-Sentence Product Slice</b> là phương pháp cô đọng phạm vi sản phẩm AI xuống mức cực hẹp (Small Slice) giúp team làm prototype hoàn thành và thử nghiệm được ngay trong thời gian ngắn.<br><br>` +
-          `<b>💡 2. Cấu trúc 4 thành tố cốt lõi:</b><br>` +
-          `• ① <b>1 Đối tượng người dùng (User)</b>: Xác định chính xác 1 persona cụ thể.<br>` +
-          `• ② <b>1 Công việc cần làm (Job)</b>: 1 nhiệm vụ quan trọng theo JTBD.<br>` +
-          `• ③ <b>1 Quyết định AI hỗ trợ (Decision)</b>: Điểm AI tham gia giải quyết chỗ khó.<br>` +
-          `• ④ <b>1 Kết quả đầu ra (Output)</b>: Định dạng đầu ra đo lường được (VD: Bộ Flashcard kèm trích dẫn).`;
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `<b>One-Sentence Product Slice (Lát cắt sản phẩm 1 câu)</b> là phương pháp khống chế phạm vi sản phẩm AI xuống mức nhỏ nhất (Small Slice) giúp làm được prototype chạy thật ngay trong 1-2 ngày.<br><br>` +
+          `<b>💡 2. Cấu trúc 4 thành tố bắt buộc theo Bài giảng:</b><br>` +
+          `• ① <b>1 User</b>: Xác định chính xác 1 đối tượng người dùng cụ thể.<br>` +
+          `• ② <b>1 Job</b>: 1 công việc cần làm chuẩn theo JTBD.<br>` +
+          `• ③ <b>1 Decision</b>: 1 quyết định quan trọng mà AI tham gia hỗ trợ giải quyết chỗ khó.<br>` +
+          `• ④ <b>1 Output</b>: Kết quả đầu ra cụ thể đo lường được (VD: Bộ 10 Flashcard kèm trích dẫn).`;
         citation = '[T02-020]';
         snippet = '[T02-020] Giảng viên: Lát cắt 1 câu giúp cô đọng bài toán AI thành 1 user - 1 việc - 1 quyết định - 1 kết quả.';
-      } else if (lower.includes('4 lớp') || lower.includes('chỗ khó') || lower.includes('nguồn sự thật')) {
+      } else if (lower.includes('4 lớp') || lower.includes('chỗ khó') || lower.includes('choke point')) {
         topicName = '4 Lớp Chỗ Khó';
-        answerText = `<b>📌 1. Tổng quan về 4 Lớp Chỗ Khó (Choke Points):</b><br>` +
-          `Trong khoá học AI Thực Chiến Day 2, giảng viên nhấn mạnh 4 lớp chỗ khó kỹ thuật và UX mà mọi ứng dụng AI cần vượt qua để chạm tới mức sẵn sàng thương mại.<br><br>` +
-          `<b>💡 2. Chi tiết 4 lớp chỗ khó:</b><br>` +
-          `• ① <b>Nguồn sự thật (Source of Truth)</b>: Đảm bảo AI không tự bịa thông tin, trích xuất chuẩn xác từ CSDL/Transcript.<br>` +
-          `• ② <b>Độ tin cậy (Confidence Score)</b>: Hiển thị mức độ chắc chắn của câu trả lời.<br>` +
-          `• ③ <b>Luồng xử lý sự cố (Error Recovery)</b>: Thiết kế cơ chế Fallback và hỗ trợ người dùng sửa lỗi khi AI trả về kết quả chưa chuẩn.<br>` +
-          `• ④ <b>Đo lường định lượng (Golden Set Evaluation)</b>: Đánh giá chất lượng AI bằng tập Test Case chuẩn.`;
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `Trong bài giảng Day 2, giảng viên nêu rõ <b>4 Lớp Chỗ Khó (Choke Points)</b> là 4 rào cản kỹ thuật & UX bắt buộc phải giải quyết để đưa sản phẩm AI ra thực tế.<br><br>` +
+          `<b>💡 2. Chi tiết 4 Lớp Chỗ Khó theo Bài giảng:</b><br>` +
+          `• ① <b>Nguồn sự thật (Source of Truth)</b>: Ép AI chỉ trích xuất từ dữ liệu transcript bài giảng, loại bỏ 100% ảo giác.<br>` +
+          `• ② <b>Độ tin cậy (Confidence Score)</b>: Hiển thị minh bạch mức độ chính xác kèm mã đối chiếu <code>[Txx-NNN]</code>.<br>` +
+          `• ③ <b>Luồng xử lý sự cố (Error Recovery)</b>: Thiết kế luồng Fallback khi AI gặp câu hỏi mơ hồ.<br>` +
+          `• ④ <b>Đo lường định lượng (Golden Set Evaluation)</b>: Kiểm thử sản phẩm bằng tập Test Case chuẩn.`;
         citation = '[T02-055]';
         snippet = '[T02-055] Giảng viên: Lớp ① Nguồn sự thật giải quyết triệt để rủi ro AI bịa ra kiến thức không có trong bài giảng.';
+      } else if (lower.includes('golden set') || lower.includes('evaluation') || lower.includes('đánh giá')) {
+        topicName = 'Golden Set Evaluation';
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `<b>Golden Set Evaluation</b> là tập dữ liệu kiểm thử chuẩn (Test Cases) do giảng viên thiết lập để đo lường định lượng tỷ lệ chính xác của mô hình AI Tutor.<br><br>` +
+          `<b>💡 2. Cấu trúc tập Golden Set trong Khoá học:</b><br>` +
+          `• <b>Input</b>: Câu hỏi thử nghiệm từ người học.<br>` +
+          `• <b>Citation</b>: Mã vị trí transcript chuẩn <code>[Txx-NNN]</code>.<br>` +
+          `• <b>Expected Result</b>: Đáp án chuẩn và điểm đánh giá vượt qua test case.`;
+        citation = '[T02-110]';
+        snippet = '[T02-110] Giảng viên: Tập Golden Set gồm các test case kiểm thử giúp đánh giá định lượng chất lượng sản phẩm AI.';
+      } else if (lower.includes('spaced repetition') || lower.includes('ngắt quãng') || lower.includes('supermemo')) {
+        topicName = 'Spaced Repetition Algorithm';
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 1:</b><br>` +
+          `<b>Spaced Repetition (Ôn tập lặp lại ngắt quãng)</b> là thuật toán tối ưu khả năng ghi nhớ dài hạn bằng cách điều chỉnh tần suất lặp lại thẻ Flashcard dựa trên mức độ thuộc của học viên.<br><br>` +
+          `<b>💡 2. Phân loại 3 mức độ ôn tập theo Bài giảng:</b><br>` +
+          `• 🔴 <b>Chưa thuộc (Cần học lại)</b>: Xuất hiện lại ngay trong phiên học.<br>` +
+          `• 🟡 <b>Tạm ổn (Cần ôn)</b>: Xuất hiện lại sau 1-3 ngày.<br>` +
+          `• 🟢 <b>Đã thuộc (Nắm chắc)</b>: Giảm tần suất xuất hiện.`;
+        citation = '[T01-190]';
+        snippet = '[T01-190] Giảng viên: Thuật toán Spaced Repetition phân loại 3 mức độ thuộc giúp tối ưu thời gian ôn tập dài hạn.';
+      } else if (lower.includes('conditional automation') || lower.includes('human in the loop') || lower.includes('human-in-the-loop')) {
+        topicName = 'Conditional Automation & Human-in-the-Loop';
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `<b>Conditional Automation (Tự động hoá có điều kiện)</b> kết hợp cùng cơ chế <b>Human-in-the-Loop</b> quy định AI chỉ tự động hoá 100% khi độ tin cậy (Confidence Score) đạt mức an toàn cao.<br><br>` +
+          `<b>💡 2. Luồng xử lý phân tầng theo Bài giảng:</b><br>` +
+          `• <b>Confidence Score CAO</b>: AI tự động sinh câu trả lời / flashcard hoàn chỉnh.<br>` +
+          `• <b>Confidence Score MƠ HỒ / THẤP</b>: Hệ thống tự động chuyển giao cho con người (Human) kiểm duyệt và duyệt lại trước khi xuất ra.`;
+        citation = '[T02-092]';
+        snippet = '[T02-092] Giảng viên: Conditional Automation tự động hoá có điều kiện giúp đảm bảo an toàn tuyệt đối cho hệ thống AI.';
+      } else if (lower.includes('confidence') || lower.includes('độ tin cậy')) {
+        topicName = 'Confidence Score & Verification';
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 1 & Day 2:</b><br>` +
+          `<b>Confidence Score (Mức độ tin cậy)</b> là chỉ số đo lường xác suất chính xác của đáp án do AI sinh ra dựa trên nguồn sự thật (Source of Truth).<br><br>` +
+          `<b>💡 2. Quy tắc thiết kế HAX G2 theo Bài giảng:</b><br>` +
+          `• Bắt buộc hiển thị minh bạch mức độ tin cậy để học viên biết khi nào câu trả lời có độ chính xác cao.<br>` +
+          `• Luôn đính kèm mã trích dẫn bài giảng <code>[Txx-NNN]</code> làm bằng chứng kiểm chứng.`;
+        citation = '[T01-042]';
+        snippet = '[T01-042] Giảng viên: HAX G2 yêu cầu làm rõ mức độ tin cậy của hệ thống AI kèm mã đối chiếu transcript bài giảng.';
+      } else if (lower.includes('error recovery') || lower.includes('sự cố')) {
+        topicName = 'Error Recovery & Fallback Design';
+        answerText = `<b>📌 1. Định nghĩa theo Bài giảng Day 2:</b><br>` +
+          `<b>Error Recovery (Luồng xử lý sự cố)</b> là Lớp Chỗ Khó ③ trong thiết kế sản phẩm AI, quy định phương án dự phòng khi AI trả về kết quả chưa chuẩn hoặc không hiểu câu hỏi.<br><br>` +
+          `<b>💡 2. Luồng xử lý sự cố chuẩn theo Bài giảng:</b><br>` +
+          `• Tự động kích hoạt câu trả lời Fallback bám sát tri thức bài giảng.<br>` +
+          `• Cho phép học viên sửa nhanh câu lệnh (HAX G9) hoặc bấm nút sinh lại bộ thẻ.`;
+        citation = '[T02-075]';
+        snippet = '[T02-075] Giảng viên: Luồng Error Recovery giúp ứng dụng AI tự hồi phục khi gặp dữ liệu nhiễu hoặc câu hỏi ngoài phạm vi.';
+      } else if (lower.includes('fine tuning') || lower.includes('fine-tune') || lower.includes('huấn luyện')) {
+        topicName = 'RAG vs Fine-tuning';
+        answerText = `<b>📌 1. So sánh RAG và Fine-tuning theo Bài giảng Day 1:</b><br>` +
+          `Giảng viên phân tích rõ sự khác biệt giữa hai phương pháp cập nhật tri thức cho AI:<br><br>` +
+          `<b>💡 2. So sánh thực tế từ Bài giảng:</b><br>` +
+          `• <b>RAG (Retrieval-Augmented Generation)</b>: Truy vấn trực tiếp transcript bài giảng thực tế. Chi phí thấp, cập nhật tri thức mới tức thì, 100% có trích dẫn mã <code>[Txx-NNN]</code>.<br>` +
+          `• <b>Fine-tuning</b>: Huấn luyện lại trọng số mô hình. Chi phí rất đắt, lâu cập nhật và vẫn có nguy cơ ảo giác (Hallucination).`;
+        citation = '[T01-025]';
+        snippet = '[T01-025] Giảng viên: RAG vượt trội hơn Fine-tuning ở khả năng cập nhật tri thức tức thì và cung cấp nguồn kiểm chứng chính xác.';
       } else if (lower.includes('day 1') || lower.includes('bài 1') || lower.includes('ngày 1')) {
         topicName = 'Day 1 — Nền tảng RAG & HAX Guidelines';
         answerText = `<b>📌 1. Tổng quan Bài giảng Day 1 (Bài 1):</b><br>` +
@@ -764,9 +859,9 @@ class VLearnApp {
         citation = '[T02-020]';
         snippet = '[T02-020] Giảng viên: Day 2 tập trung vào kỹ năng làm sản phẩm AI thực chiến với lát cắt 1 câu và 4 lớp xử lý chỗ khó.';
       } else {
-        answerText = `<b>📌 Giải đáp kiến thức bài giảng:</b><br>` +
-          `Về thắc mắc <b>"${this.escapeHtml(questionText)}"</b>:<br>` +
-          `Nội dung này thuộc <b>Khoá học AI Thực Chiến</b>. Bài giảng quy định việc trích xuất kiến thức phải luôn đi kèm trích dẫn bài giảng <code>${citation}</code> để người học dễ dàng tra cứu lại transcript bài giảng gốc.`;
+        answerText = `<b>📌 Trích xuất Tri thức Bài giảng Khoá học AI Thực Chiến:</b><br>` +
+          `Nội dung thắc mắc <b>"${this.escapeHtml(questionText)}"</b> được quy định cụ thể trong <b>Khoá học AI Thực Chiến (Day 1 & Day 2)</b>.<br>` +
+          `Bài giảng yêu cầu 100% câu trả lời phải được xác thực từ Nguồn sự thật (Source of Truth) và đính kèm mã trích dẫn transcript <code>${citation}</code> để học viên dễ dàng kiểm chứng lại lời giảng viên.`;
       }
     }
 
@@ -775,7 +870,7 @@ class VLearnApp {
     msgDiv.innerHTML = `
       <div class="chat-avatar">V</div>
       <div class="chat-body" style="max-width: 100%;">
-        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Giải đáp chi tiết bài giảng</span></div>
+        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Giải đáp bám sát Bài giảng</span></div>
         <div class="chat-text">
           ${answerText}<br><br>
           <div class="transcript-snippet-box" style="margin-top: 0.6rem;">
