@@ -46,3 +46,15 @@ async def test_slot_answer_bypasses_llm_quality_review() -> None:
         active_form_code="BIRTH_REGISTRATION_FORM", slot_answer=True,
     )
     assert result.status == "pass"
+
+
+@pytest.mark.asyncio
+async def test_clear_rag_question_is_not_suppressed_by_quality_model() -> None:
+    settings = Settings(llm_api_key="configured-but-must-not-be-used", llm_model="test-model")
+    result = await assess_request_quality(
+        settings,
+        "Thủ tục 5.003859 cần hồ sơ gì và thời hạn bao lâu?",
+        MAPPINGS,
+    )
+    assert result.status == "pass"
+    assert result.source == "deterministic"

@@ -6,6 +6,7 @@ from app.config import Settings
 from app.agent_runtime import record_tool_result
 from app.form_llm import FormFillingReply
 from app.main import create_app
+from app.request_quality import RequestQualityAssessment
 from app.schemas import ChatRequest
 
 
@@ -139,6 +140,40 @@ async def test_citations_included_for_a_genuine_procedure_guidance_reply(app) ->
     payload = _complete_payload(response.text)
     assert payload["intent"] == "procedure_guidance"
     assert len(payload["citations"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_clarification_quick_reply_resumes_original_rag_question(app, monkeypatch) -> None:
+    original = "thủ tục 5.003859 cần hồ sơ gì"
+
+    async def fake_quality(_settings, message, _mappings, **_kwargs):
+        if message == original:
+            return RequestQualityAssessment(
+                status="clarify", reason_code="unclear_request", source="llm",
+            )
+        return RequestQualityAssessment(
+            status="pass", reason_code="coherent", source="deterministic",
+        )
+
+    monkeypatch.setattr("app.main.assess_request_quality", fake_quality)
+    async with app.router.lifespan_context(app):
+        app.state.procedure_pipeline.rag_service = None
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            first = await client.post(
+                "/api/v1/chat/stream", json={"message": original, "language_code": "vi"},
+            )
+            second = await client.post(
+                "/api/v1/chat/stream", json={"message": "Hỏi thông tin thủ tục", "language_code": "vi"},
+            )
+            session_id = client.cookies.get("icivi_session")
+            state = await app.state.store.get(session_id)
+
+    assert "event: request.rejected" in first.text
+    payload = _complete_payload(second.text)
+    assert payload["intent"] == "procedure_guidance"
+    assert payload["citations"]
+    assert state["pending_clarification_request"] is None
+    assert original in state["messages"][-2]["content"]
 
 
 @pytest.mark.asyncio

@@ -74,10 +74,23 @@ _DIGITAL_OR_NONHUMAN_TARGETS = (
     "phan mem", "website", "co so du lieu", "database", "tep tin", "file", "ma nguon",
     "source code", "o to", "xe may", "con vat", "thu cung", "cai ban", "cai ghe",
 )
+_GROUNDED_INFORMATION_MARKERS = (
+    "thủ tục", "mã thủ tục", "hồ sơ", "giấy tờ", "điều kiện", "quy trình",
+    "lệ phí", "chi phí", "thời hạn", "bao lâu", "cơ quan", "nơi nộp",
+    "kết quả", "cần gì", "chuẩn bị", "tra cứu", "thông tin",
+)
 
 
 def _contains_phrase(text: str, phrase: str) -> bool:
     return re.search(rf"(?<![a-z0-9]){re.escape(phrase)}(?![a-z0-9])", text) is not None
+
+
+def _looks_like_grounded_information_request(message: str) -> bool:
+    """Let meaningful public-service questions reach the deterministic/RAG
+    pipeline. The quality model is a guard for ambiguous or illogical input,
+    not a second procedure router that may suppress valid catalog questions."""
+    text = normalize_text(message)
+    return any(_contains_phrase(text, normalize_text(marker)) for marker in _GROUNDED_INFORMATION_MARKERS)
 
 
 def matched_form_codes(message: str, mappings: tuple[FormMapping, ...]) -> list[str]:
@@ -135,7 +148,12 @@ async def assess_request_quality(
     slot_answer: bool = False,
 ) -> RequestQualityAssessment:
     deterministic = deterministic_request_quality(message, mappings)
-    if deterministic.blocked or (slot_answer and deterministic.matched_form_code is None):
+    if (
+        deterministic.blocked
+        or deterministic.matched_form_code is not None
+        or slot_answer
+        or _looks_like_grounded_information_request(message)
+    ):
         return deterministic
     if not settings.llm_api_key or not settings.llm_model:
         return deterministic

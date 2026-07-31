@@ -241,6 +241,17 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                         has_trusted_context=has_trusted_context,
                     )
                 normalized_message = normalize_untrusted_text(canonical_message).casefold()
+                clarification_choices = {
+                    "hỏi thông tin thủ tục": "Tôi muốn hỏi thông tin về thủ tục này.",
+                    "chuẩn bị hồ sơ": "Tôi muốn chuẩn bị hồ sơ cho thủ tục này.",
+                }
+                clarification_intent = clarification_choices.get(normalized_message)
+                pending_clarification = state.get("pending_clarification_request")
+                resumed_clarification = bool(clarification_intent and pending_clarification)
+                if resumed_clarification:
+                    canonical_message = f"{pending_clarification}\n{clarification_intent}"
+                    normalized_message = normalize_untrusted_text(canonical_message).casefold()
+                    state["pending_clarification_request"] = None
                 repeated_user_message = normalized_message == state.get("last_user_message_normalized")
                 if injection.blocked:
                     answer = (
@@ -289,7 +300,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     canonical_message,
                     app.state.procedure_pipeline.procedure_settings.form_mappings,
                     active_form_code=state.get("active_scenario_code"),
-                    slot_answer=slot_answer or mode_choice or repeated_user_message,
+                    slot_answer=slot_answer or mode_choice or repeated_user_message or resumed_clarification,
                 )
                 if quality.blocked:
                     answer, quick_replies = request_quality_message(quality)
@@ -308,6 +319,9 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                             },
                         ][-10:],
                         "last_user_message_normalized": normalized_message,
+                        "pending_clarification_request": (
+                            canonical_message if quality.status == "clarify" else None
+                        ),
                     }
                     await app.state.store.save(current_session_id, quality_state)
                     for word in answer.split(" "):

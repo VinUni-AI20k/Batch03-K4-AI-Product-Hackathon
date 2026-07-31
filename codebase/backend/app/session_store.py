@@ -41,6 +41,7 @@ class SessionStore:
             "last_assistant_answer_normalized": None,
             "security_event_count": 0,
             "security_events": [],
+            "pending_clarification_request": None,
         }
         await self.redis.set(self.key(session_id), json.dumps(state), ex=self.ttl_seconds)
         return session_id

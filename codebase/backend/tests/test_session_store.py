@@ -33,6 +33,7 @@ async def test_session_is_created_saved_and_deleted() -> None:
         "last_assistant_answer_normalized": None,
         "security_event_count": 0,
         "security_events": [],
+        "pending_clarification_request": None,
     }
 
     await store.save(session_id, {"messages": [{"role": "user", "content": "Xin chào"}], "intent": "general"})

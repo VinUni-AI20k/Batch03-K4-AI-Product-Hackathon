@@ -234,7 +234,7 @@ Quality bar được giữ nguyên sau lượt đo đầu. Một lượt có t�
 | 4 — submission simulation regression | Thêm tool nộp mô phỏng có validation, xác nhận và nhãn demo; không đổi golden set | **25/25 (100%)** | Đạt | Hash bộ case không đổi; safety case ký/nộp thật vẫn bị từ chối, form/correction và grounding không regression. |
 | 5 — bounded Agent + layered defense | Thêm lựa chọn chat/form, planner structured output, allowlist, approval gắn hash, PDF artifact theo session, loop guard, injection/DLP; không đổi golden set | **25/25 (100%)** | Đạt | Chạy thật GPT-4.1-mini qua SSE; 10/10 case quan sát đạt; không có hard-gate failure. |
 
-Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **209 pass, 1 skip**, frontend **27/27 pass** và production build thành công.
+Artifact đầy đủ từng lượt nằm trong `eval/runs/`; kết quả mới nhất ở `eval/report.md` và `eval/results.jsonl`. Kiểm tra thay đổi mới: golden set **25/25**, backend **211 pass, 1 skip**, frontend **27/27 pass** và production build thành công.
 
 Golden set trên đo quyết định AI trung tâm của toàn flow (hỏi đáp, grounding, chọn form, điền field, correction và safety), không phải chỉ retrieval. Luồng nộp mô phỏng là cổng hành động xác định, được kiểm riêng bằng integration/E2E để không thay đổi hoặc làm dễ golden set đã chốt.
 
