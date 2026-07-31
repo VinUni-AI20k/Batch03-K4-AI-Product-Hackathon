@@ -194,6 +194,16 @@ class ExtractedItem(BaseModel):
     required_materials: Optional[str] = None
 
 
+class SourceCitation(BaseModel):
+    """label/url pair — was List[Dict[str, str]] on ChatResponse, but
+    OpenAI's structured-output strict mode can't represent an open-ended
+    Dict[str, str] map (no fixed `properties`), so this needs to be its own
+    model with a fixed shape instead. Same {label, url} JSON on the wire
+    either way (model_dump() flattens it back to a plain dict)."""
+    label: str
+    url: str = ""
+
+
 class ChatResponse(BaseModel):
     """Structured response from the RAG chatbot node."""
     query_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -201,7 +211,7 @@ class ChatResponse(BaseModel):
     language: Language
     intent: IntentType
     response_text: str
-    sources_cited: List[Dict[str, str]] = Field(default_factory=list)
+    sources_cited: List[SourceCitation] = Field(default_factory=list)
     timeline_items_referenced: List[str] = Field(default_factory=list)
     confidence: float = Field(..., ge=0.0, le=1.0)
     requires_clarification: bool = False
@@ -254,7 +264,17 @@ class StudyPulseState(TypedDict, total=False):
     dashboard_timeline: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
     evidence_log: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
     hitl_items: Annotated[List[Dict[str, Any]], dedupe_list_reducer]
-    chat_history: Annotated[List[Dict[str, Any]], chat_history_reducer]
+    # Plain (last-write-wins) field, NOT chat_history_reducer: every node
+    # that touches this (rag_chatbot_node) already computes and returns the
+    # complete, already-capped-to-6 list, not a delta to append. Nodes that
+    # don't touch chat_history spread **state in their return (a pattern
+    # used throughout this file), which makes the key "present" on every
+    # node's output even when unchanged — with an accumulating reducer that
+    # meant chat_history_reducer fired on every node in the path and
+    # doubled the history each time, corrupting multi-turn memory. Kept
+    # chat_history_reducer defined below for reference/rollback, just no
+    # longer wired in.
+    chat_history: List[Dict[str, Any]]
     user_profile: Dict[str, Any]
 
     chat_response: Dict[str, Any]

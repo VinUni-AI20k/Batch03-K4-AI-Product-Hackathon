@@ -35,13 +35,25 @@ class VectorStoreManager:
         )
 
     def _get_embeddings(self):
-        """Lazy-init Google Generative AI embeddings."""
+        """Lazy-init embeddings, routed through providers.OpenAIProvider so
+        this stays on the same LLM vendor as the rest of the agent (no
+        langchain-openai / langchain-google-genai dependency needed)."""
         if self._embeddings is None:
             try:
-                from langchain_google_genai import GoogleGenerativeAIEmbeddings
-                self._embeddings = GoogleGenerativeAIEmbeddings(
-                    model="gemini-embedding-001"
-                )
+                from langchain_core.embeddings import Embeddings
+
+                from providers import make_provider
+
+                provider = make_provider("openai")
+
+                class _ProviderEmbeddings(Embeddings):
+                    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+                        return provider.embed(texts)
+
+                    def embed_query(self, text: str) -> list[float]:
+                        return provider.embed([text])[0]
+
+                self._embeddings = _ProviderEmbeddings()
             except Exception as e:
                 logger.warning(f"Failed to init embeddings: {e}")
                 self._embeddings = None
@@ -133,6 +145,11 @@ class VectorStoreManager:
                     "type": item.get("category", "other"),
                     "item_id": item.get("id", ""),
                     "due_date": item.get("due_date", ""),
+                    "title": item.get("title", ""),
+                    # For chat citations back to the original mail — see
+                    # rag_chatbot_node's sources_cited population.
+                    "source_platform": item.get("source_platform", ""),
+                    "source_message_id": item.get("source_message_id", ""),
                 })
 
         return self.add_documents(texts, metadatas)
@@ -170,6 +187,21 @@ class VectorStoreManager:
         except Exception as e:
             logger.warning(f"FAISS search failed: {e}")
             return self._fallback_docs
+
+    def similarity_search_with_metadata(self, query: str, k: int = 3) -> List[Dict[str, Any]]:
+        """Same retrieval as similarity_search, but returns metadata instead
+        of a formatted prompt string — for callers that need to cite sources
+        (rag_chatbot_node's sources_cited/timeline_items_referenced) rather
+        than inject retrieved text into a prompt. Empty list, not an
+        exception or fallback text, when nothing is retrievable."""
+        if not self._ensure_store():
+            return []
+        try:
+            results = self._store.similarity_search_with_score(query, k=k)
+            return [{"text": doc.page_content, **doc.metadata} for doc, _score in results]
+        except Exception as e:
+            logger.warning(f"FAISS metadata search failed: {e}")
+            return []
 
 
 # ═══════════════════════════════════════════════════════════════════════════

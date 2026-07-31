@@ -1,10 +1,11 @@
 """HTTP entrypoint for the StudyPulse agent, for the Vite/React frontend in
-codebase/FE. Wraps the exact same tool-calling loop chat.py uses
-(agent.run_model_tool_loop + tools.TOOL_FUNCTIONS) behind FastAPI instead of
-stdin, plus an in-memory 'derived timeline' (see timeline_store.py) since
-there is no persistent extracted-item store. See specs/UI.md for the
-response envelope this follows, and the plan's Known Gaps for what's
-intentionally not implemented (OAuth/integrations, persistence, correction log).
+codebase/FE. /api/v1/chat runs the studypulse/ LangGraph pipeline
+(compile_graph().invoke, see studypulse/graph.py) — NOT agent.run_model_tool_loop
++ tools.TOOL_FUNCTIONS, which chat.py (the CLI) still uses; see the
+mail-rag-design migration artifact for why these two now diverge.
+TOOL_FUNCTIONS stays imported here only for calendar_create_event, called
+directly from confirm_calendar() outside any chat loop. See specs/UI.md for
+the response envelope /api/v1/chat follows.
 """
 
 from __future__ import annotations
@@ -25,33 +26,24 @@ from pydantic import BaseModel
 import discord_connection
 import google_connection
 import outlook_connection
-from agent import run_model_tool_loop
 from env_loader import load_backend_env
-from providers import make_provider
-from timeline_store import derive_from_tool_events, timeline_store
-from tools import TOOL_FUNCTIONS, load_tool_declarations, to_openai_tools
+from studypulse import hitl
+from studypulse.graph import get_compiled_graph
+from studypulse.mail_ingest import trigger_ingestion_async
+from studypulse.storage import get_db
+from timeline_view import to_card
+from tools import TOOL_FUNCTIONS
 
 ROOT = Path(__file__).parent
 ARTIFACTS_DIR = ROOT / "artifacts"
 load_backend_env(ROOT)
 
-SYSTEM_PROMPT_PATH = ARTIFACTS_DIR / "system_prompt.md"
-TOOLS_PATH = ARTIFACTS_DIR / "tools.yaml"
-
-_system_prompt = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
-_tool_declarations = load_tool_declarations(TOOLS_PATH)
-_missing = {item["name"] for item in _tool_declarations} - set(TOOL_FUNCTIONS)
-if _missing:
-    raise SystemExit(f"tools.yaml declares tools with no implementation in TOOL_FUNCTIONS: {sorted(_missing)}")
-_openai_tools = to_openai_tools(_tool_declarations)
-_provider = make_provider("openai")
-
+# Cache-busting/debug marker for the FE — hashed from what actually drives
+# chat behavior now (studypulse's prompt), not artifacts/system_prompt.md
+# (that file only matters to chat.py's separate tool-calling loop).
 _ARTIFACT_VERSION = hashlib.sha256(
-    (_system_prompt + TOOLS_PATH.read_text(encoding="utf-8")).encode("utf-8")
+    (ROOT / "studypulse" / "system_prompt.py").read_bytes()
 ).hexdigest()[:12]
-
-# conversation_id -> history list, same shape chat.py keeps per-process.
-_conversations: dict[str, list[dict[str, str]]] = {}
 
 app = FastAPI(title="StudyPulse agent API")
 app.add_middleware(
@@ -99,46 +91,33 @@ class DiscordDisconnectRequest(BaseModel):
     guild_id: str
 
 
+class HitlApproveRequest(BaseModel):
+    edits: dict[str, Any] | None = None
+
+
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5190")
-
-
-def _sources_cited(tool_events: list[dict[str, Any]]) -> list[dict[str, str]]:
-    sources: list[dict[str, str]] = []
-    for event in tool_events:
-        name = event.get("tool")
-        if name == "gmail_read_thread":
-            thread_id = event.get("args", {}).get("thread_id", "")
-            sources.append({
-                "label": "Email gốc",
-                "url": f"https://mail.google.com/mail/u/0/#all/{thread_id}" if thread_id else "",
-            })
-        elif name == "outlook_mail_read":
-            sources.append({"label": "Email Outlook gốc", "url": ""})
-        elif name == "discord_read_messages":
-            sources.append({"label": "Tin nhắn Discord", "url": ""})
-        elif name == "calendar_list_events":
-            sources.append({"label": "Google Calendar", "url": ""})
-        elif name == "outlook_calendar_list_events":
-            sources.append({"label": "Outlook Calendar", "url": ""})
-    return sources
-
-
-def _calendar_events(tool_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Structured events from every calendar_list_events call this turn, for
-    the FE to render as meeting cards — deduped by event id (a follow-up
-    round can re-list overlapping ranges)."""
-    seen: dict[str, dict[str, Any]] = {}
-    for event in tool_events:
-        if event.get("tool") != "calendar_list_events":
-            continue
-        for item in event.get("result", {}).get("events", []) or []:
-            if item.get("id"):
-                seen[item["id"]] = item
-    return list(seen.values())
 
 
 @app.post("/api/v1/chat")
 def chat(request: ChatRequest) -> dict[str, Any]:
+    """Runs one turn through the studypulse graph's chat flow
+    (ingestion -> guardrail -> language_detect -> intent_router ->
+    rag_chatbot -> response_formatter). conversation_id doubles as the
+    LangGraph thread_id: the compiled graph's checkpointer (see
+    studypulse/graph.py get_checkpointer) restores that thread's
+    chat_history/user_profile automatically, so only this turn's
+    user_query needs to be passed in — no in-memory history dict here
+    anymore.
+
+    Known gap vs. the old tool-calling loop: rag_chatbot_node only answers
+    from what's already been ingested (mail via studypulse/mail_ingest.py,
+    triggered on connect) plus FAISS — there's no live tool call mid-chat,
+    so calendar_events is always empty here (Discord/calendar ingestion is
+    a later migration phase) and requires_clarification only reflects the
+    guardrail, not a clarify-style follow-up question (no graph equivalent
+    yet). See the mail-rag-design migration artifact, section 3c.
+    """
+
     try:
         google_status = google_connection.get_status()
     except Exception:
@@ -152,47 +131,31 @@ def chat(request: ChatRequest) -> dict[str, Any]:
         )
 
     conversation_id = request.conversation_id or uuid.uuid4().hex
-    history = _conversations.setdefault(conversation_id, [])
-
-    messages = [
-        {"role": "system", "content": _system_prompt},
-        *history[-10:],
-        {"role": "user", "content": request.user_query},
-    ]
+    config = {"configurable": {"thread_id": conversation_id}}
 
     try:
-        result = run_model_tool_loop(
-            provider=_provider,
-            messages=messages,
-            tools=_openai_tools,
-            model=None,
-            max_tool_rounds=4,
+        final_state = get_compiled_graph().invoke(
+            {"flow_type": "chat", "user_query": request.user_query, "raw_payload": {}},
+            config=config,
         )
     except Exception as exc:
         raise error_response(502, "PROVIDER_ERROR", f"{type(exc).__name__}: {exc}") from exc
 
-    assistant_text = result["assistant_text"]
-    history.append({"role": "user", "content": request.user_query})
-    history.append({"role": "assistant", "content": assistant_text})
-
-    new_items = derive_from_tool_events(result["tool_events"], _provider)
-    timeline_store.upsert(new_items)
+    assistant_text = final_state.get("final_response", "")
+    chat_resp = final_state.get("chat_response") or {}
+    blocked = bool(final_state.get("guardrail_blocked"))
 
     data = {
         "query_id": uuid.uuid4().hex,
         "conversation_id": conversation_id,
         "timestamp": now_iso(),
         "response_text": assistant_text,
-        "sources_cited": _sources_cited(result["tool_events"]),
-        "calendar_events": _calendar_events(result["tool_events"]),
-        "timeline_items_referenced": [item["id"] for item in new_items],
-        "requires_clarification": result["status"] == "waiting_for_user",
-        "suggested_actions": [],
-        # Extra fields beyond UI.md's ChatResponse, per the repo TODO note asking
-        # for tool events + artifact version to be visible on the demo UI.
-        "tool_events": result["tool_events"],
-        "rounds": result["rounds"],
-        "status": result["status"],
+        "sources_cited": chat_resp.get("sources_cited", []),
+        "calendar_events": [],
+        "timeline_items_referenced": chat_resp.get("timeline_items_referenced", []),
+        "requires_clarification": bool(chat_resp.get("requires_clarification", False)),
+        "suggested_actions": chat_resp.get("suggested_actions", []),
+        "status": "blocked" if blocked else "answered",
         "artifact_version": _ARTIFACT_VERSION,
     }
     return envelope(data=data)
@@ -200,22 +163,27 @@ def chat(request: ChatRequest) -> dict[str, Any]:
 
 @app.get("/api/v1/timeline")
 def get_timeline() -> dict[str, Any]:
-    items = timeline_store.list_items()
+    """Reads studypulse's SQLite (studypulse/storage.py), not the old
+    in-memory timeline_store — that store had nothing writing to it once
+    /api/v1/chat stopped producing tool_events; mail lands here instead via
+    studypulse/mail_ingest.py. See timeline_view.to_card for the shape
+    adapter (studypulse's ExtractedItem shape -> the FE's EventCard shape)."""
+    items = [to_card(item) for item in get_db().get_all_timeline()]
     return envelope(data={"items": items, "total": len(items)})
 
 
 @app.patch("/api/v1/timeline/{item_id}")
 def patch_timeline(item_id: str, request: PatchTimelineRequest) -> dict[str, Any]:
     patch = {k: v for k, v in request.model_dump().items() if v is not None}
-    item = timeline_store.update(item_id, patch)
+    item = get_db().update_timeline_item(item_id, patch)
     if item is None:
         raise error_response(404, "NOT_FOUND", f"No timeline item with id {item_id}")
-    return envelope(data=item)
+    return envelope(data=to_card(item))
 
 
 @app.post("/api/v1/timeline/{item_id}/feedback")
 def flag_timeline(item_id: str, request: FeedbackRequest) -> dict[str, Any]:
-    removed = timeline_store.remove(item_id)
+    removed = get_db().delete_timeline_item(item_id)
     if not removed:
         raise error_response(404, "NOT_FOUND", f"No timeline item with id {item_id}")
     return envelope(data={"status": "queued_for_review", "item_id": item_id})
@@ -223,11 +191,12 @@ def flag_timeline(item_id: str, request: FeedbackRequest) -> dict[str, Any]:
 
 @app.post("/api/v1/timeline/{item_id}/calendar")
 def confirm_calendar(item_id: str, request: CalendarConfirmRequest) -> dict[str, Any]:
-    item = timeline_store.get(item_id)
+    item = get_db().get_timeline_item(item_id)
     if item is None:
         raise error_response(404, "NOT_FOUND", f"No timeline item with id {item_id}")
+    card = to_card(item)
 
-    due_date_iso = item.get("due_date_iso") or ""
+    due_date_iso = card["due_date_iso"]
     if not due_date_iso:
         raise error_response(
             422,
@@ -236,13 +205,13 @@ def confirm_calendar(item_id: str, request: CalendarConfirmRequest) -> dict[str,
             "Hãy chỉnh sửa lại thời gian trước, hoặc kiểm tra nguồn gốc.",
         )
 
-    due_time_iso = item.get("due_time_iso") or ""
+    due_time_iso = card["due_time_iso"]
     start = f"{due_date_iso}T{due_time_iso}:00" if due_time_iso else due_date_iso
     kwargs: dict[str, Any] = {
-        "summary": item["title"],
+        "summary": card["title"],
         "start": start,
         "end": start,
-        "description": item.get("detail", ""),
+        "description": card.get("detail", ""),
         "confirmed": True,
     }
     if due_time_iso:
@@ -254,8 +223,41 @@ def confirm_calendar(item_id: str, request: CalendarConfirmRequest) -> dict[str,
     if "error" in result:
         raise error_response(502, "CALENDAR_ERROR", result.get("message", "calendar_create_event failed"))
 
-    timeline_store.update(item_id, {"verified": True})
+    get_db().update_timeline_item(item_id, {"verified": True})
     return envelope(data={"status": result.get("status", "created"), "detail": result.get("text", "")})
+
+
+@app.get("/api/v1/hitl")
+def list_hitl() -> dict[str, Any]:
+    """Items the graph paused on at hitl_escalation (confidence < 0.85 —
+    see studypulse/graph.py's route_by_confidence), across every ingestion
+    thread. Raw ExtractedItem shape (+ thread_id), not the FE's EventCard
+    shape from timeline_view.to_card — a review queue needs fields
+    (validation_issues, confidence_score, raw_snippet) that shape strips
+    out, and no FE component consumes this yet to hold a contract to."""
+    items = hitl.list_pending()
+    return envelope(data={"items": items, "total": len(items)})
+
+
+@app.post("/api/v1/hitl/{thread_id}/{item_id}/approve")
+def approve_hitl(thread_id: str, item_id: str, request: HitlApproveRequest) -> dict[str, Any]:
+    """Saves the item to SQLite/FAISS despite its low confidence — bypasses
+    dashboard_sync_node, which this item's thread never reaches (hitl_escalation
+    has no edge back to it, see graph.py). `edits` lets a reviewer fix
+    whatever extraction couldn't confirm (e.g. due_date) before saving."""
+    item = hitl.approve(thread_id, item_id, edits=request.edits)
+    if item is None:
+        raise error_response(404, "NOT_FOUND", f"No pending HITL item {item_id} on thread {thread_id}")
+    return envelope(data=item)
+
+
+@app.post("/api/v1/hitl/{thread_id}/{item_id}/reject")
+def reject_hitl(thread_id: str, item_id: str) -> dict[str, Any]:
+    """Discards the item — never saved."""
+    ok = hitl.reject(thread_id, item_id)
+    if not ok:
+        raise error_response(404, "NOT_FOUND", f"No pending HITL item {item_id} on thread {thread_id}")
+    return envelope(data={"status": "rejected", "thread_id": thread_id, "item_id": item_id})
 
 
 @app.get("/api/v1/connections")
@@ -295,6 +297,10 @@ def google_connection_callback(code: str | None = None, error: str | None = None
     except Exception:
         logging.exception("Google OAuth token exchange failed")
         return RedirectResponse(f"{FRONTEND_URL}/?google_connected=0&reason=exchange_failed")
+    # Fire-and-forget: sync + classify recent unread mail now that we have a
+    # token, rather than waiting on a timer or the first chat query — see
+    # studypulse/mail_ingest.py.
+    trigger_ingestion_async("gmail")
     return RedirectResponse(f"{FRONTEND_URL}/?google_connected=1")
 
 

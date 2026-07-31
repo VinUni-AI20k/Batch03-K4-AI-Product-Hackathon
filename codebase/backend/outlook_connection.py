@@ -29,6 +29,7 @@ from typing import Any
 from mcp import ClientSession
 
 from mcp_bridge.outlook_client import call_tool_text, close_shared_session, get_shared_session, run_sync, schedule
+from studypulse.mail_ingest import trigger_ingestion_async
 
 # The exact prefix of the message outlook-local-mcp's device-code fallback
 # returns as normal (non-error) tool text when no cached token is valid yet
@@ -98,6 +99,7 @@ async def _connect_flow() -> None:
         waiting, text = await _probe(session)
         if not waiting:
             _set_state("connected", "Outlook đã kết nối.")
+            trigger_ingestion_async("outlook")
             return
 
         _set_state("pending", text)
@@ -108,6 +110,7 @@ async def _connect_flow() -> None:
             waiting, _ = await _probe(session)
             if not waiting:
                 _set_state("connected", "Đã đăng nhập Outlook thành công.")
+                trigger_ingestion_async("outlook")
                 return
         _set_state("timeout", "Hết thời gian chờ đăng nhập Outlook — bấm Kết nối để thử lại.")
     except Exception as exc:
