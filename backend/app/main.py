@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes_diagnosis import router as diagnosis_router
 from app.core.config import TRANSCRIPT_DIR
 from app.pipeline.outline import outline_json, parse_transcript
 from app.pipeline.quiz_bank import QuizGenerationError, generate_quiz
@@ -13,6 +14,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(diagnosis_router)
 
 
 def _load_sections(transcript_file: str):
