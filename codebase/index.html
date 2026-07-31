@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 05-06 — AI Thực Chiến: Venture Arena · VLearn Codelabs</title>
+  <meta name="description" content="Trang học tập Codelab tích hợp AI Co-Pilot — Khoá AI Thực Chiến" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== TOP HEADER ===== -->
+  <header class="site-header">
+    <div class="header-left">
+      <button class="btn-back" title="Quay lại">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="lab-title">Lab 05-06 — AI Thực Chiến: Venture Arena</span>
+    </div>
+    <div class="header-right">
+      <div class="countdown-badge">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6.5" stroke="#1a73e8" stroke-width="1.4"/><path d="M7.5 4.5v3.2l2.2 2.2" stroke="#1a73e8" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>Còn <strong id="countdownDisplay">10:42:51</strong></span>
+        <button class="btn-icon-sm" title="Thông tin">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#5f6368" stroke-width="1.2"/><path d="M6.5 5.5v4M6.5 4v.5" stroke="#5f6368" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <button class="btn-lang">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#5f6368" stroke-width="1.2"/><path d="M7 1c0 0-3 2.5-3 6s3 6 3 6M7 1c0 0 3 2.5 3 6s-3 6-3 6M1.5 5.5h11M1.5 8.5h11" stroke="#5f6368" stroke-width="1.2"/></svg>
+        Tiếng Việt
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="#5f6368" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+      <!-- AI Co-Pilot toggle in header -->
+      <button class="btn-ai-header" id="btnAiHeader" title="Mở AI Co-Pilot">
+        <span class="ai-dot"></span>
+        AI Co-Pilot
+      </button>
+      <div class="step-badge">2</div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- === LEFT SIDEBAR === -->
+    <aside class="sidebar">
+      <nav class="step-nav">
+
+        <a class="step-item done" href="#">
+          <div class="step-dot done">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span>1. Chọn chiến tuyến và hiểu cách thắng</span>
+        </a>
+
+        <a class="step-item done" href="#">
+          <div class="step-dot done">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span>2. Lập team và mở đúng đề bài</span>
+        </a>
+
+        <a class="step-item active" href="#" id="step3">
+          <div class="step-dot active">3</div>
+          <span>3. Khai thác dữ liệu và chốt Problem Canvas</span>
+        </a>
+
+        <a class="step-item" href="#" id="step4">
+          <div class="step-dot">4</div>
+          <span>4. Thiết kế lát cắt và làm AI chạy thật</span>
+        </a>
+
+        <a class="step-item" href="#" id="step5">
+          <div class="step-dot">5</div>
+          <span>5. Kiểm thử, validation và hoàn thiện artifact</span>
+        </a>
+
+        <a class="step-item" href="#" id="step6">
+          <div class="step-dot">6</div>
+          <span>6. Pitch như Startup, đầu tư như Investor</span>
+        </a>
+
+        <a class="step-item" href="#" id="step7">
+          <div class="step-dot">7</div>
+          <span>7. Nộp bài, demo và vinh danh</span>
+        </a>
+
+        <div class="sidebar-footer">
+          <a href="#" class="footer-link">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#5f6368" stroke-width="1.2"/><path d="M6.5 3.5v3.5l2 2" stroke="#5f6368" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Báo lỗi website
+          </a>
+          <a href="#" class="footer-link">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C3.74 1.5 1.5 3.74 1.5 6.5S3.74 11.5 6.5 11.5 11.5 9.26 11.5 6.5 9.26 1.5 6.5 1.5z" stroke="#5f6368" stroke-width="1.2"/><path d="M6.5 5v4M6.5 4v.4" stroke="#5f6368" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Góp ý LabCoach
+          </a>
+          <a href="#" class="footer-link">Đổi ngôn ngữ LabCoach</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- === MAIN CONTENT === -->
+    <main class="content-area" id="contentArea">
+      <div class="content-inner">
+
+        <h1 class="page-title">3. Khai thác dữ liệu và chốt Problem Canvas</h1>
+
+        <p class="intro-text">Bắt đầu từ bằng chứng, không bắt đầu từ tên tính năng.</p>
+
+        <ol class="step-list">
+          <li>Đọc data dictionary trước khi mining chatlog AI Tutor hoặc transcript bài giảng.</li>
+          <li>Viết tối thiểu một pain point với actor, hành vi, trở ngại và hậu quả rõ ràng.</li>
+          <li>Dùng một trong hai con đường bằng chứng: khảo sát tối thiểu 20 người ngoài team với ít nhất 50% xác nhận, <strong>hoặc</strong> mining có số đếm, ít nhất 5 ví dụ và cách kiểm lại được.</li>
+          <li>So sánh ít nhất ba cơ hội impact trước khi chọn một cơ hội để đi tiếp.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-header">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L1.5 13h13L8 2z" stroke="#e37400" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5v3M8 11v.5" stroke="#e37400" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <strong>Lưu ý · Dữ liệu là đặc quyền</strong>
+          </div>
+          <p>Chỉ dùng data pack của hackathon hoặc dữ liệu giả tự sinh. Không đưa data pack lên repository, không công khai raw chat và không cố suy ngược danh tính từ dữ liệu đã ẩn danh.</p>
+        </div>
+
+        <div class="self-check">
+          <div class="self-check-header">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#1a73e8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="check-label">Tự kiểm</span>
+            <span class="check-tag">Sẵn sàng cho CP1</span>
+          </div>
+          <ul class="check-list">
+            <li>
+              <label class="checkbox-item">
+                <input type="checkbox" /> Đã đọc data dictionary và hiểu cấu trúc chatlog
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-item">
+                <input type="checkbox" /> Đã viết được ít nhất 1 pain point đầy đủ 4 thành tố
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-item">
+                <input type="checkbox" /> Có ít nhất 1 bằng chứng ban đầu (mining hoặc khảo sát)
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-item">
+                <input type="checkbox" /> Bảng so sánh ≥3 cơ hội đã có draft
+              </label>
+            </li>
+          </ul>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-header">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#1a73e8" stroke-width="1.4"/><path d="M8 6v5M8 4.5v.5" stroke="#1a73e8" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <strong>Gợi ý khai thác nhanh</strong>
+          </div>
+          <p>Trong chatlog VLearn, hội thoại có <code>intent = "review_concept"</code> chiếm tỷ lệ lớn nhất. Bắt đầu từ đó để tìm pain point cụ thể về việc học viên cần tra lý thuyết.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 class="section-title">Canvas Problem — Template nhanh</h2>
+
+        <div class="canvas-grid">
+          <div class="canvas-card">
+            <div class="canvas-card-label">Actor (Ai)</div>
+            <p class="canvas-card-value">Học viên đang làm Codelab buổi chiều</p>
+          </div>
+          <div class="canvas-card">
+            <div class="canvas-card-label">Hành vi (Làm gì)</div>
+            <p class="canvas-card-value">Gõ code bài tập và gặp lỗi logic / concept</p>
+          </div>
+          <div class="canvas-card">
+            <div class="canvas-card-label">Trở ngại (Vướng đâu)</div>
+            <p class="canvas-card-value">Phải chuyển sang tab slide bài giảng để tìm lý thuyết</p>
+          </div>
+          <div class="canvas-card">
+            <div class="canvas-card-label">Hậu quả (Tốn gì)</div>
+            <p class="canvas-card-value">Mất 10-15 phút/lần + mất luồng tập trung + dễ trễ CP</p>
+          </div>
+        </div>
+
+        <!-- Page nav -->
+        <div class="page-nav">
+          <button class="btn-nav prev">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Trước
+          </button>
+          <button class="btn-nav next primary">
+            Tiếp theo
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- === AI CO-PILOT PANEL === -->
+    <aside class="ai-panel" id="aiPanel">
+      <div class="ai-panel-header">
+        <div class="ai-panel-title">
+          <div class="ai-logo">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="10" fill="url(#logoGrad)"/>
+              <path d="M6.5 10l2.5 2.5 4.5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#4285f4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+            </svg>
+          </div>
+          <div>
+            <div class="ai-panel-name">AI Co-Pilot</div>
+            <div class="ai-panel-sub">Khoá AI Thực Chiến · Gemini</div>
+          </div>
+        </div>
+        <button class="btn-close-panel" id="btnClosePanel" title="Đóng">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#5f6368" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Context auto-detect -->
+      <div class="ai-context-bar" id="aiContextBar">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1C3.47 1 1 3.47 1 6.5S3.47 12 6.5 12 12 9.53 12 6.5 9.53 1 6.5 1z" fill="#e8f0fe"/><path d="M4.5 6.5l1.5 1.5 3-3" stroke="#1a73e8" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span id="contextBarText">Đang xem: <strong>Bước 3 — Khai thác dữ liệu</strong></span>
+      </div>
+
+      <!-- Messages -->
+      <div class="ai-messages" id="aiMessages">
+        <div class="ai-msg assistant">
+          <div class="ai-avatar">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="url(#msgGrad)"/><path d="M5 8l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="msgGrad" x1="0" y1="0" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop stop-color="#4285f4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg>
+          </div>
+          <div class="ai-msg-content">
+            <p>Xin chào! Mình là <strong>AI Co-Pilot</strong> tích hợp trong khoá học 👋</p>
+            <p>Mình thấy bạn đang ở <strong>Bước 3</strong> — Khai thác dữ liệu. Mình có thể giúp bạn:</p>
+            <div class="quick-chips">
+              <button class="chip" data-q="Giải thích intent review_concept trong chatlog là gì?">📊 intent review_concept là gì?</button>
+              <button class="chip" data-q="Pain point của bước này phải có những gì?">✍️ Pain point cần có gì?</button>
+              <button class="chip" data-q="Cho ví dụ mining bằng chứng đúng chuẩn">🔍 Ví dụ mining đúng chuẩn</button>
+              <button class="chip" data-q="Bảng impact cần so sánh những gì?">📋 Bảng impact so sánh gì?</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="ai-input-area">
+        <div class="ai-input-box">
+          <textarea
+            id="aiInput"
+            class="ai-textarea"
+            placeholder="Hỏi về bước này, lý thuyết khoá học..."
+            rows="1"
+          ></textarea>
+          <button class="btn-ai-send" id="btnAiSend" title="Gửi">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8.5 3L14 8l-5.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="ai-input-footer">
+          <span>Enter gửi · Shift+Enter xuống dòng</span>
+          <span class="ai-source-tag">Gemini 2.0 Flash</span>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /layout -->
+
+  <!-- ===== FLOATING AI BUTTON (when panel is closed) ===== -->
+  <button class="fab-ai" id="fabAi" title="Mở AI Co-Pilot">
+    <div class="fab-pulse"></div>
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <circle cx="11" cy="11" r="11" fill="url(#fabGrad)"/>
+      <path d="M7 11l2.5 2.5 5.5-5.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <defs><linearGradient id="fabGrad" x1="0" y1="0" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#4285f4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+    </svg>
+    <span>AI Co-Pilot</span>
+  </button>
+
+  <!-- ===== API KEY MODAL ===== -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-icon-wrap">🔑</div>
+      <h2>Kết nối AI Co-Pilot</h2>
+      <p>Prototype dùng <strong>Gemini API</strong>. Lấy key miễn phí tại <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</p>
+      <div class="form-group">
+        <label>Gemini API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="AIza..." />
+      </div>
+      <p class="modal-note">⚠️ Key chỉ lưu trong sessionStorage trình duyệt.</p>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="btnMock">Dùng Mock</button>
+        <button class="modal-btn primary" id="btnSaveKey">Kết nối →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
