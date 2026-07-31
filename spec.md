@@ -100,8 +100,8 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   | Thành phần | Thật/Mock | Ghi chú |
   |---|---|---|
   | `geminiCall()` — lời gọi AI ở quyết định trung tâm | **THẬT** | `gemini-2.0-flash` qua REST + system prompt + 6 lượt history — `codebase/app.js:297-323` |
-  | System prompt (vai trò, phạm vi, luật trích dẫn) | **THẬT** | `codebase/app.js:76-88` |
-  | `KNOWLEDGE_BASE` — nguồn sự thật để trích | **THẬT** | 8 entry từ `data/vlearn-pack/transcript/` (`app.js:14-71`). Ràng buộc: mọi mã `[Txx-NNN]` phải mở đúng đoạn trong file transcript gốc; mã nào không đối chiếu được thì gỡ khỏi knowledge base — đây chính là lớp ① của §5 |
+  | System prompt + retrieval (vai trò, phạm vi, luật trích dẫn) | **THẬT** | `codebase/prompt.js` — `buildSystemPrompt()` nạp các đoạn transcript liên quan vào prompt trước mỗi lượt hỏi. Dùng chung với eval runner nên số đo trong `eval/` đo đúng thứ đang demo |
+  | `KNOWLEDGE_BASE` — nguồn sự thật để trích | **THẬT** | **645 đoạn** sinh tự động từ `data/vlearn-pack/transcript/` bằng `node scripts/build_knowledge_base.js` (đã loại 55 đoạn `[Hoạt động lớp: ...]`). Không sửa tay: mã nào không mở đúng đoạn trong transcript gốc thì chính sản phẩm mắc lỗi lớp ① của §5 |
   | Giao diện Codelab, nút "Chạy", badge đếm ngược, tab `utils.py` | Mock | UI giả lập, không nối VLearn; nút "Chạy" in error dựng sẵn; đồng hồ không đồng bộ deadline thật |
   | Mock mode (fallback khi thiếu API key / hết quota) | Mock có chủ đích | Giữ demo chạy được khi mạng hỏng — `codebase/app.js:337-369` |
 
@@ -196,23 +196,25 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   | G14 | "tool calling là gì" | thường | — | `U0294/C0032/T1087` | ≤5 câu + citation |
   | G15 | "agent la gi" *(không dấu)* | hiếm | — | `U0208/C0033/T0338` | Hiểu tiếng Việt không dấu, trả lời + citation |
   | G16 | "các đặc điểm chính của LLM" | thường | — | `U0349/C0374/T0231` | Trả lời + citation đúng buổi Foundation |
-  | G17 | "tóm tắt ưu và nhược điểm của ReAct" | thường | — | `U0064/C0387/T1046` | Trả lời + citation; không bịa ưu/nhược không có trong transcript |
+  | G17 | "tóm tắt ưu và nhược điểm của ReAct" | khó | ① | `U0064/C0387/T1046` | ReAct **không xuất hiện** trong 6 transcript (0 hit khi grep) → phải nói không tìm thấy, không kèm mã, không bịa ưu/nhược |
   | G18 | "cách xử lý ngữ cảnh" | thường | — | `U0031/C0002/T0330` | Trả lời + citation, nối về Bước đang làm |
   | G19 | "tại sao faq rule-based thường điểm thấp" | thường | — | `U0156/C0238/T0666` | Trả lời từ transcript buổi chấm điểm use case |
   | G20 | "NameError: plt is not defined — giải thích lỗi này" | thường | — | tự sinh (`MOCK.md`) | Giải thích nguyên nhân + **không viết code hộ** (C3) |
   | G21 | "pain point cần có những gì" | thường | — | tự sinh (quick-chip) | 4 thành tố + citation |
   | G22 | "t có đẹp trai không" | hiếm | ③ | `U0084/C0008/T1189` | Một câu vui, kéo về Bước đang làm |
 
-- **Quality bar (chốt từ 23:59, giữ nguyên sau đó):** *"Đạt khi ≥ **80%** qua bộ (≥ **18/22** case PASS), và **100% case lớp ① (G01, G02, G03) pass chiều C1** — không một mã trích dẫn bịa hay lệch buổi nào lọt qua."*
+- **Quality bar (chốt từ 23:59, giữ nguyên sau đó):** *"Đạt khi ≥ **80%** qua bộ (≥ **18/22** case PASS), và **100% case lớp ① pass chiều C1** — không một mã trích dẫn bịa hay lệch buổi nào lọt qua."*
 
   80% chấp nhận còn lỗi cỡ (C2 = 3) hoặc hỏi lại chưa mượt — những lỗi user tự phát hiện trong 10 giây. Nhưng lỗi bịa nguồn user **không tự thấy được** (bảng cost-of-error §4) nên không đánh đổi lấy phần trăm: 21/22 case pass mà một case bịa mã thì **vẫn tính là KHÔNG đạt bar**.
 
 - **Kết quả các lượt chạy:** chấm tay theo guide §4.1 (`case | input | output | đạt? theo từng chiều`), case khó do 2 người chấm độc lập rồi so; mỗi lượt một bản ghi đầy đủ mọi case kể cả fail trong `eval/`.
 
-  | Lượt | Thời điểm | Pass | % | Đạt bar? | Failure đau nhất | Đã sửa gì |
+  | Lượt | File | Pass | % | Lớp ① | Đạt bar? | Failure đau nhất |
   |---|---|---|---|---|---|---|
-  | 1 | CP3 — 10:30 N2 | | | | | |
-  | 2 | sau khi sửa failure lượt 1 | | | | | |
+  | 1 | `eval/results-run-full.md` | 4/22 | 18,2% | ❌ | ❌ | **Bịa mã trích dẫn** (`T03-010`, `T05-010`, `T03-012` — không tồn tại): prompt bắt "luôn kèm [Txx-NNN]" nhưng không đưa tài liệu nào. Số này còn bị bộ chấm làm sai thêm (xem ghi chú trong file) |
+  | 2 | `eval/results-run-2.md` | **19/22** | **86,4%** | ✅ 100% | **✅ ĐẠT** | **Trả lời dài quá mức (kịch bản K11)** — G12 (7 câu), G16 (7 câu), G18 (12 câu) đều đúng nội dung và trích dẫn chuẩn nhưng vượt ngưỡng "≤5 câu" của bậc C2=4. Toàn lượt **0 mã bịa** |
+
+  **Phân tích lượt 2.** Bar đạt, nhưng ba case fail đều cùng một nguyên nhân và đều là câu hỏi *thường* — loại chiếm đa số lưu lượng thật. Model tuân thủ tốt phần khó (grounding, hỏi lại, từ chối) nhưng "nới" độ dài khi câu hỏi rộng: gặp khái niệm nhiều nhánh (`context`, `đặc điểm của LLM`) là nó liệt kê 4 mục thay vì chốt một ý rồi đẩy chi tiết xuống citation card. Đúng thứ tốn thời gian của học viên đang chạy đua Checkpoint. Việc sửa tiếp theo (một failure, theo nhịp guide §4.1): siết ràng buộc độ dài trong `SYSTEM_PROMPT_BASE` thành luật cứng kèm ví dụ, thay vì một dòng "tối đa 4-5 câu" đặt ở cuối prompt.
 
   Nhịp lặp: chạy trọn bộ → bảng % → chọn **một** failure đau nhất → sửa → **chạy lại trọn bộ**. Không đạt bar thì phân tích nguyên nhân, không chỉnh số.
 
@@ -248,5 +250,8 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | 23:59 N1 | Chốt spec: lát cắt, non-goals, automation Conditional, 12 kịch bản, golden set 22 case, **quality bar 80% + điều kiện cứng 100% lớp ①** | Hạn cứng CP4; bar chốt trước khi đo và giữ nguyên sau thời điểm này (guide §2.6) |
 | 23:59 N1 | Quyết định AI trung tâm đặt ở khâu **"câu hỏi này có căn cứ trong transcript hay không"** | Đây là chỗ AI sai đắt nhất và user không tự phát hiện được (bảng cost-of-error §4). Trích được mấy dòng lý thuyết chỉ là output của quyết định đó |
 | 23:59 N1 | Mọi số trong §1-§2 chỉ nhận nếu mở được về nguồn: 4 câu khảo sát (n=21) hoặc `mine_chatlog.py` chạy trên data pack | Guide §1.3 — đếm được mới là bằng chứng; số nào không có câu hỏi/dòng dữ liệu tương ứng thì không đưa vào spec |
-| CP3 | *kết quả lượt đo 1 + failure được chọn để sửa* | *Xuân Kiên điền sau lượt chạy* |
+| CP3 | Lượt chạy đầu ra **4/22 (18,2%)**. Sửa 5 lỗi, chưa đổi quality bar: ① nạp ngữ cảnh transcript vào prompt (`codebase/prompt.js` — retrieval IDF + ngưỡng phủ) thay vì bắt model tự nhớ mã; ② sinh lại `knowledge_base.js` từ `data/vlearn-pack/transcript/` (**645 đoạn thật**, bỏ 55 đoạn `[Hoạt động lớp]`); ③ `parseResp()` ẩn mã không đối chiếu được thay vì dựng card "(Xem transcript)"; ④ viết lại bộ chấm (`scripts/run-golden-set.js`); ⑤ mock mode dùng chung retrieval | Lượt 1 đo trên một cấu hình hỏng hai đầu: prompt bắt "luôn kèm mã [Txx-NNN]" nhưng **không đưa tài liệu nào** → model bịa `T03-010`, `T05-010`, `T03-012` (kịch bản K2 §5 xảy ra ngay trong chính sản phẩm); còn bộ chấm cho FAIL mọi case lớp `—` bất kể output, và đếm pass chỉ theo C1 thay vì `C1 ∧ C3 ∧ C2≥4`. Bản ghi lượt 1 giữ nguyên trong `eval/results-run-full.md` |
+| CP3 | **G17 chuyển từ "thường / lớp —" sang "khó / lớp ①"** | `grep -ri react data/vlearn-pack/transcript/` ra **0 hit** — ReAct không hề được giảng, nên kỳ vọng cũ ("trả lời + citation") là bất khả thi và sẽ ép model bịa. Đây là lỗi của golden set, không phải của model. Quality bar giữ nguyên 80% + ①=100%; thay đổi này chỉ làm điều kiện cứng **chặt hơn** |
+| CP3 | Sửa tiếp bộ chấm sau khi soát tay lượt 2: các mẫu nhận diện tiếng Việt đang được so trên chuỗi **đã bỏ dấu** nên không mẫu nào khớp; đếm câu tách theo xuống dòng nên danh sách gạch đầu dòng bị thổi gấp đôi; case ③ trả lời một phần + chuyển TA bị tính là "vừa nói không có vừa trích dẫn" | Chấm lại trên đúng output đã lưu: 8/22 → **17/22** rồi **18/22** mà không gọi lại model lần nào — chênh lệch là lỗi của thước đo, không phải của sản phẩm. Cùng một lỗi bỏ-dấu đã gặp ở retrieval, tái diễn ở scorer |
+| CP3 | Lượt 2: **19/22 = 86,4%**, lớp ① 100%, **đạt quality bar** | Chi tiết + phân tích 3 case fail: §7 và `eval/results-run-2.md` |
 | CP5 | *thay đổi từ feedback vòng user test* | *Duy Hưng điền sau vòng validation* |

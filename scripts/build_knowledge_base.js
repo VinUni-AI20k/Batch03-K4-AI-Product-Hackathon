@@ -23,53 +23,56 @@ function extractKeywords(text) {
 }
 
 function processFiles() {
-  const files = fs.readdirSync(transcriptDir).filter(f => f.endsWith('.md') && f.startsWith('transcript-'));
+  const files = fs.readdirSync(transcriptDir).filter(f => f.endsWith('.md') && f.startsWith('transcript-')).sort();
   const knowledgeBase = [];
+  let skippedActivity = 0;
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(transcriptDir, file), 'utf8');
     const lines = content.split('\n');
-    
-    let currentDay = 'Chưa xác định';
+
+    // Buổi lấy từ dòng metadata "Định vị buổi:" ở đầu file bản sạch — chính xác hơn
+    // là dò "Day N" trong tiêu đề, vì 2/6 file không gắn số ngày.
+    const dayMatch = content.match(/\*\*Định vị buổi:\*\*\s*([^—\n]+?)(?:\s*—|\s*\n)/);
+    const currentDay = dayMatch ? dayMatch[1].trim() : 'Chưa xác định';
     let currentTopic = 'Chung';
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
-      // Extract Day from h1 or h2 if it has "Day X"
-      if (trimmed.startsWith('# ')) {
-        const dayMatch = trimmed.match(/Day \d+/i);
-        if (dayMatch) {
-          currentDay = dayMatch[0];
-        }
-      }
-      
+
       if (trimmed.startsWith('## ')) {
         currentTopic = trimmed.substring(3).trim();
       }
 
       // Match lines like: **[T01-001]** ... or [T01-001] ...
       const refMatch = trimmed.match(/^\*?\*?\[(T\d{2}-\d{3})\]\*?\*?\s*(.+)$/);
-      if (refMatch) {
-        const ref = refMatch[1];
-        const excerpt = refMatch[2].trim();
-        const keywords = extractKeywords(excerpt);
-        
-        knowledgeBase.push({
-          ref,
-          day: currentDay,
-          topic: currentTopic,
-          excerpt,
-          keywords
-        });
-      }
+      if (!refMatch) continue;
+
+      const ref = refMatch[1];
+      const excerpt = refMatch[2].trim();
+
+      // Bỏ đoạn [Hoạt động lớp: ...] — ghi chú hành chính/tương tác, không phải nội dung
+      // giảng. Trích dẫn những đoạn này chính là kịch bản K10 trong spec §5 (cite đúng mã
+      // nhưng nội dung không dạy gì), nên chúng không được vào knowledge base.
+      if (/^\[Hoạt động lớp:/.test(excerpt)) { skippedActivity++; continue; }
+
+      knowledgeBase.push({
+        ref,
+        day: currentDay,
+        topic: currentTopic,
+        excerpt,
+        keywords: extractKeywords(excerpt)
+      });
     }
   }
 
-  console.log(`Extracted ${knowledgeBase.length} records.`);
-  
-  const jsContent = `// Tự động sinh từ script build_knowledge_base.js\nconst KNOWLEDGE_BASE = ${JSON.stringify(knowledgeBase, null, 2)};\n`;
-  
+  console.log(`Extracted ${knowledgeBase.length} records (skipped ${skippedActivity} class-activity notes).`);
+
+  const jsContent = `// Tự động sinh từ script build_knowledge_base.js — KHÔNG sửa tay.\n`
+    + `// Nguồn: data/vlearn-pack/transcript/ · chạy lại: node scripts/build_knowledge_base.js\n`
+    + `const KNOWLEDGE_BASE = ${JSON.stringify(knowledgeBase, null, 2)};\n\n`
+    + `if (typeof module !== 'undefined') { module.exports = { KNOWLEDGE_BASE }; }\n`;
+
   fs.writeFileSync(outputFile, jsContent, 'utf8');
   console.log(`Saved to ${outputFile}`);
 }

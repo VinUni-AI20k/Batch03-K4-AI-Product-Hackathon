@@ -33,7 +33,7 @@ Bộ 22 case này dùng để kiểm tra 3 chiều trong spec:
 | G14 | tool calling là gì | thường | — | U0294/C0032/T1087 | ≤5 câu + citation |
 | G15 | agent la gi | hiếm | — | U0208/C0033/T0338 | Hiểu tiếng Việt không dấu, trả lời + citation |
 | G16 | các đặc điểm chính của LLM | thường | — | U0349/C0374/T0231 | Trả lời + citation đúng buổi Foundation |
-| G17 | tóm tắt ưu và nhược điểm của ReAct | thường | — | U0064/C0387/T1046 | Trả lời + citation, không bịa ưu/nhược |
+| G17 | tóm tắt ưu và nhược điểm của ReAct | khó | ① | U0064/C0387/T1046 | ReAct không xuất hiện trong 6 transcript (0 hit) — phải nói không tìm thấy, không bịa ưu/nhược, không kèm mã |
 | G18 | cách xử lý ngữ cảnh | thường | — | U0031/C0002/T0330 | Trả lời + citation, nối về bước đang làm |
 | G19 | tại sao faq rule-based thường điểm thấp | thường | — | U0156/C0238/T0666 | Trả lời từ transcript buổi chấm điểm use case |
 | G20 | NameError: plt is not defined — giải thích lỗi này | thường | — | tự sinh (MOCK.md) | Giải thích nguyên nhân, không viết code hộ |

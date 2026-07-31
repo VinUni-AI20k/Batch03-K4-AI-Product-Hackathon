@@ -16,10 +16,29 @@
 ## Chạy script tự động
 
 ```powershell
-pwsh -ExecutionPolicy Bypass -File .\scripts\run-golden-set.ps1
+.\scripts\run-golden-set.ps1 -DryRun        # xem ngữ cảnh nạp cho từng case, không tốn quota
+.\scripts\run-golden-set.ps1                # chạy trọn bộ 22 case
 ```
 
-Kết quả sẽ được ghi ra `eval/results-run-YYYYMMDD-HHMMSS.md` và file JSON tương ứng.
+Hoặc gọi thẳng Node: `node scripts/run-golden-set.js [--dry-run] [--limit N]`.
+Cần `OPENROUTER_API_KEY` trong `.env` (xem `.env.example`).
+
+Kết quả ghi ra `eval/results-run-YYYYMMDD-HHMMSS.md` + JSON tương ứng, kèm output đầy đủ
+của từng case để soát tay.
+
+Runner nạp knowledge base và dựng system prompt bằng đúng `codebase/prompt.js` mà app
+đang dùng — sửa prompt hay ngưỡng retrieval thì phải chạy lại trọn bộ.
+
+## Sinh lại knowledge base
+
+```powershell
+node scripts/build_knowledge_base.js
+```
+
+Đọc `data/vlearn-pack/transcript/`, sinh `codebase/knowledge_base.js` (645 đoạn có mã
+`[Txx-NNN]`, đã bỏ các đoạn `[Hoạt động lớp: ...]`). **Không sửa tay file này** — mọi
+mã trong đó phải mở đúng đoạn trong transcript gốc, nếu không thì chính sản phẩm đang
+mắc lỗi lớp ① mà nó hứa chống.
 
 ## Cách ghi kết quả
 

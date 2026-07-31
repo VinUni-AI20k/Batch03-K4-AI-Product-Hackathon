@@ -638,6 +638,19 @@ html, body {
   padding: 10px 13px;
   margin-top: 10px;
 }
+/* G2 — câu trả lời không có căn cứ phải trông khác hẳn câu có trích dẫn, để học viên
+   biết mức tin cậy mà không cần đọc kỹ. Tông xám/vàng, không phải xanh như citation. */
+.citation-warn {
+  background: #fef7e0;
+  border: 1px solid #f2d491;
+  border-left: 3px solid var(--warning, #f9ab00);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #7a5c00;
+}
 .citation-top {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 5px;
