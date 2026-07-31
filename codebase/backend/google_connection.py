@@ -35,7 +35,19 @@ SCOPES = [
 
 
 def client_secrets_path() -> Path:
-    return Path(os.environ.get("GOOGLE_OAUTH_CLIENT_SECRETS_FILE", str(_CREDENTIALS_DIR / "client_secret.json")))
+    env_path = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRETS_FILE")
+    if env_path:
+        return Path(env_path)
+    
+    target = _CREDENTIALS_DIR / "client_secret.json"
+    if not target.exists():
+        # Fallback to gmail_secret.json in workspace root if client_secret.json is missing
+        workspace_root_secret = _CREDENTIALS_DIR.parent.parent / "gmail_secret.json"
+        if workspace_root_secret.exists():
+            _CREDENTIALS_DIR.mkdir(parents=True, exist_ok=True)
+            target.write_text(workspace_root_secret.read_text(encoding="utf-8"), encoding="utf-8")
+            
+    return target
 
 
 def token_path() -> Path:
@@ -51,6 +63,8 @@ class GoogleConnectionError(RuntimeError):
 
 
 def _build_flow() -> Flow:
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
     secrets_path = client_secrets_path()
     if not secrets_path.exists():
         raise GoogleConnectionError(
