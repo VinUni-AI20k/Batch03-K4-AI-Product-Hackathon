@@ -1,0 +1,14 @@
+[
+  {
+    "id": "doc-01",
+    "title": "Hướng dẫn thiết lập môi trường dự án",
+    "section": "Thiết lập môi trường",
+    "content": "Để chạy bot Discord, bạn cần cài đặt Node.js phiên bản 18 trở lên. Cài đặt các thư viện phụ thuộc bằng lệnh `npm install`. Tạo file `.env` từ file `.env.example` và điền đầy đủ các token cần thiết bao gồm `DISCORD_TOKEN`, `OPENROUTER_API_KEY`, `GEMINI_API_KEY` và `TA_ROLE_ID`. Chạy bot ở chế độ phát triển bằng lệnh `node index.js` hoặc `npm run dev` (nếu có script)."
+  },
+  {
+    "id": "doc-02",
+    "title": "Quy định về nộp bài tập lớn và dự án cuối khóa",
+    "section": "Quy định nộp bài",
+    "content": "Dự án hợp lệ phải có đầy đủ: 1. Mã nguồn (codebase) sạch sẽ. 2. File spec.md mô tả kiến trúc AI, các lớp chỗ khó, quality bar và kết quả đo eval. 3. Slide thuyết trình (PDF). 4. Bằng chứng kiểm chứng (evidence log). Thiếu một trong các thành phần trên sẽ bị trừ điểm nặng theo Rubric chấm giải."
+  }
+]

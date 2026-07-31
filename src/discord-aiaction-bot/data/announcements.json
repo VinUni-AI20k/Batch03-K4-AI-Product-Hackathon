@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ann-01",
+    "title": "Lịch nộp bài và Demo Hackathon AI",
+    "date": "2026-07-31",
+    "content": "Hạn cuối nộp bài Hackathon AI (bao gồm repo github, slide demo và spec.md) là trước 08:00 sáng ngày mai (01/08/2026). Các nhóm lưu ý nộp bài đúng hạn tại link cổng nộp bài LMS. Buổi Demo trực tiếp sẽ bắt đầu từ 09:00 sáng mai."
+  },
+  {
+    "id": "ann-02",
+    "title": "Cung cấp API Key và Tài nguyên Hackathon",
+    "date": "2026-07-30",
+    "content": "Ban tổ chức đã gửi API Key OpenRouter và Gemini cho các trưởng nhóm qua email/Discord DM. Vui lòng không chia sẻ API Key này ra bên ngoài và không commit lên GitHub công khai."
+  }
+]

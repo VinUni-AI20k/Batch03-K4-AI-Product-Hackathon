@@ -1,0 +1,135 @@
+[
+  {
+    "timestamp": "2026-07-31T07:32:41.447Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi về giai phap chatbot",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:36:35.595Z",
+    "user": "yen4732",
+    "question": "tóm tắt cho tôi bài viết này trong 200 chữ",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:36:42.549Z",
+    "user": "tdinh_hw247",
+    "question": "tìm cho tôi bài đăng về con mew mew",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:37:16.952Z",
+    "user": "tdinh_hw247",
+    "question": "tìm cho tôi về con mèo",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:37:17.553Z",
+    "user": "yen4732",
+    "question": "Hoàng Sa và Trường Sa là của",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:37:58.004Z",
+    "user": "tdinh_hw247",
+    "question": "tìm cho tôi bài đăng về con mèo",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:38:29.166Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết mới nhất trong forum <#1532309198153580605>",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:38:51.014Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết về con mèo",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:40:04.066Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết về con mèo",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:40:23.387Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết con mèo và con hổ",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:41:05.848Z",
+    "user": "tdinh_hw247",
+    "question": "tôi tên là gì",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:41:34.872Z",
+    "user": "tdinh_hw247",
+    "question": "không đúng tôi tên là Hoàng",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:41:56.600Z",
+    "user": "tdinh_hw247",
+    "question": "tôi tên là gì",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:42:37.051Z",
+    "user": "tdinh_hw247",
+    "question": "thân phận của tôi là gì",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:43:43.405Z",
+    "user": "tdinh_hw247",
+    "question": "thê cho tôi xem bạn có kiến thức gì để hỗ trợ tôi",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:44:36.752Z",
+    "user": "tdinh_hw247",
+    "question": "bạn ngu thế hạn nộp hackathon là 3h chiều mà",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:48:36.363Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết về con mèo",
+    "topic": "[Quy chế/Khác]",
+    "escalated": true
+  },
+  {
+    "timestamp": "2026-07-31T07:49:07.630Z",
+    "user": "yen4732",
+    "question": "tìm cho tôi bài viết về  học máy",
+    "topic": "[Quy chế/Khác]",
+    "escalated": false
+  },
+  {
+    "timestamp": "2026-07-31T07:50:38.745Z",
+    "user": "trickez",
+    "question": "video về học máy",
+    "topic": "[Tài liệu/Bài giảng]",
+    "escalated": false
+  }
+]
