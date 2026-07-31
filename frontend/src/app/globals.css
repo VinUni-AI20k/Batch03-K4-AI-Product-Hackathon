@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  /* VLearn brand blue */
+  --color-brand-100: #dbe6fe;
+  --color-brand-500: #3b6ef5;
+  --color-brand-600: #2757e0;
+  --color-brand-700: #1e46b8;
+
+  /* Active nav underline */
+  --color-accent-500: #d9453c;
+
+  /* "Coming soon" amber */
+  --color-pending-50: #fdf3e0;
+  --color-pending-100: #f5ddb0;
+  --color-pending-700: #9a6206;
+  --color-pending-800: #7c4f05;
+
+  /* Presentation violet */
+  --color-deck-50: #efedff;
+  --color-deck-100: #d5cfff;
+  --color-deck-700: #5b4bd6;
+
+  /* Warm neutrals backing the page */
+  --color-page: #f6f5f3;
+  --color-page-dark: #101013;
+  --color-surface-dark: #17171b;
+  --color-line: #e8e6e2;
+  --color-line-dark: #2a2a30;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The header's search field is type=search; drop the WebKit decorations. */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+/* Codelab body typography. Hand-rolled rather than @tailwindcss/typography so the
+   directive callouts keep their own spacing without fighting a prose reset. */
+.codelab-prose {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--color-neutral-700);
+}
+.dark .codelab-prose {
+  color: var(--color-neutral-300);
+}
+
+.codelab-prose > h2 {
+  margin: 2.75rem 0 0.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--color-line);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-neutral-900);
+}
+.dark .codelab-prose > h2 {
+  border-color: var(--color-line-dark);
+  color: var(--color-neutral-50);
+}
+.codelab-prose > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.codelab-prose h3 {
+  margin: 1.75rem 0 0.5rem;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.dark .codelab-prose h3 {
+  color: var(--color-neutral-100);
+}
+
+.codelab-prose p {
+  margin: 0.85rem 0;
+}
+
+.codelab-prose ul,
+.codelab-prose ol {
+  margin: 0.85rem 0;
+  padding-left: 1.35rem;
+}
+.codelab-prose ul {
+  list-style: disc;
+}
+.codelab-prose ol {
+  list-style: decimal;
+}
+.codelab-prose li {
+  margin: 0.3rem 0;
+}
+/* GFM task lists inside prose: no bullet, checkbox inline. */
+.codelab-prose li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -1.35rem;
+}
+.codelab-prose li > input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.codelab-prose blockquote {
+  margin: 1.15rem 0;
+  border-left: 3px solid var(--color-brand-500);
+  padding: 0.1rem 0 0.1rem 1rem;
+  color: var(--color-neutral-600);
+}
+.dark .codelab-prose blockquote {
+  color: var(--color-neutral-400);
+}
+
+.codelab-prose :not(pre) > code {
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--color-brand-100) 55%, transparent);
+  padding: 0.1em 0.35em;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.875em;
+}
+.dark .codelab-prose :not(pre) > code {
+  background: color-mix(in oklab, var(--color-brand-700) 28%, transparent);
+}
+
+/* Tables scroll on their own so the page never scrolls sideways. */
+.codelab-prose table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  margin: 1.15rem 0;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.codelab-prose th,
+.codelab-prose td {
+  border: 1px solid var(--color-line);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+.dark .codelab-prose th,
+.dark .codelab-prose td {
+  border-color: var(--color-line-dark);
+}
+.codelab-prose th {
+  background: color-mix(in oklab, var(--color-line) 45%, transparent);
+  font-weight: 700;
+}
+.dark .codelab-prose th {
+  background: color-mix(in oklab, var(--color-line-dark) 60%, transparent);
+}
+
+.codelab-prose hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px dashed var(--color-line);
+}
+.dark .codelab-prose hr {
+  border-color: var(--color-line-dark);
+}
+
+/* `<details>` is the one hidden-hint mechanism that also works on GitHub. */
+.codelab-prose details {
+  margin: 1.15rem 0;
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: color-mix(in oklab, var(--color-line) 22%, transparent);
+}
+.dark .codelab-prose details {
+  border-color: var(--color-line-dark);
+  background: color-mix(in oklab, var(--color-line-dark) 45%, transparent);
+}
+.codelab-prose summary {
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-brand-700);
+}
+.dark .codelab-prose summary {
+  color: var(--color-brand-500);
+}
+
+.codelab-prose strong {
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.dark .codelab-prose strong {
+  color: var(--color-neutral-100);
+}

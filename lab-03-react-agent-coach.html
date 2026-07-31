@@ -1,0 +1,1621 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lab Coach tương tác cho Lab 03 — Chatbot vs ReAct Agent, nhóm 5 người.">
+  <title>Lab 03 Coach — Chatbot vs ReAct Agent</title>
+  <style>
+    :root {
+      --ink: #10213b;
+      --muted: #64748b;
+      --paper: #f5f7f2;
+      --surface: #ffffff;
+      --line: #dfe6df;
+      --navy: #0b1f3a;
+      --navy-2: #15365e;
+      --mint: #2ac59b;
+      --mint-soft: #e7fbf5;
+      --amber: #f2b94b;
+      --amber-soft: #fff7df;
+      --blue: #4f7cff;
+      --blue-soft: #edf2ff;
+      --violet: #8b68db;
+      --violet-soft: #f2edff;
+      --red: #dc5c5c;
+      --red-soft: #fff0ee;
+      --shadow: 0 14px 35px rgba(16, 33, 59, 0.08);
+      --radius: 20px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% -10%, rgba(42, 197, 155, 0.14), transparent 28rem),
+        radial-gradient(circle at 95% 4%, rgba(79, 124, 255, 0.11), transparent 26rem),
+        var(--paper);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    code, pre { font-family: var(--mono); }
+    code {
+      padding: 0.12rem 0.36rem;
+      color: #173b66;
+      background: #edf3f7;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 70px;
+      padding: 0.75rem clamp(1rem, 3vw, 2.25rem);
+      color: #fff;
+      background: rgba(11, 31, 58, 0.96);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      color: var(--navy);
+      background: var(--mint);
+      border-radius: 12px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+    }
+    .brand-copy { min-width: 0; }
+    .brand-copy strong { display: block; font-size: 0.96rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-copy small { color: #afbed0; }
+
+    .timer-shell { display: flex; align-items: center; gap: 0.65rem; }
+    .timer {
+      min-width: 94px;
+      font-family: var(--mono);
+      font-size: 1.18rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+    .top-actions { display: flex; gap: 0.45rem; }
+    .icon-btn, .ghost-btn, .primary-btn, .copy-btn, .chip-btn, .danger-btn {
+      border: 0;
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: 750;
+      transition: transform 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    }
+    .icon-btn:hover, .ghost-btn:hover, .primary-btn:hover, .copy-btn:hover, .chip-btn:hover, .danger-btn:hover { transform: translateY(-1px); }
+    .icon-btn { padding: 0.58rem 0.7rem; color: #dce8f3; background: rgba(255,255,255,0.1); }
+    .icon-btn[aria-pressed="true"] { color: var(--navy); background: var(--mint); }
+    .primary-btn { padding: 0.7rem 1rem; color: var(--navy); background: var(--mint); }
+    .ghost-btn { padding: 0.68rem 0.92rem; color: var(--ink); background: #edf3f5; }
+    .danger-btn { padding: 0.68rem 0.92rem; color: #9f2e2e; background: var(--red-soft); }
+
+    .page {
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      width: min(1480px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 5rem;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 92px;
+      align-self: start;
+      display: grid;
+      gap: 1rem;
+    }
+    .progress-card, .side-card {
+      padding: 1.1rem;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(16,33,59,0.05);
+    }
+    .progress-head { display: flex; align-items: center; gap: 0.9rem; }
+    .progress-ring {
+      --progress: 0deg;
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      flex: 0 0 auto;
+      background: conic-gradient(var(--mint) var(--progress), #e5ece8 0);
+      border-radius: 50%;
+    }
+    .progress-ring::after {
+      position: absolute;
+      width: 47px;
+      height: 47px;
+      content: "";
+      background: #fff;
+      border-radius: 50%;
+    }
+    .progress-ring span { position: relative; z-index: 1; font-size: 0.78rem; font-weight: 900; }
+    .progress-copy strong { display: block; font-size: 1.1rem; }
+    .progress-copy small { color: var(--muted); }
+
+    .phase-nav { display: grid; gap: 0.38rem; margin-top: 1rem; }
+    .phase-nav a {
+      display: grid;
+      grid-template-columns: 26px 1fr auto;
+      gap: 0.55rem;
+      align-items: center;
+      padding: 0.62rem 0.65rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 10px;
+    }
+    .phase-nav a:hover { color: var(--ink); background: #f0f5f2; }
+    .phase-nav .nav-index {
+      display: grid;
+      place-items: center;
+      width: 25px;
+      height: 25px;
+      color: #fff;
+      background: var(--navy-2);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+    .phase-nav .nav-status { width: 9px; height: 9px; background: #d5dfda; border-radius: 50%; }
+    .phase-nav a.done .nav-status { background: var(--mint); box-shadow: 0 0 0 4px var(--mint-soft); }
+
+    .legend { display: grid; gap: 0.62rem; color: var(--muted); font-size: 0.78rem; }
+    .legend span { display: flex; align-items: center; gap: 0.5rem; }
+    .dot { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 3px; }
+    .dot.knowledge { background: var(--amber); }
+    .dot.instruction { background: var(--blue); }
+    .dot.expected { background: var(--mint); }
+    .dot.deliverable { background: var(--violet); }
+
+    main { min-width: 0; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(1.6rem, 4vw, 3.4rem);
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.04), transparent 50%),
+        var(--navy);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      position: absolute;
+      right: -80px;
+      bottom: -120px;
+      width: 330px;
+      height: 330px;
+      content: "";
+      border: 55px solid rgba(42,197,155,0.13);
+      border-radius: 50%;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+      padding: 0.38rem 0.72rem;
+      color: #a8f2dd;
+      background: rgba(42,197,155,0.12);
+      border: 1px solid rgba(42,197,155,0.25);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.25rem);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+    }
+    .hero h1 em { color: var(--mint); font-style: normal; }
+    .hero p { max-width: 780px; margin: 1.2rem 0 0; color: #c7d6e6; font-size: clamp(1rem, 2vw, 1.2rem); }
+    .hero-actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-top: 1.5rem;
+    }
+    .hero-actions a {
+      padding: 0.72rem 0.95rem;
+      color: #dce7f2;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 11px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+    .hero-actions a:hover { background: rgba(255,255,255,0.14); }
+
+    .control-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0 0;
+    }
+    .control-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 18px rgba(16,33,59,0.04);
+    }
+    .control-card label { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; }
+    .segmented { display: flex; padding: 4px; background: #edf2ef; border-radius: 11px; }
+    .chip-btn { padding: 0.48rem 0.68rem; color: var(--muted); background: transparent; font-size: 0.83rem; }
+    .chip-btn.active { color: #fff; background: var(--navy); }
+
+    section { scroll-margin-top: 92px; }
+    .section-block { margin-top: 2rem; }
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .section-heading .kicker { color: var(--mint); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+    .section-heading h2 { margin: 0.25rem 0 0; font-size: clamp(1.5rem, 3vw, 2.35rem); letter-spacing: -0.035em; }
+    .section-heading p { max-width: 620px; margin: 0; color: var(--muted); }
+
+    .audit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .audit-card {
+      padding: 1.25rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      box-shadow: 0 8px 20px rgba(16,33,59,0.04);
+    }
+    .audit-card .number {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 0.8rem;
+      color: var(--navy);
+      background: var(--mint-soft);
+      border-radius: 10px;
+      font-weight: 950;
+    }
+    .audit-card h3 { margin: 0 0 0.45rem; font-size: 1rem; }
+    .audit-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .audit-card strong { color: var(--ink); }
+
+    .notice {
+      display: flex;
+      gap: 0.9rem;
+      align-items: start;
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      color: #724400;
+      background: var(--amber-soft);
+      border: 1px solid #f1d58c;
+      border-radius: 15px;
+    }
+    .notice strong { display: block; margin-bottom: 0.12rem; }
+    .notice p { margin: 0; font-size: 0.9rem; }
+
+    .role-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
+    .role-card {
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--role);
+      border-radius: 15px;
+    }
+    .role-card .role-num { color: var(--role); font-size: 0.74rem; font-weight: 950; letter-spacing: 0.06em; text-transform: uppercase; }
+    .role-card h3 { min-height: 2.5em; margin: 0.32rem 0; font-size: 0.94rem; line-height: 1.25; }
+    .role-card code { display: block; min-height: 3.4em; padding: 0.45rem; font-size: 0.72rem; word-break: break-word; }
+    .role-card input {
+      width: 100%;
+      margin-top: 0.72rem;
+      padding: 0.62rem 0.68rem;
+      color: var(--ink);
+      background: #f8faf8;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+    }
+    .role-card input:focus { border-color: var(--role); box-shadow: 0 0 0 3px color-mix(in srgb, var(--role) 18%, transparent); }
+
+    .critical-path {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 0.7rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .lane {
+      min-height: 88px;
+      padding: 0.8rem;
+      background: #f7faf8;
+      border: 1px dashed #cddbd3;
+      border-radius: 12px;
+    }
+    .lane strong { display: block; margin-bottom: 0.25rem; font-size: 0.88rem; }
+    .lane small { color: var(--muted); }
+    .arrow { color: var(--mint); font-size: 1.35rem; font-weight: 950; }
+
+    .phase {
+      position: relative;
+      margin-top: 1.25rem;
+      padding: clamp(1rem, 2.5vw, 1.5rem);
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 8px 24px rgba(16,33,59,0.045);
+    }
+    .phase::before {
+      position: absolute;
+      top: 28px;
+      left: -19px;
+      width: 12px;
+      height: 12px;
+      content: "";
+      background: var(--mint);
+      border: 5px solid var(--paper);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    .phase-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .phase-id { color: var(--mint); font-size: 0.77rem; font-weight: 950; text-transform: uppercase; letter-spacing: 0.08em; }
+    .phase h3 { margin: 0.2rem 0 0.35rem; font-size: clamp(1.25rem, 2.5vw, 1.8rem); letter-spacing: -0.025em; }
+    .phase-summary { margin: 0; color: var(--muted); }
+    .phase-meta { display: flex; flex-wrap: wrap; justify-content: end; gap: 0.45rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.58rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .badge.time { color: #6b4700; background: var(--amber-soft); }
+    .badge.parallel { color: #1c4ec7; background: var(--blue-soft); }
+    .badge.sequential { color: #6a45b7; background: var(--violet-soft); }
+    .gate {
+      margin-bottom: 1rem;
+      padding: 0.78rem 0.9rem;
+      color: #5a457f;
+      background: var(--violet-soft);
+      border-left: 4px solid var(--violet);
+      border-radius: 10px;
+      font-size: 0.88rem;
+    }
+
+    .task-list { display: grid; gap: 0.85rem; }
+    .task-card {
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      transition: opacity 0.2s ease, border 0.2s ease;
+    }
+    .task-card.completed { border-color: #a6e5d2; }
+    .task-card.completed .task-title { text-decoration: line-through; text-decoration-color: #83bcae; }
+    .task-card.hidden-completed { display: none; }
+    .task-top {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 1rem;
+      background: #fbfcfb;
+      border-bottom: 1px solid var(--line);
+    }
+    .task-check {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 auto;
+      accent-color: var(--mint);
+      cursor: pointer;
+    }
+    .task-title-wrap { flex: 1; min-width: 0; }
+    .task-title { display: block; font-size: 0.98rem; font-weight: 900; }
+    .task-owner { color: var(--muted); font-size: 0.76rem; }
+    .task-mode { flex: 0 0 auto; }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+    }
+    .task-panel {
+      min-width: 0;
+      padding: 1rem;
+      border-right: 1px solid var(--line);
+    }
+    .task-panel:last-child { border-right: 0; }
+    .panel-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.7rem;
+      font-size: 0.69rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .task-panel.knowledge { background: linear-gradient(180deg, var(--amber-soft), #fff 65%); }
+    .task-panel.knowledge .panel-label { color: #845600; }
+    .task-panel.instruction { background: linear-gradient(180deg, var(--blue-soft), #fff 65%); }
+    .task-panel.instruction .panel-label { color: #315dcc; }
+    .task-panel.expected { background: linear-gradient(180deg, var(--mint-soft), #fff 65%); }
+    .task-panel.expected .panel-label { color: #14785d; }
+    .task-panel.deliverable { background: linear-gradient(180deg, var(--violet-soft), #fff 65%); }
+    .task-panel.deliverable .panel-label { color: #6947b2; }
+    .task-panel ul, .task-panel ol { margin: 0; padding-left: 1.1rem; }
+    .task-panel li { margin: 0 0 0.42rem; color: #33475f; font-size: 0.83rem; }
+    .task-panel li:last-child { margin-bottom: 0; }
+    .task-panel .one-line {
+      margin: 0 0 0.7rem;
+      color: #174f41;
+      font-size: 0.88rem;
+      font-weight: 850;
+    }
+    .deliverable-list { display: grid; gap: 0.5rem; }
+    .deliverable-item {
+      padding: 0.58rem;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid #dfd4fa;
+      border-radius: 9px;
+      font-family: var(--mono);
+      font-size: 0.73rem;
+      overflow-wrap: anywhere;
+    }
+
+    .command-stack { display: grid; gap: 0.55rem; margin-top: 0.72rem; }
+    .command-block { overflow: hidden; background: #0e1b2c; border-radius: 10px; }
+    .command-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.42rem 0.55rem;
+      color: #98abc1;
+      background: #14263d;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    .copy-btn { padding: 0.28rem 0.48rem; color: #cbeee4; background: rgba(42,197,155,0.15); font-size: 0.66rem; }
+    .copy-btn.copied { color: var(--navy); background: var(--mint); }
+    .command-block pre, .expected-output {
+      margin: 0;
+      padding: 0.72rem;
+      color: #d8e8f4;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 0.7rem;
+      line-height: 1.55;
+    }
+    .expected-output {
+      margin-top: 0.65rem;
+      color: #176048;
+      background: #effbf7;
+      border: 1px solid #c8edde;
+      border-radius: 9px;
+    }
+
+    .validation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+    .validation-card {
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+    .validation-card h3 { margin: 0 0 0.25rem; font-size: 0.96rem; }
+    .validation-card p { margin: 0 0 0.65rem; color: var(--muted); font-size: 0.82rem; }
+
+    .finish-card {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1rem;
+      align-items: center;
+      padding: clamp(1.3rem, 3vw, 2rem);
+      color: #fff;
+      background: linear-gradient(135deg, var(--navy), #123d5f);
+      border-radius: 22px;
+    }
+    .finish-card h2 { margin: 0; font-size: clamp(1.4rem, 3vw, 2.3rem); }
+    .finish-card p { margin: 0.65rem 0 0; color: #c3d5e4; }
+    .final-list { display: grid; gap: 0.5rem; }
+    .final-list label { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.75rem; background: rgba(255,255,255,0.08); border-radius: 10px; font-size: 0.84rem; }
+
+    footer { margin-top: 1.5rem; padding: 1rem 0; color: var(--muted); font-size: 0.78rem; }
+    footer a { color: #285ca1; }
+    .toast {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 100;
+      padding: 0.72rem 0.9rem;
+      color: #fff;
+      background: var(--navy);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    body.focus-mode .audit-grid,
+    body.focus-mode .notice,
+    body.focus-mode #roles,
+    body.focus-mode .critical-path,
+    body.focus-mode #validation,
+    body.focus-mode footer { display: none; }
+
+    @media (max-width: 1180px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { position: static; grid-template-columns: 1fr 1fr; }
+      .phase-nav { grid-template-columns: repeat(4, 1fr); }
+      .phase-nav a { grid-template-columns: 26px 1fr; }
+      .phase-nav .nav-status { display: none; }
+      .role-grid { grid-template-columns: repeat(3, 1fr); }
+      .task-grid { grid-template-columns: repeat(2, 1fr); }
+      .task-panel:nth-child(2) { border-right: 0; }
+      .task-panel:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { align-items: start; }
+      .brand-copy small { display: none; }
+      .timer-shell { flex-wrap: wrap; justify-content: end; }
+      .top-actions .print-action { display: none; }
+      .page { width: min(100% - 1rem, 1480px); padding-top: 1rem; }
+      .sidebar { grid-template-columns: 1fr; }
+      .side-card { display: none; }
+      .phase-nav { grid-template-columns: repeat(2, 1fr); }
+      .control-strip, .audit-grid, .finish-card, .validation-grid { grid-template-columns: 1fr; }
+      .control-card { align-items: start; flex-direction: column; }
+      .role-grid { grid-template-columns: 1fr; }
+      .critical-path { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); text-align: center; }
+      .phase-head { flex-direction: column; }
+      .phase-meta { justify-content: start; }
+      .phase::before { display: none; }
+      .task-grid { grid-template-columns: 1fr; }
+      .task-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .task-panel:last-child { border-bottom: 0; }
+      .task-top { align-items: start; }
+      .task-mode { display: none; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .topbar, .sidebar, .control-strip, .hero-actions, .copy-btn, .toast { display: none !important; }
+      .page { display: block; width: 100%; padding: 0; }
+      .hero { color: var(--ink); background: #fff; border: 2px solid var(--ink); box-shadow: none; }
+      .hero p { color: var(--ink); }
+      .phase, .task-card, .audit-card, .role-card { break-inside: avoid; box-shadow: none; }
+      .task-grid { grid-template-columns: repeat(4, 1fr); }
+      .command-block { border: 1px solid #333; }
+      .command-block pre { color: #111; background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">03</div>
+      <div class="brand-copy">
+        <strong>Lab Coach · Chatbot vs ReAct Agent</strong>
+        <small>Phòng E402 · Nhóm 5 người · Main branch</small>
+      </div>
+    </div>
+    <div class="timer-shell">
+      <div class="timer" id="timerDisplay" aria-live="polite">02:30:00</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="timerToggle" type="button" title="Bắt đầu hoặc tạm dừng">▶</button>
+        <button class="icon-btn" id="timerReset" type="button" title="Đặt lại đồng hồ">↺</button>
+        <button class="icon-btn" id="focusToggle" type="button" aria-pressed="false" title="Chỉ hiện phần đang làm">Focus</button>
+        <button class="icon-btn print-action" type="button" onclick="window.print()" title="In checklist">In</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+    <aside class="sidebar" aria-label="Tiến độ bài lab">
+      <div class="progress-card">
+        <div class="progress-head">
+          <div class="progress-ring" id="progressRing"><span id="progressPercent">0%</span></div>
+          <div class="progress-copy">
+            <strong id="progressCount">0/0 task</strong>
+            <small>Tự lưu trên trình duyệt</small>
+          </div>
+        </div>
+        <nav class="phase-nav" id="phaseNav"></nav>
+      </div>
+      <div class="side-card">
+        <div class="legend">
+          <span><i class="dot knowledge"></i> Kiến thức cần nắm</span>
+          <span><i class="dot instruction"></i> Hướng dẫn thực hiện</span>
+          <span><i class="dot expected"></i> Expected outcome</span>
+          <span><i class="dot deliverable"></i> Deliverable phải nộp</span>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" id="top">
+        <span class="eyebrow">Sprint guide · 150 phút lõi</span>
+        <h1>Đừng “đọc README”.<br><em>Hãy chạy đúng critical path.</em></h1>
+        <p>Mỗi task được tách rạch ròi thành kiến thức, thao tác, kết quả code mong đợi và file phải nộp. Việc song song hóa dừng lại tại các cổng tích hợp của Role 4.</p>
+        <div class="hero-actions">
+          <a href="#setup">Setup theo OS</a>
+          <a href="#roles">Chia 5 role</a>
+          <a href="#phase-1">Step by step</a>
+          <a href="#validation">Lệnh validation</a>
+          <a href="#new-file">File mới phải tạo</a>
+          <a href="https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402" target="_blank" rel="noreferrer">Mở repo ↗</a>
+        </div>
+      </section>
+
+      <div class="control-strip" id="setup">
+        <div class="control-card">
+          <div>
+            <label>Hệ điều hành</label>
+            <strong>Lệnh sẽ đổi theo lựa chọn</strong>
+          </div>
+          <div class="segmented" id="osSelector" role="group" aria-label="Chọn hệ điều hành">
+            <button class="chip-btn" type="button" data-os="windows">Windows</button>
+            <button class="chip-btn" type="button" data-os="macos">macOS</button>
+            <button class="chip-btn" type="button" data-os="linux">Linux</button>
+          </div>
+        </div>
+        <div class="control-card">
+          <div>
+            <label>Timebox</label>
+            <strong>README và CODELAB đang lệch nhau</strong>
+          </div>
+          <div class="segmented" id="durationSelector" role="group" aria-label="Chọn thời lượng">
+            <button class="chip-btn" type="button" data-minutes="150">150′ sprint</button>
+            <button class="chip-btn" type="button" data-minutes="240">240′ full</button>
+          </div>
+        </div>
+      </div>
+
+      <section class="section-block" aria-labelledby="auditTitle">
+        <div class="section-heading">
+          <div>
+            <span class="kicker">Repo audit</span>
+            <h2 id="auditTitle">Ba điều cần làm rõ trước khi code</h2>
+          </div>
+        </div>
+        <div class="audit-grid">
+          <article class="audit-card">
+            <div class="number">01</div>
+            <h3>File mới thật sự phải tạo</h3>
+            <p><strong><code>docs/hybrid_flowchart.mermaid</code></strong> được yêu cầu ở Mốc 4 nhưng chưa tồn tại trong repo. Phase 4 bên dưới có lệnh tạo, nội dung mẫu và validation.</p>
+          </article>
+          <article class="audit-card">
+            <div class="number">02</div>
+            <h3>Input mà app thật sự đọc</h3>
+            <p><strong><code>config/test_cases.json</code></strong> phải là JSON array. Mỗi item cần <code>id</code>, <code>category</code>, <code>question</code>, <code>expected_behavior</code>. App demo lấy <code>tests[2]["question"]</code>.</p>
+          </article>
+          <article class="audit-card">
+            <div class="number">03</div>
+            <h3>“Run” chưa phải “test suite”</h3>
+            <p><strong><code>python src/app.py</code></strong> là smoke/demo: tải 5 cases nhưng chỉ chạy case số 3. Các lệnh PASS trong trang này là validation bổ sung, không giả vờ là test tự động có sẵn.</p>
+          </article>
+        </div>
+        <div class="notice">
+          <span aria-hidden="true">⚠</span>
+          <div>
+            <strong>Quy ước thời gian của trang</strong>
+            <p>README mô tả 4 mốc tổng 150 phút; metadata CODELAB ghi 240 phút. Mặc định dùng sprint 150 phút để nhóm hoàn thành đúng hạn. Chọn 240′ nếu coach dành thêm thời gian giải thích và chữa bài.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block" id="roles" aria-labelledby="rolesTitle">
+        <div class="section-heading">
+          <div>
+            <span class="kicker">Team topology</span>
+            <h2 id="rolesTitle">Năm người, năm vùng sở hữu</h2>
+          </div>
+          <p>Nhập tên thành viên. Trang tự lưu. Một người chỉ sửa file mình sở hữu; Role 4 là cổng tích hợp ở cuối mỗi mốc.</p>
+        </div>
+        <div class="role-grid" id="roleGrid"></div>
+        <div class="critical-path">
+          <div class="lane">
+            <strong>Song song</strong>
+            <small>Role 1 · tests<br>Role 2 · tools<br>Role 3 · prompts<br>Role 5 · trace/report</small>
+          </div>
+          <div class="arrow">→</div>
+          <div class="lane">
+            <strong>Tuần tự tại cổng tích hợp</strong>
+            <small>Role 4 pull thay đổi, nối vào <code>src/app.py</code>, chạy validation.</small>
+          </div>
+          <div class="arrow">→</div>
+          <div class="lane">
+            <strong>Nghiệm thu chung</strong>
+            <small>Cả nhóm xem trace, đánh dấu checkpoint, rồi mới sang phase kế tiếp.</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block" id="roadmap" aria-labelledby="roadmapTitle">
+        <div class="section-heading">
+          <div>
+            <span class="kicker">Execution plan</span>
+            <h2 id="roadmapTitle">Bốn phase theo critical path</h2>
+          </div>
+          <button class="danger-btn" id="resetProgress" type="button">Xóa tiến độ</button>
+        </div>
+        <div id="phaseContainer"></div>
+      </section>
+
+      <section class="section-block" id="validation" aria-labelledby="validationTitle">
+        <div class="section-heading">
+          <div>
+            <span class="kicker">Fast checks</span>
+            <h2 id="validationTitle">Validation cheat sheet</h2>
+          </div>
+          <p>Các lệnh này kiểm tra contract của repo hiện tại mà không đòi hỏi phải có thư mục <code>tests/</code>.</p>
+        </div>
+        <div class="validation-grid" id="validationGrid"></div>
+      </section>
+
+      <section class="section-block finish-card" aria-labelledby="finishTitle">
+        <div>
+          <span class="eyebrow">Definition of done</span>
+          <h2 id="finishTitle">Nộp link repo, nhưng chấm cả hành trình.</h2>
+          <p>Final Answer đẹp không đủ. Bài đạt khi tool contract rõ, Observation đến từ code, vòng lặp có phanh, trace có bằng chứng và hybrid flowchart phân luồng đúng.</p>
+        </div>
+        <div class="final-list">
+          <label><input type="checkbox" class="final-check"> Không commit <code>.env</code> hoặc API key</label>
+          <label><input type="checkbox" class="final-check"> Tất cả validation in <strong>PASS</strong></label>
+          <label><input type="checkbox" class="final-check"> Có failed trace + root cause + Agent V2</label>
+          <label><input type="checkbox" class="final-check"> Có <code>docs/hybrid_flowchart.mermaid</code></label>
+          <label><input type="checkbox" class="final-check"> Đã push và gửi link repo</label>
+        </div>
+      </section>
+
+      <footer>
+        Nguồn được đối chiếu ngày 30/07/2026:
+        <a href="https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402" target="_blank" rel="noreferrer">README</a>,
+        <a href="https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402/blob/main/docs/CODELAB.md" target="_blank" rel="noreferrer">CODELAB</a>,
+        <a href="https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402/blob/main/docs/PHAN_CONG_CONG_VIEC.md" target="_blank" rel="noreferrer">phân công</a>,
+        <a href="https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402/blob/main/src/app.py" target="_blank" rel="noreferrer">app.py</a>.
+        Đây là file độc lập; không gửi dữ liệu ra ngoài.
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /*
+      GENERATOR CONTRACT FOR SKILL.MD
+      --------------------------------
+      To generate another lab coach, replace LAB_CONFIG only.
+      Keep these four concepts separate for every task:
+      knowledge[] | instructions[] | expected{summary, output} | deliverables[]
+      Commands must provide OS-specific variants when syntax differs.
+    */
+    const LAB_CONFIG = {
+      storageKey: "lab03-react-agent-coach-v1",
+      repo: "https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402",
+      roles: [
+        { id: 1, title: "Product Architect", file: "config/test_cases.json", color: "#ef9f43" },
+        { id: 2, title: "Tool Engineer", file: "src/tools.py", color: "#3f78de" },
+        { id: 3, title: "Prompt & Guardrail", file: "src/prompts.py", color: "#8b68db" },
+        { id: 4, title: "Core Integrator", file: "src/app.py", color: "#2ac59b" },
+        { id: 5, title: "Observability", file: "docs/trace_eval.md + flowchart", color: "#d45f75" }
+      ],
+      phases: [
+        {
+          id: 1,
+          title: "Setup & chốt Agentic Fit",
+          minutes: 20,
+          mode: "Tuần tự → song song",
+          summary: "Môi trường phải chạy trước; sau đó cả nhóm chốt một chủ đề rồi tách lane.",
+          gate: "Gate sang Phase 2: app chạy smoke test, cả nhóm nói được Tool / Action / Observation và đã thống nhất cùng một bài toán.",
+          tasks: [
+            {
+              id: "p1-setup",
+              title: "Clone, tạo môi trường và chạy smoke test",
+              owner: "Role 4 dẫn; cả nhóm cùng xác nhận",
+              mode: "Tuần tự",
+              knowledge: [
+                "Tách lỗi môi trường khỏi lỗi logic Agent.",
+                "Dùng <code>LLM_PROVIDER=mock</code> để kiểm tra zero-key trước.",
+                "<code>.env</code> là file local, tuyệt đối không commit."
+              ],
+              instructions: [
+                "Mở terminal tại thư mục muốn chứa repo.",
+                "Chạy nguyên block Setup bên dưới.",
+                "Nếu cần gọi LLM thật, đổi provider và điền đúng một API key sau khi smoke test pass."
+              ],
+              commands: [
+                {
+                  label: "Setup repo",
+                  windows: "git clone https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402.git\ncd Day-3-Lab-Chatbot-vs-react-agent-E402\npy -m venv .venv\n.\\.venv\\Scripts\\Activate.ps1\npy -m pip install --upgrade pip\npy -m pip install -r requirements.txt\nCopy-Item .env.example .env\n(Get-Content .env) -replace '^LLM_PROVIDER=.*$', 'LLM_PROVIDER=mock' | Set-Content .env\npy src/app.py",
+                  macos: "git clone https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402.git\ncd Day-3-Lab-Chatbot-vs-react-agent-E402\npython3 -m venv .venv\nsource .venv/bin/activate\npython3 -m pip install --upgrade pip\npython3 -m pip install -r requirements.txt\ncp .env.example .env\nsed -i '' 's/^LLM_PROVIDER=.*/LLM_PROVIDER=mock/' .env\npython3 src/app.py",
+                  linux: "git clone https://github.com/VinUni-AI20k/Day-3-Lab-Chatbot-vs-react-agent-E402.git\ncd Day-3-Lab-Chatbot-vs-react-agent-E402\npython3 -m venv .venv\nsource .venv/bin/activate\npython3 -m pip install --upgrade pip\npython3 -m pip install -r requirements.txt\ncp .env.example .env\nsed -i 's/^LLM_PROVIDER=.*/LLM_PROVIDER=mock/' .env\npython3 src/app.py"
+                }
+              ],
+              expected: {
+                summary: "Repo chạy zero-key và tải đúng 5 test cases.",
+                output: "🔌 LLM Provider đang hoạt động: MockProvider (...)\n✅ Đã tải thành công 5 Test Cases ...\n--- DEMO 1: CHẠY TRÊN CHATBOT BASELINE ---\n--- DEMO 2: CHẠY TRÊN REACT AGENT ---"
+              },
+              deliverables: [".venv/ (local, không nộp)", ".env (local, không nộp)", "Smoke test không báo traceback"]
+            },
+            {
+              id: "p1-fit",
+              title: "Chốt bài toán và Agentic Fit",
+              owner: "Roles 1, 2, 3, 5; Role 4 giữ repo chạy",
+              mode: "Song song",
+              knowledge: [
+                "Agent đáng dùng khi cần nhiều bước, tool, quyết định động hoặc horizon dài.",
+                "Chatbot baseline là đường cơ sở, không phải đối thủ phải làm cho yếu.",
+                "Một chủ đề duy nhất phải chi phối tests, tools và prompt."
+              ],
+              instructions: [
+                "Cả nhóm chọn đúng một chủ đề trong <code>docs/DANH_SACH_DE_TAI.md</code>.",
+                "Role 5 chấm bốn tiêu chí 1–5 trong Scoring Matrix.",
+                "Role 2 liệt kê tool; Role 3 liệt kê failure mode; Role 1 chốt user journey."
+              ],
+              commands: [],
+              expected: {
+                summary: "Cả nhóm có một câu tuyên bố bài toán và lý do dùng Agent.",
+                output: "Ví dụ: “Agent cần thiết vì truy vấn cần dữ liệu thời gian thực, gọi 2 tools theo thứ tự và đổi hướng khi tool lỗi.”"
+              },
+              deliverables: ["docs/trace_eval.md → Scoring Matrix", "Danh sách tool dự kiến", "Danh sách failure modes"]
+            }
+          ]
+        },
+        {
+          id: 2,
+          title: "Baseline, test input & tool contract",
+          minutes: 30,
+          mode: "Song song → tích hợp",
+          summary: "Roles 1–3 và 5 làm độc lập; Role 4 chỉ tích hợp sau khi các contract đã rõ.",
+          gate: "Gate sang Phase 3: JSON input hợp lệ, tools pass độc lập, baseline gọi đúng một LLM và không gọi tool.",
+          tasks: [
+            {
+              id: "p2-tests",
+              title: "Chuẩn hóa input trong test_cases.json",
+              owner: "Role 1",
+              mode: "Song song",
+              knowledge: [
+                "Đây là dữ liệu đầu vào, không phải test runner.",
+                "App hiện lấy câu thứ ba bằng <code>tests[2][\"question\"]</code>.",
+                "Năm case phải phủ simple, multi-step, 2 tools và edge case."
+              ],
+              instructions: [
+                "Chỉ sửa <code>config/test_cases.json</code>.",
+                "Giữ JSON là array và giữ đủ bốn key cho mỗi object.",
+                "Chạy validation schema trước khi push."
+              ],
+              commands: [
+                {
+                  label: "Validate JSON contract",
+                  all: "python -c \"import json; d=json.load(open('config/test_cases.json', encoding='utf-8')); assert len(d)>=5 and all({'id','category','question','expected_behavior'} <= set(x) for x in d); print('PASS:', len(d), 'test cases')\""
+                }
+              ],
+              expected: {
+                summary: "App đọc được ít nhất 5 cases; case thứ ba có key question.",
+                output: "PASS: 5 test cases"
+              },
+              deliverables: ["config/test_cases.json"]
+            },
+            {
+              id: "p2-tools",
+              title: "Định nghĩa tool contract và test tool riêng",
+              owner: "Role 2",
+              mode: "Song song",
+              knowledge: [
+                "Tool phải có input/output/error contract trước khi gắn Agent.",
+                "Lỗi nghiệp vụ là Observation; đừng làm Python crash.",
+                "Mỗi tool phải đăng ký trong <code>AVAILABLE_TOOLS</code>."
+              ],
+              instructions: [
+                "Sửa <code>src/tools.py</code>; thêm docstring nêu input, output và error semantics.",
+                "Với input không tồn tại, trả chuỗi bắt đầu bằng <code>LỖI:</code>.",
+                "Chạy validation độc lập, chưa cần gọi LLM."
+              ],
+              commands: [
+                {
+                  label: "Validate tool contract",
+                  all: "python -c \"from src.tools import get_weather, AVAILABLE_TOOLS; assert 'get_weather' in AVAILABLE_TOOLS; assert get_weather('Atlantis').startswith('LỖI'); print('PASS: tools contract')\""
+                }
+              ],
+              expected: {
+                summary: "Tool hợp lệ trả dữ liệu; input bẫy trả lỗi dạng dữ liệu.",
+                output: "PASS: tools contract"
+              },
+              deliverables: ["src/tools.py", "Docstring cho từng tool", "AVAILABLE_TOOLS đầy đủ"]
+            },
+            {
+              id: "p2-baseline",
+              title: "Dựng baseline công bằng, không tool",
+              owner: "Role 3 viết prompt; Role 4 tích hợp",
+              mode: "Tuần tự sau input",
+              knowledge: [
+                "Baseline = system prompt + user message → 1 LLM call.",
+                "Không nhúng sẵn kết quả tool vào prompt.",
+                "Output mượt không chứng minh có grounding."
+              ],
+              instructions: [
+                "Role 3 sửa <code>CHATBOT_BASELINE_PROMPT</code> trong <code>src/prompts.py</code>.",
+                "Role 4 kiểm tra <code>run_baseline_chatbot()</code> trong <code>src/app.py</code>.",
+                "Chạy app; Role 5 lưu raw answer và gắn nhãn correct / safe fallback / hallucinated."
+              ],
+              commands: [
+                { label: "Run baseline demo", all: "python src/app.py" }
+              ],
+              expected: {
+                summary: "Baseline không gọi tool và không nói rằng đã thực hiện hành động.",
+                output: "--- DEMO 1: CHẠY TRÊN CHATBOT BASELINE ---\n💬 [CHATBOT BASELINE] ...\n🤖 Chatbot trả lời: ..."
+              },
+              deliverables: ["src/prompts.py → CHATBOT_BASELINE_PROMPT", "src/app.py → baseline path", "docs/trace_eval.md → raw baseline"]
+            }
+          ]
+        },
+        {
+          id: 3,
+          title: "ReAct V1 → failed trace → Agent V2",
+          minutes: 60,
+          mode: "Song song → tích hợp → tuần tự",
+          summary: "Prompt và tools được harden song song; Role 4 nối vòng lặp; cả nhóm dùng một failed trace để sửa có bằng chứng.",
+          gate: "Gate sang Phase 4: có trace Thought → Action → Observation, có MAX_ITERATIONS và Agent V2 fallback lịch sự khi gặp case bẫy.",
+          tasks: [
+            {
+              id: "p3-prompt",
+              title: "Khóa format ReAct và guardrails",
+              owner: "Role 3",
+              mode: "Song song",
+              knowledge: [
+                "LLM đề xuất Action; application mới là nơi thực thi tool.",
+                "Mỗi Action phải sinh đúng một Observation.",
+                "Final Answer chỉ hợp lệ sau khi có đủ evidence."
+              ],
+              instructions: [
+                "Sửa <code>REACT_SYSTEM_PROMPT</code> trong <code>src/prompts.py</code>.",
+                "Giữ rõ ba marker: <code>Thought:</code>, <code>Action:</code>, <code>Final Answer:</code>.",
+                "Đặt <code>MAX_ITERATIONS</code> dương và timeout hữu hạn."
+              ],
+              commands: [
+                {
+                  label: "Validate prompt contract",
+                  all: "python -c \"from src.prompts import MAX_ITERATIONS, REACT_SYSTEM_PROMPT; assert MAX_ITERATIONS > 0; assert all(x in REACT_SYSTEM_PROMPT for x in ['Thought:', 'Action:', 'Final Answer:']); print('PASS: prompt contract')\""
+                }
+              ],
+              expected: {
+                summary: "Prompt có format parse được và phanh vòng lặp.",
+                output: "PASS: prompt contract"
+              },
+              deliverables: ["src/prompts.py → REACT_SYSTEM_PROMPT", "MAX_ITERATIONS", "TIMEOUT_SECONDS"]
+            },
+            {
+              id: "p3-integrate",
+              title: "Tích hợp vòng lặp ReAct V1",
+              owner: "Role 4",
+              mode: "Tuần tự sau Roles 1–3",
+              knowledge: [
+                "Critical loop: call LLM → parse Action → execute tool → append Observation → call LLM.",
+                "Observation phải quay lại context của vòng sau.",
+                "Repo starter hiện đang hard-code weather demo; đây là điểm cần nâng cấp."
+              ],
+              instructions: [
+                "Pull thay đổi từ test, tools và prompts.",
+                "Nâng <code>run_react_agent()</code> trong <code>src/app.py</code> từ demo hard-code thành loop đọc Action.",
+                "Không để model tự viết Observation; lookup tool qua <code>AVAILABLE_TOOLS</code>."
+              ],
+              commands: [
+                { label: "Run integrated app", all: "python src/app.py" }
+              ],
+              expected: {
+                summary: "Terminal cho thấy tool path thật và dừng đúng lúc.",
+                output: "Thought: ...\nAction: get_weather[Hà Nội]\nObservation: Thời tiết Hà Nội: 28°C ...\nThought: Tôi đã có đủ thông tin ...\nFinal Answer: ..."
+              },
+              deliverables: ["src/app.py → parser + executor + loop", "Trace ReAct V1 chạy được"]
+            },
+            {
+              id: "p3-recover",
+              title: "Tạo failed trace và sửa thành Agent V2",
+              owner: "Roles 1 & 5 tạo bẫy; Roles 3 & 4 sửa",
+              mode: "Tuần tự",
+              knowledge: [
+                "Failed trace là dữ liệu chẩn đoán, không phải thất bại cần giấu.",
+                "Root cause phải trỏ đến prompt, parser, tool contract hoặc loop control.",
+                "Agent V2 cần recovery hoặc safe fallback, không chỉ đổi câu trả lời."
+              ],
+              instructions: [
+                "Role 1 thêm hoặc chọn edge case có malformed args, unknown tool hoặc repeated action.",
+                "Role 5 lưu toàn trace và viết root cause một câu.",
+                "Roles 3–4 sửa; chạy lại đúng case; ghi Before/After."
+              ],
+              commands: [
+                { label: "Run edge-case demo", all: "python src/app.py" }
+              ],
+              expected: {
+                summary: "Case bẫy không crash, không lặp vô hạn và có fallback lịch sự.",
+                output: "LỖI: ...\n🛡️ GUARDRAIL TRIGGERED: Đã đạt giới hạn ...\nFinal/Safe fallback: Xin lỗi, tôi chưa thể xác minh ..."
+              },
+              deliverables: ["config/test_cases.json → edge case", "docs/trace_eval.md → Before/After + RCA", "Agent V2 trong src/app.py / src/prompts.py"]
+            }
+          ]
+        },
+        {
+          id: 4,
+          title: "Cross-audit, hybrid flowchart & submission",
+          minutes: 40,
+          mode: "Song song → tuần tự",
+          summary: "Role 5 tạo file còn thiếu trong khi nhóm cross-audit; Role 4 chạy validation cuối và push.",
+          gate: "Definition of done: flowchart tồn tại, trace đủ bằng chứng, secrets sạch, tất cả validation PASS và link repo đã nộp.",
+          tasks: [
+            {
+              id: "p4-flowchart",
+              title: "Tạo file hybrid_flowchart.mermaid",
+              owner: "Role 5",
+              mode: "Song song",
+              anchor: "new-file",
+              knowledge: [
+                "Đây là deliverable mới, không phải file có sẵn để sửa.",
+                "File <code>.mermaid</code> chứa Mermaid source thuần, không cần hàng rào ba dấu backtick.",
+                "Nhánh quyết định phải tách câu đơn giản và câu cần tool/multi-step."
+              ],
+              instructions: [
+                "Tạo đúng đường dẫn <code>docs/hybrid_flowchart.mermaid</code>.",
+                "Dán nội dung mẫu bên dưới rồi chỉnh wording theo chủ đề nhóm.",
+                "Chạy validation để chắc file có cả Chatbot path và ReAct path."
+              ],
+              commands: [
+                {
+                  label: "Tạo file rỗng",
+                  windows: "New-Item -ItemType File -Path docs\\hybrid_flowchart.mermaid -Force",
+                  macos: "mkdir -p docs && touch docs/hybrid_flowchart.mermaid",
+                  linux: "mkdir -p docs && touch docs/hybrid_flowchart.mermaid"
+                },
+                {
+                  label: "Nội dung cần đặt trong file",
+                  all: "flowchart TD\n  Q[User query] --> D{Cần dữ liệu thực tế hoặc nhiều bước?}\n  D -- Không --> C[Baseline Chatbot]\n  D -- Có --> A[ReAct Agent]\n  A --> T[Call tool]\n  T --> O[Observation]\n  O --> A\n  C --> F[Final answer]\n  A --> F"
+                },
+                {
+                  label: "Validate flowchart",
+                  all: "python -c \"from pathlib import Path; p=Path('docs/hybrid_flowchart.mermaid'); s=p.read_text(encoding='utf-8'); assert 'flowchart' in s and 'Chatbot' in s and 'ReAct' in s; print('PASS: hybrid flowchart')\""
+                }
+              ],
+              expected: {
+                summary: "Một sơ đồ render được, có nhánh Chatbot và ReAct.",
+                output: "PASS: hybrid flowchart"
+              },
+              deliverables: ["docs/hybrid_flowchart.mermaid (FILE MỚI)"]
+            },
+            {
+              id: "p4-audit",
+              title: "Cross-audit và chấm theo evidence",
+              owner: "Cả nhóm; Role 5 ghi nhận",
+              mode: "Song song",
+              knowledge: [
+                "Chấm Agent theo trace, không chỉ final answer.",
+                "Bốn trục: correctness, grounding, tool selection, termination.",
+                "Câu đơn giản có thể phù hợp Chatbot hơn Agent."
+              ],
+              instructions: [
+                "Nhóm khác đưa một câu bẫy chưa xuất hiện trong test cases.",
+                "Đội phòng thủ không sửa nóng; lưu trace trước.",
+                "Role 5 chấm 0–2 cho bốn tiêu chí và ghi bằng chứng."
+              ],
+              commands: [],
+              expected: {
+                summary: "Có biên bản cross-audit và kết luận path phù hợp.",
+                output: "Case: ...\nCorrectness: 0–2\nGrounding: 0–2\nTool selection: 0–2\nTermination: 0–2\nEvidence: ..."
+              },
+              deliverables: ["docs/trace_eval.md → cross-audit", "Một câu bẫy từ nhóm khác", "Điểm + evidence"]
+            },
+            {
+              id: "p4-submit",
+              title: "Validation cuối, security check và nộp bài",
+              owner: "Role 4 chạy; cả nhóm review",
+              mode: "Tuần tự cuối cùng",
+              knowledge: [
+                "Chỉ push sau khi tất cả lane đã merge và validation pass.",
+                "Không dùng <code>git add .</code> trước khi kiểm tra secrets.",
+                "Commit cuối phải chứa code, trace và flowchart."
+              ],
+              instructions: [
+                "Chạy toàn bộ validation trong mục Fast checks.",
+                "Xác minh <code>.env</code> đang bị ignore.",
+                "Review <code>git status --short</code>, rồi commit và push."
+              ],
+              commands: [
+                {
+                  label: "Security + review",
+                  all: "git check-ignore .env\ngit status --short"
+                },
+                {
+                  label: "Commit cuối",
+                  all: "git add config/test_cases.json src/tools.py src/prompts.py src/app.py docs/trace_eval.md docs/hybrid_flowchart.mermaid\ngit commit -m \"Hoan thanh Lab 03: Chatbot vs ReAct Agent E402\"\ngit push origin main"
+                }
+              ],
+              expected: {
+                summary: "Repo sạch secrets, đủ artifact và push thành công.",
+                output: ".env\n[main ...] Hoan thanh Lab 03: Chatbot vs ReAct Agent E402\n... main -> main"
+              },
+              deliverables: ["Link GitHub của nhóm", "5 file đã sửa", "1 file .mermaid mới", "Trace/report hoàn chỉnh"]
+            }
+          ]
+        }
+      ],
+      validations: [
+        {
+          title: "1. Input JSON",
+          description: "Ít nhất 5 items, đủ bốn key bắt buộc.",
+          command: "python -c \"import json; d=json.load(open('config/test_cases.json', encoding='utf-8')); assert len(d)>=5 and all({'id','category','question','expected_behavior'} <= set(x) for x in d); print('PASS:', len(d), 'test cases')\"",
+          expected: "PASS: 5 test cases"
+        },
+        {
+          title: "2. Tool error contract",
+          description: "Tool được đăng ký và input bẫy không crash.",
+          command: "python -c \"from src.tools import get_weather, AVAILABLE_TOOLS; assert 'get_weather' in AVAILABLE_TOOLS; assert get_weather('Atlantis').startswith('LỖI'); print('PASS: tools contract')\"",
+          expected: "PASS: tools contract"
+        },
+        {
+          title: "3. Prompt + guardrail",
+          description: "Có marker parse và giới hạn vòng lặp.",
+          command: "python -c \"from src.prompts import MAX_ITERATIONS, REACT_SYSTEM_PROMPT; assert MAX_ITERATIONS > 0; assert all(x in REACT_SYSTEM_PROMPT for x in ['Thought:', 'Action:', 'Final Answer:']); print('PASS: prompt contract')\"",
+          expected: "PASS: prompt contract"
+        },
+        {
+          title: "4. File mới hybrid flowchart",
+          description: "File tồn tại và chứa hai nhánh quyết định.",
+          command: "python -c \"from pathlib import Path; p=Path('docs/hybrid_flowchart.mermaid'); s=p.read_text(encoding='utf-8'); assert 'flowchart' in s and 'Chatbot' in s and 'ReAct' in s; print('PASS: hybrid flowchart')\"",
+          expected: "PASS: hybrid flowchart"
+        },
+        {
+          title: "5. Smoke/demo hiện có",
+          description: "Repo starter tải 5 cases và chạy case thứ ba.",
+          command: "python src/app.py",
+          expected: "✅ Đã tải thành công 5 Test Cases ..."
+        },
+        {
+          title: "6. Secret safety",
+          description: ".env phải được Git ignore.",
+          command: "git check-ignore .env",
+          expected: ".env"
+        }
+      ]
+    };
+
+    const defaultState = {
+      os: /Win/i.test(navigator.platform) ? "windows" : /Mac/i.test(navigator.platform) ? "macos" : "linux",
+      minutes: 150,
+      remaining: 150 * 60,
+      running: false,
+      endAt: null,
+      completed: {},
+      roles: {},
+      finalChecks: {},
+      focus: false
+    };
+
+    let state = loadState();
+    let timerId = null;
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LAB_CONFIG.storageKey) || "{}");
+        return {
+          ...defaultState,
+          ...saved,
+          completed: saved.completed || {},
+          roles: saved.roles || {},
+          finalChecks: saved.finalChecks || {}
+        };
+      } catch (_) {
+        return { ...defaultState, completed: {}, roles: {}, finalChecks: {} };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(LAB_CONFIG.storageKey, JSON.stringify(state));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function commandForOS(command) {
+      return command[state.os] || command.all || command.linux || command.macos || command.windows || "";
+    }
+
+    function commandBlock(label, code, expected = "") {
+      return `
+        <div class="command-block">
+          <div class="command-head">
+            <span>${escapeHtml(label)}</span>
+            <button class="copy-btn" type="button" data-copy="${encodeURIComponent(code)}">Copy</button>
+          </div>
+          <pre>${escapeHtml(code)}</pre>
+          ${expected ? `<div class="expected-output">${escapeHtml(expected)}</div>` : ""}
+        </div>`;
+    }
+
+    function listHtml(items, ordered = false) {
+      const tag = ordered ? "ol" : "ul";
+      return `<${tag}>${items.map(item => `<li>${item}</li>`).join("")}</${tag}>`;
+    }
+
+    function renderRoles() {
+      const target = document.getElementById("roleGrid");
+      target.innerHTML = LAB_CONFIG.roles.map(role => `
+        <article class="role-card" style="--role:${role.color}">
+          <span class="role-num">Role ${role.id}</span>
+          <h3>${role.title}</h3>
+          <code>${role.file}</code>
+          <input type="text" data-role-input="${role.id}" value="${escapeHtml(state.roles[role.id] || "")}" placeholder="Tên thành viên" aria-label="Tên thành viên Role ${role.id}">
+        </article>
+      `).join("");
+
+      target.querySelectorAll("[data-role-input]").forEach(input => {
+        input.addEventListener("input", () => {
+          state.roles[input.dataset.roleInput] = input.value;
+          saveState();
+        });
+      });
+    }
+
+    function renderTask(task) {
+      const commands = task.commands.map(command => commandBlock(command.label, commandForOS(command))).join("");
+      const completed = !!state.completed[task.id];
+      return `
+        <article class="task-card ${completed ? "completed" : ""} ${completed && state.focus ? "hidden-completed" : ""}" data-task-card="${task.id}" ${task.anchor ? `id="${task.anchor}"` : ""}>
+          <div class="task-top">
+            <input class="task-check" type="checkbox" data-task="${task.id}" ${completed ? "checked" : ""} aria-label="Đánh dấu hoàn thành ${escapeHtml(task.title)}">
+            <div class="task-title-wrap">
+              <span class="task-title">${task.title}</span>
+              <span class="task-owner">${task.owner}</span>
+            </div>
+            <span class="badge ${task.mode.includes("Song song") ? "parallel" : "sequential"} task-mode">${task.mode}</span>
+          </div>
+          <div class="task-grid">
+            <div class="task-panel knowledge">
+              <span class="panel-label">01 · Kiến thức</span>
+              ${listHtml(task.knowledge)}
+            </div>
+            <div class="task-panel instruction">
+              <span class="panel-label">02 · Hướng dẫn</span>
+              ${listHtml(task.instructions, true)}
+              ${commands ? `<div class="command-stack">${commands}</div>` : ""}
+            </div>
+            <div class="task-panel expected">
+              <span class="panel-label">03 · Expected outcome</span>
+              <p class="one-line">${task.expected.summary}</p>
+              <pre class="expected-output">${escapeHtml(task.expected.output)}</pre>
+            </div>
+            <div class="task-panel deliverable">
+              <span class="panel-label">04 · Deliverable</span>
+              <div class="deliverable-list">
+                ${task.deliverables.map(item => `<div class="deliverable-item">${item}</div>`).join("")}
+              </div>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function renderPhases() {
+      const target = document.getElementById("phaseContainer");
+      target.innerHTML = LAB_CONFIG.phases.map(phase => `
+        <article class="phase" id="phase-${phase.id}">
+          <div class="phase-head">
+            <div>
+              <span class="phase-id">Phase ${phase.id}</span>
+              <h3>${phase.title}</h3>
+              <p class="phase-summary">${phase.summary}</p>
+            </div>
+            <div class="phase-meta">
+              <span class="badge time">${phase.minutes} phút</span>
+              <span class="badge ${phase.mode.includes("Song song") ? "parallel" : "sequential"}">${phase.mode}</span>
+            </div>
+          </div>
+          <div class="gate"><strong>Checkpoint:</strong> ${phase.gate}</div>
+          <div class="task-list">${phase.tasks.map(renderTask).join("")}</div>
+        </article>
+      `).join("");
+
+      document.querySelectorAll("[data-task]").forEach(checkbox => {
+        checkbox.addEventListener("change", () => {
+          state.completed[checkbox.dataset.task] = checkbox.checked;
+          saveState();
+          renderPhases();
+          bindCopyButtons();
+          renderProgress();
+        });
+      });
+    }
+
+    function renderPhaseNav() {
+      const nav = document.getElementById("phaseNav");
+      nav.innerHTML = LAB_CONFIG.phases.map(phase => `
+        <a href="#phase-${phase.id}" data-phase-nav="${phase.id}">
+          <span class="nav-index">${phase.id}</span>
+          <span>${phase.title}</span>
+          <i class="nav-status"></i>
+        </a>
+      `).join("");
+    }
+
+    function renderProgress() {
+      const allTasks = LAB_CONFIG.phases.flatMap(phase => phase.tasks);
+      const done = allTasks.filter(task => state.completed[task.id]).length;
+      const percent = allTasks.length ? Math.round(done / allTasks.length * 100) : 0;
+      document.getElementById("progressRing").style.setProperty("--progress", `${percent * 3.6}deg`);
+      document.getElementById("progressPercent").textContent = `${percent}%`;
+      document.getElementById("progressCount").textContent = `${done}/${allTasks.length} task`;
+
+      LAB_CONFIG.phases.forEach(phase => {
+        const phaseDone = phase.tasks.every(task => state.completed[task.id]);
+        document.querySelector(`[data-phase-nav="${phase.id}"]`)?.classList.toggle("done", phaseDone);
+      });
+    }
+
+    function renderValidations() {
+      const target = document.getElementById("validationGrid");
+      target.innerHTML = LAB_CONFIG.validations.map(item => `
+        <article class="validation-card">
+          <h3>${item.title}</h3>
+          <p>${item.description}</p>
+          ${commandBlock("Copy command", item.command, `Expected: ${item.expected}`)}
+        </article>
+      `).join("");
+    }
+
+    function bindCopyButtons() {
+      document.querySelectorAll("[data-copy]").forEach(button => {
+        if (button.dataset.bound === "true") return;
+        button.dataset.bound = "true";
+        button.addEventListener("click", async () => {
+          const text = decodeURIComponent(button.dataset.copy);
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (_) {
+            const area = document.createElement("textarea");
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+          }
+          button.textContent = "Đã copy";
+          button.classList.add("copied");
+          showToast("Đã copy lệnh");
+          setTimeout(() => {
+            button.textContent = "Copy";
+            button.classList.remove("copied");
+          }, 1400);
+        });
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1700);
+    }
+
+    function renderSelectors() {
+      document.querySelectorAll("[data-os]").forEach(button => {
+        button.classList.toggle("active", button.dataset.os === state.os);
+      });
+
+      document.querySelectorAll("[data-minutes]").forEach(button => {
+        button.classList.toggle("active", Number(button.dataset.minutes) === state.minutes);
+      });
+    }
+
+    function initSelectors() {
+      document.querySelectorAll("[data-os]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.os = button.dataset.os;
+          saveState();
+          renderSelectors();
+          renderPhases();
+          bindCopyButtons();
+          showToast(`Đã chuyển lệnh sang ${button.textContent}`);
+        });
+      });
+
+      document.querySelectorAll("[data-minutes]").forEach(button => {
+        button.addEventListener("click", () => {
+          const minutes = Number(button.dataset.minutes);
+          if (state.running && !confirm("Đồng hồ đang chạy. Đổi timebox và đặt lại?")) return;
+          state.minutes = minutes;
+          state.remaining = minutes * 60;
+          state.running = false;
+          state.endAt = null;
+          saveState();
+          stopTimer();
+          renderSelectors();
+          renderTimer();
+        });
+      });
+    }
+
+    function renderTimer() {
+      if (state.running && state.endAt) {
+        state.remaining = Math.max(0, Math.ceil((state.endAt - Date.now()) / 1000));
+        if (state.remaining === 0) {
+          state.running = false;
+          state.endAt = null;
+          stopTimer();
+          showToast("Hết timebox — chuyển sang nộp trạng thái hiện tại");
+        }
+      }
+      const hours = Math.floor(state.remaining / 3600);
+      const minutes = Math.floor((state.remaining % 3600) / 60);
+      const seconds = state.remaining % 60;
+      document.getElementById("timerDisplay").textContent =
+        [hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":");
+      document.getElementById("timerToggle").textContent = state.running ? "Ⅱ" : "▶";
+      saveState();
+    }
+
+    function startTimer() {
+      state.running = true;
+      state.endAt = Date.now() + state.remaining * 1000;
+      timerId = setInterval(renderTimer, 1000);
+      renderTimer();
+    }
+
+    function stopTimer() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function initTimer() {
+      if (state.running && state.endAt && state.endAt > Date.now()) {
+        timerId = setInterval(renderTimer, 1000);
+      } else if (state.running) {
+        state.running = false;
+        state.endAt = null;
+      }
+      renderTimer();
+
+      document.getElementById("timerToggle").addEventListener("click", () => {
+        if (state.running) {
+          renderTimer();
+          state.running = false;
+          state.endAt = null;
+          stopTimer();
+          saveState();
+          renderTimer();
+        } else {
+          if (state.remaining <= 0) state.remaining = state.minutes * 60;
+          startTimer();
+        }
+      });
+
+      document.getElementById("timerReset").addEventListener("click", () => {
+        state.running = false;
+        state.endAt = null;
+        state.remaining = state.minutes * 60;
+        stopTimer();
+        saveState();
+        renderTimer();
+      });
+    }
+
+    function initFocus() {
+      const button = document.getElementById("focusToggle");
+      document.body.classList.toggle("focus-mode", state.focus);
+      button.setAttribute("aria-pressed", String(state.focus));
+      button.addEventListener("click", () => {
+        state.focus = !state.focus;
+        saveState();
+        document.body.classList.toggle("focus-mode", state.focus);
+        button.setAttribute("aria-pressed", String(state.focus));
+        renderPhases();
+        bindCopyButtons();
+      });
+    }
+
+    function initFinalChecks() {
+      document.querySelectorAll(".final-check").forEach((checkbox, index) => {
+        checkbox.checked = !!state.finalChecks[index];
+        checkbox.addEventListener("change", () => {
+          state.finalChecks[index] = checkbox.checked;
+          saveState();
+        });
+      });
+    }
+
+    function initReset() {
+      document.getElementById("resetProgress").addEventListener("click", () => {
+        if (!confirm("Xóa toàn bộ task đã đánh dấu và tên thành viên?")) return;
+        const os = state.os;
+        const minutes = state.minutes;
+        state = {
+          ...defaultState,
+          os,
+          minutes,
+          remaining: minutes * 60,
+          completed: {},
+          roles: {},
+          finalChecks: {}
+        };
+        saveState();
+        stopTimer();
+        location.reload();
+      });
+    }
+
+    function init() {
+      renderRoles();
+      renderPhaseNav();
+      renderPhases();
+      renderValidations();
+      renderProgress();
+      renderSelectors();
+      bindCopyButtons();
+      initFinalChecks();
+      renderTimer();
+    }
+
+    init();
+    initSelectors();
+    initTimer();
+    initFocus();
+    initReset();
+  </script>
+</body>
+</html>
