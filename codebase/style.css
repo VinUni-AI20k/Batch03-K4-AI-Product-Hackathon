@@ -367,18 +367,31 @@ header {
 /* Document Scroll Viewer */
 .doc-scroll-viewer {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding: 32px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 32px;
     scroll-behavior: smooth;
+    width: 100%;
+}
+
+.doc-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 32px;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
 }
 
 /* Vertical Slide Frame */
 .slide-frame {
     width: 820px;
+    max-width: 90vw;
     min-height: 480px;
     background: var(--card-cream);
     border: 1px solid var(--card-border);
