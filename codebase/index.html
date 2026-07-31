@@ -772,14 +772,12 @@ async function send(q, probe, cls){
   try{
     if(runBase){
       const p = buildBaseline(q);
-      /* Tiết kiệm quota: bug của Baseline là lỗi kiến trúc payload (mất prompt
-         history của user), không cần AI thật để chứng minh — luôn mô phỏng khi
-         bật saveQuota, dồn quota AI thật cho v2 (chỗ cần chứng minh chất lượng). */
-      const r = await callLLM(p.system, p.messages, 700, saveQuota);
+      /* Baseline luôn gọi đến API thật khi có key (bỏ qua saveQuota để kiểm chứng câu trả lời). */
+      const r = await callLLM(p.system, p.messages, 700);
       const g = grade(r.text, probe);
       trace.base = {...p, text:r.text, usage:r.usage, grade:g,
                     tokens:tok(p.system)+p.messages.reduce((a,m)=>a+tok(m.content),0), pass:g.pass};
-      if(S.key && S.provider!=="mock" && !saveQuota) trace.realCalls++;
+      if(S.key && S.provider!=="mock") trace.realCalls++;
       html += bubbleAns("base", r.text, p.meta, g);
     }
     if(runV2){
