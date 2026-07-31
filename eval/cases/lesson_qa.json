@@ -1,0 +1,42 @@
+[
+  {
+    "id": "lesson_qa_001",
+    "input": "Sau moi buoi hoc, quiz ngan de lam gi?",
+    "expected": {
+      "keywords": ["quiz", "ngan", "bonus"],
+      "reference_answer": "Cuoi buoi co mot quiz ngan de choi vui, mot so ban diem cao se duoc cong bonus."
+    },
+    "expected_citations": ["T04-014"],
+    "expected_tool_calls": ["retrieve_transcript"]
+  },
+  {
+    "id": "lesson_qa_002",
+    "input": "Khoi hoc nay tap trung build gi tren nen tang LLM?",
+    "expected": {
+      "keywords": ["build", "cong cu", "agent"],
+      "reference_answer": "Khoa hoc tap trung di sau vao phan LLM hon va build cac cong cu, build agent tren nen tang large language model."
+    },
+    "expected_citations": ["T04-003"],
+    "expected_tool_calls": ["retrieve_transcript"]
+  },
+  {
+    "id": "lesson_qa_003",
+    "input": "Tai sao giang vien noi du lieu quan trong hon mo hinh trong mot so bai toan?",
+    "expected": {
+      "keywords": ["du lieu", "quan trong", "mo hinh"],
+      "reference_answer": "Trong bai toan danh gia rui ro nguoi vay, ket qua thanh cong phu thuoc chu yeu vao du lieu, nhieu khi khong phai mo hinh."
+    },
+    "expected_citations": ["T04-005"],
+    "expected_tool_calls": ["retrieve_transcript"]
+  },
+  {
+    "id": "lesson_qa_004",
+    "input": "Neu he thong khong biet chac, no nen ung xu the nao?",
+    "expected": {
+      "keywords": ["bao", "gioi han", "user"],
+      "reference_answer": "He thong can bao ro tinh hinh hien tai cho user, dua ra gioi han, va van cho user mot cau tra loi thuyet phuc trong pham vi an toan."
+    },
+    "expected_citations": ["T03-020"],
+    "expected_tool_calls": ["retrieve_transcript"]
+  }
+]
