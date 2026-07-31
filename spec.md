@@ -64,8 +64,6 @@ Loại: [x] Tính năng mới
 │ AI Generate Retest                │
 │           ↓                       │
 │ Rule-based Retest Grading         │
-│           ↓                       │
-│ Mastery Achieved?                 │
 └──────────────┬───────────┬───────┘
                │ Yes       │ No
                ↓           ↓

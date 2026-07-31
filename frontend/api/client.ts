@@ -1,10 +1,14 @@
-// api/client.ts
-// Real backend integration — FastAPI at http://127.0.0.1:8000 (see backend/README.md).
-// No mock data below: every function calls a real endpoint. If the backend is
-// down or an AI call fails, these throw — callers surface the error, they do
-// not fall back to fake output.
+// Bypass ngrok warning pages for all API requests
+const originalFetch = window.fetch;
+window.fetch = async (input, init) => {
+  init = init || {};
+  const headers = new Headers(init.headers || {});
+  headers.set('ngrok-skip-browser-warning', 'true');
+  init.headers = headers;
+  return originalFetch(input, init);
+};
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'http://127.0.0.1:8000'; // ĐỔI THÀNH LINK NGROK BACKEND NẾU CHẠY TỪ XA (ví dụ: 'https://xxx.ngrok-free.dev')
 
 export interface QuizQuestion {
   id: string;

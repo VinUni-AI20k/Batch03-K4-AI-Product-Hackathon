@@ -65,11 +65,11 @@ export default function App() {
     <div style={{ maxWidth: state.phase === 'reteach' ? 1200 : 720, margin: '0 auto', padding: '32px 20px 60px', transition: 'max-width 0.15s ease' }}>
       <header style={{ textAlign: 'center', marginBottom: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         <img src={headerIcon} alt="logo" style={{ width: 88, height: 88, borderRadius: 12 }} />
-        <h1 className="font-display" style={{ fontSize: 32, margin: 0 }}>
+        <h1 className="font-display" style={{ fontSize: 40, margin: 0 }}>
           IllumiMATE
         </h1>
-        <p className="text-soft" style={{ fontSize: 14, marginTop: 4 }}>
-          your buddy-helf learning assistant
+        <p className="text-soft" style={{ fontSize: 18, marginTop: 4 }}>
+          Your Learning Buddy
         </p>
       </header>
 
