@@ -14,6 +14,7 @@ from ..vault import Vault
 from .assessment import Mastery
 from .external_ingest import ExternalIngestQueue
 from .flashcards import FlashcardStore
+from .media_gen import MediaGen
 from .memory import StudentMemory
 from .skills import SkillSet
 from .tools import build_tools
@@ -122,6 +123,7 @@ PUBLIC_DENY_TOOLS = {
     "save_concept", "update_memory", "update_soul", "read_soul", "update_student_memory",
     "log_assessment", "save_research_note", "flashcards",  # ghi dữ liệu của chủ agent — không cho web công khai
     "hoc_tu_nguon_ngoai",  # tool tải URL (SSRF-guard riêng) + ghi kho — chỉ chủ agent
+    "tao_am_thanh", "tao_anh",  # tốn phí/tài nguyên thật — chặn spam từ web công khai
 }
 
 
@@ -136,6 +138,10 @@ class TutorAgent:
         self.client = OpenAI(base_url=cfg.llm_base_url, api_key=cfg.llm_api_key or "chua-co-key")
         self.model = cfg.get("llm", "model")
         self.max_rounds = int(cfg.get("llm", "max_tool_rounds", default=8))
+        # Một số model "reasoning" (vd gpt-5.6-luna) BẮT BUỘC reasoning_effort khi dùng
+        # tool-calling trên /v1/chat/completions, còn model khác lại TỪ CHỐI tham số này
+        # (unrecognized argument) -> chỉ truyền khi admin khai báo rõ trong config.yaml.
+        self.reasoning_effort = str(cfg.get("llm", "reasoning_effort", default="") or "").strip()
         self.skills = SkillSet(cfg.path("agent", "skills_dir"))
         self.memory = StudentMemory(vault)
         # SOUL.md — nhân cách agent (thiết kế Vlearn Agent); đọc lại mỗi lượt nên sửa file là áp dụng ngay
@@ -154,10 +160,12 @@ class TutorAgent:
         self.mastery = Mastery(cfg.root)  # đánh giá ngầm: mức nắm vững theo chủ đề
         self.flashcards = FlashcardStore(cfg.root)  # thẻ ghi nhớ bền vững + SRS
         self.external = ExternalIngestQueue(cfg, vault, index)  # nạp kiến thức từ URL ngoài
+        self.media = MediaGen(cfg)  # sinh audio tiếng Việt (TTS) + ảnh minh hoạ, theo yêu cầu
         self.tool_schemas, self.tool_impls = build_tools(vault, index, cfg)
         self.tool_schemas += [self.skills.tool_schema(), self.memory.tool_schema(),
                               self.mastery.tool_schema(), self.flashcards.tool_schema(),
                               self.external.tool_schema()]
+        self.tool_schemas += self.media.tool_schemas()
         self.tool_schemas += self.addons.schemas()  # tools từ addons/ (gate bật/tắt lúc gọi)
         self.tool_schemas += [
             {
@@ -281,8 +289,11 @@ class TutorAgent:
         system_extra: str = "",
         origin: dict | None = None,  # {'platform': 'telegram'|'discord', 'chat_id': ...}
         trace: list | None = None,   # truyền list vào để nhận lại các bước: thought + tool calls
+        attachments: list | None = None,  # truyền list vào để nhận lại đường dẫn audio/ảnh vừa sinh
     ) -> str:
         """history: [{'role': 'user'|'assistant', 'content': ...}] các lượt gần nhất."""
+        if attachments is None:
+            attachments = []  # luôn có list thật để _run_tool append vào, không cần check None mỗi nơi
         # Gộp danh tính: 1 người chat qua nhiều kênh (Telegram/Discord/dashboard local)
         # -> 1 hồ sơ. Resolve NGAY ĐẦU, TRƯỚC khi đụng bất kỳ tầng memory nào, để hồ sơ/
         # mastery/flashcard/sessions log đều nhất quán dùng chung 1 ID gốc. KHÔNG áp cho
@@ -327,10 +338,11 @@ class TutorAgent:
                      if t.get("function", {}).get("name") not in PUBLIC_DENY_TOOLS
                      and not self.addons.owns(t.get("function", {}).get("name", ""))]
 
+        extra_kw = {"reasoning_effort": self.reasoning_effort} if self.reasoning_effort else {}
         for _ in range(self.max_rounds):
             try:
                 resp = self.client.chat.completions.create(
-                    model=self.model, messages=messages, tools=tools
+                    model=self.model, messages=messages, tools=tools, **extra_kw
                 )
             except Exception as e:
                 if not self.cfg.llm_api_key:
@@ -360,7 +372,7 @@ class TutorAgent:
                     messages.append({"role": "tool", "tool_call_id": call.id,
                                      "content": "⚠️ Tool này với đúng tham số này ĐÃ GỌI RỒI — kết quả ở trên. Đừng gọi lại; hoàn thành câu trả lời cho học viên ngay."})
                     continue
-                result = self._run_tool(call.function.name, call.function.arguments, user_id, display_name, origin)
+                result = self._run_tool(call.function.name, call.function.arguments, user_id, display_name, origin, attachments)
                 seen_calls[key] = True
                 if trace is not None:
                     trace.append({
@@ -378,7 +390,7 @@ class TutorAgent:
                          "Hết lượt dùng tool. Trả lời học viên NGAY bây giờ, đầy đủ nhất có thể "
                          "dựa trên các kết quả tool đã có ở trên."})
         try:
-            resp = self.client.chat.completions.create(model=self.model, messages=messages)
+            resp = self.client.chat.completions.create(model=self.model, messages=messages, **extra_kw)
             answer = resp.choices[0].message.content or ""
         except Exception as e:
             answer = f"⚠️ Lỗi khi tổng hợp câu trả lời: {e}"
@@ -388,7 +400,8 @@ class TutorAgent:
         self.sessions.log(user_id, "assistant", answer, (origin or {}).get("platform", ""))
         return answer
 
-    def _run_tool(self, name: str, arguments: str, user_id: str, display_name: str, origin: dict | None = None) -> str:
+    def _run_tool(self, name: str, arguments: str, user_id: str, display_name: str,
+                  origin: dict | None = None, attachments: list | None = None) -> str:
         # Web công khai: khoá tool tự động hoá / ghi dữ liệu (phòng khi model vẫn cố gọi).
         if _is_public(user_id) and (name in PUBLIC_DENY_TOOLS or name.startswith("discord_") or self.addons.owns(name)):
             return "⚠️ Tính năng này chỉ dùng khi chat riêng với chủ agent — bản web công khai chỉ hỗ trợ học & tra cứu (hỏi bài, tóm tắt, quiz, vẽ sơ đồ…)."
@@ -401,6 +414,16 @@ class TutorAgent:
             if name == "log_assessment":
                 return self.mastery.log(user_id, args.get("topic", ""),
                                         bool(args.get("correct")), args.get("note", ""))
+            if name == "tao_am_thanh":
+                msg, path = self.media.tts(args.get("text", ""))
+                if path and attachments is not None:
+                    attachments.append(path)
+                return msg
+            if name == "tao_anh":
+                msg, path = self.media.image(args.get("mo_ta", ""))
+                if path and attachments is not None:
+                    attachments.append(path)
+                return msg
             if name == "flashcards":
                 result, topic = self.flashcards.dispatch(user_id, args)
                 # chấm thẻ = một lần đánh giá ngầm -> mastery tự cập nhật, khỏi gọi 2 tool

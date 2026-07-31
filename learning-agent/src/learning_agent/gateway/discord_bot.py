@@ -172,6 +172,7 @@ class TutorBot(discord.Client):
 
         from .discord_actions import DiscordActions
         actions = DiscordActions(self, message.guild.id if message.guild else None, message.channel.id)
+        media: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh), agent.reply tự append vào
         async with target.typing():
             answer = await asyncio.to_thread(
                 self.agent.reply,
@@ -180,6 +181,7 @@ class TutorBot(discord.Client):
                 list(session),
                 self.pending.context(uid),
                 {"platform": "discord", "chat_id": target.id, "discord_actions": actions},
+                None, media,
             )
         session.append({"role": "assistant", "content": answer})
         # Có sơ đồ/mindmap (```mermaid) -> render ra PNG + HTML đính kèm (Discord không vẽ code được)
@@ -187,6 +189,7 @@ class TutorBot(discord.Client):
         from ..render import diagram_attachments
         _tmp = tempfile.mkdtemp()
         files, answer = await asyncio.to_thread(diagram_attachments, answer, _tmp)
+        files += media  # audio/ảnh vừa sinh, gửi kèm cùng đợt
         chunks = split_message(answer, MAX_LEN)
         # trả lời thẳng trong channel: reply (trích dẫn) tin học viên cho rõ đang đáp ai; DM/thread thì gửi thường
         for i, chunk in enumerate(chunks):

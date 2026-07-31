@@ -15,6 +15,7 @@ dependencies = [
     "uvicorn>=0.29",
     "ddgs>=6.0",                  # web search cho tool nghiên cứu (Reddit/GitHub dùng stdlib)
     "questionary>=2.0",           # wizard cấu hình tương tác (learning-agent config)
+    "edge-tts>=6.1",              # tạo audio tiếng Việt (giọng neural, miễn phí, không cần key riêng)
 ]
 
 [project.optional-dependencies]

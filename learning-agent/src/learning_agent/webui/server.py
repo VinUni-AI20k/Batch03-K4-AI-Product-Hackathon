@@ -389,9 +389,24 @@ def create_app(cfg, watch: bool = False) -> FastAPI:
         history = [m for m in body.history if m.get("role") in ("user", "assistant")][-12:]
         history.append({"role": "user", "content": body.question})
         trace: list = []
+        attachments: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh — luôn rỗng cho via_tunnel, tool bị chặn)
         uid = "chat-public" if via_tunnel else "admin-ui"
-        answer = agent.reply(uid, "Khách" if via_tunnel else "Admin", history, trace=trace)
-        return {"answer": answer, "trace": [] if via_tunnel else trace}
+        answer = agent.reply(uid, "Khách" if via_tunnel else "Admin", history,
+                             trace=trace, attachments=attachments)
+        media = []
+        for p in attachments:
+            try:
+                import base64
+                from pathlib import Path
+                data = Path(p).read_bytes()
+                ext = Path(p).suffix.lower()
+                mime = {".mp3": "audio/mpeg", ".png": "image/png", ".jpg": "image/jpeg"}.get(ext, "application/octet-stream")
+                kind = "audio" if mime.startswith("audio") else "image" if mime.startswith("image") else "file"
+                media.append({"kind": kind, "mime": mime, "name": Path(p).name,
+                              "data": base64.b64encode(data).decode("ascii")})
+            except Exception:
+                pass
+        return {"answer": answer, "trace": [] if via_tunnel else trace, "media": media}
 
     return app
 

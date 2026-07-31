@@ -811,6 +811,24 @@ function addTrace(trace) {
   log.appendChild(wrap);
   log.scrollTop = log.scrollHeight;
 }
+function addMedia(media) {
+  if (!media || !media.length) return;
+  const log = $('#chat-log');
+  media.forEach(m => {
+    const url = `data:${m.mime};base64,${m.data}`;
+    const div = document.createElement('div');
+    div.className = 'msg bot media-msg';
+    if (m.kind === 'audio') {
+      div.innerHTML = `<audio controls src="${url}" style="width:100%"></audio>`;
+    } else if (m.kind === 'image') {
+      div.innerHTML = `<img src="${url}" alt="${esc(m.name)}" style="max-width:100%;border-radius:10px;display:block">`;
+    } else {
+      div.innerHTML = `<a href="${url}" download="${esc(m.name)}">📎 ${esc(m.name)}</a>`;
+    }
+    log.appendChild(div);
+  });
+  log.scrollTop = log.scrollHeight;
+}
 function newSession() {
   chatHistory = [];
   $('#chat-log').innerHTML = '';
@@ -830,6 +848,7 @@ async function ask() {
     typing.remove();
     addTrace(data.trace);
     addMsg('bot', data.answer);
+    addMedia(data.media);
     chatHistory.push({role:'user', content:q}, {role:'assistant', content:data.answer});
   } catch (e) {
     typing.remove();
