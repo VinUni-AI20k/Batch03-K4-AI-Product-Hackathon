@@ -372,7 +372,76 @@ function changeHighlightColor(btn, colorHex, event) {
         '#f59e0b': 'rgba(253, 224, 71, 0.8)',
         '#10b981': 'rgba(110, 231, 183, 0.7)'
     };
+    mark.setAttribute('data-color', colorHex);
     mark.style.backgroundColor = bgMap[colorHex] || 'rgba(253, 224, 71, 0.8)';
+
+    const slideFrame = mark.closest('.slide-frame');
+    if (slideFrame) {
+        mergeAdjacentSameColorMarks(slideFrame);
+    }
+}
+
+function areSameColor(m1, m2) {
+    if (!m1 || !m2) return false;
+    const c1 = m1.getAttribute('data-color') || m1.style.backgroundColor;
+    const c2 = m2.getAttribute('data-color') || m2.style.backgroundColor;
+    if (c1 && c2 && c1 === c2) return true;
+    return getComputedStyle(m1).backgroundColor === getComputedStyle(m2).backgroundColor;
+}
+
+function mergeAdjacentSameColorMarks(container) {
+    if (!container) return;
+
+    let mergedAny = false;
+
+    do {
+        mergedAny = false;
+        const marks = Array.from(container.querySelectorAll('.custom-text-highlight'));
+
+        for (let i = 0; i < marks.length; i++) {
+            const mark = marks[i];
+            if (!mark.isConnected) continue;
+
+            let sibling = mark.nextSibling;
+            let spaceTextNode = null;
+
+            // Skip empty text nodes or handle single whitespace node between marks
+            while (sibling && sibling.nodeType === Node.TEXT_NODE && sibling.nodeValue.length === 0) {
+                sibling = sibling.nextSibling;
+            }
+
+            if (sibling && sibling.nodeType === Node.TEXT_NODE && sibling.nodeValue.trim().length === 0) {
+                spaceTextNode = sibling;
+                let nextEl = sibling.nextSibling;
+                while (nextEl && nextEl.nodeType === Node.TEXT_NODE && nextEl.nodeValue.length === 0) {
+                    nextEl = nextEl.nextSibling;
+                }
+                sibling = nextEl;
+            }
+
+            if (sibling && sibling.nodeType === Node.ELEMENT_NODE && sibling.classList.contains('custom-text-highlight')) {
+                if (areSameColor(mark, sibling)) {
+                    mark.querySelector('.hl-actions-badge')?.remove();
+                    sibling.querySelector('.hl-actions-badge')?.remove();
+
+                    if (spaceTextNode && spaceTextNode.isConnected) {
+                        mark.appendChild(spaceTextNode);
+                    }
+
+                    while (sibling.firstChild) {
+                        mark.appendChild(sibling.firstChild);
+                    }
+
+                    mark.normalize();
+                    mark.appendChild(createHighlightBadge());
+                    sibling.remove();
+
+                    mergedAny = true;
+                    break;
+                }
+            }
+        }
+    } while (mergedAny);
 }
 
 function removeSingleHighlight(btn, event) {
@@ -390,99 +459,126 @@ function unwrapMarkNode(mark) {
     parent.removeChild(mark);
 }
 
-// So sánh 1 điểm (container, offset) với 1 range, chỉ dùng API chuẩn (compareBoundaryPoints)
-// trả về: -1 = điểm nằm trước range, 0 = điểm nằm trong range, 1 = điểm nằm sau range
-function comparePointToRange(container, offset, range) {
-    const temp = document.createRange();
-    temp.setStart(container, offset);
-    temp.setEnd(container, offset);
-    const toStart = temp.compareBoundaryPoints(Range.START_TO_START, range);
-    if (toStart < 0) return -1;
-    const toEnd = temp.compareBoundaryPoints(Range.START_TO_END, range);
-    if (toEnd > 0) return 1;
-    return 0;
-}
-
-// Cắt 1 mark cũ theo vùng chọn mới (newRange):
-// - Phần nằm NGOÀI newRange (trái/phải) được giữ lại thành highlight cũ riêng biệt (giữ nguyên màu cũ)
-// - Phần nằm TRONG newRange được "tháo" (unwrap) ra khỏi mark cũ để nó thuộc về highlight mới sẽ tạo sau đó
-function splitMarkAroundRange(mark, newRange) {
-    const bgColor = mark.style.backgroundColor;
-    const existingBadge = mark.querySelector('.hl-actions-badge');
-    if (existingBadge) existingBadge.remove();
-
-    const markRange = document.createRange();
-    markRange.selectNodeContents(mark);
-
-    if (markRange.collapsed) {
-        unwrapMarkNode(mark);
-        return;
-    }
-
-    const startCmp = comparePointToRange(newRange.startContainer, newRange.startOffset, markRange);
-    const endCmp = comparePointToRange(newRange.endContainer, newRange.endOffset, markRange);
-
-    let leftRange = null, rightRange = null;
-
-    // Điểm bắt đầu của vùng chọn mới nằm trong mark cũ => có phần "trái" cần giữ lại
-    if (startCmp === 0) {
-        leftRange = document.createRange();
-        leftRange.setStart(markRange.startContainer, markRange.startOffset);
-        leftRange.setEnd(newRange.startContainer, newRange.startOffset);
-        if (leftRange.collapsed) leftRange = null;
-    }
-
-    // Điểm kết thúc của vùng chọn mới nằm trong mark cũ => có phần "phải" cần giữ lại
-    if (endCmp === 0) {
-        rightRange = document.createRange();
-        rightRange.setStart(newRange.endContainer, newRange.endOffset);
-        rightRange.setEnd(markRange.endContainer, markRange.endOffset);
-        if (rightRange.collapsed) rightRange = null;
-    }
-
-    // Trích phần phải trước (không ảnh hưởng offset của phần trái vì phần trái luôn đứng trước)
-    let rightFragment = null;
-    if (rightRange) rightFragment = rightRange.extractContents();
-
-    let leftFragment = null;
-    if (leftRange) leftFragment = leftRange.extractContents();
-
-    const parent = mark.parentNode;
-    // Phần còn lại trong mark chính là phần bị đè (giao với newRange) => tháo bỏ wrapper, giữ nguyên vị trí
-    const middleFragment = document.createDocumentFragment();
-    while (mark.firstChild) middleFragment.appendChild(mark.firstChild);
-
-    function makeMark(fragment) {
-        const m = document.createElement('mark');
-        m.className = 'custom-text-highlight';
-        m.style.backgroundColor = bgColor;
-        m.style.color = '#0f172a';
-        m.style.padding = '2px 4px';
-        m.style.borderRadius = '4px';
-        m.appendChild(fragment);
-        m.appendChild(createHighlightBadge());
-        return m;
-    }
-
-    if (leftFragment && leftFragment.textContent.length > 0) {
-        parent.insertBefore(makeMark(leftFragment), mark);
-    }
-    parent.insertBefore(middleFragment, mark);
-    if (rightFragment && rightFragment.textContent.length > 0) {
-        parent.insertBefore(makeMark(rightFragment), mark);
-    }
-    parent.removeChild(mark);
-}
-
-function cleanOverlappingMarks(range, slideFrame) {
+function processOverlappingMarks(range, slideFrame) {
     const marks = Array.from(slideFrame.querySelectorAll('.custom-text-highlight'));
+    const unwrappedNodes = [];
+
     marks.forEach(mark => {
         try {
-            if (range.intersectsNode(mark)) {
-                splitMarkAroundRange(mark, range);
+            if (!range.intersectsNode(mark)) return;
+
+            const colorAttr = mark.getAttribute('data-color');
+            const bgColor = mark.style.backgroundColor;
+
+            // Remove existing badge before computing ranges
+            const badge = mark.querySelector('.hl-actions-badge');
+            if (badge) badge.remove();
+
+            const markRange = document.createRange();
+            markRange.selectNodeContents(mark);
+
+            if (markRange.collapsed) {
+                unwrapMarkNode(mark);
+                return;
             }
-        } catch (e) { }
+
+            // Calculate exact intersection INSIDE mark:
+            // intersectStart is max(range.start, markRange.start)
+            let intersectStartContainer = range.startContainer;
+            let intersectStartOffset = range.startOffset;
+            if (range.compareBoundaryPoints(Range.START_TO_START, markRange) < 0) {
+                intersectStartContainer = markRange.startContainer;
+                intersectStartOffset = markRange.startOffset;
+            }
+
+            // intersectEnd is min(range.end, markRange.end)
+            let intersectEndContainer = range.endContainer;
+            let intersectEndOffset = range.endOffset;
+            if (range.compareBoundaryPoints(Range.END_TO_END, markRange) > 0) {
+                intersectEndContainer = markRange.endContainer;
+                intersectEndOffset = markRange.endOffset;
+            }
+
+            const intersectRange = document.createRange();
+            intersectRange.setStart(intersectStartContainer, intersectStartOffset);
+            intersectRange.setEnd(intersectEndContainer, intersectEndOffset);
+
+            // Left range (un-overlapped start section of mark)
+            const leftRange = document.createRange();
+            leftRange.setStart(markRange.startContainer, markRange.startOffset);
+            leftRange.setEnd(intersectRange.startContainer, intersectRange.startOffset);
+
+            // Right range (un-overlapped end section of mark)
+            const rightRange = document.createRange();
+            rightRange.setStart(intersectRange.endContainer, intersectRange.endOffset);
+            rightRange.setEnd(markRange.endContainer, markRange.endOffset);
+
+            const leftText = leftRange.toString();
+            const intersectText = intersectRange.toString();
+            const rightText = rightRange.toString();
+
+            const parent = mark.parentNode;
+
+            function makeOldMark(text) {
+                const m = document.createElement('mark');
+                m.className = 'custom-text-highlight';
+                if (colorAttr) m.setAttribute('data-color', colorAttr);
+                m.style.backgroundColor = bgColor;
+                m.style.color = '#0f172a';
+                m.style.padding = '2px 4px';
+                m.style.borderRadius = '4px';
+                m.appendChild(document.createTextNode(text));
+                m.appendChild(createHighlightBadge());
+                return m;
+            }
+
+            if (leftText && leftText.length > 0) {
+                parent.insertBefore(makeOldMark(leftText), mark);
+            }
+            if (intersectText && intersectText.length > 0) {
+                const textNode = document.createTextNode(intersectText);
+                parent.insertBefore(textNode, mark);
+                unwrappedNodes.push(textNode);
+            }
+            if (rightText && rightText.length > 0) {
+                parent.insertBefore(makeOldMark(rightText), mark);
+            }
+
+            parent.removeChild(mark);
+        } catch (e) {
+            console.error("Error processing overlapping mark:", e);
+        }
     });
+
+    return unwrappedNodes;
+}
+
+function getTextNodesInRange(range) {
+    const textNodes = [];
+    const root = range.commonAncestorContainer;
+
+    if (root.nodeType === Node.TEXT_NODE) {
+        textNodes.push(root);
+        return textNodes;
+    }
+
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode: function (node) {
+                if (node.parentElement && node.parentElement.closest('.hl-actions-badge')) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        }
+    );
+
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+    return textNodes;
 }
 
 function initTextHighlight() {
@@ -502,38 +598,84 @@ function initTextHighlight() {
         const slideFrame = container.closest('.slide-frame');
         if (!slideFrame) return;
 
-        // Clean up overlapping old highlight marks so the new highlight owns the overlapping section
-        cleanOverlappingMarks(range, slideFrame);
-
-        const activeSelection = window.getSelection();
-        if (!activeSelection || activeSelection.isCollapsed || activeSelection.rangeCount === 0) return;
-        const cleanRange = activeSelection.getRangeAt(0);
-
-        const mark = document.createElement('mark');
-        mark.className = 'custom-text-highlight';
-
         let bgMap = {
             '#f43f5e': 'rgba(253, 164, 175, 0.7)',
             '#2563eb': 'rgba(147, 197, 253, 0.7)',
             '#f59e0b': 'rgba(253, 224, 71, 0.8)',
             '#10b981': 'rgba(110, 231, 183, 0.7)'
         };
+        const activeBgColor = bgMap[currentDrawColor] || 'rgba(253, 224, 71, 0.8)';
 
-        mark.style.backgroundColor = bgMap[currentDrawColor] || 'rgba(253, 224, 71, 0.8)';
-        mark.style.color = '#0f172a';
-        mark.style.padding = '2px 4px';
-        mark.style.borderRadius = '4px';
+        // Process overlapping old marks and extract newly unwrapped nodes
+        const unwrappedNodes = processOverlappingMarks(range, slideFrame);
 
-        try {
-            cleanRange.surroundContents(mark);
-        } catch (err) {
-            const fragment = cleanRange.extractContents();
-            mark.appendChild(fragment);
-            cleanRange.insertNode(mark);
+        // Gather all target text nodes to highlight
+        let textNodesToHighlight = [];
+
+        if (range.startContainer.isConnected && range.endContainer.isConnected) {
+            textNodesToHighlight = getTextNodesInRange(range);
         }
 
-        mark.appendChild(createHighlightBadge());
-        activeSelection.removeAllRanges();
+        unwrappedNodes.forEach(node => {
+            if (node.isConnected && !textNodesToHighlight.includes(node)) {
+                textNodesToHighlight.push(node);
+            }
+        });
+
+        // Wrap each target text node in a new mark
+        for (let i = textNodesToHighlight.length - 1; i >= 0; i--) {
+            const node = textNodesToHighlight[i];
+            if (!node.isConnected || !node.nodeValue) continue;
+
+            let startOffset = 0;
+            let endOffset = node.nodeValue.length;
+
+            if (node === range.startContainer && range.startContainer.isConnected) {
+                startOffset = range.startOffset;
+            }
+            if (node === range.endContainer && range.endContainer.isConnected) {
+                endOffset = range.endOffset;
+            }
+
+            startOffset = Math.max(0, Math.min(startOffset, node.nodeValue.length));
+            endOffset = Math.max(0, Math.min(endOffset, node.nodeValue.length));
+
+            if (startOffset >= endOffset) continue;
+
+            const textChunk = node.nodeValue.substring(startOffset, endOffset);
+            if (!textChunk || textChunk.trim().length === 0) continue;
+
+            const subRange = document.createRange();
+            subRange.setStart(node, startOffset);
+            subRange.setEnd(node, endOffset);
+
+            const mark = document.createElement('mark');
+            mark.className = 'custom-text-highlight';
+            mark.setAttribute('data-color', currentDrawColor);
+            mark.style.backgroundColor = activeBgColor;
+            mark.style.color = '#0f172a';
+            mark.style.padding = '2px 4px';
+            mark.style.borderRadius = '4px';
+
+            try {
+                subRange.surroundContents(mark);
+                mark.appendChild(createHighlightBadge());
+            } catch (err) {
+                try {
+                    const fragment = subRange.extractContents();
+                    mark.appendChild(fragment);
+                    subRange.insertNode(mark);
+                    mark.appendChild(createHighlightBadge());
+                } catch (e) {
+                    console.error("Highlight subRange failed:", e);
+                }
+            }
+        }
+
+        // Auto-merge adjacent highlight marks of the same color into 1 mark
+        mergeAdjacentSameColorMarks(slideFrame);
+
+        selection.removeAllRanges();
     });
 }
 
