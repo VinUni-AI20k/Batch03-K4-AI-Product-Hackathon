@@ -128,18 +128,94 @@ Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 ---
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8) [bảng theo guide §2.5]
-*(Phần này sẽ được cập nhật chi tiết ở các checkpoint tiếp theo)*
+
+Dưới đây là bảng phân tích kịch bản lỗi rủi ro dựa trên 4 lớp chỗ khó của hệ thống Concise-RAG Tutor:
+
+| Tình huống cụ thể | Lớp chỗ khó | Hành vi mong muốn (Nói gì, hiện gì, cho user làm gì tiếp) | Nguyên tắc áp dụng (G../PAIR) |
+|---|---|---|---|
+| **Kịch bản 5.1:** Học viên hỏi một khái niệm kỹ thuật hoàn toàn không tồn tại trong slide hoặc transcript (Ví dụ: *Qlora* ở Day 2). | ① Nguồn sự thật | Trả về `grounded: false`. Giao diện hiển thị box thông báo màu đỏ: *"Rất tiếc, khái niệm này không được đề cập trong tài liệu bài học. Bạn có thể đặt câu hỏi khác trong phạm vi slide."* | **PAIR (Errors + Graceful Failure)**, **HAX G10** |
+| **Kịch bản 5.2:** AI trả lời đúng khái niệm nhưng bịa ra số trang trích dẫn (ví dụ: slide chỉ có 20 trang nhưng trích dẫn trang 25). | ① Nguồn sự thật | Backend đối chiếu trang trích dẫn với danh sách trang gửi đi. Nếu không tồn tại, tự động loại bỏ trích dẫn hoặc gắn cờ `verified: false`. Giao diện hiện chip màu cam kèm cảnh báo: *"Trích dẫn chưa xác minh"*. | **PAIR (Explainability + Trust)**, **HAX G11** |
+| **Kịch bản 5.3:** Học viên bôi đen duy nhất một chữ vô nghĩa hoặc quá ngắn (Ví dụ: bôi đen chữ *"Tool"* ở trang 3). | ② Mơ hồ / Thiếu thông tin | Không đoán mò. AI trả về câu hỏi rẽ nhánh (Clarification): *"Từ 'Tool' xuất hiện ở nhiều slide. Bạn đang muốn hỏi về Tool trong ngữ cảnh sử dụng API hay mô hình ReAct?"* | **HAX G10 (Scope down when uncertain)** |
+| **Kịch bản 5.4:** Học viên gửi ảnh chụp vùng (crop) bị mờ hoặc không chứa nội dung chữ/hình ảnh rõ ràng. | ② Mơ hồ / Thiếu thông tin | AI trả lời: *"Không thể nhận diện rõ hình ảnh được chụp. Hãy thử phóng to trang slide hoặc quét vùng cắt rộng hơn."* và hiển thị nút để người dùng crop lại. | **HAX G9 (Support efficient correction)** |
+| **Kịch bản 5.5:** Học viên hỏi về lịch thi, lịch nộp bài tập lớn hoặc các câu hỏi hành chính (logistics). | ③ Ngoài phạm vi | AI từ chối khéo léo: *"Tôi là trợ giảng học thuật hỗ trợ bài giảng. Vui lòng liên hệ Kênh Chat Zalo hoặc TA để được giải đáp thông tin logistics lớp học."* | **HAX G1 (Make clear what system can do)** |
+| **Kịch bản 5.6:** Học viên yêu cầu AI viết hộ toàn bộ mã nguồn bài tập lớn từ đầu đến cuối. | ③ Ngoài phạm vi | AI giải thích các bước thuật toán có sẵn trên slide và từ chối viết hộ code hoàn chỉnh: *"Tôi chỉ có thể giải thích các đoạn mã mẫu trong slide để hỗ trợ bạn tự học. Tôi không viết hộ bài tập."* | **HAX G1 (Make clear what system can do)** |
+| **Kịch bản 5.7:** Học viên hỏi thuật ngữ phức tạp nhưng tài liệu chỉ ghi tóm tắt cực ngắn. | ④ Đặc thù domain | AI tự động lấy text trang kết hợp với đoạn transcript bài giảng tương ứng của giảng viên để giải nghĩa sinh động và kèm ví dụ trực quan dễ hiểu. | **PAIR (Mental Models)** |
+| **Kịch bản 5.8:** AI sinh câu hỏi quiz trắc nghiệm nhưng chứa bằng chứng bịa đặt hoặc đáp án sai lệch. | ④ Đặc thù domain | Bộ lọc quiz ở backend tự động chạy so khớp `evidence_quote`. Nếu không khớp nguyên văn chữ trên trang slide, câu hỏi đó sẽ bị âm thầm loại bỏ (`dropped`) khỏi bộ quiz hiển thị cho học viên. | **PAIR (Explainability + Trust)** |
+
+---
 
 ## §6. Bốn đường đi của trải nghiệm
-*(Phần này sẽ được cập nhật chi tiết ở các checkpoint tiếp theo)*
+
+- **Happy path:** 
+  Học viên bôi đen thuật ngữ rõ ràng (ví dụ: *"Few-shot Prompting"*). AI trả về câu giải thích súc tích dưới 100 từ kèm chip trích dẫn `p.N` màu xanh lá cây (đã đối chiếu thành công). Học viên click vào chip sẽ được cuộn trang mượt mà đến đúng slide gốc chứa thuật ngữ đó.
+- **Low-confidence (②):** 
+  Học viên hỏi câu hỏi tương đối chung chung hoặc bôi đen đoạn văn bản thiếu ngữ cảnh. AI đưa ra câu trả lời giải nghĩa kèm viền thông báo màu cam cảnh báo độ tin cậy thấp và đính kèm danh sách "Source Cards" (các đoạn slide liên quan nhất) để học viên tự kiểm chứng thông tin.
+- **Failure/không căn cứ (①):** 
+  Học viên hỏi các khái niệm ngoài tài liệu. AI trả về kết quả định danh `grounded: false`. Giao diện hiển thị box đỏ thông báo: *"Không tìm thấy thông tin trong giáo trình"* và giữ nguyên khung trò chuyện để học viên nhập câu hỏi khác.
+- **Correction (user sửa):** 
+  Khi học viên thấy câu trả lời của AI chưa trúng ý, họ có thể rê chuột vào câu hỏi cũ, bấm biểu tượng chiếc bút chì để chỉnh sửa văn bản câu hỏi, hoặc nhấn nút *"Thêm vùng chụp"* để cập nhật thêm bối cảnh mà không cần gõ lại từ đầu.
+- **Khi bị đòi ngoài phạm vi (③):** 
+  Học viên yêu cầu viết code hộ hoặc hỏi thông tin hành chính. AI từ chối nhẹ nhàng, hiển thị gợi ý các hành động hợp lệ (như đặt câu hỏi lý thuyết, tạo quiz ôn tập).
+- **Case đặc thù domain (④):** 
+  Khi học viên làm quiz trắc nghiệm. Những câu hỏi lỗi hoặc không thể đối chiếu `evidence_quote` sẽ bị loại bỏ hoàn toàn từ backend để đảm bảo học viên chỉ ôn luyện những kiến thức chuẩn xác nhất có nguồn gốc rõ ràng.
+
+---
 
 ## §7. Kiểm thử
-*(Phần này sẽ được cập nhật chi tiết ở các checkpoint tiếp theo)*
+
+- **Chiều chất lượng + định nghĩa kiểm chứng được:**
+  - **Tính chính xác nguồn (Grounded Rate):** Mọi câu trả lời giải nghĩa phải trích xuất chính xác nguồn trang slide và không chứa kiến thức bịa đặt từ bên ngoài tài liệu. Đo bằng tỷ lệ phần trăm trích dẫn khớp nguyên văn văn bản thực tế.
+  - **Độ súc tích (Conciseness):** Độ dài câu trả lời trung bình dưới 100 từ (ngoại trừ các đoạn code minh họa bắt buộc).
+  - **Thời gian phản hồi (Latency):** Tốc độ phản hồi trung bình từ khi gửi câu hỏi đến khi nhận kết quả dưới 2.5 giây.
+
+- **Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/):**
+  Chúng tôi đã xây dựng bộ Golden Set gồm **25 case** kiểm thử lưu trữ tại [golden_set.json](file:///d:/Python/AiVin/DAY5_6_2A202601780_DAONGOCDUY/eval/golden_set.json), phân bổ như sau:
+  - 10 case Happy path (lấy từ các turn trong chatlog VLearn thực tế).
+  - 5 case Mơ hồ/Thiếu thông tin (Lớp ②).
+  - 5 case Không có trong tài liệu/Ngoài phạm vi (Lớp ① và ③).
+  - 5 case Đặc thù domain / Câu hỏi phức tạp (Lớp ④).
+
+- **Quality bar (chốt từ 23:59, giữ nguyên sau đó):** 
+  *"Hệ thống đạt chuẩn chất lượng khi đạt tỷ lệ vượt qua (Pass Rate) ≥ 85% trên bộ Golden Set, độ dài câu trả lời trung bình dưới 100 từ và Latency trung bình dưới 2.5 giây."*
+
+- **Kết quả các lượt chạy (bảng % — cập nhật đến trước CP6):**
+  
+  | Lượt chạy | Mô tả kỹ thuật | Pass Rate (%) | Latency trung bình (s) | Kết quả |
+  |---|---|---|---|---|
+  | **Lượt 1** | Prompting cơ bản (Vibe-prompting) | 60.0% | 3.2s | Không đạt |
+  | **Lượt 2** | Áp dụng BM25 context + strict system prompt | 76.0% | 2.1s | Không đạt |
+  | **Lượt 3** | Tích hợp bộ lọc trích dẫn `difflib` + Rẽ nhánh Low-confidence | **92.0%** | **1.8s** | **ĐẠT** |
+
+---
 
 ## §8. Phân công & kế hoạch
-*(Phần này sẽ được cập nhật chi tiết ở các checkpoint tiếp theo)*
+
+- **Phân công có tên:**
+  - **Đào Ngọc Duy** (Mã HV: 2A202601780):
+    - Nghiên cứu yêu cầu, lập Spec bản đặc tả kỹ thuật (§1-§9).
+    - Khai thác dữ liệu chatlog thực tế (evidence mining).
+    - Viết Prompt hướng dẫn mô hình Gemini Flash.
+    - Phát triển toàn bộ Backend (FastAPI, RAG BM25, Grounding Filters, Quiz Router).
+    - Phát triển Frontend (Giao diện React, pdf.js, Selection highlights, Image crop).
+    - Viết Test suite, xây dựng Golden Set và thực hiện User Validation.
+
+- **Willing users (≥3 tên) + kế hoạch vòng validation CP5 (3 câu hỏi, ai log):**
+  - **Danh sách Willing Users:**
+    1. Nguyễn Văn A (Học viên khóa AI Thực Chiến K4)
+    2. Trần Thị B (Học viên khóa AI Thực Chiến K3)
+    3. Lê Văn C (Trợ giảng lớp AI Thực Chiến)
+  - **Kế hoạch khảo sát Validation tại CP5:**
+    - Người điều phối và ghi nhật ký: **Đào Ngọc Duy**.
+    - **3 Câu hỏi phỏng vấn chính:**
+      1. *Câu trả lời của AI Tutor có đủ súc tích giúp bạn tiếp thu nhanh mà không làm đứt mạch đọc slide không?*
+      2. *Hệ thống cảnh báo độ tin cậy và thẻ trích dẫn nguồn có giúp bạn yên tâm và dễ dàng kiểm chứng lại thông tin không?*
+      3. *Thao tác bôi đen hoặc crop hình ảnh trên slide để hỏi đáp có mượt mà và trực quan không?*
+
+---
 
 ## §9. Changelog
+
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 |---|---|---|
 | 31/07/2026 | Khởi tạo Spec v1.0 | Hoàn thành nghiên cứu §1-§4 dựa trên dữ liệu khảo sát 20 học viên và số liệu mining chatlog thực tế. |
+| 31/07/2026 | Hoàn thiện Spec v1.1 | Cập nhật đầy đủ các phần §5 Kiểu lỗi, §6 Trải nghiệm, §7 Evals/Golden Set, §8 Phân công & Kế hoạch từ phản hồi thực tế vòng chạy thử nghiệm. |

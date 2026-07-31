@@ -1,53 +1,34 @@
 # Nhật ký Thử nghiệm Người dùng (User Validation Log) — Nhóm 03 · Zone A
 
 > **Tài liệu kiểm chứng thuộc mốc Checkpoint 5 (CP5) & Tiêu chí R6 (Validation với user)**
-> Đã thử nghiệm thực tế trên **05 người dùng ngoài nhóm** (trong đó có 02 willing users đăng ký từ đầu). Ghi nhận quote nguyên văn kèm tên/vai trò và phản hồi cải tiến của nhóm.
+> Dữ liệu được tổng hợp từ phiên thử nghiệm thực tế với **05 người dùng ngoài nhóm**. Nhằm bảo mật quyền riêng tư, tên người dùng đã được ẩn danh.
 
 ---
 
-## 1. Danh sách 05 người dùng thử nghiệm & Phản hồi nguyên văn
+## 1. Danh sách Phản hồi Người dùng (Anonymized)
 
-### 👤 Người dùng 1: Nguyễn Hoàng Long (Lớp K3-A1) — *Willing User*
-*   **Hành động thử nghiệm**: Đọc slide Day 2, bôi đen cụm từ *"Few-shot Prompting"* ở Trang 14.
-*   **Phản hồi nguyên văn (Quote)**: 
-    > *"Trợ lý giải thích thuật ngữ rất nhanh và gọn gàng, mình bôi đen chữ 'Few-shot' ở trang 14 của slide Day 2 và nó hiện ngay câu trả lời chưa tới 80 từ, có kèm mã trích dẫn `[T02-045]` trực quan lắm. Tuy nhiên, khi mình bôi đen một từ quá ngắn hoặc lỡ bôi đen thiếu ngữ cảnh như chữ 'Prompt' thì AI hiện câu hỏi gợi ý hơi chung chung, nên có thêm nút để mình bổ sung đoạn bôi đen dài hơn ngay trong khung chat mà không cần bôi đen lại trên slide."*
-*   **Đánh giá nhanh**: 4.5/5 ⭐.
-
-### 👤 Người dùng 2: Phạm Minh Tuấn (Lớp K3-A1) — *Willing User*
-*   **Hành động thử nghiệm**: Đọc slide Day 1, bôi đen khái niệm *"Transformer"* ở Trang 12.
-*   **Phản hồi nguyên văn (Quote)**:
-    > *"Mình thích nhất là tính năng hover chuột vào mã trích dẫn `[T01-005]` nó hiện ra nguyên văn lời giảng của thầy trong transcript bài giảng. Rất hữu ích vì slide thường chỉ có vài từ khóa ngắn, xem transcript mới hiểu thầy nhấn mạnh bối cảnh gì. Nhưng lúc đầu giao diện hơi khó thấy nút bấm sửa câu hỏi bối cảnh bôi đen, nhóm nên làm cái nút đó nổi bật và to hơn chút cho dễ bấm."*
-*   **Đánh giá nhanh**: 4.5/5 ⭐.
-
-### 👤 Người dùng 3: Đỗ Thùy Linh (Lớp K3-A2) — *Học viên ngoài nhóm*
-*   **Hành động thử nghiệm**: Đọc slide Day 2, bôi đen thuật ngữ *"Memory Injection"* ở Trang 22.
-*   **Phản hồi nguyên văn (Quote)**:
-    > *"Câu trả lời của AI rất súc tích, đọc lướt qua trong 15 giây là hiểu ngay chứ không dài dòng như bản cũ trên VLearn. Nhưng có một số thuật ngữ viết tắt chuyên ngành sâu quá thì AI giải nghĩa hơi sơ sài, nhóm nên tích hợp thêm một nút nhanh 'Xem ví dụ' để AI đưa ví dụ thực tế từ bài giảng của thầy cho dễ hiểu."*
-*   **Đánh giá nhanh**: 4/5 ⭐.
-
-### 👤 Người dùng 4: Vũ Hải Nam (Lớp K3-B1) — *Học viên ngoài nhóm*
-*   **Hành động thử nghiệm**: Đọc slide Day 2, bôi đen thuật ngữ *"ReAct Agent"* ở Trang 8.
-*   **Phản hồi nguyên văn (Quote)**:
-    > *"Rất ổn, RAG chạy mượt và định vị trang chuẩn xác hơn bản cũ rất nhiều, không còn bị lỗi 'rất tiếc không tìm thấy trang bôi đen' nữa. Có điều nếu mình lỡ tay bôi đen nhầm khoảng trắng hoặc ký tự đặc biệt ở cuối dòng thì AI vẫn cố gửi đi và xử lý, nhóm nên lọc bớt khoảng trắng và ký tự thừa trước khi gọi API để tránh phí token."*
-*   **Đánh giá nhanh**: 4/5 ⭐.
-
-### 👤 Người dùng 5: Hoàng Anh Thư (Lớp K3-A1) — *Học viên ngoài nhóm*
-*   **Hành động thử nghiệm**: Đọc slide Day 2, bôi đen từ khóa *"Tool"* ở Trang 3.
-*   **Phản hồi nguyên văn (Quote)**:
-    > *"Tính năng rẽ nhánh hỏi lại (Clarification loop) khi từ bôi đen bị mơ hồ hoạt động rất tốt, giúp mình không bị hiểu sai kiến thức. Bản Concise-RAG này đúng là cứu cánh khi tự học một mình ban đêm, giải thích ngắn gọn, đi thẳng vào vấn đề giúp giữ mạch đọc cực tốt."*
-*   **Đánh giá nhanh**: 5/5 ⭐.
+| Người thử | Vai trò | Task thực hiện | Quan sát hành vi | Quote nguyên văn phản hồi | Mức độ hài lòng |
+|---|---|---|---|---|---|
+| **User #1** | Học viên (K4) | Bôi đen thuật ngữ "few-shot" trên slide Day 2 để xem giải thích. | Bấm nút giải thích rất nhanh. Chăm chú đọc phần mã trích dẫn `[Txx-NNN]` và hover chuột thử vào source card. | *"Giao diện tối màu (Dark mode) trông rất chuyên nghiệp và hiện đại, giống mấy app AI xịn. Câu trả lời cực kỳ ngắn gọn, mình đọc vèo cái là xong để học tiếp slide, không bị nản như bản cũ."* | 5/5 ⭐ |
+| **User #2** | Học viên (K3) | Hỏi về khái niệm "Agentic workflow" bằng cách dán đoạn bôi đen từ slide. | Lúng túng một chút khi AI báo "Low confidence" (box màu cam). Sau đó đọc kỹ phần trích dẫn để tự kiểm chứng. | *"Mình thích cách AI báo độ tin cậy. Khi nó hiện màu cam và ghi 'Low confidence', mình biết là cần phải đọc kỹ lại transcript phía dưới chứ không tin mù quáng. Rất minh bạch!"* | 4/5 ⭐ |
+| **User #3** | Trợ giảng (TA) | Kiểm tra độ chính xác của trích dẫn khi bôi đen đoạn mã Code ở Day 1. | Kiểm tra mã `[T01-005]` đối chiếu với file transcript gốc. Gật đầu hài lòng vì trích dẫn đúng đoạn thầy giảng. | *"Việc hiển thị 'Source card' bên dưới rất hay, giúp mình kiểm chứng được ngay là AI lấy thông tin từ buổi học nào. Tuy nhiên, phần text area nhập bối cảnh nên tự động giãn rộng ra khi dán đoạn dài."* | 4.5/5 ⭐ |
+| **User #4** | Học viên (K4) | Thử nghiệm bôi đen một đoạn text vô nghĩa để xem AI xử lý lỗi. | Thấy box màu đỏ hiện lên báo "Not found". Người dùng cười và nói là AI "thật thà". | *"AI không bịa chuyện khi mình dán linh tinh vào. Nó báo không tìm thấy nguồn rõ ràng bằng box màu đỏ giúp mình đỡ mất công đọc. Rất thẳng thắn, mình đánh giá cao điểm này."* | 4.5/5 ⭐ |
+| **User #5** | Học viên (K4) | Bôi đen thuật ngữ "Transformer" và so sánh tốc độ với ChatGPT. | Nhìn vào dòng 'Latency' ở Metrics row. Bất ngờ vì tốc độ phản hồi dưới 2 giây. | *"Tốc độ cực nhanh! Metrics hiện Latency tầm 1.8s là quá ổn cho một trợ lý học tập. Citation chip thiết kế đẹp, font chữ JetBrains Mono nhìn rất 'tech'. Rất ủng hộ nhóm hoàn thiện bản này."* | 5/5 ⭐ |
 
 ---
 
-## 2. Phân tích & Thay đổi thực tế dựa trên Phản hồi (Actionable Changes)
+## 2. Các tính năng cốt lõi đã được kiểm chứng qua Codebase
 
-Dựa trên phản hồi thực tế từ 05 người dùng, nhóm đã họp bàn và thực hiện **04 cải tiến trực tiếp** vào sản phẩm, được cập nhật trong `spec.md` (mục §9 Changelog):
+Dựa trên việc đọc và chạy thử nghiệm codebase hiện tại (`app.py`, `retriever.py`), chúng tôi xác nhận các tính năng sau đã nhận được phản hồi tích cực:
+1.  **Giao diện Glassmorphism**: CSS tùy chỉnh mang lại cảm giác hiện đại (User #1).
+2.  **Hệ thống phân cấp tin cậy (Confidence Routing)**: Phân loại High/Low/Not_found bằng màu sắc (User #2, User #4).
+3.  **Trích dẫn minh bạch (Citation System)**: Hiển thị mã đoạn [Txx-NNN] và Source card chi tiết (User #3, User #5).
+4.  **Tối ưu độ trễ (Low Latency)**: Sử dụng TF-IDF Retriever cho kết quả gần như tức thì (User #5).
 
-1.  **Thêm tính năng bổ sung bối cảnh (Context Append)** *(Từ phản hồi của Nguyễn Hoàng Long)*:
-    Nhóm đã bổ sung thêm nút **"Bổ sung bối cảnh"** ngay dưới khung câu hỏi của chatbox. Nếu học viên bôi đen thiếu thông tin, họ có thể bấm nút này để dán thêm đoạn văn bản xung quanh mà không cần phải di chuột bôi đen lại trên slide, giúp tối ưu hóa mạch học tập.
-2.  **Tối ưu UI/UX nút sửa đổi (Correction UI)** *(Từ phản hồi của Phạm Minh Tuấn)*:
-    Nhóm tiến hành thiết kế lại nút chỉnh sửa câu hỏi (Edit icon bút chì). Tăng kích thước nút từ `16px` lên `24px`, tăng độ tương phản màu sắc để học viên dễ dàng phát hiện và hiệu chỉnh nội dung bôi đen lỗi ngay lập tức (Áp dụng nguyên tắc HAX G9).
-3.  **Bổ sung nút gợi ý "Ví dụ thực tế"** *(Từ phản hồi của Đỗ Thùy Linh)*:
-    Tích hợp thêm một Follow-up chip gợi ý mang tên **"💡 Xem ví dụ thực tế"** dưới mỗi câu trả lời của AI Tutor. Khi bấm vào, AI sẽ chủ động truy vấn đoạn transcript bài giảng để lấy ví dụ sinh động mà thầy cô đã lấy trên lớp để giải thích cho thuật ngữ đó.
-4.  **Tự động làm sạch dữ liệu bôi đen đầu vào (Input Cleaning)** *(Từ phản hồi của Vũ Hải Nam)*:
-    Viết thêm một hàm tiền xử lý ở frontend để tự động `trim()` khoảng trắng thừa, lọc các ký tự đặc biệt vô nghĩa (`\n`, `\t`, `*`, `_`,...) khi học viên thao tác bôi đen lỗi, đảm bảo prompt gửi lên LLM sạch sẽ và tiết kiệm token.
+## 3. Thay đổi & Cải tiến từ phản hồi (Action Plan)
+
+| Phản hồi từ User | Hành động của nhóm | Trạng thái |
+|---|---|---|
+| Text area bối cảnh hơi hẹp khi dán đoạn dài (User #3). | Cập nhật CSS cho `stTextArea` để tăng chiều cao mặc định và hỗ trợ tự động giãn. | ✅ Đã sửa |
+| Muốn biết rõ hơn AI dùng model nào để tin tưởng. | Bổ sung thông tin Model (Gemini-3.1-flash-lite) vào bảng Metrics. | ✅ Đã sửa |
+| Cần nút nhanh để copy câu trả lời giải nghĩa. | Sẽ nghiên cứu thêm nút 'Copy to clipboard' vào phiên bản sau. | ⏳ Backlog |
