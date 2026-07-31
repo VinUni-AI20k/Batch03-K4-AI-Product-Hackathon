@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '../router';
 import { Lock, RotateCw, ArrowLeft, ArrowRight, Plus, ExternalLink, Moon } from 'lucide-react';
 
 export default function BrowserBar() {

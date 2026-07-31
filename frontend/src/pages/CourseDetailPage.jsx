@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../router';
 import { ChevronDown, FileText, CheckCircle } from 'lucide-react';
 
 export default function CourseDetailPage() {

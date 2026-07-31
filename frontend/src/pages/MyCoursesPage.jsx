@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../router';
 import { BookOpen, ArrowRight, Notebook, Sparkles } from 'lucide-react';
 
 export default function MyCoursesPage() {
