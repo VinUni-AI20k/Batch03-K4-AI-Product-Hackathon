@@ -1,22 +1,22 @@
 ---
 course: packs
-generated: '2026-07-30T10:39:49+00:00'
+generated: '2026-07-31T18:28:44+00:00'
 lang: vi
 lesson: day04-prompt-engineering-tool-calling
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/slides/day04-prompt-engineering-tool-calling.md
-source_hash: sha256:29d68f1da628027c757e87c97ab479f6ea2b0b3e189df55e48d7b384ff76128e
+source_file: packs\vlearn-pack\vlearn-pack\slides\day04-prompt-engineering-tool-calling.md
+source_hash: sha256:0dc28a3ff66772df5141657c8a9ea4b676d9b629619a0b9bc38131198c6f93c7
 type: lesson-note
 ---
 
 ```markdown
 ## Slide 1 — Prompt Engineering & Tool Calling
-Giới thiệu về prompt engineering và việc gọi tool trong AI, tập trung vào cách giao tiếp để AI hiểu đúng ý người dùng. <!-- src: ... -->
+Làm sao nói để AI hiểu đúng ý? 
 
 ## Slide 2 — Hãy Suy Nghĩ...
-Câu hỏi suy ngẫm: “Tại sao hai người hỏi AI cùng một việc có thể nhận phản hồi khác nhau?” và sự khác biệt trong việc gọi tool. Giữ câu hỏi này trong đầu khi học bài hôm nay. <!-- src: ... -->
+“Hai người hỏi AI cùng một việc, một người nhận kết quả xuất sắc, người kia nhận rác. Tại sao? Và: cùng một agent, đôi khi nó gọi tool đúng, đôi khi gọi sai — do prompt hay do tool?” Giữ câu hỏi này trong đầu khi học bài hôm nay.
 
 ## Slide 3 — Nội Dung Bài Học
 1. [[prompt-fundamentals]]
@@ -27,254 +27,240 @@ Câu hỏi suy ngẫm: “Tại sao hai người hỏi AI cùng một việc có
 6. [[tool-calling]]
 7. [[design-principles-cho-tools]]
 8. [[tool-patterns-error-handling]]
-9. Thực hành Lab 4 + deliverable cuối buổi. <!-- src: ... -->
+9. Lab 4 + deliverable cuối buổi
 
 ## Slide 4 — Mục Tiêu Ngày 4
-Mục tiêu buổi học:
-- Viết prompt rõ ràng với các thành phần [[role]], [[task]], [[context]], [[format]].
-- Hiểu khi nào nên dùng các phương pháp zero-shot, few-shot, và CoT.
-- Viết được system prompt sản xuất cho agent.
-- Khai báo được [[tool-schema]] và hiểu vòng lặp tool calling từ model đến tool và trở lại model.
-- Nhận diện [[prompt-injection]] và viết system prompt an toàn.
-- Biết cách lặp lại và đánh giá chất lượng prompt. <!-- src: ... -->
+- Viết được prompt rõ ràng theo các thành phần [[Role]], [[Task]], [[Context]], [[Format]].
+- Hiểu khi nào nên dùng [[zero-shot]], [[few-shot]], [[CoT]], và khi nào không cần.
+- Viết được [[system-prompt-production-grade]] cho agent.
+- Khai báo được [[tool-schema]] và hiểu vòng lặp [[tool-calling]] từ model đến tool rồi quay lại model.
+- Nhận diện được [[prompt-injection]] và viết [[system-prompt-an-toàn]].
+- Biết cách iterate và evaluate [[prompt-quality]].
 
 ## Slide 5 — Deliverable Cuối Ngày
-Yêu cầu cuối buổi: 1 script agent hoạt động, 1 system prompt, 2 tool schemas, 5 câu hỏi kiểm tra, ghi chú lỗi prompt/tool/control flow, và checklist tự đánh giá. <!-- src: ... -->
+1 agent script chạy được + 1 system prompt + 2 tool schemas + 5 test questions + ghi chú lỗi prompt/tool/control flow + checklist self-review.
 
 ## Slide 6 — Prompt Engineering Fundamentals
-[[Prompt]] tốt không phải là prompt "hay", mà là prompt tạo ra hành vi mong muốn một cách ổn định. <!-- src: ... -->
+Prompt tốt không phải prompt “hay”, mà là prompt tạo ra hành vi mong muốn ổn định.
 
 ## Slide 7 — Prompt = Interface Giữa Ý Định và Khả Năng Model
-Prompt kém: “Viết email cho tôi” - không rõ nội dung. Prompt tốt: “Viết email xin lỗi khách hàng về việc giao hàng trễ 2 ngày, tone lịch sự, dưới 120 từ.” Nguyên tắc vàng: Rõ ràng hơn là tinh vi. <!-- src: ... -->
+Ví dụ prompt kém: "Viết email cho tôi" không rõ ràng. Ví dụ prompt tốt: "Viết email xin lỗi khách hàng về giao hàng trễ 2 ngày, tone lịch sự, dưới 120 từ, có [[CTA rõ ràng]]". Nguyên tắc vàng: Specificity beats cleverness.
 
 ## Slide 8 — 4 Thành Phần Của Prompt Tốt
-1. [[role]]: Vai trò.
-2. [[task]]: Nhiệm vụ.
-3. [[context]]: Bối cảnh.
-4. [[format]]: Định dạng.
-Bắt đầu với [[task]] + [[format]], chỉ thêm [[role]] hoặc [[context]] khi cần thiết. <!-- src: ... -->
+- [[ROLE]]: "Act as a senior support analyst"
+- [[TASK]]: "Summarize the ticket and propose next step"
+- [[CONTEXT]]: "For an internal operations dashboard"
+- [[FORMAT]]: "Output as JSON with 3 fields"
 
 ## Slide 9 — RTCF Deep Dive: Ví Dụ Thực Tế
-Ví dụ tốt và kém cho mỗi thành phần prompt. Mỗi thành phần thêm vào prompt phải có lý do rõ ràng. <!-- src: ... -->
+Ví dụ tốt và kém cho các thành phần [[ROLE]], [[TASK]], [[CONTEXT]], và [[FORMAT]]. Mỗi component thêm vào prompt phải có lý do rõ ràng.
 
 ## Slide 10 — Prompt Iteration: Từ Kém → Tốt → Xuất Sắc
-Quá trình lặp lại: Viết → test → observe → improve. Không ai viết prompt hoàn hảo lần đầu. <!-- src: ... -->
+Ví dụ về sự cải thiện từ prompt kém đến xuất sắc. Prompt engineering là quá trình lặp lại: viết → test → observe → improve.
 
 ## Slide 11 — Instruction vs Conversation vs System Prompt
-Loai prompt với mục đích và cách sử dụng khác nhau: 
-- Instruction prompt: Ra lệnh cho tác vụ. 
-- Conversation prompt: Duy trì ngữ cảnh tương tác. 
-- System prompt: Định nghĩa quy tắc, ranh giới, và hợp đồng đầu ra. <!-- src: ... -->
+- [[Instruction-prompt]]: Ra lệnh trực tiếp cho một tác vụ.
+- [[Conversation-prompt]]: Giữ ngữ cảnh nhiều lượt với user.
+- [[System-prompt]]: Đặt policy, boundary, output contract.
 
 ## Slide 12 — Negative Prompting & Boundary Setting
-Nói rõ thay thế và yêu cầu tích cực thay vì chỉ nói "đừng". Nhấn mạnh tầm quan trọng của positive alternatives. <!-- src: ... -->
+Chỉ nói "đừng" kém, nói rõ thay thế tốt hơn.
 
 ## Slide 13 — Token Budget Awareness
-Prompt dài hơn không đồng nghĩa với prompt tốt hơn. Hãy tối ưu độ rõ và khả năng kiểm soát. <!-- src: ... -->
+Prompt dài hơn không đồng nghĩa prompt tốt hơn. Ưu tiên: instruction rõ, examples đúng chỗ, output contract rõ.
 
 ## Slide 14 — Temperature & Sampling Parameters
-Lưu ý về việc thiết lập tham số nhiệt độ cho các trường hợp sử dụng khác nhau. Không thay thế cho prompt tốt. <!-- src: ... -->
+Những giá trị temperature khác nhau cho các use case khác nhau. Temperature không thay thế prompt tốt.
 
 ## Slide 15 — Quick Exercise: Viết Prompt Theo RTCF
-Viết prompt cho chatbot hỗ trợ sinh viên VinUni. Xác định 4 thành phần: [[role]], [[task]], [[context]], [[format]]. <!-- src: ... -->
+Viết prompt cho chatbot hỗ trợ sinh viên VinUni đăng ký môn học. Xác định 4 thành phần: [[Role]], [[Task]], [[Context]], [[Format]].
 
 ## Slide 16 — Advanced Prompting Techniques
-Sử dụng kỹ thuật nâng cao khi thật sự cần thiết, không phải như phép màu. <!-- src: ... -->
+Dùng kỹ thuật nâng cao khi chúng cải thiện chất lượng thật sự.
 
 ## Slide 17 — Zero-shot, One-shot, Few-shot, CoT
-Khi nào sử dụng các kỹ thuật này hiệu quả nhất. Thứ tự sử dụng thực dụng. <!-- src: ... -->
+Thứ tự thử thực dụng: [[zero-shot]] → [[few-shot]] → decomposition / [[CoT]].
 
 ## Slide 18 — Khi Nào Dùng Few-shot?
-Sử dụng few-shot khi mô hình hiểu nhiệm vụ nhưng đầu ra không ổn định hoặc cần giữ nguyên tiêu chuẩn. <!-- src: ... -->
+Khi model hiểu [[task]] nhưng ra sai [[format]] hoặc không ổn định.
 
 ## Slide 19 — Few-shot Prompting — Python Example
-Ví dụ về cách sử dụng few-shot prompting trong Python. <!-- src: ... -->
+Ví dụ về cách sử dụng few-shot trong Python.
 
 ## Slide 20 — Few-shot Anti-patterns
-Các vấn đề thường gặp khi sử dụng few-shot prompting. <!-- src: ... -->
+Một số mẹo để tránh sai lầm trong few-shot prompting.
 
 ## Slide 21 — Chain-of-Thought (CoT) và Tree-of-Thought
-Sử dụng CoT khi bài toán cần reasoning nhiều bước. Tree-of-Thought cho các bài toán cần explore nhiều hướng. <!-- src: ... -->
+Xu hướng sử dụng [[CoT]] trong bài toán cần reasoning nhiều bước.
 
 ## Slide 22 — Chain-of-Thought — Python Example
-Ví dụ về việc áp dụng CoT trong phân tích review khách sạn. <!-- src: ... -->
+Ví dụ về cách sử dụng CoT trong phân tích review khách sạn.
 
 ## Slide 23 — Structured Output Prompting
-Tại sao cần kết quả đầu ra có cấu trúc như JSON. Cách tiếp cận hiệu quả. <!-- src: ... -->
+Sự cần thiết của output dạng cấu trúc để dễ dàng Parse.
 
 ## Slide 24 — Khi Nào KHÔNG Cần Kỹ Thuật Nâng Cao
-Sử dụng khi task đơn giản, format không ổn định, hoặc không cần reasoning nhiều bước. <!-- src: ... -->
+Bắt đầu đơn giản, chỉ thêm complexity khi output chưa đạt yêu cầu.
 
 ## Slide 25 — System Prompt Engineering
-[[System-prompt]] tốt giúp agent nhất quán hơn và dễ kiểm soát hơn. <!-- src: ... -->
+[[System-prompt]] tốt làm agent nhất quán hơn, dễ kiểm soát hơn, và dễ test hơn.
 
 ## Slide 26 — Anatomy của System Prompt Production-grade
-Chi tiết cấu trúc của system prompt, bao gồm persona, quy tắc, khả năng, ranh giới và định dạng đầu ra. <!-- src: ... -->
+Các thành phần trong [[system-prompt]] production-grade.
 
 ## Slide 27 — System Prompt — Python Example
-Ví dụ về cài đặt system prompt cho agent hỗ trợ. <!-- src: ... -->
+Ví dụ về cách viết system prompt hiệu quả trong Python.
 
 ## Slide 28 — System Prompt Iteration: v1 → v2
-Cải tiến từ system prompt thiếu ranh giới đến một prompt rõ ràng hơn sau khi thử nghiệm. <!-- src: ... -->
+Cải thiện system prompt qua các kết quả test.
 
 ## Slide 29 — System Prompt: Anthropic vs OpenAI API
-So sánh cách tổ chức system prompt giữa hai nền tảng. <!-- src: ... -->
+So sánh giữa [[Anthropic]] và [[OpenAI]] về cấu trúc system prompt.
 
 ## Slide 30 — System Prompt Anti-Patterns
-Các lỗi thường gặp trong việc thiết kế system prompt và cách khắc phục những vấn đề này. <!-- src: ... -->
+Các lỗi thường gặp khi thiết kế [[system-prompt]].
 
 ## Slide 31 — System Prompt Testing Checklist
-Danh sách kiểm tra cho testing system prompt. <!-- src: ... -->
+Danh sách kiểm tra các yếu tố cần thiết khi test [[system-prompt]].
 
 ## Slide 32 — Real-world System Prompt Template
-Template cho system prompt có thể áp dụng vào thực tế. <!-- src: ... -->
+Mẫu system prompt dùng làm điểm khởi đầu.
 
 ## Slide 33 — Mini Exercise: Critique a System Prompt
-Phân tích một system prompt cụ thể và tìm các vấn đề tiềm ẩn. <!-- src: ... -->
+Phân tích một system prompt và tìm ra vấn đề.
 
 ## Slide 34 — Context Engineering
-Sự quan trọng của việc lựa chọn đúng bối cảnh hơn là nhồi nhét quá nhiều thông tin không cần thiết. <!-- src: ... -->
+Chọn đúng [[context]] cần thiết chứ không phải nhét bao nhiêu context.
 
 ## Slide 35 — Context Window Management
-Quản lý không gian context để tối ưu hóa hiệu quả đầu ra của model. <!-- src: ... -->
+Quản lý không gian context một cách hợp lý.
 
 ## Slide 36 — Lost in the Middle Problem
-Vấn đề mất mát thông tin trong bối cảnh dài và cách khắc phục. <!-- src: ... -->
+Vị trí trong context ảnh hưởng đến việc model tiếp nhận thông tin.
 
 ## Slide 37 — Memory Injection và Context Compression
-Kỹ thuật tối ưu hóa bối cảnh bằng cách chỉ đưa vào thông tin cần thiết cho nhiệm vụ hiện tại. <!-- src: ... -->
+Chiến lược để cải thiện tính hiệu quả của [[context]].
 
 ## Slide 38 — Token Budget Allocation: Nên Nghĩ Theo Rổ Nào?
-Cách tối ưu hóa phân bổ token cho các thành phần khác nhau. <!-- src: ... -->
+Phân bổ token cần chủ động.
 
 ## Slide 39 — RAG Context Pattern
-Cách thức sử dụng công cụ để truy xuất bối cảnh theo yêu cầu. <!-- src: ... -->
+Mô hình lấy lại và đưa vào context theo yêu cầu.
 
 ## Slide 40 — Context Engineering Checklist
-Danh sách kiểm tra cho việc tối ưu hóa bối cảnh. <!-- src: ... -->
+Danh sách kiểm tra cho việc tối ưu hóa [[context]].
 
 ## Slide 41 — Prompt Safety & Evaluation
-Đảm bảo prompt không chỉ đúng mà còn phải an toàn và đáng tin cậy. <!-- src: ... -->
+[[Prompt]] tốt không chỉ cho kết quả đúng — mà còn phải an toàn và đáng tin.
 
-## Slide 42 — Direct injection và Indirect injection
-Giải thích về các hình thức tiêm nhiễm prompt có thể xảy ra. <!-- src: ... -->
+## Slide 42 — Direct injection
+Cách mà người dùng có thể trực tiếp gây ảnh hưởng đến model.
 
 ## Slide 43 — Defense Strategies
-Các chiến lược phòng ngừa khi xử lý input không tin cậy trong prompt. <!-- src: ... -->
+Các chiến lược bảo vệ chống lại các cuộc tấn công.
 
 ## Slide 44 — Prompt Evaluation Framework
-Khung đánh giá các prompt theo các tiêu chí độ chính xác, tính nhất quán, và an toàn. <!-- src: ... -->
+Khung đánh giá prompt để đo lường [[correctness]], [[consistency]], và [[safety]].
 
 ## Slide 45 — Guardrails Pattern
-Mô hình miếng đệm để đảm bảo độ an toàn trong xử lý input và output. <!-- src: ... -->
+Mô hình bảo vệ để đảm bảo an toàn cho output.
 
 ## Slide 46 — Tool Calling
-Giới thiệu về quá trình gọi tool trong tương tác giữa agent và thế giới thực. <!-- src: ... -->
+[[Tool-calling]] là cách agent chuyển từ “nói” sang “tương tác với thế giới thực”.
 
 ## Slide 47 — Tool Calling Flow
-Luồng công việc khi thực hiện tool call và trả kết quả về model. <!-- src: ... -->
+Quy trình cơ bản của việc gọi tool.
 
 ## Slide 48 — Tool Calling: Ai Làm Gì?
-Phân chia vai trò và trách nhiệm trong quá trình tool calling. <!-- src: ... -->
+Phân vai trong quy trình [[tool-calling]].
 
 ## Slide 49 — Tool Schema Anatomy
-Chi tiết về cách cấu trúc tool schema để mô hình có thể hiểu đúng cách sử dụng tool. <!-- src: ... -->
+Các thành phần cần thiết trong [[tool-schema]].
 
 ## Slide 50 — Tool Schema — Python Example
-Ví dụ về cài đặt tool schema trong Python. <!-- src: ... -->
+Ví dụ sử dụng [[tool-schema]] trong Python.
 
 ## Slide 51 — Good vs Bad Tool Description
-So sánh giữa mô tả tool tốt và xấu. <!-- src: ... -->
+So sánh giữa mô tả tool tốt và kém.
 
 ## Slide 52 — tool_choice Parameter
-Các giá trị có thể cho tham số tool_choice và khi nào nên dùng chúng. <!-- src: ... -->
+Chức năng của các giá trị trong tham số `tool_choice`.
 
 ## Slide 53 — Tool Calling: OpenAI vs Anthropic Format
-So sánh định dạng gọi tool giữa OpenAI và Anthropic. <!-- src: ... -->
+So sánh hai định dạng của OpenAI và Anthropic trong việc gọi tool.
 
 ## Slide 54 — Xử Lý Tool Errors
-Cách xử lý các lỗi trong quá trình gọi tool. <!-- src: ... -->
+Cách xử lý các lỗi khi gọi tool.
 
 ## Slide 55 — Design Principles Cho Tools
-Nguyên tắc thiết kế cho các tool để đảm bảo hiệu quả. <!-- src: ... -->
+Nguyên tắc thiết kế cho [[tool]] hiệu quả.
 
 ## Slide 56 — 4 Nguyên Tắc Thiết Kế Tool
-Chi tiết về bốn nguyên tắc thiết kế tool giúp tối ưu hóa hiệu suất. <!-- src: ... -->
+Các nguyên tắc chính khi thiết kế tool.
 
 ## Slide 57 — Tool Granularity: Quá Nhỏ Hay Quá To Đều Có Giá
-Phân tích và tìm hiểu về độ chi tiết của tool trong thiết kế. <!-- src: ... -->
+Quan điểm về độ chi tiết của tool.
 
 ## Slide 58 — Parameter Design Best Practices
-Các quy tắc tốt nhất trong thiết kế tham số cho tool. <!-- src: ... -->
+Các thực hành tốt khi thiết kế tham số cho tool.
 
 ## Slide 59 — Tool Return Format Best Practices
-Quy tắc tốt nhất cho định dạng trả lại của tool. <!-- src: ... -->
+Những thực hành tốt cho định dạng trả về của tool.
 
 ## Slide 60 — Tool Description Engineering
-Tầm quan trọng của việc mô tả tool rõ ràng để điều khiển hành vi của model. <!-- src: ... -->
+Mô tả tool rõ ràng để model hiểu đúng cách sử dụng.
 
 ## Slide 61 — Parallel Tool Calling & Patterns
-Cách thức gọi tool song song và xử lý kết quả. <!-- src: ... -->
+Nhu cầu có flow control trong việc gọi song song các tool.
 
 ## Slide 62 — Sequential vs Parallel Tool Calls
-So sánh giữa gọi tool tuần tự và song song. <!-- src: ... -->
+So sánh giữa gọi tool tuần tự và song song.
 
 ## Slide 63 — 3 Tool Use Patterns Thường Gặp
-Điểm qua ba mẫu sử dụng tool phổ biến trong quá trình lập trình agent. <!-- src: ... -->
+Những mẫu sử dụng tool phổ biến.
 
 ## Slide 64 — 3 Patterns — Visual Flow
-Hình ảnh minh họa cho ba mẫu gọi tool. <!-- src: ... -->
+Hình ảnh mô tả quy trình gọi tool.
 
 ## Slide 65 — Minimal Tool Loop — Python Example
-Ví dụ về vòng lặp tool tối thiểu trong Python. <!-- src: ... -->
+Ví dụ về vòng lặp tool tối thiểu trong Python.
 
 ## Slide 66 — Robust Tool Loop — Error Handling
-Cách giải quyết vấn đề trong vòng lặp tool. <!-- src: ... -->
+Xử lý lỗi trong vòng lặp tool một cách hiệu quả.
 
 ## Slide 67 — Thực Hành
-Lab 4: Xây dựng agent đầu tiên với system prompt, hai công cụ và năm trường hợp kiểm tra. <!-- src: ... -->
+Lab 4: Build first agent với system prompt + 2 tools + 5 test cases.
 
 ## Slide 68 — Hands-on 4: Cách Chạy Lab
-Hướng dẫn cụ thể để hoàn thành lab. <!-- src: ... -->
+Các bước để hoàn thành lab 4.
 
 ## Slide 69 — Lab Skeleton — Python Example
-Cấu trúc khung cho lab trong Python. <!-- src: ... -->
+Mẫu code cho lab.
 
 ## Slide 70 — Lab Walkthrough: Step-by-Step
-Hướng dẫn từng bước để thiết lập lab. <!-- src: ... -->
+Hướng dẫn từng bước cho lab.
 
 ## Slide 71 — 5 Test Questions Gợi Ý
-Các câu hỏi kiểm tra đề xuất để thử nghiệm agent. <!-- src: ... -->
+Một số câu hỏi kiểm tra đề xuất cho lab.
 
 ## Slide 72 — Lab Self-Review Checklist
-Danh sách rà soát tự đánh giá cho lab. <!-- src: ... -->
+Danh sách kiểm tra tự đánh giá cho lab.
 
 ## Slide 73 — Lab #4
-Mục tiêu và deliverable cho Lab 4. <!-- src: ... -->
+Mục tiêu xây dựng agent với các công cụ tùy chỉnh.
 
 ## Slide 74 — Tổng kết — Key Takeaways
-Những điểm chính cần nhớ trước khi chuyển sang bài học tiếp theo. <!-- src: ... -->
+Những điểm chính cần nhớ trước khi chuyển sang bài tiếp theo.
 
 ## Slide 75 — Tiếp theo & Bài tập
-Hướng dẫn cho việc chuẩn bị nội dung cho bài học sau. <!-- src: ... -->
+Công việc cho ngày tiếp theo sau khi hoàn thành lab.
 
 ## Slide 76 — Tài Liệu Tham Khảo
-Danh sách tài liệu tham khảo hữu ích cho việc nghiên cứu thêm. <!-- src: ... -->
+Danh sách tài liệu tham khảo để nghiên cứu thêm.
 
 ## Slide 77 — Hỏi & Đáp
-Thảo luận và giải đáp các thắc mắc. <!-- src: ... -->
+Giải đáp thắc mắc liên quan đến prompt và tool contract.
 
 ## Slide 78 — Cảm ơn!
-Thông tin liên hệ và tài liệu tham khảo. <!-- src: ... -->
-
-## Khái niệm chính
-- [[prompt-fundamentals]]: Khái niệm cơ bản về cách thiết kế prompt hiệu quả.
-- [[advanced-prompting-techniques]]: Các kỹ thuật nâng cao trong việc lập trình prompt.
-- [[system-prompt-engineering]]: Kỹ thuật xây dựng hệ thống prompt cho các agent.
-- [[context-engineering]]: Cách tối ưu hóa bối cảnh sử dụng trong quá trình tương tác.
-- [[prompt-safety-evaluation]]: Đánh giá độ an toàn và tính chính xác của prompt.
-- [[tool-calling]]: Quá trình gọi và sử dụng tool thông qua agent.
-- [[design-principles-cho-tools]]: Nguyên tắc thiết kế cho các công cụ trong agent.
-- [[tool-patterns-error-handling]]: Các mẫu và cách xử lý lỗi liên quan đến tool.
-- [[prompt-injection]]: Khái niệm về việc chèn mã độc hại vào prompt để làm sai lệch kết quả.
+Email: lecturer@vinuni.edu.vn
 ```

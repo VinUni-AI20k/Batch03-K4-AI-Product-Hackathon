@@ -1,82 +1,88 @@
 ---
 course: packs
-generated: '2026-07-30T10:27:19+00:00'
+generated: '2026-07-31T18:11:16+00:00'
 lang: vi
 lesson: 1-day04-prompt-engineering-tool-calling-v2
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/slides/1-day04-prompt-engineering-tool-calling-v2.md
-source_hash: sha256:cc02884f84329731941b7940b923384d2ba2ff7ce088a95850deca1fb9b30d75
+source_file: packs\vlearn-pack\vlearn-pack\slides\1-day04-prompt-engineering-tool-calling-v2.md
+source_hash: sha256:0308ce9acc809aef85fad8af3a507658a78535253d7edbcef89abed8e8f667d8
 type: lesson-note
 ---
 
 ```markdown
 ## Slide 1 — Prompt Engineering & Tool Calling
-Làm sao nói để AI hiểu đúng ý? Đây là bài giảng về [[Prompt Engineering]] và [[Tool Calling]] trong khuôn khổ AICB-P1 tại VinUniversity.
+### AICB-P1 · Ngày 4 · Làm sao nói để AI hiểu đúng ý?
+VinUniversity · Phase 1 · Tuần 2 · 2026
 
 ## Slide 2 — Hãy Suy Nghĩ...
-“Hai người hỏi AI cùng một việc, một người nhận kết quả xuất sắc, người kia nhận rác. Tại sao?” Giữ câu hỏi này trong đầu khi học bài hôm nay.
+Hãy giữ câu hỏi trong đầu: “Hai người hỏi AI cùng một việc, một người nhận kết quả xuất sắc, người kia nhận rác. Tại sao?”
 
 ## Slide 3 — Nội Dung Bài Học
-1. [[Prompt fundamentals]]
-2. [[Advanced prompting techniques]]
-3. [[System prompt engineering]]
-4. [[Function/Tool calling]]
-5. [[Langgraph]]
+1. Prompt fundamentals
+2. Advanced prompting techniques
+3. System prompt engineering
+4. Function/Tool calling
+5. Langgraph
 
 ## Slide 4 — Mục Tiêu Ngày 4
-- Viết được prompt rõ ràng theo các thành phần [[Role]] / [[Task]] / [[Context]] / [[Format]].
-- Hiểu khi nào nên dùng [[zero-shot]], [[few-shot]], [[CoT]], và khi nào không cần.
-- Viết được [[system prompt]] production-grade cho agent.
-- Khai báo được [[tool schema]] và hiểu vòng lặp [[tool calling]] từ model đến tool rồi quay lại model.
-Mục tiêu là hiểu cơ chế: prompt là interface giữa [[human intent]] và [[model behavior]]; tool calling là interface giữa model và thế giới bên ngoài.
+- Viết được prompt rõ ràng theo các thành phần [[role]] / [[task]] / [[context]] / [[format]].
+- Hiểu khi nào nên dùng [[zero-shot]], [[few-shot]], [[Chain-of-Thought]] (CoT), và khi nào không cần.
+- Viết được [[system prompt]] production-grade cho [[agent]].
+- Khai báo được [[tool schema]] và hiểu vòng lặp tool calling từ model đến tool rồi quay lại model.
+
+Mục tiêu của buổi này là hiểu cơ chế: prompt là interface giữa [[human intent]] và [[model behavior]]; tool calling là interface giữa model và thế giới bên ngoài.
 
 ## Slide 5 — Deliverable Cuối Ngày
-1. 1 agent script chạy được + 1 system prompt + 2 tool schemas + 5 test questions + ghi chú lỗi prompt/tool/control flow.
-2. 2 tools tự viết: 1 API wrapper đơn giản, 1 data query đơn giản.
-3. 1 system prompt có rules, constraints, output contract.
-4. 5 câu test để chứng minh agent biết khi nào trả lời trực tiếp, khi nào gọi tool.
+- 1 agent script chạy được + 1 system prompt + 2 tool schemas + 5 test questions + ghi chú lỗi prompt/tool/control flow.
+- 2 tools tự viết: 1 API wrapper đơn giản, 1 data query đơn giản.
+- 1 system prompt có [[rules]], [[constraints]], [[output contract]].
+- 5 câu test để chứng minh agent biết khi nào trả lời trực tiếp, khi nào gọi tool.
 
 ## Slide 6 — Prompt Engineering Fundamentals
 Prompt tốt không phải prompt “hay”, mà là prompt tạo ra hành vi mong muốn ổn định.
 
 ## Slide 7 — Prompt = Interface Giữa Ý Định và Khả Năng Model
-Prompt kém: “Viết email cho tôi” không rõ gửi ai, về gì, tone nào, dài bao nhiêu. Kết quả: chung chung, khó dùng ngay.
-Prompt tốt: “Viết email xin lỗi khách hàng về giao hàng trễ 2 ngày, tone lịch sự, dưới 120 từ, có CTA rõ ràng.” Rõ task, context, constraint, format. Kết quả: actionable hơn hẳn. Nguyên tắc vàng: Specificity beats cleverness.
+### Prompt kém
+“Viết email cho tôi” không rõ gửi ai, về gì, tone nào, dài bao nhiêu. Kết quả: chung chung, khó dùng ngay.
+### Prompt tốt
+Viết email xin lỗi khách hàng về giao hàng trễ 2 ngày, tone lịch sự, dưới 120 từ, có [[CTA]] rõ ràng. Kết quả: actionable hơn hẳn.
+Nguyên tắc vàng: Specificity beats cleverness.
 
 ## Slide 8 — 4 Thành Phần Của Prompt Tốt
-- [[ROLE]]: Vai trò
-- [[TASK]]: Nhiệm vụ
-- [[CONTEXT]]: Bối cảnh
-- [[FORMAT]]: Định dạng
+- **[[ROLE]]**: Vai trò.
+- **[[TASK]]**: Nhiệm vụ.
+- **[[CONTEXT]]**: Bối cảnh.
+- **[[FORMAT]]**: Định dạng.
 
-Bắt đầu với Task + Format. Chỉ thêm Role hoặc Context khi thực sự cải thiện chất lượng hoặc tính nhất quán.
+Bắt đầu với [[TASK]] + [[FORMAT]]. Chỉ thêm [[ROLE]] hoặc [[CONTEXT]] khi thực sự cải thiện chất lượng hoặc tính nhất quán.
 
 ## Slide 9 — Instruction vs Conversation vs System Prompt
-- [[Instruction prompt]]: Ra lệnh trực tiếp cho một tác vụ.
-- [[Conversation prompt]]: Giữ ngữ cảnh nhiều lượt với user.
-- [[System prompt]]: Đặt policy, boundary, output contract.
+- **Instruction prompt**: Ra lệnh trực tiếp cho một tác vụ.
+- **Conversation prompt**: Giữ ngữ cảnh nhiều lượt với user.
+- **System prompt**: Đặt policy, boundary, output contract.
 
 ## Slide 10 — Token Budget Awareness
-Prompt dài hơn không đồng nghĩa prompt tốt hơn. Mỗi token thừa làm tăng chi phí, latency, và đôi khi cả nhiễu. Hãy ưu tiên: instruction rõ, examples đúng chỗ, output contract rõ.
+Prompt dài hơn không đồng nghĩa prompt tốt hơn. Hãy cắt bớt nếu prompt dài thêm nhưng không làm thay đổi hành vi mong muốn.
 
 ## Slide 11 — Advanced Prompting & Context Structuring
-Dùng kỹ thuật nâng cao khi chúng cải thiện chất lượng thực sự, không dùng như thần chú.
+Dùng kỹ thuật nâng cao khi chúng cải thiện chất lượng thật sự, không dùng như thần chú.
 
 ## Slide 12 — Types of Prompt
 Phân loại các kỹ thuật prompting từ cơ bản đến nâng cao.
 
 ## Slide 13 — Zero-shot, One-shot, Few-shot, CoT
-- [[Zero-shot]]: Không có ví dụ mẫu.
-- [[One-shot]]: 1 ví dụ mẫu.
-- [[Few-shot]]: 2–5 ví dụ.
-- [[CoT]]: Cho model reasoning từng bước.
+- **Zero-shot**: Không có ví dụ mẫu.
+- **One-shot**: 1 ví dụ mẫu.
+- **Few-shot**: 2–5 ví dụ.
+- **CoT**: Cho model reasoning từng bước.
 
 Thứ tự thử thực dụng: zero-shot -> few-shot -> decomposition / CoT.
 
 ## Slide 14 — Khi Nào Dùng Few-shot?
-Khi model hiểu task nhưng ra sai format hoặc không ổn định giữa các input tương tự. Cần giữ tiêu chuẩn đánh giá, tone, hoặc cách lập luận nhất quán.
+- Khi model hiểu task nhưng ra sai [[format]] hoặc không ổn định giữa các input tương tự.
+- Khi cần giữ tiêu chuẩn đánh giá, tone, hoặc cách lập luận nhất quán.
 
 ## Slide 15 — Few-shot Prompting — Python Example
 ```python
@@ -94,16 +100,23 @@ print(prompt)
 ```
 
 ## Slide 16 — Chain-of-Thought (CoT) và Tree-of-Thought
-CoT phù hợp khi bài toán cần reasoning nhiều bước. Tree-of-Thought hữu ích cho bài toán cần explore nhiều hướng.
+CoT phù hợp khi:
+- Bài toán cần reasoning nhiều bước.
+- Bạn muốn model giải thích logic trung gian.
+- Bạn cần debug xem model sai ở bước nào.
 
 ## Slide 17 — The Shift: Prompts as Code
 Tư duy lập trình trong việc thiết kế và quản lý cấu trúc prompt.
 
 ## Slide 18 — Tại Sao Prompt Cơ Bản Thất Bại Trong Agent Loop?
-Tính mỏng manh: Đổi 1 từ, model đổi toàn bộ format output. Ảo giác định dạng: Trả về Markdown thay vì JSON. 
+- Tính mỏng manh (Fragility).
+- Ảo giác định dạng (Format Hallucination).
+- Một output sai format = Toàn bộ pipeline bị sập.
 
 ## Slide 19 — Hướng Tới "Prompt Determinism"
-Khả năng LLM trả về đúng một định dạng cấu trúc dù input của user có "méo mó" thế nào.
+- **Khả năng**: LLM trả về đúng một định dạng cấu trúc dù input của user có "méo mó".
+- **Thách thức**: Kiểm soát được nội dung người dùng nhập vào hệ thống.
+- **Công cụ cốt lõi**: Thiết lập ranh giới và các ràng buộc chặt chẽ.
 
 ## Slide 20 — System Prompt — Python Example
 ```python
@@ -122,319 +135,332 @@ Return JSON with: intent, action, reply
 ```
 
 ## Slide 21 — Anatomy của System Prompt Production-grade
-- Persona: role, expertise level, communication style.
-- Rules: việc nên làm, việc luôn phải làm.
-- Capabilities: model được phép dùng tools nào.
-- Constraints: không làm gì, khi nào từ chối.
+- **Persona**: role, expertise level, communication style.
+- **Rules**: việc nên làm, việc luôn phải làm.
+- **Capabilities**: model được phép dùng tools nào, dữ liệu nào.
+- **Constraints**: không làm gì, khi nào từ chối, khi nào escalate.
 
 ## Slide 22 — Programming the Latent Space
-LLM là một cỗ máy pattern-matching khổng lồ.
+- Pattern-Matching: LLM là một cỗ máy pattern-matching khổng lồ.
+- Narrowing: Prompt tốt giúp "thu hẹp không gian xác suất".
+- Delimiters: Đóng vai trò như dấu ngoặc trong lập trình.
 
 ## Slide 23 — System Prompt Anti-Patterns
-- Quá dài: nhồi mọi thứ vào 1 prompt 2000+ tokens.
-- Mâu thuẫn: yêu cầu "ngắn gọn", vừa bảo "giải thích chi tiết từng bước".
+- Quá dài.
+- Mâu thuẫn.
+- Mơ hồ.
+- Không test edge cases.
 
 ## Slide 24 — Structural Prompting with XML / Delimiters
-Sử dụng thẻ XML và các dấu phân tách để tối ưu cấu trúc prompt.
+Sử dụng thẻ XML và các dấu phân tách để tối ưu cấu trúc prompt và ngăn chặn Context Bleed.
 
 ## Slide 25 — Cấu Trúc Hóa Bằng Thẻ XML (XML Tags)
-Bản chất của model là được train trên dữ liệu HTML/XML.
+- Bản chất của model: Được train trên lượng lớn dữ liệu HTML/XML.
+- Attention Mechanism: Nhận diện rất tốt cấu trúc.
 
 ## Slide 26 — Bộ Thẻ XML Căn Bản Cho System Prompt
-- `<system_role>`: Định nghĩa persona.
-- `<instructions>`: Các quy tắc cốt lõi.
-- `<examples>`: Few-shot data.
-- `<context>` / `<documents>`: Dữ liệu grounding RAG.
-- `<user_input>`: Dữ liệu thô từ người dùng.
+- `<system_role>`: Định nghĩa persona, giọng văn và chuyên môn.
+- `<instructions>`: Các quy tắc cốt lõi, ràng buộc.
+- `<examples>`: Khu vực chứa few-shot data.
+- `<user_input>`: Dữ liệu thô từ phía người dùng.
 
 ## Slide 27 — Context Bleed - Kẻ Thù Số 1 Của RAG & Agents
-Context Bleed là khi LLM nhầm lẫn giữa Lệnh (Instructions) và Dữ liệu (Payload).
+- Context Bleed là gì? Khi LLM nhầm lẫn giữa Lệnh và Dữ liệu.
+- Ví dụ minh họa: User nhập câu lệnh mập mờ, dẫn đến lỗi.
 
 ## Slide 28 — Cô Lập Dữ Liệu Bằng Delimiters
-Bao bọc Input bên ngoài và chỉ thị mô hình xử lý rõ ràng.
+- Bao bọc Input bên ngoài.
+- Lệnh xử lý rõ ràng.
+- Tính nhất quán với dấu ngoặc kép hoặc XML.
 
 ## Slide 29 — So Sánh: Messy Prompt vs. XML-Structured Prompt
-Messy Prompt không có ranh giới rõ ràng. XML-Structured Prompt làm rõ task và input.
+- Messy Prompt: Không có ranh giới rõ ràng.
+- XML-Structured Prompt: Phân định rõ nội dung.
 
 ## Slide 30 — Nested XML (Cấu trúc lồng nhau)
-Cấu trúc XML lồng nhau tối ưu hóa khả năng truy xuất thông tin.
+Cấu trúc XML lồng nhau giúp tối ưu khả năng truy xuất và tham chiếu thông tin trong các hệ thống RAG phức tạp.
 
 ## Slide 31 — Advanced Few-Shot & Formatting
 Kỹ thuật nâng cao trong việc tối ưu hóa ví dụ mẫu và định dạng đầu ra.
 
 ## Slide 32 — Sức Mạnh Thực Sự Của Few-Shot
-Few-shot prompting là kỹ thuật quan trọng để kiểm soát sự nhất quán của các mô hình ngôn ngữ lớn.
-
+- Dạy bằng ví dụ: giúp mô hình nắm bắt ngữ cảnh sâu hơn.
+  
 ## Slide 33 — Chọn Ví Dụ Sao Cho Khôn Ngoan?
-Cần tập trung vào "Edge-cases" hơn là "Happy path".
+Cần tập trung vào "Edge-cases" (Ngoại lệ).
 
 ## Slide 34 — Negative Prompting: Dạy Model Việc KHÔNG Nên Làm
-Hạn chế của lệnh phủ định. Cách tốt nhất là tạo ví dụ thực tế về những gì không nên làm.
+- Hạn chế của lệnh phủ định.
+- Tạo ví dụ chống chỉ định.
 
 ## Slide 35 — Cấu Trúc Hóa Suy Nghĩ Của Model
-Model "nghĩ" bằng cách in ra token. Phân tích trước khi kết luận.
+```xml
+<thinking>
+Phân tích yêu cầu, liệt kê các bước giải quyết...
+</thinking>
+<result>
+Kết quả cuối cùng dựa trên phân tích trên.
+</result>
+```
 
 ## Slide 36 — Few-shot Để Giữ Định Dạng JSON
-Cung cấp JSON Schema cụ thể trong ví dụ mẫu.
+Cung cấp JSON Schema cụ thể để model hiểu cấu trúc dữ liệu mong muốn.
 
 ## Slide 37 — Rủi Ro & Đánh Đổi Khi Dùng Few-shot
-Order Bias và Token Budget là những điều cần chú ý khi sử dụng few-shot.
-
+- Order Bias: LLM thường bị ảnh hưởng mạnh bởi ví dụ cuối cùng.
+  
 ## Slide 38 — Handling Long Context: "Lost in the Middle"
-Hiện tượng "Lost In The Middle" không thể nhớ hết thông tin.
+Hiện tượng "Lost In The Middle" xảy ra khi LLM không nhớ thông tin ở giữa tài liệu lớn.
 
-## Slide 39 — Tận Dụng Recency Bias (Thiên Kiến Gần Nhất)
-Đặt câu hỏi/lệnh chính ở vị trí gần cuối để tăng tính chính xác của câu trả lời.
+## Slide 39 — Tận Dụng Recency Bias
+Thứ tự thông tin giúp tăng độ chính xác của câu trả lời dựa trên cơ chế chú ý của LLM.
 
 ## Slide 40 — Tối Ưu Bằng Cách Cắt Tỉa Context
-Giữ lại dữ liệu relevant và áp dụng cơ chế tóm tắt.
+Giải pháp Compression: Áp dụng cơ chế tóm tắt để giảm tải token.
 
 ## Slide 41 — Hoạt Động 1: Chỉnh sửa Prompt (10 Phút)
-Nhiệm vụ tìm ra ít nhất 3 điểm yếu trong đoạn prompt thô.
+Nhiệm vụ: Tìm ra ít nhất 3 điểm yếu dễ gây lỗi trong đoạn prompt.
 
 ## Slide 42 — System Prompt Engineering
-System prompt tốt làm agent nhất quán và dễ kiểm soát.
+System prompt tốt làm agent nhất quán hơn, dễ kiểm soát hơn, và dễ test hơn.
 
 ## Slide 43 — User vs. System vs. Assistant Roles
 Phân biệt vai trò để định hướng mô hình ngôn ngữ hoạt động chính xác.
 
 ## Slide 44 — Chat Completions API vs Completions API
-Sự khác biệt giữa cách hoạt động của các API hiện đại và legacy.
+Sự khác biệt giữa Completions API và Chat Completions API.
 
 ## Slide 45 — Phân Tách Quyền Lực: System, User, Assistant
-Tách biệt rõ ràng giữa các vai trò giúp Model hiểu chỉ dẫn và dữ liệu.
+Giúp model hiểu rõ đâu là chỉ dẫn bắt buộc và đâu là dữ liệu cần xử lý.
 
 ## Slide 46 — System Message Nặng Ký Đến Mức Nào?
-Model ưu tiên System hơn User trong các xung đột mệnh lệnh.
+Các model hiện đại được huấn luyện theo hệ thống ưu tiên từ System hơn User.
 
 ## Slide 47 — Đặt Cái Gì Vào Đâu?
-[[System prompt]] nên chứa bối cảnh tĩnh, trong khi [[User prompt]] chứa dữ liệu biến đổi.
+Bối cảnh tĩnh và luật lệ phải được định nghĩa một cách rõ ràng.
 
-## Slide 48 — Quản Lý Lịch Sử Bằng Trạng Thái (State)
-LLM là Stateless và cần quản lý “trí nhớ” này qua State.
+## Slide 48 — Quản Lý Lịch Sử Bằng Trạng Thái
+LLM là Stateless, cần quản lý trí nhớ qua State.
 
 ## Slide 49 — Memory Injection và Context Compression
-Nên chỉ truyền vào facts thật sự cần cho task hiện tại.
+Chỉ đưa vào facts cần cho task hiện tại.
 
 ## Slide 50 — Anatomy of a Production System Prompt
-System prompt không phải đoạn văn miêu tả chung chung, mà là hợp đồng giữa bạn và Model.
 
-## Slide 51 — Persona - Định Hình Danh Tính
-Định nghĩa persona cho agent để duy trì giọng điệu nhất quán.
+## Slide 51 — System Prompt = "Bộ Não" Của Agent
+System Prompt không phải là một đoạn văn miêu tả chung chung mà là một Hợp đồng (Contract).
 
-## Slide 52 — Core Directives - Mệnh Lệnh Bất Di Bất Dịch
-Đưa ra các chỉ dẫn không thể thương lượng nhằm duy trì sự nhất quán cao.
+## Slide 52 — Persona - Định Hình Danh Tính
+Ranh giới rõ ràng giúp thu hẹp khả năng ảo giác.
 
-## Slide 53 — Capabilities - Agent Của Tôi Có Thể Làm Gì?
-Cung cấp thông tin về công cụ mà agent có thể sử dụng.
+## Slide 53 — Core Directives - Mệnh Lệnh Bất Di Bất Dịch
+Core Directives là những chỉ dẫn không thể thương lượng.
 
-## Slide 54 — Output Contract - Ràng Buộc Kết Quả
-Quy định định dạng kết quả cuối cùng và quy trình suy nghĩ liên quan.
+## Slide 54 — Capabilities - Agent Của Tôi Có Thể Làm Gì?
+Cung cấp bối cảnh về công cụ giúp Agent hiểu rõ 'tại sao' và 'khi nào' cần sử dụng.
 
-## Slide 55 — Những "Sai Lầm" Khi Viết System Prompt
-Sai lầm mâu thuẫn và thông điệp thừa thãi cần tránh khi thiết kế prompt.
+## Slide 55 — Output Contract - Ràng Buộc Kết Quả
+Output Contract là lời cam kết về định dạng, giúp dữ liệu được xử lý tự động và chính xác.
 
-## Slide 56 — Edge Cases & Refusals
-Thiết kế hệ thống đủ bền bỉ để xử lý các ngoại lệ.
+## Slide 56 — Những "Sai Lầm" Khi Viết System Prompt
+Lỗi mâu thuẫn, lịch sự thừa thãi, và vấn đề ngôn ngữ kép.
 
-## Slide 57 — Rút Lui Trong Danh Dự
+## Slide 57 — Edge Cases & Refusals
+Thử thách thực sự của Prompt Engineering.
+
+## Slide 58 — Rút Lui Trong Danh Dự (Graceful Fallback)
 Quy định rõ Agent không được tự bịa dữ liệu.
 
-## Slide 58 — Quyền Được Nói "Tôi Không Biết"
+## Slide 59 — Quyền Được Nói "Tôi Không Biết"
 Thiết lập rào cản để ngăn chặn hành vi suy luận vô căn cứ.
 
-## Slide 59 — Đối Phó Với Out-of-Scope Queries
-Định nghĩa rõ cái gì nằm ngoài ranh giới của agent.
+## Slide 60 — Đối Phó Với Out-of-Scope Queries
+Định nghĩa rõ cái gì nằm NGOÀI ranh giới để kiểm soát hành vi của Agent.
 
-## Slide 60 — Bàn Giao Cho Con Người (Escalation)
-Cần một cơ chế để can thiệp khi gặp tình huống phức tạp.
+## Slide 61 — Bàn Giao Cho Con Người (Escalation)
+Cần một cơ chế rút lui an toàn khi gặp tình huống phức tạp.
 
-## Slide 61 — Ranh Giới Của System Prompt
-Cảnh báo rằng System Prompt không phải là bức tường bảo mật.
+## Slide 62 — Ranh Giới Của System Prompt
+System Prompt tập trung xử lý Logic Nghiệp Vụ và tối ưu hóa trải nghiệm người dùng.
 
-## Slide 62 — Dynamic System Prompts
-Cần một lớp "Context Injection" để bơm dữ liệu thời gian.
+## Slide 63 — Dynamic System Prompts
+Nhu cầu về một lớp "Context Injection" để bơm dữ liệu thời gian và thông tin người dùng vào trước khi gửi tới LLM.
 
-## Slide 63 — Dynamic System Prompts (Bơm Biến Trực Tiếp)
-Biến System Prompt thành một Template với các placeholder.
+## Slide 64 — Thực Thi Dynamic Bằng Code
+Sử dụng thư viện template Jinja2 và f-strings trong Python.
 
-## Slide 64 — Nhúng Trạng Thái Hệ Thống Vào Prompt
-Cập nhật system prompt dựa trên trạng thái và thông tin người dùng.
+## Slide 65 — Hoạt Động 2: Bẻ Khóa "CFO Agent" (10 Phút)
+Tìm ít nhất 3 cách để "Lừa" AI trong điều kiện cho phép.
 
-## Slide 65 — Triển Khai Dynamic Prompt Bằng Code
-Sử dụng thư viện template Jinja2 cho các hệ thống phức tạp.
+## Slide 66 — Bước Ngoặt Tool Calling
+Cung cấp APIs và Database để model tương tác thực tế.
 
-## Slide 66 — Hoạt Động 2: Bẻ Khóa "CFO Agent" (10 Phút)
-Tìm lỗi và lỗ hổng trong System Prompt cho một Agent duyệt chi ngân sách.
+## Slide 67 — Kiến Trúc Vòng Lặp Tool Calling
+Cơ chế 4 bước trong tool calling.
 
-## Slide 67 — Function/Tool Calling
-Tool calling là cách agent tương tác với thế giới thực.
+## Slide 68 — Model Suy Nghĩ Và Yêu Cầu Tool
+Cấu trúc Output (JSON Tool Calls) giúp model sinh ra các yêu cầu chính xác.
 
-## Slide 68 — The Tool Calling API Cycle
-Hiểu vòng tay handshake giữa LLM và ứng dụng của bạn.
+## Slide 69 — Trách Nhiệm Của Hệ Thống Của Bạn
+Bắt trạng thái tool_calls và thực thi logic lập trình.
 
-## Slide 69 — Bước Ngoặt Tool Calling
-Trang bị APIs và Database để model tương tác thực tế.
+## Slide 70 — Đóng Vòng Lặp (Closing the Loop)
+Cập nhật mảng message và gửi lại cho model.
 
-## Slide 70 — Kiến Trúc Vòng Lặp Tool Calling
-Cấu trúc vòng lặp 4 bước bắt buộc giữa LLM và tool.
+## Slide 71 — Designing the Perfect JSON Schema
+Crafting precise tool definitions to eliminate model ambiguity.
 
-## Slide 71 — Model Suy Nghĩ Và Yêu Cầu Tool
-Model nhận diện và yêu cầu tool cần thiết.
+## Slide 72 — JSON Schema Của Tool Là Gì?
+Là cấu trúc khai báo giúp LLM hiểu rõ danh sách và chức năng của các hàm.
 
-## Slide 72 — Trách Nhiệm Của Hệ Thống Của Bạn
-Nhận diện yêu cầu tool_calls và thực thi để phân tích cú pháp.
+## Slide 73 — Tên Hàm - Yếu Tố Quyết Định Phân Loại
+Nguyên lý hoạt động dựa trên tên hàm giúp model đoán chức năng.
 
-## Slide 73 — Đóng Vòng Lặp (Closing the Loop)
-Cập nhật lịch sử hội thoại và gửi dữ liệu thực về cho model.
+## Slide 74 — Description Của Tool CHÍNH LÀ Prompt
+Nội dung cần rõ ràng và cụ thể để model dễ dàng kích hoạt công cụ.
 
-## Slide 74 — Designing the Perfect JSON Schema
-Khai báo cấu trúc tool giúp LLM hiểu rõ chức năng.
+## Slide 75 — Thiết Kế Parameters Cấu Trúc
+Định nghĩa thuộc tính và mô tả riêng biệt giúp tăng tính chính xác.
 
-## Slide 75 — JSON Schema Của Tool Là Gì?
-Nhằm đảm bảo model gọi đúng hàm.
+## Slide 76 — Enums - Khóa Chặt Sự Lựa Chọn
+Ràng buộc giá trị cần thiết để giảm thiểu rủi ro ảo giác.
 
-## Slide 76 — Tên Hàm - Yếu Tố Quyết Định Phân Loại
-Tên hàm phải rõ ràng và ngữ nghĩa.
+## Slide 77 — Bắt Buộc Hay Tùy Chọn? (Required Fields)
+Khai báo các trường bắt buộc giúp model nhận diện thông tin thiếu hụt.
 
-## Slide 77 — Description Của Tool CHÍNH LÀ Prompt
-Viết mô tả cho AI thay vì cho lập trình viên.
+## Slide 78 — Anti-Pattern: Nhồi Nhét Quá Nhiều Tham Số
+Một tool không nên có quá nhiều parameters để tránh nhầm lẫn.
 
-## Slide 78 — Thiết Kế Parameters Cấu Trúc
-Định nghĩa thuộc tính rõ ràng nhằm giảm thiểu lỗi.
+## Slide 79 — Mổ Xẻ Một Tool Schema Đạt Chuẩn
+Cấu trúc ví dụ của một tool schema hoàn chỉnh.
 
-## Slide 79 — Enums - Khóa Chặt Sự Lựa Chọn
-Giúp loại bỏ rủi ro ảo giác và đảm bảo đầu ra đúng.
+## Slide 80 — Tool Execution Strategies
+Nghệ thuật phối hợp các công cụ trong agents.
 
-## Slide 80 — Bắt Buộc Hay Tùy Chọn? (Required Fields)
-Quy định các tham số quan trọng cần có.
+## Slide 81 — Gọi Tuần Tự (Sequential/Chained Calls)
+Chi phí latency rất cao khi gọi các tool tuần tự.
 
-## Slide 81 — Anti-Pattern: Nhồi Nhét Quá Nhiều Tham Số
-Giới hạn độ phức tạp của tool.
+## Slide 82 — Tối Ưu Tốc Độ Bằng Parallel Calling
+Sử dụng các model đời mới giúp tối ưu hóa tốc độ phản hồi.
 
-## Slide 82 — Mổ Xẻ Một Tool Schema Đạt Chuẩn
-Cấu trúc hoàn chỉnh của tool schema mẫu.
+## Slide 83 — Cảnh Báo: Mặt Trái Của Parallel Calling
+Rủi ro hệ thống khi gọi nhiều requests cùng lúc.
 
-## Slide 83 — Tool Execution Strategies
-Chiến lược điều phối tool trong workflows của agent.
+## Slide 84 — Handling Tool Failures & Retries
+Xây dựng khả năng phục hồi cho các tích hợp tool.
 
-## Slide 84 — Nghệ Thuật Phối Hợp Các Công Cụ
-Quyết định chiến lược phụ thuộc vào sự phụ thuộc dữ liệu.
+## Slide 85 — Thực Tế Nghiệt Ngã: Tool Rất Hay Lỗi
+Những lỗi thường gặp và cách xử lý.
 
-## Slide 85 — Gọi Tuần Tự (Sequential/Chained Calls)
-Thực hiện tuần tự có thể làm tăng độ trễ.
+## Slide 86 — Khi LLM "Tự Bịa" Tham Số Mới
+Giải pháp validation chặt chẽ để đảm bảo tính chính xác.
 
-## Slide 86 — Tối Ưu Tốc Độ Bằng Parallel Calling
-Gọi nhiều tools đồng thời để tối ưu hóa thời gian phản hồi.
+## Slide 87 — Phép Màu Của Tự Sửa Lỗi (Self-Correction)
+Gửi raw error message cho model để nó có cơ hội tự điều chỉnh.
 
-## Slide 87 — Thực Thi Parallel Bằng Python
-Sử dụng asyncio hoặc multithreading để cải thiện hiệu suất.
+## Slide 88 — Orchestration with LangGraph
+Xây dựng luồng điều khiển phức tạp cho agent.
 
-## Slide 88 — Cảnh Báo: Mặt Trái Của Parallel Calling
-Rủi ro như Rate Limits và Race Conditions cần quản lý.
+## Slide 89 — Why LangGraph?
+Đi xa hơn các chuỗi đơn giản để xây dựng workflows phức tạp.
 
-## Slide 89 — Handling Tool Failures & Retries
-Xây dựng tính linh hoạt với cơ chế kiểm soát lỗi và retry.
+## Slide 90 — Tại Sao while True Không Còn Đủ Tốt?
+Khó khăn trong việc debug và quản lý trạng thái.
 
-## Slide 90 — Thực Tế Nghiệt Ngã: Tool Rất Hay Lỗi
-Đảm bảo bảo vệ luồng suy nghĩ của Agent khi xảy ra lỗi.
+## Slide 91 — Từ "Đồ Chơi" Đến Hệ Thống Thực Tế
+Nhu cầu về một kiến trúc máy trạng thái (State Machine).
 
-## Slide 91 — Khi LLM "Tự Bịa" Tham Số Mới
-Sử dụng validation chặt chẽ để tránh lỗi cú pháp hoặc tham số ảo giác.
+## Slide 92 — LangGraph: Tương Lai Của Agentic AI
+Framework chuyên dụng cho các hệ thống multi-agent.
 
-## Slide 92 — Phép Màu Của Tự Sửa Lỗi (Self-Correction)
-Gửi thông tin lỗi cho LLM để nó có cơ hội tự điều chỉnh.
+## Slide 93 — Sự Phân Nhánh: Chain vs. Graph
+LangChain cho luồng dữ liệu tuyến tính, LangGraph cho vòng lặp phức tạp.
 
-## Slide 93 — Orchestration with LangGraph
-Xây dựng luồng điều khiển phức tạp cho Agent.
+## Slide 94 — Lợi Ích Cốt Lõi Khi Học LangGraph
+- Flow điều khiển tường minh.
+- Quản lý trạng thái tự động.
 
-## Slide 94 — Why LangGraph?
-Đi vào kiến trúc máy trạng thái để quản lý tình huống phức tạp.
+## Slide 95 — Core Concepts of LangGraph
+Hiểu biết về State, Nodes, và Edges để xây dựng kiến trúc agent phức tạp.
 
-## Slide 95 — Từ "Đồ Chơi" Đến Hệ Thống Thực Tế
-Yêu cầu kiểm soát luồng, ghi nhớ bền vững và sự can thiệp của con người.
+## Slide 96 — Giải Phẫu LangGraph (State, Nodes, Edges)
+Mô tả chi tiết từng thành phần của LangGraph.
 
-## Slide 96 — LangGraph: Tương Lai Của Agentic AI
-Framework chuyên dụng cho các hệ thống Multi-Agent.
+## Slide 97 — Cập Nhật Trạng Thái Thay Vì Ghi Đè
+Cơ chế Append-only giúp duy trì toàn bộ lịch sử.
 
-## Slide 97 — Sự Phân Nhánh: Chain vs. Graph
-LangGraph hỗ trợ vòng lặp cho Agent.
+## Slide 98 — Chức Năng Của Node "Agent"
+Node thực hiện gọi API và cập nhật trạng thái.
 
-## Slide 98 — Lợi Ích Cốt Lõi Khi Học LangGraph
-Giúp giảm thiểu sự mơ hồ và tăng tính chính xác trong luồng Agent.
+## Slide 99 — Chức Năng Của Node "Tool"
+Node thực hiện duyệt qua danh sách các lệnh và parse arguments.
 
-## Slide 99 — Core Concepts of LangGraph
-Hiểu các thành phần chính để xây dựng kiến trúc agent phức tạp.
+## Slide 100 — Normal Edge vs Conditional Edge
+Định nghĩa luồng di chuyển giữa các nodes.
 
-## Slide 100 — Giải Phẫu LangGraph (State, Nodes, Edges)
-Cấu trúc cơ bản của LangGraph giúp lưu trữ và di chuyển dữ liệu.
+## Slide 101 — Logic Rẽ Nhánh Thông Minh (Router)
+Giúp agent tự quyết định vòng đời và phản hồi của mình.
 
-## Slide 101 — Khái Niệm 1: State
-Định nghĩa và khai báo cấu trúc dữ liệu chung cho agent.
+## Slide 102 — Xây Dựng Khung Xương (Builder)
+Khởi tạo và định nghĩa trạng thái cho agent.
 
-## Slide 102 — Cập Nhật Trạng Thái Thay Vì Ghi Đè
-Giữ lại toàn bộ lịch sử để Agent có ngữ cảnh đầy đủ.
+## Slide 103 — Khai Báo Dòng Chảy START / END
+Điểm bắt đầu và kết thúc của đồ thị trong LangGraph.
 
-## Slide 103 — Khái Niệm 2: Nodes
-Xử lý và trả về phần State mới cho agent.
+## Slide 104 — Đóng Gói Và Biên Dịch (Compile)
+Chuyển đổi từ cấu trúc Builder sang đối tượng đồ thị thực thi.
 
-## Slide 104 — Khái Niệm 3: Edges
-Điều hướng giữa các Nodes dựa vào logic rẽ nhánh.
+## Slide 105 — Chạy Thử Khối Động Cơ Này Thế Nào?
+Quan sát luồng sự kiện khi chạy lab.
 
-## Slide 105 — Logic Rẽ Nhánh Thông Minh (Router)
-Logic định tuyến tự động quyết định bước tiếp theo.
+## Slide 106 — Lab Skeleton — Python Example
+```python
+SYSTEM_PROMPT = open("system_prompt.txt").read()
+TOOLS = [get_weather_tool(), query_sales_tool()]
+while True:
+    user_input = input("You: ")
+    messages.append({"role": "user", "content": user_input})
+    response = call_model(messages, SYSTEM_PROMPT, TOOLS)
+    messages = handle_tool_calls(response, messages)
+    print(render_final_answer(messages, SYSTEM_PROMPT, TOOLS))
+```
 
-## Slide 106 — Xây Dựng Khung Xương (Builder)
-Khởi tạo cấu trúc và thêm các nút xử lý.
+## Slide 107 — Lab #4
+Mục tiêu: Build ReAct agent với 2 custom tools, viết system prompt chuẩn, và test end-to-end trên 5 câu hỏi.
 
-## Slide 107 — Khai Báo Dòng Chảy START / END
-Điểm đánh dấu bắt đầu và kết thúc của một đồ thị.
-
-## Slide 108 — Đóng Gói Và Biên Dịch (Compile)
-Chuyển đổi từ cấu trúc Builder sang đối tượng đồ thị có thể thực thi.
-
-## Slide 109 — Chạy Thử Khối Động Cơ Này Thế Nào?
-Thay thế lời gọi API thông thường bằng cơ chế stream.
-
-## Slide 110 — Hands-on: Cách Chạy Lab
-1. Viết 1 system prompt với rules, constraints.
-2. Tạo 2 custom tools.
-3. Nối tools vào agent loop.
-4. Chạy 5 câu test.
-
-## Slide 111 — Lab #4
-Mục tiêu: Build ReAct agent với 2 custom tools, viết system prompt chuẩn, và test end-to-end.
-
-## Slide 112 — Tổng kết — Key Takeaways
+## Slide 108 — Tổng kết — Key Takeaways
 1. Prompt = interface giữa [[human intent]] và [[model capability]].
-2. System prompt tốt = agent nhất quán hơn.
-3. [[Tool schema description]] quyết định mạnh mẽ việc model biết gọi tool nào.
-4. [[Parallel tool calls]] nhanh hơn khi các tool độc lập.
+2. System prompt tốt = agent nhất quán và predictable hơn.
+3. [[Tool schema description]] quyết định việc model biết khi nào dùng tool.
+4. [[Parallel tool calls]] nhanh hơn khi tools không phụ thuộc.
 
-## Slide 113 — Tiếp theo & Bài tập
-Hoàn thiện Lab 4 với 5 test questions rõ pass/fail và chỉ ra các điểm còn mơ hồ trong system prompt.
+## Slide 109 — Tiếp theo & Bài tập
+Hoàn thiện Lab 4 với 5 test questions rõ pass/fail.
 
-## Slide 114 — Tài Liệu Tham Khảo
-Danh sách tài liệu liên quan đến [[Prompt Engineering]], [[Tool Calling]], và [[LangGraph]].
+## Slide 110 — Tài Liệu Tham Khảo
+1. Anthropic. Prompt Engineering Overview.
+2. OpenAI. Function Calling Guide.
 
-## Slide 115 — Hỏi & Đáp
+## Slide 111 — Hỏi & Đáp
 Bạn đang gặp lỗi vì model chưa hiểu ý bạn, hay vì tool contract của bạn chưa đủ rõ?
 
-## Slide 116 — Cảm ơn!
+## Slide 112 — Cảm ơn!
 Email: lecturer@vinuni.edu.vn
 Slides & tài liệu: github.com/aicb-vinuni
 Lab template: bit.ly/aicb-day04-lab
 
-## Khái niệm chính
-- [[Prompt Engineering]]: Kỹ thuật thiết kế prompts để tương tác hiệu quả với các mô hình ngôn ngữ.
-- [[Tool Calling]]: Cách tương tác với thế giới bên ngoài thông qua các hàm và APIs.
-- [[Zero-shot]]: Phương pháp quyết định không dùng ví dụ mẫu.
-- [[Few-shot]]: Phương pháp dùng 2–5 ví dụ mẫu để cải thiện hiệu suất model.
-- [[CoT]]: [[Chain-of-Thought]], một kỹ thuật giúp model suy luận từng bước.
-- [[System prompt]]: Cấu trúc hướng dẫn hành vi của một agent.
-- [[Tool schema]]: Định nghĩa cấu trúc và chức năng của tool mà agent có thể gọi.
-- [[Role]]: Vai trò của agent trong quá trình tương tác.
-- [[Task]]: Nhiệm vụ mà agent cần thực hiện trong tương tác.
-- [[Context]]: Bối cảnh liên quan đến nhiệm vụ của agent.
-- [[Format]]: Định dạng đầu ra mà agent sẽ cung cấp.
+## Khái Niệm Chính
+- [[prompt]]: Chuỗi văn bản để chỉ dẫn AI thực hiện tác vụ.
+- [[system prompt]]: Cấu trúc chỉ dẫn đầy đủ cho agent hoạt động.
+- [[tool schema]]: Khai báo cấu trúc JSON cho các công cụ.
+- [[human intent]]: Ý định của người dùng khi giao tiếp với AI.
+- [[model behavior]]: Hành vi của AI khi nhận được prompt.
+- [[role]]: Vai trò của AI trong một bối cảnh cụ thể.
+- [[task]]: Nhiệm vụ cần thực hiện.
+- [[context]]: Bối cảnh trong đó nhiệm vụ được đặt ra.
+- [[format]]: Cách output cần được định dạng.
+- [[zero-shot]]: Kỹ thuật không có ví dụ mẫu.
+- [[few-shot]]: Kỹ thuật có từ 2–5 ví dụ mẫu.
+- [[Chain-of-Thought]]: Kỹ thuật suy luận từng bước.
+- [[CTA]]: Call to Action, chỉ dẫn hành động rõ ràng cho người dùng.
 ```

@@ -1,40 +1,29 @@
 ---
 course: packs
-generated: '2026-07-30T10:19:01+00:00'
+generated: '2026-07-31T18:03:10+00:00'
 lang: vi
 lesson: README
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/README.md
-source_hash: sha256:880ab5d7bccb4f898f0b0c98c4f1b5221fc5e8e1c2f8e3776b523163ad98165e
+source_file: packs\vlearn-pack\vlearn-pack\README.md
+source_hash: sha256:01e1eb732f01a21d7645fb2f8784981fa46dc82b29367fab9d40c25985b5a243
 type: lesson-note
 ---
 
 ```markdown
 ## Slide 1 — Có sẵn trong pack
-
-- `chatlog/chat_history_anonymized_for_hackathon.csv` — **2.522 dòng hội thoại thật** học viên × AI tutor, đã ẩn danh toàn bộ ID (user/conversation/turn/message → mã U/C/T/M) và đã quét sạch thông tin nhạy cảm.
-- `chatlog/DATA_DICTIONARY.md` — mô tả từng field của file trên (đọc trước khi mining).
-- `transcript/` — **6 transcript bài giảng bản sạch** (~700 đoạn có mã trích dẫn `[Txx-NNN]`): Day 1 Foundation, Day 2 xác định bài toán (3 file), và 2 buổi theo chủ đề. Đã sửa lỗi nhận dạng giọng nói, ẩn danh tên học viên, rút gọn phần hoạt động lớp — xem `transcript/README.md`.
-- `slides/` — **2 bộ slide bài giảng bản hackathon** (Day 1 AI & LLM Foundation · Day 2 Xác định bài toán cho AI, 29 trang/bộ, có watermark): bản rút gọn từ slide gốc, một số trang giữ nguyên footer số trang gốc để đối chiếu trích dẫn.
+- Dữ liệu bao gồm file hội thoại thực tế `chatlog/chat_history_anonymized_for_hackathon.csv` với **2.522 dòng** đã được ẩn danh và loại bỏ thông tin nhạy cảm. Đọc `chatlog/DATA_DICTIONARY.md` để hiểu cấu trúc file trước khi thực hiện khai thác dữ liệu. 
+- Thêm vào đó, có **6 transcript bài giảng** đã sửa lỗi và ẩn danh thông tin trong thư mục `transcript/`. 
+- Cũng có **2 bộ slide bài giảng** với thông tin tóm tắt trong thư mục `slides/`.
 
 ## Slide 2 — Luật dùng & bảo mật
-
-- Dùng để mining evidence, dựng golden set, và làm context cho prototype — **chỉ trong phạm vi hackathon**.
-- Không chia sẻ ra ngoài khoá học: không đăng mạng xã hội, không gửi người ngoài, không đưa vào dataset/repo công khai.
-- Không đổ nguyên file lên repo nộp bài của nhóm — trích ngắn để minh hoạ; golden set ghi mã đoạn/mã hội thoại thay vì dán nguyên văn dài.
-- Đưa vào công cụ AI ngoài: chỉ phần tối thiểu cần thiết; lưu ý free tier có thể dùng dữ liệu để huấn luyện.
-- Không cố suy ngược danh tính từ mã ẩn danh.
-- Sau sự kiện, xoá bản sao data khỏi máy và công cụ đã upload nếu ban tổ chức yêu cầu.
-
-Chi tiết quy định: README gốc của repo, mục "Bảo mật dữ liệu được cung cấp".
+- Dữ liệu này chỉ được sử dụng trong phạm vi hackathon để khai thác bằng chứng và xây dựng tập dữ liệu mẫu. 
+- Cần đảm bảo rằng không chia sẻ thông tin ra ngoài, không đưa lên mạng xã hội, không gửi cho người ngoài, và không đổ nguyên file lên repo nộp bài. 
+- Các quy định về bảo mật cũng yêu cầu không tìm kiếm danh tính từ mã ẩn danh và xoá bản sao nếu có yêu cầu từ ban tổ chức.
 
 ## Khái niệm chính
-
-- [[chatlog]]: Tập hợp các file ghi lại lịch sử hội thoại giữa học viên và AI tutor.
-- [[transcript]]: Văn bản ghi lại nội dung bài giảng, bao gồm các đoạn hội thoại có mã trích dẫn.
-- [[golden-set]]: Tập hợp dữ liệu đáng tin cậy, được sử dụng để phát triển mô hình AI.
-- [[mining-evidence]]: Quy trình khai thác dữ liệu để tìm kiếm bằng chứng cho các giả thuyết hoặc yêu cầu nghiên cứu.
-- [[bảo-mật-dữ-liệu]]: Quy định về việc bảo vệ và sử dụng dữ liệu nhạy cảm trong quá trình học tập và nghiên cứu.
+- [[chatlog]]: Tệp chứa các dòng hội thoại giữa học viên và AI tutor đã được ẩn danh.
+- [[transcript]]: Tài liệu biên bản bài giảng với các đoạn mã trích dẫn đã được xử lý.
+- [[Luật dùng & bảo mật]]: Các quy định liên quan đến việc sử dụng và bảo mật dữ liệu trong hackathon.
 ```

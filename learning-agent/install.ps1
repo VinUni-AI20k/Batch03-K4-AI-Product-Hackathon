@@ -1,4 +1,4 @@
-# Vlearn Agent — cài đặt trên Windows (PowerShell).
+﻿# Vlearn Agent — cài đặt trên Windows (PowerShell).
 # Dùng:  .\install.ps1            (cài lõi + voyage)
 #        .\install.ps1 -Ingest    (thêm Docling/Whisper xử lý PDF/PPTX/video — nặng)
 param([switch]$Ingest)

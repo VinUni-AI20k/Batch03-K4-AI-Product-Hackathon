@@ -1,13 +1,13 @@
 ---
 course: packs
-generated: '2026-07-30T10:19:36+00:00'
+generated: '2026-07-31T18:06:05+00:00'
 lang: vi
 lesson: start
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/discord/start.md
-source_hash: sha256:93346ba7b5330179d69146b2ad126a862baa972d8a855ddb468761c75202037b
+source_file: packs\vlearn-pack\vlearn-pack\discord\start.md
+source_hash: sha256:d4aba999b5cb27241759dcc45608715a77c886df9fabee189ba4981031202607
 type: lesson-note
 ---
 
@@ -18,19 +18,18 @@ Xin chào các Builder! Đây là server Discord chính thức của chương tr
 
 ---
 
-## Slide 1 — Xác thực và nhận role
+## Slide 1 — Bước 1 — Xác thực và nhận role
 Vào [kênh xác thực](https://discord.com/channels/1526532830627102781/1527920162416889948) và react vào tin nhắn ghim để nhận role `<@&1527648657325690961>` — mở khoá toàn bộ kênh học tập và cộng đồng.
 
-## Slide 2 — Tài nguyên học tập
+## Slide 2 — Bước 2 — Tài nguyên học tập
 Truy cập [kênh tài nguyên](https://discord.com/channels/1526532830627102781/1527920166397018164) để xem tài liệu, slide bài giảng và các công cụ AI hỗ trợ.
 
-## Slide 3 — Theo dõi thông báo
+## Slide 3 — Bước 3 — Theo dõi thông báo
 [Kênh thông báo](https://discord.com/channels/1526532830627102781/1527920171963125953) là nơi đăng thông báo chính thức — lịch học, sự kiện, thay đổi quan trọng.
 
 ---
 
-## Bản đồ server
-
+## Slide 4 — Bản đồ server
 | Kênh | Mục đích |
 |---|---|
 | [Chat tự do](https://discord.com/channels/1526532830627102781/1527920177390293164) | Chat tự do, kết nối cộng đồng |
@@ -44,13 +43,12 @@ Truy cập [kênh tài nguyên](https://discord.com/channels/1526532830627102781
 Bắt đầu ngay bằng cách vào [kênh xác thực](https://discord.com/channels/1526532830627102781/1527920162416889948) nhận role Learner nhé!
 
 ## Khái niệm chính
-- [[role]]: Chức vụ trong server Discord giúp phân loại người dùng.
-- [[kênh xác thực]]: Kênh nơi người dùng xác thực tài khoản để nhận quyền truy cập.
-- [[kênh tài nguyên]]: Nơi chứa tài liệu và công cụ học tập.
-- [[kênh thông báo]]: Kênh dành cho thông báo chính thức.
-- [[Chat tự do]]: Kênh để giao tiếp tự do, kết nối giữa các thành viên.
-- [[Hỏi đáp]]: Kênh hỗ trợ đặt câu hỏi và giải đáp thắc mắc.
-- [[Khoe thành quả]]: Nơi chia sẻ những thành tựu cá nhân.
-- [[Ghi chú]]: Kênh để ghi chép thông tin học tập.
-- [[Hỗ trợ]]: Kênh để giải quyết các vấn đề phát sinh.
+- [[kênh xác thực]]: Nơi người dùng xác thực để nhận vai trò và truy cập kênh học tập.
+- [[kênh tài nguyên]]: Kênh chứa tài liệu và công cụ hỗ trợ học tập.
+- [[kênh thông báo]]: Nơi đăng thông báo chính thức về lịch học và sự kiện.
+- [[Chat tự do]]: Kênh để mọi người giao lưu và kết nối.
+- [[Hỏi đáp]]: Kênh để đặt câu hỏi và nhận sự trợ giúp.
+- [[Khoe thành quả]]: Nơi chia sẻ thành tích và kinh nghiệm học tập.
+- [[Ghi chú]]: Kênh tổng hợp ghi chú và kiến thức đã học.
+- [[Hỗ trợ]]: Kênh dành cho giải quyết vấn đề trong quá trình học tập.
 ```

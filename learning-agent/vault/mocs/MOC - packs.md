@@ -7,11 +7,11 @@ type: moc
 - [[01-de-bai]] — 01-de-bai
 - [[02-guide]] — 02-guide
 - [[04-rubric]] — 04-rubric
-- [[README]] — README
 - [[DATA_DICTIONARY]] — DATA_DICTIONARY
-- [[Thôngbáo]] — Thôngbáo
 - [[rule]] — rule
 - [[start]] — start
+- [[Thôngbáo]] — Thôngbáo
+- [[README]] — README
 - [[1-AICB_Ngày_1]] — 1-AICB_Ngày_1
 - [[1-day04-prompt-engineering-tool-calling-v2]] — 1-day04-prompt-engineering-tool-calling-v2
 - [[1-day04-prompt-engineering-tool-calling]] — 1-day04-prompt-engineering-tool-calling

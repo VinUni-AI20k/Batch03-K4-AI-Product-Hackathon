@@ -1,79 +1,70 @@
 ---
 course: packs
-generated: '2026-07-30T10:22:44+00:00'
+generated: '2026-07-31T18:35:17+00:00'
 lang: vi
 lesson: transcript-04-clean
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/transcript/transcript-04-clean.md
-source_hash: sha256:92ae162746e1ed015c628ef8b904ef0f8e49222e930e78b1f0159139e9f88526
+source_file: packs\vlearn-pack\vlearn-pack\transcript\transcript-04-clean.md
+source_hash: sha256:03457fb6ddbedfe72f2345185c7147651105a2fefeffe3afa4b9ad633af5bbb1
 type: lesson-note
 ---
 
-## Slide 1 — Chào lớp và giới thiệu giảng viên
-**[T04-001]** Xin chào mọi người, mình là Trung. Mình rất ấn tượng với những bạn dũng cảm nghỉ việc để tham gia khóa học này. 
-**[T04-002]** Lớp chúng ta có sự kết hợp giữa sinh viên năm cuối và những người đã đi làm, đây là tổ hợp lý tưởng để học hỏi lẫn nhau.
-**[T04-003]** Ngày hôm nay, chúng ta sẽ bàn về nền tảng của AI và các mô hình ngôn ngữ lớn (LLM), cùng tìm hiểu cách mà chúng vận hành.
-**[T04-004]** Mình có khoảng 10 năm kinh nghiệm trong lĩnh vực công nghệ và AI, với nhiều dự án từ blockchain đến tài chính.
-**[T04-005]** Mình đã tham gia vào nhiều dự án AI, bao gồm mô hình chống gian lận và ứng dụng AI trong blockchain.
-**[T04-006]** Gần đây, mình đã làm việc về AI Center tại FPT Software và phát triển sản phẩm AI cho lĩnh vực Healthcare.
-**[T04-007]** Mình cũng tham gia vào một dự án cứu hộ mà đã thể hiện được sức mạnh của công nghệ trong các tình huống khẩn cấp.
+```markdown
+# Ghi chú bài học — Day 1: Foundation (phần 1)
 
-## Slide 2 — Nội dung ngày học và bức tranh tổng quan về AI
-**[T04-013]** Chúng ta sẽ điểm qua một bức tranh tổng quan về AI, xem xét lịch sử từ năm 1950 đến nay, cơ chế vận hành của LLM, và làm quen với API.
-**[T04-014]** Cuối buổi, chúng ta sẽ có một quiz ngắn. Ngày mai, có lab đầu tiên để cài đặt môi trường và gọi API.
+## Chào lớp và giới thiệu giảng viên
+**[T04-001]** Xin chào mọi người, mình là Trung. Ngày hôm nay chúng ta sẽ bắt đầu một hành trình thú vị về [[AI]] (trí tuệ nhân tạo). Rất nhiều bạn đang có mặt ở đây vì sự hứng thú với lĩnh vực này.
 
-## Slide 3 — AI và các thuật ngữ
-**[T04-015]** AI (trí tuệ nhân tạo) bao gồm nhiều khái niệm như [[machine-learning]], [[deep-learning]], và [[generative-ai]]. Các thuật ngữ này tạo thành một cấu trúc, với AI là lớp bên ngoài và [[generative-ai]] là lớp bên trong, hiện diện trong các mô hình như ChatGPT.
+**[T04-002]** Lớp học có sự kết hợp giữa sinh viên năm cuối và những người đã có kinh nghiệm trong ngành — đây là cơ hội tuyệt vời để tất cả học hỏi và chia sẻ.
 
-## Slide 4 — Lịch sử AI: Turing test và hai mùa đông
-**[T04-016]** AI đã tồn tại khoảng 70 năm, khởi đầu từ các ý tưởng của [[Alan-Turing]].
-**[T04-018]** Bài kiểm tra Turing là để xác định trí thông minh của máy tính.
-**[T04-022]** AI đã trải qua hai giai đoạn lịch sử gọi là “mùa đông”, thời điểm mất niềm tin vào khả năng của AI.
-**[T04-024]** Khái niệm [[symbolic-ai]] đã được giới thiệu trong những năm 1956 nhưng gặp phải vấn đề giới hạn.
+**[T04-003]** Trong buổi học hôm nay, chúng ta sẽ tìm hiểu sự khác biệt giữa [[AI]] truyền thống và [[mô-hình-ngôn-ngữ-lớn]] (LLM) như ChatGPT, Gemini hay Claude — cùng xem cách mà những mô hình này hoạt động.
 
-## Slide 5 — Deep learning và sức mạnh của dữ liệu
-**[T04-030]** [[Deep-learning]] là mô hình thần kinh gan sâu, giúp máy tự học từ dữ liệu mà không cần định nghĩa trước.
-**[T04-031]** Bộ dữ liệu đầu tiên do [[Fei-Fei Li]] phát triển đã tạo đà cho deep learning.
+**[T04-004]** Mình có khoảng 10 năm kinh nghiệm trong lĩnh vực công nghệ, đã làm việc trong nhiều dự án liên quan đến [[AI]] và [[blockchain]], và sẽ chia sẻ những kiến thức của mình trong course này.
 
-## Slide 6 — AlphaGo và kiến trúc Transformer
-**[T04-034]** AlphaGo đã đánh bại kỳ thủ cờ vây Lee Sedol, đánh dấu một bước ngoặt trong AI.
-**[T04-038]** Kiến trúc [[transformer]] được giới thiệu trong bài báo "Attention Is All You Need" của Google vào năm 2017.
+## Nội dung ngày học và bức tranh tổng quan về AI
+**[T04-013]** Chúng ta sẽ cùng nhau khám phá bức tranh tổng thể của [[AI]], tóm tắt lịch sử của nó từ năm 1950, và đi sâu vào cơ chế hoạt động của [[mô-hình-ngôn-ngữ-lớn]]. Cuối buổi, chúng ta sẽ thực hành với API.
 
-## Slide 7 — Cuộc đua AI sau ChatGPT
-**[T04-041]** ChatGPT ra đời vào năm 2022 đã dẫn đến sự bùng nổ trong ngành AI, khiến nhiều công ty phải thay đổi ngay lập tức.
-**[T04-042]** Nhiều hướng nghiên cứu mới bắt đầu phát triển sau thành công của ChatGPT.
+**[T04-015]** Đầu tiên, chúng ta cần hiểu rằng [[AI]] là một hệ thống có trí thông minh, bao gồm các tầng khác như [[machine-learning]] và [[deep-learning]]. [[AI tạo sinh]] là một tầng con của [[AI]], sử dụng trong các chatbot hiện nay.
 
-## Slide 8 — Mổ xẻ mô hình ngôn ngữ lớn: dự đoán token và context
-**[T04-046]** [[Mô-hình-ngôn-ngữ-lớn]] dự đoán token tiếp theo dựa vào khả năng thống kê.
-**[T04-049]** Token là đơn vị ngôn ngữ của máy; mô hình xử lý thông tin thông qua [[context]] — bối cảnh của văn bản.
+## Lịch sử AI: Turing test và hai mùa đông
+**[T04-016]** [[AI]] không phải là một khái niệm mới; nó đã có khoảng 70 năm phát triển. Năm 1956 đánh dấu sự ra đời của [[AI]]. Alan Turing là người đóng góp nhiều lý thuyết, bao gồm [[Turing test]] để xác định trí thông minh của máy.
 
-## Slide 9 — Attention, multi-head và bài học quản lý context
-**[T04-053]** Cơ chế [[attention]] trong mô hình transformer giúp chú ý đến các phần quan trọng của văn bản.
-**[T04-056]** Multi-head attention cho phép mô hình nhận diện nhiều đặc tính và quy luật khác nhau trong văn bản.
+**[T04-024]** Từ năm 1956, nhiều ý tưởng về [[AI]] đã được phát triển nhưng cũng gặp phải những mùa đông khi mà kỳ vọng không đạt được thực tế. Đặc biệt, ở các năm 70-80, sự thiếu hụt dữ liệu và máy móc đã khiến cho nhiều dự án AI thất bại. 
 
-## Slide 10 — Tham số, RLHF và ngành gán nhãn dữ liệu
-**[T04-058]** Các tham số (parameters) ảnh hưởng lớn đến khả năng của mô hình, và tăng cường khả năng học của mô hình qua [[RLHF]] — học tăng cường với sự tham gia của con người.
-**[T04-060]** Ngành [[gán-nhãn-dữ-liệu]] cần thiết để huấn luyện các mô hình AI.
+## Deep learning và sức mạnh của dữ liệu
+**[T04-030]** [[Deep-learning]] là một bước đột phá, cho phép máy học được từ dữ liệu mà không cần phải định nghĩa luật bằng tay. Bên cạnh đó, dữ liệu chất lượng cao là rất quan trọng để mô hình có thể học tốt.
 
-## Slide 11 — Thí nghiệm bàn cờ, giới hạn kiến thức và các mức tiếp cận mô hình
-**[T04-064]** Một thí nghiệm cho thấy liệu mô hình có kết nối thông tin để dự đoán hay không — có thể xây dựng mô hình bên trong.
-**[T04-067]** Các mô hình LLM không chỉ dựa vào dữ liệu cũ, chúng cần phải kết hợp thêm công cụ mới để cập nhật thông tin.
+**[T04-031]** [[ImageNet]] ra đời với sự góp mặt của nhiều nhà nghiên cứu đã mở đường cho xu hướng [[deep-learning]] phát triển mạnh mẽ.
 
-## Slide 12 — Cơ bản về gọi API mô hình LLM
-**[T04-087]** Khi gọi API, bạn cần hiểu các cấu phần như [[system-prompt]], [[user-input]], và những thông số ảnh hưởng đến chi phí.
+## AlphaGo và kiến trúc Transformer
+**[T04-034]** [[AlphaGo]] là dấu mốc trong lịch sử [[AI]], khi mà nó đánh bại kỳ thủ cờ vây hàng đầu Lee Sedol. Câu chuyện này đã khơi dậy sự quan tâm lớn đến [[AI]].
 
-## Slide 13 — Tóm tắt buổi học
-**[T04-091]** Hôm nay, chúng ta đã tìm hiểu về những khái niệm căn bản của AI và các mô hình LLM, bao gồm cách mà chúng hoạt động và sự quan trọng của việc đánh giá sản phẩm trong thực tế.
+**[T04-038]** Năm 2017, bài báo "Attention Is All You Need" đã giới thiệu [[kiến-trúc-transformer]], từ đó dẫn đến sự phát triển của các mô hình [[LLM]] như ChatGPT.
+
+## Cuộc đua AI sau ChatGPT
+**[T04-041]** Sau sự ra đời của ChatGPT vào năm 2022, tất cả các công ty [[AI]] đều nhanh chóng chuyển mình để thích nghi với xu hướng mới.
+
+## Mổ xẻ mô hình ngôn ngữ lớn: dự đoán token và context
+**[T04-046]** Các mô hình [[ngôn-ngữ-lớn]] như ChatGPT dự đoán và sinh ra [[token]] — các đơn vị ngôn ngữ nhỏ hơn chữ cái và từ. [[Context]] hay bối cảnh là thông tin mà mô hình có thể xử lý trong một lần.
+
+## Attention, multi-head và bài học quản lý context
+**[T04-053]** [[Attention]] trong [[Transformer]] cực kỳ quan trọng để mô hình có thể chú ý đến thông tin cần thiết. Quản lý context hiệu quả sẽ giúp tăng hiệu suất của [[AI]] hơn.
+
+## Tham số, RLHF và ngành gán nhãn dữ liệu
+**[T04-058]** [[Tham-số]] thể hiện khả năng của mô hình. [[RLHF]] (học tăng cường với con người) là phương pháp giúp nâng cao khả năng học của mô hình nhờ phản hồi từ người dùng.
+
+## Tóm tắt buổi học
+**[T04-091]** Trong buổi học hôm nay, chúng ta đã tìm hiểu về cách mô hình [[LLM]] hoạt động, cấu trúc và cách lựa chọn mô hình phù hợp với công việc mình đang làm.
 
 ## Khái niệm chính
-- [[ai]]: Hệ thống có trí thông minh mô phỏng trí tuệ con người.
-- [[machine-learning]]: Kỹ thuật cho phép máy tính học từ dữ liệu mà không cần lập trình cụ thể.
-- [[deep-learning]]: Phương pháp học sâu giúp mô hình tự học từ dữ liệu thông qua các mạng neuron.
-- [[generative-ai]]: Công nghệ cho phép sản sinh nội dung mới từ dữ liệu đầu vào.
-- [[symbolic-ai]]: Dạy máy bằng luật, phương pháp học đầu tiên của AI.
-- [[transformer]]: Kiến trúc nổi bật trong xử lý ngôn ngữ tự nhiên với cơ chế attention.
-- [[rlhf]]: Kỹ thuật học mà có sự tham gia của con người để cải thiện mô hình.
-- [[gán-nhãn-dữ-liệu]]: Ngành giúp đánh giá và chuẩn bị dữ liệu cho việc huấn luyện mô hình AI.
-- [[context]]: Bối cảnh thông tin mà mô hình tiếp nhận để xử lý các yêu cầu.
+- [[AI]]: Trí tuệ nhân tạo, là hệ thống có khả năng thực hiện những tác vụ cần trí thông minh.
+- [[LLM]]: Mô hình ngôn ngữ lớn, cho phép sinh và xử lý văn bản tự nhiên.
+- [[Deep-learning]]: Phương pháp học máy dựa trên mạng neuron nhiều lớp, tự động học từ dữ liệu.
+- [[Turing test]]: Thử nghiệm đánh giá trí thông minh của máy tính thông qua khả năng giả mạo cuộc trò chuyện với con người.
+- [[Context]]: Bối cảnh hay ngữ cảnh, thông tin mà mô hình có thể tiếp nhận trong một lần xử lý.
+- [[Attention]]: Cơ chế giúp mô hình chú ý đến phần quan trọng trong dữ liệu.
+- [[Token]]: Đơn vị cơ bản trong văn bản mà mô hình ngôn ngữ lớn sử dụng để phân tích và sinh ra văn bản.
+- [[RLHF]]: Kỹ thuật học tăng cường có sự tham gia của con người để cải thiện phản hồi từ mô hình.
+```

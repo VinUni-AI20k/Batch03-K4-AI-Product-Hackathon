@@ -1,222 +1,221 @@
 ---
 course: packs
-generated: '2026-07-30T10:25:16+00:00'
+generated: '2026-07-31T18:15:45+00:00'
 lang: vi
 lesson: 5-day02-lecture-slides-v2
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/slides/5-day02-lecture-slides-v2.md
-source_hash: sha256:449888b89392605cd76f88f4f298fbfd1ae07fea1f14cbaa14bd7de097d8ac41
+source_file: packs\vlearn-pack\vlearn-pack\slides\5-day02-lecture-slides-v2.md
+source_hash: sha256:d8ac30a6886b4386325cbc57cec20098eccaa3ed10620745c0a67a562fb1cab6
 type: lesson-note
 ---
 
 ```markdown
 ## Slide 1 — Xác định bài toán cho AI
-Xác định bài toán cho AI bắt đầu từ yêu cầu mơ hồ đến Problem Statement rõ ràng. [00:00]
+Xác định bài toán cho AI, chuyển từ yêu cầu mơ hồ thành [[Problem Statement]] rõ ràng. 
 
 ## Slide 2 — Bốn câu hỏi trọng tâm
-Bốn câu hỏi trọng tâm trong việc chuyển từ xác định bài toán đến quyết định ứng dụng AI:
-1. Bài toán có thực sự cần AI giải quyết?
-2. Nếu có, giải pháp ở cấp độ nào: Rule, Workflow, hay Agent?
-3. Problem Statement đã đủ rõ ràng để triển khai?
-4. Khi nào quyết định: Go, Not Yet, hay No-Go? [00:02]
+- Bài toán có thực sự cần AI giải quyết?
+- Nếu có, giải pháp ở cấp độ nào: Rule, Workflow, hay [[Agent]]?
+- Problem Statement đã đủ rõ ràng để triển khai?
+- Khi nào quyết định: Go, Not Yet, hay No-Go?
 
 ## Slide 3 — Agenda
-Mục tiêu của ngày hôm nay là biến yêu cầu mơ hồ thành Problem Statement rõ ràng để ra quyết định. Chương trình gồm lý thuyết và thực hành lab. [00:03]
+Mục tiêu: Biến yêu cầu mơ hồ thành Problem Statement rõ ràng để ra quyết định. 
+- Sáng: Khung lý thuyết (4H)
+- Chiều: Thực hành lab (4H)
 
-## Slide 4 — Phát triển Sản phẩm AI (AI Product)
-Sản phẩm tích hợp AI cần phải là một sản phẩm hoàn chỉnh, kế thừa các nguyên lý của sản phẩm truyền thống. [00:04]
+## Slide 4 — Phát triển Sản phẩm AI
+Sản phẩm tích hợp AI bản chất vẫn là một sản phẩm hoàn chỉnh, kế thừa chứ không thay thế nguyên lý sản phẩm truyền thống.
 
 ## Slide 5 — Ba trụ cột nền tảng của AI Product
-Ba trụ cột của AI Product bao gồm:
-- AI Engineering: Triển khai RAG, Agent, và đánh giá hệ thống AI.
-- Product Thinking: Định nghĩa đúng bài toán và thấu hiểu người dùng.
-- Design Thinking: Tối ưu trải nghiệm người dùng thông qua thiết kế phản hồi. [00:05]
+- **AI Engineering**: Triển khai RAG, Agent, Guardrails, Evaluation và vận hành hệ thống AI thực tế.
+- **Product Thinking**: Xác định đúng bài toán, thấu hiểu người dùng, tránh xây dựng những tính năng không mang lại giá trị.
+- **Design Thinking**: Thiết kế dựa trên mô hình tư duy, cơ chế phản hồi và tối ưu trải nghiệm khi AI sai sót.
 
 ## Slide 6 — Thảo luận nhanh
-Khi bạn muốn xây dựng một chatbot AI cho khách hàng, câu hỏi cần hỏi là chatbot đó đang làm gì? [00:06]
+“Tôi muốn xây dựng chatbot AI cho khách hàng.” Bạn có thể hỏi chatbot đó đang làm gì để hiểu rõ hơn.
 
-## Slide 7 — "AI chatbot" chưa phải một bài toán
-Một chatbot với mục đích khác nhau phục vụ cho các yêu cầu khác nhau dẫn đến quy trình, chỉ số và rủi ro khác nhau. [00:07]
+## Slide 7 — "AI chatbot" chưa phải là một bài toán
+Đối tượng khác nhau dẫn đến quy trình, chỉ số và rủi ro khác nhau.
 
 ## Slide 8 — Khoan đã, bạn có hỏi không?
-Cần thấu hiểu bản chất vấn đề trước khi tìm giải pháp. Hãy xem các điểm đau của học viên và trợ giảng hiện tại. [00:08]
+Cần thấu hiểu bản chất vấn đề trước khi tìm giải pháp. Học viên gặp khó khăn ở công đoạn nào? 
 
 ## Slide 9 — Nhận diện điểm đau thực tế
-Liệt kê ít nhất 3 điểm đau (pain points) bạn quan sát hoặc gặp phải trong trải nghiệm của mình. [00:09]
+Liệt kê ít nhất 3 điểm đau bạn quan sát hoặc gặp phải trong quá trình học.
 
 ## Slide 10 — Counter-Intuitive Rule
-Đừng bao giờ giải quyết vấn đề mà bạn được yêu cầu giải quyết. [00:10]
+“Never solve the problem I am asked to solve.” - Don Norman
 
 ## Slide 11 — Problem Discovery
-Tìm đúng vấn đề trước khi tìm giải pháp bằng cách áp dụng Double Diamond, HCD và các kỹ thuật phân kỳ / hội tụ. [00:11]
+Tìm đúng vấn đề trước khi tìm giải pháp — áp dụng các kỹ thuật như [[Double Diamond]], HCD.
 
 ## Slide 12 — Tìm đúng vấn đề trước khi tìm giải pháp
-Mô hình Double Diamond giúp mở rộng và thu hẹp để xác định đúng vấn đề và tìm đúng giải pháp. [00:12]
+Mô hình [[Double Diamond]] giúp mở rộng và thu hẹp vấn đề và giải pháp.
 
 ## Slide 13 — Diamond 1 — Tìm đúng vấn đề
-Phân kỳ để thấu hiểu sâu sắc và hội tụ để lựa chọn chính xác. [00:13]
+- **Discover**: Khám phá và khảo sát vấn đề căn bản.
+- **Define**: Định nghĩa đúng bài toán gốc.
 
 ## Slide 14 — Quy trình thiết kế lấy con người làm trung tâm (HCD)
-Quy trình thiết kế HCD gồm các bước quan sát, tạo ý tưởng, tạo mẫu thử, kiểm tra và lặp lại. [00:14]
+Quy trình bao gồm: Observation, Ideation, Prototype, Test, Iteration.
 
 ## Slide 15 — Những câu hỏi nguyên bản
-Đôi khi sự hiểu biết bắt đầu từ việc đặt câu hỏi cho những điều hiển nhiên. [00:15]
+Đặt câu hỏi cho những điều hiển nhiên có thể cung cấp insight mới.
 
 ## Slide 16 — Câu hỏi gợi mở
-Đặt câu hỏi gợi mở để mở rộng tư duy trước khi lựa chọn bài toán. [00:16]
+Thúc đẩy tư duy sáng tạo qua việc đặt các câu hỏi mở về bài toán.
 
 ## Slide 17 — Khởi nguồn từ bài toán
-Đưa ra ba bài học thực tế về việc hiểu lĩnh vực và định vị giải pháp. [00:17]
+Nắm rõ lĩnh vực, quy mô thị trường và định vị giải pháp là rất quan trọng.
 
 ## Slide 18 — Tìm bài toán AI ở đâu?
-Quan sát các hoạt động thực tế để nhận diện bài toán AI phù hợp: tác vụ lặp lại, tiêu tốn thời gian, lợi thế của AI và điểm đau của người dùng. [00:18]
+Quan sát các hoạt động thực tế xung quanh để nhận diện vấn đề.
 
-## Slide 19 — Sai lầm thường gặp (Anti-patterns)
-Đưa ra dấu hiệu cảnh báo khi tích hợp AI. [00:19]
+## Slide 19 — Sai lầm thường gặp khi tích hợp AI
+Cảnh báo bài toán chưa được định hình rõ hoặc giải pháp AI chọn quá sớm.
 
 ## Slide 20 — Discovery interview: 5 câu hỏi nên hỏi stakeholder
-Các câu hỏi này nhằm làm rõ vấn đề, quy trình hiện tại và chi phí thiệt hại. [00:20]
+- Vấn đề nhức nhối là gì?
+- Thiệt hại do vấn đề này gây ra là gì?
 
 ## Slide 21 — Problem Statement
-Từ pain point đến Problem Statement, bài toán được định hình qua workflow và chỉ số đo lường. [00:21]
+Đi từ điểm đau đến [[Problem Statement]] — bài toán định hình qua workflow, bottleneck, metrics và boundary.
 
 ## Slide 22 — Quick Problem Card
-Khung định hình bài toán gồm bài toán, đối tượng ảnh hưởng, quy trình hiện tại, nút thắt, tác động, chỉ số thành công và định hướng giải pháp. [00:22]
+Khung định hình cho bài toán, bao gồm các yếu tố như Problem, Actor, Workflow, Bottleneck, Impact, Success Metric.
 
 ## Slide 23 — Quick Problem Card — ví dụ đã điền
-Dùng ví dụ Weekly Report để minh họa việc áp dụng khung Quick Problem Card. [00:23]
+Ví dụ cụ thể về cách điền Quick Problem Card cho một bài toán thực tế.
 
 ## Slide 24 — Câu hỏi khai thác bài toán
-Bộ câu hỏi định hình vấn đề cho các bên liên quan hoặc chính mình để làm rõ quy trình và hiệu quả cải tiến. [00:24]
+Bộ câu hỏi định hình vấn đề để thuyết phục các bên liên quan.
 
 ## Slide 25 — Định lượng hóa bài toán
-Điểm đau chưa được định lượng sẽ không xác định được giá trị thực tế của AI. [00:25]
+Điểm đau chưa được định lượng thì không thể xác định giá trị thực tế của AI.
 
 ## Slide 26 — Thiết lập chỉ số: Output & Input
-Chỉ số đo lường nên phản ánh kết quả cuối và các đòn bẩy. [00:26]
+Chỉ số đo lường cần phải phản ánh kết quả cuối cùng và các yếu tố có thể tác động.
 
 ## Slide 27 — Chuyển điểm đau thành chỉ số định lượng
-Liệt kê chỉ số đo lường cho một điểm đau đã nhận diện. [00:27]
+Thiết lập phương án đo lường cho điểm đau đã nhận diện.
 
 ## Slide 28 — Có nên ứng dụng AI?
-AI chỉ thực sự mang lại giá trị khi nó được tích hợp chính xác vào quy trình và giải quyết đúng điểm đau. [00:28]
+AI chỉ thực sự mang lại giá trị khi tích hợp chính xác vào quy trình nghiệp vụ và giải quyết đúng điểm đau.
 
 ## Slide 29 — Khi nào AI đáng để làm?
-Các điều kiện xác định khi nào AI là lựa chọn hợp lý cho giải pháp. [00:29]
+Mục tiêu áp dụng AI sẽ quyết định cách xây dựng giải pháp.
 
 ## Slide 30 — Tự xây dựng hay mua giải pháp?
-Hai góc nhìn về việc xây dựng hay mua giải pháp AI. [00:30]
+Hai góc nhìn bổ sung nhau giúp định hình chiến lược triển khai.
 
 ## Slide 31 — Thiết lập kỳ vọng
-Đo lường mức độ hiệu quả trước khi phát hành giải pháp AI. [00:31]
+Đo lường các chỉ số để xác định mức độ hiệu quả trước khi chính thức phát hành giải pháp.
 
 ## Slide 32 — Đánh giá mức độ phù hợp của AI
-Năm câu hỏi cốt lõi giúp xác định cấp độ giải pháp. [00:32]
+Năm câu hỏi cốt lõi để xác định cấp độ giải pháp phù hợp.
 
 ## Slide 33 — Vòng đời Sản phẩm AI
-Mỗi giai đoạn từ ý tưởng đến vận hành yêu cầu phương thức xác thực riêng. [00:33]
+Mỗi giai đoạn từ ý tưởng đến vận hành thực tế yêu cầu phương thức xác thực chuyên biệt.
 
 ## Slide 34 — Khoảng cách giữa Demo và Production
-Hiệu suất trong triển khai thực tế cần đối chiếu với các quy trình hiện tại. [00:34]
+Phản hồi chỉ vào một vài lần thử chưa đủ để triển khai hệ thống thực tế.
 
 ## Slide 35 — Hệ thống AI
-Một giải pháp AI thực tế là sự kết hợp của nhiều thành phần chứ không chỉ là mô hình ngôn ngữ. [00:35]
+Hệ thống AI thực tế là sự kết hợp của nhiều thành phần chứ không chỉ là mô hình ngôn ngữ.
 
 ## Slide 36 — Tổng quan về Hệ thống AI
-Khái quát các thành phần cấu thành để định vị giải pháp AI. [00:36]
+Mô hình, ngữ cảnh, quy trình và công cụ là các thành phần cấu thành chính.
 
 ## Slide 37 — Vai trò của UX trong Sản phẩm AI
-Thiết kế UX có vai trò quan trọng trong việc đảm bảo trải nghiệm người dùng và xử lý các tình huống AI thiếu dữ liệu. [00:37]
+Thiết kế UX là rất quan trọng để xử lý các tình huống AI thiếu dữ liệu hoặc độ tin cậy thấp.
 
 ## Slide 38 — Rule / Workflow / Agent
-Phân tích cấp độ giải pháp và tối ưu theo độ phức tạp phù hợp. [00:38]
+Phân tích cấp độ giải pháp; ưu tiên đơn giản nhất đủ để giải quyết bài toán.
 
 ## Slide 39 — Ba mức giải pháp: Rule / Workflow / Agent
-Mô tả ba cấp độ giải pháp với độ phức tạp tăng dần, từ Rule đến Agent. [00:39]
+Mô tả các cấp độ giải pháp với ví dụ cụ thể cho từng cấp.
 
 ## Slide 40 — Tình huống: Tối ưu nguồn lực Trợ giảng
-Mô hình hóa quy trình nghiệp vụ hiện tại để cân nhắc giải pháp AI. [00:40]
+Mô hình hóa quy trình nghiệp vụ trước khi cân nhắc ứng dụng AI.
 
 ## Slide 41 — Cấp độ 1 — Giải pháp dựa trên Luật
-Giải pháp dựa trên luật là lựa chọn tối ưu khi logic nghiệp vụ rõ ràng. [00:41]
+Giải pháp dựa trên luật khi logic nghiệp vụ tường minh và điều kiện kết quả cố định.
 
 ## Slide 42 — Cấp độ 2 — Giải pháp dựa trên Quy trình
-Giải pháp dựa trên quy trình cần AI hỗ trợ cho từng bước. [00:42]
+Các bước xử lý đã định hình rõ nhưng từng công đoạn cần hỗ trợ AI.
 
 ## Slide 43 — Cấp độ 3 — Giải pháp dựa trên Tác nhân tự chủ
-Agent tự động lập kế hoạch và phối hợp công cụ. [00:43]
+Hệ thống tự động lập kế hoạch và linh hoạt thích ứng.
 
 ## Slide 44 — Một tình huống, ba cấp độ giải pháp
-Ưu tiên giải pháp đơn giản nhất mà vẫn đáp ứng mục tiêu đề ra. [00:44]
+Ưu tiên lựa chọn giải pháp đơn giản nhất có thể giải quyết bài toán.
 
 ## Slide 45 — Workflow Patterns theo Anthropic
-Mô tả các mẫu workflow chính để áp dụng trong nghiên cứu. [00:45]
+Khái quát về các mẫu quy trình hoạt động cơ bản và nâng cao.
 
 ## Slide 46 — Workflow patterns — đủ cho hầu hết bài toán
-Các mẫu cơ bản đáp ứng đa số yêu cầu trong thực tế. [00:46]
+Mô hình cơ bản đáp ứng hầu hết tác vụ thực tế nên được ưu tiên sử dụng.
 
 ## Slide 47 — Khi nào cần phức tạp hơn?
-Khi quy trình yêu cầu nhiều biến số hoặc tự thích ứng, hãy cân nhắc đến Agent. [00:47]
+Mẫu Orchestrator-Workers và Evaluator-Optimizer sẽ sử dụng khi cần yếu tố phức tạp.
 
 ## Slide 48 — Thang câu hỏi lựa chọn cấp độ giải pháp
-Khung câu hỏi giúp tránh nhảy vọt lên cấp độ phức tạp hơn cần thiết. [00:48]
+Khung câu hỏi tuần tự giúp tránh nhảy vọt lên giải pháp phức tạp.
 
 ## Slide 49 — Cây quyết định: Lựa chọn cấp độ giải pháp
-Chọn lựa giữa Rule, Workflow và Agent dựa trên bài toán cốt lõi. [00:49]
+Phác thảo từ bài toán cốt lõi đến lựa chọn giải pháp phù hợp.
 
 ## Slide 50 — Ví dụ thực tế ngoài lớp học
-Phân biệt giữa các cấp độ giải pháp trong các tình huống thực tế. [00:50]
+Phân biệt cấp độ giải pháp trong các tình huống như chăm sóc khách hàng hay nghiên cứu bán hàng.
 
 ## Slide 51 — Thiết kế UX và Human-in-the-loop
-Tối ưu hóa hiệu quả của AI thông qua thiết kế phù hợp với người dùng. [00:51]
+Tối ưu hóa hiệu quả của AI qua thiết kế giao diện tương tác phù hợp.
 
 ## Slide 52 — Problem Statement hoàn chỉnh
-Liên kết giữa bài toán, workflow, metrics và quyết định AI. [00:52]
+Liên kết chặt chẽ giữa bài toán và các yếu tố quyết định AI.
 
 ## Slide 53 — Problem Statement cho hệ thống AI
-Nêu rõ các yếu tố cốt lõi trong Problem Statement cho hệ thống AI. [00:53]
+Mô tả 6 yếu tố bài toán cốt lõi và 3 yếu tố quyết định AI.
 
 ## Slide 54 — Ví dụ mẫu: Hỗ trợ Lab Coach/TA
-Một ví dụ hoàn chỉnh cho một Problem Statement trong ngữ cảnh học tập. [00:54]
+Mô tả một Problem Statement hoàn chỉnh cho tình huống thực hành.
 
 ## Slide 55 — Từ Problem Statement đến Eval Plan
-Định hình tiêu chí kiểm thử dựa trên một Problem Statement rõ ràng. [00:55]
+Problem Statement rõ ràng giúp định hình các tiêu chí kiểm thử cụ thể.
 
 ## Slide 56 — Chuyển dịch từ Problem Statement sang Eval Plan
-Phương pháp đánh giá, bộ dữ liệu mẫu và ngưỡng chấp nhận. [00:56]
+Phương pháp đánh giá, bộ dữ liệu mẫu và ngưỡng chấp nhận.
 
 ## Slide 57 — Khung ra quyết định: Go / Not Yet / No-Go
-Quyết định dựa trên tính khả thi của Problem Statement và các số liệu thực tế. [00:57]
+Quyết định dựa trên tính khả thi của Problem Statement và không thiên lệch vào công nghệ.
 
 ## Slide 58 — Bài tập Lab ngày 02
-Áp dụng khung lý thuyết đã học để tổng hợp và đánh giá các vấn đề. [00:58]
+Áp dụng khung lý thuyết đã học vào thực tiễn thông qua bài tập cá nhân và nhóm.
 
 ## Slide 59 — Tổng quan bài Lab: Deliverables
-Lộ trình cụ thể cho các bước cá nhân và nhóm trong bài tập lab. [00:59]
+Lộ trình làm bài cho cá nhân và nhóm với các phần việc cụ thể.
 
 ## Slide 60 — Giai đoạn 1 & 2: Phân kỳ và Hội tụ Cá nhân
-Khảo sát bài toán thực tế và lựa chọn các Problem Cards tối ưu. [01:00]
+Khảo sát tối thiểu 5 bài toán thực tế và lựa chọn top 3 Problem Cards tối ưu.
 
 ## Slide 61 — Hướng dẫn xây dựng Workflow Diagram
-Phân tích Current-State và Future-State trong quy trình. [01:01]
+Phân tích giữa Current-State và Future-State trong quá trình thiết kế.
 
 ## Slide 62 — Worked Example: Báo cáo tuần trước và sau AI
-So sánh trạng thái hiện tại và tương lai cùng với ranh giới kiểm soát. [01:02]
+Mô tả Current-State, Future-State, ranh giới kiểm soát và phương án fallback.
 
-## Slide 63 — Sản phẩm bàn giao sau buổi Lab — Deliverables
-Chi tiết các sản phẩm bàn giao và yêu cầu cho từng phần. [01:03]
+## Slide 63 — Sản phẩm bàn giao sau buổi Lab
+Chi tiết về các sản phẩm bàn giao từ cá nhân và nhóm sau bài lab.
 
 ## Slide 64 — Năm nguyên tắc cốt lõi sau Day 02
-Tóm tắt năm nguyên tắc thiết yếu để thẩm định mọi ứng dụng AI trước khi triển khai. [01:04]
+Tóm tắt năm nguyên tắc để thẩm định mọi đề xuất ứng dụng AI.
 
 ## Khái niệm chính
-- [[problem-statement]]: Tuyên bố rõ ràng về bài toán cần giải quyết.
-- [[pain-point]]: Những khó khăn hoặc trở ngại mà người dùng gặp phải.
-- [[workflow]]: Quy trình hiện tại gồm các bước thực hiện.
-- [[input-metrics]]: Các đòn bẩy giúp theo dõi hiệu quả và cải tiến.
-- [[output-metric]]: Kết quả cuối cùng dùng để đánh giá thành công giải pháp.
-- [[HCD]]: Quy trình thiết kế lấy con người làm trung tâm.
-- [[AI-product]]: Sản phẩm tích hợp trí tuệ nhân tạo trong quá trình phát triển.
+- [[Problem Statement]]: Là bản tóm tắt vấn đề rõ ràng, giúp định hình hướng giải pháp cho AI.
+- [[Agent]]: Một hệ thống AI có khả năng tự động ra quyết định và tương tác với người dùng.
+- [[Double Diamond]]: Mô hình thiết kế bao gồm hai giai đoạn chính là mở rộng và thu hẹp để tìm ra vấn đề và giải pháp rõ ràng.
+- [[HCD]]: Thiết kế lấy con người làm trung tâm, tập trung vào nhu cầu và mong đợi của người dùng.
 ```

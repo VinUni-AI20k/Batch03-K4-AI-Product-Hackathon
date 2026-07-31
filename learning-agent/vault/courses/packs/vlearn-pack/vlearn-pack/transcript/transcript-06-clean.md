@@ -1,13 +1,13 @@
 ---
 course: packs
-generated: '2026-07-30T10:20:33+00:00'
+generated: '2026-07-31T18:37:02+00:00'
 lang: vi
 lesson: transcript-06-clean
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/transcript/transcript-06-clean.md
-source_hash: sha256:0bf0e220bf6e26d08bbf4be12fa68d619face7df788fb013036c494912eebe8c
+source_file: packs\vlearn-pack\vlearn-pack\transcript\transcript-06-clean.md
+source_hash: sha256:43b86eb16b949ffcbda4a773fd492a701fd98692ce0b4eb410b50bed9018aa5f
 type: lesson-note
 ---
 
@@ -17,57 +17,44 @@ type: lesson-note
 ## Slide 1 — Giới thiệu giảng viên và khảo sát làm quen lớp
 **[T06-001]** [Hoạt động lớp: hướng dẫn học viên vào link phiên demo trực tiếp trên điện thoại; câu hỏi trong buổi học cũng đẩy lên đây.]
 
-**[T06-002]** Giới thiệu giảng viên, một Google Developer Expert đến từ Sài Gòn. Đặt câu hỏi khảo sát để hiểu về học viên.
+**[T06-002]** Mình là [giảng viên], là Google Developer Expert. Hôm nay có bạn hỗ trợ demo về cơ chế [[attention]]. Mình muốn biết về các bạn thông qua khảo sát, có hai câu hỏi. Chúng ta sẽ quan sát kết quả.
 
 ## Slide 2 — Nội dung buổi học
-**[T06-022]** Nội dung hôm nay bao gồm:
-- Bức tranh của [[AI]] năm 2025-2026.
-- Trái tim của AI hiện đại — kiến trúc [[transformer]].
-- Thực hành cơ chế [[attention]].
-- [[Token economy]] và lần đầu gọi [[API]].
+**[T06-022]** Nội dung hôm nay bao gồm: 1) Bức tranh AI năm 2025-2026; 2) Trái tim của AI hiện đại — cơ chế bên trong; 3) [[Token economy]]; 4) Thực hành gọi [[API]] lần đầu.
 
 ## Slide 3 — AI, machine learning, deep learning và foundation model
-**[T06-023]** Định nghĩa [[AI]] và mối quan hệ với [[machine learning]] và [[deep learning]]:
-- AI: máy thực hiện tác vụ thông minh.
-- Machine learning: lập trình theo xác suất, không tường minh.
-- Deep learning: sử dụng [[neural network]] và có độ phức tạp cao hơn.
+**[T06-046]** Câu hỏi: Khi nào không dùng LLM? 
 
-## Slide 4 — Ba nhóm AI và lịch sử phát triển
-**[T06-051]** Ba nhóm chính của AI:
-- Nhóm 1: [[Discriminative AI]] — phân loại và dự đoán.
-- Nhóm 2: [[Generative AI]] — tạo nội dung từ input.
-- Nhóm 3: [[Agentic AI]] — có khả năng lập kế hoạch và hành động.
+**[T06-051]** Nhóm đầu tiên là [[discriminative AI]], sử dụng cho phân loại và dự đoán. Nhóm thứ hai là [[generative AI]], tương tác bằng cách prompt để tạo ra nội dung. Nhóm cuối cùng là [[agentic AI]], có khả năng lập kế hoạch và hành động.
 
-## Slide 5 — Vì sao 2025-2026 là bước ngoặt
-**[T06-060]** Dự đoán năm 2025-2026 là bước ngoặt vì 78% doanh nghiệp lớn đã tham gia vào AI nhưng chỉ 30% đã ứng dụng thực tế.
+## Slide 4 — LLM: encoder–decoder, transformer và attention
+**[T06-075]** LLM là mô hình ngôn ngữ lớn, sử dụng kiến trúc [[transformer]], có khả năng tạo và cho phép phân tích văn bản phức tạp.
 
-## Slide 6 — LLM: encoder–decoder, transformer và attention
-**[T06-075]** LLM là mô hình ngôn ngữ lớn dựa trên [[transformer]], với cơ chế [[attention]] cho phép xử lý song song các token đầu vào.
+## Slide 5 — Self-attention: ví dụ "con mèo ngồi trên bàn" và công thức Q–K–V
+**[T06-129]** Cơ chế [[self-attention]] giúp xác định ngữ nghĩa từ trong câu. Công thức Q–K–V (query, key, value) quan trọng trong việc xác định mối quan hệ giữa các token.
 
-## Slide 7 — Self-attention: ví dụ "con mèo ngồi trên bàn" và công thức Q–K–V
-**[T06-130]** Cơ chế [[self-attention]] giúp xác định từ "nó" trong câu bằng cách đánh giá mức độ tương đồng giữa các token sử dụng công thức Q (query), K (key), V (value).
+## Slide 6 — Token và cơ chế dự đoán next token
+**[T06-134]** Token là đơn vị cơ bản được sử dụng trong LLM. Quá trình dự đoán [[next token]] dựa trên xác suất và mức độ tương đồng giữa các token.
 
-## Slide 8 — Token và cơ chế dự đoán next token
-**[T06-134]** Đơn vị cơ bản của LLM là [[token]]. Quá trình dự đoán từ kế tiếp dựa trên đánh giá xác suất cho các token.
+## Slide 7 — Vì sao có hallucination — bias dữ liệu và quá trình huấn luyện
+**[T06-138]** Hallucination xảy ra khi LLM dự đoán sai do dữ liệu có bias và quy trình [[fine-tuning]] không hoàn hảo. Các bạn phải cẩn thận khi prompt cho các lĩnh vực như y tế hay tài chính.
 
-## Slide 9 — Giới hạn của LLM: knowledge cutoff, hallucination, context window
-**[T06-147]** Giới hạn của LLM bao gồm:
-- [[Knowledge cutoff]]: mốc thời gian ngừng cập nhật tri thức.
-- [[Hallucination]]: lỗi phát sinh do bias trong dữ liệu.
-- [[Context window]]: khả năng nhận biết thông tin giới hạn của mô hình.
+## Slide 8 — Knowledge cutoff và context window
+**[T06-146]** [[Knowledge cutoff]] có nghĩa là LLM chỉ biết được thông tin đến một thời điểm nhất định. [[Context window]] hạn chế số lượng token mà mô hình có thể xử lý cùng lúc.
+
+## Slide 9 — Token economy và chi phí API
+**[T06-154]** Mỗi lần gọi [[API]] sẽ khiến chúng ta "burn" token, chi phí phụ thuộc vào số lượng token đầu vào và đầu ra.
+
+## Slide 10 — Tổng kết buổi học
+**[T06-158]** Tổng kết học hôm nay: hiểu cấu trúc AI từ tổng quát đến chi tiết ([[machine learning]], [[deep learning]], [[transformer]]). Đặc biệt, biết áp dụng [[self-attention]] và [[token economy]] trong các dự án.
 
 ## Khái niệm chính
-- [[AI]]: Trí tuệ nhân tạo, máy thực hiện tác vụ giống con người.
-- [[Machine learning]]: Cách lập trình dựa trên dữ liệu mà không cần viết mã cụ thể.
-- [[Deep learning]]: Kiến trúc học máy sử dụng mạng nơ-ron với nhiều lớp.
-- [[Transformer]]: Kiến trúc cho phép xử lý ngữ cảnh một cách song song.
-- [[Attention]]: Cơ chế giúp mô hình tập trung vào các từ liên quan trong ngữ cảnh.
-- [[Token economy]]: Kinh tế dựa trên việc sử dụng token trong các giao dịch API.
-- [[API]]: Giao diện lập trình ứng dụng, cho phép tương tác giữa các hệ thống.
-- [[Knowledge cutoff]]: Thời điểm mà mô hình không còn cập nhật thông tin mới.
-- [[Hallucination]]: Tình trạng mô hình tạo ra thông tin sai lệch.
-- [[Context window]]: Giới hạn về lượng thông tin mô hình có thể xử lý cùng lúc.
-- [[Discriminative AI]]: AI chuyên về phân loại và dự đoán.
-- [[Generative AI]]: AI tạo ra nội dung mới từ đầu vào.
-- [[Agentic AI]]: AI có khả năng tự lập kế hoạch và hành động.
+- [[attention]]: cơ chế giúp mô hình chú ý đến các phần khác nhau trong dữ liệu đầu vào.
+- [[Token economy]]: mô hình kinh tế dựa trên việc sử dụng và thanh toán cho các token trong các thao tác AI.
+- [[API]]: giao thức để các ứng dụng giao tiếp và tương tác với nhau.
+- [[discriminative AI]]: AI có khả năng phân loại và dự đoán.
+- [[generative AI]]: AI tạo ra nội dung mới dựa trên dữ liệu đã học.
+- [[agentic AI]]: AI có khả năng lập kế hoạch và tự động hành động.
+- [[knowledge cutoff]]: điểm mốc mà một mô hình AI không còn cập nhật thông tin mới.
+- [[context window]]: số lượng token mà mô hình có thể xử lý cùng lúc.
 ```

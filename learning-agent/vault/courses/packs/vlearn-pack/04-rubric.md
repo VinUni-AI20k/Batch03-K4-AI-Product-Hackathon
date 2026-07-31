@@ -1,136 +1,72 @@
 ---
 course: packs
-generated: '2026-07-30T10:11:39+00:00'
+generated: '2026-07-31T18:02:13+00:00'
 lang: vi
 lesson: 04-rubric
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/04-rubric.md
-source_hash: sha256:53288a12279c6ef23106dbe01ca6ab2ca9a7bf46bebaf35a4a84e0bc16f38bd0
+source_file: packs\vlearn-pack\04-rubric.md
+source_hash: sha256:5d544ecc43f4831f7b7dbd615e4ec10b0d405d685b5e2cd7756ec151b7300ab3
 type: lesson-note
 ---
 
 ```markdown
-## Slide 1 — Rubric tổng quát
+## Slide 1 — Rubric Overview
 
-Rubric chấm điểm cho dự án bao gồm tổng số 100 điểm, chia thành 25 điểm cho việc nộp checkpoint và 75 điểm cho việc chấm bài nộp. Mỗi điểm sẽ liên kết với một file cụ thể trong repo và phúc khảo được. Không đánh giá dựa trên mức độ hoành tráng mà chỉ chấm dựa trên [[artifact]] và các bằng chứng cụ thể.
+Rubric chấm điểm tổng cộng là 100 điểm, trong đó có 25 điểm cho việc nộp các checkpoint và 75 điểm cho việc chấm bài nộp. Mỗi con điểm trỏ về một file, phúc khảo được. Kết quả đều được ghi nhận trung thực; điểm sẽ không được tính nếu số liệu bị chỉnh sửa hoặc che giấu. Lưu ý các điều khoản khác về điểm vòng demo, chấm chéo zone và thưởng thêm.
 
-## Slide 2 — Phần 1: Nộp checkpoint (25 điểm)
+## Slide 2 — Phần 1: 25 Điểm Nộp
 
-Nộp đúng hạn sẽ được 5 điểm, trong khi nộp muộn sẽ không được điểm. Mỗi thành viên trong nhóm cần nộp riêng liên quan đến link repo chung.
+Mỗi checkpoint (CP1-CP5) đều có giá trị 5 điểm. Nộp đúng hạn sẽ được 5 điểm, nộp muộn sẽ nhận 0 điểm. Mỗi thành viên trong nhóm nộp riêng, nhưng cả nhóm sử dụng chung một link repo.
 
-| CP1 | CP2 | CP3 | CP4 | CP5 |
-|:---:|:---:|:---:|:---:|:---:|
-| 5 | 5 | 5 | 5 | 5 |
+## Slide 3 — Phần 2: 75 Điểm Chấm
 
-## Slide 3 — Phần 2: Chấm điểm (75 điểm)
+Điểm chấm sẽ được dựa trên 7 khối theo từng tiêu chí cụ thể, bao gồm Bằng chứng & impact, Lát cắt & thiết kế, Chỗ khó & kịch bản, Kiểm thử, Prototype chạy được, Validation với user, và Quy trình & repo. 
 
-Điểm chấm được phân chia theo từng khối cụ thể dựa trên các điều kiện và file tương ứng trong repo. 
+## Slide 4 — R1 · Bằng chứng & impact — 15
 
-| Khối | Điểm | Chấm trên file nào |
-|---|---|---|
-| R1 · Bằng chứng & impact | **15** | `spec.md` §1-§2 + log khảo sát/mining |
-| R2 · Lát cắt & thiết kế | **15** | `spec.md` §4 |
-| R3 · Chỗ khó & kịch bản rủi ro | 11 | `spec.md` §5-§6 |
-| R4 · Kiểm thử | **15** | `spec.md` §7 + `eval/` |
-| R5 · Prototype chạy được | 8 | `codebase/` + demo |
-| R6 · Validation với user | 8 | `validation/` |
-| R7 · Quy trình & repo | 3 | cấu trúc repo |
+Điểm sẽ dựa trên các tiêu chí như bằng chứng đạt chuẩn A hoặc B, mô tả rõ ràng pain cụ thể, bảng impact và lý do cho ứng viên bị loại. Mỗi điều kiện cụ thể sẽ có điểm số nhất định.
 
-## Slide 4 — Điều kiện chấm: R1 · Bằng chứng & impact
+## Slide 5 — R2 · Lát cắt & thiết kế — 15
 
-R1 cần đạt các tiêu chí cụ thể về bằng chứng thu thập được từ khảo sát và phương pháp đo lường tác động, với nhiều mức điểm dựa vào chất lượng từng chứng cứ.
+Yêu cầu có lát cắt đúng định dạng, đủ nguyên tắc và lý do rõ ràng cho việc lựa chọn automation. Phải chỉ ra các nguyên tắc HAX/PAIR và liên kết với chỗ cụ thể trong prototype. 
 
-| Điều kiện | Điểm |
-|---|---|
-| Evidence đạt chuẩn **A** hoặc **B** | 6 |
-| Pain cụ thể | 3 |
-| Bảng impact ≥3 ứng viên có con số | 3 |
-| Ứng viên bị loại giữ lại + lý do chọn | 3 |
+## Slide 6 — R3 · Chỗ khó & kịch bản — 11
 
-## Slide 5 — Điều kiện chấm: R2 · Lát cắt & thiết kế
+Ghi nhận cần có 4 lớp chỗ khó cụ thể, kịch bản hành vi mong muốn và mô tả các đường đi trải nghiệm trong prototype. 
 
-R2 chấm dựa vào độ chính xác của lát cắt, sự tuân thủ nguyên tắc thiết kế và khả năng tự động hóa.
+## Slide 7 — R4 · Kiểm thử — 15
 
-| Điều kiện | Điểm |
-|---|---|
-| Lát cắt đúng format | 3 |
-| ≥3 non-goals | 2 |
-| Automation chọn rõ + lý do | 4 |
-| ≥4 nguyên tắc HAX/PAIR được xác định | 6 |
+Yêu cầu tối thiểu có golden set tối thiểu 20 case và định nghĩa chất lượng có thể kiểm chứng được. Kết quả chạy phải đủ mọi case và phân tích các nguyên nhân chưa đạt.
 
-## Slide 6 — Điều kiện chấm: R3 · Chỗ khó & kịch bản
+## Slide 8 — R5 · Prototype — 8
 
-R3 yêu cầu liệt kê và cụ thể hóa chỗ khó theo taxonomy, cùng với kịch bản ứng dụng.
+Prototype cần chạy end-to-end theo lát cắt mà đã cam kết và có lời gọi AI thực trong quyết định trung tâm. Mức độ prototype cần khớp với thực tế.
 
-| Điều kiện | Điểm |
-|---|---|
-| 4 lớp chỗ khó | 4 |
-| ≥8 kịch bản hành vi | 4 |
-| 4 đường đi trải nghiệm | 3 |
+## Slide 9 — R6 · Validation với user — 8
 
-## Slide 7 — Điều kiện chấm: R4 · Kiểm thử
+Cần có feedback log từ ít nhất 5 người và kế hoạch thay đổi từ feedback cần ghi trong Changelog. 
 
-R4 cần thiết lập một golden set và định nghĩa các chiều chất lượng một cách cụ thể.
+## Slide 10 — R7 · Quy trình & repo — 3
 
-| Điều kiện | Điểm |
-|---|---|
-| Golden set tự xây | 4 |
-| Định nghĩa chất lượng kiểm chứng được | 4 |
-| Quality bar bằng con số | 3 |
-| Kết quả chạy trọn bộ | 4 |
-
-## Slide 8 — Điều kiện chấm: R5 · Prototype
-
-R5 đánh giá dựa trên việc hoạt động của prototype và các lệnh gọi AI.
-
-| Điều kiện | Điểm |
-|---|---|
-| Chạy end-to-end | 3 |
-| ≥1 lời gọi AI thật | 3 |
-| Mức prototype khai báo khớp thực tế | 2 |
-
-## Slide 9 — Điều kiện chấm: R6 · Validation với user
-
-R6 yêu cầu phải có phản hồi từ người dùng và ghi nhận các thay đổi từ feedback.
-
-| Điều kiện | Điểm |
-|---|---|
-| Feedback log ≥5 mẩu | 4 |
-| Thay đổi từ feedback | 4 |
-
-## Slide 10 — Điều kiện chấm: R7 · Quy trình & repo
-
-R7 đánh giá cấu trúc và quy trình làm việc của repo.
-
-| Điều kiện | Điểm |
-|---|---|
-| Repo đủ cấu trúc chuẩn | 2 |
-| README phân công tên người | 1 |
+Repo cần có cấu trúc chuẩn với README đầy đủ phân công tên người cho từng phần. 
 
 ## Slide 11 — Reflection cá nhân
 
-Mỗi thành viên phải giải thích rõ ràng vai trò của mình và phần việc mà mình đảm nhiệm trong dự án.
+Mỗi thành viên cần viết về vai trò của mình, phần việc đã làm, khả năng hỗ trợ từ AI và một bài học từ case fail trong nhóm. 
 
-## Slide 12 — Phần 3: Checklist xác minh 6 mốc
+## Slide 12 — Phần 3: Checklist Xác Minh 6 Mốc
 
-Mỗi nhóm cần thực hiện kiểm tra nhịp và xác minh các checkpoint để nhận điểm cho phần nộp, điều này cũng giúp tránh tình trạng kẹt kỹ thuật.
-
-| Mốc | K3 | K4 | Nhóm cần show | TA tích Có/Không |
-|---|---|---|---|---|
-| **CP1 · Canvas** | 10:00 N1 | 15:00 N1 | Canvas 7 dòng | ☐ |
-| **CP2 · Bấm được** | 12:00 N1 | 17:00 N1 | Prototype Sketch/Mock | ☐ |
-| **CP3 · AI thật + đo lượt đầu** | 16:00 N1 | 10:30 N2 | Lời gọi AI thật | ☐ |
-| **CP4 · Chốt tiến độ** | 17:30 N1 | 12:00 N2 | Spec gần cuối | ☐ |
-| **CP5 · Xác minh + validation + dry run** | 09:00 N2 | 14:00 N2 | Feedback log ≥5 | ☐ |
-| **CP6 · Demo** | 10:00 N2 | 15:00 N2 | 5' trình bày | — |
+Đưa ra các checkpoint mỗi nhóm cần đạt để giữ nhịp và cứu nhóm kẹt, đồng thời làm rõ các điều kiện để nhận điểm cho các mốc đó.
 
 ## Khái niệm chính
 
-- [[rubric]]: Bộ tiêu chí và điểm số dùng để đánh giá dự án.
-- [[artifact]]: Tài liệu hoặc sản phẩm phần mềm được tạo ra trong tiến trình làm việc.
-- [[checkpoint]]: Điểm mốc trong quá trình thực hiện dự án cần nộp để đánh giá.
-- [[prototype]]: Mẫu thử nghiệm của sản phẩm được phát triển để kiểm tra ý tưởng và chức năng.
-- [[validation]]: Quá trình xác minh sản phẩm từ phản hồi của người dùng để cải thiện chất lượng.
+- [[rubric]]: Hệ thống chấm điểm cho sản phẩm với nhiều tiêu chí khác nhau.
+- [[checkpoint]]: Các mốc quan trọng trong quá trình thực hiện bài tập lớn.
+- [[evidence]]: Bằng chứng xác thực cần có để chứng minh các yêu cầu.
+- [[validation]]: Quy trình xác minh từ người dùng về sản phẩm.
+- [[prototype]]: Mẫu thử nghiệm của sản phẩm để kiểm tra chức năng.
+- [[impact]]: Tác động mà sản phẩm tới nhóm hoặc người dùng.
+- [[quality-bar]]: Thước đo chất lượng đã được xác định trước khi chấm điểm.
 ```

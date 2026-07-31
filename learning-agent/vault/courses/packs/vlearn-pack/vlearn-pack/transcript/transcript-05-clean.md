@@ -1,13 +1,13 @@
 ---
 course: packs
-generated: '2026-07-30T10:23:24+00:00'
+generated: '2026-07-31T18:35:34+00:00'
 lang: vi
 lesson: transcript-05-clean
 maps:
 - '[[MOC - packs]]'
 module: vlearn-pack
-source_file: packs/vlearn-pack/vlearn-pack/transcript/transcript-05-clean.md
-source_hash: sha256:65a7c2872c687b5427048be32ad9532e06f9c82040d4d1ef1dd1af42996007cb
+source_file: packs\vlearn-pack\vlearn-pack\transcript\transcript-05-clean.md
+source_hash: sha256:54bd447ec32f03ac974c2fb40635d48e8ed3c5e78b5ef6b4394541dfbf17ba45
 type: lesson-note
 ---
 
@@ -16,67 +16,74 @@ type: lesson-note
 
 ## Slide 1 — Mở đầu
 <!-- src: transcript_2/05.md -->
-Hôm nay, chúng ta sẽ cùng nhau xác định bài toán kinh doanh cho AI, cụ thể là sẽ chọn làm cái gì và không làm cái gì. Điều này rất quan trọng trong việc định hướng các dự án phát triển AI trong tương lai. 
+Buổi học bắt đầu với sự thảo luận về không khí lớp học và sự hứng khởi từ buổi lab trước. Giảng viên nhấn mạnh tầm quan trọng của việc kết hợp giữa lý thuyết và thực hành trong quá trình học.
 
-## Slide 2 — Mục tiêu của buổi học
+## Slide 2 — Chọn làm cái gì và không làm cái gì với AI
 <!-- src: transcript_2/05.md -->
-Trọng tâm hôm nay là xây dựng khung nền tảng giúp chúng ta xác định trước khi bắt tay vào làm bất kỳ sản phẩm nào, từ đó có thể đồng bộ sự hiểu biết trong team của mình.
+Chiều nay, chúng ta sẽ học về việc xác định [[bài-toán-kinh-doanh]] cho AI, và chọn làm gì và không làm gì. Buổi học hôm nay sẽ giúp định hình hướng đi trong các dự án liên quan đến AI.
 
-## Slide 3 — Nội dung buổi học
+## Slide 3 — Quy trình thảo luận
 <!-- src: transcript_2/05.md -->
-Buổi học sẽ gồm bảy phần lý thuyết: 
-1. AI landscape
-2. Anti-patterns
-3. AI product life cycle
-4. Thành phần của AI system
-5. Khung chọn mức độ ứng dụng AI
-6. Problem statement
-7. Discovery workshop và đánh giá khả thi về kỹ thuật.
+Giảng viên đặt câu hỏi để học viên suy nghĩ về tính thực tiễn của sản phẩm mà họ đang dự định phát triển. Việc phối hợp cùng team và thuyết phục đồng đội cũng là một phần quan trọng của bài học hôm nay.
 
-## Slide 4 — Khái niệm Workflow
+## Slide 4 — Khung nền tảng
 <!-- src: transcript_2/05.md -->
-Workflow là quá trình từ khi khởi phát ý tưởng cho đến khi hoàn thành sản phẩm. Nó bao gồm việc phối hợp giữa các cá nhân trong nhóm để làm việc hiệu quả.
+Chúng ta cần xây dựng khung nền tảng vững chắc trước khi bắt tay vào làm. Khung này sẽ giúp ta quyết định hướng đi và đồng bộ hóa sự hiểu biết trong team.
 
-## Slide 5 — Phân tích bức tranh chung
+## Slide 5 — Nội dung chính của buổi học
 <!-- src: transcript_2/05.md -->
-Có 88% tổ chức đã thực hiện adoption AI nhưng chỉ có 23% đưa được vào production, cho thấy cần xác định rõ khả năng thực tiễn của các giải pháp AI. 
+Nội dung buổi học gồm bảy phần lý thuyết về: [[AI-landscape]], [[anti-pattern]], [[AI-product-life-cycle]], [[component]], mức độ ứng dụng AI, [[problem-statement]], khung đánh giá các bên liên quan, và [[discovery-workshop]].
 
-## Slide 6 — Quiz về Vingroup
+## Slide 6 — Workflow là gì
 <!-- src: transcript_2/05.md -->
-Chúng ta đã thảo luận và phân tích về sản phẩm của Vingroup, chạm đến những lĩnh vực nào sẽ tích cực áp dụng AI và đâu là những lĩnh vực ít cần đến AI.
+Workflow được định nghĩa là quá trình từ khi khởi phát ý tưởng cho đến khi hoàn thành sản phẩm. Quan trọng là các bạn cần hiểu rõ quy trình và vai trò trong workflow của bản thân và team.
 
-## Slide 7 — Tạo giá trị từ AI
+## Slide 7 — Bức tranh chung 
 <!-- src: transcript_2/05.md -->
-AI có thể tạo ra giá trị ở các tác vụ lặp lại, cần tổng hợp thông tin, có nhiều bước và rõ ràng, tạo ra các tác vụ quantifiable và có tác động lớn đến người dùng.
+Có 88% tổ chức đã áp dụng AI nhưng chỉ 23% đạt kết quả khả thi. Điều này nhấn mạnh tầm quan trọng của việc xác định đúng bài toán và ứng dụng AI trong một bối cảnh thực tiễn.
 
-## Slide 8 — Bốn dấu hiệu đốt tiền sai chỗ
+## Slide 8 — Quiz hệ sinh thái Vingroup
 <!-- src: transcript_2/05.md -->
-1. Thực hiện mà không phân biệt rõ actor.
-2. Không có baseline.
-3. Không có kế hoạch kiểm tra (eval).
-4. Thiếu rõ ràng ai sẽ chịu trách nhiệm trong trường hợp xảy ra lỗi.
+Học viên tham gia vào quiz để hiểu rõ về các sản phẩm của Vingroup và thảo luận về nơi nào AI có thể áp dụng hiệu quả trong các sản phẩm của tập đoàn.
 
-## Slide 9 — AI product life cycle
+## Slide 9 — AI tạo giá trị ở đâu
 <!-- src: transcript_2/05.md -->
-Hiểu rõ vòng đời sản phẩm AI là rất quan trọng để tiết kiệm thời gian và tránh những lựa chọn sai lầm trong phát triển sản phẩm.
+AI có thể mang lại giá trị ở những tác vụ lặp đi lặp lại, cần tổng hợp tài liệu, có nhiều bước và rõ ràng trong các tác vụ. Việc nhận diện đúng bài toán sẽ giúp tiết kiệm nguồn lực.
 
-## Slide 10 — Data và baseline
+## Slide 10 — Bốn dấu hiệu đốt tiền sai chỗ
 <!-- src: transcript_2/05.md -->
-Phân tích dữ liệu và thiết lập baseline là cần thiết trước khi bắt tay vào xây dựng và triển khai sản phẩm AI.
+Nếu không xác định rõ actor, baseline, hay thiếu đánh giá, thì triển khai AI có thể dẫn đến thất bại. Cần có những chỉ số đo lường rõ ràng để đánh giá hiệu quả.
 
-## Slide 11 — Problem Statement
+## Slide 11 — AI product life cycle
 <!-- src: transcript_2/05.md -->
-Problem statement là tuyên bố rõ ràng về vấn đề cần giải quyết và cần phải xác định rõ các chỉ số thành công và giới hạn vận hành.
+Phần này sẽ giới thiệu về vòng đời sản phẩm AI, từ khâu xác định vấn đề đến việc triển khai và đo lường hiệu quả.
 
-## Slide 12 — Kế hoạch Eval
+## Slide 12 — Lập kế hoạch và phát triển sản phẩm
 <!-- src: transcript_2/05.md -->
-Lên kế hoạch đánh giá chất lượng sản phẩm yêu cầu xác định các stakeholder để hiểu được ai là người có trách nhiệm, ai là người sử dụng hệ thống và ai sẽ phê duyệt hay bị phạt khi có lỗi xảy ra.
+Cần phải có sự phân phối nguồn lực tốt, hiểu rõ vai trò của từng thành viên trong dự án và đánh giá kỹ lưỡng trước khi triển khai sản phẩm.
+
+## Slide 13 — Giao lưu
+<!-- src: transcript_2/05.md -->
+Khách mời từ VinFast chia sẻ về các dự án xe tự lái và sự phát triển của nhân lực trong lĩnh vực AI.
+
+## Slide 14 — Ba mức độ giải pháp
+<!-- src: transcript_2/05.md -->
+Có ba mức độ giải pháp: script, LLM feature, và agent. Cần phải xác định rõ loại giải pháp phù hợp cho từng bài toán cụ thể.
+
+## Slide 15 — Problem statement
+<!-- src: transcript_2/05.md -->
+Việc viết ra [[problem-statement]] hiệu quả sẽ giúp định hình rõ ràng vấn đề cần giải quyết, giúp tăng cường khả năng hợp tác trong nhóm.
+
+## Slide 16 — Hệ thống đánh giá
+<!-- src: transcript_2/05.md -->
+Khi xây dựng [[eval-plan]], cần chú ý đến các stakeholder và biết rõ vai trò của họ trong quy trình.
 
 ## Khái niệm chính
-- [[ai-landscape]]: Cảnh quan AI mô tả tình trạng phát triển và ứng dụng công nghệ AI trong thực tế.
-- [[anti-pattern]]: Những chiến lược sai lầm thường gặp trong phát triển công nghệ.
-- [[ai-product-life-cycle]]: Vòng đời sản phẩm AI, từ khâu xác định vấn đề đến triển khai và bảo trì.
-- [[workflow]]: Quy trình làm việc để quản lý và hoàn thành các tác vụ.
-- [[problem-statement]]: Tuyên bố rõ ràng về vấn đề mà sản phẩm cần giải quyết.
-- [[eval-plan]]: Kế hoạch đánh giá chất lượng sản phẩm AI dựa trên tiêu chí cụ thể và phản hồi từ người dùng.
+- [[bai-toan-kinh-doanh]]: Là vấn đề thực tiễn mà sản phẩm AI cần giải quyết để tạo ra giá trị cho người dùng.
+- [[AI-landscape]]: Bức tranh tổng thể về ứng dụng AI hiện tại và xu hướng phát triển.
+- [[anti-pattern]]: Các mô hình hoặc phương pháp không hiệu quả trong phát triển AI và sản phẩm.
+- [[AI-product-life-cycle]]: Vòng đời của một sản phẩm AI từ khâu ý tưởng đến khi ra thị trường và duy trì.
+- [[component]]: Các thành phần chính của một hệ thống AI.
+- [[problem-statement]]: Tuyên bố về vấn đề mà sản phẩm AI cần giải quyết.
+- [[discovery-workshop]]: Chu trình để khám phá và phát hiện nhu cầu thực tế trước khi phát triển sản phẩm.
 ```
