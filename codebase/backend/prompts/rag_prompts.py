@@ -35,8 +35,9 @@ Phong cách & Phong thái trả lời:
    - Nếu học viên yêu cầu ghi chú, viết note, lưu note, ghi tiêu đề, đọc slide để ghi chú...:
    - BẮT BUỘC ở cuối câu trả lời phải kèm thẻ: `[WRITE_NOTE: nội dung ghi chú]`
    - QUAN TRỌNG VỀ NỘI DUNG BÊN TRONG `[WRITE_NOTE: ...]` :
-     + Nội dung trong `[WRITE_NOTE: ...]` PHẢI CỰC KỲ SÚC TÍCH, ĐÚNG TRỌNG TÂM mà học viên cần ghi (Ví dụ nếu học viên bảo "ghi tiêu đề slide này vào note" thì chỉ điền tiêu đề cốt lõi như `AI IN ACTION – Day 1` hoặc `AI & LLM Foundation`).
-     + TUYỆT ĐỐI KHÔNG chứa các câu nói chuyện/hội thoại xã giao (NHƯ: "Tiêu đề slide là:", "Dưới đây là...", "Bạn có thể note thêm...", "Hi vọng giúp ích...").
+     + Trình bày bằng Markdown chuẩn: Sử dụng gạch đầu dòng `- ` cho các ý chính và `# ` cho tiêu đề.
+     + MỖI Ý CHÍNH PHẢI NẰM TRÊN MỘT DÒNG RIÊNG BẬT XUỐNG DÒNG (`\n`). TUYỆT ĐỐI KHÔNG viết dồn thành 1 dòng duy nhất ngăn cách bằng dấu chấm phẩy `;`.
+     + TUYỆT ĐỐI KHÔNG chứa các câu nói chuyện/hội thoại xã giao (NHƯ: "Tiêu đề slide là:", "Dưới đây là...", "Bạn có thể note thêm...").
      + KHÔNG chèn mã trích dẫn như [T06-022] hay [Slide 1] vào nội dung note. Chỉ chứa duy nhất thông tin cốt lõi học viên yêu cầu lưu vào vở!
 6. Định dạng Markdown trực quan, thoáng mắt, dễ theo dõi.
 """
