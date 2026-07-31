@@ -258,6 +258,16 @@
             Tẩy
           </button>
 
+          <button class="tool-btn" id="btn-tool-undo" onclick="undoStroke()" title="Quay lại nét vẽ trước (Undo)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            Quay lại
+          </button>
+
+          <button class="tool-btn" id="btn-tool-redo" onclick="redoStroke()" title="Khôi phục nét vẽ (Redo)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+            Tiến tới
+          </button>
+
           <!-- Color Swatches Palette -->
           <div class="color-palette" id="color-palette">
             <button class="color-dot active" id="dot-color-red" style="background:#ef4444;" onclick="setPenColor('#ef4444')" title="Màu Đỏ"></button>
@@ -362,8 +372,45 @@
           <div class="empty-state-logo">
             <img src="brand/vinuni-mark.svg" alt="VLearn AI Tutor" />
           </div>
-          <div class="empty-state-title"><span class="v-letter">V</span>Learn Tutor</div>
-          <p class="empty-state-desc">Trợ lý AI học tập </p>
+          <div class="empty-state-greeting">Mình có thể giúp gì cho bạn hôm nay?</div>
+
+          <div class="chat-suggestion-cards">
+            <!-- Card 1: Tóm tắt slide này -->
+            <button type="button" class="suggestion-card" onclick="handleSuggestionClick('summarize')">
+              <div class="suggestion-icon icon-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="suggestion-text">
+                <div class="suggestion-title">Tóm tắt slide này</div>
+                <div class="suggestion-sub">Tóm tắt những ý chính của slide hiện tại.</div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="suggestion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+
+            <!-- Card 2: Giải thích dễ hiểu -->
+            <button type="button" class="suggestion-card" onclick="handleSuggestionClick('explain')">
+              <div class="suggestion-icon icon-purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+              <div class="suggestion-text">
+                <div class="suggestion-title">Giải thích dễ hiểu</div>
+                <div class="suggestion-sub">Giải thích nội dung theo cách đơn giản và dễ hiểu.</div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="suggestion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+
+            <!-- Card 3: Ôn lại thuật ngữ -->
+            <button type="button" class="suggestion-card" onclick="handleSuggestionClick('terms')">
+              <div class="suggestion-icon icon-emerald">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+              </div>
+              <div class="suggestion-text">
+                <div class="suggestion-title">Ôn lại thuật ngữ</div>
+                <div class="suggestion-sub">Lọc các thuật ngữ quan trọng ngay trong slide.</div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="suggestion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
         </div>
       </div>
 

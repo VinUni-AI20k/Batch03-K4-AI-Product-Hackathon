@@ -717,9 +717,44 @@ function drawMove(e) {
   }
 }
 
+let pageRedoHistory = {};
+
 function stopDrawing() {
+  if (isDrawing && currentStroke) {
+    pageRedoHistory[currentPage] = [];
+  }
   isDrawing = false;
   currentStroke = null;
+}
+
+function undoStroke() {
+  if (!pageDrawStrokes[currentPage] || pageDrawStrokes[currentPage].length === 0) return;
+  if (!pageRedoHistory[currentPage]) pageRedoHistory[currentPage] = [];
+
+  const lastStroke = pageDrawStrokes[currentPage].pop();
+  pageRedoHistory[currentPage].push(lastStroke);
+
+  const notesIndEl = document.getElementById('page-notes-indicator');
+  if (notesIndEl) {
+    notesIndEl.textContent = `Trang ${currentPage} · ${pageDrawStrokes[currentPage].length} note`;
+  }
+
+  redrawPageStrokes(currentPage);
+}
+
+function redoStroke() {
+  if (!pageRedoHistory[currentPage] || pageRedoHistory[currentPage].length === 0) return;
+  if (!pageDrawStrokes[currentPage]) pageDrawStrokes[currentPage] = [];
+
+  const restoredStroke = pageRedoHistory[currentPage].pop();
+  pageDrawStrokes[currentPage].push(restoredStroke);
+
+  const notesIndEl = document.getElementById('page-notes-indicator');
+  if (notesIndEl) {
+    notesIndEl.textContent = `Trang ${currentPage} · ${pageDrawStrokes[currentPage].length} note`;
+  }
+
+  redrawPageStrokes(currentPage);
 }
 
 function redrawPageStrokes(pageNum) {
@@ -1115,8 +1150,22 @@ function sendTutorMsgWithText(text) {
   }
 }
 
+function handleSuggestionClick(type) {
+  let promptText = '';
+  if (type === 'summarize') {
+    promptText = `Tóm tắt những ý chính của slide trang ${currentPage} cho mình`;
+  } else if (type === 'explain') {
+    promptText = `Giải thích nội dung slide trang ${currentPage} theo cách đơn giản và dễ hiểu giúp mình`;
+  } else if (type === 'terms') {
+    promptText = `Liệt kê và giải thích các thuật ngữ quan trọng trong slide trang ${currentPage}`;
+  }
+  if (promptText) {
+    sendTutorMsgWithText(promptText);
+  }
+}
+
 function askTutorAboutCurrentSlide() {
-  sendTutorMsgWithText(`Tóm tắt nội dung slide trang ${currentPage} cho tôi`);
+  handleSuggestionClick('summarize');
 }
 
 // ============================================
@@ -1251,6 +1300,8 @@ window.zoomSlide = zoomSlide;
 window.downloadPdf = downloadPdf;
 window.loadPdf = loadPdf;
 window.sendTutorMsg = sendTutorMsg;
+window.sendTutorMsgWithText = sendTutorMsgWithText;
+window.handleSuggestionClick = handleSuggestionClick;
 window.askTutorAboutCurrentSlide = askTutorAboutCurrentSlide;
 window.toggleThumbnailsBar = toggleThumbnailsBar;
 window.goToSlidePage = goToSlidePage;
@@ -1263,6 +1314,8 @@ window.askTutorAboutNote = askTutorAboutNote;
 window.generateAINoteForCurrentPage = generateAINoteForCurrentPage;
 window.removeAINoteChip = removeAINoteChip;
 window.noteFormatCmd = noteFormatCmd;
+window.undoStroke = undoStroke;
+window.redoStroke = redoStroke;
 
 // ============================================
 // Initial Load
