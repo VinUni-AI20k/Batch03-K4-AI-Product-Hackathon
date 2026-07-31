@@ -1,4 +1,4 @@
-import type { McqQuestion, StudyContent } from "../api/client";
+import type { McqQuestion, RetestQuestion, StudyContent } from "../api/client";
 
 type WrongItem = { question: McqQuestion; userAnswer: number };
 
@@ -18,11 +18,33 @@ export default function ReviewList({ wrongItems, studyContentBySection, onLoop }
         {wrongItems.map((item) => (
           <div key={item.question.id} className="review-item">
             <p className="review-question">{item.question.question}</p>
-            <p className="review-wrong">Bạn chọn: {item.userAnswer}</p>
+            <p className="review-wrong">
+              Bạn chọn: {item.question.options[item.userAnswer]?.text ?? "Chưa có đáp án"}
+            </p>
             <p className="review-correct">
               Đáp án đúng: {item.question.options[item.question.correct_index]?.text}{" "}
-              <span className="citation">nguồn: {studyContentBySection[item.question.section_id]?.citation}</span>
+              <span className="citation">
+                nguồn: {studyContentBySection[item.question.section_id]?.citation ?? item.question.segment_id ?? "chưa có"}
+              </span>
             </p>
+            {item.question.explanation && (
+              <p className="review-explanation">
+                <strong>Giải thích:</strong> {item.question.explanation}
+              </p>
+            )}
+            {(() => {
+              const retestQuestion = item.question as Partial<RetestQuestion>;
+              const refs = retestQuestion.source_refs ?? [];
+              const slideRef = retestQuestion.slide_ref;
+              if (!refs.length && !slideRef) return null;
+              return (
+                <p className="review-grounding">
+                  <strong>Căn cứ:</strong>{" "}
+                  {refs.length ? `Transcript: ${refs.join(", ")}` : `Slide: ${slideRef}`}
+                  {refs.length && slideRef ? ` · Slide: ${slideRef}` : ""}
+                </p>
+              );
+            })()}
           </div>
         ))}
       </div>

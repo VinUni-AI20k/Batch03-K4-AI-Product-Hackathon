@@ -144,7 +144,7 @@ export async function analyzeWeakness(
     title: section.title,
     summary: section.key_points.join(" "),
   }));
-  const response = await fetch("http://127.0.0.1:8000/api/diagnosis/weaknesses", {
+  const response = await fetch("http://127.0.0.1:8001/api/diagnosis/weaknesses", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -1,25 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SessionProvider } from "./context/SessionContext";
 import type {
+  AlignmentItem,
   McqQuestion,
   OutlineSection,
   Section,
   StudyContent,
-  SelfCheckGrade,
+  CheckJudgement,
+  LLMStatus,
 } from "./api/client";
 import {
   MASTERY_THRESHOLD,
+  createSession,
+  askChat,
   generateQuiz,
   generateQuizFromPdf,
-  generateRetest,
-  gradeSelfCheck,
+  generateRetestQuiz,
+  saveRetestQuiz,
+  judgeActiveModeAnswer,
   getStudyContent,
   gradeQuiz,
+  getLLMStatus,
   uploadSlide,
 } from "./api/client";
 import UploadStep from "./components/UploadStep";
 import QuizView from "./components/QuizView";
 import RetestResultView from "./components/RetestResultView";
+import RetestConfigView from "./components/RetestConfigView";
+import type { RetestScope } from "./components/RetestConfigView";
 import StyleTimeSelect from "./components/StyleTimeSelect";
 import RoadmapView from "./components/RoadmapView";
 import ReviewList from "./components/ReviewList";
@@ -41,6 +49,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [outline, setOutline] = useState<OutlineSection[]>([]);
+  const [alignment, setAlignment] = useState<AlignmentItem[]>([]);
   const [round1Questions, setRound1Questions] = useState<McqQuestion[]>([]);
 
   const [quizMode, setQuizMode] = useState<"round1" | "retest">("round1");
@@ -53,34 +62,65 @@ function App() {
   const [weakSections, setWeakSections] = useState<Section[]>([]);
   const [goodSections, setGoodSections] = useState<Section[]>([]);
   const [retestSource, setRetestSource] = useState<RetestSource>("reteach");
+  const [retestSections, setRetestSections] = useState<Section[]>([]);
+  const [savedRetestId, setSavedRetestId] = useState<string | null>(null);
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [masteredSections, setMasteredSections] = useState<Section[]>([]);
 
   const [studyContent, setStudyContent] = useState<StudyContent[]>([]);
   const [activeMode, setActiveMode] = useState(true);
   const [wrongItems, setWrongItems] = useState<WrongItem[]>([]);
+  const [chatAnswer, setChatAnswer] = useState("");
+  const [llmStatus, setLlmStatus] = useState<LLMStatus | null>(null);
+  const [sessionId, setSessionId] = useState("");
+
+  useEffect(() => {
+    createSession().then((session) => setSessionId(session.session_id)).catch((error) => {
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    });
+    getLLMStatus().then(setLlmStatus).catch(() => setLlmStatus(null));
+  }, []);
 
   const sectionTitle = (id: Section) =>
     outline.find((o) => o.section_id === id)?.title ?? id;
 
+  const handleChatAsk = async (question: string) => {
+    const chat = await askChat({
+      question,
+      session_id: sessionId,
+    });
+    setChatAnswer(chat.answer);
+  };
+
   const handleUpload = async (file: File) => {
+    if (!sessionId) {
+      setErrorMessage("Learning session is not ready yet.");
+      return;
+    }
     setIsLoading(true);
-    const result = await uploadSlide(file);
-    setUploadedFile(file);
-    setSlideText(result.textContent);
-    setOutline(result.outline);
-    setStage("ready");
-    setIsLoading(false);
+    try {
+      const result = await uploadSlide(file, sessionId);
+      setUploadedFile(file);
+      setSlideText(result.textContent);
+      setOutline(result.outline);
+      setAlignment(result.alignment);
+      setStage("ready");
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreateQuiz = async () => {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const { outline: newOutline, questions: newQuestions } = uploadedFile
-        ? await generateQuizFromPdf(uploadedFile)
-        : await generateQuiz();
+      const { outline: newOutline, questions: newQuestions, alignment: newAlignment } = uploadedFile
+        ? await generateQuizFromPdf(sessionId)
+        : await generateQuiz(sessionId);
       setOutline(newOutline);
+      if (newAlignment) setAlignment(newAlignment);
       setRound1Questions(newQuestions);
       setQuizMode("round1");
       setQuestions(newQuestions);
@@ -144,9 +184,7 @@ function App() {
 
     if (result.accuracy >= MASTERY_THRESHOLD) {
       const mastered =
-        retestSource === "verify"
-          ? outline.map((o) => o.section_id)
-          : weakSections;
+        retestSections;
       setMasteredSections(mastered);
       setStage("report");
     } else {
@@ -170,18 +208,61 @@ function App() {
   };
 
   // ---- Phase 4 (RET): generate retest questions ----
-  const startRetest = async (source: RetestSource, sections: Section[]) => {
+  const startRetest = async (
+    source: RetestSource,
+    questionCount: number,
+    scope: RetestScope,
+    sections: Section[],
+    shouldSave: boolean,
+  ) => {
     setIsLoading(true);
+    try {
     setRetestSource(source);
     setQuizMode("retest");
-    const perSection = source === "verify" ? 1 : 2;
-    const qs = await generateRetest(sections, perSection, round1Questions);
+    const selectedSections = scope === "whole"
+      ? outline.map((section) => section.section_id)
+      : sections;
+    setRetestSections(selectedSections);
+    const qs = await generateRetestQuiz(
+      sessionId,
+      scope === "whole"
+        ? { mode: "whole" }
+        : { mode: "selected", sectionIds: selectedSections },
+      questionCount,
+      [],
+      round1Questions
+        .filter((question) => selectedSections.includes(question.section_id))
+        .map((question) => question.question),
+    );
+    if (qs.length === 0) {
+      setErrorMessage("Không tìm thấy câu hỏi phù hợp trong quiz bank vòng 1.");
+      setIsLoading(false);
+      return;
+    }
+    if (shouldSave) {
+      try {
+        const saved = await saveRetestQuiz(qs, scope === "whole"
+          ? { mode: "whole" }
+          : { mode: "selected", sectionIds: selectedSections });
+        setSavedRetestId(saved.saved_quiz_id);
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : String(err));
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      setSavedRetestId(null);
+    }
     setQuestions(qs);
     setAnswers([]);
     setOpenAnswer("");
     setCurrentIndex(0);
     setStage("quiz");
-    setIsLoading(false);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ---- DEC1 branching ----
@@ -189,10 +270,8 @@ function App() {
     if (weakSections.length > 0) {
       setStage("style");
     } else {
-      startRetest(
-        "verify",
-        outline.map((o) => o.section_id),
-      );
+      setRetestSource("verify");
+      setStage("retest-config");
     }
   };
 
@@ -210,29 +289,39 @@ function App() {
       level,
       style,
       Number.parseInt(timeframe, 10) || 15,
+      uploadedFile,
+      activeMode,
+      sessionId,
     );
     setStudyContent(content);
+    try {
+      const chat = await askChat({
+        question: "Điểm này cần nhớ gì để làm bài retest?",
+        session_id: sessionId,
+      });
+      setChatAnswer(chat.answer);
+    } catch (err) {
+      setChatAnswer(`# TODO-DEMO: chat unavailable (${String(err)})`);
+    }
     setStage("roadmap");
     setIsLoading(false);
   };
 
-  const handleGradeSelfCheck = (input: {
-    section: Section;
-    question: string;
-    answer: string;
-    sourceContext: string;
-  }): Promise<SelfCheckGrade> =>
-    gradeSelfCheck({
-      section_id: input.section,
-      question: input.question,
+  const handleJudgeSelfCheck = (input: { sectionId: string; answer: string }): Promise<CheckJudgement> =>
+    judgeActiveModeAnswer({
+      session_id: sessionId,
+      section_id: input.sectionId,
       learner_answer: input.answer,
-      source_context: input.sourceContext,
     });
 
   // ---- FINISH -> RET ----
   const handleFinishLearning = () => {
-    startRetest("reteach", weakSections);
+    setRetestSource("reteach");
+    setStage("retest-config");
   };
+
+  const initialRetestSections =
+    retestSource === "verify" ? outline.map((section) => section.section_id) : weakSections;
 
   // ---- REVIEW -> STYLE loop ----
   const handleLoopToStyle = () => {
@@ -244,6 +333,7 @@ function App() {
     setUploadedFile(null);
     setStage("upload");
     setOutline([]);
+    setAlignment([]);
     setRound1Questions([]);
     setQuizMode("round1");
     setQuestions([]);
@@ -253,12 +343,15 @@ function App() {
     setRound1Accuracy(0);
     setWeakSections([]);
     setGoodSections([]);
+    setRetestSections([]);
+    setSavedRetestId(null);
     setFinalAccuracy(0);
     setMasteredSections([]);
     setStudyContent([]);
     setActiveMode(true);
     setWrongItems([]);
     setErrorMessage("");
+    setChatAnswer("");
   };
 
   const studyContentBySection = Object.fromEntries(
@@ -278,14 +371,20 @@ function App() {
               mức hiểu vững.
             </p>
           </div>
-          <ChatPanel stage={stage} quizMode={quizMode} />
+          <ChatPanel
+            stage={stage}
+            quizMode={quizMode}
+            answer={chatAnswer}
+            providerStatus={llmStatus}
+            onAsk={handleChatAsk}
+          />
         </div>
 
         {errorMessage && (
           <section className="card">
             <p className="hint" style={{ color: "#dc2626" }}>
               Lỗi: {errorMessage} — kiểm tra backend đã chạy ở
-              http://127.0.0.1:8000 chưa.
+              http://127.0.0.1:8001 chưa.
             </p>
           </section>
         )}
@@ -308,7 +407,18 @@ function App() {
               {slideText && (
                 <div className="preview-box">
                   <h3>Nội dung slide (Knowledge Package)</h3>
-                  <p>{slideText}</p>
+                   <p>{slideText}</p>
+                   {alignment.length > 0 && (
+                     <div className="alignment-preview">
+                       <h4>Semantic alignment</h4>
+                       {alignment.map((item) => (
+                         <p key={item.section_id}>
+                           <strong>{sectionTitle(item.section_id)}</strong>: {item.related_segment_ids.length} transcript segment(s)
+                           {item.matches[0] ? ` · best score ${item.matches[0].score.toFixed(2)}` : " · unmatched"}
+                         </p>
+                       ))}
+                     </div>
+                   )}
                 </div>
               )}
             </section>
@@ -332,6 +442,11 @@ function App() {
 
         {stage === "quiz" && questions.length > 0 && !isLoading && (
           <section className="card quiz-card">
+            {savedRetestId && quizMode === "retest" && (
+              <p className="saved-retest-status">
+                ✓ Bài retest đã được lưu (mã: {savedRetestId})
+              </p>
+            )}
             <QuizView
               question={questions[currentIndex]}
               index={currentIndex + 1}
@@ -379,6 +494,8 @@ function App() {
             <h2>Bạn muốn ôn theo cách nào?</h2>
             <StyleTimeSelect
               weakTitles={weakSections.map(sectionTitle)}
+              activeMode={activeMode}
+              onActiveModeChange={setActiveMode}
               onSubmit={handleStyleSubmit}
             />
             {isLoading && (
@@ -389,12 +506,26 @@ function App() {
           </section>
         )}
 
+        {stage === "retest-config" && !isLoading && (
+          <section className="card review-card">
+            <RetestConfigView
+              outline={outline}
+              questionPool={round1Questions}
+              initialSections={initialRetestSections}
+                onStart={(questionCount, scope, sections, shouldSave) =>
+                startRetest(retestSource, questionCount, scope, sections, shouldSave)
+              }
+            />
+          </section>
+        )}
+
         {stage === "roadmap" && studyContent.length > 0 && (
           <section className="card review-card">
-            <RoadmapView
+              <RoadmapView
               content={studyContent}
               activeMode={activeMode}
-              onGradeSelfCheck={handleGradeSelfCheck}
+                sessionId={sessionId}
+              onJudgeSelfCheck={handleJudgeSelfCheck}
               onFinish={handleFinishLearning}
             />
           </section>

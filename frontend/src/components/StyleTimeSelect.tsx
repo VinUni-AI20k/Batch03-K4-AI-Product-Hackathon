@@ -2,6 +2,8 @@ import { useState } from "react";
 
 type Props = {
   weakTitles: string[];
+  activeMode: boolean;
+  onActiveModeChange: (enabled: boolean) => void;
   onSubmit: (level: string, style: string, timeframe: string) => void;
 };
 
@@ -14,7 +16,7 @@ const styles = [
 ];
 const timeframes = ["5 phút", "15 phút", "30 phút"];
 
-export default function StyleTimeSelect({ weakTitles, onSubmit }: Props) {
+export default function StyleTimeSelect({ weakTitles, activeMode, onActiveModeChange, onSubmit }: Props) {
   const [level, setLevel] = useState(levels[1]);
   const [style, setStyle] = useState(styles[2].value);
   const [timeframe, setTimeframe] = useState(timeframes[1]);
@@ -50,6 +52,17 @@ export default function StyleTimeSelect({ weakTitles, onSubmit }: Props) {
               </option>
             ))}
           </select>
+        </label>
+        <label className="active-mode-toggle">
+          <span>
+            <input
+              type="checkbox"
+              checked={activeMode}
+              onChange={(event) => onActiveModeChange(event.target.checked)}
+            />
+            Bật tự kiểm tra chủ động
+          </span>
+          <small>Trả lời câu hỏi cuối mỗi phần và nhận phản hồi grounded.</small>
         </label>
         <button className="primary-button" onClick={() => onSubmit(level, style, timeframe)}>
           Tạo lộ trình ôn tập

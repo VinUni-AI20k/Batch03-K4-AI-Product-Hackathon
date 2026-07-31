@@ -569,6 +569,65 @@ h1 {
   margin: 0;
 }
 
+.provider-status {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.chat-ask-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.chat-ask-form input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.7rem;
+}
+
+.chat-ask-form button {
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+}
+
+.chat-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+}
+
+.alignment-preview {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.12);
+  font-size: 0.85rem;
+}
+
+.alignment-preview h4 {
+  margin: 0 0 0.45rem;
+}
+
+.alignment-preview p {
+  margin: 0.25rem 0;
+}
+
+.review-explanation,
+.review-grounding {
+  margin: 0.65rem 0 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.saved-retest-status {
+  margin: 0 0 1rem;
+  color: #15803d;
+  font-weight: 600;
+}
+
 .score-compare {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -601,6 +660,73 @@ h1 {
 .report-view {
   display: grid;
   gap: 0.4rem;
+}
+
+.retest-config {
+  display: grid;
+  gap: 1rem;
+  max-width: 760px;
+}
+
+.retest-count {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 240px;
+}
+
+.retest-count input {
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+}
+
+.retest-count small,
+.retest-sections small {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.retest-scope {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.retest-scope legend {
+  font-weight: 700;
+}
+
+.retest-scope label,
+.retest-sections label {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.retest-sections {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.retest-sections label {
+  justify-content: space-between;
+}
+
+.retest-sections label input {
+  margin-right: auto;
+}
+
+.retest-save-choice {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  color: #475569;
 }
 
 @media (max-width: 900px) {
