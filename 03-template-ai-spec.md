@@ -1,4 +1,4 @@
-# Template AI Spec *(spec.md — commit trước 23:59 N1 · quality bar chốt từ thời điểm nộp)*
+# Template AI Spec *(spec.md — commit trước hạn chốt spec của khoá: K3 23:59 ngày 1 · K4 12:00 ngày 2 · quality bar chốt từ thời điểm nộp)*
 
 > Cấu trúc phủ đúng "SPEC 8 phần" của chương trình: Bằng chứng (§1-§2) · Lát cắt (§4) · Canvas (đính kèm CP1) · Augment/Automate (§4) · 4 đường đi của trải nghiệm (§6) · Kiểu lỗi (§5) · Kiểm thử (§7) · Phân công (§8). Hướng dẫn viết từng mục: `02-guide.md`.
 
