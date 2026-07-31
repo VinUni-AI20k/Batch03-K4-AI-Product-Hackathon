@@ -3,25 +3,25 @@ Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
 
 ## §1. User & Job
-- **Job executor + workflow**: Học viên khoá AI Thực Chiến. Sau mỗi buổi học (hoặc trong lúc học trực tuyến trên VLearn), học viên muốn tự kiểm tra độ hiểu bài ngay lập tức trước khi bước sang các bài tập thực hành phức tạp hơn.
+- **Job executor**: Học viên khoá AI Thực Chiến. Sau mỗi buổi học (hoặc trong lúc học trực tuyến trên VLearn), học viên muốn tự kiểm tra độ hiểu bài ngay lập tức trước khi bước sang các bài tập thực hành phức tạp hơn.
+- **Workflow**: workflow.png
 - **Core JTBD**: Ôn luyện và kiểm tra đánh giá mức độ ghi nhớ/hiểu bài của bản thân cho từng bài học cụ thể mà không phải tốn thời gian đọc lại 3 tiếng transcript hay tự soạn câu hỏi thô.
 - **Problem statement**: Học viên sau mỗi buổi học 2-3 tiếng không có sẵn bộ câu hỏi tự đánh giá nhanh xem mình đã thực sự nắm đúng các khái niệm trọng tâm hay chưa. Việc tự tạo flashcards thủ công tốn 30-45 phút/buổi, còn sử dụng công cụ AI chung bên ngoài (như ChatGPT) lại tạo câu hỏi lan man, không bám sát transcript và slide chính thức của khoá học.
 - **Evidence (chuẩn A & B — log đầy đủ trong repo)**:
-  - **Khảo sát (n = 22 học viên khoá K4)**: 18/22 (81.8%) xác nhận họ gặp khó khăn trong việc tự đánh giá độ hiểu bài sau buổi học và muốn có tính năng flashcard/quiz bám sát transcript bài giảng.
-  - **Data Mining (chatlog VLearn & transcript)**: Có 142/2.522 lượt hội thoại trên VLearn tutor (chiếm 5.6%) học viên đặt câu hỏi mang tính chất kiểm tra kiến thức ("Cho mình hỏi khái niệm X là gì?", "Phân biệt A và B giúp mình", "Buổi 1 đã dạy về cái gì?").
+  - **Khảo sát(`evidence/form.csv`)**: Thu được **20 phản hồi**, trong đó **12 người đã từng sử dụng VLearn**, **11/12 (91,7%)** muốn tạo flashcard sau khi đọc slide để ôn tập dễ hơn và **7/12 (58,3%)** sẵn sàng thử prototype. 
   - **≥5 quotes nguyên văn**:
-    1. *"Học xong buổi 2 tiếng nhiều kiến thức quá, mình không biết mình đã nắm chắc phần RAG hay chưa nếu không có câu hỏi test thử."* — Học viên Nguyễn V. A (K4)
-    2. *"Tự làm flashcards trên Anki thì lười và tốn thời gian, ước gì VLearn tự tạo sẵn thẻ theo transcript buổi đó luôn."* — Học viên Trần T. B (K4)
-    3. *"Mình hỏi ChatGPT tạo quiz thì nó toàn cho câu hỏi lý thuyết chung chung trên mạng, không giống cách thầy dạy trong slide."* — Học viên Phạm M. C (K4)
-    4. *"Có nhiều thuật ngữ AI học xong nhớ mang mang, lật flashcards 5 phút trước giờ học tiếp theo là chuẩn nhất."* — Học viên Lê H. D (K4)
-    5. *"Nhiều khi mình tưởng mình hiểu rồi nhưng khi nhìn vào câu hỏi trắc nghiệm/flashcard mới thấy mình bị hổng kiến thức."* — Học viên Hoàng K. E (K4)
+    1. *"cho tôi cách ghi nhớ nhanh bài này"* — Học viên `U0187`, hội thoại `C0492`, lượt `T0530`, trang 14.
+    2. *"tóm tắt những ý chính, chi tiết để tôi có thể làm quiz kahoot cuối giờ"* — Học viên `U0132`, hội thoại `C0573`, lượt `T0257`, trang 3.
+    3. *"dựa vào tài liệu này bạn hãy cho tôi bộ quizz liên quan"* — Học viên `U0175`, hội thoại `C0287`, lượt `T1113`, trang 47.
+    4. *"Tóm tắt kiến thức trọng tâm của ngày hôm nay"* — Học viên `U0357`, hội thoại `C0089`, lượt `T0952`, trang 75.
+    5. *"Bạn có thể làm gì để giúp tôi học hiểu bàu hôm nay một cách hiệu quả nhất"* — Học viên `U0187`, hội thoại `C0492`, lượt `T0894`, trang 50.
 
 ## §2. Impact & quyết định chọn
 - **Bảng impact 3 ứng viên**:
 
 | Ứng viên tính năng | Số người gặp | Tần suất | Tốn gì mỗi lần | Khả thi build | Chọn? |
 |---|---|---|---|---|---|
-| **1. Flashcard AI Tutor tự động theo từng buổi học** | ~1.000 HV | 2-3 lần/tần (sau mỗi buổi học) | 30-45 phút tự soạn/tua video ôn bài | Cao (dùng RAG trích transcript) | **CHỌN** |
+| **1. Flashcard AI Tutor tự động theo từng buổi học** | ~1.000 HV | 2-3 lần/tuần | 30-45 phút tự soạn/tua video ôn bài | Cao (dùng RAG trích transcript) | **CHỌN** |
 | 2. AI Tóm tắt tự động bài giảng dài 3 tiếng | ~1.000 HV | 1 lần/buổi | 20 phút đọc lại | Trung bình | Loại |
 | 3. AI Gợi ý bài tập cá nhân hoá theo trình độ | ~300 HV | 1 lần/tuần | 60 phút làm bài | Thấp (cần tracking lâu dài) | Loại |
 
@@ -45,13 +45,13 @@ Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
 
 ## §4. Thiết kế
 - **Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả)**:
-  > *"Một học viên vừa kết thúc buổi học (hoặc đang chat trên VLearn) muốn kiểm tra độ hiểu bài -> AI Tutor dựa trên Transcript/Slide bài giảng tự động trích xuất các kiến thức trọng tâm để sinh bộ 5 Flashcards ôn tập (kèm câu hỏi, gợi ý, đáp án & trích dẫn [Txx-NNN]) -> Học viên lật thẻ ôn tập, tự đánh giá độ thuộc và nhận phản hồi/giải thích tức thì từ AI Tutor."*
+  > *"Một học viên vừa kết thúc buổi học muốn kiểm tra độ hiểu bài → AI chọn 5 kiến thức trọng tâm và sinh 5 flashcard có trích dẫn → học viên hoàn thành lượt ôn trong dưới 5 phút và xác định được các thẻ chưa thuộc."*
 - **Non-goals (3 thứ KHÔNG build)**:
   1. KHÔNG build hệ thống chấm điểm hay chấm bài thi trắc nghiệm chính thức thay thế quiz của khoá.
   2. KHÔNG build thuật toán Spaced Repetition phức tạp (như Anki SM-2) đòi hỏi lưu trữ cơ sở dữ liệu học tập nhiều tháng.
   3. KHÔNG sinh flashcard cho các tài liệu nằm ngoài giáo trình khoá AI Thực Chiến.
 - **Mức prototype nhắm tới**: [x] Mock / Working — Chạy web app interactive hoàn chỉnh, kết nối Google Gemini API thật (nếu có key) hoặc chạy mock AI generator thông minh dựa trên data pack thật (`data/vlearn-pack`).
-- **Automation**: [x] Conditional — AI tự động trích xuất transcript để sinh flashcards chuẩn; học viên chủ động lật thẻ & tự đánh giá; trường hợp thắc mắc học viên có thể bấm "Hỏi AI Tutor" để nhận giải thích chi tiết.
+- **Automation**: [x] Augment  [ ] Conditional  [ ] Automate — AI đề xuất bộ flashcard, nhưng học viên giữ quyền xem trước, quyết định thêm bộ thẻ vào danh sách cá nhân và tự đánh giá mức độ hiểu bài. Chọn **Augment** vì cost-of-error ở mức trung bình: một câu hỏi, đáp án hoặc trích dẫn sai có thể khiến học viên ghi nhớ sai kiến thức; do đó hệ thống không tự chấm điểm chính thức và không tự quyết định học viên đã thành thạo.
 - **§4b. Nguyên tắc HAX / PAIR đã áp dụng**:
 
 | Nguyên tắc HAX/PAIR | Áp dụng cụ thể vào đâu trong prototype |
@@ -76,9 +76,11 @@ Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
 
 ## §6. Bốn đường đi của trải nghiệm
 - **Happy path**: Học viên chọn Buổi học (Day 1) -> Bấm "Sinh Flashcards" -> AI hiển thị 5 thẻ -> Học viên lật từng thẻ xem đáp án & trích dẫn `[T01-015]` -> Bấm đánh giá (🟢 Đã thuộc) -> Xem báo cáo hoàn thành.
-- **Low-confidence path (② Mơ hồ)**: Học viên chọn bài học nhưng dữ liệu transcript ngắn -> AI sinh 3 thẻ thay vì 5 thẻ và đưa cảnh báo: "Dữ liệu bài học ngắn, AI đã chọn lọc 3 câu hỏi quan trọng nhất."
-- **Failure / Không căn cứ path (① Nguồn sự thật)**: AI phát hiện thông tin câu hỏi không có mã trích dẫn hợp lệ -> Tự động loại bỏ thẻ lỗi và thay thế bằng thẻ kiểm tra khái niệm tổng quan kèm disclaimer.
-- **Correction path (User sửa / Hỏi lại)**: Học viên không hiểu đáp án của thẻ -> Bấm nút "Hỏi AI giải thích thêm" -> Mở AI Tutor Drawer -> Học viên gõ thắc mắc -> AI giải thích chi tiết kèm trích dẫn văn bản transcript.
+- **Low-confidence path (② Mơ hồ / thiếu thông tin)**: Học viên chưa chọn rõ chủ đề hoặc nhập yêu cầu quá ngắn -> hệ thống dùng cấu hình mặc định của buổi học và hiển thị bộ thẻ ở trạng thái preview -> học viên kiểm tra, thay đổi chủ đề/độ khó hoặc yêu cầu sinh lại trước khi thêm vào bộ thẻ cá nhân.
+- **Failure / Không căn cứ path (① Nguồn sự thật)**: Gemini API không phản hồi, trả về JSON lỗi hoặc không có API key -> hệ thống chuyển sang bộ câu hỏi fallback và thông báo đây là dữ liệu mẫu -> học viên có thể tiếp tục xem thử luồng hoặc cấu hình API và sinh lại; hệ thống không dùng kết quả lỗi để tự đánh giá năng lực học viên.
+- **Correction path (User sửa / Hỏi lại)**: Học viên thấy câu hỏi quá dễ, quá khó hoặc chưa phù hợp -> quay lại màn hình sinh thẻ, thay đổi chủ đề/độ khó/yêu cầu bổ sung và tạo bộ khác. Nếu chưa hiểu đáp án, học viên mở AI Tutor Drawer để xem phần giải thích theo nội dung của thẻ; trong prototype hiện tại phần hội thoại này là mock.
+- **Khi bị đòi ngoài phạm vi (③)**: Học viên yêu cầu đáp án bài thi, nội dung ngoài giáo trình hoặc nhờ thực hiện một dự án không liên quan -> AI Tutor từ chối thực hiện, nhắc lại phạm vi hỗ trợ là tạo và ôn flashcard từ bài học VLearn, đồng thời đề nghị học viên chọn lại bài học/chủ đề hợp lệ.
+- **Case đặc thù domain (④)**: Flashcard chứa thuật ngữ chuyên môn hoặc khái niệm dễ nhầm như Augment/Automate -> hệ thống phải kèm mã trích dẫn `[Txx-NNN]` và đoạn nguồn để học viên đối chiếu. Nếu không có nguồn phù hợp, thẻ không được xem là đạt và học viên cần sinh lại hoặc báo lỗi.
 
 ## §7. Kiểm thử
 - **Chiều chất lượng + định nghĩa kiểm chứng được**:
@@ -89,7 +91,7 @@ Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
   - 10 case thô trích từ chatlog VLearn thật và transcript Day 1 & Day 2.
   - 8 case đại diện cho 4 lớp chỗ khó (2 case/lớp).
   - 2 case biên/hiếm (input rỗng, bài giảng nhiều thuật ngữ tiếng Anh).
-- **Quality bar (chốt từ 23:59 N1)**: "Đạt khi ≥ 85% case qua toàn bộ bộ kiểm thử Golden set, và 100% case không vi phạm lỗi bịa nguồn kiến thức."
+- **Quality bar**: "Đạt khi ≥ 85% case qua toàn bộ bộ kiểm thử Golden set, và 100% case không vi phạm lỗi bịa nguồn kiến thức."
 - **Kết quả các lượt chạy**:
 
 | Lượt chạy | Ngày/Giờ | Số case test | % Đạt | Ghi chú |
@@ -98,14 +100,15 @@ Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
 
 ## §8. Phân công & Kế hoạch
 - **Phân công thành viên**:
-  - Nguyễn Thế Hân: Product Lead & Lead Frontend (Build codebase interactive UI, Flashcard 3D flip effect).
-  - Thành viên 2: AI Prompting & RAG Integration (Tối ưu prompt Gemini API & trích dẫn transcript `[Txx-NNN]`).
-  - Thành viên 3: Data Mining & Golden Set (Xây dựng 20 test cases trong `eval/` từ data pack).
-  - Thành viên 4: Validation & Slide Presentation (Thực hiện user test với 5 người dùng và soạn slide demo 6 trang).
+  - Đào Duy Hưng: Product lead, validation
+  - Nguyễn Thế Hải Đăng: evidence
+  - Trần Văn Thắng: spec, code
+  - Nguyễn Thế Nam: prompt, code
+  
 - **Willing users (≥3 người ngoài nhóm)**:
-  1. Học viên Lê Văn H. (Zone 1 - K4)
-  2. Học viên Phạm Thị K. (Zone 2 - K4)
-  3. Học viên Trần Minh T. (Zone 1 - K4)
+  1. Học viên Sái Hùng Anh 
+  2. Học viên Lê Khải Chính 
+  3. Học viên Tô Minh Quân 
 - **Kế hoạch vòng validation CP5**:
   - Giao task: "Hãy chọn Buổi 1, sinh bộ Flashcard và lật thẻ ôn tập 5 câu hỏi."
   - 3 câu hỏi phỏng vấn:
@@ -117,3 +120,5 @@ Loại: [x] Tính năng mới  [ ] Tối ưu tính năng có sẵn
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 |---|---|---|
 | N1 17:00 | Tạo bản thảo Spec CP2 | Khởi tạo cấu trúc spec theo rubric CP2 |
+| N2 9:30 | Chuyển mức automation từ Conditional sang Augment và bổ sung lý do theo cost-of-error | Phản ánh đúng quyền quyết định của học viên trong §4 và prototype hiện tại |
+| N2 | Cập nhật số liệu khảo sát từ `evidence/form.csv` | Thay claim 18/22 chưa có căn cứ bằng kết quả thực: 20 phản hồi, 12 người đã dùng VLearn, 11 người muốn tạo flashcard |
