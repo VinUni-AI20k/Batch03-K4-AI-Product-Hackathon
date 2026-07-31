@@ -1,0 +1,86 @@
+[
+  {
+    "concept_id": "d1-c01",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Bức tranh AI: các tầng AI & ba nhóm AI (Discriminative/Generative/Agentic)",
+    "prereq_id": null
+  },
+  {
+    "concept_id": "d1-c02",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Lịch sử AI 70 năm: hệ chuyên gia, ImageNet, Transformer, ChatGPT",
+    "prereq_id": "d1-c01"
+  },
+  {
+    "concept_id": "d1-c03",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "LLM là gì & cơ chế sinh văn bản (next-token prediction)",
+    "prereq_id": "d1-c02"
+  },
+  {
+    "concept_id": "d1-c04",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Token hóa (tokenization)",
+    "prereq_id": "d1-c03"
+  },
+  {
+    "concept_id": "d1-c05",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Context window",
+    "prereq_id": "d1-c04"
+  },
+  {
+    "concept_id": "d1-c06",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Cơ chế Attention",
+    "prereq_id": "d1-c05"
+  },
+  {
+    "concept_id": "d1-c07",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Tham số mô hình & scaling law (dense vs MoE)",
+    "prereq_id": "d1-c03"
+  },
+  {
+    "concept_id": "d1-c08",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Quy trình huấn luyện LLM: pretraining, SFT, RLHF/DPO",
+    "prereq_id": "d1-c07"
+  },
+  {
+    "concept_id": "d1-c09",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Giới hạn của LLM: knowledge cutoff, hallucination, context có hạn",
+    "prereq_id": "d1-c08"
+  },
+  {
+    "concept_id": "d1-c10",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Học vẹt đường tắt (spurious cues)",
+    "prereq_id": "d1-c09"
+  },
+  {
+    "concept_id": "d1-c11",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Chain-of-Thought reasoning",
+    "prereq_id": "d1-c09"
+  },
+  {
+    "concept_id": "d1-c12",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Từ LLM đến Agent: 4 cấp độ & giải phẫu agent",
+    "prereq_id": "d1-c03"
+  },
+  {
+    "concept_id": "d1-c13",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Chi phí token & chọn model theo tầng",
+    "prereq_id": "d1-c04"
+  },
+  {
+    "concept_id": "d1-c14",
+    "lecture_id": "d1-ai-llm-foundation",
+    "name": "Kỹ thuật prompt: 4 lớp prompt & núm vặn temperature/top_p",
+    "prereq_id": "d1-c06"
+  }
+]

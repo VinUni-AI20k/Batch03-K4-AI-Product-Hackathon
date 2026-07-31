@@ -1,0 +1,6 @@
+{
+  "lecture_id": "d2-xac-dinh-bai-toan",
+  "title": "Day 2 - Xác định bài toán cho AI",
+  "n_slides": 29,
+  "summary": "Bài giảng dạy quy trình biến một yêu cầu AI mơ hồ thành Problem Statement rõ ràng, dùng khung Double Diamond (Discover/Define/Develop/Deliver) và Google PAIR. Học viên học cách tìm đúng bài toán (4 lens, tránh anti-pattern solution-first), định lượng hóa điểm đau (baseline/target/measurement), rồi đi qua 3 bước PAIR: (1) AI có thật sự cần thiết không, (2) Automate hay Augment và chọn cấp độ giải pháp Rule/Workflow/Agent, (3) thiết kế reward function và đánh đổi precision/recall. Kết thúc bằng cách viết Problem Statement đầy đủ 9 trường và ra quyết định Go / Not Yet / No-Go dựa trên lập luận chứ không phải thiên kiến công nghệ."
+}

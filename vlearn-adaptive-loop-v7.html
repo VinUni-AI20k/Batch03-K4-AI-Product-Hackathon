@@ -248,7 +248,7 @@
 <div class="topbar">
   <div class="logo"><span class="vmark">▶</span> VLearn</div>
   <div>
-    <div class="doc-title" id="docTitle">day05-ai-product-thinking-requirements.pdf</div>
+    <div class="doc-title" id="docTitle">d1-slide-hackathon.pdf</div>
     <div class="doc-sub">COMP2010 · Lecture_material_ms204v3b_r9mo78Week_03_Optimization</div>
   </div>
   <div class="top-right">
@@ -393,13 +393,10 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.cla
 
 /* ===== SIDEBAR ===== */
 const DAYS = [
-  {name:"Day01", files:[{n:"day01-intro-ai-products.pdf",p:28},{n:"day01-reading-list.pdf",p:6}]},
-  {name:"Day02", files:[{n:"day02-user-research-ai.pdf",p:35}]},
-  {name:"Day03", files:[{n:"day03-data-strategy.pdf",p:41},{n:"day03-case-studies.pdf",p:18}]},
-  {name:"Day04", files:[{n:"day04-prompt-engineering-1.pdf",p:43},{n:"day04-prompt-engineering-2.pdf",p:78},{n:"day04-prompt-engineering-3.pdf",p:98}]},
-  {name:"Day05", studying:true, files:[{n:"day05-ai-product-thinking-requirements.pdf",p:62,main:true},{n:"day05-lecture-slides-batch.pdf",p:39},{n:"day05-quiz-review-pack.pdf",p:12}]},
+  {name:"Day01", studying:true, files:[{n:"d1-slide-hackathon.pdf",p:29,main:true}]},
+  {name:"Day02", files:[{n:"d2-slide-hackathon.pdf",p:29,main:true}]}
 ];
-let curDay = 4, curFile = 0;
+let curDay = 0, curFile = 0;
 function renderSidebar(){
   document.getElementById("sidebar").innerHTML =
     `<h3>📖 Học liệu môn học</h3><div class="sh">Chương, slide và tài liệu đã upload</div>` +
@@ -444,15 +441,33 @@ const DECK = {
   52:{t:"Dropout",b:"<p>Train: tắt ngẫu nhiên p% neuron.</p><ul><li>Inference: bật hết, scale trọng số</li></ul>"},
   53:{t:"Dropout: Chọn tỉ lệ p",b:"<ul><li>Hidden: p ≈ 0.5</li><li>Input: p ≈ 0.1–0.2</li></ul>"},
 };
-let TOTAL = 62, curPage = 1, isMainDeck = true;
-function renderSlide(){
-  const s = (isMainDeck && DECK[curPage]) || {t:`(Trang ${curPage} — nội dung mock)`,b:"<i style='color:#98a0ae'>Slide nội dung bài giảng…</i>"};
-  document.getElementById("slTitle").textContent = s.t;
-  document.getElementById("slBody").innerHTML = s.b;
+let TOTAL = 29, curPage = 1, isMainDeck = true;
+async function renderSlide(){
+  // Update doc title and total pages dynamically based on current day
+  const currentDoc = DAYS[curDay] && DAYS[curDay].files[0] ? DAYS[curDay].files[0] : null;
+  if(currentDoc) {
+    TOTAL = currentDoc.p;
+    document.getElementById("docTitle").textContent = currentDoc.n;
+  }
+
+  document.getElementById("slTitle").textContent = "Đang tải...";
+  document.getElementById("slBody").innerHTML = "<div class='spin'></div>";
   document.getElementById("slFoot").textContent = `Tuần 3   ${curPage} / ${TOTAL}`;
   document.getElementById("pgTop").textContent = `Trang ${curPage} / ${TOTAL}`;
   document.getElementById("pgBottom").textContent = `/ ${TOTAL}`;
   document.getElementById("pgInput").value = curPage;
+
+  const dayName = DAYS[curDay] ? DAYS[curDay].name.toLowerCase() : "day01";
+  try {
+    const res = await fetch(`http://localhost:8000/slides/${dayName}/${curPage}`);
+    if(!res.ok) throw new Error("Not found");
+    const data = await res.json();
+    document.getElementById("slTitle").textContent = data.title;
+    document.getElementById("slBody").innerHTML = `<pre style="white-space:pre-wrap; font-family:inherit; font-size:14px; line-height:1.5;">${data.content_text}</pre>`;
+  } catch(e) {
+    document.getElementById("slTitle").textContent = `(Trang ${curPage} - Trống)`;
+    document.getElementById("slBody").innerHTML = "<i style='color:#98a0ae'>Slide không có nội dung text (hoặc chưa bật server API)...</i>";
+  }
   bindHighlight();
 }
 function nav(d){ curPage = Math.min(TOTAL, Math.max(1, curPage + d)); renderSlide(); }
@@ -496,20 +511,43 @@ function zoom(d){
 }
 
 /* ===== TUTOR CHAT ===== */
-function sendChat(){
+async function sendChat(){
   const inp = document.getElementById("chatInput");
   const txt = inp.value.trim(); if(!txt) return;
   inp.value = "";
   const log = document.getElementById("chatLog");
   log.insertAdjacentHTML("beforeend", `<div class="chatmsg user">${txt.replace(/</g,"&lt;")}</div>`);
-  const s = isMainDeck && DECK[curPage];
-  const reply = s
-    ? `Theo <b>slide trang ${curPage}</b> ("${s.t}"): ${s.b.replace(/<[^>]+>/g," ").trim().slice(0,170)}…<br><small>📎 Chỉ thấy slide ${curPage}. Muốn học có lộ trình: tab 🎯.</small>`
-    : `Trang ${curPage} chưa có nội dung mock. Thử trang 8, 14, 27, 33, 45, 52 của tài liệu chính.<br><small>📎 Ngữ cảnh: slide ${curPage}</small>`;
-  setTimeout(()=>{
-    log.insertAdjacentHTML("beforeend", `<div class="chatmsg">${reply}<div class="fb"><span onclick="fb(this,1)">👍</span><span onclick="fb(this,0)">👎</span></div></div>`);
-    log.scrollTop = log.scrollHeight;
-  }, 450);
+  
+  const loadingId = "load" + Date.now();
+  log.insertAdjacentHTML("beforeend", `<div class="chatmsg" id="${loadingId}" style="opacity:0.6">Đang suy nghĩ...</div>`);
+  log.scrollTop = log.scrollHeight;
+
+  try {
+    const dayName = DAYS[curDay] ? DAYS[curDay].name.toLowerCase() : "day01";
+    const res = await fetch("http://localhost:8000/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "user-id": "minhanh"
+      },
+      body: JSON.stringify({
+        lecture_id: dayName,
+        slide_no: curPage,
+        question: txt
+      })
+    });
+    
+    if(!res.ok) throw new Error("API error");
+    const data = await res.json();
+    
+    document.getElementById(loadingId).remove();
+    // format response to handle basic newlines
+    const formattedAns = data.answer.replace(/\n/g, "<br>");
+    log.insertAdjacentHTML("beforeend", `<div class="chatmsg">${formattedAns}<div class="fb"><span onclick="fb(this,1)">👍</span><span onclick="fb(this,0)">👎</span></div></div>`);
+  } catch(e) {
+    document.getElementById(loadingId).remove();
+    log.insertAdjacentHTML("beforeend", `<div class="chatmsg" style="color:var(--red)">Lỗi kết nối Backend. Hãy chắc chắn server đang chạy tại cổng 8000.</div>`);
+  }
   log.scrollTop = log.scrollHeight;
 }
 function fb(el,v){ el.parentElement.querySelectorAll("span").forEach(s=>s.classList.remove("sel")); el.classList.add("sel"); toast(v?"👍 đã ghi nhận":"👎 đã ghi nhận"); }

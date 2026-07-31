@@ -1,0 +1,263 @@
+[
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 1,
+    "title": "Xác định bài toán cho AI.",
+    "body_text": "AI IN ACTION · DAY 02\nXác định bài toán cho AI.\nTừ yêu cầu mơ hồ đến Problem Statement rõ ràng.",
+    "char_count": 95,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 2,
+    "title": "Agenda",
+    "body_text": "S Á N G\nKHUNG LÝ THUYẾT (4H)\n· Problem Discovery (Double Diamond, HCD)\n· Problem Statement & định lượng hóa\n· PAIR ① AI có thêm giá trị?\n· PAIR ② Automate/Augment →\nRule/Workflow/Agent\n· PAIR ③ Reward function & success criteria\n· Khi AI sai & UX/HITL\n· PS hoàn chỉnh → Go/Not Yet/No-Go\nC H I ỀU\nTHỰC HÀNH LAB (4H)\n· Cá nhân: Tìm 5 bài toán & điền 3 Problem\nCards\n· Nhóm: Phản biện chéo, chốt 1 bài toán\n· Nhóm: Xác thực dữ liệu & vẽ quy trình\n· Nhóm: Xác định giải pháp & ra quyết định\n· Cá nhân: Viết nhật ký phản tư (Reflection Log)\nB À I N ỘP\nCUỐI BUỔI\n· Nhật ký tìm và lọc bài toán (Cá nhân)\n· Problem Statement hoàn chỉnh (Nhóm)\n· Nhật ký phản tư (Cá nhân)\nAgenda\n— Mục tiêu: Biến yêu cầu mơ hồ thành Problem Statement rõ ràng để ra quyết định\nMỞ ĐẦU · AGENDA\nDAY 02 · 04 / 83",
+    "char_count": 782,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 3,
+    "title": "Tìm đúng",
+    "body_text": "D I A M O N D 1 — T Ì M Đ Ú N G VẤN Đ Ề\nDiscover: Mở rộng — khảo sát vấn đề căn bản.\nDefine: Thu hẹp — xác định đúng bài toán gốc.\nD I A M O N D 2 — T Ì M Đ Ú N G G I ẢI P H Á P\nDevelop: Mở rộng — nhiều giải pháp tiềm năng.\nDeliver: Thu hẹp — chọn và triển khai.\n\"Kỹ sư và doanh nhân được đào tạo để giải vấn đề. Nhà thiết kế được đào\ntạo để khám phá vấn đề thật.\"\nGiải pháp xuất sắc cho sai vấn đề có thể còn tệ hơn không có giải pháp.\nTìm đúng vấn đề trước khi tìm giải pháp\n— Mô hình Double Diamond — Don Norman / British Design Council (2005)\nNGUỒN  Don Norman — jnd.org · Design Council — The Double Diamond\nBÀI TOÁN · DOUBLE DIAMOND\nDAY 02 · 16 / 83",
+    "char_count": 655,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 4,
+    "title": "Diamond 1 —",
+    "body_text": "D I S C OV E R · P H Â N K Ỳ\nKhám phá / mở rộng góc nhìn\n· Quan sát thực tế (Observation)\n· Phỏng vấn người dùng (User Interview)\n· Khảo sát (Survey)\n· Nhật ký hành vi (Diary Study)\n· Phân tích dữ liệu / Nhật ký hệ thống\n· Bản đồ các bên liên quan (Stakeholder Mapping)\nD E F I N E · H ỘI T Ụ\nĐịnh nghĩa / chọn lọc dựa vào dữ liệu\n· Sơ đồ đồng cảm / Gom nhóm (Affinity Mapping)\n· Kỹ thuật đặt câu hỏi 5 Whys\n· Ma trận Tác động – Nỗ lực (Impact-Effort)\n· Biểu quyết bằng chấm tròn (Dot Voting)\n· Câu hỏi mở hướng giải quyết (How Might We)\n· Phát biểu bài toán (Problem Statement)\nDiamond 1 — Tìm đúng vấn đề\n— Phân kỳ để thấu hiểu sâu sắc, hội tụ để lựa chọn chính xác\nBÀI TOÁN · DIAMOND 1\nDAY 02 · 17 / 83",
+    "char_count": 705,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 5,
+    "title": "Khởi nguồn từ",
+    "body_text": "C U R S O R\n\"Lệch năng lực cốt lõi\"\nTừ bỏ mảng AI thiết kế cơ khí (CAD) để\ntập trung vào AI code editor — nơi đội\nngũ am hiểu sâu sắc quy trình nghiệp vụ.\nA R T I FAC T\n\"Sản phẩm tốt ≠ Thị trường lớn\"\nỨng dụng đọc tin tích hợp AI xuất sắc,\nnhưng quy mô thị trường quá hẹp để\nthương mại hóa thành công (đóng cửa\n1/2024).\nN OT E B O O K L M\n\"Định vị đúng điểm đau\"\nTập trung giải quyết nhu cầu hỏi đáp, tóm\ntắt trên tài liệu cá nhân và đối chiếu\nnguồn gốc bằng trích dẫn.\nKhởi nguồn từ bài toán, không bắt đầu từ AI\n— Ba bài học thực tế về am hiểu lĩnh vực, quy mô thị trường và định vị giải pháp\nLộ trình: Bài toán → Quy trình vận hành → Chỉ số đo lường → Giải pháp AI\nNGUỒN  Lenny's Podcast — The rise of Cursor · The Verge — Artifact · Google Blog — NotebookLM\nBÀI TOÁN · CASE STUDY\nDAY 02 · 22 / 83",
+    "char_count": 800,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 6,
+    "title": "Tìm bài toán AI",
+    "body_text": "R E P E T I T I V E\nTác vụ lặp lại\nViệc diễn ra thường xuyên;\ncông đoạn nào cần chuẩn hóa\nđể hướng tới tự động hóa?\nT I M E - C O N S U M I N G\nTiêu tốn thời gian\nKhối lượng xử lý lớn; thời gian\nhao phí ở bước nào (tìm kiếm,\nđọc hiểu, chờ đợi, định dạng)?\nA I A DVA N TAG E\nLợi thế của AI\nTác vụ đòi hỏi phân tích ngữ\ncảnh, xử lý ngôn ngữ tự nhiên,\ntổng hợp đa nguồn.\nU S E R PA I N P O I N T S\nĐiểm đau người dùng\nAi đang gặp khó khăn, phàn\nnàn hoặc bị tắc nghẽn liên tục?\nTập trung nhận diện vấn đề; chưa vội đề xuất giải pháp.\nSàng lọc bài toán sẽ diễn ra vào buổi chiều.\nTìm bài toán AI ở đâu?\n— Bắt đầu từ việc quan sát các hoạt động thực tế xung quanh\nBÀI TOÁN · 4 LENSES\nDAY 02 · 23 / 83",
+    "char_count": 694,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 7,
+    "title": "Sai lầm thường gặp —",
+    "body_text": "Ưu tiên giải pháp (Solution-first)\nXây dựng chatbot/agent trước khi làm rõ quy trình vận hành và điểm\nnghẽn thực tế.\nMơ hồ hiện trạng (No baseline)\nKhông lượng hóa tổn thất hiện tại, dẫn đến mất căn cứ đánh giá hiệu\nquả cải tiến.\nBỏ qua đánh giá (No evaluation)\nKhông thiết lập kịch bản kiểm thử, chỉ số đo lường hoặc phương án đối\nchứng.\nMập mờ ranh giới (No boundary)\nKhông rõ phạm vi tự chủ của AI và thời điểm cần con người phê duyệt\n(Human-in-the-loop).\nNếu phát hiện mắc các sai lầm trên, hãy quay lại làm rõ Problem Statement trước khi chọn công nghệ.\nSai lầm thường gặp — Anti-patterns\n— Dấu hiệu cảnh báo bài toán chưa được định hình rõ hoặc giải pháp AI được lựa chọn quá sớm\nBÀI TOÁN · ANTI-PATTERNS\nDAY 02 · 24 / 83",
+    "char_count": 727,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 8,
+    "title": "\"Can we use AI to ______?\"",
+    "body_text": "P A I R · C H Ư Ơ N G 1 — R E F R A M E C Â U H ỎI\n\"Can we use AI to ______?\"\n↓  thay bằng hai câu hỏi:  ↓\n\"How might we\nsolve ______?\"\n\"Can AI solve this problem\nin a unique way?\"\nHỏi về bài toán trước, về AI sau — AI chỉ là một phương án trong nhiều phương án khả dĩ.\nCâu hỏi đúng quyết định bài toán bạn giải — và giải pháp bạn chọn.\nNGUỒN  Google PAIR — Ch.1 User Needs + Defining Success\nBÀI TOÁN · PAIR REFRAME\nDAY 02 · 26 / 83",
+    "char_count": 433,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 9,
+    "title": "Quick",
+    "body_text": "Bài toán (1 câu)  problem\nVấn đề cụ thể cần giải quyết (không bao gồm giải pháp).\nĐối tượng ảnh hưởng  actor\nCá nhân hoặc bộ phận chịu tác động trực tiếp từ vấn đề.\nQuy trình hiện tại  workflow\nCác bước vận hành thủ công hoặc tự động hiện tại (gồm 3–7 bước).\nNút thắt & Tác động  bottleneck + impact\nKhâu gây chậm trễ, sai sót hoặc lặp lại; hệ quả hay tổn thất cụ thể.\nChỉ số đo thành công  success metric\nChỉ số định lượng cụ thể dùng để chứng minh hiệu quả cải tiến.\nĐịnh hướng giải pháp  direction\nNo AI / Rule / Workflow / Agent / Chưa xác định.\nQuick Problem Card\n— Khung định hình bài toán\nPROBLEM STATEMENT · QUICK CARD\nDAY 02 · 28 / 83",
+    "char_count": 643,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 10,
+    "title": "Câu hỏi",
+    "body_text": "0 1\nQuy trình hiện tại như thế nào?\nCông cụ, các bước, cơ chế bàn giao thông tin?\n0 2\nNút thắt nằm ở đâu?\nBước nào chậm, dễ sai sót, lặp lại?\n0 3\nHao phí hiện tại là bao nhiêu?\nThời gian, chi phí nhân sự, SLA, cơ hội bỏ lỡ?\n0 4\nTiêu chí thành công đo bằng gì?\nHiệu quả cải tiến định lượng cụ thể?\n0 5\nHậu quả khi xảy ra sai sót?\nPhạm vi tự quyết của AI; điểm cần con người phê duyệt?\n0 6\nCó giải pháp phi AI đơn giản hơn?\nQuy tắc, checklist, quy trình hay tài liệu hướng dẫn?\nCâu hỏi khai thác bài toán\n— Bộ câu hỏi định hình vấn đề dành cho các bên liên quan hoặc chính mình\nBỘ THẺ CÂU HỎI #3 — CẤU TRÚC PS\nPROBLEM STATEMENT · 6 CÂU HỎI\nDAY 02 · 30 / 83",
+    "char_count": 654,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 11,
+    "title": "Định lượng hóa",
+    "body_text": "0 1 · B A S E L I N E\nHiện trạng / where we are\nMức hao phí hiện tại là bao nhiêu? Bằng con\nsố cụ thể.\n0 2 · TA R G E T\nMục tiêu / where to go\nKỳ vọng cải thiện ở mức độ nào? Ngưỡng cụ\nthể là gì?\n0 3 · M E A S U R E M E N T\nĐo lường / how we know\nChỉ số nào chứng minh tính hiệu quả? Cách\nthu thập?\nV Í D Ụ\nT H ỜI G I A N H OÀ N T H À N H\nRút ngắn từ 90 phút xuống dưới 30 phút.\nC H ẤT L Ư ỢN G C Ô N G V I ỆC\nGiảm tỷ lệ lỗi phân loại từ 20% xuống dưới\n5%.\nTẢI T R ỌN G VẬN H À N H\nCắt giảm 40% câu hỏi trùng lặp cần Trợ\ngiảng xử lý.\nĐịnh lượng hóa bài toán\n— Điểm đau chưa được định lượng thì không thể xác định giá trị thực tế của AI\nPROBLEM STATEMENT · ĐỊNH LƯỢNG\nDAY 02 · 31 / 83",
+    "char_count": 683,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 12,
+    "title": "Thiết lập chỉ số:",
+    "body_text": "O U T P U T M E T R I C\nKết quả cuối cùng / what we optimize\n· Thời lượng hoàn tất quy trình giảm bao nhiêu?\n· Tỷ lệ sai sót / chất lượng đầu ra thay đổi thế nào?\n· Giá trị thực tế người dùng nhận được rõ nét hơn?\nI N P U T M E T R I C S\nCác đòn bẩy / what we can move\n· Tỷ lệ câu hỏi được phân loại chính xác.\n· Tỷ lệ yêu cầu được chuyển tiếp hỗ trợ kịp thời.\n· Thời gian Trợ giảng hiệu chỉnh bản nháp phản hồi.\ntăng cái này\n→ đo cái kia\nThiết lập chỉ số: Output & Input\n— Chỉ số đo lường cần phản ánh kết quả cuối và các đòn bẩy có thể tác động\n\"Nâng cao hiệu suất\" không phải chỉ số — cần gắn với hiện trạng, mục tiêu và phương pháp đo.\nNGUỒN  Amplitude — North Star Playbook · Lenny Rachitsky — Choosing Your North Star Metric\nPROBLEM STATEMENT · METRICS\nDAY 02 · 32 / 83",
+    "char_count": 775,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 13,
+    "title": "Ba bước quyết định AI theo",
+    "body_text": "B Ư ỚC ①\nGiao điểm: nhu cầu × thế mạnh\nAI\nBài toán của bạn có nằm trong nhóm việc\nAI làm tốt hơn hẳn rule/heuristic không?\nVD: câu hỏi trùng lặp của 1000 học viên K3 &\nK4 có nằm trong thế mạnh của AI?\n→ trả lời câu hỏi 1: có thực sự cần AI?\nB Ư ỚC ②\nAutomate hay Augment?\nAI thay thế hay hỗ trợ con người? Mức tự\nđộng hóa tăng dần theo độ tin cậy và rủi\nro.\nVD: AI trả lời thay TA luôn, hay chỉ soạn nháp để\nTA duyệt?\n→ trả lời câu hỏi 2: giải pháp ở cấp độ nào?\nB Ư ỚC ③\nReward function & tiêu chí\nthành công\nĐịnh nghĩa \"đúng/sai\" của hệ thống\n(precision ↔ recall) và ngưỡng thành\ncông đo được.\nVD: đo bằng gì — thời gian phản hồi? tỷ lệ định\nhướng sai?\n→ trả lời câu hỏi 3: PS đã đủ rõ để đo?\nÁnh xạ về 4 câu hỏi trọng tâm của ngày: ① Có cần AI?  ·  ② Cấp độ nào?  ·  ③ Đủ rõ để đo?  ·  Tổng hợp ①②③ → ④ Go / Not Yet / No-Go\nBa bước quyết định AI theo PAIR\n— Google People + AI Guidebook · Chương 1: User Needs + Defining Success\nĐi hết 3 bước này, bạn trả lời được cả 4 câu hỏi của ngày hôm nay — từ \"có thực sự cần AI?\" đến \"Go, Not Yet hay No-\nGo\".\nNGUỒN  Google PAIR — People + AI Guidebook · PAIR — Ch.1 User Needs + Defining Success\nCÓ NÊN ỨNG DỤNG AI · PAIR 3 BƯỚC\nDAY 02 · 35 / 83",
+    "char_count": 1190,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 14,
+    "title": "Khi nào",
+    "body_text": "Gợi ý theo từng người · recommendation\nMỗi người dùng nhận một nội dung gợi ý khác nhau.\nDự đoán tương lai · prediction\nĐoán trước sự kiện sắp xảy ra để chuẩn bị phản ứng.\nCá nhân hóa · personalization\nTrải nghiệm tự điều chỉnh theo từng người, ngày càng hợp hơn.\nHiểu ngôn ngữ tự nhiên · natural language\nHiểu câu hỏi viết tự do bằng lời nói hằng ngày.\nNhận diện cả một lớp thực thể\nNhận ra mọi đối tượng cùng loại — VD mọi khuôn mặt.\nPhát hiện cái hiếm & biến đổi\nBắt sự kiện hiếm, thay đổi theo thời gian — VD gian lận.\nAgent/bot cho một lĩnh vực cụ thể\nTrợ lý ảo xử lý trọn một phạm vi việc chuyên biệt.\nNội dung động thay giao diện tĩnh\nNội dung linh hoạt hiệu quả hơn layout cố định, dễ đoán.\nKhi nào AI có lợi thế?\n— Tám trường hợp PAIR gọi là \"AI probably better\" · Chương 1\nPAIR\n①\n②\n③\nAI chỉ đáng làm khi bài toán nằm trong nhóm này.\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success\nCÓ NÊN ỨNG DỤNG AI · AI PROBABLY BETTER\nDAY 02 · 36 / 83",
+    "char_count": 948,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 15,
+    "title": "Khi nào AI",
+    "body_text": "Cần duy trì tính dự đoán được\nNút Home / Cancel phải luôn nằm ở một chỗ quen thuộc — người dùng\nkhông phải đoán mỗi lần.\nThông tin tĩnh, ít thay đổi\nNội dung cố định thì cứ hiển thị trực tiếp — không cần AI sinh lại mỗi lần.\nLỗi quá tốn kém\nChi phí của một lần sai lớn hơn lợi ích của nhiều lần đúng.\nYêu cầu minh bạch tuyệt đối\nMọi quyết định phải giải thích được từng bước, truy vết được.\nTối ưu tốc độ & chi phí thấp\nCần ra thị trường nhanh (time-to-market), vận hành rẻ — AI chỉ thêm độ trễ\nvà chi phí.\nViệc giá trị cao người dùng muốn tự làm\nTác vụ mang ý nghĩa cá nhân mà người dùng KHÔNG muốn bị tự động hóa.\nKhi nào AI KHÔNG tốt hơn?\n— Sáu trường hợp PAIR gọi là \"AI probably NOT better\" · Chương 1\nPAIR\n①\n②\n③\nRule/heuristic dễ build, dễ giải thích, dễ debug và bảo trì hơn — nếu nó giải quyết được, đó là lựa chọn tối ưu.\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success\nCÓ NÊN ỨNG DỤNG AI · KHI NÀO KHÔNG CẦN AI\nDAY 02 · 37 / 83",
+    "char_count": 938,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 16,
+    "title": "Hệ thống AI =",
+    "body_text": "M O D E L\nTư duy & Sáng tạo\nXử lý đọc hiểu, soạn thảo, tổng hợp, phân loại và đưa ra gợi ý.\nC O N T E XT\nTri thức chuyên biệt\nCơ sở dữ liệu, tài liệu nghiệp vụ, hồ sơ lịch sử giúp AI phản hồi chính xác theo\nbối cảnh.\nP L A N N I N G\nĐiều phối quy trình\nTự động phân rã tác vụ phức tạp và linh hoạt điều chỉnh.\nTO O L S\nLiên kết hệ thống\nTích hợp CRM, database, lịch làm việc hoặc API bên thứ ba.\nHệ thống AI = Model + Context + Planning + Tools\n— Một giải pháp AI thực tế là một hệ thống nhiều thành phần, không chỉ dừng lại ở mô hình ngôn ngữ\nGiải pháp AI là một HỆ THỐNG — model chỉ là một thành phần.\nNGUỒN  Anthropic — Building effective agents · Chip Huyen — AI Engineering\nHỆ THỐNG AI · KIẾN TRÚC\nDAY 02 · 42 / 83",
+    "char_count": 719,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 17,
+    "title": "Automation vs",
+    "body_text": "A U TO M AT E\nAI làm thay\nChọn khi:\n· Việc khó, nhàm chán, nguy hiểm hoặc cần scale\n· Người dùng thiếu kiến thức / khả năng tự làm\n· Có \"đáp án đúng\" mà mọi người cùng đồng thuận\nĐo thành công bằng: hiệu quả tăng · an toàn hơn · giảm việc tẻ nhạt.\nquyết định theo\ntừng tác vụ\nA U G M E N T\nAI hỗ trợ con người\nChọn khi:\n· Người dùng thích tự làm việc đó\n· Stakes cao: tiền bạc, pháp lý, sức khỏe\n· Kết quả cần trách nhiệm cá nhân / social capital\n· Sở thích khó diễn đạt thành lời\nĐo bằng: mức độ thích thú · cảm giác kiểm soát · sáng tạo tăng.\nAutomation vs Augmentation\n— Bước ② của PAIR: với từng tác vụ, AI nên làm thay hay hỗ trợ con người?\n①\n②\n③\nViệc đã automate vẫn gần như luôn cần human oversight — preview, edit, undo.\nNGUỒN  Google PAIR — Ch.1 User Needs + Defining Success\nRWA · AUTOMATE VS AUGMENT\nDAY 02 · 43 / 83",
+    "char_count": 827,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 18,
+    "title": "Ba mức giải pháp:",
+    "body_text": "C ẤP Đ Ộ 1\nRule / Script\n· Đầu vào ổn định, ít thay đổi\n· Logic viết được thành if/else\n· Cần kết quả luôn đúng 100%\n· Quy định pháp lý / tuân thủ chặt\nVí dụ: Tính thuế · chặn email spam theo từ khóa ·\nauto-reply theo template.\nC ẤP Đ Ộ 2\nLLM Feature / Workflow\n· Đầu vào đa dạng, không viết hết rule được\n· Đầu ra cần linh hoạt (tóm tắt, dịch, phân\nloại)\n· Có cách đo chất lượng\n· Người có thể kiểm tra trước khi gửi\nVí dụ: Tóm tắt email · chatbot FAQ · phân loại\nticket hỗ trợ.\nC ẤP Đ Ộ 3\nAgent\n· Nhiều bước, dùng nhiều công cụ\n· Tình huống thay đổi liên tục\n· Cần tự ra quyết định giữa các bước\n· Có kiểm soát rủi ro rõ ràng\nVí dụ: Agent nghiên cứu thị trường · coding agent\nsửa nhiều file.\nThứ tự ưu tiên thực dụng: bắt đầu từ bên trái, chỉ đi sang bên phải khi giá trị tăng hơn độ phức tạp.\nBa mức giải pháp: Rule / Workflow / Agent\n— Rule/Workflow/Agent là cấp độ KỸ THUẬT — còn Automate/Augment (PAIR) là cấp độ VAI TRÒ của con người trong hệ thống\nRWA · TỔNG QUAN\nDAY 02 · 45 / 83",
+    "char_count": 988,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 19,
+    "title": "Một tình huống,",
+    "body_text": "C ẤP Đ Ộ 1 — R U L E ( L U ẬT T Ĩ N H )\nTrả lời tự động\n· Tự động trả lời FAQ, gửi link thời khóa biểu\n· Gửi tài liệu sửa lỗi cài đặt cơ bản\n· Nhắc nhở checklist nộp bài\nKhi nào? Logic tường minh, kết quả cố định.\nC ẤP Đ Ộ 2 — W O R K F L O W ( Q U Y T R Ì N H )\nDuyệt Problem Card\n· AI kiểm tra độ đầy đủ của Problem Card\n· Yêu cầu bổ sung nếu thiếu thông tin\n· Chuyển cho Trợ giảng giải quyết\nKhi nào? Có quy trình rõ, AI hỗ trợ từng bước.\nC ẤP Đ Ộ 3 — AG E N T ( TÁC N H Â N )\nĐề xuất can thiệp chủ động\n· Tự động theo dõi tiến độ nộp bài\n· Phát hiện nhóm học viên bị kẹt lâu\n· Chuẩn bị câu trả lời, đề xuất TA duyệt\nKhi nào? Tình huống động, đa công cụ.\nKhông bắt buộc nâng cấp tuần tự từ Rule lên Agent → dừng ở cấp tối giản nhất nếu đã đáp ứng mục tiêu đề ra.\nMột tình huống, ba cấp độ giải pháp\n— Ưu tiên giải pháp đơn giản nhất có thể giải quyết bài toán và mang lại cải tiến đo lường được\nRWA · SO SÁNH\nDAY 02 · 50 / 83",
+    "char_count": 928,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 20,
+    "title": "Workflow patterns —",
+    "body_text": "1. Prompt Chaining\nIn\n→\nLLM Call 1\n→\nGate\n→\nLLM Call 2\n→\nLLM Call 3\n→\nOut\n┖ - - Gate fail → Exit\nChia task thành chuỗi bước tuần tự, có gate kiểm tra giữa các bước. VD: Viết outline\n→ check → viết bài.\nÝ nghĩa quyết định: đổi độ trễ lấy độ chính xác.\n2. Routing\nIn\n→\nRouter\n→\nLLM Call 1\nLLM Call 2\nLLM Call 3\n→\nOut\nPhân loại input → đưa vào nhánh chuyên biệt, tối ưu từng loại riêng. VD: CS query →\nFAQ / refund / kỹ thuật.\nÝ nghĩa quyết định: câu dễ đi model rẻ, câu khó đi model mạnh.\n3. Parallelization\nIn\n→\nLLM Call 1\nLLM Call 2\nLLM Call 3\n→\nAggregator\n→\nOut\nChạy song song rồi tổng hợp (sectioning), hoặc chạy nhiều lần lấy vote. VD:\nGuardrail + response đồng thời.\nÝ nghĩa quyết định: vote để giảm rủi ro một đầu ra sai.\nN G U Y Ê N TẮC A N T H R O P I C\n→ Luôn ưu tiên giải pháp đơn giản nhất; chỉ tăng độ phức tạp khi\nthực sự cần thiết.\n3 mô hình cơ bản bên cạnh đã đủ đáp ứng hầu hết bài toán thực\ntế.\nWorkflow patterns — đủ cho hầu hết bài toán\n— Ba mô hình cơ bản theo Anthropic · Building Effective Agents (2024)\nNGUỒN  Anthropic — Building effective agents\nWORKFLOW PATTERNS · BASIC\nDAY 02 · 52 / 83",
+    "char_count": 1112,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 21,
+    "title": "Cây quyết định:",
+    "body_text": "Cây quyết định: Lựa chọn cấp độ giải pháp\n— Từ bài toán cốt lõi đến lựa chọn Rule, Workflow hay Agent\nĐi từ trên xuống — mỗi nhánh \"KHÔNG\" là một lần tránh được độ phức tạp không cần thiết.\nNGUỒN  Anthropic — Building effective agents · Google — Rules of ML\nWORKFLOW · DECISION TREE\nDAY 02 · 55 / 83",
+    "char_count": 299,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 22,
+    "title": "Reward function: hệ thống hiểu",
+    "body_text": "Reward function là công thức quyết định đâu là dự đoán \"đúng\", đâu là \"sai\" — và chính nó định hình trải nghiệm người dùng cuối. Vì vậy\nnó phải được thiết kế liên chức năng: tối thiểu UX × Product × Engineering cùng ngồi lại.\nB ỐN K ẾT Q U Ả C Ó T H Ể X ẢY R A — C A S E A I G ỢI Ý C Â U T R Ả L ỜI\nT P — T R U E P O S I T I V E · Đ Ú N G -T Í C H C ỰC\nCâu hỏi nghẽn thật → AI gợi ý đúng câu trả lời. Học viên được giải tỏa,\nTA đỡ tải.\nT N — T R U E N E G AT I V E · Đ Ú N G -T I Ê U C ỰC\nCâu hỏi đã có tài liệu sẵn → AI không can thiệp. Đúng — không cần\ngợi ý gì thêm.\nF P — FA L S E P O S I T I V E · B ÁO Đ ỘN G G I Ả\nAI gợi ý câu trả lời SAI (hallucination) và gửi thẳng cho học viên → học\nviên đi sai hướng thực hành.\nF N — FA L S E N E G AT I V E · B Ỏ S ÓT\nHọc viên đang kẹt thật nhưng AI bỏ sót, không gợi ý → học viên vẫn\nchờ lâu như cũ.\nReward function: hệ thống hiểu \"đúng / sai\" thế nào?\n— PAIR Bước ③ · Case: AI gợi ý câu trả lời cho câu hỏi của 1000 học viên (khóa K3 & K4)\n① Nhu cầu\n② Auto / Augment\n③ Reward function\nChi phí của FP và FN KHÔNG đối xứng — báo cháy giả ≠ bỏ sót đám cháy. Cân nhắc đánh đổi này là quyết định then chốt khi\nthiết kế reward function.\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success\nREWARD · HÀM THƯỞNG\nDAY 02 · 57 / 83",
+    "char_count": 1264,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 23,
+    "title": "⇄",
+    "body_text": "P R E C I S I O N C AO\nTP / (TP + FP)\nÍt gợi ý — nhưng gợi ý nào cũng chắc đúng. Người dùng\ntin vào từng gợi ý nhận được.\nH Ệ Q U Ả\nNhiều False Negative — bỏ sót học viên đang thực sự cần\ngiúp.\n⇄\nĐ Ò N B ẨY\nVặn nút bên này\nlên, chất lượng\nbên kia xấu đi.\nR E C A L L C AO\nTP / (TP + FN)\nBao trọn mọi trường hợp cần giúp — không học viên\nnào bị bỏ lại phía sau.\nH Ệ Q U Ả\nNhiều False Positive — gợi ý sai nhiều, TA phải lọc lại thủ\ncông.\nPrecision ↔ Recall: đánh đổi không tránh khỏi\n— Cùng một hệ thống AI, hai hướng vặn nút ngược nhau\n① Nhu cầu\n② Auto / Augment\n③ Reward function\nKhông có cấu hình đúng tuyệt đối — phải test điểm cân bằng với chính người dùng.\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success\nREWARD · PRECISION ↔ RECALL\nDAY 02 · 58 / 83",
+    "char_count": 755,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 24,
+    "title": "Viết",
+    "body_text": "T E M P L AT E C ỦA PA I R\nIf {chỉ số cụ thể} for {tính năng AI} {drops below / goes above} {ngưỡng có nghĩa}, we will\n{hành động cụ thể}.\nV Í D Ụ Đ I ỀN S ẴN — C A S E TA 1 0 0 0 H ỌC V I Ê N\nNếu tỷ lệ câu trả lời AI gợi ý bị TA sửa > 30% trong 2 tuần, ta sẽ hạ mức tự động về pha 1 (chỉ gợi ý, không gửi thẳng cho học viên).\nC H E C K L I S T T R Ư ỚC K H I C H ỐT M E T R I C\n0 1\nMetric có ý nghĩa với MỌI người dùng\nkhông?\n0 2\nCó nhóm nào bị ảnh hưởng tiêu cực\nkhông?\n0 3\nĐây là thành công của ngày 1 — còn\nngày 1000 thì sao?\n→ Và đừng quên: lên lịch review metric định kỳ — tiêu chí thành công cũng cần được bảo trì theo thời gian.\nViết tiêu chí thành công mà hành động được\n— PAIR Bước ③ · Metric tốt = chỉ số cụ thể + ngưỡng có nghĩa + hành động cụ thể\n① Nhu cầu\n② Auto / Augment\n③ Reward function\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success · PAIR Worksheet — User Needs (PDF)\nREWARD · SUCCESS CRITERIA\nDAY 02 · 59 / 83",
+    "char_count": 932,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 25,
+    "title": "Khoảng cách giữa",
+    "body_text": "0 1 · B A S E L I N E\nThiết lập đối chứng\nĐối chiếu hiệu quả với quy tắc\ntĩnh, nhân sự hay quy trình hiện\ntại?\n0 2 · E VA L U AT I O N\nKiểm thử hệ thống\nBộ dữ liệu kiểm thử, kịch bản\nbiên (edge cases) và tiêu chí\nnghiệm thu?\n0 3 · C O N T R O L S\nCơ chế kiểm soát\nLogging, fallback, rollback và\nnhân sự chịu trách nhiệm?\n0 4 · O P E R AT I O N S\nVận hành liên tục\nAi giám sát lỗi, cập nhật tri thức\nnền và tối ưu hệ thống?\nKhoảng cách giữa Demo và Production\n— Phản hồi chính xác trong vài lần thử chưa đủ cơ sở để triển khai hệ thống thực tế\nMục tiêu Day 02 là xác định tính khả thi để tiếp tục nghiên cứu — chưa phải quyết định triển khai ngay.\nNGUỒN  Google — Rules of ML · Chip Huyen — AI Engineering\nQUYẾT ĐỊNH AI · DEMO TO PRODUCTION\nDAY 02 · 61 / 83",
+    "char_count": 756,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 26,
+    "title": "Từ",
+    "body_text": "0 1 · I N P U T\nProblem Statement\n9 trường đã hoàn chỉnh — từ Actor,\nWorkflow, Bottleneck đến Boundary & HITL.\n0 2 · T E S T C A S E S\nKịch bản kiểm thử\nDữ liệu thực tế và các trường hợp biên (edge\ncases).\n0 3 · S U C C E S S\nChỉ số hiệu năng\nĐạt yêu cầu (pass) / Không đạt (fail) /\nChuyển tiếp kiểm duyệt thủ công (HITL).\nTÁC V Ụ Đ Ơ N L Ẻ\nHệ thống có phân loại chính xác các\ncâu hỏi đầu vào không?\nH I ỆU N Ă N G Q U Y T R Ì N H\nNhóm học viên có hoàn thành bài lab\nnhanh hơn và ít kẹt hơn không?\nR ỦI R O & S A I S Ố\nHệ thống có phản hồi sai lệch mà\nkhông chuyển tiếp cho Lab Coach phê\nduyệt không?\nTừ Problem Statement đến Eval Plan\n— Problem Statement rõ ràng giúp định hình cụ thể các tiêu chí kiểm thử\nPROBLEM STATEMENT · EVAL PLAN\nDAY 02 · 62 / 83",
+    "char_count": 754,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 27,
+    "title": "Problem Statement cho",
+    "body_text": "6 Y ẾU TỐ B À I TOÁ N C ỐT L Õ I\nActor\nđối tượng ảnh hưởng\nĐối tượng trực tiếp chịu ảnh hưởng bởi vấn đề.\nWorkflow\nquy trình hiện tại\nQuy trình vận hành hiện tại gồm các bước cụ thể nào?\nBottleneck\nnút thắt\nKhâu nào gặp tình trạng chậm trễ, sai sót, lặp lại?\nImpact\ntác động\nTổn thất lượng hóa bằng thời gian, chi phí, SLA hoặc chất lượng.\nSuccess Metric\nchỉ số thành công\nChỉ số đo lường cụ thể để xác định sự cải thiện.\nBoundary\nranh giới\nAI không được làm gì; khâu nào bắt buộc có con người.\n3 Y ẾU TỐ Q U Y ẾT Đ ỊN H A I\nĐiểm AI can thiệp\ndecision · entry\nAI hỗ trợ hoặc tự động hóa ở bước cụ thể nào?\nMức chọn\ndecision · level\nRule / Workflow / Agent?\nRủi ro & HITL\ndecision · safety\nPhương án xử lý khi AI sai sót và quy trình phê duyệt thủ công.\nProblem Statement cho hệ thống AI\n— 6 yếu tố bài toán cốt lõi và 3 yếu tố quyết định AI\nPROBLEM STATEMENT · 9 TRƯỜNG\nDAY 02 · 67 / 83",
+    "char_count": 886,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 28,
+    "title": "Khung ra quyết định:",
+    "body_text": "✓ Go\nthực hiện\nĐ Ủ Đ I ỀU K I ỆN\n— Bài toán rõ ràng\n— Chỉ số đo lường khả thi\n— Điểm can thiệp AI phù hợp\n— Kiểm soát được rủi ro\n⏸ Not Yet\ntạm hoãn\nC Ó T R I ỂN VỌN G\n— Cần bổ sung dữ liệu thực tế\n— Chuẩn hóa quy trình\n— Thiết lập chỉ số\n— Xác định ranh giới\n✕ No-Go\nkhông triển khai\nK H Ô N G P H Ù H ỢP\n— AI không mang giá trị vượt trội\n— Rủi ro vận hành quá cao\n— Giải pháp không dùng AI tối ưu hơn\nKhung ra quyết định: Go / Not Yet / No-Go\n— Lập luận dựa trên tính khả thi của Problem Statement, tránh thiên kiến công nghệ\nQuyết định \"Not Yet\" thể hiện sự chín chắn trong tư duy thiết kế sản phẩm, không phải sự thất bại.\nQUYẾT ĐỊNH · GO / NOT YET / NO-GO\nDAY 02 · 70 / 83",
+    "char_count": 677,
+    "needs_fallback": false,
+    "image_url": null
+  },
+  {
+    "lecture_id": "d2-xac-dinh-bai-toan",
+    "slide_no": 29,
+    "title": "Sáu",
+    "body_text": "01\nBrief mơ hồ không thay thế Problem Statement.\nMột bản tóm tắt mơ hồ không thể thay thế cho một Problem Statement hoàn chỉnh.\n02\nMô hình hóa workflow trước khi tích hợp AI.\nBắt buộc phải mô hình hóa quy trình trước khi xem xét tích hợp giải pháp AI.\n03\nPain point phải được lượng hóa.\nMọi điểm đau cần được lượng hóa bằng baseline và chỉ số đo lường cụ thể.\n04\nPhức tạp không đồng nghĩa với hiệu quả.\nRule, Workflow và Agent là ba cấp độ khác nhau; độ phức tạp kỹ thuật không đồng nghĩa với hiệu quả tối ưu.\n05\nQuyết định dựa trên lập luận thực tế.\nQuyết định Go / Not Yet / No-Go phải được thiết lập dựa trên lập luận thực tế và số liệu kiểm thử rõ ràng.\n06\nĐo reward function bằng trải nghiệm người dùng, không chỉ accuracy.\nMỚI · PAIR\nThiết kế đánh đổi precision ↔ recall theo lợi ích người dùng và kiểm chứng với người dùng thật.\nSáu nguyên tắc cốt lõi sau Day 02\n— Kim chỉ nam để thẩm định mọi đề xuất ứng dụng AI\nNGUỒN  PAIR — Ch.1 User Needs + Defining Success\nRECAP · 6 NGUYÊN TẮC\nDAY 02 · 78 / 83",
+    "char_count": 1007,
+    "needs_fallback": false,
+    "image_url": null
+  }
+]
