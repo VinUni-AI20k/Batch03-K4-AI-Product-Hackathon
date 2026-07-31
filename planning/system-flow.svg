@@ -1,0 +1,93 @@
+<svg viewBox="0 0 760 1120" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Luồng hệ thống VLearn Quiz AI</title>
+<desc>Sơ đồ 6 bước: học viên upload PDF, backend trích text, ghép prompt, gọi Gemini API với retry và fallback, xác minh nguồn và sắp xếp độ khó, rồi hiển thị quiz tương tác cho học viên.</desc>
+
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+    <path d="M0,0 L10,5 L0,10 z" fill="#8B8478"/>
+  </marker>
+</defs>
+
+<rect width="760" height="1120" fill="#F7ECD9"/>
+
+<!-- Header -->
+<text x="380" y="46" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="22" font-weight="800" fill="#2E2B40">VLearn Quiz AI — luồng xử lý 1 lượt tạo quiz</text>
+<text x="380" y="70" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12.5" fill="#8B8478">Browser (JS) ↔ Flask backend (app.py) ↔ Gemini API (gemini-2.5-flash)</text>
+
+<!-- Lane labels -->
+<text x="40" y="112" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700" fill="#A79F8E" letter-spacing="1">TRÌNH DUYỆT</text>
+<text x="40" y="130" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700" fill="#A79F8E" letter-spacing="1">FLASK BACKEND</text>
+
+<!-- ================= STEP 1 ================= -->
+<rect x="90" y="96" width="580" height="64" rx="16" fill="#FFFFFF" stroke="#EA7B5C" stroke-width="2"/>
+<text x="120" y="122" font-family="Segoe UI, sans-serif" font-size="20">📄</text>
+<text x="152" y="120" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">1. Học viên upload PDF</text>
+<text x="152" y="140" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#8B8478">Chọn số câu (5/10/15/20) + chế độ (Chuẩn / Sáng tạo)</text>
+
+<line x1="380" y1="160" x2="380" y2="192" stroke="#8B8478" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- ================= STEP 2 ================= -->
+<rect x="90" y="194" width="580" height="64" rx="16" fill="#FFFFFF" stroke="#EBDFC7" stroke-width="2"/>
+<text x="120" y="220" font-family="Segoe UI, sans-serif" font-size="20">🔍</text>
+<text x="152" y="218" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">2. Trích text từng trang PDF</text>
+<text x="152" y="238" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#8B8478">pypdf · giữ số trang để trích dẫn ngược · &lt;500 ký tự → cảnh báo</text>
+
+<line x1="380" y1="258" x2="380" y2="290" stroke="#8B8478" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- ================= STEP 3 ================= -->
+<rect x="90" y="292" width="580" height="64" rx="16" fill="#FFFFFF" stroke="#EBDFC7" stroke-width="2"/>
+<text x="120" y="318" font-family="Segoe UI, sans-serif" font-size="20">✍️</text>
+<text x="152" y="316" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">3. Ghép prompt theo chế độ</text>
+<text x="152" y="336" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#8B8478">Chuẩn: ràng buộc bám nguồn · Sáng tạo: cho phép liên hệ ngoài slide</text>
+
+<line x1="380" y1="356" x2="380" y2="388" stroke="#8B8478" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- ================= STEP 4 (AI call - highlighted) ================= -->
+<rect x="90" y="390" width="580" height="88" rx="16" fill="#FBE3D9" stroke="#EA7B5C" stroke-width="2.5"/>
+<text x="120" y="424" font-family="Segoe UI, sans-serif" font-size="20">🤖</text>
+<text x="152" y="422" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">4. Gọi Gemini API thật</text>
+<text x="152" y="442" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#8B5A3C">gemini-2.5-flash · JSON schema bắt buộc (câu hỏi + đáp án + nguồn)</text>
+<text x="152" y="460" font-family="Segoe UI, sans-serif" font-size="11" fill="#8B5A3C">⟳ 400 schema lạ → đổi định dạng khác · 503/429 quá tải → tự thử lại x3</text>
+
+<line x1="380" y1="478" x2="380" y2="510" stroke="#8B8478" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- ================= STEP 5 ================= -->
+<rect x="90" y="512" width="580" height="76" rx="16" fill="#FFFFFF" stroke="#9BDCC9" stroke-width="2"/>
+<text x="120" y="542" font-family="Segoe UI, sans-serif" font-size="20">✅</text>
+<text x="152" y="540" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">5. Xác minh nguồn + sắp dễ → khó</text>
+<text x="152" y="560" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#1F8F55">Chuẩn: câu không trace về PDF gốc bị loại · Sáng tạo: giữ, gắn nhãn ⚠️</text>
+<text x="152" y="577" font-family="Segoe UI, sans-serif" font-size="11" fill="#8B8478">Sort server-side theo difficulty (không phụ thuộc AI trả đúng thứ tự)</text>
+
+<line x1="380" y1="588" x2="380" y2="620" stroke="#8B8478" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- ================= STEP 6 ================= -->
+<rect x="90" y="622" width="580" height="64" rx="16" fill="#FFFFFF" stroke="#EA7B5C" stroke-width="2"/>
+<text x="120" y="648" font-family="Segoe UI, sans-serif" font-size="20">🎯</text>
+<text x="152" y="646" font-family="Segoe UI, sans-serif" font-size="14" font-weight="800" fill="#2E2B40">6. Hiển thị quiz cho học viên</text>
+<text x="152" y="666" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#8B8478">Bấm 1 đáp án → thấy ngay đúng/sai + giải thích + trích nguồn</text>
+
+<!-- Legend -->
+<rect x="90" y="720" width="580" height="1" fill="#EBDFC7"/>
+<text x="90" y="756" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#2E2B40">Cơ chế chịu lỗi đã build (khác biệt so với gọi AI "một phát ăn ngay"):</text>
+
+<g>
+  <circle cx="100" cy="782" r="4" fill="#EA7B5C"/>
+  <text x="114" y="787" font-family="Segoe UI, sans-serif" font-size="12" fill="#2E2B40">Sai định dạng schema (400) → tự đổi sang cách khai báo JSON khác, không cần người dùng làm gì</text>
+</g>
+<g>
+  <circle cx="100" cy="810" r="4" fill="#EA7B5C"/>
+  <text x="114" y="815" font-family="Segoe UI, sans-serif" font-size="12" fill="#2E2B40">Model quá tải (503) / vượt tần suất (429) → tự đợi 2s→4s→6s rồi gọi lại, tối đa 3 lần</text>
+</g>
+<g>
+  <circle cx="100" cy="838" r="4" fill="#EA7B5C"/>
+  <text x="114" y="843" font-family="Segoe UI, sans-serif" font-size="12" fill="#2E2B40">Câu hỏi có trích dẫn không tồn tại thật trong PDF → chặn ở bước 5 (chống bịa, lớp ①)</text>
+</g>
+
+<rect x="90" y="866" width="580" height="1" fill="#EBDFC7"/>
+<text x="90" y="900" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#2E2B40">Automation: Augment</text>
+<text x="90" y="922" font-family="Segoe UI, sans-serif" font-size="12" fill="#8B8478">AI sinh nháp, học viên tự luyện tập ngay (bước 6) — người dạy/TA nên xem qua</text>
+<text x="90" y="942" font-family="Segoe UI, sans-serif" font-size="12" fill="#8B8478">trước khi phát chính thức cho cả lớp (chưa có UI riêng cho bước duyệt này).</text>
+
+<text x="380" y="1000" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#A79F8E">codebase/quiz-app/app.py · spec.md §4-§5</text>
+
+</svg>

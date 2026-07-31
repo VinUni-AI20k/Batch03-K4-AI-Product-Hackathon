@@ -1,0 +1,1 @@
+Yêu cầu ngắn gọn, cô đọng, không lan man, làm nổi bật thông tin quan trọng

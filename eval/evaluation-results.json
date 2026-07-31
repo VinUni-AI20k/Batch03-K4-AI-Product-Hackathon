@@ -1,0 +1,858 @@
+{
+  "meta": {
+    "evaluation_time": "2026-07-31T09:09:12.446589",
+    "total_test_cases": 20,
+    "total_questions": 20,
+    "quality_bar": {
+      "grounding": "≥90% cases phải có source_snippet trace được về PDF",
+      "application_level": "≥80% cases đạt mức ≥4/5 (ứng dụng thật)",
+      "correctness": "100% cases phải có đáp án đúng"
+    }
+  },
+  "overall_scores": {
+    "grounding": {
+      "passed": 20,
+      "total": 20,
+      "percentage": 100.0,
+      "quality_bar": 90,
+      "達成": true
+    },
+    "application_level": {
+      "level_4_or_above": 20,
+      "total": 20,
+      "percentage": 100.0,
+      "quality_bar": 80,
+      "達成": true
+    },
+    "correctness": {
+      "passed": 20,
+      "total": 20,
+      "percentage": 100.0,
+      "quality_bar": 100,
+      "達成": true
+    }
+  },
+  "overall_pass": true,
+  "per_test_case_results": [
+    {
+      "test_case_id": "TC001",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 25 ký tự đầu",
+            "source_snippet": "AI (Artificial Intelligence) là khả năng của máy t..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "easy"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC002",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 25 ký tự đầu",
+            "source_snippet": "RAG (Retrieval-Augmented Generation) kết hợp retri..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC003",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 25 ký tự đầu",
+            "source_snippet": "LLM (Large Language Model) như GPT, Claude được hu..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC004",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Neural network gồm input layer, hidden layers, out..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "easy"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC005",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Transformer architecture uses self-attention. BERT..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC006",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Supervised learning cần labeled data. Unsupervised..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "easy"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC007",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Agent AI có khả năng lập kế hoạch, thực thi hành đ..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC008",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Fine-tuning là kỹ thuật điều chỉnh mô hình pre-tra..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC009",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Prompt engineering là kỹ thuật thiết kế câu hỏi hi..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC010",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Overfitting xảy ra khi mô hình học quá khớp với tr..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "mixed"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC011",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Embedding chuyển đổi text thành vector số. Word2Ve..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "easy"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC012",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "AI Ethics bao gồm: fairness, transparency, privacy..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC013",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Reinforcement Learning: agent học bằng trial-and-e..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC014",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 25 ký tự đầu",
+            "source_snippet": "CNN (Convolutional Neural Network) hiệu quả cho xử..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC015",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Transfer learning tái sử dụng mô hình đã học. Tiết..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "easy"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC016",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Attention mechanism cho phép mô hình tập trung vào..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "mixed"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC017",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Vector database lưu trữ embeddings hiệu quả. Hỗ tr..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC018",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Batch size ảnh hưởng tốc độ training. Learning rat..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "hard"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC019",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "Gradient descent tối ưu loss function. SGD, Adam, ..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    },
+    {
+      "test_case_id": "TC020",
+      "total_questions": 1,
+      "per_question_results": [
+        {
+          "grounding": {
+            "pass": true,
+            "reason": "Khớp 26 ký tự đầu",
+            "source_snippet": "API rate limiting bảo vệ server. Token bucket, sli..."
+          },
+          "application_level": {
+            "score": 4,
+            "reason": "Có tình huống nhưng chưa rõ mức ứng dụng"
+          },
+          "correctness": {
+            "pass": true,
+            "reason": "Đáp án và explanation hợp lệ"
+          },
+          "question_index": 1,
+          "difficulty": "medium"
+        }
+      ],
+      "summary": {
+        "grounding": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        },
+        "application_level": {
+          "level_4_or_above": 1,
+          "total": 1,
+          "percentage": 100.0,
+          "avg_score": 4.0
+        },
+        "correctness": {
+          "passed": 1,
+          "total": 1,
+          "percentage": 100.0
+        }
+      }
+    }
+  ]
+}

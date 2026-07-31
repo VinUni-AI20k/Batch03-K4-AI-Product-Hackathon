@@ -1,0 +1,8 @@
+{
+  // Tắt tính năng "Integrated Browser" của VS Code (từ bản 1.109) tự mở link
+  // localhost (vd http://127.0.0.1:5000 khi chạy `python app.py`) vào 1 tab
+  // ngay trong VS Code — thay vì mở ra Google Chrome ngoài như Ctrl+Click bình
+  // thường vẫn làm với các link khác.
+  "workbench.browser.openLocalhostLinks": false,
+  "simpleBrowser.useIntegratedBrowser": false
+}

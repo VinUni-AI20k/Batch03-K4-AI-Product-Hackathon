@@ -1,0 +1,70 @@
+{
+  "doc_id": "562410018d57",
+  "filename": "AI20K-Build-Phase-Onboarding-Huong-Dan-Hoc-Vien 1.pdf",
+  "pages": [
+    {
+      "page": 1,
+      "text": "AI20K · BUILD PHASE · COHORT 3\n \nHƯỚNG DẪN ONBOARDING\nDành cho học viên — từ lời mời tham gia đến khi sẵn sàng build cùng đội\nLink mời tham gia nền tảng:\nhttps://phoenix.note.transformerlabs.ai/invite/ACqrVitaAoZmuK-v1x_no2fl53zpfLKjixOp8wPvJVU\nLộ trình 7 bước\n1\nTruy cập nền tảng qua link mời — đăng nhập bằng GitHub\n2\nTham gia Discord server của chương trình\n3\nChấp nhận lời mời vào GitHub Organization\n4\nHoàn thiện hồ sơ đầu vào (kỹ năng & mức độ thành thạo)\n5\nLập đội / tham gia đội — trao đổi với đồng đội trên Discord\n6\nClone repository GitHub được cấp cho đội\n7\nTạo API key & cấu hình AI Log\nChuẩn bị trước khi bắt đầu\nBạn cần: (1) tài khoản GitHub (đăng ký miễn phí tại github.com), (2) tài khoản Discord đã xác minh email, (3)\nMã số sinh viên (MSSV) và email đã đăng ký với chương trình, (4) máy tính đã cài Git."
+    },
+    {
+      "page": 2,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 2\n1\nTruy cập nền tảng qua link mời\nMở link mời ở trang bìa bằng trình duyệt. Trang mời hiển thị: “Bạn được mời tham gia chương trình\nAI20K Build Phase” kèm nhãn Cohort III · Learner.\nNhấn nút “Tiếp tục với GitHub” và đăng nhập bằng tài khoản GitHub của bạn. Tài khoản GitHub này\nsẽ gắn với toàn bộ quá trình học, vì vậy hãy dùng tài khoản bạn sẽ code trong suốt chương trình.\n Trang lời mời — nhấn “Tiếp tục với GitHub” để bắt đầu.\n \nTrình onboarding 7 trạng thái\nSau khi đăng nhập, bạn vào trang “Chào mừng đến AI20K” với thanh tiến trình 7 bước: Được mời → Đã đăng\nký → Xác minh danh tính → Vào Discord → Vào GitHub Org → Hoàn tất hồ sơ → Đã ghép đội. Ba bước đầu được\nhệ thống xác nhận tự động khi bạn đăng nhập GitHub thành công. Các bước còn lại làm theo hướng dẫn dưới\nđây."
+    },
+    {
+      "page": 3,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 3\n2\nTham gia Discord server của chương trình\n2.1. Kết nối Discord từ trang onboarding\nTại bước 4 — “Vào Discord” trên trang onboarding, nhấn nút “Kết nối Discord”. Sau khi kết nối, bạn sẽ\nđược tự động thêm vào server Discord của AI20K — AI20K Build Phase — Cohort 3.\n Bước “Vào Discord” — nhấn “Kết nối Discord” để bắt đầu."
+    },
+    {
+      "page": 4,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 4\n2.2. Xác minh email Discord (nếu tài khoản mới)\nNếu tài khoản Discord của bạn chưa xác minh email/số điện thoại, Discord sẽ chặn thao tác với thông\nbáo như dưới đây. Hãy vào hộp thư đăng ký Discord, xác minh email rồi thử lại.\n Discord yêu cầu email/số điện thoại đã xác minh trước khi tiếp tục.\n \n2.3. Cấp quyền cho bot của chương trình\nMàn hình uỷ quyền hiện ra cho bot “Trợ lý Kute”. Nhấn Authorize — bot chỉ đọc username/avatar và tự\nđộng thêm bạn vào server Build Phase, sau đó trình duyệt quay về trang\nphoenix.note.transformerlabs.ai. Bot không thể đọc hay gửi tin nhắn thay bạn.\n Nhấn “Authorize” để bot tự thêm bạn vào server của chương trình."
+    },
+    {
+      "page": 5,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 5\n2.4. Hoàn thành onboarding trong Discord server\nMở Discord — bạn đã ở trong server AI20K Build Phase — Cohort 3. Vào kênh #bắt-đầu-tại-đây, đọc\nhướng dẫn của Admin (trong đó có quy định đặt nickname), rồi nhấn nút Complete ở góc dưới bên phải\nđể hoàn tất các bước Get Started của server.\n Kênh #bắt-đầu-tại-đây — đọc hướng dẫn rồi nhấn “Complete”.\n \nQuy định đặt nickname trong server (bắt buộc)\nCú pháp: Mã đội — Họ và tên — 5 số cuối MSSV. Ví dụ: bạn là Nguyễn Văn An, MSSV 2A202601234, thuộc\nteam 001 → đặt tên T001 — Nguyễn Văn An — 01234. Nếu tên quá dài, có thể rút gọn, ví dụ T001 — An —\n01234. Việc đổi nickname chỉ áp dụng trong server của chương trình, không ảnh hưởng tài khoản Discord gốc.\nLưu ý: những bạn chưa có mã đội và MSSV thì đổi tạm thành Họ và tên và cập nhật sau.\n2.5. Điền MSSV và email để được duyệt vào server\nHộp thoại “Answer a few questions to join AI20K Build Phase — Cohort 3” sẽ hiện ra. Điền đúng Mã\nsố sinh viên và địa chỉ email đã đăng ký với chương trình, nhấn Submit rồi chờ Admin phê duyệt. Sau\nkhi được duyệt, bạn mới chat được trong server và trạng thái “Vào Discord” trên nền tảng sẽ chuyển\nthành hoàn tất."
+    },
+    {
+      "page": 6,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 6\n Điền MSSV + email đã đăng ký → Submit → chờ Admin duyệt."
+    },
+    {
+      "page": 7,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 7\n3\nChấp nhận lời mời vào GitHub Organization\nSau khi vào Discord, trang onboarding chuyển sang bước 5 — “Vào GitHub Org”. Hệ thống đã gửi lời\nmời vào tổ chức GitHub của chương trình tới tài khoản GitHub bạn đã đăng nhập.\nNhấn “Mở lời mời trên GitHub” trên trang onboarding (hoặc kiểm tra email từ GitHub).\nTrên GitHub, vào Settings → Organizations — bạn sẽ thấy lời mời vào org\nAI20K-Build-Phase-Cohort-3. Nhấn Accept. Lưu ý lời mời hết hạn sau 7 ngày.\nQuay lại trang onboarding và nhấn “Làm mới trạng thái” để hệ thống xác nhận.\n Bước “Vào GitHub Org” trên trang onboarding — mở lời mời rồi làm mới trạng thái.\n \n GitHub → Settings → Organizations → Accept lời mời AI20K-Build-Phase-Cohort-3."
+    },
+    {
+      "page": 8,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 8\n4\nHoàn thiện hồ sơ đầu vào\nBước 6 — “Hoàn tất hồ sơ”: điền hồ sơ cá nhân để hệ thống hiểu thế mạnh của bạn. Hồ sơ này chính là\ndữ liệu để AI gợi ý ghép đội ở bước sau, vì vậy hãy điền trung thực và đầy đủ.\nChọn kỹ năng theo từng nhóm: Engineering (Frontend, Backend, Mobile, DevOps/Cloud), AI/Data\n(Machine Learning, NLP, Computer Vision, Data Analysis, Data Engineering, Prompt Engineering),\nProduct, Design, Leadership.\nVới mỗi kỹ năng đã chọn, kéo thanh tự đánh giá mức độ thành thạo 1–5 (1 = cơ bản, 5 = chuyên\ngia).\nHoàn thành các mục còn lại của biểu mẫu rồi lưu hồ sơ.\n Chọn kỹ năng và tự đánh giá mức độ thành thạo 1–5."
+    },
+    {
+      "page": 9,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 9\n5\nLập đội / tham gia đội\nBước cuối của onboarding là ghép đội (mỗi đội tối đa 4 thành viên). Vào mục Tìm đội trên nền tảng\nPhoenix Agent — có 3 cách:\nGhép đội bằng AI — AI phân tích hồ sơ của bạn và gợi ý đội phù hợp nhất.\nTìm và tham gia đội — duyệt danh sách đội đang tuyển thành viên và gửi yêu cầu.\nTạo đội của riêng bạn — lập đội mới và chiêu mộ đồng đội.\n5.1. Tạo đội mới (dành cho đội trưởng)\nChọn “Tạo đội của riêng bạn”, đặt tên đội và viết giới thiệu đội (tuỳ chọn, nên viết để thu hút đồng\nđội), rồi nhấn Tạo đội. Mã đội, repository GitHub và kênh thảo luận Discord của đội sẽ được cấp tự\nđộng.\n Tạo đội: đặt tên + giới thiệu → “Tạo đội”. Mã đội, repo GitHub, kênh Discord được cấp tự động."
+    },
+    {
+      "page": 10,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 10\n5.2. Chưa có đội — gửi yêu cầu tham gia đội còn trống\nỞ mục “Các đội đang tuyển thành viên”, xem thông tin đội (số chỗ trống, kỹ năng, khu vực…) và nhấn\n“Gửi yêu cầu tham gia” ở đội bạn muốn vào.\n Duyệt các đội đang tuyển thành viên và gửi yêu cầu tham gia.\n \nSau khi gửi, yêu cầu ở trạng thái “Đang chờ đội trưởng duyệt” — bạn có thể Huỷ yêu cầu nếu đổi ý.\n Yêu cầu tham gia đang chờ đội trưởng phê duyệt."
+    },
+    {
+      "page": 11,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 11\n5.3. Tìm đội theo gợi ý của AI\nChọn “Ghép đội bằng AI”: hệ thống rút gọn danh sách những đội hợp nhất với hồ sơ của bạn (kỹ năng,\nvai trò còn thiếu, lĩnh vực quan tâm) kèm độ phù hợp %, đồng thời gợi ý đồng đội tiềm năng nếu bạn\nmuốn tự tạo đội rồi mời họ. Muốn kết quả tốt hơn, hãy cập nhật hồ sơ ở mục “Chỉnh sửa hồ sơ”.\n AI xếp hạng đội phù hợp từ hồ sơ đầu vào và gợi ý đồng đội tiềm năng.\n \n5.4. Đội trưởng duyệt thành viên\nĐội trưởng vào “Đội của tôi” — mục Yêu cầu tham gia hiển thị các học viên đang xin vào đội kèm kỹ\nnăng của họ. Nhấn Duyệt để chấp nhận thành viên.\n Trang “Đội của tôi” của đội trưởng — nhấn “Duyệt” để nhận thành viên."
+    },
+    {
+      "page": 12,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 12\n5.5. Đội trưởng chủ động mời thành viên vào đội\nNgoài việc duyệt yêu cầu, đội trưởng có thể chủ động chiêu mộ: tại trang đội, chọn “Mời thành viên”,\ntìm bạn cùng cohort chưa có đội theo tên hoặc MSSV rồi nhấn “Mời” — vào đội hay không là do họ\nquyết định.\n Hộp thoại “Mời thành viên” — tìm theo tên/MSSV và nhấn “Mời”.\n \nNgười được mời sẽ thấy lời mời trong mục “Tìm đội”: “Đội … (mã …) mời bạn tham gia cùng họ” — nhấn\n“Nhận lời” để vào đội ngay hoặc “Từ chối”.\n Người được mời nhấn “Nhận lời” để tham gia đội."
+    },
+    {
+      "page": 13,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 13\n5.6. Trao đổi với đồng đội trên Discord\nKhi đã vào đội, trang “Đội của tôi” hiển thị danh sách thành viên (đội trưởng có biểu tượng vương miện)\ncùng các nút Nhắn tin với đồng đội, Sửa thông tin đội, Chuyển quyền đội trưởng, Rời đội. Nhấn “Nhắn\ntin với đồng đội” để mở kênh Discord riêng của đội.\n Trang đội sau khi ghép: thành viên, vai trò và nút “Nhắn tin với đồng đội”.\n \nMỗi đội có mã đội và kênh riêng tư trong Discord server (ví dụ đội 001 → kênh t-001) — chỉ thành viên\nđội và coach nhìn thấy. Trong kênh có sẵn 2 post: Thông báo (thông báo hệ thống) và Thảo luận (chỗ\ntrao đổi của đội, mọi thành viên đều đăng bài được).\n Kênh riêng của đội (t-001) với 2 post “Thông báo” và “Thảo luận”."
+    },
+    {
+      "page": 14,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 14\n6\nClone repository GitHub được cấp cho đội\nMỗi đội được cấp tự động một repository riêng (private) trong org AI20K-Build-Phase-Cohort-3, đặt\ntên theo mã đội (ví dụ đội 001 → repo P-001). Repo được tạo từ template của chương trình, có sẵn:\nAI-log hook cho các AI coding assistant phổ biến — các thư mục .claude, .codex, .cursor,\n.gemini, .agents và .ai-log.\nKhung dự án: src, tests, docs, scripts, eval/results, presentation và file .env.example.\nClone repo về máy (thay P-001 bằng mã đội của bạn):\ngit clone https://github.com/AI20K-Build-Phase-Cohort-3/P-001.git\n Repo P-001 của đội — template có sẵn AI-log hook cho Claude, Codex, Cursor, Gemini…\n \nLưu ý\nBạn chỉ thấy và clone được repo sau khi đã accept lời mời GitHub Org (Bước 3) và đã có đội (Bước 5). Đọc kỹ\nREADME trong repo trước khi bắt đầu."
+    },
+    {
+      "page": 15,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 15\n7\nTạo API key & cấu hình AI Log\nAI Log là cơ chế ghi lại quá trình bạn làm việc với AI coding assistant và gửi về nền tảng Phoenix. Để hook\ntrong repo gửi được log, bạn cần một API key cá nhân.\n7.1. Tạo API key trên nền tảng\nTrên Phoenix Agent, vào Công cụ → API Keys.\nNhấn “+ New token”, đặt tên gợi nhớ và tạo token. Token cho phép công cụ local (ví dụ\nsubmit_log.py) gửi dữ liệu về Phoenix dưới danh nghĩa của bạn.\nCopy token ngay khi tạo và cất giữ an toàn — token là thông tin bí mật, không chia sẻ, không\ncommit lên GitHub.\n Công cụ → API Keys → “+ New token” để tạo API key cá nhân.\n \n7.2. Cấu hình AI Log trong repo của đội\nTrong repo đã clone, tạo file cấu hình môi trường từ mẫu .env.example và điền API key của bạn theo\nhướng dẫn trong README của repo.\nRepo đã có sẵn hook cho Claude Code, Codex, Cursor, Gemini… — khi bạn dùng AI assistant trong dự\nán, log sẽ tự động được ghi và gửi về nền tảng.\nKiểm tra mục AI Logs trên Phoenix Agent để xác nhận log đã được ghi nhận. Nếu chưa thấy log, kiểm\ntra lại API key và hỏi trong kênh đội hoặc kênh hỗ trợ trên Discord.\nChecklist hoàn thành onboarding\nĐăng nhập nền tảng qua link mời bằng tài khoản GitHub\nVào Discord server, đặt nickname đúng cú pháp, điền MSSV + email và được Admin duyệt\nAccept lời mời GitHub Org AI20K-Build-Phase-Cohort-3"
+    },
+    {
+      "page": 16,
+      "text": "AI20K Build Phase — Hướng dẫn Onboarding học viên\nTrang 16\nHoàn thiện hồ sơ đầu vào (kỹ năng + mức độ thành thạo)\nCó đội (tạo đội hoặc được duyệt vào đội) — vào được kênh Discord riêng của đội\nClone repo của đội về máy\nTạo API key, cấu hình AI Log và thấy log trên nền tảng\nCần hỗ trợ?\nĐặt câu hỏi trong các kênh hỗ trợ trên Discord server AI20K Build Phase — Cohort 3 (kênh hỏi đáp/hỗ trợ ở\nnhóm kênh cộng đồng) hoặc trao đổi với coach trong kênh riêng của đội. Chúc bạn có một Build Phase thật\nbùng nổ!"
+    }
+  ]
+}

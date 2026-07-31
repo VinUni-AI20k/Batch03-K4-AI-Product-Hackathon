@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLearn Quiz AI</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23EA7B5C'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">✨</div>
+    <h1>VLearn <span class="accent">Quiz AI</span></h1>
+  </div>
+  <div class="sub">Biến slide bài giảng thành quiz vui trong 30 giây 🎯</div>
+
+  <div class="stepper" id="stepper">
+    <div class="step active" data-step="upload">
+      <div class="step-icon">📄</div>
+      <div class="step-label">Upload</div>
+    </div>
+    <div class="step" data-step="generate">
+      <div class="step-icon">✨</div>
+      <div class="step-label">AI sinh</div>
+    </div>
+    <div class="step" data-step="review">
+      <div class="step-icon">👀</div>
+      <div class="step-label">Duyệt</div>
+    </div>
+    <div class="step" data-step="quiz">
+      <div class="step-icon">🎯</div>
+      <div class="step-label">Làm quiz</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ FORM PANEL ============ -->
+  <section class="panel" id="form-panel">
+
+    <div class="field">
+      <label class="field-label">1. Upload slide bài giảng</label>
+      <div class="field-hint">Kéo PDF vào đây — AI sẽ đọc và sinh câu hỏi thực tế, sắp xếp từ dễ đến khó.</div>
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Chọn file PDF slide bài giảng (kéo thả hoặc bấm/Enter để mở hộp thoại chọn file)">
+        <input type="file" id="pdf-input" accept="application/pdf" hidden>
+        <div id="dropzone-empty">
+          <div class="dz-icon">📄</div>
+          <div class="dz-title">Kéo thả PDF vào đây</div>
+          <div class="dz-sub">hoặc bấm để chọn file — PDF, tối đa 30MB</div>
+        </div>
+        <div id="dropzone-filled" class="hidden">
+          <div class="dz-icon">✅</div>
+          <div id="file-name" class="dz-title"></div>
+          <div class="dz-sub">Bấm để chọn file khác hoặc dùng tài liệu đã lưu</div>
+        </div>
+      </div>
+
+      <!-- Kho tài liệu đã upload -->
+      <div id="doc-library-wrapper" class="doc-library-wrapper hidden" style="margin-top: 14px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <label style="font-weight: 700; font-size: 13px; color: #334155; display: block; margin-bottom: 6px;">
+          📚 Kho bài giảng đã tải lên (Chọn bài để tạo Quiz):
+        </label>
+        <select id="doc-library-select" style="width: 100%; padding: 8px 12px; font-size: 13.5px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #1e293b;">
+          <option value="">-- Chưa có tài liệu --</option>
+        </select>
+      </div>
+
+      <!-- Xem lại nội dung slide bài giảng đã nạp -->
+      <div id="doc-viewer-bar" class="doc-viewer-bar hidden" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <button type="button" id="toggle-doc-btn" class="pill-btn" style="background: #eef2ff; color: #4f46e5; font-weight: 600; padding: 8px 16px; border: 1px solid #c7d2fe;">
+          📖 Xem nội dung văn bản PDF
+        </button>
+        <a id="open-pdf-link" href="/api/view-pdf" target="_blank" class="pill-btn" style="background: #f0fdf4; color: #166534; font-weight: 600; padding: 8px 16px; border: 1px solid #bbf7d0; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          👁️ Mở trực tiếp file PDF gốc (Tab mới)
+        </a>
+      </div>
+      <div id="doc-preview-content" class="hidden" style="margin-top: 10px; max-height: 400px; overflow-y: auto; background: #ffffff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);">
+        <div id="doc-pages-list" style="font-size: 13px; line-height: 1.6; color: #374151;"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">2. Số lượng câu hỏi</label>
+      <div class="btn-group" id="num-questions-group">
+        <button type="button" class="pill-btn" data-value="5">5 câu</button>
+        <button type="button" class="pill-btn active" data-value="10">10 câu</button>
+        <button type="button" class="pill-btn" data-value="15">15 câu</button>
+        <button type="button" class="pill-btn" data-value="20">20 câu</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">3. Độ bám sát tài liệu</label>
+      <div class="diff-cards" id="mode-group">
+        <button type="button" class="diff-card mode-standard active" data-value="standard">
+          <div class="dc-icon">🎯</div>
+          <div class="dc-title">Chuẩn — bám sát tài liệu</div>
+          <div class="dc-desc">Chỉ dùng nội dung có thật trong PDF, không tự bịa thêm. Phù hợp luyện thi thật.</div>
+        </button>
+        <button type="button" class="diff-card mode-stress" data-value="stress">
+          <div class="dc-icon">⚡</div>
+          <div class="dc-title">Sáng tạo — mở rộng liên hệ</div>
+          <div class="dc-desc">AI liên hệ thêm ví dụ thực ngoài slide, vui hơn nhưng có thể lệch 1 chút — câu chưa xác minh được nguồn sẽ gắn nhãn rõ.</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">4. Mức độ khó</label>
+      <div class="btn-group" id="difficulty-group">
+        <button type="button" class="pill-btn" data-value="easy">Dễ</button>
+        <button type="button" class="pill-btn" data-value="medium">Trung bình</button>
+        <button type="button" class="pill-btn" data-value="hard">Khó</button>
+        <button type="button" class="pill-btn active" data-value="mixed">Dễ → Khó</button>
+      </div>
+      <div class="field-hint" style="margin-top:8px; margin-bottom:0;">"Dễ → Khó" trộn cả 3 mức trong 1 bộ, sắp theo thứ tự tăng dần (mặc định). Chọn 1 mức riêng nếu muốn cả bộ cùng độ khó.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">5. LightRAG (Đồ thị tri thức)</label>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;">
+        <input type="checkbox" id="use-rag-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+        <label for="use-rag-checkbox" style="cursor: pointer; font-size: 14px; color: #78350f; font-weight: 600; flex: 1;">
+          Bật LightRAG Knowledge Graph (chậm hơn ~40s, hữu ích khi có nhiều tài liệu)
+        </label>
+      </div>
+      <div class="field-hint" style="margin-top:8px;">
+        ⚡ <strong>Mặc định TẮT</strong> để tăng tốc (5-10s thay vì 50s). Chỉ bật khi bạn đã upload nhiều tài liệu và muốn AI kết nối kiến thức giữa các bài giảng.
+      </div>
+    </div>
+
+    <button id="generate-btn" class="primary-btn" disabled>✨ Tạo Quiz ngay</button>
+
+    <div id="error-box" class="error-box hidden"></div>
+  </section>
+
+  <!-- ============ LOADING ============ -->
+  <section id="loading-panel" class="panel hidden">
+    <div class="spinner"></div>
+    <div id="loading-text">Đang gọi Gemini để sinh quiz…</div>
+    <button type="button" id="cancel-btn" class="cancel-btn">✕ Hủy</button>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results-panel" class="hidden">
+    <div id="mode-banner" class="mode-banner hidden"></div>
+    <div id="warning-banner" class="warning-banner hidden"></div>
+    <div id="meta-line" class="meta-line"></div>
+    <div id="quiz-list"></div>
+    <button id="reset-btn" class="primary-btn" style="margin-top:8px;">↺ Tạo quiz khác</button>
+  </section>
+
+  <!-- ============ DEMO PREVIEW (trước khi upload) ============ -->
+  <section id="demo-panel">
+    <div class="demo-badge">🪄 Demo câu hỏi mẫu</div>
+    <button type="button" id="demo-toggle" class="link-btn">👀 Xem thử quiz sẽ trông như thế nào</button>
+    <div id="demo-content" class="hidden">
+      <div class="section-title">Xem trước quiz sẽ trông như thế nào</div>
+      <div class="section-sub">Chưa cần upload file gì cả — thử bấm vào 1 đáp án bên dưới.</div>
+      <div id="demo-quiz-list"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ BÔI ĐEN -> HỎI AI (nút nổi + ô trò chuyện nhỏ) ============ -->
+<button type="button" id="ask-ai-btn" class="ask-ai-btn hidden">🤖 Hỏi AI</button>
+
+<div id="ask-ai-bubble" class="ask-ai-bubble hidden">
+  <div class="ask-ai-bubble-head">
+    <span>🤖 Giải thích nhanh</span>
+    <button type="button" id="ask-ai-close" class="ask-ai-close" aria-label="Đóng">✕</button>
+  </div>
+  <div class="ask-ai-quote" id="ask-ai-quote"></div>
+  <div class="ask-ai-body" id="ask-ai-body"></div>
+</div>
+
+<footer>Prototype hackathon — Hướng A VLearn · Automation: Augment — AI chỉ sinh nháp, học viên tự luyện tập ngay, người dạy nên duyệt trước khi phát chính thức</footer>
+
+<script src="{{ url_for('static', filename='app.js') }}?v=1001"></script>
+</body>
+</html>

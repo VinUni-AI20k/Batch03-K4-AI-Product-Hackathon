@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLearn Quiz AI — Vấn Đề Cốt Lõi</title>
+  
+  <!-- Fonts: Plus Jakarta Sans (Headings) + Be Vietnam Pro (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-slate: #0f172a;
+      --text-white: #ffffff;
+      --text-emerald: #34d399;
+      --text-muted: #94a3b8;
+      --text-subtle: #cbd5e1;
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      
+      --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-slate);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      padding: clamp(3.5rem, 7vw, 6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at 82% 18%, #1e293b 0%, transparent 60%),
+                  radial-gradient(circle at 15% 85%, #064e3b 0%, transparent 45%),
+                  var(--bg-slate);
+    }
+
+    .hero {
+      max-width: 1050px;
+      margin: auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .main-title {
+      font-family: var(--font-heading);
+      font-size: clamp(3.2rem, 6.5vw, 5rem);
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: -0.035em;
+      color: var(--text-white);
+    }
+
+    .highlight-emerald {
+      color: var(--text-emerald);
+    }
+
+    /* 3 Clean Minimal Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2.2rem 2rem;
+      display: flex;
+      align-items: center;
+      transition: border-color 0.25s;
+    }
+
+    .card:hover {
+      border-color: var(--text-emerald);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1.4;
+      color: var(--text-white);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link {
+      color: var(--text-emerald);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide">
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1 class="main-title">
+        Vấn Đề — <span class="highlight-emerald">Thách Thức Cốt Lõi</span>
+      </h1>
+
+      <!-- 3 Minimal Problem Cards -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">Thiếu công cụ tự đo mức hiểu bài</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Gia sư AI hiện tại thụ động</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Rủi ro học sai kiến thức khi AI bịa</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer">
+      <a href="slide_2.html" class="nav-link">❮ TRỞ VỀ SLIDE 2</a>
+      <span>SLIDE 03 / 06</span>
+      <a href="slide_4.html" class="nav-link">TIẾP THEO: LIGHTRAG ➔</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        window.location.href = 'slide_4.html';
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        window.location.href = 'slide_2.html';
+      }
+    });
+  </script>
+</body>
+</html>

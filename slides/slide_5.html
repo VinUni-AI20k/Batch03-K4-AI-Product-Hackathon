@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLearn Quiz AI — Chi Phí Vận Hành</title>
+  
+  <!-- Fonts: Plus Jakarta Sans (Headings) + Be Vietnam Pro (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-slate: #0f172a;
+      --text-white: #ffffff;
+      --text-emerald: #34d399;
+      --text-muted: #94a3b8;
+      --text-subtle: #cbd5e1;
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      
+      --font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-body: 'Be Vietnam Pro', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-slate);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      padding: clamp(3.5rem, 7vw, 6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at 82% 18%, #1e293b 0%, transparent 60%),
+                  radial-gradient(circle at 15% 85%, #064e3b 0%, transparent 45%),
+                  var(--bg-slate);
+    }
+
+    .hero {
+      max-width: 1050px;
+      margin: auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .main-title {
+      font-family: var(--font-heading);
+      font-size: clamp(3.2rem, 6.5vw, 5rem);
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: -0.035em;
+      color: var(--text-white);
+    }
+
+    .highlight-emerald {
+      color: var(--text-emerald);
+    }
+
+    /* 3 Clean Stat Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: border-color 0.25s;
+    }
+
+    .card:hover {
+      border-color: var(--text-emerald);
+    }
+
+    .stat-number {
+      font-family: var(--font-heading);
+      font-size: clamp(2.3rem, 3.8vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--text-emerald);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-white);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link {
+      color: var(--text-emerald);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+
+    .nav-link:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide">
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1 class="main-title">
+        Chi Phí Vận Hành — <span class="highlight-emerald">Siêu Tiết Kiệm</span>
+      </h1>
+
+      <!-- 3 Clear Production Cost Cards -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="stat-number">~31 VNĐ</div>
+          <div class="card-title">Chi phí 1 lượt tạo Quiz 10 câu</div>
+          <div class="card-desc">≈ $0.00125 USD</div>
+        </div>
+
+        <div class="card">
+          <div class="stat-number">~7.250 VNĐ</div>
+          <div class="card-title">Chi phí dựng sẵn Graph 100 bài giảng</div>
+          <div class="card-desc">≈ $0.28500 USD</div>
+        </div>
+
+        <div class="card">
+          <div class="stat-number">~318.000 VNĐ</div>
+          <div class="card-title">Chi phí 10.000 lần tạo Quiz 10 câu</div>
+          <div class="card-desc">≈ $12.50000 USD</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer">
+      <a href="slide_4.html" class="nav-link">❮ TRỞ VỀ SLIDE 4</a>
+      <span>SLIDE 05 / 06</span>
+      <a href="slide_6.html" class="nav-link">TIẾP THEO: DEMO ➔</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        window.location.href = 'slide_6.html';
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        window.location.href = 'slide_4.html';
+      }
+    });
+  </script>
+</body>
+</html>
