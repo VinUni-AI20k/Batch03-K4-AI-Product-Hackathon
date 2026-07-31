@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40">
+  <!-- Red part of V icon -->
+  <polygon points="10,5 15,12 10,17" fill="#c3232c"/>
+  <!-- Blue part of V icon -->
+  <path d="M 10,17 L 15,12 L 23,24 L 35,5 L 42,9 L 23,35 Z" fill="#0f447d"/>
+  <!-- Text -->
+  <text x="50" y="28" font-family="sans-serif" font-weight="900" font-size="24">
+    <tspan fill="#c3232c">V</tspan><tspan fill="#0f447d">Learn</tspan>
+  </text>
+</svg>

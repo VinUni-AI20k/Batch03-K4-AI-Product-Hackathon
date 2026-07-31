@@ -5,8 +5,9 @@ export default function Header({ kbStatusText, user, onLogout }) {
   return (
     <header className="glass-header">
       <div className="brand">
-        <div className="logo-badge">
-          <Zap className="logo-icon" size={26} />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/vlearn-logo.svg" alt="VLearn Logo" style={{ height: '32px', width: 'auto', marginRight: '16px' }} />
+          <div style={{ width: '2px', height: '36px', background: 'var(--border-color)', marginRight: '16px', borderRadius: '2px' }}></div>
         </div>
         <div className="brand-text">
           <h1>AI AGENT QA — KHÓA AI THỰC CHIẾN VIN</h1>

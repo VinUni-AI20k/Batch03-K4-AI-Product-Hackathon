@@ -16,6 +16,8 @@ from .check_deadline   import run as check_deadline,          SCHEMA as SCHEMA_C
 from .recommend_path   import run as recommend_path,          SCHEMA as SCHEMA_RECOMMEND_PATH
 from .format_code      import run as format_code,             SCHEMA as SCHEMA_FORMAT_CODE
 from .kb_stats         import run as get_kb_stats,            SCHEMA as SCHEMA_KB_STATS
+from .campus_info      import run as get_campus_info,         SCHEMA as SCHEMA_CAMPUS_INFO
+from .create_ticket    import run as create_ticket,           SCHEMA as SCHEMA_CREATE_TICKET
 
 ALL_SCHEMAS = [
     SCHEMA_SEARCH_KB,
@@ -29,6 +31,8 @@ ALL_SCHEMAS = [
     SCHEMA_RECOMMEND_PATH,
     SCHEMA_FORMAT_CODE,
     SCHEMA_KB_STATS,
+    SCHEMA_CAMPUS_INFO,
+    SCHEMA_CREATE_TICKET,
 ]
 
 TOOL_REGISTRY = {
@@ -43,4 +47,6 @@ TOOL_REGISTRY = {
     "recommend_path":        recommend_path,
     "format_code":           format_code,
     "get_kb_stats":          get_kb_stats,
+    "campus_info":           get_campus_info,
+    "create_ticket":         create_ticket,
 }

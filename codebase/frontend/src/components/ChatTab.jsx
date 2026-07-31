@@ -261,12 +261,11 @@ export default function ChatTab({
                     <p>{msg.text}</p>
                   )}
 
-                  {/* Bản đồ campus: hiển thị khi câu hỏi hoặc trả lời liên quan địa điểm */}
+                  {/* Bản đồ campus: hiển thị khi người dùng hỏi về địa điểm */}
                   {isAgent && (() => {
                     const prevMsg = messages[idx - 1];
                     const userAsked = prevMsg?.sender === 'user' && shouldShowMap(prevMsg.text);
-                    const agentMentioned = shouldShowMap(msg.text);
-                    return (userAsked || agentMentioned) ? <CampusMap /> : null;
+                    return userAsked ? <CampusMap /> : null;
                   })()}
 
                   {/* Nguồn trích dẫn */}
@@ -306,7 +305,19 @@ export default function ChatTab({
                         <button
                           type="button"
                           className="action-pill-btn report-btn"
-                          onClick={() => alert('Đã ghi nhận báo cáo lỗi để cải thiện!')}
+                          onClick={async () => {
+                            try {
+                              const prevUserMsg = messages[idx - 1]?.text || '';
+                              await fetch((import.meta.env.VITE_API_URL || '') + '/api/reports', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ user_email: userEmail || 'guest', question: prevUserMsg, answer: msg.text })
+                              });
+                              alert('Đã ghi nhận báo cáo lỗi để cải thiện!');
+                            } catch(e) {
+                              alert('Ghi nhận thất bại, vui lòng thử lại.');
+                            }
+                          }}
                         >
                           <AlertTriangle size={12} className="text-orange-500" />
                           <span>Báo sai / Sửa lỗi</span>
@@ -316,7 +327,19 @@ export default function ChatTab({
                       <button
                         type="button"
                         className="transfer-agent-btn"
-                        onClick={() => alert('Đã chuyển yêu cầu đến tư vấn viên BTC AI Thực Chiến!')}
+                        onClick={async () => {
+                          try {
+                            const prevUserMsg = messages[idx - 1]?.text || 'Cần hỗ trợ từ tư vấn viên';
+                            await fetch((import.meta.env.VITE_API_URL || '') + '/api/tickets', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ user_email: userEmail || 'guest', question: prevUserMsg, reason: 'Chuyển tư vấn viên' })
+                            });
+                            alert('Đã tạo Ticket gửi tư vấn viên thành công!');
+                          } catch(e) {
+                            alert('Tạo ticket thất bại, vui lòng thử lại.');
+                          }
+                        }}
                       >
                         <UserCheck size={14} />
                         <span>Chuyển cho tư vấn viên để được giải đáp đúng nhu cầu</span>

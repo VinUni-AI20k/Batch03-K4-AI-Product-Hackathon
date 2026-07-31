@@ -119,6 +119,91 @@ async def get_all_users():
     users = list(mongo_db["users"].find({}, {"_id": 0}))
     return {"users": users, "count": len(users)}
 
+import uuid
+
+class TicketRequest(BaseModel):
+    user_email: str
+    question: str
+    reason: str = ""
+
+class TicketResponseUpdate(BaseModel):
+    response: str
+    status: str = "resolved"
+
+class ReportRequest(BaseModel):
+    user_email: str
+    question: str
+    answer: str
+    reason: str = ""
+
+@app.post("/api/tickets")
+async def create_ticket(request: TicketRequest):
+    if mongo_db is None:
+        raise HTTPException(status_code=500, detail="DB not connected")
+    ticket_id = str(uuid.uuid4())[:8]
+    from datetime import datetime
+    now_str = datetime.utcnow().isoformat() + "Z"
+    new_ticket = {
+        "id": ticket_id,
+        "user_email": request.user_email,
+        "question": request.question,
+        "reason": request.reason,
+        "status": "pending",
+        "response": "",
+        "created_at": now_str,
+        "updated_at": now_str
+    }
+    mongo_db["tickets"].insert_one(new_ticket)
+    return {"success": True, "ticket_id": ticket_id}
+
+@app.get("/api/tickets")
+async def get_all_tickets():
+    if mongo_db is None:
+        return {"tickets": []}
+    tickets = list(mongo_db["tickets"].find({}, {"_id": 0}).sort("created_at", -1))
+    return {"tickets": tickets}
+
+@app.get("/api/tickets/user/{email}")
+async def get_user_tickets(email: str):
+    if mongo_db is None:
+        return {"tickets": []}
+    tickets = list(mongo_db["tickets"].find({"user_email": email}, {"_id": 0}).sort("created_at", -1))
+    return {"tickets": tickets}
+
+@app.put("/api/tickets/{ticket_id}")
+async def update_ticket(ticket_id: str, update: TicketResponseUpdate):
+    if mongo_db is None:
+        raise HTTPException(status_code=500, detail="DB not connected")
+    from datetime import datetime
+    now_str = datetime.utcnow().isoformat() + "Z"
+    result = mongo_db["tickets"].update_one(
+        {"id": ticket_id},
+        {"$set": {
+            "response": update.response,
+            "status": update.status,
+            "updated_at": now_str
+        }}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return {"success": True}
+
+@app.post("/api/reports")
+async def create_report(request: ReportRequest):
+    if mongo_db is None:
+        raise HTTPException(status_code=500, detail="DB not connected")
+    from datetime import datetime
+    now_str = datetime.utcnow().isoformat() + "Z"
+    new_report = {
+        "user_email": request.user_email,
+        "question": request.question,
+        "answer": request.answer,
+        "reason": request.reason,
+        "created_at": now_str
+    }
+    mongo_db["reports"].insert_one(new_report)
+    return {"success": True}
+
 @app.get("/api/docs/{file_path:path}")
 async def serve_docs(file_path: str):
     import os
