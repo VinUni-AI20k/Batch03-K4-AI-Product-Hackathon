@@ -1,0 +1,23 @@
+[
+  {
+    "email": "student1@vinuni.edu.vn",
+    "password": "password123",
+    "name": "Nguyễn Văn A",
+    "role": "student",
+    "id": "20240001"
+  },
+  {
+    "email": "student2@vinuni.edu.vn",
+    "password": "password123",
+    "name": "Trần Thị B",
+    "role": "student",
+    "id": "20240002"
+  },
+  {
+    "email": "giangvien@vinuni.edu.vn",
+    "password": "password123",
+    "name": "Thầy Vũ Hoàng",
+    "role": "teacher",
+    "id": "20241001"
+  }
+]

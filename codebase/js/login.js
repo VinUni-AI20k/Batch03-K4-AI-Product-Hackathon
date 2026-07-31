@@ -45,22 +45,68 @@ if (pwToggle && pwInput) {
   });
 }
 
-// --- Form Submit (Redirect to My Courses) ---
+// --- Form Submit (Authenticate with Backend) ---
 const form = document.getElementById('login-form');
 const errorDiv = document.getElementById('login-error');
 const loginBtn = document.getElementById('login-btn');
+
+function showLoginError(text) {
+  if (errorDiv) {
+    const errorText = errorDiv.querySelector('#error-text');
+    if (errorText) errorText.textContent = text;
+    errorDiv.classList.add('visible');
+  }
+}
 
 if (form) {
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Show loading state and redirect to my-courses.html
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      showLoginError("Vui lòng nhập đầy đủ Email và Mật khẩu.");
+      return;
+    }
+
     if (errorDiv) errorDiv.classList.remove('visible');
     loginBtn.classList.add('loading');
     loginBtn.disabled = true;
 
-    setTimeout(function() {
-      window.location.href = 'my-courses.html';
-    }, 800);
+    const apiBase = window.location.origin.includes('localhost:8080') ? '' : 'http://localhost:8080';
+    fetch(`${apiBase}/api/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email, password: password })
+    })
+    .then(async res => {
+      let data = {};
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        if (!res.ok) {
+          throw new Error(`Đăng nhập thất bại (HTTP ${res.status}): Python Backend chưa chạy hoặc trả về trang lỗi.`);
+        }
+      }
+      if (!res.ok) {
+        throw new Error(data.detail || "Đăng nhập thất bại");
+      }
+      return data;
+    })
+    .then(data => {
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
+      setTimeout(function() {
+        window.location.href = 'my-courses.html';
+      }, 500);
+    })
+    .catch(err => {
+      loginBtn.classList.remove('loading');
+      loginBtn.disabled = false;
+      showLoginError(err.message);
+    });
   });
 }
