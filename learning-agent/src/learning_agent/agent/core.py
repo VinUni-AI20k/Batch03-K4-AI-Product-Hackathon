@@ -12,6 +12,7 @@ from openai import OpenAI
 from ..index.store import LessonIndex
 from ..vault import Vault
 from .assessment import Mastery
+from .flashcards import FlashcardStore
 from .memory import StudentMemory
 from .skills import SkillSet
 from .tools import build_tools
@@ -112,7 +113,7 @@ PUBLIC_DENY_TOOLS = {
     "schedule_task", "list_scheduled_tasks", "cancel_scheduled_task",
     "install_knowledge_pack",
     "save_concept", "update_memory", "update_soul", "read_soul", "update_student_memory",
-    "log_assessment", "save_research_note",  # ghi dữ liệu của chủ agent — không cho web công khai
+    "log_assessment", "save_research_note", "flashcards",  # ghi dữ liệu của chủ agent — không cho web công khai
 }
 
 
@@ -143,9 +144,10 @@ class TutorAgent:
         self.addons = Addons(cfg)
 
         self.mastery = Mastery(cfg.root)  # đánh giá ngầm: mức nắm vững theo chủ đề
+        self.flashcards = FlashcardStore(cfg.root)  # thẻ ghi nhớ bền vững + SRS
         self.tool_schemas, self.tool_impls = build_tools(vault, index, cfg)
         self.tool_schemas += [self.skills.tool_schema(), self.memory.tool_schema(),
-                              self.mastery.tool_schema()]
+                              self.mastery.tool_schema(), self.flashcards.tool_schema()]
         self.tool_schemas += self.addons.schemas()  # tools từ addons/ (gate bật/tắt lúc gọi)
         self.tool_schemas += [
             {
@@ -383,6 +385,12 @@ class TutorAgent:
             if name == "log_assessment":
                 return self.mastery.log(user_id, args.get("topic", ""),
                                         bool(args.get("correct")), args.get("note", ""))
+            if name == "flashcards":
+                result, topic = self.flashcards.dispatch(user_id, args)
+                # chấm thẻ = một lần đánh giá ngầm -> mastery tự cập nhật, khỏi gọi 2 tool
+                if topic and args.get("action") == "grade":
+                    self.mastery.log(user_id, topic, bool(args.get("correct")))
+                return result
             if name == "schedule_task":
                 if self.task_store is None or origin is None:
                     return "Tính năng lên lịch chỉ hoạt động khi chat qua Discord/Telegram."
