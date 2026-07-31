@@ -45,6 +45,8 @@ const CONTENT_DIR = path.join(process.cwd(), "content");
  * place instead of silently linking to a dead card.
  */
 const REPLACES: Record<string, string> = {
+  "day1-lab-llm-api-foundation": "lab-01-nen-tang-llm-api",
+  "day2-lab-ai-product-problem-discovery": "lab-02-tim-dung-bai-toan-cho-ai",
   "day3-lab-chatbot-vs-react-agent-e402": "lab-03-chatbot-vs-react-agent",
 };
 

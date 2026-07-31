@@ -84,24 +84,29 @@ export default async function LabPage({ params }: { params: Promise<{ slug: stri
           </p>
         )}
 
+        {fm && (
+          <details className="mt-6 max-w-4xl rounded-lg border border-line bg-white/60 px-4 py-3 text-sm dark:border-line-dark dark:bg-surface-dark/60">
+            <summary className="cursor-pointer font-semibold text-neutral-700 marker:text-brand-600 dark:text-neutral-200">
+              Thông tin lab
+            </summary>
+            <div className="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+              <Meta label="Cần biết trước" items={fm.prerequisites} />
+              <Meta label="Xong sẽ làm được" items={fm.outcomes} />
+              <Meta label="Công cụ" items={fm.requiredTools} />
+              <Meta label="Lỗi thường gặp" items={fm.commonErrors} />
+              <Meta label="Hệ điều hành" items={fm.supportedOs} />
+            </div>
+          </details>
+        )}
+
         {!codelab ? (
           <p className="mt-10 rounded-xl border border-dashed border-line px-6 py-12 text-center text-sm text-neutral-500 dark:border-line-dark">
             Chưa có <code className="font-mono">docs/CODELAB.md</code> cho lab này.
           </p>
         ) : (
-          <div className="mt-10 gap-12 lg:flex lg:items-start">
-            <article className="min-w-0 flex-1">
-              <CodelabRenderer slug={slug} body={codelab.body} />
-            </article>
-
-            <aside className="mt-10 w-full shrink-0 space-y-6 lg:mt-0 lg:w-64 lg:sticky lg:top-6">
-              <Meta label="Cần biết trước" items={fm?.prerequisites} />
-              <Meta label="Xong sẽ làm được" items={fm?.outcomes} />
-              <Meta label="Công cụ" items={fm?.requiredTools} />
-              <Meta label="Lỗi thường gặp" items={fm?.commonErrors} />
-              <Meta label="Hệ điều hành" items={fm?.supportedOs} />
-            </aside>
-          </div>
+          <article className="mt-10 min-w-0">
+            <CodelabRenderer slug={slug} body={codelab.body} />
+          </article>
         )}
       </main>
     </>

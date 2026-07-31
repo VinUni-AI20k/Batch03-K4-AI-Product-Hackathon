@@ -7,6 +7,12 @@ description: Chuyển một repo lab thành codelab Markdown chuẩn cho web VLe
 
 Biến một repo lab thành codelab Markdown mà người mới học AI đọc là làm được, và web codelabs render được không cần ai sửa lại format. Người dùng skill này là lab coach sở hữu repo.
 
+Skill này chạy theo chuẩn Codex hiện tại:
+
+- Thư mục skill là thư mục chứa file `SKILL.md` này.
+- Tài nguyên chi tiết nằm trong `references/`, script kiểm nằm trong `scripts/`, template output nằm trong `assets/templates/`.
+- Khi cần chạy script của skill, dùng path tuyệt đối tới thư mục skill mà Codex cung cấp trong source locator; không dùng biến môi trường của công cụ khác.
+
 Hai nguyên tắc gốc — mọi luật bên dưới là hệ quả của chúng:
 
 1. **Repo là bằng chứng, không phải tài liệu đã đúng.** Mọi câu trong output truy được về một file, một lệnh, hoặc một assertion trong repo — hoặc gắn nhãn `Coach inference`.
@@ -48,11 +54,11 @@ Mỗi file đọc một lần, ở đúng phase. Đừng đọc hết từ đầ
 | `references/team-roles.md` | Phase 5 | 14 role, chọn theo số người, handoff, integration gate |
 | `references/pedagogy.md` | Phase 2 | Vì sao thứ tự trong step là thứ tự đó |
 | `references/worked-example.md` | Khi chưa rõ "đúng" trông thế nào | Một step viết sai và viết đúng, cạnh nhau |
-| `templates/*.md` | Phase 3–5 | Khung để điền, không phải luật |
+| `assets/templates/*.md` | Phase 3–5 | Khung để điền, không phải luật |
 
 ## Output
 
-- `docs/CODELAB.md` — luôn luôn. Đây là bản publish. Khung: `templates/CODELAB.template.md`.
+- `docs/CODELAB.md` — luôn luôn. Đây là bản publish. Khung: `assets/templates/CODELAB.template.md`.
 - `README.md` — khi repo chưa có, hoặc README không nói được bài toán / setup / cách nộp.
 - `docs/PHAN_CONG_CONG_VIEC.md` — khi lab làm nhóm.
 - `report/TEMPLATE_REPORT.md` — khi lab yêu cầu nộp báo cáo.
@@ -114,7 +120,7 @@ Cân thế nào: default tồn tại để chống viết dài và viết rỗng
 
 ## Phase 0 — Chốt phạm vi
 
-Repo root bằng `git rev-parse --show-toplevel`; không phải git checkout thì dùng path user đưa. Đọc mọi `AGENTS.md` / `CLAUDE.md` áp dụng được trước khi ghi gì. Match ngôn ngữ material: tiếng Việt thì output tiếng Việt, giữ jargon tiếng Anh.
+Repo root bằng `git rev-parse --show-toplevel`; không phải git checkout thì dùng path user đưa. Đọc mọi `AGENTS.md` áp dụng được trước khi ghi gì. Nếu repo cũ chỉ có `CLAUDE.md` thì đọc như tài liệu legacy, nhưng ưu tiên `AGENTS.md` khi có cả hai. Match ngôn ngữ material: tiếng Việt thì output tiếng Việt, giữ jargon tiếng Anh.
 
 Hỏi tối đa 3 câu, chỉ khi câu trả lời làm đổi nội dung: lab cá nhân hay nhóm mấy người · timebox thật và mốc giờ trong buổi · `preparationTipIds` nào đã tồn tại trên web. Suy ra được thì tự suy và ghi thành assumption có nhãn; không hỏi thứ repo đã trả lời.
 
@@ -157,7 +163,7 @@ Chạy sau khi viết xong, như một lượt riêng. Không vừa viết vừa
 ## Phase 7 — Validator, rồi giao
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/scripts/validate_codelab.py docs/CODELAB.md --repo-root .
+python3 /absolute/path/to/build-codelab-markdown/scripts/validate_codelab.py docs/CODELAB.md --repo-root .
 ```
 
 Vòng lặp: chạy → sửa hết ERROR → chạy lại. Không giao khi còn ERROR. WARN thì đọc từng dòng rồi tự quyết giữ hay sửa, và nói rõ trong bàn giao cái nào cố ý giữ.

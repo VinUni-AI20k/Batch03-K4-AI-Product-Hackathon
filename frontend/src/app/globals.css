@@ -62,7 +62,7 @@ input[type="search"]::-webkit-search-cancel-button {
   color: var(--color-neutral-300);
 }
 
-.codelab-prose > h2 {
+.codelab-prose h2 {
   margin: 2.75rem 0 0.75rem;
   padding-top: 1.75rem;
   border-top: 1px solid var(--color-line);
@@ -75,7 +75,8 @@ input[type="search"]::-webkit-search-cancel-button {
   border-color: var(--color-line-dark);
   color: var(--color-neutral-50);
 }
-.codelab-prose > h2:first-child {
+.codelab-prose > h2:first-child,
+.codelab-step-panel > h2:first-child {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
@@ -204,4 +205,190 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .dark .codelab-prose strong {
   color: var(--color-neutral-100);
+}
+
+/* Step workspace: the Markdown remains the source of truth; the renderer only
+   turns its stable `## N.` headings into navigable, focused learning units. */
+.codelab-workspace {
+  display: grid;
+  grid-template-columns: 11.5rem minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 2rem;
+}
+.codelab-stepper {
+  position: sticky;
+  top: 1.5rem;
+  border-right: 1px solid var(--color-line);
+  padding-right: 1rem;
+}
+.dark .codelab-stepper {
+  border-color: var(--color-line-dark);
+}
+.codelab-stepper__progress {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 0.6rem;
+  color: var(--color-neutral-500);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.codelab-stepper__progress strong {
+  color: var(--color-brand-700);
+  font-size: 13px;
+}
+.codelab-stepper__list {
+  display: grid;
+  gap: 0.25rem;
+}
+.codelab-stepper__list button {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.55rem;
+  width: 100%;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.45rem;
+  color: var(--color-neutral-500);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: left;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.codelab-stepper__list button:hover {
+  background: color-mix(in oklab, var(--color-brand-100) 50%, transparent);
+  color: var(--color-neutral-900);
+}
+.codelab-stepper__list button.is-active {
+  background: var(--color-brand-100);
+  color: var(--color-brand-700);
+}
+.dark .codelab-stepper__list button.is-active {
+  background: color-mix(in oklab, var(--color-brand-700) 35%, transparent);
+  color: var(--color-brand-500);
+}
+.codelab-stepper__number {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  width: 1.5rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 11px;
+}
+.codelab-stepper__title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.codelab-step-panel {
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, white 86%, var(--color-page));
+  padding: 1.5rem clamp(1rem, 3vw, 2.25rem);
+  box-shadow: 0 14px 28px color-mix(in oklab, var(--color-neutral-900) 5%, transparent);
+}
+.dark .codelab-step-panel {
+  border-color: var(--color-line-dark);
+  background: var(--color-surface-dark);
+}
+.codelab-step-panel__meta {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: var(--color-neutral-500);
+  font-size: 12px;
+}
+.codelab-step-panel__meta span:first-child {
+  border-radius: 999px;
+  background: var(--color-brand-100);
+  padding: 0.2rem 0.55rem;
+  color: var(--color-brand-700);
+  font-weight: 700;
+}
+.codelab-step-panel__meta span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.codelab-step-panel__controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2.25rem;
+  border-top: 1px solid var(--color-line);
+  padding-top: 1rem;
+  color: var(--color-neutral-500);
+  font-size: 12px;
+  font-weight: 700;
+}
+.dark .codelab-step-panel__controls {
+  border-color: var(--color-line-dark);
+}
+.codelab-step-panel__controls button {
+  width: fit-content;
+  border: 0;
+  border-radius: 0.375rem;
+  padding: 0.45rem 0.6rem;
+  color: var(--color-brand-700);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+}
+.codelab-step-panel__controls button:last-child {
+  justify-self: end;
+  background: var(--color-brand-600);
+  color: white;
+}
+.codelab-step-panel__controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+.codelab-step-panel__controls > span {
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .codelab-workspace {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .codelab-stepper {
+    position: static;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0 0 0.75rem;
+  }
+  .codelab-stepper__list {
+    display: flex;
+    min-width: max-content;
+  }
+  .codelab-stepper__list button {
+    width: 10rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .codelab-workspace {
+    margin-top: 1.5rem;
+  }
+  .codelab-step-panel {
+    padding: 1rem;
+  }
+  .codelab-stepper__list button {
+    width: 8.75rem;
+  }
+  .codelab-step-panel__controls {
+    gap: 0.35rem;
+  }
 }

@@ -19,10 +19,6 @@ requiredTools: ["Python 3.10+", "pip", "Git", "API key model provider (OpenRoute
 commonErrors: ["RuntimeError: Missing API key env var: OPENROUTER_API_KEY", "No cases matched phase='B' in data/eval_group.json", "Invalid failure_type in data/eval_group.json: G01_test: 'wrong_arg'. Allowed: missing_info, out_of_scope, unnecessary_tool, wrong_arg_value, wrong_boundary, wrong_tool", "Invalid expected tool in data/eval_group.json: G02_test: 'web_search' not declared in tools.yaml", "ModuleNotFoundError: No module named 'yaml'", "Provider did not return structured tool_calls."]
 requiresSubmission: true
 ---
-# Lab 04 — Research Agent Tool Eval
-
-**Prompt Engineering · Day 4 · ~205 phút · VinUni AI Codelab × GDGoC · Cập nhật 2026-07-31**
-
 > **205 phút · Day 4 · intermediate.** Nhóm bạn nhận một research agent đã chạy được nhưng
 > [system prompt](#glossary "Đoạn chỉ dẫn đặt ở đầu hội thoại, nói cho model biết nó là ai và được phép làm gì.")
 > và
@@ -33,6 +29,15 @@ requiresSubmission: true
 Câu hỏi trọng tâm xuyên suốt Lab:
 
 > **Khi agent chọn sai tool, lỗi nằm ở system prompt hay ở mô tả tool — và bạn lấy bằng chứng nào từ log để phân biệt hai chỗ đó?**
+
+| Mốc | Step | Xong sẽ có gì |
+|---:|---|---|
+| 0–40 | 1. Dựng môi trường và kiểm registry | Venv, validation offline, bảng role đã ký |
+| 40–75 | 2. Đo baseline v0 | Một run JSON và 4 metric đáng tin |
+| 75–110 | 3. Sửa v1 và thêm tool | Tool mới đủ 4 mảnh, version log có v1 |
+| 110–135 | 4. Viết team eval và chạy v2 | 10 case của nhóm, Report A |
+| 135–180 | 5. Demo và nhận challenge | Transcript, challenge có thể tái tạo |
+| 180–205 | 6. Chạy v3 và nộp bài | Report B, artifact checklist, repo sạch |
 
 > **Mâu thuẫn trong repo — cách guide này xử lý**
 >
@@ -67,9 +72,13 @@ flowchart LR
 | UI demo | Entrypoint cho người ngoài thử agent | `app.py` — FILE MỚI (Role 4) |
 | Bằng chứng | Version log và report nộp bài | `artifacts/version_log.csv`, `artifacts/REPORT.md` (Role 5) |
 
+FILE MỚI: Role 4 sẽ tạo `starter_v0/app.py` ở step 2. Role 4 tạo `starter_v0/.env` từ `.env.example` ở step 1; file này là KHÔNG COMMIT vì đã có trong `.gitignore`.
+
 ---
 
-## 1. Dựng môi trường và chạy registry tool khi chưa có API key (40 phút)
+## 1. Dựng môi trường và chạy registry tool khi chưa có API key
+
+**40 phút · mốc 0–40.**
 
 :::goal{title="Registry 10 tool chạy được offline, nhóm đã ký tên vào bảng phân vai"}
 Bạn có một venv cài đủ dependency, ba tool local chạy ra output thật, và mỗi người trong nhóm sở hữu đúng một file.
@@ -104,6 +113,8 @@ python -m pip install -r requirements.txt
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 :::
+
+Kết quả đúng: sau block này terminal đang ở `starter_v0/`, đầu dòng có `(.venv)` và có file `.env`. Từ đây đến hết bài, mọi path không bắt đầu bằng `starter_v0/` đều được hiểu **tương đối từ `starter_v0/`**.
 
 Validation 1 — tên tool trong `artifacts/tools.yaml` có khớp với
 [registry](#glossary "Dict TOOL_FUNCTIONS trong tools/__init__.py, map tên tool mà model thấy sang hàm Python chạy thật.")
@@ -201,7 +212,9 @@ Windows chặn script activate với `cannot be loaded because running scripts i
 
 ---
 
-## 2. Chạy baseline v0 và đọc một trace fail (35 phút)
+## 2. Chạy baseline v0 và đọc một trace fail
+
+**35 phút · mốc 40–75.**
 
 :::goal{title="Có một file runs/*.json với provider_error_cases bằng 0 và bốn metric đã ghi lại"}
 Bạn có số đo baseline để mọi vòng sau so vào, và bạn đã đọc được một case fail xuống tận args mà model gửi.
@@ -392,7 +405,9 @@ Nhiều case FAIL với `failures` chứa `extra tool call`
 
 ---
 
-## 3. Chạy vòng v1 và thêm một tool mới (35 phút)
+## 3. Chạy vòng v1 và thêm một tool mới
+
+**35 phút · mốc 75–110.**
 
 :::goal{title="Có một metric tăng so với v0, và một tool mới do nhóm viết gọi được qua registry"}
 Bạn có dòng `v1` trong `artifacts/version_log.csv` với before/after trên cùng một metric, và một tool mới đủ bốn mảnh: `TOOL.md`, `tool.py`, registry, declaration.
@@ -531,7 +546,9 @@ Tool mới gọi được bằng `python -c` nhưng model không bao giờ chọ
 
 ---
 
-## 4. Viết 10 eval case của nhóm, chạy v2 và hoàn tất Report A (25 phút)
+## 4. Viết 10 eval case của nhóm, chạy v2 và hoàn tất Report A
+
+**25 phút · mốc 110–135.**
 
 :::goal{title="data/eval_group.json có đúng 10 case chạy qua được validator, UI hiện tool trace, Report A xong trước 16:30"}
 Nhóm có bộ eval riêng đo được lỗi nhóm quan tâm, một UI người ngoài mở được, và một trang giới thiệu agent để dùng khi demo.
@@ -651,9 +668,15 @@ Link tạm cho team khác mở từ máy của họ:
 cloudflared tunnel --url http://localhost:8501
 ```
 
+Kết quả kỳ vọng (Coach inference — chỉ chạy được khi máy đã cài `cloudflared` và Streamlit đang mở cổng 8501):
+
+```text
+Your quick Tunnel has been created! Visit it at https://<random>.trycloudflare.com
+```
+
 Dán URL `trycloudflare.com` vào `artifacts/REPORT.md` mục A1, rồi mở thử từ điện thoại trước 16:30. Không nhập dữ liệu thật vào UI đang public, và không render key ra trang.
 
-**Nếu bị chậm:** thứ tự bỏ là UI trace trước, rồi v2. Bắt buộc phải có: 10 eval case qua validator, và Report A mục A1 đến A3 có nội dung. Chưa có link công khai thì demo trên máy trình chiếu bằng `http://localhost:8501`.
+**Nếu bị chậm:** vẫn hiện UI trace cho ít nhất một scenario, vì đây là deliverable core. Có thể hoãn v2 và link công khai; demo trên máy trình chiếu bằng `http://localhost:8501` là đủ.
 
 **Xong sớm:** chạy `python run_eval.py --provider openrouter --version v2 --suite extension --eval-cases data/eval_research_extension.json` cho 10 case optional về `policy`, `papers`, `paper_text`.
 
@@ -686,7 +709,9 @@ Dán URL `trycloudflare.com` vào `artifacts/REPORT.md` mục A1, rồi mở th�
 
 ---
 
-## 5. Showdown — demo agent và thu challenge từ team khác (45 phút)
+## 5. Showdown — demo agent và thu challenge từ team khác
+
+**45 phút · mốc 135–180.**
 
 :::goal{title="Agent của nhóm bị người ngoài thử trực tiếp, và mọi challenge đã được ghi thành việc phải sửa"}
 Nhóm có ít nhất hai lỗi mới do team khác tìm ra, viết dưới dạng có thể chuyển thành eval case.
@@ -752,7 +777,9 @@ Team khác gõ câu hỏi khiến agent gọi `send`
 
 ---
 
-## 6. Chạy vòng v3, hoàn tất Report B và nộp bài (25 phút)
+## 6. Chạy vòng v3, hoàn tất Report B và nộp bài
+
+**25 phút · mốc 180–205.**
 
 :::goal{title="Bốn dòng v0 đến v3 trong version log, Report B đầy đủ, repo push lên không chứa .env"}
 Nhóm nộp được một chuỗi bốn version có metric before/after và mọi ô trong report trỏ về một file bằng chứng.
@@ -857,6 +884,8 @@ git add .
 git commit -m "Day04 lab: research agent v0-v3, 10 team eval cases, report"
 git push origin main
 ```
+
+Kết quả đúng: terminal báo branch đã được push; mở repo trên GitHub thấy các artifact trong checklist bên dưới.
 
 Kênh nộp, quy ước tên repo và deadline cuối theo thông báo của giảng viên. Nhóm xác nhận ba thông tin đó trước khi gửi link, vì `README.md` mục Submit ghi rõ chúng chưa được chốt trong repo.
 
