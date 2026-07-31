@@ -24,6 +24,7 @@ let currentPage = 1;
 let totalPages = 83;
 let currentZoom = 100;
 let currentPdfPath = '../data/vlearn-pack/slides/d1-slide-hackathon.pdf';
+window.currentPdfPath = currentPdfPath;
 let pdfDoc = null;        // PDF.js document instance
 let pageRendering = false;
 let pageNumPending = null;
@@ -843,6 +844,7 @@ function zoomSlide(delta) {
 
 function loadPdf(pdfPath, docName, totalPgs) {
   currentPdfPath = pdfPath;
+  window.currentPdfPath = pdfPath;
   currentPage = 1;
 
   const docTitleEl = document.getElementById('current-doc-title');
