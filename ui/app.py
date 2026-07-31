@@ -69,6 +69,18 @@ css_path = BASE_DIR / "style.css"
 js_path = BASE_DIR / "app.js"
 
 if html_path.exists() and css_path.exists() and js_path.exists():
+    import base64
+    pdf_d1_b64 = ""
+    pdf_d2_b64 = ""
+    d1_path = SLIDES_DIR / "d1-slide-hackathon.pdf"
+    d2_path = SLIDES_DIR / "d2-slide-hackathon.pdf"
+    if d1_path.exists():
+        with open(d1_path, "rb") as f_pdf:
+            pdf_d1_b64 = base64.b64encode(f_pdf.read()).decode("utf-8")
+    if d2_path.exists():
+        with open(d2_path, "rb") as f_pdf:
+            pdf_d2_b64 = base64.b64encode(f_pdf.read()).decode("utf-8")
+
     with open(html_path, "r", encoding="utf-8") as f_h:
         html_code = f_h.read()
     with open(css_path, "r", encoding="utf-8") as f_c:
@@ -76,8 +88,12 @@ if html_path.exists() and css_path.exists() and js_path.exists():
     with open(js_path, "r", encoding="utf-8") as f_j:
         js_code = f_j.read()
 
-    # Inline CSS and JS into single standalone bundle
+    # Inline PDF Base64, CSS and JS into single standalone bundle
+    pdf_script = f'<script>window.PDF_D1_BASE64 = "{pdf_d1_b64}"; window.PDF_D2_BASE64 = "{pdf_d2_b64}";</script>'
     standalone_bundle = html_code.replace(
+        '</head>',
+        f'{pdf_script}</head>'
+    ).replace(
         '<link rel="stylesheet" href="style.css">',
         f'<style>{css_code}</style>'
     ).replace(
@@ -86,7 +102,7 @@ if html_path.exists() and css_path.exists() and js_path.exists():
     )
 
     # Render full height embedded view with 100% interactive buttons
-    components.html(standalone_bundle, height=950, scrolling=True)
+    components.html(standalone_bundle, height=760, scrolling=False)
 
 else:
     st.error("Không tìm thấy các file giao diện (product.html, style.css, app.js) trong thư mục ui/")
