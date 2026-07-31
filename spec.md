@@ -1,4 +1,4 @@
-# AI SPEC — Khắc phục lỗi "nhớ lệch" và đứt mạch hội thoại của AI Tutor · Nhóm 5 (CVRLearn) · Zone 4
+# AI SPEC — Khắc phục lỗi "nhớ lệch" và đứt mạch hội thoại của AI Tutor · Nhóm  CRVLearn(CVRLearn)
 Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 
