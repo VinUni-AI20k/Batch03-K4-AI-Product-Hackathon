@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -890,7 +891,12 @@
         .ai-chat-send-btn:hover { background: #1d4ed8; }
         .ai-chat-send-btn:disabled { background: #93c5fd; cursor: not-allowed; }
     </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- Top Header Bar (100% Matching Real VLearn) -->
@@ -987,16 +993,22 @@
                 <div class="toolbar-group">
                     <button class="tb-btn active" id="btnModeRead" onclick="setToolMode('read')">👁️ Đọc</button>
                     <button class="tb-btn" id="btnModePen" onclick="setToolMode('pen')">✏️ Bút</button>
-                    <button class="tb-btn" id="btnModeHighlight" onclick="setToolMode('highlight')">🖍️ Highlight</button>
+                    <button class="tb-btn" id="btnModeHighlight" onclick="setToolMode('highlight')">🖍️
+                        Highlight</button>
 
                     <!-- Drawing Tool Options (Color & Clear) -->
                     <div class="draw-sub-toolbar" id="drawSubToolbar">
                         <span style="font-size: 11px; font-weight: 600; color: #475569;">Màu:</span>
-                        <div class="color-dot active" style="background: #f43f5e;" onclick="setDrawColor('#f43f5e', this)" title="Đỏ"></div>
-                        <div class="color-dot" style="background: #2563eb;" onclick="setDrawColor('#2563eb', this)" title="Xanh"></div>
-                        <div class="color-dot" style="background: #f59e0b;" onclick="setDrawColor('#f59e0b', this)" title="Vàng"></div>
-                        <div class="color-dot" style="background: #10b981;" onclick="setDrawColor('#10b981', this)" title="Lục"></div>
-                        <button class="tb-btn" style="padding: 2px 8px; font-size: 11px;" onclick="clearAllDrawings()">🗑️ Xóa nét vẽ</button>
+                        <div class="color-dot active" style="background: #f43f5e;"
+                            onclick="setDrawColor('#f43f5e', this)" title="Đỏ"></div>
+                        <div class="color-dot" style="background: #2563eb;" onclick="setDrawColor('#2563eb', this)"
+                            title="Xanh"></div>
+                        <div class="color-dot" style="background: #f59e0b;" onclick="setDrawColor('#f59e0b', this)"
+                            title="Vàng"></div>
+                        <div class="color-dot" style="background: #10b981;" onclick="setDrawColor('#10b981', this)"
+                            title="Lục"></div>
+                        <button class="tb-btn" style="padding: 2px 8px; font-size: 11px;"
+                            onclick="clearAllDrawings()">🗑️ Xóa nét vẽ</button>
                     </div>
                 </div>
                 <div class="toolbar-group">
@@ -1019,6 +1031,210 @@
                      the next section only appears after the current section's quiz is passed. -->
                 <div id="docD1Container" class="doc-container"></div>
                 <div id="docD2Container" class="doc-container" style="display:none;"></div>
+                <!-- SLIDE PAGE 1 -->
+                <div class="slide-frame">
+                    <canvas class="draw-canvas"></canvas>
+                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
+                    <div>
+                        <div class="slide-page-num">Trang 1 / 32</div>
+                        <div class="slide-heading" style="color: #2563eb; font-size: 36px; margin-top: 20px;">Day 01
+                        </div>
+                        <div class="slide-heading" style="font-size: 42px; margin-top: 10px;">AI & LLM Foundation</div>
+                        <div class="slide-subheading" style="color: #dc2626; margin-top: 14px;">Vibe Coding 1: Setup &
+                            Foundation + LAB 1: LLM API Exploration</div>
+                    </div>
+                    <div style="font-size: 12px; color: #94a3b8;">Ha Noi 23.07.2026 - @ Vin University</div>
+                </div>
+
+                <!-- SLIDE PAGE 2 -->
+                <div class="slide-frame">
+                    <canvas class="draw-canvas"></canvas>
+                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
+                    <div>
+                        <div class="slide-page-num">Trang 2 / 32</div>
+                        <div class="slide-heading">Instructor: Mai Anh Nguyen (Blue)</div>
+                        <div class="slide-subheading">Generalist Product Builder</div>
+                        <div class="slide-content-box">
+                            • 2026: FPT Long Châu (PM · Healthcare Product)<br>
+                            • 2025: Thongtincuuho.org (Co-founder)<br>
+                            • 2025: FPT Software AI Center (PM · AI Agent)<br>
+                            • 2021 - 2025: Xantus (PM · On-chain Analytics, AI Agent)
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-002]</div>
+                </div>
+
+                <!-- SLIDE PAGE 3: ATTENTION MECHANISM -->
+                <div class="slide-frame" id="slideAttention">
+                    <canvas class="draw-canvas"></canvas>
+                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
+                    <div>
+                        <div class="slide-page-num">Trang 22 / 32</div>
+                        <div class="slide-heading">Minh họa Khái niệm: Token "nó" cần Attention tới token nào?</div>
+                        <div class="slide-content-box">
+                            Ví dụ: <em>"Lan bỏ quyển sách vào túi vì <strong>nó</strong> quá dày"</em>
+                            <div class="attention-demo">
+                                <span class="token">Lan</span>
+                                <span class="token">bỏ</span>
+                                <span class="token highlight">quyển (0.28)</span>
+                                <span class="token highlight">sách (0.32)</span>
+                                <span class="token">vào</span>
+                                <span class="token">túi (0.09)</span>
+                                <span class="token">vì</span>
+                                <span class="token target">nó</span>
+                                <span class="token">quá</span>
+                                <span class="token">dày</span>
+                            </div>
+                            <div style="font-size: 12px; color: #0284c7; margin-top: 12px; text-align: center;">
+                                Trọng số Attention mạnh nhất hướng về <strong>"quyển sách"</strong> thay vì "cái túi".
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-022]</div>
+                </div>
+
+                <!-- SLIDE PAGE 4: THREE AXES OF MODEL SCALING -->
+                <div class="slide-frame">
+                    <canvas class="draw-canvas"></canvas>
+                    <div class="watermark">material_mrxpq9zu_t8e6xs.pdf</div>
+                    <div>
+                        <div class="slide-page-num">Trang 23 / 32</div>
+                        <div class="slide-heading">Ba trục làm model "giỏi hơn"</div>
+                        <div class="slide-subheading">Số tham số chỉ là MỘT trong ba trục, không phải trục mạnh nhất
+                        </div>
+                        <div class="slide-content-box">
+                            <strong>1. Pretraining scale:</strong> Cùng ngân sách tính toán, Chinchilla 70B thắng Gopher
+                            280B.<br>
+                            <strong>2. Post-training:</strong> RLHF giúp câu trả lời được yêu thích 85% so với bản
+                            gốc.<br>
+                            <strong>3. Test-time / Agentic compute:</strong> Cùng 1 model Claude Opus 4.8, điểm lệch 19%
+                            khi dùng harness.
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #94a3b8;">Mã đoạn trích dẫn: [T01-023]</div>
+                </div>
+
+                <!-- ============================================================= -->
+                <!-- END OF LESSON: ACTIVE RECALL SURVEY / QUIZ SECTION            -->
+                <!-- ============================================================= -->
+                <div class="active-recall-section" id="activeRecallQuiz">
+                    <div class="quiz-section-header">
+                        <div class="quiz-header-icon">🎯</div>
+                        <div class="quiz-header-title">
+                            <h3>BÀI KIỂM TRA MỨC ĐỘ HIỂU BÀI (VLEARN ACTIVE RECALL)</h3>
+                            <p>Bạn đã cuộn hết slide Day 01! Hãy hoàn thành 3 câu hỏi tình huống bên dưới để AI kiểm tra
+                                xem bạn có bị hổng kiến thức cốt lõi nào không trước khi làm bài tập lớn.</p>
+                        </div>
+                    </div>
+
+                    <!-- QUESTION 1 -->
+                    <div class="quiz-card">
+                        <div class="quiz-card-title">
+                            📌 <strong>Câu 1 (Cơ chế Attention — Trang 22):</strong> Trong câu <em>"Lan bỏ quyển sách
+                                vào túi vì <strong>nó</strong> quá dày"</em>, tại sao từ <strong>"nó"</strong> lại tự
+                            động chú ý (Attention) tới <strong>"quyển sách"</strong> chứ không phải <strong>"cái
+                                túi"</strong>?
+                        </div>
+                        <div class="mc-options-list" id="mcOptions1">
+                            <label class="mc-option-card" onclick="selectMc(1, 'A', this)">
+                                <input type="radio" name="q1" value="A" class="mc-radio">
+                                <span class="mc-option-text"><strong>A.</strong> Self-Attention tính toán trọng số tương
+                                    quan xác suất giữa các vector token; cụm "sách quá dày" có trọng số (0.32) cao hơn
+                                    hẳn "túi quá dày" (0.09).</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(1, 'B', this)">
+                                <input type="radio" name="q1" value="B" class="mc-radio">
+                                <span class="mc-option-text"><strong>B.</strong> Do từ "túi" đứng sát từ "nó" hơn trong
+                                    câu nên mô hình luôn chọn từ đứng gần nhất.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(1, 'C', this)">
+                                <input type="radio" name="q1" value="C" class="mc-radio">
+                                <span class="mc-option-text"><strong>C.</strong> Do AI hiểu được ý nghĩa thực tế bên
+                                    ngoài đời thực là chỉ có sách mới dày còn túi thì không.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(1, 'D', this)">
+                                <input type="radio" name="q1" value="D" class="mc-radio">
+                                <span class="mc-option-text"><strong>D.</strong> Do trọng số Attention được khởi tạo
+                                    ngẫu nhiên mỗi lần chạy mô hình.</span>
+                            </label>
+                        </div>
+                        <button class="btn-submit-quiz" onclick="checkMcAns(1)">Nộp đáp án & AI Phân tích Hiểu lầm
+                            🚀</button>
+
+                        <div id="res1" class="result-box"></div>
+                    </div>
+
+                    <!-- QUESTION 2 -->
+                    <div class="quiz-card">
+                        <div class="quiz-card-title">
+                            📌 <strong>Câu 2 (3 Trục Scaling Model — Trang 23):</strong> Tại sao mô hình
+                            <strong>Chinchilla 70B</strong> lại chiến thắng mô hình <strong>Gopher 280B</strong> dù số
+                            lượng tham số nhỏ hơn tới 4 lần?
+                        </div>
+                        <div class="mc-options-list" id="mcOptions2">
+                            <label class="mc-option-card" onclick="selectMc(2, 'A', this)">
+                                <input type="radio" name="q2" value="A" class="mc-radio">
+                                <span class="mc-option-text"><strong>A.</strong> Do Chinchilla 70B có số lượng tham số
+                                    được nén lại thông minh hơn nên luôn mạnh hơn.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(2, 'B', this)">
+                                <input type="radio" name="q2" value="B" class="mc-radio">
+                                <span class="mc-option-text"><strong>B.</strong> Do Chinchilla được huấn luyện trên
+                                    lượng dữ liệu (Tokens) gấp 4 lần, đạt tỷ lệ tối ưu giữa Data và Parameters
+                                    (Chinchilla Scaling Law).</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(2, 'C', this)">
+                                <input type="radio" name="q2" value="C" class="mc-radio">
+                                <span class="mc-option-text"><strong>C.</strong> Do Gopher 280B chạy quá chậm nên bị
+                                    tính điểm phạt khi chấm benchmark.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(2, 'D', this)">
+                                <input type="radio" name="q2" value="D" class="mc-radio">
+                                <span class="mc-option-text"><strong>D.</strong> Do Chinchilla được áp dụng RLHF còn
+                                    Gopher thì không.</span>
+                            </label>
+                        </div>
+                        <button class="btn-submit-quiz" onclick="checkMcAns(2)">Nộp đáp án & AI Phân tích 🚀</button>
+
+                        <div id="res2" class="result-box"></div>
+                    </div>
+
+                    <!-- QUESTION 3 -->
+                    <div class="quiz-card">
+                        <div class="quiz-card-title">
+                            📌 <strong>Câu 3 (Cost of Error & Automation Level — Trang 14):</strong> Một nhóm định thiết
+                            kế AI tự động chấm bài tập lớn của học viên mà không cần giảng viên duyệt. Hãy đánh giá
+                            Cost-of-Error và đề xuất mức Automation phù hợp.
+                        </div>
+                        <div class="mc-options-list" id="mcOptions3">
+                            <label class="mc-option-card" onclick="selectMc(3, 'A', this)">
+                                <input type="radio" name="q3" value="A" class="mc-radio">
+                                <span class="mc-option-text"><strong>A.</strong> Chọn Full Automate 100% để tiết kiệm
+                                    tối đa thời gian cho giảng viên.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(3, 'B', this)">
+                                <input type="radio" name="q3" value="B" class="mc-radio">
+                                <span class="mc-option-text"><strong>B.</strong> Chấm bài tập lớn có Cost-of-Error rất
+                                    cao (AI chấm sai gây bức xúc/mất điểm); bắt buộc dùng Conditional Automation /
+                                    Augment (AI chấm nháp + Giảng viên/TA duyệt).</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(3, 'C', this)">
+                                <input type="radio" name="q3" value="C" class="mc-radio">
+                                <span class="mc-option-text"><strong>C.</strong> Tuyệt đối không ứng dụng AI vì AI luôn
+                                    luôn chấm sai bài tập.</span>
+                            </label>
+                            <label class="mc-option-card" onclick="selectMc(3, 'D', this)">
+                                <input type="radio" name="q3" value="D" class="mc-radio">
+                                <span class="mc-option-text"><strong>D.</strong> Chuyển cho các học viên tự chấm chéo
+                                    lẫn nhau.</span>
+                            </label>
+                        </div>
+                        <button class="btn-submit-quiz" onclick="checkMcAns(3)">Nộp đáp án & AI Phân tích 🚀</button>
+
+                        <div id="res3" class="result-box"></div>
+                    </div>
+
+                </div>
 
             </div>
 
@@ -1027,21 +1243,56 @@
     </div>
 
     <!-- Modal Dialog for TA Escalation (PAIR Feedback & Control) -->
-    <div id="taModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: #ffffff; border-radius: 14px; width: 460px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 16px;">
-            <div style="font-size: 16px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+    <div id="taModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: #ffffff; border-radius: 14px; width: 460px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 16px;">
+            <div
+                style="font-size: 16px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
                 📩 Xác nhận chuyển cho TA trực ban
             </div>
             <div style="font-size: 13px; color: #475569; line-height: 1.6;" id="taModalText">
-                Bạn sắp gửi câu hỏi và vị trí slide <code id="taCitationTag" style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:600;">[T01-022]</code> cho TA trực ban hỗ trợ.
+                Bạn sắp gửi câu hỏi và vị trí slide <code id="taCitationTag"
+                    style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:600;">[T01-022]</code>
+                cho TA trực ban hỗ trợ.
             </div>
-            <div style="font-size: 12px; background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; padding: 10px; border-radius: 8px;">
-                ⚠️ <em>Theo khảo sát VLearn (N=24): 37.5% học viên yêu cầu bước xác nhận này trước khi gửi để tránh bị làm phiền.</em>
+            <div
+                style="font-size: 12px; background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; padding: 10px; border-radius: 8px;">
+                ⚠️ <em>Theo khảo sát VLearn (N=24): 37.5% học viên yêu cầu bước xác nhận này trước khi gửi để tránh bị
+                    làm phiền.</em>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
-                <button style="background: #f1f5f9; color: #475569; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="closeTaModal()">Hủy</button>
-                <button style="background: #2563eb; color: #ffffff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="confirmTaEscalate()">Đồng ý gửi TA</button>
+                <button
+                    style="background: #f1f5f9; color: #475569; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;"
+                    onclick="closeTaModal()">Hủy</button>
+                <button
+                    style="background: #2563eb; color: #ffffff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;"
+                    onclick="confirmTaEscalate()">Đồng ý gửi TA</button>
             </div>
+        </div>
+    </div>
+
+    <!-- AI Trace Modal (Rubric R5: Log/Trace AI Call) -->
+    <div id="traceModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: #0f172a; color: #f8fafc; border-radius: 14px; width: 600px; max-height: 80vh; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 14px; overflow-y: auto;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <div
+                    style="font-size: 15px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+                    ⚡ AI Execution Trace Log (Gemini 1.5 Flash Call)
+                </div>
+                <button style="background: transparent; color: #94a3b8; border: none; font-size: 18px; cursor: pointer;"
+                    onclick="closeTraceModal()">✕</button>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);"
+                id="traceContent">
+                <!-- Dynamic trace content -->
+            </div>
+            <button
+                style="align-self: flex-end; background: #38bdf8; color: #0f172a; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;"
+                onclick="closeTraceModal()">Đóng Log</button>
         </div>
     </div>
 
@@ -1854,4 +2105,5 @@
         }
     </script>
 </body>
+
 </html>
