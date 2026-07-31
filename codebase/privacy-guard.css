@@ -1,0 +1,92 @@
+.privacy-note {
+  margin: 0 13px 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.privacy-alert {
+  margin: 0 13px 8px;
+  padding: 10px 11px;
+  border: 1px solid var(--bad-line);
+  border-radius: 9px;
+  background: var(--bad-bg);
+  color: var(--text);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.privacy-alert[hidden] {
+  display: none;
+}
+
+.privacy-alert strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--red);
+  font-size: 12px;
+}
+
+.privacy-alert__details {
+  color: var(--muted);
+}
+
+.privacy-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.privacy-alert__actions button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 4px 9px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 11px;
+}
+
+.privacy-alert__actions .privacy-redact {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
+.privacy-alert__actions .privacy-send-anyway {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.privacy-detected {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 16%, transparent);
+}
+
+.privacy-key-hint {
+  display: block;
+  margin: -3px 0 8px;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .privacy-alert {
+    animation: privacy-alert-in 140ms ease-out;
+  }
+
+  @keyframes privacy-alert-in {
+    from {
+      opacity: 0;
+      transform: translateY(3px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
