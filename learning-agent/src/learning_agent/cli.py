@@ -1,6 +1,8 @@
 """CLI: learning-agent <lệnh>
 
   onboard   kiểm tra cấu hình lần đầu (.env, token, thư mục)
+  config    wizard cấu hình tương tác: chọn provider LLM, dán key, model, kênh, khởi động
+  chat      chat liên tục với agent ngay trong terminal (REPL)
   sync      quét source_mirror, ingest bài mới/đổi, cập nhật index (incremental)
   reindex   rebuild toàn bộ index từ vault (index là phái sinh)
   ask       hỏi thử agent trong terminal (không cần Discord/Telegram)
@@ -65,6 +67,7 @@ def main() -> None:
     sub.add_parser("reindex")
     ask = sub.add_parser("ask")
     ask.add_argument("question", nargs="+")
+    sub.add_parser("chat")
     sub.add_parser("bot")
     args = parser.parse_args()
 
@@ -104,6 +107,10 @@ def main() -> None:
         agent = TutorAgent(cfg, vault, index)
         question = " ".join(args.question)
         print(agent.reply("cli-user", "CLI", [{"role": "user", "content": question}]))
+
+    elif args.cmd == "chat":
+        from .agent import TutorAgent
+        _repl(TutorAgent(cfg, vault, index))
 
     elif args.cmd == "bot":
         if not cfg.discord_token and not cfg.telegram_token:
@@ -180,6 +187,24 @@ def _onboard(cfg) -> None:
         "  2. Trong chat: /sethome để nhận báo cáo học tập hằng ngày (cron trong config.yaml)\n"
         "  3. Giới hạn người dùng: DISCORD_ALLOWED_USERS / TELEGRAM_ALLOWED_USERS trong .env"
     )
+
+
+def _repl(agent) -> None:
+    """Chat với Vlearn Agent ngay trong terminal (REPL đơn giản)."""
+    print("\n\033[1;35m💬 Chat với Vlearn Agent\033[0m — gõ câu hỏi; Enter rỗng hoặc 'thoát' để dừng.\n")
+    history: list[dict] = []
+    while True:
+        try:
+            q = input("\033[1;36mBạn:\033[0m ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+        if not q or q.lower() in ("thoát", "thoat", "quit", "exit", ":q"):
+            break
+        history.append({"role": "user", "content": q})
+        answer = agent.reply("cli-user", "CLI", history)
+        history.append({"role": "assistant", "content": answer})
+        print(f"\033[1;35mVlearn:\033[0m {answer}\n")
 
 
 # ─────────────────────────── wizard cấu hình tương tác ───────────────────────────
@@ -307,13 +332,20 @@ def _config_wizard(cfg) -> None:
             default=bool(cfg.voyage_api_key), style=style, qmark="▸",
         ).ask()
         vk = questionary.password("VOYAGE_API_KEY (dán vào):", style=style, qmark="▸").ask() if use_voyage else None
-        channels = questionary.checkbox(
-            "Kênh chat nào? (Space chọn · Enter xong · Dashboard web luôn bật)",
-            choices=[Choice("Telegram", "telegram"), Choice("Discord", "discord")],
-            style=style, qmark="▸",
-        ).ask() or []
-        tg = questionary.password("TELEGRAM_BOT_TOKEN:", style=style, qmark="▸").ask() if "telegram" in channels else None
-        dc = questionary.password("DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask() if "discord" in channels else None
+
+        tg = dc = tg_allow = dc_allow = None
+        if questionary.confirm("Bật kênh Telegram? (chat qua bot Telegram)",
+                               default=bool(cfg.telegram_token), style=style, qmark="▸").ask():
+            tg = questionary.password("Dán TELEGRAM_BOT_TOKEN (lấy ở @BotFather):", style=style, qmark="▸").ask()
+            tg_allow = questionary.text(
+                "Telegram user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                style=style, qmark="▸").ask()
+        if questionary.confirm("Bật kênh Discord?", default=bool(cfg.discord_token),
+                               style=style, qmark="▸").ask():
+            dc = questionary.password("Dán DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask()
+            dc_allow = questionary.text(
+                "Discord user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                style=style, qmark="▸").ask()
     except KeyboardInterrupt:
         print("Đã huỷ."); return
     except Exception:
@@ -327,15 +359,48 @@ def _config_wizard(cfg) -> None:
         _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
     if tg and tg.strip():
         _env_set(env_path, "TELEGRAM_BOT_TOKEN", tg.strip())
+        _env_set(env_path, "TELEGRAM_ALLOWED_USERS", (tg_allow or "").strip())
     if dc and dc.strip():
         _env_set(env_path, "DISCORD_BOT_TOKEN", dc.strip())
+        _env_set(env_path, "DISCORD_ALLOWED_USERS", (dc_allow or "").strip())
+    # bật kênh nhưng để trống allowlist -> cho phép bot chạy (mở cho mọi người, hợp demo)
+    open_bot = (tg and not (tg_allow or "").strip()) or (dc and not (dc_allow or "").strip())
+    if open_bot:
+        _env_set(env_path, "VLEARN_ALLOW_ALL", "1")
     _yaml_set(cfg.root / "config.yaml", "provider", provider)
     if model and model.strip():
         _yaml_set(cfg.root / "config.yaml", "model", model.strip())
     env_path.chmod(0o600)
 
-    print("\n\033[1;32m✅ Đã lưu cấu hình.\033[0m Chạy:  \033[36mlearning-agent ui\033[0m "
-          "(dashboard http://127.0.0.1:8321)  ·  hoặc  \033[36mlearning-agent bot\033[0m")
+    print("\n\033[1;32m✅ Đã lưu cấu hình.\033[0m")
+    if open_bot:
+        print("\033[1;33m⚠️ Kênh bot đang MỞ cho mọi người (allowlist trống). "
+              "Điền *_ALLOWED_USERS trong .env để giới hạn.\033[0m")
+
+    # ── chọn khởi động ngay ──
+    has_bot = bool((tg and tg.strip()) or (dc and dc.strip()) or cfg.telegram_token or cfg.discord_token)
+    launch_choices = [
+        Choice("💬 Chat thử ngay trong Terminal", value="chat"),
+        Choice("🌐 Dashboard web  (http://127.0.0.1:8321)", value="ui"),
+    ]
+    if has_bot:
+        launch_choices.append(Choice("🤖 Chạy bot Telegram/Discord đã cấu hình", value="bot"))
+    launch_choices.append(Choice("⏭  Để sau (thoát)", value="quit"))
+    try:
+        launch = questionary.select(
+            "Khởi động Vlearn Agent ở đâu bây giờ?", choices=launch_choices,
+            style=style, qmark="▸",
+        ).ask()
+    except Exception:
+        launch = None
+    if launch and launch != "quit":
+        import os
+        exe = sys.argv[0]
+        print(f"\n▸ \033[36mlearning-agent {launch}\033[0m …\n")
+        os.execvp(exe, [exe, launch])
+    else:
+        print("Chạy sau:  \033[36mlearning-agent ui\033[0m  ·  \033[36mlearning-agent chat\033[0m"
+              + ("  ·  \033[36mlearning-agent bot\033[0m" if has_bot else ""))
 
 
 def _config_simple(cfg, env_path) -> None:
