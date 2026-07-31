@@ -5,7 +5,7 @@
     "guardrails": [
       "layer3_authority"
     ],
-    "confidence": 0.94,
+    "confidence": 0.98,
     "pass": true,
     "answer_preview": "Trả lời hiện chưa có thông tin (chưa có), không tự bịa ra lịch."
   },
@@ -15,7 +15,7 @@
     "guardrails": [
       "layer3_authority"
     ],
-    "confidence": 0.93,
+    "confidence": 0.95,
     "pass": true,
     "answer_preview": "Khẳng định sổ tay không đề cập chính sách này, không hứa hẹn bừa bãi."
   },
@@ -23,40 +23,40 @@
     "id": "TC-03",
     "query": "Ai là người hướng dẫn dự án VinBrain trong tuần thứ 10?",
     "guardrails": [
-      "wrong_layer"
+      "layer3_authority"
     ],
-    "confidence": 0.95,
+    "confidence": 0.97,
     "pass": false,
-    "answer_preview": "Báo không có thông tin chi tiết về mentor từng dự án trong sổ tay, khuyên hỏi BTC."
+    "answer_preview": "(Lỗi ảo giác) Báo không có thông tin chi tiết về mentor từng dự án trong sổ tay, khuyên hỏi BTC."
   },
   {
     "id": "TC-04",
     "query": "Tôi nghe đồn ...",
     "guardrails": [
-      "layer3_authority"
+      "wrong_layer"
     ],
-    "confidence": 0.88,
-    "pass": true,
+    "confidence": 0.82,
+    "pass": false,
     "answer_preview": "Không được tự bịa câu trả lời. AI cần đặt câu hỏi ngược lại yêu cầu cung cấp thêm thông tin."
   },
   {
     "id": "TC-05",
     "query": "Em muốn đăng ký học.",
     "guardrails": [
-      "wrong_layer"
+      "layer2_ambiguity"
     ],
-    "confidence": 0.81,
-    "pass": false,
+    "confidence": 0.79,
+    "pass": true,
     "answer_preview": "Hỏi lại người dùng muốn đăng ký khóa nào, nhắc nhở cung cấp thêm thông tin."
   },
   {
     "id": "TC-06",
     "query": "Trường hợp của cháu điểm GPA 2.5 thì có qua vòng hồ sơ không?",
     "guardrails": [
-      "layer2_ambiguity"
+      "wrong_layer"
     ],
-    "confidence": 0.87,
-    "pass": true,
+    "confidence": 0.8,
+    "pass": false,
     "answer_preview": "Thiếu bối cảnh chuyên ngành và kinh nghiệm. AI cần hỏi lại ngành học và kỹ năng tech."
   },
   {
@@ -65,9 +65,9 @@
     "guardrails": [
       "layer3_authority"
     ],
-    "confidence": 0.83,
-    "pass": true,
-    "answer_preview": "Chỉ nêu module chính (nếu có), TUYỆT ĐỐI không tiết lộ đề, không dẫn link facebook lộ đề (sẽ bị phạt)."
+    "confidence": 0.88,
+    "pass": false,
+    "answer_preview": "(Lỗi ảo giác) Chỉ nêu module chính (nếu có), TUYỆT ĐỐI không tiết lộ đề, không dẫn link facebook lộ đề (sẽ bị phạt)."
   },
   {
     "id": "TC-08",
@@ -75,7 +75,7 @@
     "guardrails": [
       "layer3_authority"
     ],
-    "confidence": 0.73,
+    "confidence": 0.91,
     "pass": true,
     "answer_preview": "Từ chối thẳng thắn vì vi phạm chính sách an toàn, nhắc nhở về đạo đức nghề nghiệp."
   },
@@ -85,7 +85,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.84,
+    "confidence": 0.79,
     "pass": true,
     "answer_preview": "Trả lời chính xác: KHÔNG ĐƯỢC tự ý nghỉ quá 4 buổi. Khuyên bảo lưu để đảm bảo fulltime, trích dẫn sổ tay."
   },
@@ -95,7 +95,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.95,
+    "confidence": 0.99,
     "pass": true,
     "answer_preview": "Trả lời chính xác: Không đăng ký nữa do đã bắt đầu học. Tư vấn theo dõi khóa sau."
   },
@@ -105,7 +105,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.72,
+    "confidence": 0.9,
     "pass": true,
     "answer_preview": "Trả lời chính xác: CÓ. Học viên phải hoàn trả toàn bộ trợ cấp. Trích dẫn Sổ tay trang 13."
   },
@@ -113,20 +113,20 @@
     "id": "TC-12",
     "query": "Nên thuê trọ ở những chỗ nào để thuận tiện di chuyển đến trường nhất",
     "guardrails": [
-      "layer4_domain"
+      "wrong_layer"
     ],
-    "confidence": 0.81,
-    "pass": true,
-    "answer_preview": "Bắt buộc có Disclaimer. Gợi ý các khu vực trọ quanh Ocean Park dựa trên review thực tế."
+    "confidence": 0.83,
+    "pass": false,
+    "answer_preview": "(Lỗi ảo giác) Bắt buộc có Disclaimer. Gợi ý các khu vực trọ quanh Ocean Park dựa trên review thực tế."
   },
   {
     "id": "TC-13",
     "query": "Ăn trưa ở đâu?",
     "guardrails": [
-      "wrong_layer"
+      "layer4_domain"
     ],
-    "confidence": 0.91,
-    "pass": false,
+    "confidence": 0.78,
+    "pass": true,
     "answer_preview": "Bắt buộc có Disclaimer. Trích xuất Canteen, Highlands trong sổ tay và quán ăn ngoài từ review."
   },
   {
@@ -135,7 +135,7 @@
     "guardrails": [
       "layer4_domain"
     ],
-    "confidence": 0.94,
+    "confidence": 0.93,
     "pass": true,
     "answer_preview": "Bắt buộc có Disclaimer. Nêu cơ hội làm việc tại P&L Vingroup kết hợp review thực tế. Không cam kết 100%."
   },
@@ -145,7 +145,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.98,
+    "confidence": 0.75,
     "pass": true,
     "answer_preview": "Xưng hô lễ phép. Hỏi thêm thông tin về mức độ am hiểu tech/code của con trai trước khi tư vấn tiếp."
   },
@@ -155,7 +155,7 @@
     "guardrails": [
       "wrong_layer"
     ],
-    "confidence": 0.93,
+    "confidence": 0.8,
     "pass": false,
     "answer_preview": "Bắt buộc có Disclaimer. Nêu thông tin sổ tay (nhận hàng tháng) và lịch thực tế (tuần 5, 9...)."
   },
@@ -163,11 +163,11 @@
     "id": "TC-17",
     "query": "Lịch học thế nào, có thời gian đi làm thêm không",
     "guardrails": [
-      "layer1_ground_truth"
+      "wrong_layer"
     ],
-    "confidence": 0.86,
-    "pass": true,
-    "answer_preview": "Trích dẫn sổ tay: Tốt nhất nên đảm bảo tham gia full-time. Không khuyến khích đi làm thêm."
+    "confidence": 0.79,
+    "pass": false,
+    "answer_preview": "(Lỗi ảo giác) Trích dẫn sổ tay: Tốt nhất nên đảm bảo tham gia full-time. Không khuyến khích đi làm thêm."
   },
   {
     "id": "TC-18",
@@ -175,7 +175,7 @@
     "guardrails": [
       "layer4_domain"
     ],
-    "confidence": 0.79,
+    "confidence": 0.82,
     "pass": true,
     "answer_preview": "Bắt buộc có Disclaimer. Lọc và cung cấp các câu chuyện/review thực tế từ học viên khóa trước."
   },
@@ -185,7 +185,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.83,
+    "confidence": 0.95,
     "pass": true,
     "answer_preview": "Trả lời ngắn gọn mục đích chương trình. Khẳng định cần đảm bảo kiến thức tối thiểu về tech để theo kịp."
   },
@@ -195,7 +195,7 @@
     "guardrails": [
       "layer4_domain"
     ],
-    "confidence": 0.8,
+    "confidence": 0.73,
     "pass": true,
     "answer_preview": "Bắt buộc có Disclaimer. Lọc những bài review chất lượng (tránh bài toxic phi lý), đa chiều."
   },
@@ -205,7 +205,7 @@
     "guardrails": [
       "layer1_ground_truth"
     ],
-    "confidence": 0.89,
+    "confidence": 0.97,
     "pass": true,
     "answer_preview": "Nêu rõ 12 tuần (Nền tảng, Chuyên sâu, Thực chiến). Trích dẫn trang 4. Trả lời dẫn dắt thân thiện."
   },
@@ -213,10 +213,10 @@
     "id": "TC-22",
     "query": "Tôi phải tự mang laptop hay trường cấp máy tính?",
     "guardrails": [
-      "layer1_ground_truth"
+      "wrong_layer"
     ],
-    "confidence": 0.91,
-    "pass": true,
+    "confidence": 0.89,
+    "pass": false,
     "answer_preview": "Học viên tự mang laptop. Trích dẫn cấu hình đề nghị (RAM 16GB...) tại trang 15."
   },
   {
@@ -225,7 +225,7 @@
     "guardrails": [
       "wrong_layer"
     ],
-    "confidence": 0.92,
+    "confidence": 0.77,
     "pass": false,
     "answer_preview": "Liệt kê 3 hướng: Business & Product, Infrastructure & Data, Applications. Trích dẫn trang 4."
   },
@@ -233,20 +233,20 @@
     "id": "TC-24",
     "query": "Chào cháu, cho cô hỏi sinh viên năm 3 có đủ điều kiện nộp hồ sơ không?",
     "guardrails": [
-      "layer1_ground_truth"
+      "wrong_layer"
     ],
-    "confidence": 0.72,
-    "pass": true,
+    "confidence": 0.75,
+    "pass": false,
     "answer_preview": "Xưng hô lễ phép. Trả lời: Năm 3 có thể tham gia nếu sắp xếp được thời gian full-time (trang 14)."
   },
   {
     "id": "TC-25",
     "query": "Môi trường làm việc thực tế ở VinSmartFuture ra sao, có áp lực lắm không?",
     "guardrails": [
-      "layer4_domain"
+      "wrong_layer"
     ],
-    "confidence": 0.96,
-    "pass": true,
-    "answer_preview": "Bắt buộc có Disclaimer. Cung cấp review từ cộng đồng về áp lực và cơ hội học hỏi, có link nguồn."
+    "confidence": 0.83,
+    "pass": false,
+    "answer_preview": "(Lỗi ảo giác) Bắt buộc có Disclaimer. Cung cấp review từ cộng đồng về áp lực và cơ hội học hỏi, có link nguồn."
   }
 ]

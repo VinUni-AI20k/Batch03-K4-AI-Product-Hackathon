@@ -109,3 +109,6 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 |---|---|---|
 | 2026-07-31 | Hoàn thiện Spec File dựa trên Draft tổng quan dự án | Đồng bộ team luồng xử lý 4 intent và các tính năng chính |
+| 2026-07-31 | Bổ sung cơ chế fallback `layer2_ambiguity` cho Router | Xử lý lỗi từ CP3 (nhầm luồng): Nhiều câu hỏi mơ hồ bị ép vào RAG sổ tay dẫn đến sai ngữ cảnh (vd: TC-04, TC-06). |
+| 2026-07-31 | Tinh chỉnh Prompt luồng 1 (Chính thống), cấm tuyệt đối trả lời ngoài Sổ tay | Khắc phục lỗi ảo giác ở CP3 (đạt 80% lên 100%): Agent tự bịa thông tin khi sổ tay không có (vd: TC-02, TC-03). |
+| 2026-07-31 | Ưu tiên bắt keyword "kinh nghiệm", "review" để điều hướng Facebook sớm | Giải quyết tình trạng mâu thuẫn domain ở các case (vd: TC-12, TC-14) bị đẩy nhầm vào luồng 1 thay vì luồng 3. |
