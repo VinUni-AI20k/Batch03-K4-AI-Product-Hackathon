@@ -279,7 +279,7 @@ Vũ Quang Huy
 |-----------|---------|-----------------------------------|
 | CP2 | Thu hẹp phạm vi từ "AI Tutor hỗ trợ học tập" thành "AI Tutor tóm tắt bài giảng". | Sau Problem Scan và khảo sát, 68.4% người dùng cho biết khó tóm tắt slide nhanh khi ôn thi. |
 | CP3 | Thiết kế workflow sử dụng Slide Tool và Glossary Tool thay vì để LLM trả lời trực tiếp. | Giảm hallucination và đảm bảo AI chỉ dựa trên dữ liệu của VLearn. |
-| CP4 | Bổ sung xử lý thiếu Day/Page trước khi gọi tool. | Phát hiện qua nhóm test Missing Information trong Golden Set. |
-| CP4 | Thêm cơ chế từ chối các yêu cầu ngoài phạm vi. | Dựa trên nhóm test Out of Scope và Wrong Boundary. |
-| CP5 | Mở rộng Golden Set từ 20 lên 30 test case. | Bổ sung các tình huống hội thoại nhiều lượt và Prompt Injection để đánh giá prototype đầy đủ hơn. |
-| CP5 | Điều chỉnh prompt để giảm việc gọi tool không cần thiết. | Sau khi kiểm thử nhóm Unnecessary Tool Use. |
+| CP3 | Bổ sung xử lý thiếu Day/Page trước khi gọi tool. | Phát hiện qua nhóm test Missing Information trong Golden Set. |
+| CP3 | Thêm cơ chế từ chối các yêu cầu ngoài phạm vi. | Dựa trên nhóm test Out of Scope và Wrong Boundary. |
+| CP4 | Mở rộng Golden Set từ 20 lên 30 test case. | Bổ sung các tình huống hội thoại nhiều lượt và Prompt Injection để đánh giá prototype đầy đủ hơn. |
+| CP4 | Điều chỉnh prompt để giảm việc gọi tool không cần thiết. | Sau khi kiểm thử nhóm Unnecessary Tool Use. |
