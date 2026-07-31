@@ -40,6 +40,7 @@ export default function App() {
   const [busyItemId, setBusyItemId] = useState(null);
   const [outlookConnecting, setOutlookConnecting] = useState(false);
   const [outlookDeviceCode, setOutlookDeviceCode] = useState(null);
+  const [googleUser, setGoogleUser] = useState({ connected: false, email: null });
 
   const {
     data: events = [],
@@ -58,6 +59,7 @@ export default function App() {
   const refreshConnections = async () => {
     try {
       const data = await getConnections();
+      setGoogleUser({ connected: data.google.connected, email: data.google.email });
       setPlatforms((current) =>
         current.map((platform) => {
           if (platform.id === "gmail") return { ...platform, connected: data.google.connected };
@@ -139,6 +141,10 @@ export default function App() {
   }, [showConnections]);
 
   const sendMessage = async (text) => {
+    if (!googleUser.connected) {
+      notify("Vui lòng đăng nhập Google trước khi trò chuyện với AI.", "error");
+      return;
+    }
     const userMessageId = generateUUID();
     const loadingMessageId = generateUUID();
     setMessages((current) => [
@@ -347,11 +353,42 @@ export default function App() {
     outlookConnecting,
     showConnections,
     setShowConnections,
+    googleUser,
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const authUrl = await getGoogleAuthUrl();
+      window.location.href = authUrl;
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể bắt đầu kết nối Google, kiểm tra backend.", "error");
+    }
+  };
+
+  const handleGoogleLogout = async () => {
+    const confirmed = window.confirm(
+      "Đăng xuất khỏi tài khoản Google?\n\nStudyPulse sẽ không thể đọc email hoặc lịch của bạn cho đến khi bạn kết nối lại.",
+    );
+    if (!confirmed) return;
+    try {
+      await disconnectGoogle();
+      setGoogleUser({ connected: false, email: null });
+      setPlatforms((current) => current.map((p) => (p.id === "gmail" ? { ...p, connected: false } : p)));
+      notify("Đã đăng xuất Google", "info");
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : "Không thể đăng xuất, thử lại sau.", "error");
+    }
   };
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
-      <Header onOpenConnections={() => { setShowConnections(true); setMobileView("dashboard"); }} />
+      <Header
+        googleConnected={googleUser.connected}
+        googleEmail={googleUser.email}
+        onGoogleLogin={handleGoogleLogin}
+        onGoogleLogout={handleGoogleLogout}
+        onOpenConnections={() => { setShowConnections(true); setMobileView("dashboard"); }}
+      />
       <div className="hidden min-h-0 flex-1 lg:flex">
         <ChatPanel messages={messages} onSend={sendMessage} isSending={isSending} />
         <Dashboard {...dashboardProps} />

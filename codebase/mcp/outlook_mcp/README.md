@@ -1,6 +1,6 @@
 # outlook_mcp (Python client, Dockerized Go server)
 
-Unlike `discord_mcp` and `google_calendar_mcp`, this isn't a Python MCP
+Unlike `discord_mcp` and `gmail_mcp`, this isn't a Python MCP
 *server* — it's a thin Python MCP *client* wrapping the existing
 [outlook-local-mcp](https://github.com/desek/outlook-local-mcp) Go server
 (vendored for reference at `../../example/outlook-local-mcp`), run inside
@@ -137,7 +137,7 @@ call (each spawn is a fresh container + a fresh, if silent, auth check).
 
 This server exposes **aggregate domain tools** dispatched by an `operation`
 verb, not one tool per operation (a different pattern from `discord_mcp` /
-`google_calendar_mcp`):
+`gmail_mcp`):
 
 ```python
 await outlook.call_tool("calendar", {"operation": "list_events", "date": "today"})

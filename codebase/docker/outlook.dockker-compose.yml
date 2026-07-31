@@ -1,0 +1,25 @@
+services:
+  outlook-local-mcp:
+    image: ${OUTLOOK_MCP_IMAGE:-ghcr.io/desek/outlook-local-mcp:latest}
+    container_name: outlook-local-mcp
+    hostname: outlook-local-mcp
+    stdin_open: true
+    tty: true
+    env_file:
+      - path: .env.outlook
+        required: false
+    environment:
+      - HOME=/data/auth
+      - OUTLOOK_MCP_TENANT_ID=${OUTLOOK_MCP_TENANT_ID:-common}
+      - OUTLOOK_MCP_CLIENT_ID=${OUTLOOK_MCP_CLIENT_ID:-d3590ed6-52b3-4102-aeff-aad2292ab01c}
+      - OUTLOOK_MCP_DEFAULT_TIMEZONE=${OUTLOOK_MCP_DEFAULT_TIMEZONE:-Asia/Ho_Chi_Minh}
+      - OUTLOOK_MCP_LOG_LEVEL=${OUTLOOK_MCP_LOG_LEVEL:-warn}
+      - OUTLOOK_MCP_MAIL_ENABLED=${OUTLOOK_MCP_MAIL_ENABLED:-true}
+      - OUTLOOK_MCP_MAIL_MANAGE_ENABLED=${OUTLOOK_MCP_MAIL_MANAGE_ENABLED:-false}
+      - OUTLOOK_MCP_READ_ONLY=${OUTLOOK_MCP_READ_ONLY:-true}
+    volumes:
+      - ${OUTLOOK_MCP_VOLUME:-outlook-mcp-auth}:/data/auth
+
+volumes:
+  outlook-mcp-auth:
+    name: ${OUTLOOK_MCP_VOLUME:-outlook-mcp-auth}
