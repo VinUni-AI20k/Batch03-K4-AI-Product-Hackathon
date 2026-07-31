@@ -1,0 +1,29 @@
+[
+  {
+    "id": "quota_001",
+    "input": "Hoc vien vua hoan thanh quiz cuoi bai voi diem dat yeu cau.",
+    "expected": {
+      "keywords": ["credit", "luyen tap"],
+      "reference_answer": "Sau khi hoan thanh quiz dat yeu cau, hoc vien duoc cong them luot hoi o che do luyen tap."
+    },
+    "expected_quota_delta": 2
+  },
+  {
+    "id": "quota_002",
+    "input": "Hoc vien da dat max 20 luot hoi, khong duoc cong them nua.",
+    "expected": {
+      "keywords": ["20", "toi da", "khong cong them"],
+      "reference_answer": "He thong phai giu tran toi da 20 luot hoi va khong vuot quota."
+    },
+    "expected_quota_delta": 0
+  },
+  {
+    "id": "quota_003",
+    "input": "Hoc vien truot quiz, kiem tra xem quota co bi cong sai khong.",
+    "expected": {
+      "keywords": ["truot", "khong cong"],
+      "reference_answer": "Neu hoc vien truot quiz thi khong cong them luot hoi."
+    },
+    "expected_quota_delta": 0
+  }
+]

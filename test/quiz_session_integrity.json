@@ -1,6 +1,6 @@
 {
   "module": "quiz_session_integrity",
-  "entrypoint": "codebase/app.js::openQuiz, fullscreenchange, visibilitychange, handleCheat",
+  "entrypoint": "codebase/app.js::openQuiz, fullscreenchange, visibilitychange, mouseleave, handleCheat",
   "description": "Kiểm tra integrity của phiên làm quiz và quyền kiểm soát của người học. Không biến anti-cheat thành điều kiện để sử dụng trợ lý ôn tập ngoài bài kiểm tra chính thức.",
   "cases": [
     {
@@ -64,6 +64,41 @@
       "expected_status": "OUT_OF_SCOPE",
       "assertions": ["no AI call", "no quiz output", "message says practice-only"],
       "rationale": "Fullscreen UI must not be used to imply that the system supports graded/official assessment."
+    },
+    {
+      "id": "SES-08",
+      "class": "warning_limit",
+      "execution": "browser_manual",
+      "precondition": "Quiz has started and the learner has answered at least one question.",
+      "action": "Leave the quiz area three times, returning to fullscreen after each warning.",
+      "expected": ["cheatCount equals 3", "answers are preserved", "quiz can still continue", "third warning says the next violation will end the quiz"],
+      "assertions": ["no result screen before the fourth distinct violation", "no credit state changes"]
+    },
+    {
+      "id": "SES-09",
+      "class": "warning_limit_exceeded",
+      "execution": "browser_manual",
+      "precondition": "cheatCount equals 3 and quiz is active in fullscreen.",
+      "action": "Trigger one more mouseleave, fullscreen exit, or hidden-tab violation.",
+      "expected": ["cheatCount equals 4", "quiz ends immediately", "answered questions are scored", "unanswered questions are treated as unanswered", "result screen is shown"],
+      "assertions": ["no practice credit is awarded", "result explains that the warning limit was exceeded"]
+    },
+    {
+      "id": "SES-10",
+      "class": "duplicate_browser_events",
+      "execution": "browser_manual",
+      "precondition": "Quiz is active in fullscreen.",
+      "action": "Perform one action that emits visibilitychange and fullscreenchange within one second.",
+      "expected": ["cheatCount increments exactly once"],
+      "rationale": "A single learner action must not consume two warnings because the browser emits multiple events."
+    },
+    {
+      "id": "SES-11",
+      "class": "pointer_leaves_quiz_area",
+      "execution": "browser_manual",
+      "precondition": "Quiz is active in fullscreen.",
+      "action": "Move the pointer outside the document viewport.",
+      "expected": ["one warning is recorded with reason 'Di chuột ra khỏi vùng làm bài'", "quiz answers are preserved", "learner can return to fullscreen and continue"]
     }
   ]
 }
