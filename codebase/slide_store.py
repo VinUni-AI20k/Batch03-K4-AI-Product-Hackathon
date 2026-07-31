@@ -13,6 +13,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pypdf import PdfReader
+import fitz
+import json
+import base64
 
 TOKEN_PATTERN = re.compile(r"[^\W_]{2,}", flags=re.UNICODE)
 
@@ -53,6 +56,11 @@ class SlideStore:
     def __init__(self, slide_dir: Path):
         self.slide_dir = slide_dir
         self._pages: dict[str, list[SlidePage]] = {}
+        self.captions = {}
+        captions_path = slide_dir / "captions.json"
+        if captions_path.exists():
+            with captions_path.open("r", encoding="utf-8") as f:
+                self.captions = json.load(f)
 
     def list_lessons(self) -> list[dict]:
         result = []
@@ -86,6 +94,11 @@ class SlideStore:
         pages = []
         for number, page in enumerate(reader.pages, start=1):
             text = " ".join((page.extract_text() or "").split())
+            
+            caption = self.captions.get(lesson.id, {}).get(str(number), "")
+            if caption:
+                text += f"\n\n[Mô tả nội dung hình ảnh/biểu đồ trên slide:]\n{caption}"
+                
             pages.append(SlidePage(lesson.id, lesson.filename, number, text))
         self._pages[lesson_id] = pages
         return pages
@@ -138,17 +151,29 @@ class SlideStore:
         unique_numbers = list(dict.fromkeys(int(number) for number in page_numbers))
         if not unique_numbers or len(unique_numbers) > 6:
             raise ValueError("Đọc từ 1 đến 6 trang mỗi lần")
+            
+        lesson = self._lesson(lesson_id)
+        pdf_path = self.slide_dir / lesson.filename
+        doc = fitz.open(pdf_path)
+        
         result = []
         for number in unique_numbers:
             if number < 1 or number > len(pages):
                 raise ValueError(f"Trang {number} nằm ngoài khoảng 1–{len(pages)}")
             page = pages[number - 1]
+            
+            # Generate base64 image of the page
+            fitz_page = doc[number - 1]
+            pix = fitz_page.get_pixmap(dpi=150)
+            b64_image = base64.b64encode(pix.tobytes("png")).decode("utf-8")
+            
             result.append(
                 {
                     "lesson_id": page.lesson_id,
                     "filename": page.filename,
                     "page": page.page,
                     "text": page.text[:5000],
+                    "base64_image": b64_image,
                 }
             )
         return result

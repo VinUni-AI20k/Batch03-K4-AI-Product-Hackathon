@@ -53,8 +53,40 @@ def build_graph(store: SlideStore, model: Any | None = None):
     model_with_tools = chat_model.bind_tools(tools)
 
     def call_model(state: MessagesState):
+        messages = list(state["messages"])
+        
+        # Scan for images in ToolMessages
+        images = []
+        for i, msg in enumerate(messages):
+            if getattr(msg, "type", "") == "tool":
+                try:
+                    content = json.loads(msg.content)
+                    has_image = False
+                    if isinstance(content, list):
+                        for item in content:
+                            if isinstance(item, dict) and "base64_image" in item:
+                                images.append(item["base64_image"])
+                                del item["base64_image"]
+                                has_image = True
+                    if has_image:
+                        # Remove base64 from raw text to save tokens
+                        messages[i].content = json.dumps(content, ensure_ascii=False)
+                except Exception:
+                    pass
+
+        # If images found, inject a HumanMessage for Vision
+        if images:
+            from langchain.messages import HumanMessage
+            content_blocks = [{"type": "text", "text": "Đây là hình ảnh của các trang slide bạn vừa truy xuất. Hãy quan sát kỹ để trả lời:"}]
+            for b64 in images:
+                content_blocks.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{b64}"}
+                })
+            messages.append(HumanMessage(content=content_blocks))
+
         response = model_with_tools.invoke(
-            [SystemMessage(content=LESSON_AGENT_SYSTEM_PROMPT), *state["messages"]]
+            [SystemMessage(content=LESSON_AGENT_SYSTEM_PROMPT), *messages]
         )
         return {"messages": [response]}
 
