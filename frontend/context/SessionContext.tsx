@@ -52,7 +52,7 @@ function reducer(state: SessionState, action: Action): SessionState {
       return {
         ...state,
         diagnosis: action.payload,
-        phase: action.payload.needsReteaching ? 'style-time' : 'report',
+        phase: 'diagnosis',
       };
     case 'SET_STYLE_TIME':
       return { ...state, style: action.style, minutesPerDay: action.minutesPerDay };

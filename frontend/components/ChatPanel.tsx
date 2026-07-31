@@ -3,7 +3,7 @@ import { generateRetest } from '../api/client';
 import { useSession } from '../context/SessionContext';
 import MarkdownWithCitations from './shared/MarkdownWithCitations';
 import ProgressLoader from './shared/ProgressLoader';
-import AskPanel from './AskPanel';
+import LearningProgressCard from './shared/LearningProgressCard';
 
 function TutorBubble({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
   return (
@@ -103,9 +103,7 @@ export default function ChatPanel() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div className="flat-card" style={{ flex: 1 }}>
-          <AskPanel />
-        </div>
+        <LearningProgressCard />
       </div>
     </div>
   );
