@@ -201,6 +201,8 @@ const state = {
   recommendations: [],
   recommendationMeta: null,
   conversationContext: [],
+  sessionId: `s${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
+  transcript: [],
   preferenceQuery: "",
   suggestedTopics: [],
   catalogLimit: 12,
@@ -215,6 +217,7 @@ async function init() {
   applyAppearanceSettings(false);
   bindGlobalEvents();
   renderInitialConversation();
+  renderHistory();
   syncOnboardingSelections();
   renderTopicCatalog();
   openOnboarding(1);
@@ -300,7 +303,10 @@ function cacheElements() {
     "newTopicTeam",
     "newTopicProblem",
     "newTopicSkills",
-    "resetDemo",
+    "newChat",
+    "historyList",
+    "historyEmpty",
+    "clearHistory",
     "catalogCsvInput",
     "importCatalogCsv",
     "restoreDefaultCatalog",
@@ -378,7 +384,8 @@ function bindGlobalEvents() {
   });
   refs.suggestForm.addEventListener("submit", submitTopicSuggestion);
 
-  refs.resetDemo.addEventListener("click", resetDemo);
+  refs.newChat.addEventListener("click", startNewSession);
+  refs.clearHistory.addEventListener("click", clearChatHistory);
   refs.importCatalogCsv.addEventListener("click", openCsvPicker);
   refs.catalogCsvInput.addEventListener("change", handleCatalogCsvChange);
   refs.restoreDefaultCatalog.addEventListener("click", restoreDefaultCatalog);
@@ -858,7 +865,150 @@ function recordTurn(role, text) {
   const content = String(text || "").trim();
   if (!content) return;
   const prefix = role === "user" ? "Người dùng" : "Ideora";
+  // Chỉ 8 lượt gần nhất được gửi cho agent (giới hạn ngữ cảnh)...
   state.conversationContext = [...state.conversationContext, `${prefix}: ${content}`].slice(-8);
+  // ...nhưng lịch sử lưu lại thì giữ đủ, không cắt.
+  state.transcript.push({ role, content });
+  saveCurrentSession();
+}
+
+/* ---------- Lịch sử trò chuyện ---------- */
+
+const HISTORY_STORAGE_KEY = "ideora-chat-history";
+const HISTORY_MAX_SESSIONS = 20;
+
+function loadHistory() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "[]");
+    return Array.isArray(raw) ? raw : [];
+  } catch (error) {
+    // localStorage hỏng hoặc bị chặn (private mode) — chạy tiếp không lịch sử.
+    return [];
+  }
+}
+
+function persistHistory(sessions) {
+  try {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(sessions.slice(0, HISTORY_MAX_SESSIONS)));
+  } catch (error) {
+    /* hết quota hoặc bị chặn — bỏ qua, không làm vỡ luồng chat */
+  }
+}
+
+function sessionTitle(transcript) {
+  const firstUser = transcript.find((turn) => turn.role === "user");
+  const raw = (firstUser?.content || "Đoạn chat mới").replace(/\s+/g, " ").trim();
+  return raw.length > 52 ? `${raw.slice(0, 52)}…` : raw;
+}
+
+function saveCurrentSession() {
+  if (!state.transcript.length) return;
+  const sessions = loadHistory().filter((item) => item.id !== state.sessionId);
+  sessions.unshift({
+    id: state.sessionId,
+    title: sessionTitle(state.transcript),
+    savedAt: new Date().toISOString(),
+    turns: state.transcript.length,
+    transcript: state.transcript,
+    recommendations: state.recommendations.map((topic) => ({
+      ma_de: topic.ma_de,
+      ten_de_tai: topic.ten_de_tai,
+    })),
+  });
+  persistHistory(sessions);
+  renderHistory();
+}
+
+function formatSavedAt(iso) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const sameDay = new Date().toDateString() === date.toDateString();
+  const time = date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  return sameDay ? `Hôm nay ${time}` : `${date.toLocaleDateString("vi-VN")} ${time}`;
+}
+
+function renderHistory() {
+  const sessions = loadHistory();
+  refs.historyEmpty.classList.toggle("is-hidden", sessions.length > 0);
+  refs.historyList.innerHTML = sessions
+    .map(
+      (session) => `
+      <li>
+        <button class="history-item${session.id === state.sessionId ? " is-current" : ""}"
+                type="button" data-session-id="${escapeHtml(session.id)}">
+          <span class="history-title">${escapeHtml(session.title)}</span>
+          <span class="history-meta">${escapeHtml(formatSavedAt(session.savedAt))} · ${session.turns} lượt</span>
+        </button>
+      </li>`,
+    )
+    .join("");
+  refs.historyList.querySelectorAll("[data-session-id]").forEach((button) => {
+    button.addEventListener("click", () => openSession(button.dataset.sessionId));
+  });
+}
+
+function openSession(sessionId) {
+  const session = loadHistory().find((item) => item.id === sessionId);
+  if (!session) return;
+
+  // Đang xem chính phiên hiện tại thì không cần dựng lại.
+  if (sessionId === state.sessionId) {
+    switchView("advisor");
+    return;
+  }
+
+  state.sessionId = session.id;
+  state.transcript = session.transcript.slice();
+  state.conversationContext = session.transcript
+    .map((turn) => `${turn.role === "user" ? "Người dùng" : "Ideora"}: ${turn.content}`)
+    .slice(-8);
+  state.recommendations = [];
+  state.recommendationMeta = null;
+
+  refs.chatStream.innerHTML = "";
+  addAssistantMessage(`
+    <p><strong>Đoạn chat đã lưu</strong> · ${escapeHtml(formatSavedAt(session.savedAt))}</p>
+    <p class="history-note">Đây là bản ghi lại nội dung. Bạn nhắn tiếp bên dưới để tiếp tục cuộc trò chuyện này.</p>
+  `);
+  session.transcript.forEach((turn) => {
+    if (turn.role === "user") addUserMessage(escapeHtml(turn.content));
+    else addAssistantMessage(`<p>${escapeHtml(turn.content).replace(/\n/g, "<br />")}</p>`);
+  });
+  if (session.recommendations?.length) {
+    addAssistantMessage(`
+      <p class="history-note">Đề tài đã gợi ý trong phiên này:</p>
+      <ul class="history-topics">
+        ${session.recommendations
+          .map((topic) => `<li><strong>${escapeHtml(topic.ma_de)}</strong> — ${escapeHtml(topic.ten_de_tai)}</li>`)
+          .join("")}
+      </ul>
+    `);
+  }
+  switchView("advisor");
+  renderHistory();
+  refs.chatStream.lastElementChild?.scrollIntoView({ block: "end" });
+}
+
+function startNewSession() {
+  state.sessionId = `s${Date.now()}${Math.random().toString(36).slice(2, 7)}`;
+  state.transcript = [];
+  state.conversationContext = [];
+  state.recommendations = [];
+  state.recommendationMeta = null;
+  renderInitialConversation();
+  switchView("advisor");
+  renderHistory();
+}
+
+function clearChatHistory() {
+  if (!loadHistory().length) return;
+  if (!window.confirm("Xoá toàn bộ lịch sử trò chuyện đã lưu?")) return;
+  try {
+    localStorage.removeItem(HISTORY_STORAGE_KEY);
+  } catch (error) {
+    /* bỏ qua */
+  }
+  renderHistory();
 }
 
 function renderRecommendationLoading() {
@@ -2073,48 +2223,6 @@ function showToast(options) {
   window.clearTimeout(showToast.timeout);
   showToast.timeout = window.setTimeout(() => refs.toast.classList.add("is-hidden"), 3200);
 }
-
-function resetDemo() {
-  state.stage = "profile";
-  state.activeView = "advisor";
-  state.onboardingStep = 1;
-  state.profileLoaded = false;
-  state.profileName = "";
-  state.profileMajor = "";
-  state.ocrProfile = null;
-  state.ocrRunId = null;
-  state.ocrConfirmed = false;
-  state.extractedProjects = [];
-  state.experienceLevel = "unknown";
-  state.interest = null;
-  state.skills = ["Python", "SQL", "Phân tích dữ liệu"];
-  state.teamSize = 4;
-  state.difficulty = "balanced";
-  state.recommendations = [];
-  state.recommendationMeta = null;
-  state.conversationContext = [];
-  state.preferenceQuery = "";
-  state.catalogLimit = 12;
-  refs.profileFileInput.value = "";
-  resetOcrReview();
-  refs.onboardingName.value = "";
-  refs.onboardingMajor.value = "";
-  refs.onboardingFileLabel.textContent = "Tải hồ sơ PDF, DOCX hoặc ảnh";
-  refs.onboardingFileMeta.textContent = "PDF, DOCX, PNG hoặc JPG · tối đa 5 MB";
-  refs.profileEmpty.classList.remove("is-hidden");
-  refs.profileContent.classList.add("is-hidden");
-  refs.fitSummary.classList.add("is-hidden");
-  refs.profilePanel.classList.remove("is-open");
-  closeDetail();
-  closeSuggestModal();
-  clearTopicFilters();
-  updateNav("profile");
-  renderInitialConversation();
-  syncOnboardingSelections();
-  switchView("advisor");
-  openOnboarding(1);
-}
-
 function getProjectTags(project) {
   const corpus = normalize(project.tech_stack || "");
   const candidates = ["Python", "SQL", "FastAPI", "PostgreSQL", "React", "OCR", "Dashboard"];
