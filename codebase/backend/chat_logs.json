@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": "2026-07-31T10:06:28.809931",
+    "student_email": "student1@vinuni.edu.vn",
+    "student_name": "Nguyễn Văn A",
+    "query": "tóm tắt slide",
+    "answer": "[MOCK LLM RESPONSE - Gemini 2.5 Flash]\nNội dung trả lời mẫu dựa trên prompt được cung cấp. Vui lòng điền GEMINI_API_KEY trong file .env để gọi Gemini 2.5 API thực tế.",
+    "page_number": 4,
+    "slide_file": "../data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  },
+  {
+    "timestamp": "2026-07-31T10:07:15.514947",
+    "student_email": "student1@vinuni.edu.vn",
+    "student_name": "Nguyễn Văn A",
+    "query": "Tóm tắt nội dung slide trang 1 cho tôi",
+    "answer": "[MOCK LLM RESPONSE - Gemini 2.5 Flash]\nNội dung trả lời mẫu dựa trên prompt được cung cấp. Vui lòng điền GEMINI_API_KEY trong file .env để gọi Gemini 2.5 API thực tế.",
+    "page_number": 1,
+    "slide_file": "../data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  },
+  {
+    "timestamp": "2026-07-31T10:07:19.541689",
+    "student_email": "student1@vinuni.edu.vn",
+    "student_name": "Nguyễn Văn A",
+    "query": "Tóm tắt nội dung slide trang 2 cho tôi",
+    "answer": "[MOCK LLM RESPONSE - Gemini 2.5 Flash]\nNội dung trả lời mẫu dựa trên prompt được cung cấp. Vui lòng điền GEMINI_API_KEY trong file .env để gọi Gemini 2.5 API thực tế.",
+    "page_number": 2,
+    "slide_file": "../data/vlearn-pack/slides/d1-slide-hackathon.pdf"
+  }
+]

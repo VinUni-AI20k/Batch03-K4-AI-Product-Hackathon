@@ -727,14 +727,22 @@ function sendTutorMsg(e) {
   chatBody.appendChild(thinkingCard);
   chatBody.scrollTop = chatBody.scrollHeight;
 
+  const currentUserStr = localStorage.getItem('currentUser');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+  const studentEmail = currentUser ? currentUser.email : "unknown_student";
+  const studentName = currentUser ? currentUser.name : "Unknown";
+
   // Gọi REST API tới Python RAG Backend hoặc Fallback Direct API
-  fetch('/api/chat', {
+  const apiBase = window.location.origin.includes('localhost:8080') ? '' : 'http://localhost:8080';
+  fetch(`${apiBase}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query: text,
       page_number: currentPage,
-      slide_file: currentPdfPath
+      slide_file: currentPdfPath,
+      student_email: studentEmail,
+      student_name: studentName
     })
   })
   .then(res => {

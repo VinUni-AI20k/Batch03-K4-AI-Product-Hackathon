@@ -1,5 +1,7 @@
 import sys
 import os
+import json
+import datetime
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
@@ -12,7 +14,7 @@ if str(BACKEND_DIR) not in sys.path:
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from agents import PageAwareRAGAgent
@@ -32,10 +34,16 @@ app.add_middleware(
 # Khởi tạo Page-Aware RAG Agent
 rag_agent = PageAwareRAGAgent(provider=DEFAULT_PROVIDER, model_name=DEFAULT_OPENAI_MODEL)
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
 class ChatRequest(BaseModel):
     query: str
     page_number: Optional[int] = 1
     slide_file: Optional[str] = None
+    student_email: Optional[str] = "unknown_student"
+    student_name: Optional[str] = "Unknown"
 
 class SummarizeRequest(BaseModel):
     page_number: int
@@ -57,6 +65,23 @@ def resolve_slide_path(slide_file_input: Optional[str]) -> str:
 
     return str(SLIDES_DIR / "d1-slide-hackathon.pdf")
 
+@app.post("/api/login")
+async def login_endpoint(req: LoginRequest):
+    users_file = BACKEND_DIR / "users.json"
+    if not users_file.exists():
+        raise HTTPException(status_code=500, detail="Không tìm thấy cơ sở dữ liệu người dùng")
+    
+    with open(users_file, "r", encoding="utf-8") as f:
+        users = json.load(f)
+    
+    for user in users:
+        if user["email"].strip().lower() == req.email.strip().lower() and user["password"] == req.password:
+            user_data = user.copy()
+            user_data.pop("password", None)
+            return {"status": "success", "user": user_data}
+            
+    raise HTTPException(status_code=400, detail="Email hoặc mật khẩu không chính xác")
+
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest):
     slide_path = resolve_slide_path(req.slide_file)
@@ -67,6 +92,31 @@ async def chat_endpoint(req: ChatRequest):
         answer = rag_agent.summarize_page(slide_path=slide_path, page_number=req.page_number)
     else:
         answer = rag_agent.ask_question(slide_path=slide_path, query=req.query, page_number=req.page_number)
+
+    # Ghi log cuộc trò chuyện
+    try:
+        log_entry = {
+            "timestamp": datetime.datetime.now().isoformat(),
+            "student_email": req.student_email,
+            "student_name": req.student_name,
+            "query": req.query,
+            "answer": answer,
+            "page_number": req.page_number,
+            "slide_file": req.slide_file
+        }
+        logs_file = BACKEND_DIR / "chat_logs.json"
+        logs_list = []
+        if logs_file.exists():
+            with open(logs_file, "r", encoding="utf-8") as f:
+                try:
+                    logs_list = json.load(f)
+                except Exception:
+                    logs_list = []
+        logs_list.append(log_entry)
+        with open(logs_file, "w", encoding="utf-8") as f:
+            json.dump(logs_list, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Lỗi khi ghi chat log: {e}")
 
     return {"answer": answer, "page_number": req.page_number}
 
@@ -89,6 +139,6 @@ if VLEARN_DIR.exists():
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))
-    print(f"🚀 VLearn Backend đang khởi chạy tại http://localhost:{port}")
+    print(f"[VLearn Backend] Dang khoi chay tai http://localhost:{port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
 
