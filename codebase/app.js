@@ -13,6 +13,8 @@ const S = {
   penSize: 3,
   penColor: '#e0483b',
   moreOpen: false,    // "..." trên toolbar có đang mở thanh phụ không
+  sideManual: false,  // người dùng đã tự bấm ẩn/hiện sidebar chưa (xem fitPanels)
+  tutorManual: false, // như trên, cho panel trợ lý
   notes: [],          // {id,page,kind,quote,text,x,y}
   undo: [],           // {page,label,fn}
   chat: [],
@@ -1244,8 +1246,19 @@ $('#btnClear').onclick = () => {
 
 
 
-$('#tglSidebar').onclick = () => $('#workspace').classList.toggle('side-off');
-$('#tglTutor').onclick = () => openTutor(false);
+$('#tglSidebar').onclick = () => { S.sideManual = true; $('#workspace').classList.toggle('side-off'); };
+$('#tglTutor').onclick = () => { S.tutorManual = true; openTutor(false); };
+
+/* Dưới một bề rộng nhất định thì hai panel ăn hết chỗ của khung xem, nên tự thu gọn.
+   Chỉ tự động khi người dùng CHƯA tự bấm nút ẩn/hiện — bấm rồi thì tôn trọng lựa chọn
+   của họ, không tự bật lại khi resize. */
+function fitPanels() {
+  const w = $('#workspace'), vw = window.innerWidth;
+  if (!S.sideManual) w.classList.toggle('side-off', vw < 1080);
+  if (!S.tutorManual) w.classList.toggle('tutor-off', vw < 860);
+}
+fitPanels();
+addEventListener('resize', fitPanels);
 
 async function updateAiBadge() {
   const badge = document.getElementById('aiModeBadge');
@@ -1279,6 +1292,12 @@ async function showAiStatus() {
     : '<p>Không kết nối được backend. Chạy <code>python3 codebase/server.py</code>.</p>');
 }
 $('#aiModeBadge').onclick = showAiStatus;
+
+// Ba handler này từng có ở nhánh 2 (f86dd28) nhưng bị commit "sync codebase with p2"
+// ghi đè mất, khiến pager dưới cùng và chip số trang bấm không ăn.
+$('#chipPage').onclick = () => openNotesModal();
+$('#prevPage').onclick = () => goPage(S.page - 1);
+$('#nextPage').onclick = () => goPage(S.page + 1);
 
 $('#btnTheme').onclick = () => {
   const dark = document.documentElement.dataset.theme === 'dark';

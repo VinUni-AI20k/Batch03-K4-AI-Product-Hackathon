@@ -5,7 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VLearn · Học liệu môn học</title>
-  <link rel="stylesheet" href="styles.css">
+  <!-- ?v= là cache-buster: đổi chuỗi này mỗi lần sửa CSS/JS thì trình duyệt buộc phải
+       tải lại. Bump cả 3 dòng (styles.css, data.js, app.js) cho đồng bộ. -->
+  <link rel="stylesheet" href="styles.css?v=20260731a">
 </head>
 
 <body>
@@ -19,10 +21,8 @@
     </button>
 
     <a class="brand" href="#" id="brand">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M4 5h7l5 14 5-14h7L20 28h-8z" />
-      </svg>
-      <span class="brand-text">VLearn</span>
+      <img class="brand-mark" src="../logo/vinuni-mark.png" alt="VLearn">
+      <span class="brand-text"><span class="brand-v">V</span>Learn</span>
     </a>
 
     <span class="vsep"></span>
@@ -360,8 +360,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-  <script src="data.js?v=cp3-audit"></script>
-  <script src="app.js?v=cp3-audit"></script>
+  <script src="data.js?v=20260731a"></script>
+  <script src="app.js?v=20260731a"></script>
 </body>
 
 </html>

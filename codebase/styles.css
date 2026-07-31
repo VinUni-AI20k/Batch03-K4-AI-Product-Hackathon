@@ -79,7 +79,7 @@ input{font:inherit}
   height:var(--top-h);display:flex;align-items:center;gap:12px;padding:0 18px;
   background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:60;
 }
-.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;flex:none}
 .brand-mark{width:32px;height:32px;object-fit:contain}
 .brand-text{font-size:23px;font-weight:800;letter-spacing:-.4px;color:var(--accent)}
 .brand-v{color:#e03636}
@@ -167,7 +167,10 @@ input{font:inherit}
 .doc-check.off{color:var(--ink-3);opacity:.45}
 
 /* ---------- VIEWER ---------- */
-.viewer{flex:1;position:relative;min-width:0;background:var(--bg)}
+/* container query đo theo bề rộng THẬT của khung xem, nên thanh công cụ co giãn đúng
+   cả khi người dùng đóng/mở sidebar hay panel trợ lý — @media theo viewport không thấy
+   được hai panel đó. An toàn vì trong .viewer không có phần tử position:fixed nào. */
+.viewer{flex:1;position:relative;min-width:0;background:var(--bg);container:viewer/inline-size}
 
 .rail{
   position:absolute;top:50%;transform:translateY(-50%);z-index:56;
@@ -187,6 +190,9 @@ input{font:inherit}
   display:flex;align-items:center;gap:6px;padding:8px;max-width:calc(100% - 90px);
   background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);
 }
+/* Không cho flex bóp các nhóm nhỏ hơn nội dung của chúng — đó chính là thứ làm các
+   thanh công cụ trông như đè lên nhau khi hẹp. Hẹp thì bớt món, chứ không bóp. */
+.toolbar>*{flex:none}
 .tgroup{display:flex;align-items:center;gap:3px}
 .tsep{width:1px;height:26px;background:var(--line);margin:0 4px}
 .tool{
@@ -208,6 +214,35 @@ input{font:inherit}
 .chip.sm{height:28px;font-size:12px;padding:0 10px}
 .zoom{display:flex;align-items:center;gap:2px}
 .zoom-val{font-size:14px;font-weight:700;min-width:52px;text-align:center;color:var(--ink-2)}
+
+/* Khung xem hẹp dần thì bỏ bớt món theo thứ tự ít quan trọng trước, giữ nguyên
+   4 công cụ chính. Mọi thứ bị ẩn đều còn đường khác dùng được:
+   penUp/penDown trùng thanh trượt NÉT ở subbar; zoom còn Ctrl+lăn chuột;
+   nhãn chữ ẩn đi vẫn còn tooltip (data-tip) và phím tắt r/b/h/s. */
+@container viewer (max-width:1180px){
+  #penUp,#penDown{display:none}
+}
+@container viewer (max-width:1060px){
+  .toolbar .tool>span{display:none}
+  .toolbar .tool{padding:0 11px;gap:0}
+  .toolbar{gap:4px}
+  .tsep{margin:0 2px}
+}
+@container viewer (max-width:880px){
+  #btnDownload,#btnExport{display:none}
+}
+@container viewer (max-width:760px){
+  .toolbar .zoom,.toolbar .zoom+.tsep{display:none}
+}
+@container viewer (max-width:620px){
+  #chipPage,#chipPage+.tsep{display:none}
+  .toolbar{padding:6px}
+}
+/* subbar hẹp thì xuống dòng thay vì tràn ra ngoài */
+@container viewer (max-width:640px){
+  .subbar{flex-wrap:wrap;justify-content:center;max-width:calc(100% - 24px)}
+  #penRange{width:96px}
+}
 
 /* thanh công cụ phụ (Khoanh · Text · Ảnh · Tẩy · màu · độ dày nét) */
 .subbar{
@@ -591,4 +626,19 @@ textarea.note-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--
 @media (max-width:1400px){
   .sidebar{width:320px;flex-basis:320px} .workspace.side-off .sidebar{margin-left:-320px}
   .tutor{width:392px;flex-basis:392px} .workspace.tutor-off .tutor{margin-right:-392px}
+}
+@media (max-width:1200px){
+  .sidebar{width:276px;flex-basis:276px} .workspace.side-off .sidebar{margin-left:-276px}
+  .tutor{width:348px;flex-basis:348px} .workspace.tutor-off .tutor{margin-right:-348px}
+}
+@media (max-width:1000px){
+  .sidebar{width:248px;flex-basis:248px} .workspace.side-off .sidebar{margin-left:-248px}
+  .tutor{width:316px;flex-basis:316px} .workspace.tutor-off .tutor{margin-right:-316px}
+  .topbar{padding:0 12px;gap:8px}
+  .brand-text{display:none}          /* còn logo, đủ nhận diện */
+  .doc-name{font-size:16px}
+}
+@media (max-width:720px){
+  .vsep,.doc-icon{display:none}
+  .doc-sub{display:none}
 }
