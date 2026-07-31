@@ -1,9 +1,20 @@
+# CVRLearn - VLearn AI Tutor Optimization (Nhóm 5 - Zone 4)
+
+## Thành viên & Phân công nhiệm vụ
+- **Trần Tiến Dũng (HV001):** Khai thác dữ liệu (Data Mining & Evidence Analysis).
+- **Hoàng Thị Hà Huyền (HV002):** Kỹ sư AI 1 (Thiết kế prompt hệ thống & Prompt Engineering).
+- **Dương Văn Kiên (HV003):** Kỹ sư AI 2 (Xây dựng bộ Golden Set & AI Evaluation).
+- **Nguyễn Đình Hoàng (HV004):** Lập trình viên (Xây dựng Prototype & Code logic API integration).
+- **Lương Hoàng Minh (HV005):** Quản lý tài liệu (Viết spec.md, khảo sát và Validate với người dùng).
+
+---
+
 # Mini Hackathon AI — Batch 03
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
-- Nhóm: **4-5 người** · zone tối đa 5 nhóm · thi theo lớp
+- Nhóm: **5 người** · zone tối đa 5 nhóm · thi theo lớp
 
 ## Bắt đầu từ đâu?
 
