@@ -94,7 +94,7 @@ def score_case(case: dict[str, Any], result: dict[str, Any], latency_ms: float, 
         required.append("exact_match")
         thresholds.setdefault("exact_match", 1.0)
         
-    is_generative = case.get("suite") in ("quiz_generation", "lesson_qa", "socratic_agent")
+    is_generative = case.get("suite") in ("quiz_generation", "lesson_qa", "socratic_agent", "quiz_quality")
     
     if expected.get("keywords") is not None:
         metrics["keyword_recall"] = round(keyword_recall(answer, expected["keywords"]), 4)

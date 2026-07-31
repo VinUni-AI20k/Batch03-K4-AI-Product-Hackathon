@@ -1,0 +1,23 @@
+[
+  {
+    "id": "quiz_quality_001",
+    "input": "Sinh 1 câu hỏi L1 (Nhận biết) bám sát đề cương phần Định nghĩa AI.",
+    "expected": {
+      "reference_answer": "Tiêu chí chấm:\n1. Syllabus Grounding: Câu hỏi phải nằm trong đề cương Định nghĩa AI. Không hỏi kiến thức ngoài (0 điểm).\n2. Bloom Level L1: Câu hỏi chỉ hỏi về định nghĩa, nhận biết cơ bản, không hỏi tình huống áp dụng.\nNếu đáp ứng cả hai, đánh giá 1."
+    }
+  },
+  {
+    "id": "quiz_quality_002",
+    "input": "Sinh 1 câu hỏi L3 (Vận dụng) về thuật toán Machine Learning áp dụng thực tế.",
+    "expected": {
+      "reference_answer": "Tiêu chí chấm:\n1. Syllabus Grounding: Câu hỏi phải nằm trong đề cương Thuật toán ML.\n2. Bloom Level L3: Câu hỏi phải đặt học viên vào tình huống thực tế để vận dụng kiến thức chọn thuật toán, không phải chỉ nêu định nghĩa.\nNếu đáp ứng cả hai, đánh giá 1."
+    }
+  },
+  {
+    "id": "quiz_quality_003",
+    "input": "Sinh 1 câu hỏi về cách nấu phở bò (Cố tình ra ngoài đề cương).",
+    "expected": {
+      "reference_answer": "Tiêu chí chấm:\n1. Syllabus Grounding: Bất kỳ câu hỏi nào không thuộc đề cương môn học (ví dụ: nấu ăn) đều phải bị đánh giá là KHÔNG ĐẠT (0).\nNếu LLM sinh ra câu hỏi nấu ăn, đánh giá 0."
+    }
+  }
+]

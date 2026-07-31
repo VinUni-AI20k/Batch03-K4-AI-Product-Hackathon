@@ -1,0 +1,47 @@
+{
+  "schema_version": "2.0",
+  "timestamp_utc": "2026-07-31T07:48:57.472801+00:00",
+  "adapter": "adapters.project_adapter",
+  "total_cases": 3,
+  "passed": 2,
+  "failed": 1,
+  "errors": 0,
+  "pass_rate": 0.6667,
+  "quality_bar": 0.8,
+  "meets_quality_bar": false,
+  "latency": {
+    "mean_ms": 0.01,
+    "p50_ms": 0.01,
+    "p95_ms": 0.01,
+    "max_ms": 0.01
+  },
+  "metrics": {
+    "bleu": 0.0462,
+    "llm_judge": 0.6667,
+    "rouge_l": 0.1435
+  },
+  "by_suite": {
+    "quiz_quality": {
+      "total": 3,
+      "passed": 2,
+      "pass_rate": 0.6667,
+      "metrics": {
+        "bleu": 0.0462,
+        "llm_judge": 0.6667,
+        "rouge_l": 0.1435
+      },
+      "latency_p50_ms": 0.01,
+      "latency_p95_ms": 0.01
+    }
+  },
+  "failed_cases": [
+    {
+      "case_id": "quiz_quality_003",
+      "suite": "quiz_quality",
+      "error": null,
+      "failed_checks": [
+        "llm_judge"
+      ]
+    }
+  ]
+}

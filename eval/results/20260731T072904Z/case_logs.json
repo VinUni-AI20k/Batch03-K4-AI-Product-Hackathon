@@ -1,0 +1,48 @@
+[
+  {
+    "case_id": "quiz_quality_001",
+    "suite": "quiz_quality",
+    "tags": [],
+    "input": "Sinh 1 câu hỏi trắc nghiệm kiểm tra sự hiểu biết về bản chất của Deep Learning.",
+    "expected": {
+      "reference_answer": "Tiêu chí chấm: Câu hỏi trắc nghiệm được sinh ra phải kiểm tra kiến thức ĐỊNH HƯỚNG BẢN CHẤT, KHÔNG HỎI TRIVIA (ngày tháng, tên riêng không quan trọng). Đáp án đúng phải rõ ràng, và các đáp án sai phải có tính phân loại (có vẻ hợp lý nhưng sai về bản chất). Không được có 2 đáp án đúng."
+    },
+    "result": {
+      "answer": "Câu hỏi quiz:\nĐặc điểm cốt lõi nào phân biệt Deep Learning với các thuật toán Machine Learning truyền thống?\nA. Deep Learning luôn cần lượng dữ liệu rất nhỏ để huấn luyện.\nB. Deep Learning tự động trích xuất các đặc trưng (features) từ dữ liệu thô thông qua các mạng nơ-ron nhiều lớp.\nC. Deep Learning yêu cầu con người phải định nghĩa trước các luật IF-THEN.\nD. Deep Learning là hệ chuyên gia tĩnh.\nĐáp án đúng: B\nGiải thích: Câu hỏi đánh giá sự hiểu biết về bản chất tự học đặc trưng của Deep Learning so với ML truyền thống."
+    },
+    "latency_ms": 0.01,
+    "error": null,
+    "metrics": {
+      "bleu": 0.0374,
+      "rouge_l": 0.119,
+      "llm_judge": 1.0
+    },
+    "required_checks": {
+      "llm_judge": true
+    },
+    "passed": true
+  },
+  {
+    "case_id": "quiz_quality_002",
+    "suite": "quiz_quality",
+    "tags": [],
+    "input": "Sinh 1 câu hỏi trắc nghiệm về sự kiện hội thảo Dartmouth năm 1956.",
+    "expected": {
+      "reference_answer": "Tiêu chí chấm: Câu hỏi trắc nghiệm được sinh ra phải kiểm tra kiến thức ĐỊNH HƯỚNG BẢN CHẤT, KHÔNG HỎI TRIVIA (ngày tháng, tên riêng không quan trọng). Nếu câu hỏi chỉ thuần túy hỏi năm nào, tên ai, thì ĐÁNH GIÁ LÀ KHÔNG ĐẠT (0). Đáp án đúng phải rõ ràng, và các đáp án sai phải có tính phân loại."
+    },
+    "result": {
+      "answer": "Câu hỏi quiz:\nHội thảo Dartmouth, nơi thuật ngữ Trí tuệ nhân tạo (AI) lần đầu tiên được sử dụng, diễn ra vào năm nào?\nA. 1950\nB. 1956\nC. 1965\nD. 1997\nĐáp án đúng: B\nGiải thích: Hội thảo Dartmouth diễn ra năm 1956."
+    },
+    "latency_ms": 0.01,
+    "error": null,
+    "metrics": {
+      "bleu": 0.0492,
+      "rouge_l": 0.1651,
+      "llm_judge": 0.0
+    },
+    "required_checks": {
+      "llm_judge": false
+    },
+    "passed": false
+  }
+]

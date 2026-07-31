@@ -6,7 +6,7 @@ Hướng: **A — VLearn** · Loại: **Tính năng mới** · Prototype: **Mock
 
 - **Job executor:** học viên vừa hoàn thành một buổi học trên VLearn.
 - **Core JTBD:** sau khi học xong, kiểm tra ý chính chưa nắm để biết cần ôn phần nào trước khi sang bài tiếp theo.
-- **Problem statement:** học viên vừa hoàn thành buổi học nhưng không có phản hồi nhanh, đáng tin về mức hiểu của mình, nên khó ưu tiên nội dung cần ôn và dễ mang lỗ hổng sang bài sau.
+- **Problem statement:** Người học hiện nay đang thiếu động lực ôn tập do hệ thống truyền thống không thể đo lường lỗ hổng kiến thức tức thời; đồng thời, việc lạm dụng AI để 'giải bài hộ' thay vì khơi gợi tư duy đang vô tình tạo ra một thế hệ chỉ biết học vẹt.
 - **Evidence:** khảo sát theo `quiz/survey.md`; CSV phản hồi phải lưu ngoài repo public hoặc trong khu vực được phép.
 
 | Chỉ số evidence bắt buộc | Kết quả |
@@ -42,8 +42,8 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 
 ## §4. Thiết kế
 
-- **Lát cắt một câu:** Một học viên vừa học xong một bài tự làm quiz ôn tập được AI phân bổ lại số câu/độ khó theo từng chủ đề dựa trên năng lực ước lượng của chính học viên đó qua nhiều vòng, có thể hỏi một trợ lý bị giới hạn lượt/token trong lúc làm quiz, để đạt ngưỡng % hiểu bài tối thiểu (threshold) ở mọi chủ đề trước khi chuyển sang bài tiếp theo.
-- **Non-goals:** không tích hợp điểm học phần; không dùng trong đánh giá chính thức (thi/điểm học phần) — trợ lý trong quiz chỉ tồn tại trong chế độ ôn tập không tính điểm; không tạo ngân hàng toàn khóa; không chẩn đoán năng lực dài hạn (chỉ ước lượng theo phiên + học liệu buổi đó); không cấp reward thật khi chưa duyệt; **trợ lý không được tiết lộ trực tiếp đáp án đúng của câu đang làm**; **credit không được cộng dồn vô hạn** — có cap cứng và không thay thế quota nền.
+- **Lát cắt một câu:** Một học viên vừa học xong một bài tự làm quiz ôn tập được AI phân bổ lại số câu/độ khó theo từng chủ đề (đảm bảo câu hỏi bám sát đề cương và có các mức đo lường nhận thức: Nhận biết, Thông hiểu, Vận dụng) dựa trên năng lực ước lượng của chính học viên đó qua nhiều vòng, có thể hỏi một trợ lý bị giới hạn lượt/token trong lúc làm quiz, để đạt ngưỡng % hiểu bài tối thiểu (threshold) ở mọi chủ đề trước khi chuyển sang bài tiếp theo.
+- **Non-goals:** không tích hợp điểm học phần; không dùng trong đánh giá chính thức (thi/điểm học phần) — trợ lý trong quiz chỉ tồn tại trong chế độ ôn tập không tính điểm; không tạo ngân hàng toàn khóa; không chẩn đoán năng lực dài hạn (chỉ ước lượng theo phiên + học liệu buổi đó); không dung túng gian lận — hệ thống cảnh báo rõ ràng khi rời màn hình và tự động hủy bài sau 10 giây hoặc quá 3 lần vi phạm; không cấp reward thật khi chưa duyệt; **trợ lý không được tiết lộ trực tiếp đáp án đúng của câu đang làm**; **credit không được cộng dồn vô hạn** — có cap cứng và không thay thế quota nền.
 - **Phần thật:** AI sinh câu hỏi theo từng vòng bám nguồn (transcript), chấm MCQ deterministic, ước lượng mastery theo topic sau mỗi vòng, agent-trong-quiz trả lời có validator chặn lộ đáp án và lưu trace.
 - **Phần mock:** login, giá trị credit khởi tạo, liên kết LMS/backend thật, quy trình duyệt của giảng viên trước khi công nhận credit là "thật".
 - **Automation:** Conditional/augment, hai tầng quyết định:
@@ -69,11 +69,12 @@ Nhóm cần ghi log quan sát trực tiếp từng sản phẩm trước CP4.
 | G16 — Cho biết hậu quả trước khi hành động | Trước khi dùng 1 lượt hỏi hoặc đổi credit lấy quota, hiển rõ "dùng lượt này trừ bao nhiêu, còn lại bao nhiêu" trước khi học viên xác nhận. |
 | G17 — Quyền kiểm soát | Học viên có thể đóng quiz, xem lại bài hoặc bỏ qua vòng bổ sung bất kỳ lúc nào. |
 
-## §5. Kiểu lỗi — 4 lớp và ≥8 kịch bản
+## §5. Kiểu lỗi — 5 lớp và ≥9 kịch bản
 
 | # | Lớp | Trigger | Hành vi mong muốn | Nguyên tắc |
 |---:|---|---|---|---|
 | 1 | ① Nguồn sự thật | Source ID không tồn tại | Chặn tạo quiz, báo chọn học liệu khác | G10 |
+| 9 | ⑤ Toàn vẹn (Integrity) | Rời khỏi màn hình hoặc thoát Fullscreen | Hiện Modal cảnh báo rõ ràng kèm đếm ngược 10s và số lần vi phạm (tối đa 3 lần) trước khi tự động hủy bài | G16 |
 | 2 | ① Nguồn sự thật | Câu/đáp án không được nguồn hỗ trợ | Validator/chấm tay fail; không tính reward | G11 |
 | 3 | ② Mơ hồ | Chỉ có một đoạn ngắn | Trả insufficient hoặc chỉ tạo khi vẫn đủ 3 ý công bằng | G10 |
 | 4 | ② Mơ hồ | User sai nhưng lý do chưa rõ | Chỉ giải thích đáp án; không suy đoán misconception | G2 |

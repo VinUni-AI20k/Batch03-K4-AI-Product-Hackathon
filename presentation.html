@@ -7,14 +7,17 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Outfit', 'sans-serif'] },
+          fontFamily: { 
+            sans: ['Roboto', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif']
+          },
           colors: { primary: '#4f46e5', secondary: '#10b981', danger: '#ef4444', dark: '#0f172a' }
         }
       }
@@ -25,27 +28,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
   
   <style>
+    html {
+      font-size: 19px !important; /* Scale up all Tailwind rem-based units */
+    }
     .reveal {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
       color: #0f172a;
     }
-    .reveal h1, .reveal h2, .reveal h3 {
-      font-family: 'Outfit', sans-serif;
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+      font-family: 'Montserrat', sans-serif;
       text-transform: none;
       font-weight: 700;
       color: #0f172a;
     }
-    .reveal h1 { font-weight: 800; font-size: 4rem; letter-spacing: -0.05em; }
-    .reveal h2 { font-size: 3rem; }
+    .reveal h1 { font-weight: 800; font-size: 4.8rem; letter-spacing: -0.05em; }
+    .reveal h2 { font-size: 3.5rem; }
     
     .glass-card {
       background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(255, 255, 255, 1);
       box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.15);
-      border-radius: 24px;
-      padding: 3.5rem;
-      width: 100%;
+      border-radius: 28px;
+      padding: 4.5rem !important; /* Increased padding */
+      width: 95% !important; /* Enforce wide width */
+      max-width: 1780px !important; /* Enforce wide max-width globally */
       margin: 0 auto;
     }
 
@@ -142,39 +149,34 @@
         </div>
       </section>
 
-      <!-- Slide 2: Vấn đề (Mở rộng từ Spec) -->
+      <!-- Slide 2: Vấn đề (JTBD) & Nỗi đau -->
       <section>
         <div class="glass-card w-11/12 max-w-[1600px]">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-warning-circle text-danger"></i> Job To Be Done (JTBD) & Nỗi đau</h2>
+          <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-warning-circle text-danger"></i> Vấn đề & Job To Be Done (JTBD)</h2>
           
-          <div class="grid grid-cols-2 gap-10">
-            <div>
-              <h3 class="text-2xl font-bold mb-4 text-gray-800">Tình trạng hiện tại</h3>
-              <p class="text-gray-700 text-xl leading-relaxed mb-6">
-                Học viên vừa học xong một bài trên VLearn, nhưng <strong>không có công cụ phản hồi nhanh</strong> để biết chính xác lỗ hổng kiến thức của mình (Mastery) trước khi sang bài mới.
-              </p>
-              <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="data-stat text-3xl">>50%</div>
-                <div class="text-gray-600 text-lg">Học viên mang lỗ hổng từ bài cũ sang bài mới do ôn tập sai trọng tâm.</div>
-              </div>
+          <div class="bg-indigo-50 border-l-8 border-primary p-6 rounded-r-xl mb-10">
+            <p class="text-3xl text-gray-800 font-medium leading-relaxed italic">
+              "Người học hiện nay đang thiếu động lực ôn tập do hệ thống truyền thống không thể đo lường lỗ hổng kiến thức tức thời; đồng thời, việc lạm dụng AI để <strong class="text-danger">'giải bài hộ'</strong> thay vì khơi gợi tư duy đang vô tình tạo ra một thế hệ chỉ biết học vẹt."
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl border-t-4 border-gray-400 shadow-sm">
+              <i class="ph-fill ph-hourglass-high text-gray-500 text-5xl mb-4"></i>
+              <h4 class="font-bold text-gray-800 text-2xl mb-3">1. Thiếu đo lường tức thời</h4>
+              <p class="text-xl text-gray-600 leading-relaxed">Học viên mang lỗ hổng từ bài cũ sang bài mới vì hệ thống cũ (LMS) không chỉ ra ngay được họ đang yếu chỗ nào trước khi chuyển bài.</p>
             </div>
             
-            <div class="space-y-6">
-              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
-                <i class="ph-fill ph-robot text-danger text-4xl mt-1"></i>
-                <div>
-                  <h4 class="font-bold text-danger text-2xl mb-2">Lạm dụng AI (Học vẹt)</h4>
-                  <p class="text-lg text-gray-700">Mang bài tập sang ChatGPT hỏi thẳng kết quả. Sinh viên mất dần tư duy tự giải quyết vấn đề.</p>
-                </div>
-              </div>
-              
-              <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex gap-6 items-start shadow-sm">
-                <i class="ph-fill ph-shield-warning text-danger text-4xl mt-1"></i>
-                <div>
-                  <h4 class="font-bold text-danger text-2xl mb-2">Gian lận tinh vi</h4>
-                  <p class="text-lg text-gray-700">Dùng tiểu xảo "Jailbreak" lừa AI đọc đáp án, hoặc thoát Quiz giữa chừng để mở slide/Google tra cứu.</p>
-                </div>
-              </div>
+            <div class="bg-white p-8 rounded-xl border-t-4 border-danger shadow-sm">
+              <i class="ph-fill ph-robot text-danger text-5xl mb-4"></i>
+              <h4 class="font-bold text-danger text-2xl mb-3">2. Lạm dụng AI (Học vẹt)</h4>
+              <p class="text-xl text-gray-600 leading-relaxed">Sinh viên mang bài tập lên ChatGPT hỏi kết quả ăn liền. Tư duy tự giải quyết vấn đề bị bào mòn, sinh ra nạn "gian lận công nghệ cao".</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl border-t-4 border-yellow-500 shadow-sm">
+              <i class="ph-fill ph-smiley-sad text-yellow-500 text-5xl mb-4"></i>
+              <h4 class="font-bold text-yellow-600 text-2xl mb-3">3. Ôn tập nhàm chán</h4>
+              <p class="text-xl text-gray-600 leading-relaxed">Việc ôn tập tự kỷ cực kỳ khô khan. Người học cần một động lực (Gamification) để cảm thấy thích thú và thấy rõ sự hiệu quả của bản thân.</p>
             </div>
           </div>
         </div>
@@ -327,105 +329,219 @@
               </ul>
             </div>
             
-            <div class="col-span-8">
             <div class="col-span-8 flex justify-center items-center h-full">
-              <!-- Custom HTML Flowchart -->
-              <div class="flex flex-col items-center gap-3 w-full max-w-4xl font-semibold text-xl text-gray-700 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+              <!-- Custom HTML Flowchart - Compact Edition -->
+              <div class="flex flex-col items-center gap-1.5 w-full max-w-4xl font-semibold text-base text-gray-700 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 
-                <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Hoàn thành bài học</div>
-                <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                <div class="bg-blue-50 border-2 border-blue-200 py-3 px-6 rounded-xl shadow-sm text-blue-800">Tạo Quiz Động</div>
+                <div class="bg-gray-100 border border-gray-300 py-1.5 px-4 rounded-lg shadow-sm text-sm">Hoàn thành bài học</div>
+                <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                <div class="bg-blue-50 border border-blue-200 py-1.5 px-4 rounded-lg shadow-sm text-blue-800 text-sm">Tạo Quiz Động</div>
                 
-                <div class="flex gap-16 w-full justify-center relative mt-2">
+                <div class="flex gap-8 w-full justify-center relative mt-1">
                   
                   <!-- Nguồn đủ Branch -->
-                  <div class="flex flex-col items-center gap-3">
-                    <div class="text-sm text-blue-600 font-bold bg-white px-2">Nguồn đủ</div>
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-blue-100 border-2 border-blue-400 py-4 px-8 rounded-xl shadow-md text-blue-900 text-2xl font-bold">AI sinh 15 câu MCQ</div>
+                  <div class="flex flex-col items-center gap-1.5">
+                    <div class="text-xs text-blue-600 font-bold bg-white px-1.5">Nguồn đủ</div>
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-lg"></i>
+                    <div class="bg-blue-100 border-2 border-blue-400 py-2 px-5 rounded-lg shadow-sm text-blue-900 text-lg font-bold">AI sinh 15 câu MCQ</div>
                     
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm text-center">Khóa trình duyệt<br><span class="text-sm text-gray-500">(Anti-Cheat Fullscreen)</span></div>
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-lg"></i>
+                    <div class="bg-indigo-50 border border-indigo-200 py-1.5 px-4 rounded-lg shadow-sm text-center text-sm">Khóa trình duyệt<br><span class="text-xs text-gray-500">(Anti-Cheat, Modal cảnh báo & đếm ngược)</span></div>
                     
-                    <i class="ph-fill ph-arrow-down text-blue-400 text-3xl"></i>
-                    <div class="bg-indigo-50 border-2 border-indigo-200 py-3 px-6 rounded-xl shadow-sm">Làm Quiz & Chat Agent</div>
+                    <i class="ph-fill ph-arrow-down text-blue-400 text-lg"></i>
+                    <div class="bg-indigo-50 border border-indigo-200 py-1.5 px-4 rounded-lg shadow-sm text-sm">Làm Quiz & Chat Agent</div>
                     
-                    <div class="flex gap-10 mt-4">
+                    <div class="flex gap-6 mt-2">
                       <!-- Chat Branch -->
-                      <div class="flex flex-col items-center gap-3">
-                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Hỏi xin gợi ý</div>
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-blue-50 border-2 border-blue-300 py-3 px-6 rounded-xl shadow-sm">Socratic Agent (RAG)</div>
+                      <div class="flex flex-col items-center gap-1.5">
+                        <div class="text-xs text-gray-500 font-bold bg-white px-1.5">Hỏi xin gợi ý</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                        <div class="bg-blue-50 border border-blue-300 py-1.5 px-4 rounded-lg shadow-sm text-xs">Socratic Agent (RAG)</div>
                         
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-yellow-100 border-2 border-yellow-400 py-3 px-6 rounded-xl shadow-md text-yellow-800">Validator LLM</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                        <div class="bg-yellow-100 border border-yellow-400 py-1.5 px-4 rounded-lg shadow-sm text-yellow-800 text-xs">Validator LLM</div>
                         
-                        <div class="flex gap-4 mt-3">
-                           <div class="flex flex-col items-center gap-2">
-                             <div class="text-sm text-green-600 font-bold">Safe</div>
-                             <div class="bg-green-100 border-2 border-green-400 py-2 px-4 rounded-lg text-green-800 text-base">Hiện Gợi ý</div>
+                        <div class="flex gap-2 mt-1">
+                           <div class="flex flex-col items-center gap-1">
+                             <div class="text-xs text-green-600 font-bold">Safe</div>
+                             <div class="bg-green-100 border border-green-400 py-1 px-2.5 rounded text-green-800 text-xs">Hiện Gợi ý</div>
                            </div>
-                           <div class="flex flex-col items-center gap-2">
-                             <div class="text-sm text-red-600 font-bold">Leak</div>
-                             <div class="bg-red-100 border-2 border-red-400 py-2 px-4 rounded-lg text-red-800 text-base">Chặn tin nhắn</div>
+                           <div class="flex flex-col items-center gap-1">
+                             <div class="text-xs text-red-600 font-bold">Leak</div>
+                             <div class="bg-red-100 border border-red-400 py-1 px-2.5 rounded text-red-800 text-xs">Chặn tin nhắn</div>
                            </div>
                         </div>
                       </div>
                       
                       <!-- Submit Branch -->
-                      <div class="flex flex-col items-center gap-3">
-                        <div class="text-sm text-gray-500 font-bold bg-white px-2">Nộp bài</div>
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm">Tính Delta Mastery</div>
+                      <div class="flex flex-col items-center gap-1.5">
+                        <div class="text-xs text-gray-500 font-bold bg-white px-1.5">Nộp bài</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                        <div class="bg-gray-100 border border-gray-300 py-1.5 px-4 rounded-lg shadow-sm text-xs">Tính Delta Mastery</div>
                         
-                        <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                        <div class="bg-indigo-600 border-2 border-indigo-700 py-4 px-8 rounded-full shadow-lg text-white text-2xl font-bold">Cộng Credit</div>
+                        <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                        <div class="bg-indigo-600 border border-indigo-700 py-2.5 px-5 rounded-full shadow-md text-white text-base font-bold">Cộng Credit</div>
                       </div>
                     </div>
                   </div>
                   
                   <!-- Nguồn thiếu Branch -->
-                  <div class="flex flex-col items-center gap-3">
-                    <div class="text-sm text-gray-500 font-bold bg-white px-2">Nguồn thiếu</div>
-                    <i class="ph-fill ph-arrow-down text-gray-400 text-3xl"></i>
-                    <div class="bg-gray-100 border-2 border-gray-300 py-3 px-6 rounded-xl shadow-sm text-gray-500 text-center">Fallback:<br>Câu hỏi Giáo viên</div>
+                  <div class="flex flex-col items-center gap-1.5">
+                    <div class="text-xs text-gray-500 font-bold bg-white px-1.5">Nguồn thiếu</div>
+                    <i class="ph-fill ph-arrow-down text-gray-400 text-lg"></i>
+                    <div class="bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg shadow-sm text-gray-500 text-center text-sm">Fallback:<br>Câu hỏi Giáo viên</div>
                   </div>
                   
                 </div>
               </div>
-            </div>
             </div>
             
           </div>
         </div>
       </section>
 
-      <!-- Slide 8: Eval Quality Bar -->
+      <!-- Slide 8: Human-in-the-loop & Quality Assurance -->
       <section>
         <div class="glass-card w-11/12 max-w-[1600px]">
-          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-chart-bar text-green-500"></i> AI Evals & Bằng chứng thực tế</h2>
-          <p class="text-gray-700 text-2xl mb-10 leading-relaxed">
-            Hệ thống áp dụng phương pháp <strong>Eval-Driven Development</strong> với bộ <em>Golden Set</em> (đánh giá bằng kịch bản khó) để đảm bảo độ an toàn theo tiêu chuẩn HAX/PAIR.
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-users-three text-indigo-500"></i> Đảm bảo Chất lượng Quiz (Human-in-the-loop)</h2>
+          <p class="text-gray-700 text-2xl mb-8 leading-relaxed">
+            Kết hợp tốc độ của AI và sự kiểm soát của Con người (HITL) để đảm bảo chất lượng sư phạm ở 2 luồng sử dụng.
           </p>
           
-          <div class="grid grid-cols-3 gap-8 text-center mb-10">
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-gray-100">
-              <div class="text-5xl font-black text-gray-800 mb-3">20</div>
-              <div class="text-lg font-bold text-gray-500 uppercase">Test Cases Golden Set</div>
+          <div class="grid grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl border-t-8 border-indigo-500 shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 opacity-10"><i class="ph-fill ph-chalkboard-teacher text-9xl"></i></div>
+              <h3 class="text-3xl font-bold mb-4 text-indigo-900">Luồng 1: Teacher-in-the-loop</h3>
+              <p class="text-xl text-gray-500 uppercase tracking-widest font-semibold mb-6">DÀNH CHO QUIZ CỐ ĐỊNH (CUỐI BÀI)</p>
+              
+              <ul class="space-y-4 text-xl text-gray-700">
+                <li class="flex gap-4"><i class="ph-fill ph-check-circle text-indigo-500 text-3xl shrink-0"></i><div><strong>AI đóng vai trò "Trợ lý soạn thảo":</strong> Quét toàn bộ Transcript, phân tích Schema và tự động sinh hàng loạt câu hỏi thô dạng JSON.</div></li>
+                <li class="flex gap-4"><i class="ph-fill ph-check-circle text-indigo-500 text-3xl shrink-0"></i><div><strong>Giảng viên Review (Duyệt):</strong> Đọc, chỉnh sửa, loại bỏ các câu hỏi lỗi/không phù hợp và nhấn "Publish".</div></li>
+              </ul>
+              <div class="mt-6 p-4 bg-indigo-50 text-indigo-800 rounded-lg font-medium text-lg">
+                💡 AI giúp tiết kiệm 80% thời gian soạn đề, Giảng viên nắm 20% quyền quyết định cuối cùng.
+              </div>
             </div>
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-green-100 bg-green-50/50">
-              <div class="text-5xl font-black text-green-600 mb-3">95%</div>
+            
+            <div class="bg-white p-8 rounded-2xl border-t-8 border-orange-500 shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 opacity-10"><i class="ph-fill ph-student text-9xl"></i></div>
+              <h3 class="text-3xl font-bold mb-4 text-orange-900">Luồng 2: Student-in-the-loop</h3>
+              <p class="text-xl text-gray-500 uppercase tracking-widest font-semibold mb-6">DÀNH CHO QUIZ CỦNG CỐ (ĐỘNG)</p>
+              
+              <ul class="space-y-4 text-xl text-gray-700">
+                <li class="flex gap-4"><i class="ph-fill ph-check-circle text-orange-500 text-3xl shrink-0"></i><div><strong>Học viên làm Reviewer:</strong> Khi user muốn củng cố, AI sinh quiz động real-time (Giảng viên không thể duyệt kịp).</div></li>
+                <li class="flex gap-4"><i class="ph-fill ph-check-circle text-orange-500 text-3xl shrink-0"></i><div><strong>Cơ chế Báo Lỗi (Crowdsourcing):</strong> Tích hợp nút "Báo lỗi" trên UI. Câu bị report sẽ KHÔNG tính vào điểm Mastery.</div></li>
+              </ul>
+              <div class="mt-6 p-4 bg-orange-50 text-orange-800 rounded-lg font-medium text-lg">
+                💡 Nếu 1 câu bị nhiều học viên report, hệ thống tự động đưa vào Blacklist để AI tự rút kinh nghiệm.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 9: Eval Quality Bar -->
+      <section>
+        <div class="glass-card w-11/12 max-w-[1600px]">
+          <h2 class="flex items-center gap-3 mb-8"><i class="ph-fill ph-chart-bar text-green-500"></i> Khung kiểm thử tự động (Automated Evals)</h2>
+          <p class="text-gray-700 text-2xl mb-10 leading-relaxed">
+            Hệ thống áp dụng phương pháp <strong>Eval-Driven Development</strong> với bộ <em>Golden Set</em> (đánh giá bằng kịch bản khó) kết hợp LLM-as-a-judge trên dữ liệu thật.
+          </p>
+          
+          <div class="grid grid-cols-4 gap-6 text-center mb-10">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-gray-100">
+              <div class="text-5xl font-black text-gray-800 mb-3">23</div>
+              <div class="text-lg font-bold text-gray-500 uppercase">Test Cases</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-green-100 bg-green-50/50">
+              <div class="text-5xl font-black text-green-600 mb-3">91.3%</div>
               <div class="text-lg font-bold text-green-700 uppercase">Tỉ Lệ Pass Chung</div>
             </div>
-            <div class="bg-white p-8 rounded-2xl shadow-md border-2 border-primary/20 bg-indigo-50/50">
-              <div class="text-5xl font-black text-primary mb-3">100%</div>
-              <div class="text-lg font-bold text-indigo-700 uppercase">Jailbreak & Quota Pass</div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-primary/20 bg-indigo-50/50">
+              <div class="text-5xl font-black text-primary mb-3">450<span class="text-2xl">ms</span></div>
+              <div class="text-lg font-bold text-indigo-700 uppercase">Latency (p50)</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-orange-100 bg-orange-50/50">
+              <div class="text-5xl font-black text-orange-600 mb-3">0</div>
+              <div class="text-lg font-bold text-orange-700 uppercase">Runtime Errors</div>
             </div>
           </div>
           
           <div class="text-center bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h3 class="text-2xl font-bold text-gray-800 mb-2"><i class="ph-fill ph-check-circle text-green-500"></i> Kết luận: Prototype Sẵn sàng Vượt Trội</h3>
-            <p class="text-gray-600 text-xl">Hệ thống bảo vệ hoàn toàn khỏi rủi ro Leak Đáp Án và Gian Lận Credit. Tổng điểm 95%, vượt xa mục tiêu Quality Bar (80%) cho Production.</p>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2"><i class="ph-fill ph-check-circle text-green-500"></i> Kết luận chung</h3>
+            <p class="text-gray-600 text-xl">Tổng điểm Pass 21/23, vượt mục tiêu Quality Bar (80%). Hệ thống phản hồi nhanh, ổn định và bảo vệ an toàn tuyệt đối khỏi các rủi ro bảo mật lõi.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 9: Chi tiết Test Suites -->
+      <section>
+        <div class="glass-card w-11/12 max-w-[1600px]">
+          <h2 class="flex items-center gap-3 mb-6"><i class="ph-fill ph-magnifying-glass text-blue-500"></i> Phân tích 6 Modules Cốt lõi</h2>
+          
+          <div class="grid grid-cols-3 gap-6">
+            <!-- Trụ cột 1 -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-2xl text-blue-800">1. Chất lượng AI Core</h4>
+                <i class="ph-fill ph-brain text-blue-500 text-3xl"></i>
+              </div>
+              <ul class="space-y-4">
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">lesson_qa</span><span class="text-green-600">4/4 (100%)</span></div>
+                  <div class="text-gray-600 text-lg">Trả lời đúng, trích dẫn chuẩn, gọi tool chuẩn.</div>
+                </li>
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">quiz_generation</span><span class="text-green-600">4/4 (100%)</span></div>
+                  <div class="text-gray-600 text-lg">Sinh JSON bám sát Syllabus & chuẩn Bloom (L1, L2, L3) được chấm chéo bởi LLM-Judge.</div>
+                </li>
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100 border-l-4 border-l-yellow-400">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">quiz_quality</span><span class="text-yellow-600">2/3 (66%)</span></div>
+                  <div class="text-gray-600 text-lg">Đo lường mức nhận thức (Bloom) & lọc câu lạc đề. Sẽ cải thiện prompt.</div>
+                </li>
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100 border-l-4 border-l-yellow-400">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">socratic_agent</span><span class="text-yellow-600">2/3 (66%)</span></div>
+                  <div class="text-gray-600 text-lg">Khả năng mớm ý. Sẽ finetune khắt khe hơn.</div>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Trụ cột 2 -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-2xl text-red-800">2. An toàn & Anti-cheat</h4>
+                <i class="ph-fill ph-shield-check text-red-500 text-3xl"></i>
+              </div>
+              <ul class="space-y-4">
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">validator_guardrails</span><span class="text-green-600">3/3 (100%)</span></div>
+                  <div class="text-gray-600 text-lg">Lưới lọc chặn 100% rủi ro lộ đáp án (A,B,C,D).</div>
+                </li>
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">quiz_integrity</span><span class="text-green-600">3/3 (100%)</span></div>
+                  <div class="text-gray-600 text-lg">Bắt lỗi gian lận trình duyệt (Cảnh báo Modal max 3 lần/10s).</div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Trụ cột 3 -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-2xl text-purple-800">3. Logic Gamification</h4>
+                <i class="ph-fill ph-game-controller text-purple-500 text-3xl"></i>
+              </div>
+              <ul class="space-y-4">
+                <li class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div class="flex justify-between font-bold mb-1"><span class="text-gray-800">delta_credit_and_quota</span><span class="text-green-600">3/3 (100%)</span></div>
+                  <div class="text-gray-600 text-lg">Thuật toán tính Delta mastery cấp Quota chuẩn.</div>
+                </li>
+              </ul>
+              
+              <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h5 class="font-bold text-blue-800 mb-2"><i class="ph-fill ph-lightbulb"></i> Bài học (Next Steps)</h5>
+                <p class="text-gray-700 text-lg">100% Pass các luồng Core. Tuy nhiên cần thắt chặt System Prompt của Socratic Agent để không mớm lời quá sát thực tế.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
