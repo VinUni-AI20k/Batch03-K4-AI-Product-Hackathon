@@ -3,8 +3,11 @@ import os
 import tempfile
 from pathlib import Path
 
-# Đảm bảo Python nhận diện được thư mục gốc của dự án
-ROOT_DIR = Path(__file__).resolve().parent
+# Đảm bảo Python nhận diện được thư mục backend và thư mục gốc của dự án
+BACKEND_DIR = Path(__file__).resolve().parent
+ROOT_DIR = BACKEND_DIR.parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 

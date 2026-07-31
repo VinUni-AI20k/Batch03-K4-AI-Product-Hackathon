@@ -2,8 +2,11 @@ import sys
 import os
 from pathlib import Path
 
-# Thêm thư mục gốc của dự án vào sys.path
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Thêm thư mục backend và thư mục gốc của dự án vào sys.path
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = BACKEND_DIR.parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
