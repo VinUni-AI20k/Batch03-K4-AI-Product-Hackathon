@@ -20,9 +20,11 @@ evidence, not as already-correct teaching instructions.
    [references/lab-model-schema.md](references/lab-model-schema.md).
 5. Read [references/team-workflow-patterns.md](references/team-workflow-patterns.md)
    and assign ownership, handoffs, integration gates, and suggested commits.
-6. Read [references/rendering-contracts.md](references/rendering-contracts.md),
+6. Read [references/workflow-graph-requirements.md](references/workflow-graph-requirements.md)
+   and derive the mandatory Markdown end-to-end team workflow graph from the normalized model.
+7. Read [references/rendering-contracts.md](references/rendering-contracts.md),
    then render the normalized model with `scripts/render_lab_guide.py`.
-7. Validate both the model and artifact with
+8. Validate both the model and artifact with
    `scripts/validate_lab_guide.py`. Fix every error before delivery.
 
 Do not draft the final HTML or Markdown directly from scattered repository
@@ -131,6 +133,9 @@ Markdown must render every phase as a table with exactly these four columns:
 | --- | --- | --- | --- |
 
 Do not replace this table with four repeated subheadings.
+
+Markdown must also render one end-to-end team workflow graph derived from the
+normalized model. Do not add a duplicate graph field to the model.
 
 ## Validate
 

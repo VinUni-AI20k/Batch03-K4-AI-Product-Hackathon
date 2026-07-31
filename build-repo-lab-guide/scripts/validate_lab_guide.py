@@ -149,6 +149,8 @@ def validate_model(model: dict[str, Any]) -> list[str]:
         for path in role.get("files", []):
             if not is_relative_repo_path(path):
                 errors.append(f"{where} has non-portable file path: {path}")
+    if len(role_ids) != len(roles) or None in role_ids or "" in role_ids:
+        errors.append("roles must have unique, non-empty ids")
 
     files = require_list(model, "files", "model", errors)
     file_index: dict[str, dict[str, Any]] = {}
@@ -185,6 +187,7 @@ def validate_model(model: dict[str, Any]) -> list[str]:
     elif re.search(r"(?i)\bsmoke\b", str(phases[0].get("entry_condition", ""))) and "smoke_demo" not in setup_types:
         errors.append("First phase requires a smoke check, but setup has no smoke_demo command")
     task_ids: set[str] = set()
+    phase_ids: set[str] = set()
     for p_index, phase in enumerate(phases):
         where = f"phases[{p_index}]"
         for key in ("id", "title", "minutes", "mode", "entry_condition", "checkpoint"):
@@ -192,6 +195,10 @@ def validate_model(model: dict[str, Any]) -> list[str]:
                 errors.append(f"{where} missing {key}")
         if phase.get("mode") not in PHASE_MODES:
             errors.append(f"{where}.mode must be parallel, sequential, or mixed")
+        phase_id = phase.get("id")
+        if phase_id in phase_ids:
+            errors.append(f"Duplicate phase id: {phase_id}")
+        phase_ids.add(phase_id)
         tasks = require_list(phase, "tasks", where, errors)
         if not tasks:
             errors.append(f"{where} must contain at least one task")
@@ -375,6 +382,15 @@ def validate_artifact(model: dict[str, Any], artifact: Path) -> list[str]:
 
     elif artifact.suffix.lower() == ".md":
         language = model.get("meta", {}).get("language")
+        workflow_heading = (
+            "## Luồng làm việc nhóm đầu-cuối"
+            if language == "vi"
+            else "## End-to-end team workflow"
+        )
+        if text.count(workflow_heading) != 1:
+            errors.append("Markdown needs exactly one end-to-end workflow heading")
+        if len(re.findall(r"^```mermaid\s*$", text, re.M)) != 1:
+            errors.append("Markdown needs exactly one Mermaid workflow graph")
         header = (
             "| Kiến thức | Hướng dẫn | Đầu ra kỳ vọng | Các file cần nộp |"
             if language == "vi"

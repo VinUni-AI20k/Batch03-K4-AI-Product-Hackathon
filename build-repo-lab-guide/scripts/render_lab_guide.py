@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -232,6 +233,95 @@ def code_block(command: str, language: str = "text") -> str:
     return f"```{language}\n{command.rstrip()}\n```"
 
 
+def mermaid_node_id(prefix: str, value: Any) -> str:
+    normalized = re.sub(r"[^A-Za-z0-9_]", "_", str(value))
+    return f"{prefix}_{normalized or 'node'}"
+
+
+def mermaid_label(value: Any) -> str:
+    return str(value if value is not None else "").replace("\\", "\\\\").replace(
+        '"', '\\"'
+    ).replace("\r\n", "<br/>").replace("\n", "<br/>")
+
+
+def build_workflow_graph(model: dict[str, Any]) -> str:
+    language = model.get("meta", {}).get("language", "vi")
+    vi = language == "vi"
+    role_map = {role["id"]: role.get("title", role["id"]) for role in model.get("roles", [])}
+    lines = ["flowchart TD"]
+    declared_nodes: set[str] = set()
+
+    def node(node_id: str, label: str) -> None:
+        if node_id not in declared_nodes:
+            lines.append(f'{node_id}["{mermaid_label(label)}"]')
+            declared_nodes.add(node_id)
+
+    def role_node(role_id: str) -> str:
+        node_id = mermaid_node_id("role", role_id)
+        node(node_id, role_map.get(role_id, role_id))
+        return node_id
+
+    start = "start"
+    node(start, "Bắt đầu" if vi else "Start")
+    previous = start
+    for phase_index, phase in enumerate(model.get("phases", []), start=1):
+        phase_id = phase.get("id", phase_index)
+        entry = mermaid_node_id("entry", phase_id)
+        integration = mermaid_node_id("integration", phase_id)
+        checkpoint = mermaid_node_id("checkpoint", phase_id)
+        collaboration = phase["collaboration"]
+        node(entry, phase.get("entry_condition", ""))
+        node(integration, role_map.get(collaboration["integration_owner"], ""))
+        node(checkpoint, phase.get("checkpoint", ""))
+        lines.append(f"{previous} --> {entry}")
+
+        tasks = phase.get("tasks", [])
+        task_nodes = [
+            mermaid_node_id("task", task.get("id", index))
+            for index, task in enumerate(tasks, start=1)
+        ]
+        for task, task_node in zip(tasks, task_nodes):
+            owner = role_map.get(task.get("owner"), task.get("owner", ""))
+            node(task_node, f"{owner}: {task.get('title', '')}")
+
+        if phase.get("mode") == "sequential":
+            if task_nodes:
+                lines.append(f"{entry} --> {task_nodes[0]}")
+                lines.extend(f"{source} --> {target}" for source, target in zip(task_nodes, task_nodes[1:]))
+        else:
+            lines.extend(f"{entry} --> {task_node}" for task_node in task_nodes)
+
+        handoffs = collaboration.get("handoffs", [])
+        handoff_sources = {handoff.get("from") for handoff in handoffs}
+        for task, task_node in zip(tasks, task_nodes):
+            owner = task.get("owner")
+            if owner in handoff_sources:
+                lines.append(f"{task_node} --> {role_node(owner)}")
+            elif phase.get("mode") != "sequential" or task_node == task_nodes[-1]:
+                lines.append(f"{task_node} --> {integration}")
+
+        handoff_targets: set[str] = set()
+        for handoff in handoffs:
+            source = role_node(handoff.get("from", ""))
+            target_id = handoff.get("to", "")
+            target = role_node(target_id)
+            lines.append(f'{source} -->|"{mermaid_label(handoff.get("output", ""))}"| {target}')
+            handoff_targets.add(target_id)
+        for target_id in handoff_targets:
+            lines.append(f"{role_node(target_id)} --> {integration}")
+
+        lines.append(f"{integration} --> {checkpoint}")
+        previous = checkpoint
+
+    completion = "completion"
+    completion_label = "<br/>".join(model.get("definition_of_done", [])) or (
+        "Hoàn thành" if vi else "Complete"
+    )
+    node(completion, completion_label)
+    lines.append(f"{previous} --> {completion}")
+    return "\n".join(lines)
+
+
 def render_markdown(model: dict[str, Any]) -> str:
     meta = model["meta"]
     language = meta.get("language", "vi")
@@ -353,6 +443,13 @@ def render_markdown(model: dict[str, Any]) -> str:
                 if validation.get("expected"):
                     out.append(f"**{'Kỳ vọng' if vi else 'Expected'}:** {validation['expected']}")
                 out.append("")
+
+    out.extend([
+        "",
+        "## Luồng làm việc nhóm đầu-cuối" if vi else "## End-to-end team workflow",
+        "",
+        code_block(build_workflow_graph(model), "mermaid"),
+    ])
 
     out.extend(["", "## Các phase thực hiện" if vi else "## Execution phases"])
     task_header = (
