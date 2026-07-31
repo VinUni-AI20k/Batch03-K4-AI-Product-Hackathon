@@ -34,8 +34,8 @@
             <div class="doc-info-badge">
                 <div style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border-dark); display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">📖</div>
                 <div>
-                    <div class="doc-name-text" id="current-doc-name">day01_302.pdf</div>
-                    <div class="doc-sub-text" id="current-doc-meta">COMP2010 · Lecture_material_ms2039d0_hnxpxy</div>
+                    <div class="doc-name-text" id="current-doc-name">d1-slide-hackathon.pdf</div>
+                    <div class="doc-sub-text" id="current-doc-meta">COMP2010 · AI & LLM Foundation</div>
                 </div>
             </div>
         </div>
@@ -54,13 +54,16 @@
         <!-- ----------------------------------------------------------------------
              LEFT SIDEBAR (HỌC LIỆU MÔN HỌC)
              ---------------------------------------------------------------------- -->
-        <aside class="sidebar-left">
+        <aside class="sidebar-left" id="sidebar-left">
             <div class="sidebar-header">
-                <div class="book-icon-box">📖</div>
-                <div>
-                    <h2>Học liệu môn học</h2>
-                    <p>Chương, slide và tài liệu đã upload</p>
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                    <div class="book-icon-box">📖</div>
+                    <div>
+                        <h2>Học liệu môn học</h2>
+                        <p>Chương, slide và tài liệu đã upload</p>
+                    </div>
                 </div>
+                <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Thu gọn danh sách học liệu">◀</button>
             </div>
 
             <div class="accordion-list">
@@ -69,10 +72,10 @@
                     <button class="accordion-btn">
                         <div class="acc-left">
                             <div class="play-btn-circle">▶</div>
-                            <span class="acc-title">Day01</span>
+                            <span class="acc-title">Day 01</span>
                         </div>
                         <div class="acc-right">
-                            <span class="acc-meta">2 TÀI LIỆU · PUBLISHED</span>
+                            <span class="acc-meta">1 TÀI LIỆU · PUBLISHED</span>
                             <span class="badge-studying">STUDYING</span>
                             <span class="acc-arrow">▲</span>
                         </div>
@@ -80,78 +83,37 @@
                     
                     <div class="accordion-body">
                         <!-- Active Document Card -->
-                        <div class="doc-card active" data-file="day01_302.pdf">
+                        <div class="doc-card active" data-file="d1-slide-hackathon.pdf">
                             <div>
-                                <div class="doc-card-name">day01_302.pdf</div>
-                                <div class="doc-card-pages">83 trang</div>
+                                <div class="doc-card-name">d1-slide-hackathon.pdf</div>
+                                <div class="doc-card-pages">29 trang</div>
                             </div>
                             <div class="check-circle">✓</div>
-                        </div>
-
-                        <!-- Secondary Document Card -->
-                        <div class="doc-card" data-file="material_mrxpq9zu_t8e6xs.pdf">
-                            <div>
-                                <div class="doc-card-name">material_mrxpq9zu_t8e6xs.p...</div>
-                                <div class="doc-card-pages">32 trang</div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Day02 Module -->
-                <div class="accordion-item" id="acc-day02">
+                <!-- Day02 Module (Expanded & Available) -->
+                <div class="accordion-item expanded" id="acc-day02">
                     <button class="accordion-btn">
                         <div class="acc-left">
                             <div class="play-btn-circle">▶</div>
-                            <span class="acc-title">Day02</span>
+                            <span class="acc-title">Day 02</span>
                         </div>
                         <div class="acc-right">
                             <span class="acc-meta">1 TÀI LIỆU · PUBLISHED</span>
-                            <span class="acc-arrow">▼</span>
+                            <span class="acc-arrow">▲</span>
                         </div>
                     </button>
-                </div>
 
-                <!-- Day03 Module -->
-                <div class="accordion-item" id="acc-day03">
-                    <button class="accordion-btn">
-                        <div class="acc-left">
-                            <div class="play-btn-circle">▶</div>
-                            <span class="acc-title">Day03</span>
+                    <div class="accordion-body">
+                        <div class="doc-card" data-file="d2-slide-hackathon.pdf">
+                            <div>
+                                <div class="doc-card-name">d2-slide-hackathon.pdf</div>
+                                <div class="doc-card-pages">29 trang</div>
+                            </div>
                         </div>
-                        <div class="acc-right">
-                            <span class="acc-meta">2 TÀI LIỆU · PUBLISHED</span>
-                            <span class="acc-arrow">▼</span>
-                        </div>
-                    </button>
-                </div>
-
-                <!-- Day04 Module -->
-                <div class="accordion-item" id="acc-day04">
-                    <button class="accordion-btn">
-                        <div class="acc-left">
-                            <div class="play-btn-circle">▶</div>
-                            <span class="acc-title">Day04</span>
-                        </div>
-                        <div class="acc-right">
-                            <span class="acc-meta">3 TÀI LIỆU · PUBLISHED</span>
-                            <span class="acc-arrow">▼</span>
-                        </div>
-                    </button>
-                </div>
-
-                <!-- Day05 Module -->
-                <div class="accordion-item" id="acc-day05">
-                    <button class="accordion-btn">
-                        <div class="acc-left">
-                            <div class="play-btn-circle">▶</div>
-                            <span class="acc-title">Day05</span>
-                        </div>
-                        <div class="acc-right">
-                            <span class="acc-meta">3 TÀI LIỆU · PUBLISHED</span>
-                            <span class="acc-arrow">▼</span>
-                        </div>
-                    </button>
+                    </div>
                 </div>
 
             </div>
@@ -162,11 +124,14 @@
              ---------------------------------------------------------------------- -->
         <main class="viewer-center">
 
+            <!-- Button Mở Học liệu khi Sidebar bị thu gọn -->
+            <button class="sidebar-expand-btn hidden" id="sidebar-expand-btn" title="Mở danh sách Học liệu">
+                <span>📖</span> Học liệu môn học ❯
+            </button>
+
             <!-- Floating Control Bar -->
             <div class="floating-toolbar">
                 <button class="pill-tool-btn active" id="tool-read">📍 Đọc</button>
-                <button class="pill-tool-btn" id="tool-pen">✏️ Bút</button>
-                <button class="pill-tool-btn" id="tool-highlight">🖍️ Highlight</button>
                 <button class="pill-tool-btn" id="tool-more">..</button>
 
                 <div class="v-line"></div>
@@ -180,46 +145,35 @@
                 </div>
 
                 <div class="v-line"></div>
-                <button class="tool-icon-btn" id="btn-add-note" title="Thêm note">+</button>
-                <button class="tool-icon-btn" id="btn-collapse-stage" title="Thu nhỏ">-</button>
+                <button class="tool-icon-btn" id="btn-add-note" title="Thêm ghi chú">📝</button>
+                <button class="tool-icon-btn" id="btn-view-notes" title="Danh sách ghi chú">📋</button>
                 <button class="tool-icon-btn" id="btn-download-pdf" title="Tải file PDF">📥</button>
                 <button class="tool-icon-btn" id="btn-bookmark" title="Bookmark">🔖</button>
                 <button class="tool-icon-btn" id="btn-undo" title="Undo">↩</button>
-                <button class="tool-icon-btn" id="btn-delete" title="Xóa">🗑</button>
             </div>
 
             <!-- Stage Viewport Area -->
             <div class="stage-area">
-                <button class="side-arrow-btn side-prev" id="side-prev-btn">❮</button>
-
                 <div class="slide-stack">
                     <div class="slide-outer-box">
                         <div class="slide-top-meta">
-                            <span id="slide-page-text">Trang 1 / 83</span>
-                            <span id="slide-file-text">day01_302.pdf</span>
+                            <span id="slide-page-text">Trang 1 / 29</span>
+                            <span id="slide-file-text">d1-slide-hackathon.pdf</span>
                         </div>
 
-                        <!-- Inner Sage Green Slide Card -->
-                        <div class="slide-inner-sage">
-                            <div class="watermark-subtle">SON90751@GMAIL.COM</div>
-                            <div>
-                                <div class="slide-tag-header">AI IN ACTION - Day 1</div>
-                                <h1 class="slide-title-main" id="slide-main-h1">AI & LLM Foundation</h1>
-                                <p class="slide-sub-main" id="slide-sub-p">Bạn đang dùng AI mỗi ngày — nhưng thực sự bên trong nó đang làm gì?</p>
-                            </div>
-                            <div class="slide-instructor" id="slide-instructor-text">Instructor: Mai Anh Nguyen (Blue)</div>
+                        <!-- Real PDF Visual Canvas Viewer -->
+                        <div class="pdf-canvas-container" id="pdf-container">
+                            <canvas id="pdf-render-canvas"></canvas>
                         </div>
                     </div>
+
+                    <!-- Page Nav Footer (Đặt ngay dưới Slide) -->
+                    <div class="bottom-nav-footer">
+                        <button class="foot-arrow-btn" id="foot-prev-btn">❮</button>
+                        <span style="font-size: 0.82rem; font-weight: 700;" id="foot-page-text">Trang 1 / 29</span>
+                        <button class="foot-arrow-btn" id="foot-next-btn">❯</button>
+                    </div>
                 </div>
-
-                <button class="side-arrow-btn side-next" id="side-next-btn">❯</button>
-            </div>
-
-            <!-- Bottom Page Nav Footer -->
-            <div class="bottom-nav-footer">
-                <button class="foot-arrow-btn" id="foot-prev-btn">❮</button>
-                <span style="font-size: 0.8rem; font-weight: 600;" id="foot-page-text">Trang 1 / 83</span>
-                <button class="foot-arrow-btn" id="foot-next-btn">❯</button>
             </div>
 
             <!-- RIGHT EDGE ROBOT DRAWER TOGGLE BUTTON (🤖) -->
@@ -245,22 +199,41 @@
                     Ngữ cảnh: Slide trang 1
                 </div>
 
-                <div class="drawer-chat-body" id="drawer-chat-messages">
-                    <div class="bot-card">
-                        Xin chào! Mình là VLearn Tutor. Bạn có thể bôi đen một đoạn trên slide để hỏi hoặc gửi câu hỏi tự do nhé!
+                <!-- Input Footer Placed Right At The TOP -->
+                <div class="drawer-chat-footer">
+                    <div class="drawer-input-pill">
+                        <input type="text" id="drawer-user-input" placeholder="Hỏi VLearn Tutor về slide này...">
+                        <button class="drawer-send-btn" id="drawer-send-btn">✈</button>
                     </div>
                 </div>
 
-                <div class="drawer-chat-footer">
-                    <div class="drawer-input-pill">
-                        <input type="text" id="drawer-user-input" placeholder="Nhập câu hỏi hoặc bôi đen tài liệu...">
-                        <button class="drawer-send-btn" id="drawer-send-btn">✈</button>
+                <!-- Scrollable Chat Messages Below -->
+                <div class="drawer-chat-body" id="drawer-chat-messages">
+                    <div class="bot-card">
+                        Xin chào! Mình là VLearn Tutor. Bạn có thể gửi câu hỏi trực tiếp để thảo luận về slide nhé!
                     </div>
                 </div>
             </aside>
 
         </main>
 
+    </div>
+
+    <!-- NOTES MODAL POPUP -->
+    <div class="modal-overlay hidden" id="notes-modal">
+        <div class="notes-modal-content">
+            <div class="notes-modal-header">
+                <h3>📋 Ghi Chú Đã Lưu (<span id="modal-doc-name">d1-slide-hackathon.pdf</span>)</h3>
+                <button class="close-modal-btn" id="close-notes-modal-btn">✕</button>
+            </div>
+            <div class="notes-modal-body" id="notes-list-container">
+                <!-- Dynamic notes items rendered here -->
+            </div>
+            <div class="notes-modal-footer">
+                <input type="text" id="new-note-input" placeholder="Viết ghi chú mới cho trang này..." />
+                <button class="add-note-confirm-btn" id="add-note-confirm-btn">+ Thêm Note</button>
+            </div>
+        </div>
     </div>
 
     <!-- Application Script -->
