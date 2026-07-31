@@ -16,7 +16,17 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-STANDARD_KEYS = {"interest", "skills", "team_size", "difficulty", "profile_major"}
+STANDARD_KEYS = {
+    "interest",
+    "skills",
+    "team_size",
+    "difficulty",
+    "profile_major",
+    "experience_level",
+    "profile_projects",
+    "user_query",
+    "conversation_context",
+}
 
 
 def call_api(base_url: str, payload: dict) -> tuple[int, dict | str]:

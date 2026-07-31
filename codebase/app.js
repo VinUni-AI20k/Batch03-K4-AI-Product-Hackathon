@@ -200,6 +200,8 @@ const state = {
   projects: fallbackProjects,
   recommendations: [],
   recommendationMeta: null,
+  conversationContext: [],
+  preferenceQuery: "",
   suggestedTopics: [],
   catalogLimit: 12,
 };
@@ -805,25 +807,36 @@ async function finishOnboarding() {
   renderTopicCatalog();
 }
 
-async function resolveAndRenderRecommendations() {
+async function resolveAndRenderRecommendations({ userQuery = null, fromChat = false } = {}) {
   const loadingBlock = renderRecommendationLoading();
   try {
-    const { recommendations, meta } = await getRecommendationsFromAI();
+    const { recommendations, meta } = await getRecommendationsFromAI(userQuery);
     loadingBlock.remove();
+    if (userQuery) {
+      state.preferenceQuery = userQuery;
+      state.conversationContext = [...state.conversationContext, userQuery].slice(-6);
+    }
     if (!recommendations.length) {
       state.recommendations = [];
       state.recommendationMeta = meta;
-      renderRecommendationEmpty(meta);
+      renderRecommendationEmpty(meta, { fromChat });
+      renderTopicCatalog();
       return;
     }
     state.recommendations = recommendations;
     state.recommendationMeta = meta;
-    renderRecommendations();
+    renderRecommendations({ fromChat });
+    renderTopicCatalog();
   } catch (error) {
     loadingBlock.remove();
-    state.recommendations = getRecommendations();
+    if (userQuery) {
+      state.preferenceQuery = userQuery;
+      state.conversationContext = [...state.conversationContext, userQuery].slice(-6);
+    }
+    state.recommendations = getRecommendations(userQuery);
     state.recommendationMeta = { source: "fallback_rule", error: error.message };
-    renderRecommendations();
+    renderRecommendations({ fromChat });
+    renderTopicCatalog();
   }
 }
 
@@ -846,13 +859,18 @@ function renderRecommendationLoading() {
   return block;
 }
 
-function renderRecommendationEmpty(meta) {
+function renderRecommendationEmpty(meta, { fromChat = false } = {}) {
+  document.querySelectorAll(".recommendation-results-block").forEach((item) => item.remove());
+  const assistantMessage = meta?.assistantMessage
+    ? `<p>${escapeHtml(meta.assistantMessage)}</p>`
+    : "";
   addAssistantMessage(`
+    ${assistantMessage}
     <p>Mình chưa tìm được đề tài đủ khớp với hồ sơ hiện tại${meta?.overallNote ? `: ${escapeHtml(meta.overallNote)}` : "."}</p>
-    <p>Bạn có thể chọn lại lĩnh vực quan tâm, bổ sung thêm kỹ năng, hoặc bấm "Không thấy đề tài phù hợp?" để gửi góp ý đề tài mới.</p>
+    <p>${fromChat ? "Bạn có thể mô tả thêm công nghệ muốn dùng, lĩnh vực hoặc giới hạn độ khó." : "Bạn có thể chọn lại lĩnh vực quan tâm, bổ sung thêm kỹ năng, hoặc gửi góp ý đề tài mới."}</p>
   `);
   const block = document.createElement("div");
-  block.className = "interactive-block";
+  block.className = "interactive-block recommendation-results-block";
   block.innerHTML = `
     <section class="result-actions">
       <button class="button secondary small" id="suggestAfterEmpty" type="button">Không thấy đề tài phù hợp?</button>
@@ -905,6 +923,9 @@ function clearTopicFilters() {
 function getFilteredTopics() {
   const query = normalize(refs.topicSearch.value.trim());
   const queryTokens = query.split(/\s+/).filter(Boolean);
+  const preferenceTokens = normalize(state.preferenceQuery)
+    .split(/\s+/)
+    .filter((token) => token.length > 2);
   const category = refs.topicCategory.value;
   const team = Number(refs.topicTeamFilter.value);
 
@@ -930,10 +951,11 @@ function getFilteredTopics() {
       return matchesQuery && matchesCategory && matchesTeam;
     })
     .map((project) => {
-      const ranking = scoreCatalogProject(project, queryTokens);
+      const ranking = scoreCatalogProject(project, [...queryTokens, ...preferenceTokens]);
       return {
         ...project,
-        match: ranking.score,
+        rankScore: ranking.score,
+        recommendationSource: "catalog_rule",
         reasons: ranking.reasons,
       };
     });
@@ -944,7 +966,7 @@ function getFilteredTopics() {
     if (sort === "za") return String(b.ten_de_tai).localeCompare(String(a.ten_de_tai), "vi");
     if (sort === "code") return String(a.ma_de).localeCompare(String(b.ma_de), "vi", { numeric: true });
     if (sort === "team") return (Number(a.max_team) || 4) - (Number(b.max_team) || 4);
-    return b.match - a.match || String(a.ma_de).localeCompare(String(b.ma_de), "vi", { numeric: true });
+    return b.rankScore - a.rankScore || String(a.ma_de).localeCompare(String(b.ma_de), "vi", { numeric: true });
   });
   return filtered;
 }
@@ -986,7 +1008,9 @@ function scoreCatalogProject(project, queryTokens = []) {
   });
 
   return {
-    score: Math.min(97, Math.max(68, score)),
+    // Internal ordering signal only. It is intentionally not displayed as a
+    // percentage or treated as model confidence.
+    score,
     reasons: reasons.length
       ? reasons.slice(0, 3)
       : [
@@ -1051,7 +1075,7 @@ function topicCardTemplate(project) {
       <p>${escapeHtml(project.mo_ta_bai_toan || project.pain_point || project.quyet_dinh_ai || "")}</p>
       <div class="topic-card-footer">
         <div class="topic-card-tags">
-          ${state.profileLoaded ? `<span class="mini-tag">${project.match}% phù hợp</span>` : ""}
+          ${state.profileLoaded ? `<span class="mini-tag">Khớp theo hồ sơ</span>` : ""}
           ${tags.slice(0, 2).map((tag) => `<span class="mini-tag">${escapeHtml(tag)}</span>`).join("")}
         </div>
         <span class="topic-open">
@@ -1473,40 +1497,10 @@ async function runRecommendationSimulation() {
   addUserMessage(`Nhóm ${state.teamSize} người · Mức ${difficultyLabels[state.difficulty]}`);
   updateNav("results");
   refs.fitSummary.classList.remove("is-hidden");
-
-  const block = document.createElement("div");
-  block.className = "interactive-block active-interactive";
-  block.innerHTML = `
-    <section class="analysis-card">
-      <div class="analysis-head">
-        <span class="analysis-spinner"></span>
-        <div>
-          <strong>Đang đối chiếu hồ sơ với kho đề tài...</strong>
-          <span>Luồng mô phỏng bằng quy tắc cố định, không gọi AI.</span>
-        </div>
-      </div>
-      <div class="analysis-steps">
-        <div class="analysis-step" data-analysis-step="1">So khớp lĩnh vực quan tâm</div>
-        <div class="analysis-step" data-analysis-step="2">Đối chiếu kỹ năng và công nghệ</div>
-        <div class="analysis-step" data-analysis-step="3">Kiểm tra phạm vi nhóm và độ khó</div>
-      </div>
-    </section>
-  `;
-  refs.chatStream.appendChild(block);
-  scrollChat();
-
-  for (let index = 1; index <= 3; index += 1) {
-    await wait(430);
-    block.querySelector(`[data-analysis-step="${index}"]`).classList.add("is-done");
-  }
-
-  await wait(380);
-  state.recommendations = getRecommendations();
-  block.remove();
-  renderRecommendations();
+  await resolveAndRenderRecommendations();
 }
 
-async function getRecommendationsFromAI() {
+async function getRecommendationsFromAI(userQuery = null) {
   const response = await fetch(`${API_BASE}/recommend`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -1516,6 +1510,10 @@ async function getRecommendationsFromAI() {
       team_size: state.teamSize,
       difficulty: state.difficulty,
       profile_major: state.profileMajor || null,
+      experience_level: state.experienceLevel || "unknown",
+      profile_projects: state.extractedProjects.slice(0, 10),
+      user_query: userQuery || null,
+      conversation_context: state.conversationContext.slice(-6),
     }),
   });
 
@@ -1532,7 +1530,7 @@ async function getRecommendationsFromAI() {
       if (!project) return null;
       return {
         ...project,
-        match: null,
+        recommendationSource: "ai",
         reasons: selection.reasons || [],
         riskNote: selection.risk_note || "",
       };
@@ -1545,14 +1543,19 @@ async function getRecommendationsFromAI() {
       source: "ai",
       confidence: payload.confidence || "low",
       overallNote: payload.overall_note || "",
+      assistantMessage: payload.assistant_message || "",
+      appliedSignals: payload.applied_profile_signals || [],
+      candidateCount: payload.candidate_count || 0,
       traceId: payload.trace_id || null,
     },
   };
 }
 
-function getRecommendations() {
+function getRecommendations(userQuery = null) {
   const rule = interestRules[state.interest] || interestRules.data;
-  const skillTokens = state.skills.flatMap((skill) => normalize(skill).split(/\s+/)).filter((token) => token.length > 2);
+  const queryTokens = normalize(userQuery || state.preferenceQuery)
+    .split(/\s+/)
+    .filter((token) => token.length > 2);
 
   const scored = state.projects.map((project, index) => {
     const block = normalize(project.khoi || "");
@@ -1601,18 +1604,22 @@ function getRecommendations() {
 
     if (state.difficulty === "hard" && corpus.includes("machine learning")) score += 5;
     if (state.difficulty === "easy" && corpus.includes("rule engine")) score += 4;
+    queryTokens.forEach((token) => {
+      if (corpus.includes(token)) score += 6;
+    });
 
     score += Math.max(0, 3 - (index % 4));
     return {
       ...project,
-      match: Math.min(97, Math.max(68, score)),
+      rankScore: score,
+      recommendationSource: "fallback_rule",
       reasons: reasons.slice(0, 3),
       skillMatches,
     };
   });
 
   const chosen = [];
-  for (const project of scored.sort((a, b) => b.match - a.match || String(a.ma_de).localeCompare(String(b.ma_de)))) {
+  for (const project of scored.sort((a, b) => b.rankScore - a.rankScore || String(a.ma_de).localeCompare(String(b.ma_de)))) {
     const prefix = String(project.ma_de).split("-")[0];
     if (!chosen.some((item) => String(item.ma_de).startsWith(prefix)) || chosen.length >= 2) {
       chosen.push(project);
@@ -1622,31 +1629,42 @@ function getRecommendations() {
   return chosen;
 }
 
-function renderRecommendations() {
+function renderRecommendations({ fromChat = false } = {}) {
   state.stage = "results";
   const meta = state.recommendationMeta;
   const isFallback = meta?.source === "fallback_rule";
   const isLowConfidence = meta?.source === "ai" && meta?.confidence === "low";
+  const assistantMessage = meta?.assistantMessage
+    ? `<p>${escapeHtml(meta.assistantMessage)}</p>`
+    : "";
+  const appliedSignals = meta?.appliedSignals?.length
+    ? `<p><small>Tín hiệu đã dùng: ${escapeHtml(meta.appliedSignals.join(" · "))}</small></p>`
+    : "";
 
   let introHtml;
   if (isFallback) {
     introHtml = `
-      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong> bằng quy tắc cố định — model AI hiện không phản hồi được (${escapeHtml(meta.error || "lỗi không rõ")}), nên phần xếp hạng và lý do này chưa được model kiểm chứng.</p>
+      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong> bằng bộ xếp hạng dự phòng — model AI hiện không phản hồi được (${escapeHtml(meta.error || "lỗi không rõ")}). Kết quả này chỉ giúp tiếp tục demo và không phải recommendation của model.</p>
     `;
   } else if (isLowConfidence) {
     introHtml = `
+      ${assistantMessage}
       <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài</strong>, nhưng chưa chắc đây là lựa chọn tốt nhất${meta.overallNote ? `: ${escapeHtml(meta.overallNote)}` : " — hồ sơ chưa cho đủ tín hiệu để phân biệt rõ giữa các đề tài."}</p>
       <p>Bạn nên đọc kỹ lý do từng đề tài trước khi chọn, hoặc bổ sung thêm kỹ năng cụ thể để mình xếp hạng chính xác hơn.</p>
+      ${appliedSignals}
     `;
   } else {
     introHtml = `
-      <p>Mình đã tìm thấy <strong>${state.recommendations.length} đề tài phù hợp nhất</strong>. Lý do được model AI sinh ra dựa trên hồ sơ và nội dung từng đề tài — bấm vào từng đề tài để xem chi tiết và rủi ro cần lưu ý.</p>
+      ${assistantMessage}
+      <p>${fromChat ? "Mình đã xếp hạng lại" : "Mình đã tìm thấy"} <strong>${state.recommendations.length} đề tài phù hợp nhất</strong>. Lý do được model AI sinh từ hồ sơ, yêu cầu chat và dữ liệu thật của từng đề tài.</p>
+      ${appliedSignals}
     `;
   }
   addAssistantMessage(introHtml);
 
+  document.querySelectorAll(".recommendation-results-block").forEach((item) => item.remove());
   const block = document.createElement("div");
-  block.className = "interactive-block";
+  block.className = "interactive-block recommendation-results-block";
   block.innerHTML = `
     <section>
       <div class="recommendation-intro">
@@ -1690,10 +1708,10 @@ function renderRecommendations() {
 
 function recommendationCardTemplate(project) {
   const tags = getProjectTags(project);
-  const scoreHtml =
-    project.match === null || project.match === undefined
-      ? `<div class="match-score match-score-ai" title="Xếp hạng bởi model AI, không quy đổi thành %">AI</div>`
-      : `<div class="match-score">${project.match}<span>%</span></div>`;
+  const isAiSourced = project.recommendationSource === "ai";
+  const scoreHtml = isAiSourced
+    ? `<div class="match-score match-score-ai" title="Xếp hạng bởi model AI, không quy đổi thành phần trăm">AI</div>`
+    : `<div class="match-score" title="Xếp hạng dự phòng bằng quy tắc minh bạch">RULE</div>`;
   return `
     <article
       class="recommendation-card"
@@ -1732,24 +1750,37 @@ function openProjectDetail(project, announce = false) {
         "Có thể tận dụng bộ kỹ năng trong hồ sơ.",
         `Phạm vi có thể chia cho nhóm ${state.teamSize} người.`,
       ];
-  const isAiSourced = project.match === null || project.match === undefined;
-  const scoreRowHtml = isAiSourced
-    ? `
+  const isAiSourced = project.recommendationSource === "ai";
+  const isCatalogSourced = project.recommendationSource === "catalog_rule";
+  let scoreRowHtml;
+  if (isAiSourced) {
+    scoreRowHtml = `
     <div class="drawer-score-row">
       <span class="drawer-score drawer-score-ai">AI</span>
       <div>
         <strong>Xếp hạng bởi model AI</strong>
         <span>Lý do bên dưới do model sinh ra từ hồ sơ và nội dung đề tài — không phải điểm số cố định.</span>
       </div>
-    </div>`
-    : `
+    </div>`;
+  } else if (isCatalogSourced) {
+    scoreRowHtml = `
     <div class="drawer-score-row">
-      <span class="drawer-score">${project.match || 88}%</span>
+      <span class="drawer-score drawer-score-ai">HỒ SƠ</span>
       <div>
-        <strong>Mức phù hợp mô phỏng</strong>
-        <span>Tính bằng quy tắc cố định từ câu trả lời của bạn.</span>
+        <strong>Sắp xếp trong Kho đề tài</strong>
+        <span>Dùng tìm kiếm và tín hiệu hồ sơ để sắp xếp; không phải phần trăm hay model confidence.</span>
       </div>
     </div>`;
+  } else {
+    scoreRowHtml = `
+    <div class="drawer-score-row">
+      <span class="drawer-score">RULE</span>
+      <div>
+        <strong>Xếp hạng dự phòng</strong>
+        <span>Dùng tín hiệu hồ sơ để sắp xếp khi model không phản hồi; không phải phần trăm xác suất phù hợp.</span>
+      </div>
+    </div>`;
+  }
 
   refs.detailContent.innerHTML = `
     ${scoreRowHtml}
@@ -1901,7 +1932,7 @@ function submitTopicSuggestion(event) {
   showToast();
 }
 
-function handleTypedMessage() {
+async function handleTypedMessage() {
   const text = refs.chatInput.value.trim();
   if (!text) return;
   refs.chatInput.value = "";
@@ -1909,36 +1940,47 @@ function handleTypedMessage() {
   addUserMessage(escapeHtml(text));
 
   const lower = normalize(text);
-  window.setTimeout(() => {
-    if (!state.profileLoaded) {
-      addAssistantMessage(`
-        <p>Hãy hoàn tất cửa sổ <strong>Thiết lập hồ sơ</strong> trước để mình có đủ thông tin tạo gợi ý.</p>
-      `);
-      window.setTimeout(() => openOnboarding(1), 300);
-      return;
-    }
-
-    if (state.stage !== "results") {
-      addAssistantMessage(`
-        <p>Mình đã ghi nhận câu trả lời. Bạn có thể dùng các lựa chọn ngay phía trên để tiếp tục đến bước gợi ý đề tài.</p>
-      `);
-      return;
-    }
-
-    if (lower.includes("setup") || lower.includes("bat dau") || lower.includes("thuc hien")) {
-      openProjectDetail(state.recommendations[0], true);
-      return;
-    }
-
-    if (lower.includes("de xuat") || lower.includes("y tuong moi")) {
-      openSuggestModal();
-      return;
-    }
-
+  if (!state.profileLoaded) {
     addAssistantMessage(`
-      <p>Trong prototype này, mình dùng câu trả lời dựng sẵn. Bạn có thể <strong>bấm một đề tài</strong> để xem setup, hoặc chọn <strong>Góp ý đề tài</strong> để gửi ý tưởng mới.</p>
+      <p>Hãy hoàn tất cửa sổ <strong>Thiết lập hồ sơ</strong> trước để mình có đủ thông tin tạo gợi ý.</p>
     `);
-  }, 380);
+    window.setTimeout(() => openOnboarding(1), 300);
+    return;
+  }
+
+  if (state.stage !== "results") {
+    addAssistantMessage(`
+      <p>Mình đã ghi nhận câu trả lời. Bạn có thể dùng các lựa chọn ngay phía trên để tiếp tục đến bước gợi ý đề tài.</p>
+    `);
+    return;
+  }
+
+  const isSetupCommand =
+    lower === "setup" ||
+    lower === "bat dau" ||
+    lower.includes("huong dan bat dau") ||
+    lower.includes("cach bat dau");
+  if (isSetupCommand && state.recommendations.length) {
+    openProjectDetail(state.recommendations[0], true);
+    return;
+  }
+
+  if (lower === "gop y de tai" || lower === "y tuong moi") {
+    openSuggestModal();
+    return;
+  }
+
+  refs.chatInput.disabled = true;
+  refs.sendMessage.disabled = true;
+  refs.chatInput.placeholder = "Agent đang xếp hạng lại theo yêu cầu của bạn...";
+  try {
+    await resolveAndRenderRecommendations({ userQuery: text, fromChat: true });
+  } finally {
+    refs.chatInput.disabled = false;
+    refs.sendMessage.disabled = false;
+    refs.chatInput.placeholder = "Bổ sung preference để agent xếp hạng lại...";
+    refs.chatInput.focus();
+  }
 }
 
 function updateProfileSkills() {
@@ -2043,6 +2085,9 @@ function resetDemo() {
   state.teamSize = 4;
   state.difficulty = "balanced";
   state.recommendations = [];
+  state.recommendationMeta = null;
+  state.conversationContext = [];
+  state.preferenceQuery = "";
   state.catalogLimit = 12;
   refs.profileFileInput.value = "";
   resetOcrReview();

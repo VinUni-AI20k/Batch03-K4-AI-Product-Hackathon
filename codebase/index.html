@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="ĐềTài+ — prototype mô phỏng trợ lý chọn đề tài theo hồ sơ, sở thích và kỹ năng."
+      content="ĐềTài+ — trợ lý AI chọn đề tài theo hồ sơ, sở thích, kỹ năng và yêu cầu hội thoại."
     />
     <meta id="themeColor" name="theme-color" content="#fbfaf6" />
     <title>ĐềTài+ · Trợ lý chọn đề tài</title>
@@ -56,7 +56,7 @@
 
         <div class="demo-badge">
           <span class="status-dot"></span>
-          Prototype mô phỏng
+          AI recommender
         </div>
 
         <nav class="flow-nav" aria-label="Các bước">
@@ -145,7 +145,7 @@
                 <path d="M12 3 4.5 6v5c0 4.7 3.2 8.9 7.5 10 4.3-1.1 7.5-5.3 7.5-10V6L12 3Z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
-              Không gửi dữ liệu ra ngoài
+              CV gốc xử lý cục bộ
             </span>
             <button class="icon-button mobile-only" id="mobileProfileToggle" type="button" aria-label="Mở hồ sơ">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -157,7 +157,7 @@
         </header>
 
         <div class="workspace">
-          <section class="chat-panel" aria-label="Cuộc trò chuyện mô phỏng">
+          <section class="chat-panel" aria-label="Cuộc trò chuyện với trợ lý đề tài">
             <div class="chat-heading">
               <div class="assistant-identity">
                 <div class="assistant-avatar" aria-hidden="true">
@@ -212,7 +212,7 @@
                   </svg>
                 </button>
               </div>
-              <p>Đây là luồng phản hồi dựng sẵn để trình diễn UI, không phải chatbot AI thật.</p>
+              <p>Tin nhắn mới sẽ được gửi tới recommendation engine để cập nhật preference và xếp hạng lại.</p>
             </div>
 
             <section class="topic-explorer is-hidden" id="topicExplorer" aria-label="Kho đề tài">
@@ -607,7 +607,7 @@
               <span>✓</span>
               <div>
                 <strong>Đã đủ thông tin để tạo gợi ý</strong>
-                <small>Kết quả được mô phỏng bằng quy tắc cố định từ kho đề tài.</small>
+                <small>Model sẽ dùng hồ sơ đã xác nhận để xếp hạng từ kho đề tài thật.</small>
               </div>
             </div>
 
