@@ -1,3 +1,13 @@
+# 👥 Thông tin thành viên
+
+| STT | Họ và Tên | MSSV | Vai trò (Role) |
+|---|---|---|---|
+| 1 | Nguyễn Tấn Hoàng | 2A202601198 | **Team Lead / AI Engineer** (Đảm nhận build AI) |
+| 2 | Nguyễn Minh Hiếu | 2A202601154 | **Data** (Thu thập data, thử nghiệm sản phẩm) |
+| 3 | Nguyễn Minh Đức | 2A202601946 | **Data** (xử lý data, góp ý kiến trúc Agent) |
+| 4 | Trần Thanh Huyền | 2A202601578 | **Documentation** (Viết tài liệu báo cáo, evidence) |
+| 5 | Đỗ Tú Anh | 2A202601272 | **Documentation** (Viết tài liệu test case, làm survey) |
+
 # 🎓 Vlearn Agent
 
 **Trợ giảng AI cá nhân — open source, self-host.** Học viên chat trên **Telegram / Discord**, gửi slide · video · ghi âm → agent biến thành knowledge base rồi trả lời **có trích nguồn, không bịa**, dạy theo các kỹ thuật học tập đã được khoa học chứng minh.
