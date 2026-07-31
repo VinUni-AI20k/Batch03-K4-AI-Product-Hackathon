@@ -61,7 +61,7 @@ export default function ChatPanel() {
 
   return (
     <div className="clay-card" style={{ display: 'flex', gap: 20 }}>
-      <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span className="clay-badge clay-badge--purple">PHASE 3 · RE-TEACHING</span>
           <span className="text-soft" style={{ fontWeight: 800, fontSize: 13 }}>
@@ -116,7 +116,7 @@ export default function ChatPanel() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <LearningProgressCard />
+        <LearningProgressCard currentIndex={sectionIndex} />
       </div>
     </div>
   );

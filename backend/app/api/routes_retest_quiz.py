@@ -26,9 +26,9 @@ class GenerateRetestQuizRequest(BaseModel):
     session_id: str = Field(..., min_length=1)
     scope: RetestScope
     num_questions: int = Field(..., alias="numQuestions", ge=1)
-    outline: List[RetestOutlineInput] = Field(default_factory=list)
-    filtered_transcript: List[RetestTranscriptInput] = Field(default_factory=list, alias="filteredTranscript")
-    avoid_similar_to: List[str] = Field(default_factory=list, alias="avoidSimilarTo")
+    outline: list[RetestOutlineInput] = Field(default_factory=list)
+    filtered_transcript: list[RetestTranscriptInput] = Field(default_factory=list, alias="filteredTranscript")
+    avoid_similar_to: list[str] = Field(default_factory=list, alias="avoidSimilarTo")
 
     model_config = {"populate_by_name": True}
 
@@ -57,4 +57,6 @@ def post_generate_retest_quiz(payload: GenerateRetestQuizRequest) -> list[Retest
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
     except Exception as error:  # noqa: BLE001 - hide provider details
-        raise HTTPException(status_code=502, detail="Grounded retest generation failed") from error
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=502, detail=f"Grounded retest generation failed: {error}") from error

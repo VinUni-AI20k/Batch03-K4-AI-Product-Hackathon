@@ -63,7 +63,7 @@ export default function StyleTimeSelect() {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
         {diagnosis.weakSections.map((s) => (
           <span key={s.sectionId} className="clay-chip" style={{ cursor: 'default' }}>
-            🌱 {s.sectionTitle} · {Math.round(s.accuracy * 100)}%
+            {s.sectionTitle}
           </span>
         ))}
         {diagnosis.weakSections.length === 0 && (

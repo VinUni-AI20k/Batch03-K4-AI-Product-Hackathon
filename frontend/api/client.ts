@@ -15,6 +15,7 @@ export interface QuizQuestion {
   correctIndex: number;
   /** Present on questions the backend can trace to a transcript segment. */
   sourceRefs?: string[];
+  slideRef?: string;
 }
 
 export interface OutlineEntry {
@@ -277,6 +278,7 @@ export async function generateRetest(
     options: string[];
     correct_index: number;
     source_refs: string[];
+    slide_ref?: string;
   }[];
   const titleFor = new Map(weakSections.map((s) => [s.sectionId, s.sectionTitle]));
 
@@ -288,6 +290,7 @@ export async function generateRetest(
     options: q.options,
     correctIndex: q.correct_index,
     sourceRefs: q.source_refs,
+    slideRef: q.slide_ref,
   }));
 }
 
@@ -302,12 +305,18 @@ export async function submitRetest(
   const afterScore = Math.round((correctCount / retestQuiz.length) * 100);
   const wrongAnswers: WrongAnswer[] = retestQuiz
     .filter((q) => answers[q.id] !== q.correctIndex)
-    .map((q) => ({
-      question: q.prompt,
-      yourAnswer: q.options[answers[q.id] ?? 0] ?? '—',
-      correctAnswer: q.options[q.correctIndex],
-      sourceRef: q.sourceRefs?.length ? `${q.sectionTitle} · ${q.sourceRefs.join(', ')}` : q.sectionTitle,
-    }));
+    .map((q) => {
+      const citations = [
+        ...(q.slideRef ? [`Slide ${q.slideRef}`] : []),
+        ...(q.sourceRefs ?? []),
+      ];
+      return {
+        question: q.prompt,
+        yourAnswer: q.options[answers[q.id] ?? 0] ?? '—',
+        correctAnswer: q.options[q.correctIndex],
+        sourceRef: citations.length ? `${q.sectionTitle} · ${citations.join(', ')}` : q.sectionTitle,
+      };
+    });
   return {
     masteryAchieved: afterScore >= 80,
     beforeScore,

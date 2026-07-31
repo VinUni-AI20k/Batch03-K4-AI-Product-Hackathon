@@ -74,7 +74,6 @@ export default function DiagnosisView() {
             {diagnosis.weakSections.map((section) => (
               <div key={section.sectionId} className="clay-panel" style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
                 <span style={{ fontWeight: 800 }}>{section.sectionTitle}</span>
-                <span className="clay-badge clay-badge--yellow">{Math.round(section.accuracy * 100)}% accuracy</span>
               </div>
             ))}
           </div>
