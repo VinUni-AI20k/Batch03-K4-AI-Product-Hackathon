@@ -28,7 +28,7 @@ function detailMarkup(day) {
       <button class="day-action" type="button" data-action="slides"><span>▤</span><b>Đọc slide</b><small>${day.slides} slide · mở tài liệu bên dưới</small></button>
       ${
         isQuizReady
-          ? `<a class="day-action day-action--quiz" href="../quizzcuoi/"><span>✓</span><b>Kiểm tra sau bài</b><small>Khảo sát nhanh và quiz củng cố</small></a>`
+          ? `<a class="day-action day-action--quiz" href="../quiz/"><span>✓</span><b>Kiểm tra sau bài</b><small>Khảo sát nhanh và quiz củng cố</small></a>`
           : `<button class="day-action" type="button" data-unavailable="quiz"><span>✓</span><b>Kiểm tra sau bài</b><small>Đang được biên soạn</small></button>`
       }
     </div>

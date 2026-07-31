@@ -155,8 +155,7 @@ const state = {
   typeTimer: null,
   isTyping: false,
   communityComments: loadCommunityComments(),
-  replyingTo: null,
-  exitDestination: "lobby"
+  replyingTo: null
 };
 
 const mascotAnimations = {};
@@ -175,12 +174,7 @@ const elements = {
   fullscreenButton: document.querySelector("#fullscreenButton"),
   replayButton: document.querySelector("#replayButton"),
   exitButton: document.querySelector("#exitButton"),
-  courseBackLink: document.querySelector("#courseBackLink"),
   exitDialog: document.querySelector("#exitDialog"),
-  exitDialogTitle: document.querySelector("#exitDialogTitle"),
-  exitDialogMessage: document.querySelector("#exitDialogMessage"),
-  cancelExitButton: document.querySelector("#cancelExitButton"),
-  confirmExitButton: document.querySelector("#confirmExitButton"),
   announcer: document.querySelector("#announcer")
 };
 
@@ -977,20 +971,8 @@ function isAttemptActive() {
   return state.view === "dialogue" || state.view === "question" || state.view === "results";
 }
 
-function configureExitDialog(destination) {
-  const leavingForCourse = destination === "course";
-  elements.exitDialogTitle.textContent = leavingForCourse ? "Về lại khóa học?" : "Thoát khỏi warm-up?";
-  elements.exitDialogMessage.textContent = leavingForCourse
-    ? "Tiến độ của lượt làm hiện tại sẽ bị xoá trước khi bạn quay về trang khóa học."
-    : "Tiến độ của lượt làm hiện tại sẽ bị xoá. Bạn có thể bắt đầu lại từ sảnh chờ.";
-  elements.cancelExitButton.textContent = "Tiếp tục làm bài";
-  elements.confirmExitButton.textContent = leavingForCourse ? "Về khóa học" : "Thoát về sảnh chờ";
-}
-
-function openExitDialog(destination = "lobby") {
+function openExitDialog() {
   if (elements.exitDialog.open) return;
-  state.exitDestination = destination;
-  configureExitDialog(destination);
   clearSceneTimer();
   elements.exitDialog.returnValue = "";
   elements.exitDialog.showModal();
@@ -1004,14 +986,9 @@ function resumeAttemptAfterDialog() {
 }
 
 function confirmExitWarmup() {
-  const destination = state.exitDestination;
   if (elements.exitDialog.open) elements.exitDialog.close();
   clearSceneTimer();
   clearTypeTimer();
-  if (destination === "course") {
-    window.location.assign(elements.courseBackLink.href);
-    return;
-  }
   returnToLobby();
   announce("Đã thoát warm-up và xoá tiến độ lượt làm.");
 }
@@ -1019,12 +996,7 @@ function confirmExitWarmup() {
 elements.primaryAction.addEventListener("click", nextScene);
 elements.replayButton.addEventListener("click", replayDialogue);
 elements.fullscreenButton.addEventListener("click", toggleFullscreen);
-elements.exitButton.addEventListener("click", () => openExitDialog("lobby"));
-elements.courseBackLink.addEventListener("click", (event) => {
-  if (!isAttemptActive()) return;
-  event.preventDefault();
-  openExitDialog("course");
-});
+elements.exitButton.addEventListener("click", openExitDialog);
 elements.exitDialog.addEventListener("close", () => {
   if (elements.exitDialog.returnValue === "confirm") {
     confirmExitWarmup();

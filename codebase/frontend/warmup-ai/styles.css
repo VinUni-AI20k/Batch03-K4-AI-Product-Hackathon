@@ -171,10 +171,6 @@ button:focus-visible {
   color: var(--danger);
 }
 
-.soundless-badge--course {
-  color: var(--sky-deep);
-}
-
 .screen {
   min-height: 0;
   overflow: hidden;

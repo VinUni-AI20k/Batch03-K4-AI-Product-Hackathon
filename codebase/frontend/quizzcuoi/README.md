@@ -7,7 +7,7 @@ Module do Giang khởi tạo, gồm hai màn:
 
 ## Luồng điều hướng
 
-`vlearn-course/` → **Day01 / Kiểm tra sau bài** → `quizzcuoi/index.html` → `cauhoi.html`.
+`vlearn-course/` → **Day01 / Kiểm tra sau bài** → `quiz/` → `cauhoi.html`.
 
 Nút đóng ở màn tự đánh giá quay về cổng VLearn. Nút đóng ở câu hỏi quay lại phần tự đánh giá.
 
@@ -16,9 +16,8 @@ Nút đóng ở màn tự đánh giá quay về cổng VLearn. Nút đóng ở c
 Từ root repo:
 
 ```bash
-python3 -m http.server 8765
+cd codebase/frontend
+python3 -m http.server 4176
 ```
 
-Mở `http://localhost:8765/codebase/frontend/quizzcuoi/`.
-
-Server phải được chạy từ root repository để liên kết quay về VLearn hoạt động.
+Mở `http://localhost:4176/quiz/`.

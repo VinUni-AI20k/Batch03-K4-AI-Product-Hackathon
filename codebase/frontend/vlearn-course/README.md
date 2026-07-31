@@ -7,17 +7,18 @@ Trang tĩnh mô phỏng cổng khóa học VLearn cho COMP2010. Visual của tra
 Từ root repo:
 
 ```bash
-python3 -m http.server 8765
+cd codebase/frontend
+python3 -m http.server 4176
 ```
 
-Mở `http://localhost:8765/` hoặc `http://localhost:8765/codebase/frontend/vlearn-course/`.
-Chạy từ root giúp liên kết sang warm-up, quiz, PDF và transcript hoạt động đúng.
+Mở `http://localhost:4176/vlearn-course/`.
+Chạy từ `codebase/frontend` giúp liên kết sang warm-up và quiz hoạt động đúng.
 
 ## Luồng
 
 - Click một Day để mở các hành động.
-- Day01 → **Chuẩn bị trước buổi học** dẫn tới `../warmup-ai/index.html`.
+- Day01 → **Chuẩn bị trước buổi học** dẫn tới `../warmup-ai/`.
 - **Đọc slide** sổ ngăn tài liệu bên dưới; PDF/transcript trỏ tới file hiện có trong `data/vlearn-pack/`.
-- Day01 → **Kiểm tra sau bài** dẫn tới phần tự đánh giá và quiz tại `../quizzcuoi/index.html`.
+- Day01 → **Kiểm tra sau bài** dẫn tới phần tự đánh giá và quiz tại `../quiz/`.
 
 Day02–Day06 giữ cùng cấu trúc và hiển thị trạng thái đang biên soạn cho các hoạt động chưa có nội dung.

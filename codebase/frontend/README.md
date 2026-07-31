@@ -10,18 +10,18 @@ Trước khi sửa hoặc thêm giao diện, đọc [`AGENTS.md`](./AGENTS.md). 
 
 ## Chạy toàn bộ frontend
 
-Chạy server từ **root của repository**, không chạy riêng trong từng thư mục UI:
+Chạy một server duy nhất từ thư mục `codebase/frontend`:
 
 ```bash
-python3 -m http.server 8765
+cd codebase/frontend
+python3 -m http.server 4176
 ```
 
-Sau đó chỉ cần mở:
+Sau đó các route chuẩn là:
 
-- Cửa vào duy nhất: `http://localhost:8765/`
-- VLearn: `http://localhost:8765/codebase/frontend/vlearn-course/`
-- Warm-up: `http://localhost:8765/codebase/frontend/warmup-ai/`
-- Kiểm tra sau bài: `http://localhost:8765/codebase/frontend/quizzcuoi/`
+- VLearn: `http://localhost:4176/vlearn-course/`
+- Warm-up: `http://localhost:4176/warmup-ai/`
+- Kiểm tra sau bài: `http://localhost:4176/quiz/`
 
 Các màn hình liên kết với nhau bằng đường dẫn tương đối. Không hard-code
 `localhost`, port hoặc domain trong source frontend; nhờ vậy cùng một luồng hoạt
