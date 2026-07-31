@@ -1,0 +1,49 @@
+single-turn conversations: 309
+===== C0096 T0558
+STUDENT: (Trang 13, đoạn được chọn: "Trụ Cột Responsible AI") Giải thích đoạn bôi đen ở Trang 13.
+TUTOR: Đoạn này liệt kê 5 trụ cột chính nhằm đảm bảo việc phát triển và vận hành AI có trách nhiệm, cần được cụ thể hóa thành các quyết định sản phẩm, yêu cầu kỹ thuật và đánh giá rủi ro [trang 13]:  1.  **K
+citations: [13]
+===== C0025 T0708
+STUDENT: (Trang 35, đoạn được chọn: "Multi-head:") Giải thích đoạn bôi đen ở Trang 35.
+TUTOR: Trong cơ chế Multi-head, thay vì chỉ có một cơ chế chú ý (attention) duy nhất, mô hình sử dụng nhiều "con mắt" chuyên môn hoạt động song song để tập trung vào các khía cạnh khác nhau của câu cùng một 
+citations: [35]
+===== C0252 T1028
+STUDENT: (Trang 3, đoạn được chọn: "tóm tắt những phần cốt lõi của slide này, những phần quan trongk") tóm tắt những phần cốt lõi của slide này, những phần qua
+TUTOR: Dựa trên nội dung bài học, dưới đây là những phần cốt lõi và quan trọng nhất về chủ đề ReAct agent [trang 42]:  *   **Định nghĩa về Agent:** Agent không chỉ đơn thuần là một chatbot thông minh hơn, mà
+citations: [42]
+===== C0220 T0939
+STUDENT: (Trang 9, đoạn được chọn: "Tìm vé HAN → HCM dưới 2 triệu, rồi gợi ý mang gì nếu trời mưa.") con agent nó sẽ làm gì
+TUTOR: Để thực hiện yêu cầu "Tìm vé HAN → HCM dưới 2 triệu, rồi gợi ý mang gì nếu trời mưa", một agent sử dụng mô hình ReAct (Reason + Act) sẽ hoạt động theo quy trình lặp đi lặp lại như sau:  1.  **Thought 
+citations: []
+===== C0202 T0660
+STUDENT: (Trang 11, đoạn được chọn: "System prom") Giải thích đoạn bôi đen ở Trang 11.
+TUTOR: "System prompt" là thành phần dùng để thiết lập các quy tắc cốt lõi, phạm vi hành vi (boundary), và cấu trúc đầu ra (output contract) cho một AI agent hoặc trợ lý ảo [trang 11].  Khác với instruction 
+citations: [11, 25, 27]
+===== C0127 T1027
+STUDENT: (Trang 29, đoạn được chọn: "Hãy giải thích slide 21 đến slide 32. Hướng dẫn tôi chi tiết cách hoàn thành bài lab và cách nộp") Hãy giải thích slide 21
+TUTOR: Xin lỗi, tôi không thể tìm thấy nội dung chi tiết của các slide từ 21 đến 32 hoặc hướng dẫn cụ thể về bài lab và cách nộp trong dữ liệu hiện có của ngày học này.  Vui lòng kiểm tra lại xem tài liệu đã
+citations: []
+
+### turns with non-empty citations (for golden set - grounded cases) ###
+count grounded turns: 679
+--- C0088 T0351 citations: [12]
+Slide này nhấn mạnh tầm quan trọng của việc **thấu hiểu bản chất vấn đề trước khi đề xuất bất kỳ giải pháp nào** [trang 12].  Thay vì vội vàng đưa ra đáp án, bạn cần đặt câu hỏi để
+--- C0467 T0184 citations: [28, 29]
+"Quick Problem Card" là một công cụ giúp bạn định hình và làm rõ một bài toán kinh doanh hoặc kỹ thuật một cách súc tích trước khi tìm giải pháp [trang 28]. Nó bao gồm 5 thành phần
+--- C0070 T1050 citations: [12, 27, 36, 52, 65, 69]
+Dựa trên nội dung các slide bài giảng, buổi học này tập trung vào các kiến thức nền tảng về LLM, cách tối ưu hóa tương tác với AI và lộ trình phát triển từ mô hình ngôn ngữ đến các
+--- C0504 T0608 citations: [11]
+Việc xác định ai là người được phục vụ bởi giải pháp AI trong bối cảnh lớp học quy mô lớn tại VinUniversity tập trung vào hai nhóm đối tượng chính, nhằm tạo ra sự hỗ trợ cộng hưởng
+--- C0373 T0891 citations: [2]
+Câu hỏi này nhằm giúp bạn phân biệt rõ ràng giữa một chatbot thông thường và một agent (tác nhân) thông minh.  *   **Chatbot (như ChatGPT ở dạng cơ bản):** Tập trung vào việc tạo r
+
+### turns with empty citations but move=review_concept (risk of fabrication, class 1) ###
+count: 448
+--- C0029 T0524
+Chào bạn, tôi có thể đọc và hỗ trợ bạn giải thích nội dung các slide của môn học.  Tuy nhiên, tôi đã kiểm tra lại tài liệu hiện có và nhận thấy slide số 44 không tồn tại hoặc không chứa thông tin tron
+--- C0029 T0200
+Xin chào! Với tư cách là trợ giảng AI của khóa học, tôi tập trung hỗ trợ bạn giải đáp các khái niệm chuyên môn liên quan đến bài giảng. Câu hỏi về thời gian thực tế hiện tại nằm ngoài phạm vi tài liệu
+--- C0078 T0078
+Chào bạn, rất vui được hỗ trợ bạn.  Dựa trên nội dung tài liệu về ngày học này, khái niệm "kỹ thuật Prompt Engineering" chủ yếu tập trung vào việc thiết kế cấu trúc các yêu cầu gửi tới mô hình AI để đ
+--- C0151 T1256
+Trong ngữ cảnh kỹ thuật, từ "overkill" dùng để chỉ việc sử dụng một phương pháp, công cụ hoặc kỹ thuật phức tạp hơn mức cần thiết để giải quyết một vấn đề cụ thể.  Khi tài liệu nói "CoT (Chain-of-Thou
