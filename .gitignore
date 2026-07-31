@@ -5,6 +5,10 @@ node_modules/
 
 # Environment
 *.env
+.venv/
+__pycache__/
+*.pyc
+backend/data/*.db
 
 # Vite
 frontend/.vite/

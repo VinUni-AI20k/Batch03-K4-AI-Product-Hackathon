@@ -1,0 +1,618 @@
+[
+  {
+    "segment_id": "T03-001",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-002",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-003",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-004",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-005",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-006",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-007",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-008",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-009",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-010",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-011",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-012",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-013",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-014",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-015",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-016",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-017",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-018",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-019",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-020",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-021",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-022",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-023",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-024",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-025",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-026",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-027",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-028",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-029",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-030",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-031",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-032",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-033",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-034",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-035",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-036",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-037",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-038",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-039",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-040",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-041",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-042",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-043",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-044",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-045",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-046",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-047",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-048",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-049",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-050",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-051",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-052",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-053",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-054",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-055",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-056",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-057",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-058",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-059",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-060",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-061",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-062",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-063",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-064",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-065",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-066",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-067",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-068",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-069",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-070",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-071",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-072",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-073",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-074",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-075",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-076",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-077",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-078",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-079",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-080",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-081",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-082",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-083",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-084",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-085",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-086",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-087",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-088",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-089",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-090",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-091",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-092",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-093",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-094",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-095",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-096",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-097",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-098",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-099",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-100",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-101",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-102",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-103",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-104",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-105",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-106",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-107",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-108",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-109",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-110",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-111",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-112",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-113",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-114",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-115",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-116",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-117",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-118",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-119",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-120",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-121",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-122",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-123",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-124",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-125",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-126",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-127",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-128",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-129",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-130",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-131",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-132",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-133",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-134",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-135",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-136",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-137",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-138",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-139",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-140",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-141",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-142",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-143",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-144",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-145",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-146",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-147",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-148",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-149",
+    "label": "CLASSROOM_ACTIVITY"
+  },
+  {
+    "segment_id": "T03-150",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-151",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-152",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-153",
+    "label": "TEACHING_CONTENT"
+  },
+  {
+    "segment_id": "T03-154",
+    "label": "CLASSROOM_ACTIVITY"
+  }
+]

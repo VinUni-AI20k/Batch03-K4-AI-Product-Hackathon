@@ -1,0 +1,35 @@
+[
+  {
+    "section_id": "s1",
+    "title": "Primary Key & Foreign Key",
+    "key_points": [
+      "Primary Key lÃ  cá»™t Ä‘á»‹nh danh duy nháº¥t cho má»—i dÃ²ng trong báº£ng",
+      "Foreign Key trá» tá»›i Primary Key cá»§a báº£ng khÃ¡c Ä‘á»ƒ thá»ƒ hiá»‡n quan há»‡ giá»¯a hai báº£ng"
+    ]
+  },
+  {
+    "section_id": "s2",
+    "title": "INNER JOIN",
+    "key_points": [
+      "Chá»‰ tráº£ vá» dÃ²ng cÃ³ khá»›p á»Ÿ Cáº¢ HAI báº£ng",
+      "CÃº phÃ¡p cÆ¡ báº£n: SELECT * FROM a INNER JOIN b ON a.id = b.id"
+    ]
+  },
+  {
+    "section_id": "s3",
+    "title": "LEFT JOIN",
+    "key_points": [
+      "Tráº£ vá» Táº¤T Cáº¢ dÃ²ng á»Ÿ báº£ng bÃªn trÃ¡i, dÃ¹ cÃ³ khá»›p hay khÃ´ng",
+      "Cá»™t thuá»™c báº£ng bÃªn pháº£i sáº½ lÃ  NULL náº¿u khÃ´ng khá»›p",
+      "ÄÃ¢y lÃ  khÃ¡c biá»‡t cá»‘t lÃµi so vá»›i INNER JOIN"
+    ]
+  },
+  {
+    "section_id": "s4",
+    "title": "Chá»n JOIN nÃ o cho Ä‘Ãºng use case",
+    "key_points": [
+      "DÃ¹ng INNER JOIN khi chá»‰ cáº§n dá»¯ liá»‡u khá»›p á»Ÿ cáº£ 2 báº£ng",
+      "DÃ¹ng LEFT JOIN khi cáº§n giá»¯ toÃ n bá»™ báº£ng chÃ­nh dÃ¹ cÃ³ khá»›p hay khÃ´ng"
+    ]
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "quiz_result": [
+    { "q_id": "q1", "selected_index": 0, "correct": true, "section_id": "s1" },
+    { "q_id": "q2", "selected_index": 1, "correct": true, "section_id": "s1" },
+    { "q_id": "q3", "selected_index": 2, "correct": true, "section_id": "s2" },
+    { "q_id": "q4", "selected_index": 1, "correct": true, "section_id": "s2" },
+    { "q_id": "q5", "selected_index": 2, "correct": false, "section_id": "s3" },
+    { "q_id": "q6", "selected_index": 1, "correct": false, "section_id": "s3" },
+    { "q_id": "q7", "selected_index": 0, "correct": false, "section_id": "s4" },
+    { "q_id": "q8", "selected_index": 0, "correct": true, "section_id": "s4" }
+  ],
+  "open_answer_text": "MÃ¬nh tháº¥y pháº§n LEFT JOIN khÃ³ hiá»ƒu nháº¥t, khÃ´ng rÃµ khÃ¡c gÃ¬ vá»›i INNER JOIN, lÃºc nÃ o ra NULL lÃºc nÃ o khÃ´ng.",
+  "weakness_ranking": [
+    {
+      "section_id": "s3",
+      "weak_score": 0.9,
+      "reason": "Sai 2/2 cÃ¢u vá» LEFT JOIN (q5, q6); tá»± nháº­n Ä‘Ã¢y lÃ  pháº§n khÃ³ nháº¥t trong cÃ¢u tráº£ lá»i má»Ÿ"
+    },
+    {
+      "section_id": "s4",
+      "weak_score": 0.4,
+      "reason": "Sai 1/2 cÃ¢u vá» khi nÃ o chá»n loáº¡i JOIN (q7), nhiá»u kháº£ nÄƒng lÃ  há»‡ quáº£ cá»§a viá»‡c chÆ°a náº¯m LEFT JOIN á»Ÿ s3"
+    }
+  ],
+  "sections_to_reteach": ["s3", "s4"]
+}

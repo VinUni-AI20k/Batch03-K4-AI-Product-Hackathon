@@ -1,0 +1,46 @@
+[
+  {
+    "transcript": "transcript-01-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Day 2 (sáng) — Xác định bài toán kinh doanh cho AI",
+    "course_day": "02",
+    "day_source": "explicit_title",
+    "classification_file": "clean-data/fallback_responses/classify/day-02/transcript-01-sang-xac-dinh-bai-toan-kinh-doanh-cho-ai.json"
+  },
+  {
+    "transcript": "transcript-02-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Day 2 — Chỉ số thành công & mức tự động hoá (phần sau buổi)",
+    "course_day": "02",
+    "day_source": "explicit_title",
+    "classification_file": "clean-data/fallback_responses/classify/day-02/transcript-02-chi-so-thanh-cong-muc-tu-dong-hoa-phan-sau-buoi.json"
+  },
+  {
+    "transcript": "transcript-03-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Day 2 (chiều) — Soi bài toán các nhóm · tự động hoá & ràng buộc",
+    "course_day": "02",
+    "day_source": "explicit_title",
+    "classification_file": "clean-data/fallback_responses/classify/day-02/transcript-03-chieu-soi-bai-toan-cac-nhom-tu-dong-hoa-rang-buoc.json"
+  },
+  {
+    "transcript": "transcript-04-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Day 1 — Foundation: cách LLM hoạt động (transformer, attention, agent)",
+    "course_day": "01",
+    "day_source": "explicit_title",
+    "classification_file": "clean-data/fallback_responses/classify/day-01/transcript-04-foundation-cach-llm-hoat-dong-transformer-attention-agent.json"
+  },
+  {
+    "transcript": "transcript-05-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Buổi về bài toán · đánh giá · dữ liệu",
+    "course_day": "02",
+    "day_source": "topic_similarity",
+    "classification_file": "clean-data/fallback_responses/classify/day-02/transcript-05-buoi-ve-bai-toan-danh-gia-du-lieu.json",
+    "day_confidence": 0.3205
+  },
+  {
+    "transcript": "transcript-06-clean.md",
+    "title": "Transcript bài giảng (bản sạch) — Buổi Foundation: transformer & attention",
+    "course_day": "01",
+    "day_source": "topic_similarity",
+    "classification_file": "clean-data/fallback_responses/classify/day-01/transcript-06-buoi-foundation-transformer-attention.json",
+    "day_confidence": 0.6828
+  }
+]
