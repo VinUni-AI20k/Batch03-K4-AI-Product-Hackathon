@@ -2,13 +2,23 @@ import sys
 import os
 from pathlib import Path
 
-# Thêm thư mục backend và thư mục gốc của dự án vào sys.path
+# Thêm thư mục backend vào sys.path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = BACKEND_DIR.parent.parent
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
+
+if str(BACKEND_DIR) in sys.path:
+    sys.path.remove(str(BACKEND_DIR))
+sys.path.insert(0, str(BACKEND_DIR))
+if str(BASE_DIR) in sys.path:
+    sys.path.remove(str(BASE_DIR))
+sys.path.append(str(BASE_DIR))
+
+# Fix lỗi httpx.InvalidURL khi httpx parse IPv6 (::1/128) trong NO_PROXY của hệ thống
+for env_v in ["NO_PROXY", "no_proxy"]:
+    env_val = os.getenv(env_v)
+    if env_val and ("::" in env_val or "/" in env_val):
+        cleaned_items = [item.strip() for item in env_val.split(",") if "::" not in item and "/" not in item]
+        os.environ[env_v] = ",".join(cleaned_items)
 
 # Load environment variables from .env file
 try:
