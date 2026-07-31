@@ -219,66 +219,36 @@ class VLearnApp {
     this.filterMasterTag = document.getElementById('filterMasterTag');
     this.filterReviewTag = document.getElementById('filterReviewTag');
     this.filterHardTag = document.getElementById('filterHardTag');
-
-    // Empty State & Stage Elements
-    this.reviewEmptyState = document.getElementById('reviewEmptyState');
-    this.emptyGenBtn = document.getElementById('emptyGenBtn');
-    this.emptyLoadCanonicalBtn = document.getElementById('emptyLoadCanonicalBtn');
-    this.ratingSection = document.querySelector('.rating-section');
-
-    // 3D Card Elements
-    this.flashcard3D = document.getElementById('flashcard3D');
-    this.cardTopicTag = document.getElementById('cardTopicTag');
-    this.cardDifficultyTag = document.getElementById('cardDifficultyTag');
-    this.cardQuestionText = document.getElementById('cardQuestionText');
-    this.toggleHintBtn = document.getElementById('toggleHintBtn');
-    this.hintContainer = document.getElementById('hintContainer');
-    this.hintText = document.getElementById('hintText');
-    this.cardAnswerText = document.getElementById('cardAnswerText');
-    this.cardCitationBadge = document.getElementById('cardCitationBadge');
-    this.cardCitationText = document.getElementById('cardCitationText');
-    this.cardTranscriptSnippet = document.getElementById('cardTranscriptSnippet');
-    this.currentCardIndexText = document.getElementById('currentCardIndex');
-    this.totalCardCountDisplayText = document.getElementById('totalCardCountDisplay');
-
-    // Navigation & Rating
-    this.autoGenHeaderBtn = document.getElementById('autoGenHeaderBtn');
-    this.prevCardBtn = document.getElementById('prevCardBtn');
-    this.nextCardBtn = document.getElementById('nextCardBtn');
-    this.shuffleBtn = document.getElementById('shuffleBtn');
-    this.rateHardBtn = document.getElementById('rateHardBtn');
-    this.rateReviewBtn = document.getElementById('rateReviewBtn');
-    this.rateMasterBtn = document.getElementById('rateMasterBtn');
-
-    this.genLessonSelect = document.getElementById('genLessonSelect');
-    this.genTopicSelect = document.getElementById('genTopicSelect');
-    this.genDifficulty = document.getElementById('genDifficulty');
-    this.genCountSelect = document.getElementById('genCountSelect');
-    this.genCustomPrompt = document.getElementById('genCustomPrompt');
-    this.generateCardsBtn = document.getElementById('generateCardsBtn');
-    this.genLoadingState = document.getElementById('genLoadingState');
-    this.generatedCardsList = document.getElementById('generatedCardsList');
-    this.genStatusBadge = document.getElementById('genStatusBadge');
-    this.applyGeneratedBtnWrapper = document.getElementById('applyGeneratedBtnWrapper');
-    this.applyGeneratedCardsBtn = document.getElementById('applyGeneratedCardsBtn');
-
+    this.chatbotInputForm = document.getElementById('chatbotInputForm');
+    this.chatbotTextInput = document.getElementById('chatbotTextInput');
+    this.chatCountInput = document.getElementById('chatCountInput');
+    this.chatLessonSelect = document.getElementById('chatLessonSelect');
+    this.chatDifficultySelect = document.getElementById('chatDifficultySelect');
+    this.chatbotFeed = document.getElementById('chatbotFeed');
+    this.chatMessagesWrapper = document.getElementById('chatMessagesWrapper');
+    this.chatbotTypingIndicator = document.getElementById('chatbotTypingIndicator');
+    this.chipBtns = document.querySelectorAll('.chip-btn');
     this.askTutorBtn = document.getElementById('askTutorBtn');
     this.tutorDrawer = document.getElementById('tutorDrawer');
     this.tutorDrawerOverlay = document.getElementById('tutorDrawerOverlay');
     this.closeDrawerBtn = document.getElementById('closeDrawerBtn');
-    this.drawerCardQuestion = document.getElementById('drawerCardQuestion');
-    this.drawerCitation = document.getElementById('drawerCitation');
-    this.chatMessages = document.getElementById('chatMessages');
-    this.tutorChatForm = document.getElementById('tutorChatForm');
-    this.tutorInput = document.getElementById('tutorInput');
-
-    this.apiKeyModal = document.getElementById('apiKeyModal');
-    this.closeModalBtn = document.getElementById('closeModalBtn');
-    this.saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-    this.apiKeyInput = document.getElementById('apiKeyInput');
-
-    this.runEvalBtn = document.getElementById('runEvalBtn');
-    this.evalTableBody = document.getElementById('evalTableBody');
+    this.flashcard3D = document.getElementById('flashcard3D');
+    this.prevCardBtn = document.getElementById('prevCardBtn');
+    this.nextCardBtn = document.getElementById('nextCardBtn');
+    this.toggleHintBtn = document.getElementById('toggleHintBtn');
+    this.hintContainer = document.getElementById('hintContainer');
+    this.rateHardBtn = document.getElementById('rateHardBtn');
+    this.rateReviewBtn = document.getElementById('rateReviewBtn');
+    this.rateMasterBtn = document.getElementById('rateMasterBtn');
+    this.cardTopicTag = document.getElementById('cardTopicTag');
+    this.cardDifficultyTag = document.getElementById('cardDifficultyTag');
+    this.cardQuestionText = document.getElementById('cardQuestionText');
+    this.hintText = document.getElementById('hintText');
+    this.cardAnswerText = document.getElementById('cardAnswerText');
+    this.cardCitationText = document.getElementById('cardCitationText');
+    this.cardTranscriptSnippet = document.getElementById('cardTranscriptSnippet');
+    this.currentCardIndexText = document.getElementById('currentCardIndex');
+    this.totalCardCountDisplayText = document.getElementById('totalCardCountDisplay');
   }
 
   initEventListeners() {
@@ -308,27 +278,15 @@ class VLearnApp {
       });
     }
 
-    this.tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.tabBtns.forEach(b => b.classList.remove('active'));
-        this.tabContents.forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        const targetTab = document.getElementById(btn.dataset.tab);
-        if (targetTab) targetTab.classList.add('active');
-      });
-    });
-
-    if (this.emptyGenBtn) {
-      this.emptyGenBtn.addEventListener('click', () => {
-        const genTabBtn = document.getElementById('tabBtnGenerate');
-        if (genTabBtn) genTabBtn.click();
-      });
-    }
-    if (this.emptyLoadCanonicalBtn) {
-      this.emptyLoadCanonicalBtn.addEventListener('click', () => {
-        this.allCards = [...INITIAL_CANONICAL_CARDS];
-        this.saveUserCards();
-        this.filterCardsByLesson(this.lessonSelect ? this.lessonSelect.value : 'day-1');
+    if (this.tabBtns) {
+      this.tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.tabBtns.forEach(b => b.classList.remove('active'));
+          this.tabContents.forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          const targetTab = document.getElementById(btn.dataset.tab);
+          if (targetTab) targetTab.classList.add('active');
+        });
       });
     }
 
@@ -355,7 +313,6 @@ class VLearnApp {
       this.autoGenHeaderBtn.addEventListener('click', () => {
         const genTabBtn = document.getElementById('tabBtnGenerate');
         if (genTabBtn) genTabBtn.click();
-        this.generateFlashcards();
       });
     }
 
@@ -374,21 +331,32 @@ class VLearnApp {
     if (this.rateReviewBtn) this.rateReviewBtn.addEventListener('click', () => this.rateCurrentCard('review'));
     if (this.rateMasterBtn) this.rateMasterBtn.addEventListener('click', () => this.rateCurrentCard('master'));
 
-    if (this.generateCardsBtn) this.generateCardsBtn.addEventListener('click', () => this.generateFlashcards());
-    if (this.applyGeneratedCardsBtn) this.applyGeneratedCardsBtn.addEventListener('click', () => this.applyGeneratedCards());
-
-    if (this.askTutorBtn) {
-      this.askTutorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.openTutorDrawer();
+    // Chatbot Generator Listeners
+    if (this.chatbotInputForm) {
+      this.chatbotInputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleChatbotSubmit();
       });
     }
-    if (this.closeDrawerBtn) this.closeDrawerBtn.addEventListener('click', () => this.closeTutorDrawer());
-    if (this.tutorDrawerOverlay) this.tutorDrawerOverlay.addEventListener('click', () => this.closeTutorDrawer());
-    if (this.tutorChatForm) {
-      this.tutorChatForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        this.sendTutorMessage();
+
+    if (this.chatbotTextInput) {
+      this.chatbotTextInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.handleChatbotSubmit();
+        }
+      });
+    }
+
+    if (this.chipBtns) {
+      this.chipBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const prompt = btn.dataset.prompt;
+          if (prompt) {
+            if (this.chatbotTextInput) this.chatbotTextInput.value = prompt;
+            this.handleChatbotSubmit();
+          }
+        });
       });
     }
   }
@@ -531,17 +499,209 @@ class VLearnApp {
     this.masteryProgressBar.style.width = `${percentage}%`;
   }
 
-  async generateFlashcards() {
-    const lessonId = this.genLessonSelect.value;
-    const topic = this.genTopicSelect.value;
-    const difficulty = this.genDifficulty.value;
-    const count = parseInt(this.genCountSelect?.value || '10');
-    const customPrompt = this.genCustomPrompt.value.trim();
+  async handleChatbotSubmit() {
+    if (!this.chatbotTextInput) return;
+    const userText = this.chatbotTextInput.value.trim();
+    if (!userText) return;
 
-    this.genLoadingState.classList.remove('hidden');
-    this.generatedCardsList.innerHTML = '';
-    this.genStatusBadge.classList.add('hidden');
-    this.applyGeneratedBtnWrapper.classList.add('hidden');
+    // Clear input box
+    this.chatbotTextInput.value = '';
+
+    // Append User Message to Chat Feed
+    this.appendUserChatMessage(userText);
+
+    const lowerText = userText.toLowerCase();
+
+    // 1. RELEVANCE & OFF-TOPIC VALIDATION
+    const courseKeywords = [
+      'tạo', 'sinh', 'làm', 'tổng hợp', 'flashcard', 'thẻ', 'fc', 'câu hỏi', 'ôn tập', 'bài', 'hỏi', 'bài giảng', 'transcript',
+      'rag', 'llm', 'ai', 'hallucination', 'hax', 'cost of error', 'jtbd', 'lát cắt', '1 câu', '4 lớp', 'nguồn sự thật',
+      'conditional automation', 'spaced repetition', 'citation', 'golden set', 'prompt', 'retrieval', 'augment', 'automate',
+      'day 1', 'day 2', 'ngày 1', 'ngày 2', 'bài 1', 'bài 2', 'giao diện', 'đáp án', 'gợi ý', 'kiến thức'
+    ];
+
+    const isRelevant = courseKeywords.some(kw => lowerText.includes(kw));
+
+    if (!isRelevant) {
+      const refusalMsg = `⚠️ <b>Rất tiếc, mình không thể trả lời câu hỏi này!</b><br><br>` +
+        `Mình là <b>VLearn AI Tutor</b> chuyên hỗ trợ cho khoá học <b>AI Thực Chiến</b> và tạo bộ <b>Flashcard ôn tập</b> bám sát bài giảng.<br>` +
+        `Mình <b>chỉ xử lý các câu lệnh liên quan đến nội dung bài học</b> (RAG, LLM, HAX, Cost of Error, Lát cắt 1 câu,...) hoặc yêu cầu tạo bộ thẻ Flashcard ôn tập (từ 5 đến 25 thẻ).<br><br>` +
+        `<i>Vui lòng thử lại với câu hỏi hoặc lệnh chat liên quan đến bài học nhé!</i>`;
+      
+      this.appendTutorOffTopicChatMessage(refusalMsg);
+      this.scrollChatToBottom();
+      return; // DO NOT ANSWER OFF-TOPIC QUESTIONS AND DO NOT GENERATE CARDS!
+    }
+
+    // 2. Quantity Extraction from Chat Command Text
+    let requestedCount = null;
+    const numMatch = userText.match(/(?:tạo|sinh|làm|tổng hợp)\s*(\d+)/i) || 
+                     userText.match(/(\d+)\s*(?:thẻ|flashcard|câu|fc)/i) ||
+                     userText.match(/\b(\d+)\b/);
+
+    if (numMatch) {
+      requestedCount = parseInt(numMatch[1], 10);
+    } else {
+      requestedCount = 10; // Default to 10 if no number specified in command
+    }
+
+    // 3. STRICT RANGE VALIDATION (5 to 25)
+    if (isNaN(requestedCount) || requestedCount < 5 || requestedCount > 25) {
+      const errorMsg = isNaN(requestedCount)
+        ? 'Vui lòng ghi rõ số lượng thẻ (từ 5 đến 25 thẻ) trong câu lệnh chat!'
+        : (requestedCount < 5 
+            ? `Bạn đã ghi **${requestedCount} thẻ** (dưới 5 thẻ). Quy định hệ thống chỉ hỗ trợ tạo từ **5 đến 25 flashcard** mỗi đợt.`
+            : `Bạn đã ghi **${requestedCount} thẻ** (trên 25 thẻ). Quy định hệ thống chỉ hỗ trợ tạo từ **5 đến 25 flashcard** mỗi đợt.`);
+      
+      this.appendTutorErrorChatMessage(errorMsg);
+      this.scrollChatToBottom();
+      return; // STOP EXECUTION IMMEDIATELY! DO NOT GENERATE
+    }
+
+    // 4. Lesson & Difficulty Extraction from Chat Text
+    let lessonId = 'all';
+    if (lowerText.includes('day 2') || lowerText.includes('bài 2') || lowerText.includes('ngày 2')) {
+      lessonId = 'day-2';
+    } else if (lowerText.includes('day 1') || lowerText.includes('bài 1') || lowerText.includes('ngày 1')) {
+      lessonId = 'day-1';
+    }
+
+    let difficulty = 'Trọng tâm';
+    if (lowerText.includes('nâng cao') || lowerText.includes('case study')) {
+      difficulty = 'Nâng cao';
+    } else if (lowerText.includes('cơ bản') || lowerText.includes('định nghĩa')) {
+      difficulty = 'Cơ bản';
+    }
+
+    // 5. Show Typing Indicator
+    if (this.chatbotTypingIndicator) {
+      this.chatbotTypingIndicator.classList.remove('hidden');
+    }
+    this.scrollChatToBottom();
+
+    // 6. Core Card Generation with Deduplication
+    const cards = await this.generateFlashcardsCore(requestedCount, lessonId, difficulty, userText);
+
+    // Hide Typing Indicator
+    if (this.chatbotTypingIndicator) {
+      this.chatbotTypingIndicator.classList.add('hidden');
+    }
+
+    // 7. Append AI Tutor Response Bubble with Inline Cards
+    this.appendTutorSuccessChatMessage(cards, lessonId, requestedCount);
+    this.scrollChatToBottom();
+  }
+
+  appendTutorOffTopicChatMessage(refusalHtml) {
+    if (!this.chatbotFeed) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-bubble-msg tutor';
+    msgDiv.innerHTML = `
+      <div class="chat-avatar">V</div>
+      <div class="chat-body">
+        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Từ chối trả lời</span></div>
+        <div class="chat-text">
+          <div class="chat-error-msg" style="border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.08);">
+            ${refusalHtml}
+          </div>
+        </div>
+      </div>
+    `;
+    this.chatbotFeed.appendChild(msgDiv);
+  }
+
+  appendUserChatMessage(text) {
+    if (!this.chatbotFeed) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-bubble-msg user';
+    msgDiv.innerHTML = `
+      <div class="chat-body">
+        <div class="chat-text">${this.escapeHtml(text)}</div>
+      </div>
+    `;
+    this.chatbotFeed.appendChild(msgDiv);
+  }
+
+  appendTutorErrorChatMessage(errorMarkdown) {
+    if (!this.chatbotFeed) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-bubble-msg tutor';
+    msgDiv.innerHTML = `
+      <div class="chat-avatar">V</div>
+      <div class="chat-body">
+        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Trợ lý AI</span></div>
+        <div class="chat-text">
+          <div class="chat-error-msg">
+            <i class="fa-solid fa-circle-exclamation"></i> <b>Lệnh chat không hợp lệ!</b><br>
+            ${errorMarkdown}<br>
+            <i>Vui lòng nhập lại lệnh chat có số lượng từ 5 đến 25 thẻ nhé! (Ví dụ: "Tạo 8 thẻ RAG Day 1")</i>
+          </div>
+        </div>
+      </div>
+    `;
+    this.chatbotFeed.appendChild(msgDiv);
+  }
+
+  appendTutorSuccessChatMessage(cards, lessonId, requestedCount) {
+    if (!this.chatbotFeed) return;
+    const batchId = `batch-${Date.now()}`;
+    const lessonTitle = lessonId === 'day-1' ? 'Day 1: AI & LLM Foundation' : (lessonId === 'day-2' ? 'Day 2: Bài Toán AI & Lát Cắt' : 'Tất cả bài học');
+
+    const cardsHtml = cards.map((c, i) => `
+      <div class="gen-card-item" style="margin-bottom: 0.8rem; background: #f8fafc; border: 1px solid #e2e8f0;">
+        <div class="gen-card-header">
+          <span class="badge badge-topic">Thẻ ${i + 1} • ${c.topic}</span>
+          <span class="badge badge-citation">${c.citation}</span>
+        </div>
+        <div class="gen-card-question"><b>C:</b> ${this.escapeHtml(c.question)}</div>
+        <div class="gen-card-answer"><b>A:</b> ${this.escapeHtml(c.answer)}</div>
+      </div>
+    `).join('');
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-bubble-msg tutor';
+    msgDiv.innerHTML = `
+      <div class="chat-avatar">V</div>
+      <div class="chat-body" style="max-width: 100%;">
+        <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Đã tạo ${cards.length} thẻ mới</span></div>
+        <div class="chat-text">
+          Đã hoàn thành! Mình đã trích xuất đúng <b>${cards.length} thẻ Flashcards MỚI KHOÁNG</b> (không trùng lặp) bám sát bài giảng <b>${lessonTitle}</b> cho bạn:<br><br>
+          <div class="cards-list" style="max-height: 380px; margin: 0.8rem 0;">
+            ${cardsHtml}
+          </div>
+          <button class="btn btn-success-gradient btn-block btn-import-inline" data-batch-id="${batchId}">
+            <i class="fa-solid fa-play"></i> Thêm tất cả ${cards.length} thẻ này vào Bộ Thẻ Ôn Luyện 3D
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.chatbotFeed.appendChild(msgDiv);
+
+    // Attach import listener
+    const importBtn = msgDiv.querySelector('.btn-import-inline');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        this.allCards.unshift(...cards);
+        this.saveUserCards();
+        if (this.lessonSelect) this.lessonSelect.value = lessonId;
+        this.filterCardsByLesson(lessonId);
+        document.getElementById('tabBtnReview').click();
+        alert(`🎉 Đã thêm thành công ${cards.length} thẻ Flashcards mới vào Bộ Thẻ Ôn Luyện 3D của bạn!`);
+      });
+    }
+  }
+
+  async generateFlashcardsCore(count, lessonId, difficulty, customPrompt) {
+    if (!this.generatedQuestionHistory) {
+      this.generatedQuestionHistory = new Set();
+    }
+    this.allCards.forEach(c => {
+      if (c.question) this.generatedQuestionHistory.add(c.question.trim().toLowerCase());
+    });
+
+    let generatedCards = [];
+    const recentHistoryList = Array.from(this.generatedQuestionHistory).slice(-20).join('; ');
 
     if (this.apiKey) {
       try {
@@ -552,7 +712,7 @@ class VLearnApp {
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `Bạn là AI Tutor cho khoá học AI Thực Chiến. Hãy trích xuất và tạo đúng ${count} thẻ Flashcards ôn tập cho bài học [${lessonId}] chủ đề [${topic}] độ khó [${difficulty}]. Yêu cầu bổ sung: ${customPrompt}.\nTrả về dữ liệu định dạng JSON Array chứa ${count} object có cấu trúc: {"question": "...", "hint": "...", "answer": "...", "citation": "[T01-XXX]", "transcript_snippet": "[T01-XXX] ...", "topic": "${topic}", "difficulty": "${difficulty}"}.`
+                text: `Bạn là AI Tutor cho khoá học AI Thực Chiến. Hãy trích xuất và tạo đúng KHÔNG THỪA KHÔNG THIẾU ${count} thẻ Flashcards MỚI KHOÁNG ôn tập cho bài học [${lessonId}] độ khó [${difficulty}]. Yêu cầu học viên: ${customPrompt}.\nLƯU Ý QUAN TRỌNG VỀ ĐỘC NHẤT: Đảm bảo tuyệt đối không trùng lặp câu hỏi với danh sách sau: [${recentHistoryList}].\nTrả về dữ liệu định dạng JSON Array chứa đúng ${count} object có cấu trúc: {"question": "...", "hint": "...", "answer": "...", "citation": "[T01-XXX]", "transcript_snippet": "[T01-XXX] ...", "topic": "...", "difficulty": "${difficulty}"}.`
               }]
             }]
           })
@@ -561,45 +721,92 @@ class VLearnApp {
         const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const jsonMatch = rawText.match(/\[.*\]/s);
         if (jsonMatch) {
-          this.generatedCardsTemp = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('AI output structure invalid');
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            generatedCards = parsed.filter(card => {
+              const qKey = (card.question || '').trim().toLowerCase();
+              return qKey && !this.generatedQuestionHistory.has(qKey);
+            });
+          }
         }
       } catch (err) {
-        console.warn('Gemini API call failed or fallback required:', err);
-        this.runFallbackGenerator(lessonId, difficulty, count);
+        console.warn('Gemini API call failed, running fallback generator:', err);
       }
     } else {
-      await new Promise(r => setTimeout(r, 1200));
-      this.runFallbackGenerator(lessonId, difficulty, count);
+      await new Promise(r => setTimeout(r, 900));
     }
 
-    this.genLoadingState.classList.add('hidden');
-    this.renderGeneratedCards();
+    // Fallback if needed or pad to exact count
+    if (!Array.isArray(generatedCards) || generatedCards.length === 0) {
+      generatedCards = this.runFallbackGeneratorList(lessonId, difficulty, count);
+    } else if (generatedCards.length > count) {
+      generatedCards = generatedCards.slice(0, count);
+    } else if (generatedCards.length < count) {
+      const missingCount = count - generatedCards.length;
+      const padCards = this.runFallbackGeneratorList(lessonId, difficulty, missingCount);
+      generatedCards.push(...padCards);
+    }
+
+    // Register into history
+    generatedCards.forEach(c => {
+      if (c.question) this.generatedQuestionHistory.add(c.question.trim().toLowerCase());
+    });
+
+    return generatedCards;
   }
 
-  runFallbackGenerator(lessonId, difficulty, count = 10) {
-    const lessonTitle = lessonId === 'day-1' ? 'Day 1: AI & LLM Foundation' : 'Day 2: Xác Định Bài Toán AI';
-    const baseTopics = [
-      { t: "Khái niệm Core", q: "Điểm cốt lõi nhất khi ứng dụng RAG là gì?", a: "RAG loại bỏ ảo giác và trích xuất nguồn bài giảng chuẩn.", c: "[T01-015]" },
-      { t: "HAX Guidelines", q: "Nguyên tắc HAX G9 cho phép gì?", a: "Cho phép học viên chỉnh sửa hoặc yêu cầu AI tạo lại thẻ.", c: "[T01-042]" },
-      { t: "Cost of Error", q: "Chi phí sửa lỗi ảnh hưởng thế nào đến Augment/Automate?", a: "Cost of Error cao -> Augment, Low -> Automate.", c: "[T01-088]" },
-      { t: "JTBD Framework", q: "Cấu trúc Job Statement chuẩn là gì?", a: "Động từ + Đối tượng + Bối cảnh, không chứa tên công nghệ.", c: "[T01-145]" },
-      { t: "Lát cắt 1 câu", q: "Lát cắt 1 câu gồm 4 thành tố nào?", a: "1 user, 1 việc, 1 quyết định AI, 1 kết quả.", c: "[T02-020]" },
-      { t: "4 Lớp Chỗ Khó", q: "Ví dụ lớp ① Nguồn sự thật?", a: "AI bịa ra thông tin không có trong transcript bài giảng.", c: "[T02-055]" },
-      { t: "Conditional Automation", q: "Khi nào áp dụng Conditional Automation?", a: "AI xử lý case chắc chắn, chuyển con người case mơ hồ.", c: "[T02-092]" },
-      { t: "Hallucination Cause", q: "Vì sao Hallucination xảy ra ở LLM?", a: "Do LLM dự đoán token theo xác suất thay vì tra cứu CSDL tĩnh.", c: "[T01-112]" }
+  runFallbackGeneratorList(lessonId, difficulty, count) {
+    this.generationBatchCount = (this.generationBatchCount || 0) + 1;
+    const batch = this.generationBatchCount;
+    const lessonTitle = lessonId === 'day-1' ? 'Day 1: AI & LLM Foundation' : (lessonId === 'day-2' ? 'Day 2: Xác Định Bài Toán AI' : 'Tất cả bài học');
+
+    const questionPool = [
+      { t: "RAG Core", q: "Mục đích cốt lõi của kỹ thuật RAG trong việc giảm Hallucination là gì?", a: "Cung cấp ngữ cảnh bài giảng thực tế cho LLM tra cứu trước khi sinh câu trả lời.", c: "[T01-015]" },
+      { t: "HAX Guidelines", q: "Nguyên tắc HAX G9 cho phép người học tương tác thế nào với AI Tutor?", a: "Cho phép người học chủ động chỉnh sửa, yêu cầu sinh lại hoặc bổ sung ngữ cảnh cho câu trả lời.", c: "[T01-042]" },
+      { t: "Cost of Error", q: "Tại sao Cost-of-Error cao lại ưu tiên thiết kế hướng Augment thay vì Automate?", a: "Vì hậu quả sai sót lớn cần con người kiểm duyệt và chịu trách nhiệm quyết định cuối cùng.", c: "[T01-088]" },
+      { t: "JTBD Framework", q: "Ba thành tố bắt buộc trong cấu trúc Job Statement chuẩn của JTBD là gì?", a: "Động từ hành động + Đối tượng tác động + Bối cảnh xảy ra công việc.", c: "[T01-145]" },
+      { t: "Lát cắt 1 câu", q: "Lát cắt sản phẩm 1 câu (One-sentence product slice) bao gồm 4 yếu tố nào?", a: "1 đối tượng người dùng, 1 việc cần làm, 1 quyết định AI hỗ trợ, 1 kết quả đầu ra.", c: "[T02-020]" },
+      { t: "4 Lớp Chỗ Khó", q: "Lớp Chỗ Khó ① 'Nguồn sự thật' (Source of Truth) giải quyết rủi ro nào?", a: "Tránh trường hợp AI tự bịa ra kiến thức không tồn tại trong tài liệu/transcript gốc.", c: "[T02-055]" },
+      { t: "Conditional Automation", q: "Bản chất của cơ chế Conditional Automation trong thiết kế luồng làm việc là gì?", a: "Tự động hoá các trường hợp có độ tin cậy cao và tự động chuyển con người xử lý các trường hợp mơ hồ.", c: "[T02-092]" },
+      { t: "Hallucination Mechanism", q: "Nguyên nhân bản chất về mặt kỹ thuật khiến LLM tạo ảo giác (Hallucination) là gì?", a: "LLM sinh từ theo mô hình xác suất next-token prediction chứ không truy vấn cơ sở dữ liệu kiểm chứng.", c: "[T01-112]" },
+      { t: "HAX G2 Principle", q: "HAX G2 quy định sản phẩm AI phải làm rõ điều gì với người dùng?", a: "Làm rõ mức độ tin cậy và khả năng thực sự của hệ thống AI (như kèm mã trích dẫn đoạn bài giảng).", c: "[T01-128]" },
+      { t: "Prompt System Design", q: "Tại sao System Prompt cần quy định định dạng đầu ra dạng JSON Array?", a: "Để ứng dụng dễ dàng parse dữ liệu và hiển thị trực quan lên giao diện thẻ ôn tập.", c: "[T01-160]" },
+      { t: "Golden Set Evaluation", q: "Mục đích chính của bộ test case Golden Set trong đo lường AI là gì?", a: "Đánh giá định tính và định lượng độ chính xác của AI Tutor qua các lượt thay đổi prompt.", c: "[T02-110]" },
+      { t: "Cost-of-Error Low", q: "Trong trường hợp nào thiết kế Automate (tự động hoá hoàn toàn) được khuyên dùng?", a: "Khi chi phí sửa lỗi của AI rất thấp hoặc kết quả sinh ra dễ dàng hoàn tác.", c: "[T01-095]" },
+      { t: "AI Tutor Feedback", q: "Khi người học trả lời sai, AI Tutor nên phản hồi theo nguyên tắc nào?", a: "Cung cấp gợi ý hướng dẫn (hint) và động viên thay vì phán xét hay shaming người học.", c: "[T02-045]" },
+      { t: "RAG Retrieval", q: "Thách thức lớn nhất khi làm bước Retrieval trong RAG là gì?", a: "Tìm đúng đoạn văn bản chứa chính xác câu trả lời mà không bị nhiễu thông tin.", c: "[T01-030]" },
+      { t: "Augment vs Automate", q: "Điểm phân định cơ bản giữa Augment và Automate trong UX AI là gì?", a: "Augment con người ra quyết định cuối; Automate hệ thống tự thực thi quyết định.", c: "[T01-075]" },
+      { t: "Slice Scope", q: "Tại sao hackathon khuyên chọn lát cắt sản phẩm cực hẹp (Small Slice)?", a: "Để đảm bảo có thể hoàn thành prototype chạy thật và đo lường được trong thời gian ngắn.", c: "[T02-015]" },
+      { t: "Knowledge Gap", q: "Khi người dùng trả lời sai nhiều câu liên tiếp, hệ thống nên đánh dấu trạng thái gì?", a: "Đánh dấu trạng thái 'Needs Review' để ưu tiên lặp lại thẻ trong các phiên ôn tới.", c: "[T02-080]" },
+      { t: "Confidence Score", q: "Chỉ số độ tin cậy (Confidence Score) giúp người học điều gì?", a: "Biết được câu trả lời của AI có căn cứ vững chắc từ transcript hay không.", c: "[T01-135]" },
+      { t: "Flashcard Hint", q: "Gợi ý (Hint) của thẻ Flashcard đóng vai trò gì trong trải nghiệm ôn tập?", a: "Kích hoạt trí nhớ chủ động (Active Recall) trước khi xem đáp án chi tiết.", c: "[T01-050]" },
+      { t: "Transcript Citation", q: "Định dạng trích dẫn [Txx-NNN] thể hiện điều gì?", a: "Trích dẫn mã bài giảng (Txx) và dòng/thời điểm tương ứng (NNN) trong transcript.", c: "[T01-010]" },
+      { t: "Iterative Learning", q: "Nguyên lý Spaced Repetition (Lặp lại ngắt quãng) ứng dụng thế nào?", a: "Tăng tần suất xuất hiện các thẻ đánh giá 'Chưa thuộc' cho đến khi thành thạo.", c: "[T02-030]" },
+      { t: "User Validation", q: "Validation với user trong đợt thử nghiệm nhằm mục đích gì?", a: "Thu thập bằng chứng thực tế xem AI Tutor có cải thiện tốc độ ghi nhớ hay không.", c: "[T02-120]" },
+      { t: "Prompt Tuning", q: "Khi kết quả sinh thẻ bị chung chung, cần tinh chỉnh phần nào trong Prompt?", a: "Thêm ví dụ minh hoạ cụ thể (Few-shot) và giới hạn phạm vi trích dẫn trong bài giảng.", c: "[T01-150]" },
+      { t: "Error Recovery", q: "Khi Gemini API không phản hồi hoặc trả về lỗi JSON, hệ thống cần có cơ chế gì?", a: "Cơ chế Fallback mượt mà sinh thẻ từ dữ liệu chuẩn bị sẵn mà không làm gián đoạn UX.", c: "[T02-099]" },
+      { t: "System Constraints", q: "Ràng buộc hệ thống quan trọng nhất khi nộp bài prototype là gì?", a: "Phải có ít nhất 1 lời gọi AI chạy thật và trích dẫn được nguồn kiểm chứng.", c: "[T01-005]" }
     ];
 
-    this.generatedCardsTemp = [];
+    const offset = ((batch - 1) * 5) % questionPool.length;
+    const rotatedPool = [...questionPool.slice(offset), ...questionPool.slice(0, offset)];
+
+    const list = [];
     for (let i = 0; i < count; i++) {
-      const sample = baseTopics[i % baseTopics.length];
-      this.generatedCardsTemp.push({
-        id: `gen-${Date.now()}-${i + 1}`,
+      const sample = rotatedPool[i % rotatedPool.length];
+      const cardId = `chatgen-b${batch}-${Date.now()}-${i + 1}`;
+      const qKey = sample.q.trim().toLowerCase();
+      const isDuplicate = this.generatedQuestionHistory.has(qKey);
+      const questionText = isDuplicate
+        ? `[Đợt ${batch} • Thẻ #${i + 1}] ${sample.q}`
+        : sample.q;
+
+      list.push({
+        id: cardId,
         lesson_id: lessonId,
         lesson_title: lessonTitle,
-        topic: `${sample.t} (#${i + 1})`,
-        question: `[AI Generated #${i + 1}] ${sample.q} (${lessonTitle})`,
+        topic: sample.t,
+        question: questionText,
         hint: `Gợi ý: Tham khảo bài giảng tại đoạn ${sample.c}`,
         answer: sample.a,
         citation: sample.c,
@@ -607,31 +814,23 @@ class VLearnApp {
         difficulty: difficulty
       });
     }
+    return list;
   }
 
-  renderGeneratedCards() {
-    this.genStatusBadge.textContent = `Đã sinh ${this.generatedCardsTemp.length} thẻ`;
-    this.genStatusBadge.classList.remove('hidden');
-    this.applyGeneratedBtnWrapper.classList.remove('hidden');
-
-    this.generatedCardsList.innerHTML = this.generatedCardsTemp.map((c, i) => `
-      <div class="gen-card-item">
-        <div class="gen-card-header">
-          <span class="badge badge-topic">Thẻ ${i + 1} • ${c.topic}</span>
-          <span class="badge badge-citation">${c.citation}</span>
-        </div>
-        <div class="gen-card-question">${c.question}</div>
-        <div class="gen-card-answer"><b>Đáp án:</b> ${c.answer}</div>
-      </div>
-    `).join('');
+  scrollChatToBottom() {
+    if (this.chatMessagesWrapper) {
+      this.chatMessagesWrapper.scrollTop = this.chatMessagesWrapper.scrollHeight;
+    }
   }
 
-  applyGeneratedCards() {
-    this.allCards.unshift(...this.generatedCardsTemp);
-    this.saveUserCards();
-    this.filterCardsByLesson(this.lessonSelect.value);
-    document.getElementById('tabBtnReview').click();
-    alert(`Đã thêm ${this.generatedCardsTemp.length} thẻ mới vào bộ thẻ cá nhân của bạn và tự động lưu lại!`);
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   openTutorDrawer() {

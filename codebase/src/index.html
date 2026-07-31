@@ -73,8 +73,8 @@
           <span>Ôn Luyện Thẻ 3D</span>
         </button>
         <button class="nav-item" data-tab="generateTab" id="tabBtnGenerate">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Sinh Flashcard AI</span>
+          <i class="fa-solid fa-robot"></i>
+          <span>Chatbot Sinh Flashcard</span>
         </button>
       </nav>
 
@@ -236,95 +236,50 @@
         </div>
       </section>
 
-      <!-- TAB 2: AI FLASHCARD GENERATOR -->
+      <!-- TAB 2: AI TUTOR CHATBOT FLASHCARD GENERATOR -->
       <section id="generateTab" class="tab-content">
-        <div class="tab-header">
-          <div>
-            <h1 class="tab-title">Sinh Flashcard Tự Động Bằng AI</h1>
-            <p class="tab-subtitle">Trích xuất kiến thức trọng tâm từ Transcript/Slide bài giảng để tạo câu hỏi mới.</p>
-          </div>
-        </div>
-
-        <div class="generator-grid">
-          <!-- Options Panel -->
-          <div class="panel form-panel">
-            <h2 class="panel-title"><i class="fa-solid fa-sliders"></i> Cấu hình sinh Flashcard</h2>
-
-            <div class="form-group">
-              <label for="genLessonSelect">Chọn bài học gốc (Data Pack):</label>
-              <select id="genLessonSelect" class="form-control">
-                <option value="day-1">Day 1: AI & LLM Foundation (Trích 290 đoạn transcript)</option>
-                <option value="day-2">Day 2: Xác Định Bài Toán AI & Lát Cắt (Trích 310 đoạn transcript)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="genTopicSelect">Chủ đề bài giảng:</label>
-              <select id="genTopicSelect" class="form-control">
-                <option value="all">Tất cả khái niệm chính trong buổi</option>
-                <option value="hallucination">Hallucination & RAG Retrieval</option>
-                <option value="augment-automate">Phân biệt Augment vs Automate & Cost-of-Error</option>
-                <option value="jtbd">Jobs-To-Be-Done & One-Sentence Slice</option>
-                <option value="hax">Nguyên tắc HAX/PAIR & 4 Lớp Chỗ Khó</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="genDifficulty">Độ khó mong muốn:</label>
-              <select id="genDifficulty" class="form-control">
-                <option value="Cơ bản">Cơ bản (Định nghĩa khái niệm)</option>
-                <option value="Trọng tâm" selected>Trọng tâm (So sánh & Nguyên lý)</option>
-                <option value="Nâng cao">Nâng cao (Case Study Thực tế & Rủi ro)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="genCountSelect">Số lượng Flashcards sinh cùng lúc:</label>
-              <select id="genCountSelect" class="form-control">
-                <option value="5">5 Flashcards (Ôn nhanh 5 phút)</option>
-                <option value="10" selected>10 Flashcards (Bộ chuẩn)</option>
-                <option value="15">15 Flashcards (Chuyên sâu)</option>
-                <option value="20">20 Flashcards (Bộ hoàn chỉnh)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="genCustomPrompt">Yêu cầu bổ sung cho AI Tutor (Tuỳ chọn):</label>
-              <textarea id="genCustomPrompt" class="form-control" rows="3"
-                placeholder="Ví dụ: Tạo câu hỏi tập trung vào cách phân biệt giữa Augment và Automate khi làm product..."></textarea>
-            </div>
-
-            <button id="generateCardsBtn" class="btn btn-primary-gradient btn-block btn-lg">
-              <i class="fa-solid fa-bolt"></i> Sinh Flashcards Bằng Gemini AI
-            </button>
-          </div>
-
-          <!-- Preview & AI Results Panel -->
-          <div class="panel results-panel">
-            <h2 class="panel-title">
-              <i class="fa-solid fa-list-check"></i> Danh sách Flashcard mới sinh
-              <span id="genStatusBadge" class="badge badge-success hidden">Đã sinh 5 thẻ</span>
-            </h2>
-
-            <div id="genLoadingState" class="loading-state hidden">
-              <div class="spinner"></div>
-              <p class="loading-text">AI Tutor đang đọc Transcript bài giảng và sinh bộ câu hỏi bám sát kiến thức...</p>
-            </div>
-
-            <div id="generatedCardsList" class="cards-list">
-              <div class="empty-state">
-                <i class="fa-solid fa-wand-magic-sparkles empty-icon"></i>
-                <p>Nhấn nút <b>"Sinh 5 Flashcards Bằng Gemini AI"</b> để bắt đầu trích xuất câu hỏi từ transcript bài
-                  giảng.</p>
+        <div class="chatbot-workspace">
+          <!-- Chat Messages Container -->
+          <div class="chatbot-messages-wrapper" id="chatMessagesWrapper">
+            <!-- Chat Stream Feed -->
+            <div id="chatbotFeed" class="chatbot-feed">
+              <!-- Welcome AI Message -->
+              <div class="chat-bubble-msg tutor">
+                <div class="chat-avatar">V</div>
+                <div class="chat-body">
+                  <div class="chat-meta"><span class="author">VLearn AI Tutor</span> • <span class="time">Trợ lý AI</span></div>
+                  <div class="chat-text">
+                    Xin chào! Mình là <b>VLearn AI Tutor</b>. Bạn muốn tạo bao nhiêu thẻ Flashcard ôn tập (<b>quy định từ 5 đến 25 thẻ</b>) cho bài học nào hôm nay?<br>
+                    Hãy nhập tin nhắn yêu cầu của bạn ở ô bên dưới nhé!
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div id="applyGeneratedBtnWrapper" class="hidden" style="margin-top: 1.5rem;">
-              <button id="applyGeneratedCardsBtn" class="btn btn-success-gradient btn-block">
-                <i class="fa-solid fa-play"></i> Thêm vào Bộ Thẻ Ôn Luyện Ngay
-              </button>
+            <!-- Loading Indicator -->
+            <div id="chatbotTypingIndicator" class="typing-indicator hidden">
+              <div class="chat-avatar">V</div>
+              <div class="typing-content">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+                <span class="typing-text">VLearn AI Tutor đang trích xuất câu hỏi từ Transcript bài giảng...</span>
+              </div>
             </div>
           </div>
+
+          <!-- Chatbot Input Controls (Pure Command Chat) -->
+          <form id="chatbotInputForm" class="chatbot-input-bar">
+            <div class="chat-input-wrapper">
+              <textarea id="chatbotTextInput" class="chatbot-textarea" rows="1" 
+                placeholder="Tiếp tục hỏi... (Ví dụ: Tạo 8 flashcard chủ đề RAG bài Day 1)"></textarea>
+              <button type="submit" id="chatbotSendBtn" class="btn-send-chat" aria-label="Gửi">
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+            <div class="chat-command-hint" style="font-size: 0.78rem; color: #64748b; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-circle-info"></i> Quy định: Nhập số lượng từ 5 đến 25 thẻ trong câu lệnh chat (Ví dụ: "Tạo 7 thẻ Day 1").
+            </div>
+          </form>
+
         </div>
       </section>
 
