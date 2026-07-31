@@ -231,22 +231,38 @@ export default function Home() {
     if (f) processFile(f);
   };
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     setSelectedFile(file);
     setUploadProgressVisible(true);
-    setUploadProgress(0);
+    setUploadProgress(20); // Bắt đầu gửi
     setStartBtnReady(false);
 
-    let pct = 0;
-    const timer = setInterval(() => {
-      pct += Math.random() * 22 + 8;
-      if (pct >= 100) {
-        pct = 100;
-        clearInterval(timer);
-        setStartBtnReady(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Gọi API Backend
+      const response = await fetch('http://localhost:8000/api/upload-slide', {
+        method: 'POST',
+        body: formData,
+      });
+
+      setUploadProgress(80); // Đã nhận xong, chuẩn bị xử lý
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
-      setUploadProgress(pct);
-    }, 180);
+
+      const data = await response.json();
+      console.log('Markdown trích xuất từ Docling:', data.markdown);
+      
+      setUploadProgress(100);
+      setStartBtnReady(true);
+    } catch (error) {
+      console.error('Lỗi khi xử lý file:', error);
+      setUploadProgress(100);
+      setStartBtnReady(true); // Fallback để không bị kẹt UI
+    }
   };
 
   const removeFile = (e: React.MouseEvent) => {
