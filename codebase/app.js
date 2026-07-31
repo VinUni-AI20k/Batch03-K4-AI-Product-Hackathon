@@ -816,6 +816,15 @@ async function resolveAndRenderRecommendations({ userQuery = null, fromChat = fa
       state.preferenceQuery = userQuery;
       state.conversationContext = [...state.conversationContext, userQuery].slice(-6);
     }
+    // Bug đã sửa: mọi tin nhắn tự do trước đây đều bị ép qua recommend engine
+    // và luôn hiển thị như đang tìm/không tìm được đề tài, kể cả khi user chỉ
+    // chào hỏi hoặc hỏi chuyện không liên quan. Khi model tự nhận đây không
+    // phải yêu cầu xếp hạng (response_type="conversational"), chỉ trả lời
+    // đúng ngữ cảnh, không đụng vào state.recommendations hiện có.
+    if (meta.responseType === "conversational") {
+      renderConversationalReply(meta);
+      return;
+    }
     if (!recommendations.length) {
       state.recommendations = [];
       state.recommendationMeta = meta;
@@ -857,6 +866,11 @@ function renderRecommendationLoading() {
   refs.chatStream.appendChild(block);
   scrollChat();
   return block;
+}
+
+function renderConversationalReply(meta) {
+  const message = meta?.assistantMessage?.trim();
+  addAssistantMessage(`<p>${escapeHtml(message || "Mình chưa rõ ý bạn, bạn có thể nói rõ hơn được không?")}</p>`);
 }
 
 function renderRecommendationEmpty(meta, { fromChat = false } = {}) {
@@ -1541,6 +1555,7 @@ async function getRecommendationsFromAI(userQuery = null) {
     recommendations,
     meta: {
       source: "ai",
+      responseType: payload.response_type || "recommendation",
       confidence: payload.confidence || "low",
       overallNote: payload.overall_note || "",
       assistantMessage: payload.assistant_message || "",

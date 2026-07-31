@@ -9,7 +9,7 @@ from app.config import get_settings
 
 settings = get_settings()
 app = FastAPI(
-    title="ĐềTài+ Profile Reader API",
+    title="Ideora Profile Reader API",
     description="Isolated local-first OCR and evidence-backed profile extraction.",
     version="1.0.0",
 )

@@ -1,1 +1,1 @@
-"""ĐềTài+ local-first profile extraction service."""
+"""Ideora local-first profile extraction service."""
