@@ -1,0 +1,3459 @@
+{
+  "schema_name": "DoclingDocument",
+  "version": "1.10.0",
+  "name": "INSPIRED How to Create Tech Products Customers Love",
+  "origin": {
+    "mimetype": "application/pdf",
+    "binary_hash": 15557970772255183927,
+    "filename": "INSPIRED How to Create Tech Products Customers Love.pdf"
+  },
+  "furniture": {
+    "self_ref": "#/furniture",
+    "children": [],
+    "content_layer": "furniture",
+    "name": "_root_",
+    "label": "unspecified"
+  },
+  "body": {
+    "self_ref": "#/body",
+    "children": [
+      {
+        "$ref": "#/texts/0"
+      },
+      {
+        "$ref": "#/texts/1"
+      },
+      {
+        "$ref": "#/texts/2"
+      },
+      {
+        "$ref": "#/texts/3"
+      },
+      {
+        "$ref": "#/texts/4"
+      },
+      {
+        "$ref": "#/texts/5"
+      },
+      {
+        "$ref": "#/texts/6"
+      },
+      {
+        "$ref": "#/texts/7"
+      },
+      {
+        "$ref": "#/texts/8"
+      },
+      {
+        "$ref": "#/texts/9"
+      },
+      {
+        "$ref": "#/groups/0"
+      },
+      {
+        "$ref": "#/texts/14"
+      },
+      {
+        "$ref": "#/texts/15"
+      },
+      {
+        "$ref": "#/texts/16"
+      },
+      {
+        "$ref": "#/texts/17"
+      },
+      {
+        "$ref": "#/texts/18"
+      },
+      {
+        "$ref": "#/texts/19"
+      },
+      {
+        "$ref": "#/texts/20"
+      },
+      {
+        "$ref": "#/texts/21"
+      },
+      {
+        "$ref": "#/texts/22"
+      },
+      {
+        "$ref": "#/texts/23"
+      },
+      {
+        "$ref": "#/texts/24"
+      },
+      {
+        "$ref": "#/texts/25"
+      }
+    ],
+    "content_layer": "body",
+    "name": "_root_",
+    "label": "unspecified"
+  },
+  "groups": [
+    {
+      "self_ref": "#/groups/0",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/10"
+        },
+        {
+          "$ref": "#/texts/11"
+        },
+        {
+          "$ref": "#/texts/12"
+        },
+        {
+          "$ref": "#/texts/13"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    }
+  ],
+  "texts": [
+    {
+      "self_ref": "#/texts/0",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 199.63799999999998,
+            "t": 518.447949421875,
+            "r": 253.1134818,
+            "b": 505.6210075203002,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            7
+          ]
+        }
+      ],
+      "orig": "CHAPTER",
+      "text": "CHAPTER",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/1",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 193.14,
+            "t": 499.02880042187513,
+            "r": 259.6106896,
+            "b": 444.05624482344996,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            2
+          ]
+        }
+      ],
+      "orig": "37",
+      "text": "37",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/2",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 81.51299999999999,
+            "t": 421.10134342187513,
+            "r": 371.26203547000006,
+            "b": 396.3637025990405,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            24
+          ]
+        }
+      ],
+      "orig": "Startup Canvas Technique",
+      "text": "Startup Canvas Technique",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/3",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 64.97955534,
+            "t": 305.2620664218751,
+            "r": 387.7925849699993,
+            "b": 265.5688022050001,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            203
+          ]
+        }
+      ],
+      "orig": "S o far, we've explored techniques for typical-sized, smaller efforts like adding a new feature, or medium to large-sized efforts like a redesign. Those cover most of what product teams actually work on.",
+      "text": "S o far, we've explored techniques for typical-sized, smaller efforts like adding a new feature, or medium to large-sized efforts like a redesign. Those cover most of what product teams actually work on."
+    },
+    {
+      "self_ref": "#/texts/4",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 64.97955534,
+            "t": 262.7413375118751,
+            "r": 387.8068315399994,
+            "b": 195.83841739500014,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            340
+          ]
+        }
+      ],
+      "orig": "However, another especially difficult situation requires a more comprehensive framing technique. This is an early stage startup, where you are trying to figure out a new product that can power a new business, or, for those that work at an enterprise size company, when you're asked to tackle an all-new business opportunity for the company.",
+      "text": "However, another especially difficult situation requires a more comprehensive framing technique. This is an early stage startup, where you are trying to figure out a new product that can power a new business, or, for those that work at an enterprise size company, when you're asked to tackle an all-new business opportunity for the company."
+    },
+    {
+      "self_ref": "#/texts/5",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 64.97955534,
+            "t": 193.00218558187515,
+            "r": 387.80683153999945,
+            "b": 167.93924977500018,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            124
+          ]
+        }
+      ],
+      "orig": "In other words, you're not being asked to improve an existing product, you're being asked to invent an entirely new product.",
+      "text": "In other words, you're not being asked to improve an existing product, you're being asked to invent an entirely new product."
+    },
+    {
+      "self_ref": "#/texts/6",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 64.97955534,
+            "t": 165.1030179618752,
+            "r": 387.7980644199995,
+            "b": 84.25928115500017,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            407
+          ]
+        }
+      ],
+      "orig": "In this situation, you have a much broader set of risks, including validating your value proposition, figuring out how you intend to make money, how you plan to get this product out to your customers and sell to them, how much it will cost to produce and sell this product, and what you will measure to track your progress-not to mention determining whether the market is large enough to sustain a business.",
+      "text": "In this situation, you have a much broader set of risks, including validating your value proposition, figuring out how you intend to make money, how you plan to get this product out to your customers and sell to them, how much it will cost to produce and sell this product, and what you will measure to track your progress-not to mention determining whether the market is large enough to sustain a business."
+    },
+    {
+      "self_ref": "#/texts/7",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "furniture",
+      "label": "page_footer",
+      "prov": [
+        {
+          "page_no": 207,
+          "bbox": {
+            "l": 216.40499999999997,
+            "t": 36.199103421875066,
+            "r": 236.35327985999993,
+            "b": 25.204647480930134,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            3
+          ]
+        }
+      ],
+      "orig": "187",
+      "text": "187"
+    },
+    {
+      "self_ref": "#/texts/8",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "furniture",
+      "label": "page_header",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 44.208,
+            "t": 604.783203421875,
+            "r": 64.15627986000003,
+            "b": 593.7887474809302,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            3
+          ]
+        }
+      ],
+      "orig": "246",
+      "text": "246"
+    },
+    {
+      "self_ref": "#/texts/9",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "furniture",
+      "label": "page_header",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 328.7967,
+            "t": 603.368528421875,
+            "r": 366.97936076,
+            "b": 594.26216290219,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            8
+          ]
+        }
+      ],
+      "orig": "INSPIRED",
+      "text": "INSPIRED"
+    },
+    {
+      "self_ref": "#/texts/10",
+      "parent": {
+        "$ref": "#/groups/0"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 67.617,
+            "t": 576.741321821875,
+            "r": 367.0009973199995,
+            "b": 551.695920255,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            114
+          ]
+        }
+      ],
+      "orig": "other person to debrief with afterward to make sure you both saw the same things and came to the same conclusions.",
+      "text": "other person to debrief with afterward to make sure you both saw the same things and came to the same conclusions.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/11",
+      "parent": {
+        "$ref": "#/groups/0"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 56.95179852,
+            "t": 545.889826541875,
+            "r": 367.0272986799997,
+            "b": 451.16664288500004,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            451
+          ]
+        }
+      ],
+      "orig": "· Formal testing labs will typically have setups with two-way mirrors or closed-circuit video monitors with cameras that capture both the screen and the user from the front. This is fine if you have it, but I can't count how many prototypes I've tested at a tiny table at Starbucks-just big enough for three or four chairs around the table. In fact, in many ways, this is preferable to the testing lab because the user feels a lot less like a lab rat.",
+      "text": "Formal testing labs will typically have setups with two-way mirrors or closed-circuit video monitors with cameras that capture both the screen and the user from the front. This is fine if you have it, but I can't count how many prototypes I've tested at a tiny table at Starbucks-just big enough for three or four chairs around the table. In fact, in many ways, this is preferable to the testing lab because the user feels a lot less like a lab rat.",
+      "enumerated": false,
+      "marker": "·"
+    },
+    {
+      "self_ref": "#/texts/12",
+      "parent": {
+        "$ref": "#/groups/0"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 56.95179852,
+            "t": 445.360549171875,
+            "r": 367.03058634999957,
+            "b": 336.70531594499994,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            513
+          ]
+        }
+      ],
+      "orig": "· The other environment that works really well is your customer's office. It can be time consuming to do, but even 30 minutes in their office can tell you a lot. They are masters of their domain and often very talkative. In addition, all the cues are there to remind them of how they might use the product. You can also learn from seeing what their office looks like. How big is their monitor? How fast is their computer and network connectivity? How do they communicate with their colleagues on their work tasks?",
+      "text": "The other environment that works really well is your customer's office. It can be time consuming to do, but even 30 minutes in their office can tell you a lot. They are masters of their domain and often very talkative. In addition, all the cues are there to remind them of how they might use the product. You can also learn from seeing what their office looks like. How big is their monitor? How fast is their computer and network connectivity? How do they communicate with their colleagues on their work tasks?",
+      "enumerated": false,
+      "marker": "·"
+    },
+    {
+      "self_ref": "#/texts/13",
+      "parent": {
+        "$ref": "#/groups/0"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 56.95179852,
+            "t": 330.88935922187494,
+            "r": 367.03606579999945,
+            "b": 264.0390418249999,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            273
+          ]
+        }
+      ],
+      "orig": "· There are tools for doing this type of testing remotely, and I encourage that, but they are primarily designed for usability testing and not for the value testing that will usually follow. So, I view the remote usability testing as a supplement rather than a replacement.",
+      "text": "There are tools for doing this type of testing remotely, and I encourage that, but they are primarily designed for usability testing and not for the value testing that will usually follow. So, I view the remote usability testing as a supplement rather than a replacement.",
+      "enumerated": false,
+      "marker": "·"
+    },
+    {
+      "self_ref": "#/texts/14",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 129.861,
+            "t": 230.66559542187508,
+            "r": 281.3368888100001,
+            "b": 216.00616755967036,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            22
+          ]
+        }
+      ],
+      "orig": "Testing Your Prototype",
+      "text": "Testing Your Prototype",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/15",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 44.208,
+            "t": 201.6303218218751,
+            "r": 207.62054146000003,
+            "b": 120.84795485500013,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            179
+          ]
+        }
+      ],
+      "orig": "Nowthatyou've got your prototype ready, lined up your test subjects, and prepared the tasks and questions, here are a set of tips and techniques for administering the actual test.",
+      "text": "Nowthatyou've got your prototype ready, lined up your test subjects, and prepared the tasks and questions, here are a set of tips and techniques for administering the actual test."
+    },
+    {
+      "self_ref": "#/texts/16",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 44.20800000000001,
+            "t": 118.02049016187516,
+            "r": 207.71369211000007,
+            "b": 79.0430390250001,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            94
+          ]
+        },
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 225.87298519999996,
+            "t": 197.05226142187507,
+            "r": 358.68959220000033,
+            "b": 88.11544574187508,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            95,
+            268
+          ]
+        }
+      ],
+      "orig": "Before you jump in, we want to take the opportunity to learn how they think about this problem We want to learn whether the user or customer really has the problems we think they have, and how they solve those problems today, and what it would take for them to switch.",
+      "text": "Before you jump in, we want to take the opportunity to learn how they think about this problem We want to learn whether the user or customer really has the problems we think they have, and how they solve those problems today, and what it would take for them to switch."
+    },
+    {
+      "self_ref": "#/texts/17",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 266,
+          "bbox": {
+            "l": 44.207999999999984,
+            "t": 76.22434145187515,
+            "r": 367.02322140999956,
+            "b": 50.90818656187514,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            137
+          ]
+        },
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431,
+            "t": 576.741321821875,
+            "r": 367.0173262699996,
+            "b": 510.2153878650001,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            138,
+            409
+          ]
+        }
+      ],
+      "orig": "today. If you remember the key questions from the Customer Interview Technique , we want to learn whether the user or customer really has With this as a foundation, the key technique is to spend one-on-one time with the key stakeholders. Sit down with them and listen. Explain that the better you understand their constraints, the better your solutions will be. Ask lots of questions. Be open and transparent.",
+      "text": "today. If you remember the key questions from the Customer Interview Technique , we want to learn whether the user or customer really has With this as a foundation, the key technique is to spend one-on-one time with the key stakeholders. Sit down with them and listen. Explain that the better you understand their constraints, the better your solutions will be. Ask lots of questions. Be open and transparent."
+    },
+    {
+      "self_ref": "#/texts/18",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "furniture",
+      "label": "page_header",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.208,
+            "t": 604.783203421875,
+            "r": 64.15627986000003,
+            "b": 593.7887474809302,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            3
+          ]
+        }
+      ],
+      "orig": "300",
+      "text": "300"
+    },
+    {
+      "self_ref": "#/texts/19",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "furniture",
+      "label": "page_header",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 328.7967,
+            "t": 603.368528421875,
+            "r": 366.97936076,
+            "b": 594.26216290219,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            8
+          ]
+        }
+      ],
+      "orig": "INSPIRED",
+      "text": "INSPIRED"
+    },
+    {
+      "self_ref": "#/texts/20",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431,
+            "t": 507.477786151875,
+            "r": 367.0239016099997,
+            "b": 399.398991065,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            517
+          ]
+        }
+      ],
+      "orig": "One of the most common mistakes product managers make with stakeholders is that they show them their solution after they have already built it. And, sometimes, there are issues because the product manager did not have a clear enough understanding of the constraints. Not only will the stakeholder be frustrated, but your engineering team will be frustrated as well with all the rework. So, commit to previewing your solutions during discovery with the key stakeholders before you put this work on the product backlog.",
+      "text": "One of the most common mistakes product managers make with stakeholders is that they show them their solution after they have already built it. And, sometimes, there are issues because the product manager did not have a clear enough understanding of the constraints. Not only will the stakeholder be frustrated, but your engineering team will be frustrated as well with all the rework. So, commit to previewing your solutions during discovery with the key stakeholders before you put this work on the product backlog."
+    },
+    {
+      "self_ref": "#/texts/21",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431000003,
+            "t": 396.652622231875,
+            "r": 367.0151344899996,
+            "b": 343.986409105,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            264
+          ]
+        }
+      ],
+      "orig": "This is one of the keys of product discovery. In discovery, you are not only making sure that your solutions are valuable and usable (with customers), and feasible (with engineers), but you are also making sure your stakeholders will support the proposed solution.",
+      "text": "This is one of the keys of product discovery. In discovery, you are not only making sure that your solutions are valuable and usable (with customers), and feasible (with engineers), but you are also making sure your stakeholders will support the proposed solution."
+    },
+    {
+      "self_ref": "#/texts/22",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431000003,
+            "t": 341.248807391875,
+            "r": 367.03376461999966,
+            "b": 219.31029147499999,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            580
+          ]
+        }
+      ],
+      "orig": "The other big mistake I often see being made is when situations boil down to the product manager's opinion versus the stakeholder's opinion. In this case, the stakeholder usually wins because he or she is usually more senior. However, as we've already discussed many times before, the key is to change the game by quickly running a test and collecting some evidence. Move the discussion from opinions to data. Share what you're learning very openly. It may be that neither of your opinions were right. Again, the discovery work is designed specifically as a place for these tests.",
+      "text": "The other big mistake I often see being made is when situations boil down to the product manager's opinion versus the stakeholder's opinion. In this case, the stakeholder usually wins because he or she is usually more senior. However, as we've already discussed many times before, the key is to change the game by quickly running a test and collecting some evidence. Move the discussion from opinions to data. Share what you're learning very openly. It may be that neither of your opinions were right. Again, the discovery work is designed specifically as a place for these tests."
+    },
+    {
+      "self_ref": "#/texts/23",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431000003,
+            "t": 216.57268976187498,
+            "r": 367.0304769499996,
+            "b": 136.18703497499996,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            363
+          ]
+        }
+      ],
+      "orig": "Mostly this is about creating a collaborative, mutually respectful personal relationship. For most companies, it takes about two to three hours a week-meeting for half an hour or so with each key stakeholder-to keep them apprised, and to get their feedback on new ideas. My favorite way to do this is a weekly lunch or coffee with your most-involved stakeholders.",
+      "text": "Mostly this is about creating a collaborative, mutually respectful personal relationship. For most companies, it takes about two to three hours a week-meeting for half an hour or so with each key stakeholder-to keep them apprised, and to get their feedback on new ideas. My favorite way to do this is a weekly lunch or coffee with your most-involved stakeholders."
+    },
+    {
+      "self_ref": "#/texts/24",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431000003,
+            "t": 133.44943326187501,
+            "r": 367.02499749999953,
+            "b": 66.92349930499995,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            301
+          ]
+        }
+      ],
+      "orig": "Manyproductmanagerstell me that the way they deal with testing business viability with all their different stakeholders is by scheduling a large, group meeting and inviting all the stakeholders. The product manager then presents to them what they want to build, usually with a PowerPoint presentation.",
+      "text": "Manyproductmanagerstell me that the way they deal with testing business viability with all their different stakeholders is by scheduling a large, group meeting and inviting all the stakeholders. The product manager then presents to them what they want to build, usually with a PowerPoint presentation."
+    },
+    {
+      "self_ref": "#/texts/25",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 320,
+          "bbox": {
+            "l": 44.20758431000003,
+            "t": 64.185897591875,
+            "r": 366.9877372399995,
+            "b": 39.22159188499995,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            76
+          ]
+        }
+      ],
+      "orig": "There are two very serious (potentially career limiting) problems with this.",
+      "text": "There are two very serious (potentially career limiting) problems with this."
+    }
+  ],
+  "pictures": [],
+  "tables": [],
+  "key_value_items": [],
+  "form_items": [],
+  "pages": {
+    "2": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 2
+    },
+    "207": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 207
+    },
+    "266": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 266
+    },
+    "320": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 320
+    },
+    "1": {
+      "size": {
+        "width": 432.0,
+        "height": 648.0
+      },
+      "page_no": 1
+    },
+    "3": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 3
+    },
+    "4": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 4
+    },
+    "5": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 5
+    },
+    "6": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 6
+    },
+    "7": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 7
+    },
+    "8": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 8
+    },
+    "9": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 9
+    },
+    "10": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 10
+    },
+    "11": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 11
+    },
+    "12": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 12
+    },
+    "13": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 13
+    },
+    "14": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 14
+    },
+    "15": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 15
+    },
+    "16": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 16
+    },
+    "17": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 17
+    },
+    "18": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 18
+    },
+    "19": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 19
+    },
+    "20": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 20
+    },
+    "21": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 21
+    },
+    "22": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 22
+    },
+    "23": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 23
+    },
+    "24": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 24
+    },
+    "25": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 25
+    },
+    "26": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 26
+    },
+    "27": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 27
+    },
+    "28": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 28
+    },
+    "29": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 29
+    },
+    "30": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 30
+    },
+    "31": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 31
+    },
+    "32": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 32
+    },
+    "33": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 33
+    },
+    "34": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 34
+    },
+    "35": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 35
+    },
+    "36": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 36
+    },
+    "37": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 37
+    },
+    "38": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 38
+    },
+    "39": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 39
+    },
+    "40": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 40
+    },
+    "41": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 41
+    },
+    "42": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 42
+    },
+    "43": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 43
+    },
+    "44": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 44
+    },
+    "45": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 45
+    },
+    "46": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 46
+    },
+    "47": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 47
+    },
+    "48": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 48
+    },
+    "49": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 49
+    },
+    "50": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 50
+    },
+    "51": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 51
+    },
+    "52": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 52
+    },
+    "53": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 53
+    },
+    "54": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 54
+    },
+    "55": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 55
+    },
+    "56": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 56
+    },
+    "57": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 57
+    },
+    "58": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 58
+    },
+    "59": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 59
+    },
+    "60": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 60
+    },
+    "61": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 61
+    },
+    "62": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 62
+    },
+    "63": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 63
+    },
+    "64": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 64
+    },
+    "65": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 65
+    },
+    "66": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 66
+    },
+    "67": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 67
+    },
+    "68": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 68
+    },
+    "69": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 69
+    },
+    "70": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 70
+    },
+    "71": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 71
+    },
+    "72": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 72
+    },
+    "73": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 73
+    },
+    "74": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 74
+    },
+    "75": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 75
+    },
+    "76": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 76
+    },
+    "77": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 77
+    },
+    "78": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 78
+    },
+    "79": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 79
+    },
+    "80": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 80
+    },
+    "81": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 81
+    },
+    "82": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 82
+    },
+    "83": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 83
+    },
+    "84": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 84
+    },
+    "85": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 85
+    },
+    "86": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 86
+    },
+    "87": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 87
+    },
+    "88": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 88
+    },
+    "89": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 89
+    },
+    "90": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 90
+    },
+    "91": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 91
+    },
+    "92": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 92
+    },
+    "93": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 93
+    },
+    "94": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 94
+    },
+    "95": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 95
+    },
+    "96": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 96
+    },
+    "97": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 97
+    },
+    "98": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 98
+    },
+    "99": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 99
+    },
+    "100": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 100
+    },
+    "101": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 101
+    },
+    "102": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 102
+    },
+    "103": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 103
+    },
+    "104": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 104
+    },
+    "105": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 105
+    },
+    "106": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 106
+    },
+    "107": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 107
+    },
+    "108": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 108
+    },
+    "109": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 109
+    },
+    "110": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 110
+    },
+    "111": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 111
+    },
+    "112": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 112
+    },
+    "113": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 113
+    },
+    "114": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 114
+    },
+    "115": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 115
+    },
+    "116": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 116
+    },
+    "117": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 117
+    },
+    "118": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 118
+    },
+    "119": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 119
+    },
+    "120": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 120
+    },
+    "121": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 121
+    },
+    "122": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 122
+    },
+    "123": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 123
+    },
+    "124": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 124
+    },
+    "125": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 125
+    },
+    "126": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 126
+    },
+    "127": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 127
+    },
+    "128": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 128
+    },
+    "129": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 129
+    },
+    "130": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 130
+    },
+    "131": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 131
+    },
+    "132": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 132
+    },
+    "133": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 133
+    },
+    "134": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 134
+    },
+    "135": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 135
+    },
+    "136": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 136
+    },
+    "137": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 137
+    },
+    "138": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 138
+    },
+    "139": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 139
+    },
+    "140": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 140
+    },
+    "141": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 141
+    },
+    "142": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 142
+    },
+    "143": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 143
+    },
+    "144": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 144
+    },
+    "145": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 145
+    },
+    "146": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 146
+    },
+    "147": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 147
+    },
+    "148": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 148
+    },
+    "149": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 149
+    },
+    "150": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 150
+    },
+    "151": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 151
+    },
+    "152": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 152
+    },
+    "153": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 153
+    },
+    "154": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 154
+    },
+    "155": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 155
+    },
+    "156": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 156
+    },
+    "157": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 157
+    },
+    "158": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 158
+    },
+    "159": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 159
+    },
+    "160": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 160
+    },
+    "161": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 161
+    },
+    "162": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 162
+    },
+    "163": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 163
+    },
+    "164": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 164
+    },
+    "165": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 165
+    },
+    "166": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 166
+    },
+    "167": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 167
+    },
+    "168": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 168
+    },
+    "169": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 169
+    },
+    "170": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 170
+    },
+    "171": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 171
+    },
+    "172": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 172
+    },
+    "173": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 173
+    },
+    "174": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 174
+    },
+    "175": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 175
+    },
+    "176": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 176
+    },
+    "177": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 177
+    },
+    "178": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 178
+    },
+    "179": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 179
+    },
+    "180": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 180
+    },
+    "181": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 181
+    },
+    "182": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 182
+    },
+    "183": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 183
+    },
+    "184": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 184
+    },
+    "185": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 185
+    },
+    "186": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 186
+    },
+    "187": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 187
+    },
+    "188": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 188
+    },
+    "189": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 189
+    },
+    "190": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 190
+    },
+    "191": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 191
+    },
+    "192": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 192
+    },
+    "193": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 193
+    },
+    "194": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 194
+    },
+    "195": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 195
+    },
+    "196": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 196
+    },
+    "197": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 197
+    },
+    "198": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 198
+    },
+    "199": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 199
+    },
+    "200": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 200
+    },
+    "201": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 201
+    },
+    "202": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 202
+    },
+    "203": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 203
+    },
+    "204": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 204
+    },
+    "205": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 205
+    },
+    "206": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 206
+    },
+    "208": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 208
+    },
+    "209": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 209
+    },
+    "210": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 210
+    },
+    "211": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 211
+    },
+    "212": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 212
+    },
+    "213": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 213
+    },
+    "214": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 214
+    },
+    "215": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 215
+    },
+    "216": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 216
+    },
+    "217": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 217
+    },
+    "218": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 218
+    },
+    "219": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 219
+    },
+    "220": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 220
+    },
+    "221": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 221
+    },
+    "222": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 222
+    },
+    "223": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 223
+    },
+    "224": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 224
+    },
+    "225": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 225
+    },
+    "226": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 226
+    },
+    "227": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 227
+    },
+    "228": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 228
+    },
+    "229": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 229
+    },
+    "230": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 230
+    },
+    "231": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 231
+    },
+    "232": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 232
+    },
+    "233": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 233
+    },
+    "234": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 234
+    },
+    "235": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 235
+    },
+    "236": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 236
+    },
+    "237": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 237
+    },
+    "238": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 238
+    },
+    "239": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 239
+    },
+    "240": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 240
+    },
+    "241": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 241
+    },
+    "242": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 242
+    },
+    "243": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 243
+    },
+    "244": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 244
+    },
+    "245": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 245
+    },
+    "246": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 246
+    },
+    "247": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 247
+    },
+    "248": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 248
+    },
+    "249": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 249
+    },
+    "250": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 250
+    },
+    "251": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 251
+    },
+    "252": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 252
+    },
+    "253": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 253
+    },
+    "254": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 254
+    },
+    "255": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 255
+    },
+    "256": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 256
+    },
+    "257": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 257
+    },
+    "258": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 258
+    },
+    "259": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 259
+    },
+    "260": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 260
+    },
+    "261": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 261
+    },
+    "262": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 262
+    },
+    "263": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 263
+    },
+    "264": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 264
+    },
+    "265": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 265
+    },
+    "267": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 267
+    },
+    "268": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 268
+    },
+    "269": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 269
+    },
+    "270": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 270
+    },
+    "271": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 271
+    },
+    "272": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 272
+    },
+    "273": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 273
+    },
+    "274": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 274
+    },
+    "275": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 275
+    },
+    "276": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 276
+    },
+    "277": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 277
+    },
+    "278": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 278
+    },
+    "279": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 279
+    },
+    "280": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 280
+    },
+    "281": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 281
+    },
+    "282": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 282
+    },
+    "283": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 283
+    },
+    "284": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 284
+    },
+    "285": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 285
+    },
+    "286": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 286
+    },
+    "287": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 287
+    },
+    "288": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 288
+    },
+    "289": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 289
+    },
+    "290": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 290
+    },
+    "291": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 291
+    },
+    "292": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 292
+    },
+    "293": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 293
+    },
+    "294": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 294
+    },
+    "295": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 295
+    },
+    "296": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 296
+    },
+    "297": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 297
+    },
+    "298": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 298
+    },
+    "299": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 299
+    },
+    "300": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 300
+    },
+    "301": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 301
+    },
+    "302": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 302
+    },
+    "303": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 303
+    },
+    "304": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 304
+    },
+    "305": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 305
+    },
+    "306": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 306
+    },
+    "307": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 307
+    },
+    "308": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 308
+    },
+    "309": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 309
+    },
+    "310": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 310
+    },
+    "311": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 311
+    },
+    "312": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 312
+    },
+    "313": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 313
+    },
+    "314": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 314
+    },
+    "315": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 315
+    },
+    "316": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 316
+    },
+    "317": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 317
+    },
+    "318": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 318
+    },
+    "319": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 319
+    },
+    "321": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 321
+    },
+    "322": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 322
+    },
+    "323": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 323
+    },
+    "324": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 324
+    },
+    "325": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 325
+    },
+    "326": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 326
+    },
+    "327": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 327
+    },
+    "328": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 328
+    },
+    "329": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 329
+    },
+    "330": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 330
+    },
+    "331": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 331
+    },
+    "332": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 332
+    },
+    "333": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 333
+    },
+    "334": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 334
+    },
+    "335": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 335
+    },
+    "336": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 336
+    },
+    "337": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 337
+    },
+    "338": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 338
+    },
+    "339": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 339
+    },
+    "340": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 340
+    },
+    "341": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 341
+    },
+    "342": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 342
+    },
+    "343": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 343
+    },
+    "344": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 344
+    },
+    "345": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 345
+    },
+    "346": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 346
+    },
+    "347": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 347
+    },
+    "348": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 348
+    },
+    "349": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 349
+    },
+    "350": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 350
+    },
+    "351": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 351
+    },
+    "352": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 352
+    },
+    "353": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 353
+    },
+    "354": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 354
+    },
+    "355": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 355
+    },
+    "356": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 356
+    },
+    "357": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 357
+    },
+    "358": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 358
+    },
+    "359": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 359
+    },
+    "360": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 360
+    },
+    "361": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 361
+    },
+    "362": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 362
+    },
+    "363": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 363
+    },
+    "364": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 364
+    },
+    "365": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 365
+    },
+    "366": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 366
+    },
+    "367": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 367
+    },
+    "368": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 368
+    },
+    "369": {
+      "size": {
+        "width": 431.9919738769531,
+        "height": 648.031982421875
+      },
+      "page_no": 369
+    },
+    "370": {
+      "size": {
+        "width": 432.0,
+        "height": 648.0
+      },
+      "page_no": 370
+    }
+  }
+}
