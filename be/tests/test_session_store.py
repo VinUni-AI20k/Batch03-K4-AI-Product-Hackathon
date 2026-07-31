@@ -28,6 +28,9 @@ async def test_session_is_created_saved_and_deleted() -> None:
         "simulated_submission_artifacts": {},
         "submission_approvals": {},
         "agent_workflow": None,
+        "last_user_message_normalized": None,
+        "last_assistant_answer_normalized": None,
+        "security_event_count": 0,
     }
 
     await store.save(session_id, {"messages": [{"role": "user", "content": "Xin chào"}], "intent": "general"})

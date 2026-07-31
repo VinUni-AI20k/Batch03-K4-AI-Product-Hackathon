@@ -225,12 +225,27 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                 canonical_message = await app.state.translation_service.to_vietnamese(
                     chat_request.message, chat_request.language_code,
                 )
+                normalized_message = normalize_untrusted_text(canonical_message).casefold()
+                repeated_user_message = normalized_message == state.get("last_user_message_normalized")
                 injection = assess_prompt_injection(canonical_message)
                 if injection.blocked:
                     answer = (
-                        "Yêu cầu này có dấu hiệu cố thay đổi chỉ dẫn, lấy thông tin bảo mật hoặc bỏ qua bước xác nhận. "
-                        "Tôi đã khóa các tool ghi trong lượt này. Bạn vẫn có thể hỏi thông tin thủ tục hoặc bắt đầu lại bằng yêu cầu bình thường."
+                        "Yêu cầu bất thường này đã lặp lại và tiếp tục bị chặn. Không có tool, quyền hay thao tác phê duyệt nào được thực thi."
+                        if repeated_user_message else
+                        "Yêu cầu này có dấu hiệu thay đổi quy tắc, tự cấp quyền, giả mạo thẩm quyền, lấy thông tin bảo mật hoặc bỏ qua xác nhận. "
+                        "Tôi đã chặn ngay lượt này; không có tool hay quyền nào được thực thi. Bạn vẫn có thể hỏi thủ tục bằng yêu cầu thông thường."
                     )
+                    blocked_state = {
+                        **state,
+                        "messages": [
+                            *state.get("messages", []),
+                            {"role": "user", "content": canonical_message},
+                            {"role": "assistant", "content": answer},
+                        ][-12:],
+                        "last_user_message_normalized": normalized_message,
+                        "security_event_count": int(state.get("security_event_count", 0)) + 1,
+                    }
+                    await app.state.store.save(current_session_id, blocked_state)
                     for word in answer.split(" "):
                         yield sse("message.delta", {"text": f"{word} "})
                     yield sse("security.blocked", {"risk_score": injection.risk_score, "reasons": injection.reasons})
@@ -243,9 +258,34 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     return
 
                 workflow = state.get("agent_workflow") or {}
-                normalized_message = normalize_untrusted_text(canonical_message).casefold()
+                if repeated_user_message:
+                    answer = (
+                        "Bạn vừa gửi lại đúng nội dung của lượt trước. Tôi không chạy lại Agent hoặc tool để tránh lặp vô hạn. "
+                        "Hãy cung cấp thông tin mới, chọn một hướng đang được đề xuất hoặc diễn đạt rõ phần bạn muốn hỏi lại."
+                    )
+                    duplicate_state = {
+                        **state,
+                        "messages": [
+                            *state.get("messages", []),
+                            {"role": "user", "content": canonical_message},
+                            {"role": "assistant", "content": answer},
+                        ][-12:],
+                        "last_user_message_normalized": normalized_message,
+                    }
+                    await app.state.store.save(current_session_id, duplicate_state)
+                    for word in answer.split(" "):
+                        yield sse("message.delta", {"text": f"{word} "})
+                    yield sse("agent.stopped", {"reason": "duplicate_user_message"})
+                    yield sse("message.complete", {
+                        "intent": "general", "quick_replies": [], "citations": [], "answer_strategy": "high",
+                        "confidence_score": 1, "confidence_band": "high", "confidence_reasons": ["Duplicate-turn guard"],
+                        "external_search_used": False, "external_search_consent_required": False,
+                        "form_code": None, "translation_used": needs_translation,
+                    })
+                    return
+
                 selected_mode = None
-                if workflow.get("status") == "awaiting_mode":
+                if workflow.get("status") in {"awaiting_mode", "collecting", "ready_for_review"}:
                     if "điền từng bước" in normalized_message or "cùng agent" in normalized_message:
                         selected_mode = "agent_chat"
                     elif "mở biểu mẫu" in normalized_message or "điền trên biểu mẫu" in normalized_message:
@@ -258,7 +298,11 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                 if selected_mode == "review_form":
                     form_code = workflow.get("form_code")
                     answer = "Đã mở biểu mẫu ngay trong khung chat. Bạn có thể điền trực tiếp, chạy Agent kiểm tra, xác nhận dữ liệu, xem PDF và xác nhận lần cuối trước khi gửi mô phỏng."
-                    new_state = {**turn_state, "messages": [*messages, {"role": "assistant", "content": answer}][-12:]}
+                    new_state = {
+                        **turn_state,
+                        "messages": [*messages, {"role": "assistant", "content": answer}][-12:],
+                        "last_user_message_normalized": normalized_message,
+                    }
                     await app.state.store.save(current_session_id, new_state)
                     for word in answer.split(" "):
                         yield sse("message.delta", {"text": f"{word} "})
@@ -331,12 +375,10 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                         "tool_history": tool_history,
                     }
                     reply.answer = (
-                        f"Agent đã xác định tool phù hợp: {plan.selected_registration_tool}. "
-                        "Biểu mẫu đã được hiển thị ngay trong khung chat. Bạn có thể điền trực tiếp trên biểu mẫu "
-                        "hoặc chọn điền từng bước cùng Agent."
+                        "Tôi đã xác định được mẫu hồ sơ phù hợp. Bạn muốn tự điền biểu mẫu trong khung chat "
+                        "hay để tôi hỏi lần lượt từng thông tin cần thiết?"
                     )
                     reply.quick_replies = ["Điền trên biểu mẫu", "Điền từng bước cùng Agent"]
-                    yield sse("agent.plan", plan.model_dump())
                 elif form_patch and workflow.get("mode") == "agent_chat":
                     try:
                         workflow = {
@@ -345,6 +387,18 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                                 workflow.get("tool_history", []), "collect_form_data", {"fields": form_patch["fields"]},
                             ),
                         }
+                        form_candidate = app.state.procedure_pipeline.procedure_settings.form_candidates[form_code]
+                        missing_required = [
+                            field.field_code for field in form_candidate.fields
+                            if field.required and not form_patch["fields"].get(field.field_code)
+                        ]
+                        if not missing_required:
+                            workflow = {**workflow, "status": "ready_for_review"}
+                            reply.answer = (
+                                "Tôi đã thu thập đủ thông tin bắt buộc. Hãy mở biểu mẫu để kiểm tra toàn bộ dữ liệu, "
+                                "thẩm định và xác nhận trước khi tạo PDF."
+                            )
+                            reply.quick_replies = ["Mở biểu mẫu để kiểm tra"]
                         yield sse("tool.result", {"name": "collect_form_data", "ok": True, "field_count": len(form_patch["fields"])})
                     except AgentLoopStopped:
                         reply.answer = "Agent đã dừng vì tool thu thập dữ liệu trả cùng một kết quả hai lần liên tiếp. Hãy cung cấp thông tin mới hoặc chuyển sang biểu mẫu."
@@ -352,6 +406,16 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                         workflow = {**workflow, "status": "loop_stopped"}
                         yield sse("agent.stopped", {"reason": "repeated_identical_tool_result"})
                 canonical_answer = redact_known_secrets(reply.answer)
+                normalized_answer = normalize_untrusted_text(canonical_answer).casefold()
+                if normalized_answer and normalized_answer == turn_state.get("last_assistant_answer_normalized"):
+                    canonical_answer = (
+                        "Câu trả lời dự kiến trùng hoàn toàn với lượt trước nên Agent đã dừng để tránh lặp. "
+                        "Bạn hãy bổ sung dữ liệu mới hoặc chọn một thao tác khác."
+                    )
+                    reply.answer = canonical_answer
+                    reply.quick_replies = ["Điền trên biểu mẫu"] if form_code else []
+                    workflow = {**workflow, "status": "loop_stopped", "stop_reason": "duplicate_assistant_answer"}
+                    yield sse("agent.stopped", {"reason": "duplicate_assistant_answer"})
                 reply.answer = canonical_answer
                 if needs_translation:
                     reply.answer = await app.state.translation_service.from_vietnamese(reply.answer, chat_request.language_code)
@@ -378,8 +442,13 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     "form_draft": {**turn_state.get("form_draft", {}), form_code: form_patch["fields"]} if form_patch else turn_state.get("form_draft", {}),
                     "last_validation": turn_state.get("last_validation", {}),
                     "agent_workflow": workflow or turn_state.get("agent_workflow"),
+                    "last_user_message_normalized": normalized_message,
+                    "last_assistant_answer_normalized": normalize_untrusted_text(canonical_answer).casefold(),
                 }
                 await app.state.store.save(current_session_id, new_state)
+                visible_form_code = form_code
+                if workflow.get("mode") != "review_form":
+                    visible_form_code = None
                 yield sse("message.complete", {
                     "intent": reply.intent,
                     "quick_replies": reply.quick_replies,
@@ -393,7 +462,7 @@ def create_app(settings: Settings | None = None, redis_client: Redis | None = No
                     "confidence_reasons": reply.confidence_reasons,
                     "external_search_used": reply.external_search_used,
                     "external_search_consent_required": reply.external_search_consent_required,
-                    "form_code": form_code,
+                    "form_code": visible_form_code,
                     "translation_used": needs_translation,
                 })
             except TranslationError as exc:

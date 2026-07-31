@@ -36,6 +36,9 @@ class SessionStore:
             "simulated_submission_artifacts": {},
             "submission_approvals": {},
             "agent_workflow": None,
+            "last_user_message_normalized": None,
+            "last_assistant_answer_normalized": None,
+            "security_event_count": 0,
         }
         await self.redis.set(self.key(session_id), json.dumps(state), ex=self.ttl_seconds)
         return session_id

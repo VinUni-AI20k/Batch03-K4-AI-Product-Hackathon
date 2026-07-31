@@ -49,18 +49,34 @@ describe("App", () => {
     expect(screen.getByRole("link", { name: "Luật Hộ tịch" })).toHaveAttribute("href", "https://example.test/source");
   });
 
-  it("shows an agent-selected form directly inside the chat", async () => {
-    vi.mocked(streamChat).mockImplementationOnce(async (_message, _language, _translationConsent, _searchConsent, onEvent) => {
-      onEvent({ type: "message.delta", text: "Đã mở biểu mẫu ngay trong khung chat." });
-      onEvent({
-        type: "message.complete", intent: "form_guidance", quickReplies: [], citations: [], answerStrategy: "high",
-        confidenceBand: "high", confidenceReasons: [], externalSearchUsed: false, externalSearchConsentRequired: false,
-        formCode: "BIRTH_REGISTRATION_FORM", openReview: true,
+  it("asks for a mode before showing an agent-selected form", async () => {
+    vi.mocked(streamChat)
+      .mockImplementationOnce(async (_message, _language, _translationConsent, _searchConsent, onEvent) => {
+        onEvent({ type: "agent.plan", selectedTool: "prepare_birth_registration", steps: ["lookup_procedure"], requiredData: [], decisionBasis: "internal" });
+        onEvent({ type: "message.delta", text: "Bạn muốn điền theo cách nào?" });
+        onEvent({
+          type: "message.complete", intent: "form_guidance", quickReplies: ["Điền trên biểu mẫu", "Điền từng bước cùng Agent"], citations: [], answerStrategy: "high",
+          confidenceBand: "high", confidenceReasons: [], externalSearchUsed: false, externalSearchConsentRequired: false,
+          formCode: null, openReview: false,
+        });
+      })
+      .mockImplementationOnce(async (_message, _language, _translationConsent, _searchConsent, onEvent) => {
+        onEvent({ type: "message.delta", text: "Đã mở biểu mẫu." });
+        onEvent({
+          type: "message.complete", intent: "form_guidance", quickReplies: [], citations: [], answerStrategy: "high",
+          confidenceBand: "high", confidenceReasons: [], externalSearchUsed: false, externalSearchConsentRequired: false,
+          formCode: "BIRTH_REGISTRATION_FORM", openReview: false,
+        });
       });
-    });
     render(<App />);
     fireEvent.click(screen.getByText("Tôi muốn đăng ký khai sinh cho bé"));
 
+    expect(await screen.findByText("Bạn muốn điền theo cách nào?")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Biểu mẫu dịch vụ công trong hội thoại" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Kế hoạch Agent")).not.toBeInTheDocument();
+    expect(screen.queryByText("prepare_birth_registration")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Điền trên biểu mẫu" }));
     expect(await screen.findByRole("region", { name: "Biểu mẫu dịch vụ công trong hội thoại" })).toBeInTheDocument();
     expect(await screen.findByText("Tờ khai đăng ký khai sinh")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Rà soát & Nộp mô phỏng/ })).not.toHaveClass("active");
