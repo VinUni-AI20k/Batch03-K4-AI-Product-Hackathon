@@ -36,7 +36,7 @@ Kiểm tra evaluator:
 uv run python -m unittest eval.test_module_eval -v
 ```
 
-Smoke test toàn bộ pipeline:
+Contract smoke test toàn bộ pipeline (phải đạt 20/20; chỉ xác nhận evaluator):
 
 ```bash
 uv run python eval/run_module_eval.py \
@@ -44,6 +44,16 @@ uv run python eval/run_module_eval.py \
 ```
 
 Smoke adapter chỉ kiểm tra hệ thống đo, không phải bằng chứng chất lượng Agent.
+`mock_vlearn_adapter` là contract fixture nên đọc expectation trong testcase.
+Để kiểm tra evaluator có thực sự bắt lỗi, chạy adapter cố ý sai:
+
+```bash
+uv run python eval/run_module_eval.py \
+  --adapter eval.adapters.faulty_vlearn_adapter
+```
+
+Lượt faulty phải fail; lượt contract phải pass. Cả hai đều không được dùng để
+thay thế kết quả Agent/API thật.
 Để đánh giá Agent thật, sao chép `eval/adapters/project_adapter_template.py`
 thành adapter của dự án, gọi Agent/API thật trong `run_case()`, rồi chạy:
 

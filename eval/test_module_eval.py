@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from eval.metrics import bleu, keyword_recall, rouge_l, set_scores
-from eval.run_module_eval import score_case, summarize
+from eval.adapters import faulty_vlearn_adapter, mock_vlearn_adapter
+from eval.run_module_eval import load_cases, score_case, summarize
 
 
 class MetricTests(unittest.TestCase):
@@ -26,6 +28,29 @@ class MetricTests(unittest.TestCase):
 
 
 class ScoringTests(unittest.TestCase):
+    def test_contract_fixture_passes_every_golden_case(self) -> None:
+        cases = load_cases(Path(__file__).with_name("cases"), selected_suites=None)
+        rows = [
+            score_case(case, mock_vlearn_adapter.run_case(case), latency_ms=0, error=None)
+            for case in cases
+        ]
+        self.assertEqual(len(rows), 20)
+        self.assertTrue(all(row["passed"] for row in rows))
+
+    def test_faulty_fixture_is_rejected(self) -> None:
+        case = {
+            "id": "qa_broken",
+            "suite": "lesson_qa",
+            "input": "x",
+            "expected": {"keywords": ["đúng"]},
+            "expected_citations": ["T1"],
+            "expected_tool_calls": ["retrieve"],
+        }
+        row = score_case(case, faulty_vlearn_adapter.run_case(case), latency_ms=0, error=None)
+        self.assertFalse(row["passed"])
+        self.assertFalse(row["required_checks"]["citation_recall"])
+        self.assertFalse(row["required_checks"]["tool_call_precision"])
+
     def test_tool_and_citation_are_required(self) -> None:
         case = {
             "id": "qa_1",
