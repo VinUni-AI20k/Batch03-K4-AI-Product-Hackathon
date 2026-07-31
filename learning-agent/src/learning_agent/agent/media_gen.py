@@ -13,8 +13,10 @@ kênh, giống hệt pattern diagram_attachments() đã có trong render.py.
 """
 from __future__ import annotations
 
+import os
 import re
 import uuid
+from datetime import date
 from pathlib import Path
 
 TTS_MAX_CHARS = 2000       # 1 clip vừa phải, tránh audio quá dài/chậm
@@ -22,12 +24,43 @@ IMAGE_MAX_PROMPT = 900
 VI_VOICE = "vi-VN-HoaiMyNeural"
 
 
+class MediaRateLimiter:
+    """Giới hạn RIÊNG cho tạo audio/ảnh trên web công khai — tách biệt hẳn rate-limit
+    chat thường (chat-public dùng CHUNG 1 user_id cho mọi khách nên phải đếm theo IP
+    thật, không theo user_id). Chỉ áp cho public; Telegram/Discord/admin đã qua
+    allowlist riêng nên không giới hạn thêm ở đây. In-memory, reset khi restart —
+    đủ dùng cho demo, không cần bền vững qua restart."""
+
+    def __init__(self):
+        self.audio_cap = int(os.environ.get("VLEARN_MEDIA_AUDIO_DAILY_PUBLIC", "10"))
+        self.image_cap = int(os.environ.get("VLEARN_MEDIA_IMAGE_DAILY_PUBLIC", "2"))
+        self._counts: dict[str, int] = {}  # key: f"{kind}:{ip}:{ngày}"
+
+    def check(self, kind: str, ip: str) -> str:
+        """'' nếu còn hạn mức, chuỗi lý do nếu đã hết (KHÔNG tự tăng đếm — gọi consume() sau khi thật sự sinh xong)."""
+        cap = self.audio_cap if kind == "audio" else self.image_cap
+        key = f"{kind}:{ip}:{date.today().isoformat()}"
+        if self._counts.get(key, 0) >= cap:
+            noun = "audio" if kind == "audio" else "ảnh"
+            return f"⚠️ Bản demo công khai giới hạn {cap} {noun}/ngày cho mỗi người — bạn đã dùng hết hôm nay, hẹn mai nhé!"
+        return ""
+
+    def consume(self, kind: str, ip: str) -> None:
+        key = f"{kind}:{ip}:{date.today().isoformat()}"
+        self._counts[key] = self._counts.get(key, 0) + 1
+
+
 class MediaGen:
     def __init__(self, cfg):
         self.cfg = cfg
         self.out_dir = Path(cfg.root) / "data" / "generated"
+        self.limiter = MediaRateLimiter()
 
-    def tts(self, text: str) -> tuple[str, str | None]:
+    def tts(self, text: str, rate_key: str | None = None) -> tuple[str, str | None]:
+        if rate_key:
+            blocked = self.limiter.check("audio", rate_key)
+            if blocked:
+                return blocked, None
         text = re.sub(r"\s+", " ", (text or "")).strip()[:TTS_MAX_CHARS]
         if not text:
             return "⚠️ Thiếu nội dung cần đọc.", None
@@ -48,6 +81,8 @@ class MediaGen:
             return f"⚠️ Không tạo được audio: {e}", None
         if not out.exists() or out.stat().st_size == 0:
             return "⚠️ Không tạo được audio (file rỗng).", None
+        if rate_key:
+            self.limiter.consume("audio", rate_key)
         return f"✅ Đã tạo audio tiếng Việt ({len(text)} ký tự).", str(out)
 
     def _openai_key(self) -> str:
@@ -61,7 +96,11 @@ class MediaGen:
             return self.cfg.llm_api_key
         return ""
 
-    def image(self, mo_ta: str) -> tuple[str, str | None]:
+    def image(self, mo_ta: str, rate_key: str | None = None) -> tuple[str, str | None]:
+        if rate_key:
+            blocked = self.limiter.check("image", rate_key)
+            if blocked:
+                return blocked, None
         key = self._openai_key()
         if not key:
             return ("⚠️ Tạo ảnh cần key OpenAI thật (OPENAI_API_KEY, hoặc LLM_API_KEY nếu "
@@ -93,6 +132,8 @@ class MediaGen:
             return f"⚠️ Lưu ảnh lỗi: {e}", None
         if not out.exists() or out.stat().st_size == 0:
             return "⚠️ Tải ảnh về lỗi (file rỗng).", None
+        if rate_key:
+            self.limiter.consume("image", rate_key)
         return "✅ Đã tạo ảnh.", str(out)
 
     def tool_schemas(self) -> list[dict]:

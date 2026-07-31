@@ -123,7 +123,8 @@ PUBLIC_DENY_TOOLS = {
     "save_concept", "update_memory", "update_soul", "read_soul", "update_student_memory",
     "log_assessment", "save_research_note", "flashcards",  # ghi dữ liệu của chủ agent — không cho web công khai
     "hoc_tu_nguon_ngoai",  # tool tải URL (SSRF-guard riêng) + ghi kho — chỉ chủ agent
-    "tao_am_thanh", "tao_anh",  # tốn phí/tài nguyên thật — chặn spam từ web công khai
+    # tao_am_thanh/tao_anh: KHÔNG chặn hẳn — cho web công khai dùng với rate-limit
+    # riêng theo IP (nghiêm hơn nhiều lần rate-limit chat thường), xem MediaRateLimiter.
 }
 
 
@@ -290,6 +291,7 @@ class TutorAgent:
         origin: dict | None = None,  # {'platform': 'telegram'|'discord', 'chat_id': ...}
         trace: list | None = None,   # truyền list vào để nhận lại các bước: thought + tool calls
         attachments: list | None = None,  # truyền list vào để nhận lại đường dẫn audio/ảnh vừa sinh
+        client_key: str | None = None,  # IP thật (web public) — rate-limit riêng cho tạo audio/ảnh
     ) -> str:
         """history: [{'role': 'user'|'assistant', 'content': ...}] các lượt gần nhất."""
         if attachments is None:
@@ -372,7 +374,7 @@ class TutorAgent:
                     messages.append({"role": "tool", "tool_call_id": call.id,
                                      "content": "⚠️ Tool này với đúng tham số này ĐÃ GỌI RỒI — kết quả ở trên. Đừng gọi lại; hoàn thành câu trả lời cho học viên ngay."})
                     continue
-                result = self._run_tool(call.function.name, call.function.arguments, user_id, display_name, origin, attachments)
+                result = self._run_tool(call.function.name, call.function.arguments, user_id, display_name, origin, attachments, client_key)
                 seen_calls[key] = True
                 if trace is not None:
                     trace.append({
@@ -401,9 +403,12 @@ class TutorAgent:
         return answer
 
     def _run_tool(self, name: str, arguments: str, user_id: str, display_name: str,
-                  origin: dict | None = None, attachments: list | None = None) -> str:
+                  origin: dict | None = None, attachments: list | None = None,
+                  client_key: str | None = None) -> str:
         # Web công khai: khoá tool tự động hoá / ghi dữ liệu (phòng khi model vẫn cố gọi).
-        if _is_public(user_id) and (name in PUBLIC_DENY_TOOLS or name.startswith("discord_") or self.addons.owns(name)):
+        # tao_am_thanh/tao_anh CHỪA RA — cho phép nhưng rate-limit riêng nghiêm ngặt (dưới).
+        if _is_public(user_id) and name not in ("tao_am_thanh", "tao_anh") and \
+                (name in PUBLIC_DENY_TOOLS or name.startswith("discord_") or self.addons.owns(name)):
             return "⚠️ Tính năng này chỉ dùng khi chat riêng với chủ agent — bản web công khai chỉ hỗ trợ học & tra cứu (hỏi bài, tóm tắt, quiz, vẽ sơ đồ…)."
         try:
             args = json.loads(arguments or "{}")
@@ -415,12 +420,14 @@ class TutorAgent:
                 return self.mastery.log(user_id, args.get("topic", ""),
                                         bool(args.get("correct")), args.get("note", ""))
             if name == "tao_am_thanh":
-                msg, path = self.media.tts(args.get("text", ""))
+                rate_key = (client_key or "unknown-ip") if _is_public(user_id) else None
+                msg, path = self.media.tts(args.get("text", ""), rate_key)
                 if path and attachments is not None:
                     attachments.append(path)
                 return msg
             if name == "tao_anh":
-                msg, path = self.media.image(args.get("mo_ta", ""))
+                rate_key = (client_key or "unknown-ip") if _is_public(user_id) else None
+                msg, path = self.media.image(args.get("mo_ta", ""), rate_key)
                 if path and attachments is not None:
                     attachments.append(path)
                 return msg

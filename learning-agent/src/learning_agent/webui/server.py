@@ -71,6 +71,10 @@ def create_app(cfg, watch: bool = False) -> FastAPI:
     _hits: dict[str, list[float]] = {}
     _day = {"date": "", "n": 0}
 
+    def _client_ip(request: Request) -> str:
+        return (request.headers.get("cf-connecting-ip")
+                or request.headers.get("x-forwarded-for", "").split(",")[0].strip() or "?")
+
     def chat_gate(request: Request, body_token: str):
         """None nếu qua; JSONResponse nếu bị chặn. Chỉ chặn request đến qua tunnel."""
         via_tunnel = bool(request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for"))
@@ -83,8 +87,7 @@ def create_app(cfg, watch: bool = False) -> FastAPI:
             _day.update(date=today, n=0)
         if _day["n"] >= RL_CAP:
             return JSONResponse({"answer": "⚠️ Bản demo công khai đã đạt giới hạn lượt hỏi hôm nay. Hẹn bạn ngày mai nhé!"}, status_code=429)
-        ip = (request.headers.get("cf-connecting-ip")
-              or request.headers.get("x-forwarded-for", "").split(",")[0].strip() or "?")
+        ip = _client_ip(request)
         now = time.time()
         arr = [t for t in _hits.get(ip, []) if now - t < 86400]
         if sum(1 for t in arr if now - t < 60) >= RL_MIN:
@@ -389,10 +392,10 @@ def create_app(cfg, watch: bool = False) -> FastAPI:
         history = [m for m in body.history if m.get("role") in ("user", "assistant")][-12:]
         history.append({"role": "user", "content": body.question})
         trace: list = []
-        attachments: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh — luôn rỗng cho via_tunnel, tool bị chặn)
+        attachments: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh)
         uid = "chat-public" if via_tunnel else "admin-ui"
         answer = agent.reply(uid, "Khách" if via_tunnel else "Admin", history,
-                             trace=trace, attachments=attachments)
+                             trace=trace, attachments=attachments, client_key=_client_ip(request))
         media = []
         for p in attachments:
             try:
