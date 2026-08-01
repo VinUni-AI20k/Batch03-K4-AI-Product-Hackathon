@@ -1,0 +1,51 @@
+name: "🐛 Báo lỗi (Bug report)"
+description: Agent chạy sai, crash, hoặc trả lời không đúng như mong đợi.
+title: "[Bug] "
+labels: ["bug", "cần phân loại"]
+body:
+  - type: dropdown
+    id: khu-vuc
+    attributes:
+      label: Khu vực gặp lỗi
+      options:
+        - "Trả lời / tool-calling của agent"
+        - "Nạp tài liệu (ingest slide/video/audio)"
+        - "Kênh chat Telegram / Discord"
+        - "Kết nối MCP / Maton / CLI"
+        - "Dashboard web"
+        - "Cài đặt / Docker / script"
+        - "Khác"
+    validations:
+      required: true
+  - type: textarea
+    id: mo-ta
+    attributes:
+      label: Mô tả lỗi
+      description: Chuyện gì đã xảy ra?
+    validations:
+      required: true
+  - type: textarea
+    id: tai-hien
+    attributes:
+      label: Các bước tái hiện
+      placeholder: |
+        1. Gõ '...'
+        2. Gửi file '...'
+        3. Thấy lỗi '...'
+    validations:
+      required: true
+  - type: textarea
+    id: mong-doi
+    attributes:
+      label: Kết quả mong đợi
+  - type: textarea
+    id: log
+    attributes:
+      label: Log / thông báo lỗi (nếu có)
+      description: "⚠️ Nhớ XOÁ mọi API key, token, thông tin cá nhân trước khi dán."
+      render: shell
+  - type: input
+    id: moi-truong
+    attributes:
+      label: Môi trường
+      placeholder: "macOS 15 · Python 3.12 · model gpt-4o-mini · provider openai"

@@ -1,0 +1,34 @@
+name: "💡 Đề xuất tính năng (Feature request)"
+description: Gợi ý tính năng, tool, skill hoặc tích hợp mới cho Vlearn Agent.
+title: "[Feature] "
+labels: ["enhancement", "cần phân loại"]
+body:
+  - type: textarea
+    id: van-de
+    attributes:
+      label: Vấn đề / nhu cầu
+      description: Tính năng này giải quyết khó khăn gì trong việc học?
+    validations:
+      required: true
+  - type: textarea
+    id: de-xuat
+    attributes:
+      label: Giải pháp đề xuất
+    validations:
+      required: true
+  - type: dropdown
+    id: loai
+    attributes:
+      label: Thuộc nhóm nào?
+      options:
+        - "Tool mới (agent tự gọi)"
+        - "Skill học tập mới"
+        - "Addon / plugin"
+        - "Kênh chat / tích hợp MCP mới"
+        - "Cải thiện dashboard"
+        - "Khác"
+  - type: textarea
+    id: bo-sung
+    attributes:
+      label: Bổ sung (tuỳ chọn)
+      description: Giải pháp thay thế đã cân nhắc, ví dụ tham khảo, ảnh minh hoạ...

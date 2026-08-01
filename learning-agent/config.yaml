@@ -1,0 +1,78 @@
+# Cấu hình hệ thống learning-agent (secrets để trong .env, không để ở đây)
+
+vault:
+  path: ./vault                # source of truth: markdown, mở được bằng Obsidian
+  git_autocommit: true         # mỗi lần ingest/update -> 1 commit
+
+sources:
+  dir: ./source_mirror         # nơi rclone sync bài giảng về (slide/video/ghi âm)
+  manifest_db: ./data/manifest.sqlite
+
+index:
+  chroma_path: ./data/chroma
+  collection: lessons
+  embedding_provider: voyage   # voyage | local (fallback: embedding mặc định của Chroma)
+  voyage_model: voyage-context-3   # contextualized: embed chunk theo ngữ cảnh toàn bài (hợp slide rời rạc)
+  top_k: 6
+
+llm:
+  # provider: chọn nhà cung cấp (tự set base_url; key đọc từ .env theo từng provider):
+  #   openai      -> OPENAI_API_KEY       · model vd: gpt-4o-mini, gpt-4.1-mini, o4-mini
+  #   openrouter  -> OPENROUTER_API_KEY   · model vd: anthropic/claude-3.7-sonnet, google/gemini-2.0-flash, meta-llama/llama-3.3-70b (CLAUDE dùng qua đây)
+  #   gemini      -> GEMINI_API_KEY       · model vd: gemini-2.0-flash, gemini-1.5-pro
+  #   groq        -> GROQ_API_KEY         · model vd: llama-3.3-70b-versatile (siêu nhanh)
+  #   together    -> TOGETHER_API_KEY     · model vd: meta-llama/Llama-3.3-70B-Instruct-Turbo
+  #   ollama      -> chạy local, không cần key · model vd: llama3.1
+  #   custom      -> tự điền LLM_BASE_URL + LLM_API_KEY trong .env (bất kỳ endpoint OpenAI-compatible)
+  provider: openai
+  model: gpt-5.6-luna             # model dùng để CHAT (đổi theo provider ở trên)
+  reasoning_effort: none          # BẮT BUỘC cho model reasoning (vd gpt-5.6-luna) khi dùng tool-calling —
+                                   # model KHÔNG phải reasoning sẽ TỪ CHỐI tham số này, để trống nếu đổi model
+  structurer_model: gpt-4o-mini   # model rẻ cho bước cấu trúc hoá bài giảng lúc nạp (có thể giữ rẻ)
+  max_tool_rounds: 8
+
+asr:
+  # faster-whisper cần model CTranslate2. Dùng bản chuẩn: large-v3 (chất lượng cao, chậm)
+  # hoặc medium (nhanh ~0.5x realtime, tiếng Việt vẫn tốt). PhoWhisper phải convert CT2 trước khi dùng.
+  model: medium
+  language: vi
+
+discord:
+  # token trong .env (DISCORD_BOT_TOKEN); allowlist: DISCORD_ALLOWED_USERS
+  thread_per_question: false      # false = trả lời thẳng trong channel (tự nhiên); true = mở thread riêng mỗi câu (channel đông)
+  max_events_per_minute: 20       # chống bot-loop
+  message_content_intent: true    # true = đọc MỌI tin trong channel/thread (đã bật Message Content Intent
+                                  # trong Developer Portal). false = chỉ DM + @mention + slash
+
+# telegram: token trong .env (TELEGRAM_BOT_TOKEN); allowlist: TELEGRAM_ALLOWED_USERS
+# Bot API chuẩn chỉ nhận file <=20MB — video lớn bỏ vào source_mirror/ hoặc chạy local bot-api server
+
+agent:
+  skills_dir: ./skills            # skills/<name>/SKILL.md — chuẩn agentskills.io
+  student_memory_dir: students    # nằm trong vault
+  language: vi
+
+security:
+  user_rate_per_minute: 10        # tối đa tin nhắn/user/phút (chống spam + đội chi phí LLM)
+  max_upload_mb: 32               # trần file gửi qua Discord (Telegram bị Bot API chặn 20MB sẵn)
+  # audit log: data/audit.log — ghi mọi sự kiện nhạy cảm (user bị chặn, ingest, cài pack, tạo lịch)
+
+# Knowledge packs — bộ bài học cài từ GitHub qua chat (agent chỉ được cài các repo
+# khai báo ở đây, không clone URL tuỳ ý). Thay repo bằng repo bài học thật của bạn.
+knowledge_packs:
+  - name: vlearn-pack
+    repo: https://github.com/hoangaiecos-boop/K4-hackathon-VLAgent-D304.git
+    description: Bộ bài học K4 hackathon (slides + 6 transcript bài giảng + nội dung Discord + đề bài/rubric)
+    subdirs:                      # chỉ ingest các mục này, tránh nuốt code/file ngoài lề
+      - data/vlearn-pack
+      - 01-de-bai.md
+      - 02-guide.md
+      - 04-rubric.md
+
+# Cron: tick 60s, mỗi job chạy phiên agent mới với skill chỉ định,
+# kết quả gửi về home chat (đặt bằng /sethome trong Discord/Telegram)
+schedules:
+  - name: bao-cao-sang
+    time: "07:30"
+    skill: bao-cao-hang-ngay
+    deliver: all                  # all | telegram | discord

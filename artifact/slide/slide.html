@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vlearn Agent — Pitch Deck</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#0B0C0E; --ink-2:#14161B; --ink-3:#1A1D23; --line:#262A31; --line-2:#31363F;
+    --paper:#EEECE7; --muted:#9CA0A8; --faint:#6B6F78;
+    --amber:#F6B33F; --amber-deep:#E8891C; --teal:#57C7B8;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,"Cascadia Code",Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%; background:#000; overflow:hidden; font-family:var(--sans)}
+  .stagewrap{position:fixed; inset:0; display:flex; align-items:center; justify-content:center}
+  .stage{width:1280px; height:720px; position:relative; transform-origin:center center}
+
+  .slide{
+    position:absolute; inset:0; padding:56px 62px 46px; display:flex; flex-direction:column;
+    background:
+      radial-gradient(120% 80% at 84% -10%, rgba(246,179,63,.10), transparent 46%),
+      radial-gradient(90% 70% at -8% 110%, rgba(87,199,184,.06), transparent 50%),
+      var(--ink);
+    color:var(--paper); opacity:0; visibility:hidden; transform:translateY(14px);
+    transition:opacity .4s ease, transform .4s ease; overflow:hidden;
+  }
+  .slide.active{opacity:1; visibility:visible; transform:none}
+  @media(prefers-reduced-motion:reduce){ .slide{transition:none} }
+
+  .eyebrow{font-family:var(--mono); font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--amber)}
+  h1{font-size:44px; line-height:1.13; letter-spacing:-.02em; font-weight:800}
+  h1 em{font-family:var(--serif); font-style:italic; font-weight:500; color:var(--amber)}
+  h2{font-size:36px; line-height:1.15; letter-spacing:-.02em; font-weight:800; margin-top:10px}
+  h2 em{font-family:var(--serif); font-style:italic; font-weight:500; color:var(--amber)}
+  .lead{color:var(--muted); font-size:17px; line-height:1.5; margin-top:12px; max-width:960px}
+  .lead b{color:var(--paper); font-weight:600}
+  .s-body{flex:1; display:flex; flex-direction:column; justify-content:center}
+  .s-head .eyebrow{margin-bottom:8px}
+
+  footer{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:18px}
+  footer .brand{display:flex; align-items:center; gap:7px; color:var(--paper); font-family:var(--sans); font-weight:700; font-size:13.5px}
+  footer .cap{width:20px; height:20px}
+  footer .sp{margin-left:auto}
+  footer b{color:var(--amber)}
+
+  /* grids / cards */
+  .grid{display:grid; gap:14px; margin-top:22px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--ink-2); border:1px solid var(--line); border-radius:14px; padding:17px 18px; position:relative; overflow:hidden}
+  .card.rail::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--amber); opacity:.85}
+  .card .ic{width:28px; height:28px; color:var(--amber); margin-bottom:10px}
+  .card h3{font-size:16.5px; letter-spacing:-.01em; margin-bottom:5px; font-weight:700}
+  .card p{font-size:12.8px; line-height:1.5; color:var(--muted)}
+  .card p b{color:var(--paper); font-weight:600}
+  .card .num{position:absolute; top:14px; right:16px; font-family:var(--mono); font-size:11px; color:var(--faint)}
+  .k{font-family:var(--mono); font-size:10.5px; color:var(--teal); letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:9px}
+
+  /* cover */
+  .cover{align-items:center; justify-content:center; text-align:center}
+  .mascot{width:104px; height:104px; margin:0 auto 22px; position:relative}
+  .mascot svg{width:100%; height:100%; position:relative; z-index:1}
+  .mascot::after{content:""; position:absolute; inset:-28% -28% -8%; background:radial-gradient(circle at 50% 55%, rgba(246,179,63,.20), transparent 62%); filter:blur(6px)}
+  .cover h1{font-size:74px; margin-top:6px; letter-spacing:-.035em}
+  .cover .lead{margin:20px auto 0; max-width:720px; font-size:19px; text-align:center}
+  .cover .meta{margin-top:30px; font-family:var(--mono); font-size:13px; color:var(--faint); letter-spacing:.05em}
+  .cover .meta b{color:var(--amber)}
+
+  /* pipeline flow */
+  .flow{display:flex; align-items:stretch; gap:10px; margin-top:26px}
+  .step{flex:1; background:var(--ink-2); border:1px solid var(--line); border-radius:13px; padding:16px 15px; position:relative}
+  .step .t{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--amber); margin-bottom:8px}
+  .step h4{font-size:15px; margin-bottom:5px}
+  .step p{font-size:11.8px; color:var(--muted); line-height:1.45}
+  .flow .arr{display:flex; align-items:center; color:var(--faint); flex:none}
+  .flow .arr svg{width:22px; height:16px}
+  .band{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+  .pill{font-family:var(--mono); font-size:12px; color:var(--paper); border:1px solid var(--line-2); border-radius:999px; padding:8px 14px; background:var(--ink-2)}
+  .pill .d{color:var(--amber)}
+
+  /* ribbon (chatbot->agent) */
+  .ribbon{display:flex; align-items:center; gap:14px; margin-top:18px}
+  .chip{border:1px solid var(--line-2); border-radius:11px; padding:9px 15px; display:flex; flex-direction:column; gap:2px}
+  .chip .tt{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint)}
+  .chip .vv{font-size:13.5px; font-weight:600}
+  .chip.old .vv{color:var(--muted)}
+  .chip.new{background:linear-gradient(180deg,rgba(246,179,63,.14),rgba(246,179,63,.05)); border-color:rgba(246,179,63,.5)}
+  .chip.new .vv{color:var(--amber)}
+  .arrow{display:flex; align-items:center; gap:6px; color:var(--amber); font-family:var(--mono); font-size:11.5px}
+  .arrow svg{width:30px; height:14px}
+
+  /* two-col list */
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:14px 34px; margin-top:22px}
+  .row{display:flex; gap:12px; align-items:flex-start}
+  .row .di{color:var(--amber); flex:none; margin-top:3px; font-size:13px}
+  .row .tx{font-size:14.5px; line-height:1.5; color:var(--muted)}
+  .row .tx b{color:var(--paper); font-weight:600}
+
+  /* skill chips */
+  .skills{display:flex; flex-wrap:wrap; gap:9px; margin-top:20px}
+  .sc{font-family:var(--mono); font-size:12.5px; color:var(--paper); border:1px solid var(--line-2); border-radius:999px; padding:8px 14px; background:var(--ink-2)}
+  .sc span{color:var(--faint); margin-left:7px}
+  .note{margin-top:18px; font-family:var(--mono); font-size:12.5px; color:var(--faint)}
+  .note b{color:var(--amber)}
+
+  /* chrome */
+  .chrome{position:fixed; left:0; right:0; bottom:0; height:52px; display:flex; align-items:center; gap:16px;
+    padding:0 22px; background:linear-gradient(0deg, rgba(0,0,0,.55), transparent); z-index:20; font-family:var(--mono)}
+  .navbtn{width:34px; height:34px; border-radius:9px; border:1px solid var(--line-2); background:rgba(20,22,27,.8); color:var(--paper);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.15s}
+  .navbtn:hover{border-color:var(--amber); color:var(--amber)}
+  .dots{display:flex; gap:7px; margin:0 auto}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--line-2); border:0; cursor:pointer; padding:0; transition:.18s}
+  .dot.on{background:var(--amber); transform:scale(1.25)}
+  .counter{font-size:12.5px; color:var(--muted); letter-spacing:.04em}
+  .counter b{color:var(--paper)}
+  .hint{position:fixed; top:14px; right:16px; font-family:var(--mono); font-size:11px; color:var(--faint); z-index:20}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:6px}
+
+  /* pipeline slide */
+  .pipe{display:flex; align-items:center; gap:7px; margin-top:16px}
+  .pnode{background:var(--ink-2); border:1px solid var(--line-2); border-radius:10px; padding:8px 11px; font-family:var(--mono); font-size:11.5px; text-align:center; flex:none; line-height:1.3}
+  .pnode.hl{border-color:rgba(246,179,63,.55); color:var(--amber); background:linear-gradient(180deg,rgba(246,179,63,.10),transparent)}
+  .parr{display:flex; flex-direction:column; align-items:center; color:var(--faint); flex:1; min-width:0}
+  .parr .lb{font-family:var(--mono); font-size:9.5px; color:var(--amber); letter-spacing:.03em; margin-bottom:2px; white-space:nowrap}
+  .parr svg{width:100%; height:12px}
+  .exgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px}
+  .ex .lab{font-family:var(--mono); font-size:11px; color:var(--amber); letter-spacing:.04em; margin-bottom:4px; font-weight:600}
+  .ex .d{font-size:11.5px; color:var(--muted); line-height:1.45; margin-bottom:8px}
+  .ex .d b{color:var(--paper); font-weight:600}
+  .code{background:#0C0D11; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-family:var(--mono); font-size:10.6px; line-height:1.55; color:#D7DAE0; white-space:pre-wrap; word-break:break-word}
+  .code .c{color:var(--faint)} .code .a{color:var(--amber)} .code .t{color:var(--teal)}
+  .sumline{margin-top:16px; font-size:14px; color:var(--muted); line-height:1.5}
+  .sumline b{color:var(--paper); font-weight:600} .sumline .am{color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="stagewrap"><div class="stage" id="stage">
+
+  <!-- 1 · COVER -->
+  <section class="slide cover active">
+    <div class="mascot">
+      <svg viewBox="0 0 120 120" fill="none">
+        <path d="M28 66c0-18 14-30 32-30s32 12 32 30c0 20-14 32-32 32S28 86 28 66Z" fill="url(#gc)"/>
+        <path d="M24 70c-6-1-9 3-9 8s4 8 9 7" stroke="#E8891C" stroke-width="6" stroke-linecap="round"/>
+        <path d="M96 70c6-1 9 3 9 8s-4 8-9 7" stroke="#E8891C" stroke-width="6" stroke-linecap="round"/>
+        <ellipse cx="49" cy="68" rx="6.5" ry="8" fill="#1A1206"/><ellipse cx="71" cy="68" rx="6.5" ry="8" fill="#1A1206"/>
+        <circle cx="51" cy="65" r="2.1" fill="#fff"/><circle cx="73" cy="65" r="2.1" fill="#fff"/>
+        <path d="M53 82c3 3 11 3 14 0" stroke="#1A1206" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M60 20 32 31l28 11 22-8.6-22-13.4Z" fill="#16181D" stroke="#2E323A" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M82 33.4V45" stroke="#F6B33F" stroke-width="2.4" stroke-linecap="round"/><circle cx="82" cy="47.5" r="3" fill="#F6B33F"/>
+        <defs><linearGradient id="gc" x1="60" y1="36" x2="60" y2="98" gradientUnits="userSpaceOnUse"><stop stop-color="#F9C15E"/><stop offset="1" stop-color="#E8891C"/></linearGradient></defs>
+      </svg>
+    </div>
+    <div class="eyebrow">Mã nguồn mở · Self-host</div>
+    <h1>Vlearn <em>Agent</em></h1>
+    <p class="lead">Trợ giảng AI cá nhân — trả lời từ chính <b>slide, video, giáo trình</b> của bạn, <b>có trích nguồn, không bịa</b>. Đồng hành cùng người học ngay trên Telegram &amp; Discord.</p>
+    <div class="meta">team <b>VLagent</b> · VinUni AI20K · vlearn-agent.vercel.app</div>
+  </section>
+
+  <!-- 2 · LÀ GÌ -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Vlearn Agent là gì</div>
+      <h2>Không phải chatbot — một <em>agent trợ giảng</em>.</h2></div>
+    <div class="s-body"><div class="grid g3">
+      <div class="card rail"><span class="k">RAG · trích nguồn</span><h3>Hiểu tài liệu của bạn</h3><p>Nạp slide/video/ghi âm thành kho tri thức; trả lời kèm 📖 Bài · Slide · phút video.</p></div>
+      <div class="card rail"><span class="k">no-hallucination</span><h3>Không bịa</h3><p>Không có trong tài liệu thì nói thẳng — thay vì bịa cho có.</p></div>
+      <div class="card rail"><span class="k">16 skills</span><h3>Dạy đúng phương pháp</h3><p>Spaced repetition, active recall, Feynman… agent tự chọn.</p></div>
+      <div class="card rail"><span class="k">memory</span><h3>Nhớ &amp; thích ứng</h3><p>Nhớ điểm yếu, mục tiêu, tiến độ từng học viên, cá nhân hoá.</p></div>
+      <div class="card rail"><span class="k">chủ động</span><h3>Đồng hành mỗi ngày</h3><p>Nhắc lịch, báo cáo tiến độ, gài ôn lặp — không cần hỏi.</p></div>
+      <div class="card rail"><span class="k">self-host</span><h3>Dữ liệu của bạn</h3><p>Mã nguồn mở, chạy trên máy bạn, đổi được nhà cung cấp LLM.</p></div>
+    </div></div>
+    <footer><span class="brand"><svg class="cap" viewBox="0 0 32 32" fill="none"><path d="M16 6 3 12l13 6 10-4.6V21" stroke="#F6B33F" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 16.5V21c0 1.7 3.6 3.4 8 3.4s8-1.7 8-3.4v-4.5" stroke="#57C7B8" stroke-width="2.2" stroke-linejoin="round"/></svg>Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 3 · CHATBOT -> AGENT -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Vì sao chọn · Chatbot → Agent</div>
+      <h2>Không chỉ giải đáp — <em>đồng hành</em> &amp; phát triển năng lực.</h2></div>
+    <div class="ribbon">
+      <div class="chip old"><span class="tt">Chatbot Vlearn</span><span class="vv">Hỏi → Đáp (phản ứng)</span></div>
+      <div class="arrow"><svg viewBox="0 0 40 16" fill="none"><path d="M2 8h32m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>nâng cấp</div>
+      <div class="chip new"><span class="tt">Vlearn Agent</span><span class="vv">Lập kế hoạch · Chủ động · Nhớ dài hạn · Đa kênh</span></div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card rail"><span class="num">01</span><h3>Lập kế hoạch, làm nhiều bước</h3><p>Gọi tool nhiều bước trong <b>một vòng lặp</b> để hiểu sâu &amp; thực hành tốt hơn.</p></div>
+      <div class="card rail"><span class="num">02</span><h3>Chủ động 100%</h3><p>Nhắc lịch, workshop, deadline qua <b>Calendar·Telegram·Discord</b>; báo cáo ngày/tuần; ôn lặp.</p></div>
+      <div class="card rail"><span class="num">03</span><h3>Hồ sơ cá nhân hoá</h3><p><b>Memory dài hạn</b>, tự học từ mỗi phiên chat để lên plan &amp; cải thiện câu trả lời.</p></div>
+      <div class="card rail"><span class="num">04</span><h3>16+ kỹ năng học tập</h3><p>Tự chọn theo nhu cầu và <b>mở rộng thêm được</b>.</p></div>
+      <div class="card rail"><span class="num">05</span><h3>Tích hợp MCP &amp; CLI</h3><p><b>Tự động hoá</b> các công việc học tập cá nhân.</p></div>
+      <div class="card rail"><span class="num">06</span><h3>Đồng hành mọi nơi</h3><p>Telegram·Discord·Zalo·Facebook·chat web…</p></div>
+    </div>
+    <footer><span class="brand">Vlearn Agent</span><span>· lớp <b>agent mở</b> — bạn tự sở hữu</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 4 · KIẾN TRÚC -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Kiến trúc &amp; pipeline</div>
+      <h2>Tài liệu của bạn → <em>kho tri thức</em> có trích nguồn.</h2></div>
+    <div class="flow">
+      <div class="step"><div class="t">1 · Nạp</div><h4>Slide · Video · Ghi âm</h4><p>Docling (PDF/PPTX+OCR) · PhoWhisper (ASR tiếng Việt) · gửi thẳng qua chat.</p></div>
+      <div class="arr"><svg viewBox="0 0 24 16" fill="none"><path d="M2 8h20m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="step"><div class="t">2 · Cấu trúc hoá</div><h4>Lớp knowledge</h4><p>LLM tách khái niệm, wikilink → vault markdown kiểu Obsidian, git-versioned.</p></div>
+      <div class="arr"><svg viewBox="0 0 24 16" fill="none"><path d="M2 8h20m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="step"><div class="t">3 · Index</div><h4>Voyage + Chroma</h4><p>Embedding ngữ cảnh chất lượng tiếng Việt cao → RAG truy hồi chính xác.</p></div>
+    </div>
+    <div class="band">
+      <span class="pill"><span class="d">✓</span> Xác nhận trước khi nạp</span>
+      <span class="pill"><span class="d">↻</span> Phát hiện update (thay/giữ/bỏ)</span>
+      <span class="pill"><span class="d">⚡</span> Incremental — mỗi lần 1 git commit</span>
+    </div>
+    <p class="lead" style="margin-top:16px">Một gateway chạy cả <b>Telegram + Discord</b> + scheduler; một <b>dashboard web</b> quản trị. Vault markdown là nguồn sự thật, index chỉ là phái sinh.</p>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 4b · PIPELINE MÔ PHỎNG -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Pipeline · mô phỏng</div>
+      <h2>Biến <em>PDF ảnh</em> thành kho tri thức AI tìm được.</h2></div>
+    <p class="lead" style="margin-top:8px"><b>day3-material.pdf</b> thực chất là ảnh chụp slide — AI không đọc chữ trực tiếp. Ba phép biến đổi biến nó thành dữ liệu cho RAG:</p>
+    <div class="pipe">
+      <div class="pnode">📄 PDF ảnh</div>
+      <div class="parr"><span class="lb">Docling + OCR</span><svg viewBox="0 0 60 12" fill="none" preserveAspectRatio="none"><path d="M2 6h54m0 0-5-4m5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="pnode">Markdown thô</div>
+      <div class="parr"><span class="lb">LLM tổ chức</span><svg viewBox="0 0 60 12" fill="none" preserveAspectRatio="none"><path d="M2 6h54m0 0-5-4m5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="pnode">Markdown<br>+ Wikilink</div>
+      <div class="parr"><span class="lb">Voyage Embed</span><svg viewBox="0 0 60 12" fill="none" preserveAspectRatio="none"><path d="M2 6h54m0 0-5-4m5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="pnode hl">Vector DB · RAG</div>
+    </div>
+    <div class="exgrid">
+      <div class="ex">
+        <div class="lab">① Docling + OCR</div>
+        <div class="d">Nhận diện chữ/tiêu đề/bảng trong ảnh → <b>Markdown thô</b>.</div>
+        <div class="code"><span class="c"># Retrieval Augmented Generation</span>
+
+RAG gồm retrieval + generation.
+Embedding: văn bản → vector.</div>
+      </div>
+      <div class="ex">
+        <div class="lab">② LLM tổ chức bài học</div>
+        <div class="d">Ghép slide, xác định khái niệm, thêm định nghĩa + <b>[[wikilink]]</b> liên kết.</div>
+        <div class="code"><span class="c">## Khái niệm</span>
+<span class="a">[[RAG]]</span> = truy xuất + <span class="a">[[LLM]]</span>.
+<span class="c">## Thành phần</span>
+1.<span class="a">[[Chunking]]</span> 2.<span class="a">[[Embedding]]</span>
+3.<span class="a">[[Vector DB]]</span> 4.<span class="a">[[Retrieval]]</span></div>
+      </div>
+      <div class="ex">
+        <div class="lab">③ Voyage Embedding</div>
+        <div class="d">Mỗi đoạn → <b>vector ngữ nghĩa</b>: tìm theo ý, không chỉ từ khoá.</div>
+        <div class="code"><span class="t">"Embedding: văn bản → vector"</span>
+   ↓
+[0.018, -0.224, 0.731, …]
+
+<span class="c"># lưu ở Chroma / pgvector /</span>
+<span class="c"># Qdrant / Pinecone / Weaviate</span></div>
+      </div>
+    </div>
+    <p class="sumline"><span class="am">Docling</span> đọc tài liệu → <span class="am">LLM</span> biến thành kiến thức → <span class="am">Voyage</span> biến thành vector. Đầu ra không phải bản chép PDF, mà là <b>kho kiến thức có cấu trúc, liên kết khái niệm, sẵn sàng cho chatbot/RAG</b>.</p>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 5 · TOOLS -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Tools</div><h2>Bộ công cụ agent <em>tự gọi</em>.</h2></div>
+    <div class="s-body"><div class="grid g2">
+      <div class="card rail"><span class="k">Kiến thức &amp; tài liệu</span><p style="color:var(--paper);font-family:var(--mono);font-size:13px;line-height:1.9">search_lessons · list_lessons · get_lesson · get_concept · save_concept</p></div>
+      <div class="card rail"><span class="k">Cá nhân hoá &amp; bộ nhớ</span><p style="color:var(--paper);font-family:var(--mono);font-size:13px;line-height:1.9">update_student_memory · update_memory · search_sessions · read/update_soul</p></div>
+      <div class="card rail"><span class="k">Hành động</span><p style="color:var(--paper);font-family:var(--mono);font-size:13px;line-height:1.9">google_calendar_event (lịch+Meet) · schedule_task · discord_create_event / invite</p></div>
+      <div class="card rail"><span class="k">Mở rộng &amp; vận hành</span><p style="color:var(--paper);font-family:var(--mono);font-size:13px;line-height:1.9">research (web·Reddit·GitHub·X) · use_cli · maton · install_knowledge_pack</p></div>
+    </div></div>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 6 · SKILLS -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">16 skills học tập · chuẩn agentskills.io</div>
+      <h2>Dựa trên <em>khoa học học tập</em>, không phải mẹo vặt.</h2></div>
+    <div class="skills">
+      <span class="sc">the-ghi-nho<span>Spaced repetition</span></span>
+      <span class="sc">van-dap-active-recall<span>Retrieval practice</span></span>
+      <span class="sc">feynman<span>Feynman</span></span>
+      <span class="sc">hoi-vi-sao<span>Elaboration</span></span>
+      <span class="sc">so-do-khai-niem<span>Dual coding</span></span>
+      <span class="sc">tron-bai-interleaving<span>Interleaving</span></span>
+      <span class="sc">on-thi-mock-test<span>Practice testing</span></span>
+      <span class="sc">nhat-ky-loi-sai<span>Error analysis</span></span>
+      <span class="sc">phien-hoc-tap-trung<span>Pomodoro</span></span>
+      <span class="sc">tu-danh-gia-tuan<span>Metacognition</span></span>
+      <span class="sc">tao-quiz</span><span class="sc">tom-tat-bai</span><span class="sc">nghien-cuu</span>
+      <span class="sc">xay-tu-dien-thuat-ngu</span><span class="sc">lo-trinh-on-tap</span><span class="sc">bao-cao-hang-ngay</span>
+    </div>
+    <p class="note">Thêm skill mới = tạo <b>skills/&lt;tên&gt;/SKILL.md</b> — không sửa code. Cài thêm từ registry cộng đồng.</p>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 7 · KÊNH & PLUGINS -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Kênh &amp; mở rộng</div><h2>Một agent, <em>nhiều kênh</em> — mở rộng không giới hạn.</h2></div>
+    <div class="s-body"><div class="grid g3">
+      <div class="card rail"><span class="k">Channel</span><h3>Đa kênh chat</h3><p><b>Telegram · Discord</b> (chung 1 process); gửi file thẳng để nạp bài; roadmap Zalo · Facebook · chat web.</p></div>
+      <div class="card rail"><span class="k">Addon</span><h3>Plugin Python</h3><p>Thả 1 file vào <b>addons/</b> → agent có tool mới ngay, không sửa lõi; bật/tắt trong dashboard, có audit.</p></div>
+      <div class="card rail"><span class="k">Registry</span><h3>Kho skill cộng đồng</h3><p>Cài skill chuẩn <b>agentskills.io</b> thẳng từ dashboard.</p></div>
+    </div>
+    <div class="band" style="margin-top:18px">
+      <span class="pill"><span class="d">/</span> Slash: /hoi · /quiz · /tomtat</span>
+      <span class="pill"><span class="d">🔒</span> Allowlist fail-closed · rate-limit</span>
+      <span class="pill"><span class="d">💬</span> Nói tự nhiên tiếng Việt</span>
+    </div></div>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 8 · MCP & HỆ SINH THÁI -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">MCP &amp; hệ sinh thái</div><h2>Cắm vào <em>hệ sinh thái</em> bạn đã dùng.</h2></div>
+    <div class="s-body"><div class="grid g2">
+      <div class="card rail"><span class="k">MCP — Maton</span><h3>Hàng trăm SaaS qua một API</h3><p>Google <b>Calendar · Meet · Docs · Sheets · Gmail</b> — đã chạy: tạo lịch + link Meet thật.</p></div>
+      <div class="card rail"><span class="k">CLI hạ tầng</span><h3>Google Workspace · M365</h3><p><b>gog</b> (Drive/Calendar/Classroom) · <b>m365</b> — chỉ đọc/tra cứu, chặn hành động ghi/xoá.</p></div>
+      <div class="card rail"><span class="k">Research</span><h3>Ngoài giáo trình</h3><p>🌐 Web · 🟠 Reddit · 🐙 GitHub · ✖️ X — luôn ghi rõ nguồn ngoài.</p></div>
+      <div class="card rail"><span class="k">Đa nhà cung cấp LLM</span><h3>Không khoá vendor</h3><p>OpenAI · <b>OpenRouter</b> (Claude/Gemini/Llama) · Groq · <b>Ollama</b> (local) — đổi 1 dòng config.</p></div>
+    </div></div>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 9 · HỖ TRỢ ĐẶC BIỆT -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Hỗ trợ học tập đặc biệt</div><h2>Đồng hành, <em>không chỉ trả lời</em>.</h2></div>
+    <div class="cols">
+      <div class="row"><span class="di">◆</span><span class="tx"><b>Memory 3 tầng</b> — hồ sơ từng học viên · bộ nhớ chung · tìm lại mọi hội thoại cũ (FTS5).</span></div>
+      <div class="row"><span class="di">◆</span><span class="tx"><b>Thích ứng</b> — nhớ bạn yếu chỗ nào → tự gài ôn vào quiz/gợi ý, nhớ xuyên phiên.</span></div>
+      <div class="row"><span class="di">◆</span><span class="tx"><b>Trích nguồn chính xác</b> đến slide/timestamp — kiểm chứng được, chống học vẹt.</span></div>
+      <div class="row"><span class="di">◆</span><span class="tx"><b>Chủ động</b> — báo cáo tiến độ mỗi sáng, nhắc hẹn, ôn lặp ngắt quãng.</span></div>
+      <div class="row"><span class="di">◆</span><span class="tx"><b>SOUL.md</b> — chỉnh tính cách bot ngay trong chat (thân thiện, nghiêm túc…).</span></div>
+      <div class="row"><span class="di">◆</span><span class="tx"><b>Trace minh bạch</b> — dashboard xem từng bước suy luận + tool agent gọi.</span></div>
+    </div>
+    <footer><span class="brand">Vlearn Agent</span><span class="sp pg"></span></footer>
+  </section>
+
+  <!-- 10 · BẢO MẬT · TRIỂN KHAI · TẦM NHÌN -->
+  <section class="slide">
+    <div class="s-head"><div class="eyebrow">Bảo mật · Triển khai · Tầm nhìn</div><h2>An toàn theo thiết kế. <em>Của riêng bạn.</em></h2></div>
+    <div class="s-body"><div class="grid g3">
+      <div class="card rail"><span class="k">🔒 Bảo mật</span><p style="font-size:13px;line-height:1.6;color:var(--muted)">Allowlist fail-closed · chống prompt-injection (tài liệu là <b style="color:var(--paper)">dữ liệu</b>, không phải lệnh) · dashboard có token · pack whitelist · audit log.</p></div>
+      <div class="card rail"><span class="k">🚀 Triển khai</span><p style="font-size:13px;line-height:1.6;color:var(--muted)"><b style="color:var(--paper)">install.sh · install.ps1 · Docker/compose</b> · dashboard quản trị web · đa nền tảng.</p></div>
+      <div class="card rail"><span class="k">🎯 Tầm nhìn</span><p style="font-size:13px;line-height:1.6;color:var(--muted)">Mỗi học viên một <b style="color:var(--paper)">Vlearn Agent riêng</b> — cá nhân, mở, tự chủ — đồng hành xuyên suốt hành trình học.</p></div>
+    </div>
+    <p class="lead" style="margin-top:24px;text-align:center;font-size:19px">🌐 Dùng thử: <b style="color:var(--amber)">vlearn-agent.vercel.app</b>&nbsp;&nbsp;·&nbsp;&nbsp;GitHub: K4-hackathon-VLAgent-D304</p></div>
+    <footer><span class="brand"><svg class="cap" viewBox="0 0 32 32" fill="none"><path d="M16 6 3 12l13 6 10-4.6V21" stroke="#F6B33F" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 16.5V21c0 1.7 3.6 3.4 8 3.4s8-1.7 8-3.4v-4.5" stroke="#57C7B8" stroke-width="2.2" stroke-linejoin="round"/></svg>Vlearn Agent</span><span>· made by <b>team VLagent</b> 🇻🇳</span><span class="sp pg"></span></footer>
+  </section>
+
+</div></div>
+
+<div class="hint">← → chuyển slide · F toàn màn hình</div>
+<div class="chrome">
+  <button class="navbtn" id="prev" aria-label="Slide trước">‹</button>
+  <div class="dots" id="dots"></div>
+  <button class="navbtn" id="next" aria-label="Slide sau">›</button>
+  <button class="navbtn" id="fs" aria-label="Toàn màn hình" style="margin-left:8px">⛶</button>
+  <span class="counter"><b id="cur">1</b> / <b id="tot">10</b></span>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var stage = document.getElementById("stage");
+  var dotsWrap = document.getElementById("dots");
+  var cur = 0;
+
+  slides.forEach(function(_,i){
+    var b=document.createElement("button"); b.className="dot"+(i===0?" on":""); b.setAttribute("aria-label","Slide "+(i+1));
+    b.addEventListener("click",function(){ go(i); }); dotsWrap.appendChild(b);
+  });
+  var dots = dotsWrap.querySelectorAll(".dot");
+
+  // đánh số slide tự động (footer .pg + tổng ở chrome)
+  var tot = document.getElementById("tot"); if(tot) tot.textContent = slides.length;
+  slides.forEach(function(s,i){ var pg=s.querySelector(".pg"); if(pg) pg.textContent=(i+1)+" / "+slides.length; });
+
+  function go(i){
+    i = Math.max(0, Math.min(slides.length-1, i));
+    slides[cur].classList.remove("active"); dots[cur].classList.remove("on");
+    cur = i;
+    slides[cur].classList.add("active"); dots[cur].classList.add("on");
+    document.getElementById("cur").textContent = cur+1;
+  }
+  function fit(){
+    var s = Math.min(window.innerWidth/1280, (window.innerHeight-8)/720);
+    stage.style.transform = "scale(" + s + ")";
+  }
+  window.addEventListener("resize", fit); fit();
+
+  // deep-link slide qua #số (vd .../deck.html#3)
+  function fromHash(){ var n=parseInt((location.hash||"").replace("#",""),10); if(n>=1&&n<=slides.length) go(n-1); }
+  window.addEventListener("hashchange", fromHash); fromHash();
+
+  document.getElementById("prev").addEventListener("click",function(){ go(cur-1); });
+  document.getElementById("next").addEventListener("click",function(){ go(cur+1); });
+  document.getElementById("fs").addEventListener("click",toggleFs);
+  function toggleFs(){ if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); } else { document.exitFullscreen(); } }
+
+  document.addEventListener("keydown", function(e){
+    if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){ e.preventDefault(); go(cur+1); }
+    else if(e.key==="ArrowLeft"||e.key==="PageUp"){ e.preventDefault(); go(cur-1); }
+    else if(e.key==="Home"){ go(0); } else if(e.key==="End"){ go(slides.length-1); }
+    else if(e.key==="f"||e.key==="F"){ toggleFs(); }
+  });
+})();
+</script>
+</body>
+</html>

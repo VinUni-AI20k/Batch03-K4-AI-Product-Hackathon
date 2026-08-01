@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vlearn Agent · gateway dashboard</title>
+<style>
+  :root[data-theme="dark"] {
+    --bg:#0f1216; --panel:#171b21; --panel2:#1d222a; --ink:#e7ebf0; --muted:#8a93a0;
+    --line:#262b33; --accent:#e5484d; --accent-dim:#3a1d20; --ok:#46c26f; --warn:#d9a13d;
+    --input:#12151a; --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  :root[data-theme="light"] {
+    --bg:#f4f5f7; --panel:#ffffff; --panel2:#f7f8fa; --ink:#1c2333; --muted:#68717f;
+    --line:#e3e6eb; --accent:#d33338; --accent-dim:#fbe9ea; --ok:#1f9d61; --warn:#b0791a;
+    --input:#f0f2f5; --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);display:grid;grid-template-columns:232px 1fr;grid-template-rows:58px 1fr;height:100vh;overflow:hidden}
+  svg.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  /* ── header ─────────────────────────── */
+  header{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff}
+  .brand b{display:block;font-size:.9rem;letter-spacing:.06em}
+  .brand span{color:var(--muted);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase}
+  header .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .health{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:.78rem;font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .dot.bad{background:var(--accent)}
+  .iconbtn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:8px;cursor:pointer}
+  .iconbtn:hover{color:var(--ink)}
+
+  /* ── sidebar ────────────────────────── */
+  aside{background:var(--panel);border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto}
+  aside h3{color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;padding:16px 12px 6px;font-weight:600}
+  aside button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:none;color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.86rem;text-align:left}
+  aside button:hover{background:var(--panel2);color:var(--ink)}
+  aside button.active{background:var(--accent-dim);color:var(--accent);font-weight:600}
+
+  /* ── main & pages ───────────────────── */
+  main{overflow-y:auto;display:flex;flex-direction:column}
+  section{padding:26px 30px;max-width:1150px;width:100%}
+  .page-head{margin-bottom:20px}
+  .page-head h1{font-size:1.35rem;letter-spacing:-.01em}
+  .page-head p{color:var(--muted);font-size:.85rem;margin-top:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  @media(max-width:980px){.grid2{grid-template-columns:1fr}.label{display:none}body{grid-template-columns:60px 1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .panel h2{font-size:.95rem;margin-bottom:3px}
+  .panel .desc{color:var(--muted);font-size:.8rem;margin-bottom:14px}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .k{color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}
+  .stat .v{font-size:1.2rem;font-weight:700;font-family:var(--mono)}
+  .stat .v.ok{color:var(--ok)}
+  .stat .v.small{font-size:.88rem}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+  .bigcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .bigcard .k{color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:.14em}
+  .bigcard .v{font-size:1.75rem;font-weight:700;margin:5px 0 3px;font-family:var(--mono)}
+  .bigcard .sub{color:var(--muted);font-size:.76rem}
+  .note{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 15px;color:var(--muted);font-size:.8rem;line-height:1.55}
+  .note code{font-family:var(--mono);font-size:.75rem;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);font-size:.84rem;vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;background:var(--panel2)}
+  tr:last-child td{border-bottom:0}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 11px;font-size:.7rem;font-weight:600}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.on{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+  .pill.off{background:color-mix(in srgb,var(--muted) 14%,transparent);color:var(--muted)}
+  .pill.warn{background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--warn)}
+
+  /* toggle switch */
+  .switch{position:relative;width:38px;height:22px;flex:none;cursor:pointer}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .18s}
+  .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .switch input:checked + .track{background:var(--ok)}
+  .switch input:checked + .track::after{transform:translateX(16px)}
+
+  /* code chip + copy */
+  .codechip{display:flex;align-items:center;gap:8px;background:var(--input);border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-top:8px}
+  .codechip code{flex:1;font-family:var(--mono);font-size:.72rem;color:var(--muted);word-break:break-all}
+  .copybtn{border:0;background:none;color:var(--muted);cursor:pointer;padding:2px;display:flex}
+  .copybtn:hover{color:var(--ink)}
+
+  /* toast */
+  #toasts{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:99}
+  .toast{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:10px;padding:11px 16px;font-size:.84rem;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:slidein .2s ease}
+  .toast.err{border-left-color:var(--accent)}
+  @keyframes slidein{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+  .panel,.stat,.bigcard{transition:border-color .15s}
+  .panel:hover,.bigcard:hover{border-color:var(--border-strong,var(--muted))}
+  tbody tr{transition:background .12s}
+  tbody tr:hover td{background:color-mix(in srgb,var(--panel2) 55%,transparent)}
+  button{transition:filter .12s,background .12s,color .12s}
+  :focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 60%,transparent);outline-offset:1px}
+
+  /* integration cards */
+  .int-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:12px}
+  .int-card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+  .int-card .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .int-card .head b{font-size:.88rem}
+  .int-card .desc2{color:var(--muted);font-size:.78rem;line-height:1.5}
+  .int-card .foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:.78rem}
+  .int-card .foot a{color:var(--muted);text-decoration:none;font-size:.74rem}
+  .int-card .foot a:hover{color:var(--blue)}
+  button.act{border:1px solid var(--line);background:var(--panel2);color:var(--accent);border-radius:7px;padding:4px 12px;cursor:pointer;font-size:.76rem}
+  a.name{color:var(--ink);cursor:pointer;text-decoration:none;border-bottom:1px dotted var(--muted)}
+  a.name:hover{color:var(--accent);border-color:var(--accent)}
+  pre{background:var(--input);border:1px solid var(--line);border-radius:10px;padding:14px;white-space:pre-wrap;font-size:.8rem;max-height:440px;overflow:auto;margin-top:12px;line-height:1.55;font-family:var(--mono)}
+  .muted{color:var(--muted)}
+
+  /* ── chat page ─────── */
+  #tab-chat{flex:1;display:flex;flex-direction:column;max-width:1150px;padding-bottom:18px}
+  .chat-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+  .chat-top .page-head{margin:0;flex:1}
+  .chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+  .chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px;min-height:0}
+  /* lịch sử chat */
+  .hist-log{display:flex;flex-direction:column;gap:12px;padding:2px}
+  .hist-log .msg{max-width:82%}
+  .hist-day{align-self:center;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.08em;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 14px;margin:8px 0 2px}
+  .hist-meta{font-size:.62rem;color:var(--muted);margin-top:6px;display:flex;gap:8px}
+  .hist-meta .pf{text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+  .msg{max-width:76%;border-radius:12px;padding:11px 14px;font-size:.87rem;line-height:1.55;white-space:pre-wrap}
+  .msg.user{align-self:flex-end;background:var(--accent-dim);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .msg.bot{align-self:flex-start;background:var(--panel);border:1px solid var(--line)}
+  .msg .who{font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:5px}
+  .msg.typing{color:var(--muted)}
+  .msg strong{font-weight:700;color:var(--ink)}
+  .msg em{font-style:italic}
+  .msg a{color:var(--accent);text-decoration:underline}
+  .msg code{font-family:var(--mono);background:var(--input);border:1px solid var(--line);padding:.5px 5px;border-radius:5px;font-size:.86em}
+  .msg pre{font-family:var(--mono);background:var(--input);border:1px solid var(--line);padding:10px 12px;border-radius:8px;font-size:.82em;overflow-x:auto;white-space:pre;margin:6px 0}
+  /* bảng markdown */
+  .msg .tblwrap{overflow-x:auto;margin:9px 0;border:1px solid var(--line);border-radius:9px}
+  .msg table{border-collapse:collapse;width:100%;font-size:.88em;line-height:1.5}
+  .msg th,.msg td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  .msg th{background:var(--panel2);font-weight:700;white-space:nowrap}
+  .msg td:first-child{white-space:nowrap}
+  .msg tr:last-child td{border-bottom:none}
+  /* heading markdown */
+  .msg .mdh{display:block;font-weight:700;font-size:1.03em;margin:11px 0 4px}
+  .msg .mdh:first-child{margin-top:0}
+  /* card viewer sơ đồ */
+  .dgcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:10px 0;background:var(--panel)}
+  .dg-head{display:flex;align-items:center;gap:7px;padding:7px 11px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .dg-title{font-size:.74rem;font-weight:700;color:var(--muted)}
+  .dg-sp{flex:1}
+  .dg-b{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.5}
+  .dg-b:hover{border-color:var(--accent)}
+  .dg-body{position:relative;overflow:auto;max-height:480px;padding:13px}
+  .dg-scale{transform-origin:top left;transition:transform .15s;width:max-content;min-width:100%}
+  .dg-src{margin:0 !important}
+  .dg-zoom{position:sticky;bottom:0;float:right;display:flex;flex-direction:column;gap:5px;margin:-4px 2px 2px 0}
+  .dg-zoom .dg-b{width:28px;height:28px;padding:0;border-radius:50%;background:var(--panel2)}
+  .dgcard.fs{position:fixed;inset:12px;z-index:1200;margin:0;display:flex;flex-direction:column;box-shadow:0 18px 60px rgba(0,0,0,.45)}
+  .dgcard.fs .dg-body{flex:1;max-height:none}
+  /* cây mindmap (đồng bộ trang chat) */
+  .mm2{display:inline-block;min-width:0}
+  .mm2 ul{list-style:none;margin:0;padding:0}
+  .mm2 .item{display:flex;align-items:center}
+  .mm2 .item>ul{position:relative;padding-left:32px;display:flex;flex-direction:column;gap:9px}
+  .mm2 .item>ul::before{content:"";position:absolute;left:15px;top:14px;bottom:14px;width:2px;background:var(--line)}
+  .mm2 .item>ul>li{position:relative}
+  .mm2 .item>ul>li::before{content:"";position:absolute;left:15px;top:50%;width:17px;height:2px;background:var(--line)}
+  .mm2 .pill{display:inline-block;padding:8px 15px;border-radius:22px;font-size:13px;font-weight:600;white-space:nowrap;line-height:1.2;color:#0B0C0E;background:var(--c);box-shadow:0 3px 12px -5px var(--c)}
+  .mm2 .d0{font-size:15px;padding:12px 20px;border-radius:26px}
+  .mm2 .d2{color:var(--ink);background:transparent !important;border:1px solid var(--c);box-shadow:none;font-weight:500;font-size:12.5px}
+  .mm2 .d3{color:var(--muted);background:transparent !important;border:1px dashed var(--line);box-shadow:none;font-weight:400;font-size:12px}
+  .mm2.practice .pill:not(.d0):not(.shown){filter:blur(7px);cursor:pointer;user-select:none}
+  .mm2.practice .pill:not(.d0):not(.shown):hover{filter:blur(5px)}
+  .mermaid svg{max-width:100%}
+  .steps{align-self:flex-start;max-width:76%;width:100%}
+  .steps details{background:var(--input);border:1px solid var(--line);border-radius:11px;padding:0}
+  .steps summary{cursor:pointer;padding:9px 14px;font-size:.74rem;color:var(--muted);font-family:var(--mono);display:flex;align-items:center;gap:8px;list-style:none}
+  .steps summary::-webkit-details-marker{display:none}
+  .steps summary .n{color:var(--warn);font-weight:700}
+  .step{border-top:1px solid var(--line);padding:10px 14px;font-size:.76rem;font-family:var(--mono);line-height:1.5}
+  .step .tname{color:var(--accent);font-weight:700}
+  .step .targs{color:var(--muted);word-break:break-all}
+  .step .tres{color:var(--muted);margin-top:5px;padding-left:14px;border-left:2px solid var(--line);word-break:break-word;white-space:pre-wrap;max-height:96px;overflow:hidden}
+  .step.thought .tname{color:var(--warn)}
+  .composer{display:flex;gap:10px;margin-top:14px;align-items:flex-end}
+  .composer textarea{flex:1;resize:none;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--input);color:var(--ink);font-size:.88rem;font-family:inherit;min-height:46px;max-height:140px;line-height:1.5}
+  .composer textarea:focus{outline:1px solid color-mix(in srgb,var(--accent) 55%,transparent)}
+  .btn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:11px;padding:12px 16px;cursor:pointer;font-size:.85rem;font-weight:600;white-space:nowrap}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:hover{filter:brightness(1.08)}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <div class="mark"><svg class="ic" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5v6"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+  <div class="brand"><b>VLEARN AGENT</b><span>Gateway Dashboard</span></div>
+  <div class="right">
+    <div class="health"><span class="dot" id="health-dot"></span><span id="health-txt">Health OK</span></div>
+    <button class="iconbtn" onclick="toggleTheme()" title="Đổi giao diện sáng/tối"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+  </div>
+</header>
+
+<aside id="nav">
+  <h3>Chat</h3>
+  <button data-tab="chat"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="label">Chat</span></button>
+  <button data-tab="history"><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span class="label">Lịch sử chat</span></button>
+  <h3>Control</h3>
+  <button data-tab="overview" class="active"><svg class="ic" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="label">Overview</span></button>
+  <button data-tab="tasks"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="label">Cron Jobs</span></button>
+  <button data-tab="audit"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg><span class="label">Logs / Audit</span></button>
+  <h3>Agent</h3>
+  <button data-tab="skills"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg><span class="label">Skills</span></button>
+  <button data-tab="lessons"><svg class="ic" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="label">Bài học</span></button>
+  <button data-tab="packs"><svg class="ic" viewBox="0 0 24 24"><path d="m21 8-9-5-9 5v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v9"/></svg><span class="label">Knowledge Packs</span></button>
+  <button data-tab="students"><svg class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="label">Học viên</span></button>
+  <h3>Settings</h3>
+  <button data-tab="config"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="label">Config</span></button>
+</aside>
+
+<main>
+  <section id="tab-overview">
+    <div class="page-head"><h1>Overview</h1><p>Trạng thái gateway, dữ liệu học tập và các job định kỳ.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <h2>Gateway</h2>
+        <p class="desc">Trạng thái kết nối và mô hình đang phục vụ agent.</p>
+        <div class="kv" id="gw"></div>
+      </div>
+      <div class="panel">
+        <h2>Snapshot</h2>
+        <p class="desc">Thông tin phiên làm việc hiện tại.</p>
+        <div class="kv" id="snap"></div>
+        <div class="note" style="margin-top:12px">Kênh chat cấu hình qua <code>.env</code> (<code>TELEGRAM_BOT_TOKEN</code> / <code>DISCORD_BOT_TOKEN</code>); học viên đặt nơi nhận báo cáo bằng <code>/sethome</code>.</div>
+      </div>
+    </div>
+    <div class="cards" id="cards"></div>
+    <table id="static-jobs"><thead><tr><th>Cron cố định</th><th>Giờ</th><th>Skill</th><th>Kênh nhận</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section id="tab-tasks" class="hidden">
+    <div class="page-head"><h1>Cron Jobs</h1><p>Công việc học viên tự lên lịch qua chat hoặc tạo tại đây — scheduler nhận thay đổi trong ~20 giây.</p></div>
+    <div class="panel" style="margin-bottom:14px">
+      <h2>Tạo job mới</h2>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+        <input id="task-prompt" placeholder="Việc cần làm, vd: Tạo 3 câu quiz bài đang học" style="flex:2;min-width:240px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+        <input id="task-when" placeholder="Lịch: 5m · 21:00 · daily 07:30" style="flex:1;min-width:150px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+        <select id="task-platform" style="padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+          <option value="telegram">Telegram</option><option value="discord">Discord</option>
+        </select>
+        <button class="btn primary" onclick="createTask()">Tạo</button>
+      </div>
+      <p class="muted" style="font-size:.76rem;margin-top:8px">Kết quả gửi về home chat của kênh (đặt bằng /sethome).</p>
+    </div>
+    <table id="tasks"><thead><tr><th>ID</th><th>Lịch</th><th>Việc</th><th>Kênh</th><th></th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section id="tab-skills" class="hidden">
+    <div class="page-head" style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1"><h1>Skills</h1><p>Kỹ năng chuẩn agentskills.io — thêm bằng thư mục <code>skills/&lt;tên&gt;/SKILL.md</code> hoặc cài từ registry.</p></div>
+      <button class="btn" onclick="document.querySelector('[data-tab=config]').click();setTimeout(()=>$('#registry-panel').scrollIntoView({behavior:'smooth'}),200)">+ Cài từ registry</button>
+    </div>
+    <table id="skills"><thead><tr><th>Skill</th><th>Mô tả (trigger)</th><th>Version</th><th></th></tr></thead><tbody></tbody></table>
+    <pre id="skill-body" class="hidden"></pre>
+  </section>
+
+  <section id="tab-lessons" class="hidden">
+    <div class="page-head"><h1>Bài học</h1><p>Ghi chú máy sinh trong vault — nhấp tên bài để đọc toàn văn. <span id="lesson-count" class="muted"></span></p></div>
+    <input id="lesson-search" placeholder="Tìm bài học..." oninput="filterLessons()" style="width:100%;margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+    <table id="lessons"><thead><tr><th>Bài</th><th>Khoá</th><th>Nguồn</th><th>Sinh lúc</th><th></th></tr></thead><tbody></tbody></table>
+    <pre id="lesson-body" class="hidden"></pre>
+  </section>
+
+  <section id="tab-packs" class="hidden">
+    <div class="page-head"><h1>Knowledge Packs</h1><p>Bộ bài học cài từ GitHub — agent chỉ cài repo trong danh sách khai báo (whitelist).</p></div>
+    <table id="packs"><thead><tr><th>Pack</th><th>Repo</th><th>Trạng thái</th><th></th></tr></thead><tbody></tbody></table>
+    <div class="note" style="margin-top:12px">Cài tại đây chạy nền vài phút (trích xuất + index). Học viên cũng cài được qua chat: <code>cài &lt;tên pack&gt;</code>.</div>
+  </section>
+
+  <section id="tab-students" class="hidden">
+    <div class="page-head"><h1>Học viên</h1><p>Hồ sơ memory agent tự ghi trong <code>vault/students/</code>.</p></div>
+    <table id="students"><thead><tr><th>ID</th><th>Tên</th><th>Hồ sơ</th><th></th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section id="tab-audit" class="hidden">
+    <div class="page-head"><h1>Logs / Audit</h1><p>Nhật ký an ninh: user bị chặn, rate-limit, ingest, cài pack, tạo lịch.</p></div>
+    <table id="audit"><thead><tr><th>Thời gian</th><th>Sự kiện</th><th>Chi tiết</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section id="tab-config" class="hidden">
+    <div class="page-head"><h1>Config · Ecosystem & Integrations</h1><p>Kết nối kênh chat, registry skills và CLI hạ tầng phục vụ học tập. CLI phải được BẬT ở đây thì agent mới dùng được (tool <code>use_cli</code>, có audit).</p></div>
+    <div id="integrations"></div>
+    <div class="panel" style="margin-top:16px" id="addons-panel">
+      <h2>Addons</h2>
+      <p class="desc" style="margin-bottom:0">Plugin tool cho agent — thả file Python vào <code>addons/</code> là xuất hiện ở đây; bật thì agent mới được gọi (có audit).</p>
+      <div class="int-grid" id="addons"></div>
+    </div>
+    <div class="panel" style="margin-top:16px" id="registry-panel">
+      <h2>Duyệt & cài skill từ registry</h2>
+      <p class="desc">Skill chuẩn agentskills.io — cài xong agent dùng được ngay lượt chat sau.</p>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <select id="reg-select" style="padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+          <option value="vlearn-skills">Vlearn Agent Skills</option>
+          <option value="anthropic-skills">anthropics/skills</option>
+        </select>
+        <button class="btn" onclick="loadRegistry()">Tải danh sách</button>
+      </div>
+      <div id="registry-list" class="muted" style="font-size:.84rem">Chọn registry rồi bấm "Tải danh sách" (lần đầu sẽ clone repo, hơi lâu).</div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h2>config.yaml</h2>
+      <p class="desc">Cấu hình đang chạy — secrets nằm trong <code>.env</code>, không hiển thị.</p>
+      <pre id="config" style="margin-top:0"></pre>
+    </div>
+  </section>
+
+  <section id="tab-chat" class="hidden">
+    <div class="chat-top">
+      <div class="page-head"><h1>Chat</h1><p>Phiên chat trực tiếp với agent — chạy bằng chính pipeline RAG thật.</p></div>
+      <div class="chip"><svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="session-chip">admin:ui</span></div>
+    </div>
+    <div class="chat-log" id="chat-log"></div>
+    <div class="composer">
+      <textarea id="q" rows="1" placeholder="Tin nhắn (Enter gửi · Shift+Enter xuống dòng)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask()}"></textarea>
+      <button class="btn" onclick="newSession()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Phiên mới</button>
+      <button class="btn primary" onclick="ask()">Gửi<svg class="ic" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg></button>
+    </div>
+  </section>
+
+  <section id="tab-history" class="hidden">
+    <div class="page-head"><h1>Lịch sử chat</h1><p>Toàn bộ hội thoại đã ghi (Telegram · Discord · Web) — đọc từ session log FTS5, nguồn dữ liệu tool <code>search_sessions</code> của agent.</p></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select id="hist-user" onchange="loadHistory()" style="min-width:190px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+        <option value="">Tất cả người dùng</option>
+      </select>
+      <input id="hist-q" placeholder="Tìm trong nội dung… (Enter)" onkeydown="if(event.key==='Enter')loadHistory()"
+        style="flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--input);color:var(--ink)">
+      <button class="btn" onclick="loadHistory()">Lọc</button>
+      <span id="hist-count" class="muted" style="align-self:center;font-size:.8rem"></span>
+    </div>
+    <div id="hist-log" class="hist-log"><div class="muted">Đang tải…</div></div>
+  </section>
+</main>
+<div id="toasts"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = p => fetch(p).then(r => r.json());
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+// Render markdown an toàn cho tin nhắn agent: escape HTML TRƯỚC, rồi mới bold/italic/code/link/bullet.
+// Giữ '\n' để white-space:pre-wrap tự xuống dòng.
+function mdToHtml(t) {
+  const mer = [], code = [];
+  let s = String(t ?? '');
+  // tách khối ```mermaid và ``` thường ra placeholder TRƯỚC mọi xử lý khác — vừa để
+  // render sơ đồ riêng, vừa để dòng trống/thụt lề BÊN TRONG code không bị đụng khi
+  // chuẩn hoá khoảng trắng dọc của phần văn xuôi ở bước sau.
+  s = s.replace(/```mermaid\s*\n?([\s\S]*?)```/g, (_, c) => { mer.push(c.trim()); return '%%MM' + (mer.length - 1) + '%%'; });
+  s = s.replace(/```([\s\S]*?)```/g, (_, c) => { code.push(c.replace(/^\n/, '')); return '%%CB' + (code.length - 1) + '%%'; });
+  // model hay trả 3+ dòng trống liên tiếp (không nhất quán, tuỳ hứng) -> ép về ĐÚNG 1
+  // dòng trống (paragraph break đều nhau); list rời rạc (cách dòng giữa các gạch đầu
+  // dòng liền kề) -> ép sát lại thành list liền mạch.
+  s = s.replace(/[ \t]+\n/g, '\n');
+  s = s.replace(/\n{3,}/g, '\n\n');
+  s = s.replace(/^([ \t]*[-*] .+)\n\n(?=[ \t]*[-*] )/gm, '$1\n');
+  s = esc(s);
+  s = s.replace(/%%CB(\d+)%%/g, (_, i) => '<pre>' + esc(code[+i]) + '</pre>');
+  s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^\w_])_([^_\n]+?)_(?![\w_])/g, '$1<em>$2</em>');
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  /* bảng markdown -> <table> (sau inline format để cell giữ <strong>) */
+  s = s.replace(/(?:^|\n)((?:[ \t]*\|.*\|[ \t]*(?:\n|$)){2,})/g, (_, blk) => {
+    const rows = [];
+    blk.trim().split('\n').forEach(l => {
+      l = l.trim();
+      if (/^\|[\s:\-|]+\|$/.test(l)) return;              /* hàng |---|---| */
+      rows.push(l.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim()));
+    });
+    if (!rows.length) return '\n' + blk;
+    const h = '<tr>' + rows[0].map(c => '<th>' + c + '</th>').join('') + '</tr>';
+    const b = rows.slice(1).map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('');
+    return '\n<div class="tblwrap"><table>' + h + b + '</table></div>\n';
+  });
+  s = s.replace(/^\s*#{1,6}\s+(.+)$/gm, '<span class="mdh">$1</span>');
+  s = s.replace(/^[ \t]*[-*] +/gm, '• ');
+  s = s.replace(/%%MM(\d+)%%/g, (_, i) =>
+    '<div class="mmwrap"><pre class="mmsrc" hidden>' + esc(mer[+i].replace(/\*\*/g, '').replace(/__/g, '')) + '</pre></div>');
+  return s;
+}
+
+/* ── sơ đồ/mindmap: card viewer (header + code + fullscreen + zoom) ── */
+const MM_PAL = ['#F6B33F','#57C7B8','#B98CFF','#FF8A6B','#5AA9FF','#5FCF8F','#F49AC2','#7FD4E8'];
+function mmParse(code) {
+  let lines = code.split('\n').filter(l => l.trim());
+  if (/^\s*mindmap/.test(lines[0])) lines = lines.slice(1);
+  const clean = t => {
+    t = t.trim().replace(/^root\s*/, '');
+    const m = t.match(/^[\(\[\{]+([\s\S]+?)[\)\]\}]+$/); if (m) t = m[1];
+    return t.trim();
+  };
+  let root = null; const stack = [];
+  lines.forEach(l => {
+    const ind = l.match(/^\s*/)[0].length, node = { t: clean(l), k: [], i: ind };
+    while (stack.length && stack[stack.length - 1].i >= ind) stack.pop();
+    if (stack.length) stack[stack.length - 1].n.k.push(node); else root = node;
+    stack.push({ i: ind, n: node });
+  });
+  return root;
+}
+function mmNodeHtml(n, depth, cIdx) {
+  const color = depth === 0 ? '#F6B33F' : MM_PAL[cIdx % MM_PAL.length];
+  const cls = depth === 0 ? 'pill d0' : depth === 1 ? 'pill d1' : depth === 2 ? 'pill d2' : 'pill d3';
+  const label = `<span class="${cls}" style="--c:${color}">${esc(n.t)}</span>`;
+  const kids = n.k.map((c, i) => mmNodeHtml(c, depth + 1, depth === 0 ? i : cIdx)).join('');
+  return `<li><div class="item">${label}${kids ? '<ul>' + kids + '</ul>' : ''}</div></li>`;
+}
+function mmTree(code) {
+  const r = mmParse(code);
+  if (!r || !r.k.length) throw new Error('empty');
+  return '<div class="mm2"><ul>' + mmNodeHtml(r, 0, 0) + '</ul></div>';
+}
+function dgCard(kind, inner, code) {
+  return '<div class="dgcard">'
+    + '<div class="dg-head"><span class="dg-title">' + (kind === 'mindmap' ? '🗺 Mindmap' : '📊 Sơ đồ') + '</span><span class="dg-sp"></span>'
+    + (kind === 'mindmap'
+        ? '<button type="button" class="dg-b mm-practice">🙈 Luyện nhớ</button><button type="button" class="dg-b mm-showall" style="display:none">👁 Hiện hết</button>'
+        : '')
+    + '<button type="button" class="dg-b dg-code" title="Xem code">&lt;/&gt;</button>'
+    + '<button type="button" class="dg-b dg-fs" title="Toàn màn hình">⛶</button></div>'
+    + '<div class="dg-body"><div class="dg-scale" data-z="1">' + inner + '</div>'
+    + '<pre class="dg-src" hidden>' + esc(code) + '</pre>'
+    + '<div class="dg-zoom"><button type="button" class="dg-b dg-z" data-d="0.2">+</button><button type="button" class="dg-b dg-z" data-d="-0.2">−</button></div></div></div>';
+}
+let _mmSeq = 0;
+function mermaidGo(nodes) {
+  nodes.forEach(x => { if (!x.id) x.id = 'dmm' + (++_mmSeq); });
+  const go = () => { try { window.__mermaid.run({ nodes }).catch(() => {}); } catch (e) {} };
+  if (window.__mermaid) go();
+  else { let c = 0; const iv = setInterval(() => { if (window.__mermaid) { clearInterval(iv); go(); } else if (++c > 60) clearInterval(iv); }, 150); }
+}
+function renderDiagrams(el) {
+  [...el.querySelectorAll('.mmwrap')].forEach(w => {
+    if (w.dataset.done) return;
+    const src = w.querySelector('.mmsrc'); if (!src) return;
+    const code = src.textContent.trim();
+    if (/^mindmap/i.test(code)) {
+      try { w.innerHTML = dgCard('mindmap', mmTree(code), code); w.dataset.done = '1'; return; } catch (e) {}
+    }
+    w.innerHTML = dgCard('graph', '', code); w.dataset.done = '1';
+    const d = document.createElement('div'); d.className = 'mermaid'; d.textContent = code;
+    w.querySelector('.dg-scale').appendChild(d); mermaidGo([d]);
+  });
+}
+document.addEventListener('click', e => {
+  const card = e.target.closest ? e.target.closest('.dgcard') : null;
+  const pr = e.target.closest('.mm-practice');
+  if (pr && card) {
+    const mm = card.querySelector('.mm2'); if (!mm) return;
+    const on = mm.classList.toggle('practice');
+    if (!on) mm.querySelectorAll('.pill.shown').forEach(p => p.classList.remove('shown'));
+    pr.textContent = on ? '✅ Thoát' : '🙈 Luyện nhớ';
+    card.querySelector('.mm-showall').style.display = on ? '' : 'none';
+    return;
+  }
+  if (e.target.closest('.mm-showall') && card) {
+    card.querySelectorAll('.mm2 .pill:not(.d0)').forEach(p => p.classList.add('shown'));
+    return;
+  }
+  if (e.target.closest('.dg-code') && card) {
+    const src = card.querySelector('.dg-src'), sc = card.querySelector('.dg-scale');
+    const show = src.hidden; src.hidden = !show; sc.style.display = show ? 'none' : '';
+    return;
+  }
+  if (e.target.closest('.dg-fs') && card) {
+    const fs = card.classList.toggle('fs');
+    document.body.style.overflow = fs ? 'hidden' : '';
+    card.querySelector('.dg-fs').textContent = fs ? '✕' : '⛶';
+    return;
+  }
+  const z = e.target.closest('.dg-z');
+  if (z && card) {
+    const sc = card.querySelector('.dg-scale');
+    const v = Math.min(2.6, Math.max(0.5, (parseFloat(sc.dataset.z) || 1) + parseFloat(z.dataset.d)));
+    sc.dataset.z = v; sc.style.transform = 'scale(' + v + ')';
+    return;
+  }
+  const pill = e.target.closest('.mm2.practice .pill');
+  if (pill && !pill.classList.contains('d0')) pill.classList.add('shown');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const fs = document.querySelector('.dgcard.fs');
+    if (fs) { fs.classList.remove('fs'); document.body.style.overflow = ''; fs.querySelector('.dg-fs').textContent = '⛶'; }
+  }
+});
+let chatHistory = [];
+
+function toggleTheme(){
+  const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#nav button').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('main section').forEach(x => x.classList.add('hidden'));
+  b.classList.add('active');
+  $('#tab-' + b.dataset.tab).classList.remove('hidden');
+  load(b.dataset.tab);
+});
+
+// Deep-link tab qua #hash (vd .../#skills) — tiện chia sẻ link tới đúng module.
+function _tabFromHash() {
+  const h = location.hash.slice(1);
+  if (!h) return;
+  const b = document.querySelector('#nav button[data-tab="' + h + '"]');
+  if (b) b.click();
+}
+window.addEventListener('hashchange', _tabFromHash);
+_tabFromHash();
+
+async function load(tab) {
+  try {
+    if (tab === 'overview') {
+      const s = await api('/api/status');
+      $('#health-dot').classList.remove('bad'); $('#health-txt').textContent = 'Health OK';
+      $('#gw').innerHTML = [
+        ['Status', '<span class="v ok">Connected</span>'],
+        ['Uptime UI', `<span class="v small">${s.uptime}</span>`],
+        ['Model', `<span class="v small">${esc(s.model)}</span>`],
+        ['Provider', `<span class="v small">${esc(s.provider || 'custom')}</span>`],
+        ['Embedding', `<span class="v small">${esc(s.embedding)}</span>`],
+      ].map(([k,v]) => `<div class="stat"><div class="k">${k}</div>${v}</div>`).join('');
+      $('#snap').innerHTML = [
+        ['Version', `<span class="v small">v${s.version}</span>`],
+        ['Kênh', `<span class="pill ${s.channels.telegram?'on':'off'}">Telegram</span> <span class="pill ${s.channels.discord?'on':'off'}">Discord</span>`],
+        ['Home chat', `<span class="v small">${Object.keys(s.home||{}).join(', ') || '<span class="muted">chưa đặt</span>'}</span>`],
+        ['Cron', `<span class="v small ok">${(s.static_jobs||[]).length + s.tasks} jobs</span>`],
+      ].map(([k,v]) => `<div class="stat"><div class="k">${k}</div>${v}</div>`).join('');
+      $('#cards').innerHTML = [
+        [s.lessons, 'BÀI HỌC', 'ghi chú trong vault'],
+        [s.chunks, 'CHUNKS', 'đoạn đã index cho RAG'],
+        [s.students, 'HỌC VIÊN', 'hồ sơ memory'],
+        [s.tasks, 'SCHEDULED', 'task học viên tự tạo'],
+      ].map(([n,k,sub]) => `<div class="bigcard"><div class="k">${k}</div><div class="v">${n}</div><div class="sub">${sub}</div></div>`).join('');
+      $('#static-jobs tbody').innerHTML = (s.static_jobs||[]).map(j =>
+        `<tr><td>${esc(j.name)}</td><td>${esc(j.time)}</td><td>${esc(j.skill)}</td><td>${esc(j.deliver||'all')}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">chưa có</td></tr>';
+    }
+    if (tab === 'tasks') {
+      const rows = await api('/api/tasks');
+      $('#tasks tbody').innerHTML = rows.map(t =>
+        `<tr><td style="font-family:var(--mono)">${t.id}</td><td>${t.type==='daily' ? 'hằng ngày '+t.at : esc(t.at).replace('T',' ')}</td><td>${esc(t.prompt)}</td><td>${t.platform}</td><td><button class="act" onclick="cancelTask('${t.id}')">Huỷ</button></td></tr>`).join('') || '<tr><td colspan=5 class="muted">chưa có task nào</td></tr>';
+    }
+    if (tab === 'skills') {
+      const rows = await api('/api/skills');
+      $('#skills tbody').innerHTML = rows.map(s =>
+        `<tr><td><a class="name" onclick="viewSkill('${esc(s.name)}')">${esc(s.name)}</a></td><td class="muted">${esc(s.description)}</td><td style="font-family:var(--mono)">${esc(s.version)}</td>
+         <td style="white-space:nowrap"><button class="act" onclick="uninstallSkill('${esc(s.name)}')">Gỡ</button></td></tr>`).join('');
+    }
+    if (tab === 'lessons') {
+      const rows = await api('/api/lessons');
+      $('#lesson-count').textContent = `(${rows.length} bài)`;
+      $('#lessons tbody').innerHTML = rows.map(r =>
+        `<tr><td><a class="name" onclick="openLesson('${esc(r.name)}')">${esc(r.name)}</a></td><td>${esc(r.course)}</td><td class="muted">${esc(r.source)}</td><td class="muted" style="font-family:var(--mono)">${esc(r.generated).slice(0,16)}</td>
+         <td><button class="act" onclick="deleteLesson('${esc(r.name)}')">Xoá</button></td></tr>`).join('');
+      filterLessons();
+    }
+    if (tab === 'packs') {
+      const rows = await api('/api/packs');
+      $('#packs tbody').innerHTML = rows.map(p =>
+        `<tr><td><b>${esc(p.name)}</b><br><span class="muted">${esc(p.description||'')}</span></td><td class="muted" style="font-family:var(--mono);font-size:.76rem">${esc(p.repo)}</td><td><span class="pill ${p.installed?'on':'warn'}">${p.installed?'đã cài':'chưa cài'}</span></td>
+         <td><button class="act" onclick="installPack('${esc(p.name)}')">${p.installed?'Cập nhật':'Cài'}</button></td></tr>`).join('');
+    }
+    if (tab === 'students') {
+      const rows = await api('/api/students');
+      $('#students tbody').innerHTML = rows.map(s =>
+        `<tr><td style="font-family:var(--mono)">${s.id}</td><td>${esc(s.name)}</td><td><pre style="max-height:150px;margin:0">${esc(s.body)}</pre></td>
+         <td><button class="act" onclick="deleteStudent('${s.id}')">Xoá</button></td></tr>`).join('') || '<tr><td colspan=4 class="muted">chưa có hồ sơ</td></tr>';
+    }
+    if (tab === 'audit') {
+      const rows = await api('/api/audit');
+      $('#audit tbody').innerHTML = rows.map(e => {
+        const {ts, event, ...rest} = e;
+        return `<tr><td class="muted" style="font-family:var(--mono);font-size:.76rem">${ts.replace('T',' ').slice(0,19)}</td><td><b>${esc(event)}</b></td><td class="muted" style="font-family:var(--mono);font-size:.76rem">${esc(JSON.stringify(rest))}</td></tr>`;
+      }).join('') || '<tr><td colspan=3 class="muted">trống</td></tr>';
+    }
+    if (tab === 'history') { await loadHistoryUsers(); await loadHistory(); }
+    if (tab === 'config') {
+      $('#config').textContent = JSON.stringify(await api('/api/config'), null, 2);
+      const items = await api('/api/integrations');
+      const groups = {};
+      items.forEach(i => (groups[i.category] = groups[i.category] || []).push(i));
+      const CAT_DESC = {
+        'Chat channels': 'Kênh học viên trò chuyện với agent — cấu hình token trong .env.',
+        'Ecosystem — Skills registries': 'Kho skill cộng đồng chuẩn agentskills.io — duyệt và cài thẳng từ đây.',
+        'Agent Infrastructure & CLIs': 'Công cụ hạ tầng agent dùng để lấy tài liệu bên ngoài — bật thì agent mới được phép gọi.',
+      };
+      $('#integrations').innerHTML = Object.entries(groups).map(([cat, list]) => `
+        <div class="panel" style="margin-bottom:16px">
+          <h2>${esc(cat)}</h2>
+          <p class="desc" style="margin-bottom:0">${CAT_DESC[cat] || ''}</p>
+          <div class="int-grid">
+            ${list.map(i => {
+              const status = i.detected
+                ? '<span class="pill on">Sẵn sàng</span>'
+                : '<span class="pill warn">Chưa kết nối</span>';
+              const chip = i.type === 'cli'
+                ? (i.detected ? i.detail : (i.install || ''))
+                : (i.env ? i.env + '=...' : (i.repo || ''));
+              const foot = (i.type === 'cli' || i.type === 'api') ? `
+                  <label class="switch" title="Cho phép agent sử dụng">
+                    <input type="checkbox" ${i.enabled ? 'checked' : ''} onchange="toggleIntegration('${i.key}', this.checked, '${esc(i.name)}')">
+                    <span class="track"></span>
+                  </label>
+                  <span class="muted">Cho phép agent sử dụng</span>`
+                : i.type === 'registry' ? `
+                  <button class="btn" style="padding:7px 13px;font-size:.78rem" onclick="browseRegistry('${i.key}')">Duyệt skill →</button>`
+                : `<span class="muted">${i.detected ? 'Đang hoạt động' : 'Điền token vào .env rồi khởi động lại bot'}</span>`;
+              return `
+              <div class="int-card">
+                <div class="head"><b>${esc(i.name)}</b>${status}</div>
+                <div class="desc2">${esc(i.desc || '')}</div>
+                ${chip ? `<div class="codechip"><code>${esc(chip)}</code>
+                  <button class="copybtn" title="Copy" onclick="copyText('${esc(chip).replace(/'/g, "\\'")}')">
+                    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button></div>` : ''}
+                <div class="foot">
+                  <div style="display:flex;align-items:center;gap:9px">${foot}</div>
+                  <a href="${esc(i.url)}" target="_blank">${esc(i.url).replace('https://','').replace(/\/$/,'')} ↗</a>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`).join('');
+      const addons = await api('/api/addons');
+      $('#addons').innerHTML = addons.map(a => `
+        <div class="int-card">
+          <div class="head"><b>${esc(a.name)}</b>
+            <span class="pill ${a.error ? 'warn' : (a.enabled ? 'on' : 'off')}">${a.error ? 'Lỗi' : (a.enabled ? 'Đang bật' : 'Đang tắt')}</span></div>
+          <div class="desc2">${esc(a.description)}</div>
+          ${a.tools.length ? `<div class="codechip"><code>tools: ${esc(a.tools.join(', '))}</code></div>` : ''}
+          ${!a.error ? `<div class="foot">
+            <div style="display:flex;align-items:center;gap:9px">
+              <label class="switch"><input type="checkbox" ${a.enabled ? 'checked' : ''} onchange="toggleAddon('${esc(a.name)}', this.checked)"><span class="track"></span></label>
+              <span class="muted">Cho phép agent sử dụng</span>
+            </div></div>` : ''}
+        </div>`).join('') || '<p class="muted" style="font-size:.82rem">Chưa có addon nào trong thư mục addons/.</p>';
+    }
+  } catch (e) {
+    $('#health-dot').classList.add('bad');
+    $('#health-txt').textContent = 'Mất kết nối';
+  }
+}
+
+async function openLesson(name) {
+  const d = await api('/api/lesson?name=' + encodeURIComponent(name));
+  const pre = $('#lesson-body');
+  pre.textContent = d.body;
+  pre.classList.remove('hidden');
+  pre.scrollIntoView({behavior:'smooth'});
+}
+async function cancelTask(id) {
+  await fetch('/api/tasks/' + id, {method:'DELETE'});
+  toast('Đã huỷ task ' + id);
+  load('tasks');
+}
+function toast(msg, err=false) {
+  const box = document.createElement('div');
+  box.className = 'toast' + (err ? ' err' : '');
+  box.textContent = msg;
+  $('#toasts').appendChild(box);
+  setTimeout(() => box.remove(), 3500);
+}
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Đã copy vào clipboard'));
+}
+async function toggleIntegration(key, enabled, name) {
+  await fetch('/api/integrations/' + key, {method:'PATCH',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled})});
+  toast(`${name || key}: ${enabled ? 'agent ĐƯỢC PHÉP sử dụng' : 'đã tắt quyền sử dụng'}`);
+}
+function browseRegistry(key) {
+  $('#reg-select').value = key;
+  loadRegistry();
+  $('#registry-panel').scrollIntoView({behavior:'smooth'});
+}
+async function viewSkill(name) {
+  const d = await api('/api/skill?name=' + encodeURIComponent(name));
+  const pre = $('#skill-body');
+  pre.textContent = d.body;
+  pre.classList.remove('hidden');
+  pre.scrollIntoView({behavior:'smooth'});
+}
+async function uninstallSkill(name) {
+  if (!confirm(`Gỡ skill "${name}"? (cài lại được từ registry)`)) return;
+  const r = await fetch('/api/skills/' + name, {method:'DELETE'});
+  toast((await r.json()).message);
+  load('skills');
+}
+function filterLessons() {
+  const q = ($('#lesson-search').value || '').toLowerCase();
+  document.querySelectorAll('#lessons tbody tr').forEach(tr =>
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none');
+}
+async function deleteLesson(name) {
+  if (!confirm(`Xoá bài "${name}" khỏi vault + index? (ingest lại được từ nguồn)`)) return;
+  const r = await fetch('/api/lesson?name=' + encodeURIComponent(name), {method:'DELETE'});
+  toast((await r.json()).message);
+  load('lessons');
+}
+async function installPack(name) {
+  const r = await fetch('/api/packs/' + name + '/install', {method:'POST'});
+  toast((await r.json()).message);
+}
+async function deleteStudent(id) {
+  if (!confirm(`Xoá hồ sơ học viên ${id}?`)) return;
+  const r = await fetch('/api/students/' + id, {method:'DELETE'});
+  toast((await r.json()).message);
+  load('students');
+}
+async function createTask() {
+  const prompt = $('#task-prompt').value.trim(), when = $('#task-when').value.trim();
+  if (!prompt || !when) { toast('Điền đủ việc + lịch', true); return; }
+  const r = await fetch('/api/tasks', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({prompt, when, platform: $('#task-platform').value})});
+  const d = await r.json();
+  toast(d.message, !d.message.includes('✅'));
+  if (d.message.includes('✅')) { $('#task-prompt').value = ''; $('#task-when').value = ''; load('tasks'); }
+}
+async function toggleAddon(name, enabled) {
+  await fetch('/api/addons/' + name, {method:'PATCH',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled})});
+  toast(`addon ${name}: ${enabled ? 'agent ĐƯỢC PHÉP dùng' : 'đã tắt'}`);
+}
+/* ---- Lịch sử chat ---- */
+const PLATFORM_ICON = {telegram:'✈️', discord:'🎮', web:'🌐', '':'💻'};
+async function loadHistoryUsers() {
+  const users = await api('/api/history/users');
+  const sel = $('#hist-user'), cur = sel.value;
+  sel.innerHTML = '<option value="">Tất cả người dùng (' + users.length + ')</option>' +
+    users.map(u => `<option value="${esc(u.id)}">${esc(u.id)} · ${u.questions} câu hỏi · lần cuối ${esc((u.last||'').slice(0,10))}</option>`).join('');
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+async function loadHistory() {
+  const user = $('#hist-user').value, q = $('#hist-q').value.trim();
+  const rows = await api('/api/history?user=' + encodeURIComponent(user) + '&q=' + encodeURIComponent(q) + '&limit=300');
+  $('#hist-count').textContent = rows.length ? rows.length + ' lượt' + (q ? ' khớp "' + q + '"' : '') : '';
+  if (!rows.length) {
+    $('#hist-log').innerHTML = '<div class="muted">' + (q ? 'Không có tin nhắn nào khớp.' : 'Chưa có hội thoại nào được ghi.') + '</div>';
+    return;
+  }
+  let html = '', day = '';
+  rows.forEach(r => {
+    const d = (r.ts || '').slice(0, 10);
+    if (d && d !== day) { day = d; html += `<div class="hist-day">${esc(d)}</div>`; }
+    const time = (r.ts || '').slice(11, 16);
+    const who = r.role === 'user' ? esc(r.user) : 'Agent';
+    const body = r.role === 'user' ? esc(r.content) : mdToHtml(r.content);
+    html += `<div class="msg ${r.role === 'user' ? 'user' : 'bot'}">`
+          + `<div class="who">${who}</div>${body}`
+          + `<div class="hist-meta"><span>${esc(time)} UTC</span><span class="pf">${PLATFORM_ICON[r.platform] || '💻'} ${esc(r.platform || 'web')}</span></div></div>`;
+  });
+  $('#hist-log').innerHTML = html;
+  renderDiagrams($('#hist-log'));
+}
+
+async function loadRegistry() {
+  const key = $('#reg-select').value;
+  $('#registry-list').textContent = '⏳ Đang tải registry (lần đầu clone repo)...';
+  const rows = await api('/api/registry/' + key + '/skills');
+  if (rows.error) { $('#registry-list').textContent = rows.error; return; }
+  $('#registry-list').innerHTML = '<table><thead><tr><th>Skill</th><th>Mô tả</th><th></th></tr></thead><tbody>' +
+    rows.map(s => `<tr><td><b>${esc(s.name)}</b></td><td class="muted">${esc(s.description)}</td>
+      <td>${s.installed ? '<span class="pill on">đã cài</span>'
+        : `<button class="act" onclick="installSkill('${key}','${esc(s.name)}', this)">Cài</button>`}</td></tr>`).join('') +
+    '</tbody></table>';
+}
+async function installSkill(key, skill, btn) {
+  btn.textContent = '⏳';
+  const r = await fetch('/api/registry/' + key + '/install', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify({skill})});
+  const d = await r.json();
+  toast(d.message, !d.message.includes('✅'));
+  btn.outerHTML = d.message.includes('✅') ? '<span class="pill on">Đã cài</span>' : esc(d.message);
+}
+
+/* ── chat ── */
+function addMsg(role, text, typing=false) {
+  const log = $('#chat-log');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'bot') + (typing ? ' typing' : '');
+  const rendered = role === 'user' ? esc(text) : mdToHtml(text);
+  div.innerHTML = `<div class="who">${role === 'user' ? 'Bạn' : 'Agent'}</div>${rendered}`;
+  log.appendChild(div);
+  if (role !== 'user') renderDiagrams(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function addTrace(trace) {
+  if (!trace || !trace.length) return;
+  const log = $('#chat-log');
+  const wrap = document.createElement('div');
+  wrap.className = 'steps';
+  const rows = trace.map(t => {
+    if (t.type === 'thought')
+      return `<div class="step thought"><span class="tname">thinking</span> <span class="targs">${esc(t.text)}</span></div>`;
+    return `<div class="step"><span class="tname">${esc(t.name)}</span> <span class="targs">${esc(t.args)}</span><div class="tres">${esc(t.result)}</div></div>`;
+  }).join('');
+  const nTools = trace.filter(t => t.type === 'tool').length;
+  wrap.innerHTML = `<details><summary>▸ <span class="n">${nTools}</span> tool call · ${trace.length} bước xử lý — bấm để xem</summary>${rows}</details>`;
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+}
+function addMedia(media) {
+  if (!media || !media.length) return;
+  const log = $('#chat-log');
+  media.forEach(m => {
+    const url = `data:${m.mime};base64,${m.data}`;
+    const div = document.createElement('div');
+    div.className = 'msg bot media-msg';
+    if (m.kind === 'audio') {
+      div.innerHTML = `<audio controls src="${url}" style="width:100%"></audio>`;
+    } else if (m.kind === 'image') {
+      div.innerHTML = `<img src="${url}" alt="${esc(m.name)}" style="max-width:100%;border-radius:10px;display:block">`;
+    } else {
+      div.innerHTML = `<a href="${url}" download="${esc(m.name)}">📎 ${esc(m.name)}</a>`;
+    }
+    log.appendChild(div);
+  });
+  log.scrollTop = log.scrollHeight;
+}
+function newSession() {
+  chatHistory = [];
+  $('#chat-log').innerHTML = '';
+  $('#session-chip').textContent = 'admin:ui · phiên mới';
+}
+async function ask() {
+  const box = $('#q');
+  const q = box.value.trim();
+  if (!q) return;
+  box.value = '';
+  addMsg('user', q);
+  const typing = addMsg('bot', 'Đang suy nghĩ…', true);
+  try {
+    const r = await fetch('/api/ask', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question: q, history: chatHistory})});
+    const data = await r.json();
+    typing.remove();
+    addTrace(data.trace);
+    addMsg('bot', data.answer);
+    addMedia(data.media);
+    chatHistory.push({role:'user', content:q}, {role:'assistant', content:data.answer});
+  } catch (e) {
+    typing.remove();
+    addMsg('bot', '⚠ Không gọi được API — kiểm tra server UI.');
+  }
+}
+
+load('overview');
+setInterval(() => { if (!$('#tab-overview').classList.contains('hidden')) load('overview'); }, 15000);
+</script>
+<script type="module">
+/* mermaid cho sơ đồ graph TD (mindmap vẽ bằng HTML thuần, không cần) — lỗi mạng thì bỏ qua */
+try {
+  const m = (await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')).default;
+  const dark = document.documentElement.dataset.theme === 'dark';
+  m.initialize({ startOnLoad: false, securityLevel: 'loose', theme: dark ? 'dark' : 'neutral',
+    flowchart: { htmlLabels: false },  // label SVG text — htmlLabels đo sai bề rộng, chữ bị cắt
+    themeVariables: dark ? { primaryColor: '#1d222a', primaryTextColor: '#e7ebf0',
+      primaryBorderColor: '#d9a13d', lineColor: '#57C7B8' } : {} });
+  window.__mermaid = m;
+} catch (e) {}
+</script>
+</body>
+</html>
