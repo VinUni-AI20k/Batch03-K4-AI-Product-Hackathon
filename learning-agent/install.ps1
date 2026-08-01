@@ -28,14 +28,20 @@ if ($Ingest) {
   & .\.venv\Scripts\pip.exe install -q -e ".[ingest]"
 }
 
-if (-not (Test-Path .env)) { Copy-Item .env.example .env; Say "Đã tạo .env — mở lên điền LLM key + token bot" }
+if (-not (Test-Path .env)) { Copy-Item .env.example .env; Say "Đã tạo .env" }
+
+# Wizard tương tác: chọn provider bằng mũi tên + dán key (mask ***)
+Say "Cấu hình nhanh (chọn provider LLM + dán API key)"
+& .\.venv\Scripts\learning-agent.exe config
+
 & .\.venv\Scripts\learning-agent.exe onboard
 
 Write-Host ""
 Write-Host "────────────────────────────────────────────────"
-Write-Host "✅ Cài xong. Tiếp theo:" -ForegroundColor Green
-Write-Host "  1. Mở .env điền: LLM key, TELEGRAM_BOT_TOKEN/DISCORD_BOT_TOKEN"
-Write-Host "  2. Kích hoạt:   .\.venv\Scripts\Activate.ps1"
-Write-Host "  3. Chạy bot:    learning-agent bot"
-Write-Host "  4. Dashboard:   learning-agent ui   → http://127.0.0.1:8321"
+Write-Host "✅ Cài xong. Repo đã kèm sẵn KHO KIẾN THỨC (vault/) — lần đầu chạy tự index, dùng ngay." -ForegroundColor Green
+Write-Host "Tiếp theo:"
+Write-Host "  1. (Nếu chưa điền key) mở .env: LLM key, tuỳ chọn VOYAGE_API_KEY / token bot"
+Write-Host "  2. Kích hoạt:     .\.venv\Scripts\Activate.ps1"
+Write-Host "  3. Dashboard chat: learning-agent ui   → http://127.0.0.1:8321"
+Write-Host "     (hoặc Telegram/Discord: learning-agent bot — lần đầu tự index, chờ chút)"
 Write-Host "────────────────────────────────────────────────"

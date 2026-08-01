@@ -1,6 +1,8 @@
 """CLI: learning-agent <lệnh>
 
   onboard   kiểm tra cấu hình lần đầu (.env, token, thư mục)
+  config    wizard cấu hình tương tác: chọn provider LLM, dán key, model, kênh, khởi động
+  chat      chat liên tục với agent ngay trong terminal (REPL)
   sync      quét source_mirror, ingest bài mới/đổi, cập nhật index (incremental)
   reindex   rebuild toàn bộ index từ vault (index là phái sinh)
   ask       hỏi thử agent trong terminal (không cần Discord/Telegram)
@@ -28,7 +30,27 @@ def _setup(cfg):
         cfg.get("index", "collection", default="lessons"),
         make_embedder(cfg),
     )
+    _ensure_indexed(cfg, vault, index)
     return vault, index
+
+
+def _ensure_indexed(cfg, vault, index) -> None:
+    """Cài đặt là DÙNG ĐƯỢC NGAY: repo đã bundle sẵn vault (bài học); lần đầu chạy mà index còn
+    rỗng thì tự embed toàn bộ kho có sẵn (một lần) — khớp đúng embedder người dùng vừa cấu hình."""
+    try:
+        if index.collection.count() > 0:
+            return
+        notes = list(vault.notes("courses"))
+        if not notes:
+            return
+        emb = "Voyage" if cfg.voyage_api_key else "local (miễn phí)"
+        print(f"🔎 Lần đầu chạy — đang index {len(notes)} bài học có sẵn trong repo bằng embedding {emb} "
+              "(một lần, chờ chút)...", flush=True)
+        from .updater.sync import reindex_all
+        n = reindex_all(cfg, vault, index)
+        print(f"✅ Kho kiến thức sẵn sàng — {n} đoạn. Agent trả lời được ngay.", flush=True)
+    except Exception as e:  # lỗi index không được chặn agent khởi động
+        print(f"⚠️ Chưa tự index được kho kiến thức ({e}). Chạy tay: learning-agent reindex", flush=True)
 
 
 def main() -> None:
@@ -36,6 +58,7 @@ def main() -> None:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("onboard")
+    sub.add_parser("config")
     sub.add_parser("update")
     ui = sub.add_parser("ui")
     ui.add_argument("--port", type=int, default=8321)
@@ -44,6 +67,7 @@ def main() -> None:
     sub.add_parser("reindex")
     ask = sub.add_parser("ask")
     ask.add_argument("question", nargs="+")
+    sub.add_parser("chat")
     sub.add_parser("bot")
     args = parser.parse_args()
 
@@ -51,6 +75,10 @@ def main() -> None:
 
     if args.cmd == "onboard":
         _onboard(cfg)
+        return
+
+    if args.cmd == "config":
+        _config_wizard(cfg)
         return
 
     if args.cmd == "update":
@@ -80,6 +108,10 @@ def main() -> None:
         question = " ".join(args.question)
         print(agent.reply("cli-user", "CLI", [{"role": "user", "content": question}]))
 
+    elif args.cmd == "chat":
+        from .agent import TutorAgent
+        _repl(TutorAgent(cfg, vault, index))
+
     elif args.cmd == "bot":
         if not cfg.discord_token and not cfg.telegram_token:
             sys.exit("Cần ít nhất DISCORD_BOT_TOKEN hoặc TELEGRAM_BOT_TOKEN trong .env")
@@ -95,6 +127,8 @@ async def _run_gateway(cfg, vault, index) -> None:
     agent = TutorAgent(cfg, vault, index)
     home = HomeStore(cfg.root / "data" / "home.json")
     scheduler = Scheduler(cfg, agent)
+    from .updater.watch import start_vault_watcher
+    start_vault_watcher(cfg, vault, index)  # sửa vault bằng Obsidian -> RAG tự cập nhật
     agent.attach_task_store(scheduler.store)  # bật tools schedule_task từ chat
     tasks = []
 
@@ -155,6 +189,383 @@ def _onboard(cfg) -> None:
         "  2. Trong chat: /sethome để nhận báo cáo học tập hằng ngày (cron trong config.yaml)\n"
         "  3. Giới hạn người dùng: DISCORD_ALLOWED_USERS / TELEGRAM_ALLOWED_USERS trong .env"
     )
+
+
+def _repl(agent) -> None:
+    """Chat với Vlearn Agent ngay trong terminal (REPL đơn giản)."""
+    print("\n\033[1;35m💬 Chat với Vlearn Agent\033[0m — gõ câu hỏi; Enter rỗng hoặc 'thoát' để dừng.\n")
+    history: list[dict] = []
+    while True:
+        try:
+            q = input("\033[1;36mBạn:\033[0m ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+        if not q or q.lower() in ("thoát", "thoat", "quit", "exit", ":q"):
+            break
+        history.append({"role": "user", "content": q})
+        answer = agent.reply("cli-user", "CLI", history)
+        history.append({"role": "assistant", "content": answer})
+        print(f"\033[1;35mVlearn:\033[0m {answer}\n")
+
+
+# ─────────────────────────── wizard cấu hình tương tác ───────────────────────────
+_PROVIDERS = [
+    ("openai",     "OpenAI — GPT (gpt-4o-mini, gpt-5.4-mini)"),
+    ("openrouter", "OpenRouter — Claude / Gemini / Llama qua 1 key"),
+    ("gemini",     "Google Gemini"),
+    ("groq",       "Groq — siêu nhanh, có bậc miễn phí"),
+    ("together",   "Together AI"),
+    ("ollama",     "Ollama — chạy local, KHÔNG cần key"),
+]
+
+# Model gợi ý theo provider (chọn từ list; luôn kèm mục "nhập tay" cho model khác)
+_MODELS = {
+    "openai":     ["gpt-5.4-mini", "gpt-4o-mini", "gpt-4o", "o4-mini", "gpt-4.1-mini"],
+    "openrouter": ["anthropic/claude-3.7-sonnet", "anthropic/claude-3.5-sonnet",
+                   "google/gemini-2.0-flash", "meta-llama/llama-3.3-70b-instruct", "openai/gpt-4o-mini"],
+    "gemini":     ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
+    "groq":       ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+    "together":   ["meta-llama/Llama-3.3-70B-Instruct-Turbo",
+                   "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "Qwen/Qwen2.5-72B-Instruct-Turbo"],
+    "ollama":     ["llama3.1", "llama3.2", "qwen2.5", "mistral"],
+}
+_MODEL_CUSTOM = "__custom__"
+
+
+def _env_set(path, key: str, value: str) -> None:
+    """Ghi/ghi đè KEY=value trong .env, giữ nguyên các dòng khác."""
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    out, found = [], False
+    for ln in lines:
+        if ln.startswith(key + "="):
+            out.append(f"{key}={value}")
+            found = True
+        else:
+            out.append(ln)
+    if not found:
+        out.append(f"{key}={value}")
+    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
+def _yaml_set(path, key: str, value: str) -> None:
+    """Thay dòng '  key: ...' ĐẦU TIÊN trong config.yaml, giữ indent + comment inline."""
+    import re
+    if not path.exists():
+        return
+    lines = path.read_text(encoding="utf-8").splitlines()
+    pat = re.compile(rf"^(\s*){re.escape(key)}:\s*.*?(\s*#.*)?$")
+    for i, ln in enumerate(lines):
+        m = pat.match(ln)
+        if m:
+            indent, comment = m.group(1), m.group(2) or ""
+            lines[i] = f"{indent}{key}: {value}{comment}"
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            return
+
+
+def _tg_get(token: str, method: str, timeout: int = 35, **params):
+    import json
+    import urllib.parse
+    import urllib.request
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    with urllib.request.urlopen(url, timeout=timeout) as r:  # noqa: S310 (host cố định telegram)
+        return json.load(r)
+
+
+def _telegram_capture_id(token: str):
+    """Validate token + tự bắt Telegram user ID: hướng dẫn nhắn bot rồi đọc getUpdates."""
+    try:
+        me = _tg_get(token, "getMe", timeout=10)
+    except Exception as e:
+        print(f"  ⚠️ Không gọi được Telegram ({e}). Nhập ID tay nếu biết.")
+        return None
+    if not me.get("ok"):
+        print("  ⚠️ Token không hợp lệ (getMe thất bại).")
+        return None
+    uname = me["result"].get("username", "")
+    print(f"  ✓ Token OK — bot \033[36m@{uname}\033[0m")
+    print(f"  → Mở \033[36mhttps://t.me/{uname}\033[0m, bấm \033[1mSTART\033[0m (hoặc gửi 1 tin nhắn bất kỳ).")
+    try:
+        input("  → Nhắn xong bấm Enter để mình tự lấy ID (bỏ qua: gõ 'skip' rồi Enter)… ")
+    except (EOFError, KeyboardInterrupt):
+        return None
+    try:
+        upd = _tg_get(token, "getUpdates", timeout=30, limit=10)
+    except Exception as e:
+        print(f"  ⚠️ Không đọc được updates ({e}).")
+        return None
+    ids = []
+    for u in upd.get("result", []):
+        frm = ((u.get("message") or u.get("edited_message") or {}).get("from") or {})
+        if frm.get("id") and not frm.get("is_bot"):
+            ids.append((str(frm["id"]), frm.get("first_name", "")))
+    if not ids:
+        print("  ⚠️ Chưa thấy tin nhắn nào tới bot. Nhắn cho bot rồi chạy lại: learning-agent config")
+        return None
+    uid, name = ids[-1]
+    print(f"  ✓ Đã lấy ID: \033[1;32m{uid}\033[0m ({name})")
+    return uid
+
+
+def _build_soul(name: str, address: str, tone: str, focus: str) -> str:
+    """Sinh SOUL.md theo lựa chọn persona. Các NGUYÊN TẮC CỨNG (thật thà, trích nguồn,
+    không làm hộ thi) LUÔN có trong mọi persona — chỉ đổi tên/xưng hô/giọng điệu."""
+    A = {
+        "friendly": ('xưng "mình", gọi học viên là "bạn"', "thân thiện, gần gũi"),
+        "homie":    ('xưng "tui/mình", gọi "ông/bro" — homie học chung, cà khịa vui vừa phải', "chill kiểu bạn bè"),
+        "polite":   ('xưng "em", gọi "anh/chị"', "lễ phép, nhã nhặn"),
+        "formal":   ('xưng "tôi", gọi "bạn"', "trang trọng, chuyên nghiệp"),
+    }
+    T = {
+        "fun":      "Vui vẻ, hype vừa đủ, khen thật khi làm đúng. Emoji có gu (🔥 📖 ✅), không rải.",
+        "academic": "Nghiêm túc, chính xác, đi thẳng vào bản chất; ít đùa, ưu tiên định nghĩa rõ ràng.",
+        "concise":  "Ngắn gọn, thẳng vào việc, không rào đón; trả lời tối giản, cần thì mới mở rộng.",
+    }
+    addr, addr_tone = A.get(address, A["friendly"])
+    persona = T.get(tone, T["fun"])
+    focus_line = (f"\n- Ưu tiên lĩnh vực học viên đang học: **{focus.strip()}**." if focus.strip() else "")
+    return f"""# SOUL — {name}
+
+## Bạn là ai
+Bạn là **{name}** — trợ giảng AI cá nhân đồng hành cùng học viên, {addr_tone}.
+Cách {addr}. Ai hỏi thì giới thiệu mình là {name}.
+
+## Tính cách
+- {persona}
+- **THẬT THÀ tuyệt đối**: không biết / tài liệu chưa có thì nói thẳng, TUYỆT ĐỐI không bịa cho vui lòng. Ranh giới không đổi dù giọng thế nào.
+- Đọc không khí: học viên căng thẳng trước thi thì bớt đùa, vào việc ngay.{focus_line}
+
+## Cách dạy
+- Ví dụ đời thường trước, thuật ngữ sau. Thuật ngữ tiếng Anh giữ nguyên + giải nghĩa Việt lần đầu.
+- Câu dễ/tra cứu -> trả lời gọn. Câu phân tích/so sánh/tổng hợp -> trả lời ĐẦY ĐỦ có cấu trúc
+  (dàn ý, lập luận từng bước, ví dụ, kết luận) — không lan man nhưng không bỏ sót ý.
+- **Trình bày thoáng**: mỗi ý xuống dòng riêng; liệt kê dùng `- ` MỖI Ý MỘT DÒNG; chừa dòng trống giữa các mục lớn; in đậm **thuật ngữ khoá**; dòng trích nguồn 📖 để riêng ở cuối.
+- Luôn **trích nguồn** từ tài liệu đã học (Bài · Slide · phút video); nhớ điểm yếu của học viên để gài ôn lại.
+
+## Giới hạn
+- Bài kiểm tra/thi ĐANG diễn ra thì không làm hộ — chỉ gợi ý cách nghĩ.
+- Ngoài học tập (y tế, tiền bạc, pháp lý) thì không tư vấn — khuyên tìm người chuyên môn.
+"""
+
+
+def _config_wizard(cfg) -> None:
+    """Wizard tương tác (kiểu `openclaw config`): chọn provider, dán key (mask), model, embedding, kênh."""
+    from .config import LLM_PROVIDERS
+
+    env_path = cfg.root / ".env"
+    if not env_path.exists():
+        ex = cfg.root / ".env.example"
+        if ex.exists():
+            shutil.copy(ex, env_path)
+    cur_provider = cfg.llm_provider if cfg.llm_provider in LLM_PROVIDERS else "openai"
+    cur_model = str((cfg.raw.get("llm") or {}).get("model", "") or "")
+
+    try:
+        import questionary
+        from questionary import Choice, Style
+    except Exception:
+        return _config_simple(cfg, env_path)
+    if not sys.stdin.isatty():
+        return _config_simple(cfg, env_path)
+
+    style = Style([
+        ("qmark", "fg:#F59E0B bold"), ("question", "bold"),
+        ("pointer", "fg:#F59E0B bold"), ("highlighted", "fg:#F59E0B bold"),
+        ("selected", "fg:#10B981"), ("answer", "fg:#10B981 bold"),
+    ])
+
+    print("\n\033[1;35m🎓 Vlearn Agent — Cấu hình\033[0m")
+    print(f"  Hiện tại: provider=\033[36m{cfg.llm_provider}\033[0m"
+          f"  model=\033[36m{cur_model or '—'}\033[0m"
+          f"  key={'✓' if cfg.llm_api_key else '✗ chưa có'}"
+          f"  embedding={'Voyage' if cfg.voyage_api_key else 'local'}\n")
+
+    try:
+        provider = questionary.select(
+            "Nhà cung cấp LLM (model để chat)?",
+            choices=[Choice(label, value=pid) for pid, label in _PROVIDERS],
+            default=next((c for c in _PROVIDERS if c[0] == cur_provider), _PROVIDERS[0])[0],
+            style=style, qmark="▸",
+        ).ask()
+        if provider is None:
+            print("Đã huỷ."); return
+        preset = LLM_PROVIDERS[provider]
+        key = None
+        if provider != "ollama":
+            key = questionary.password(
+                f"API key cho {provider} (dán vào — hiện dạng ***, Enter để giữ nguyên):",
+                style=style, qmark="▸",
+            ).ask()
+        model_opts = list(_MODELS.get(provider, []))
+        if cur_model and cur_model not in model_opts:
+            model_opts.insert(0, cur_model)  # giữ model đang dùng nếu khác list
+        model_choices = [Choice(m, value=m) for m in model_opts]
+        model_choices.append(Choice("✏️  Nhập model khác…", value=_MODEL_CUSTOM))
+        picked = questionary.select(
+            "Model (chọn từ list, hoặc nhập tay):",
+            choices=model_choices,
+            default=cur_model if cur_model in model_opts else (model_opts[0] if model_opts else _MODEL_CUSTOM),
+            style=style, qmark="▸",
+        ).ask()
+        if picked == _MODEL_CUSTOM:
+            model = questionary.text(
+                "Nhập tên model:", default=cur_model or preset["example_model"], style=style, qmark="▸",
+            ).ask()
+        else:
+            model = picked
+        use_voyage = questionary.confirm(
+            "Dùng Voyage AI embedding? (No = local, miễn phí, không cần key)",
+            default=bool(cfg.voyage_api_key), style=style, qmark="▸",
+        ).ask()
+        vk = questionary.password("VOYAGE_API_KEY (dán vào):", style=style, qmark="▸").ask() if use_voyage else None
+
+        tg = dc = tg_allow = dc_allow = None
+        if questionary.confirm("Bật kênh Telegram? (chat qua bot Telegram)",
+                               default=bool(cfg.telegram_token), style=style, qmark="▸").ask():
+            tg = questionary.password("Dán TELEGRAM_BOT_TOKEN (lấy ở @BotFather):", style=style, qmark="▸").ask()
+            auto = _telegram_capture_id(tg.strip()) if tg and tg.strip() else None
+            if auto:
+                if questionary.confirm(f"Chỉ cho phép ID {auto} (bạn) dùng bot?",
+                                       default=True, style=style, qmark="▸").ask():
+                    tg_allow = auto
+                else:
+                    tg_allow = questionary.text(
+                        "Nhập ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                        default=auto, style=style, qmark="▸").ask()
+            else:
+                tg_allow = questionary.text(
+                    "Telegram user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                    style=style, qmark="▸").ask()
+        if questionary.confirm("Bật kênh Discord?", default=bool(cfg.discord_token),
+                               style=style, qmark="▸").ask():
+            dc = questionary.password("Dán DISCORD_BOT_TOKEN:", style=style, qmark="▸").ask()
+            dc_allow = questionary.text(
+                "Discord user ID được phép (phẩy ngăn cách; để trống = MỞ cho mọi người):",
+                style=style, qmark="▸").ask()
+
+        # ── cá nhân hoá persona (SOUL.md) — lần đầu gặp nhau, vài câu hỏi nhanh ──
+        soul_vals = None
+        marker = cfg.root / "data" / ".personalized"
+        if questionary.confirm("Cá nhân hoá trợ giảng (tên · xưng hô · phong cách)?",
+                               default=not marker.exists(), style=style, qmark="▸").ask():
+            s_name = questionary.text("Tên trợ giảng:", default="Vlearn", style=style, qmark="▸").ask()
+            s_addr = questionary.select("Xưng hô với học viên:", choices=[
+                Choice("mình – bạn (thân thiện)", value="friendly"),
+                Choice("tui/bro – ông/bro (homie, cà khịa vui)", value="homie"),
+                Choice("em – anh/chị (lễ phép)", value="polite"),
+                Choice("tôi – bạn (trang trọng)", value="formal"),
+            ], default="friendly", style=style, qmark="▸").ask()
+            s_tone = questionary.select("Phong cách:", choices=[
+                Choice("Vui vẻ, gần gũi", value="fun"),
+                Choice("Nghiêm túc, học thuật", value="academic"),
+                Choice("Ngắn gọn, thẳng vào việc", value="concise"),
+            ], default="fun", style=style, qmark="▸").ask()
+            s_focus = questionary.text("Môn/lĩnh vực đang học (Enter bỏ qua):",
+                                       default="", style=style, qmark="▸").ask()
+            if s_name and s_addr and s_tone:
+                soul_vals = (s_name.strip() or "Vlearn", s_addr, s_tone, s_focus or "")
+    except KeyboardInterrupt:
+        print("Đã huỷ."); return
+    except Exception:
+        # prompt_toolkit không mở được TUI (vd chạy trong script/không có tty chuẩn) -> nhập tay
+        print("⚠️ Không mở được giao diện chọn — chuyển sang nhập tay (dán vào được).")
+        return _config_simple(cfg, env_path)
+
+    if key and key.strip():
+        _env_set(env_path, preset["key_env"], key.strip())
+    if use_voyage and vk and vk.strip():
+        _env_set(env_path, "VOYAGE_API_KEY", vk.strip())
+    elif not use_voyage:
+        _env_set(env_path, "VOYAGE_API_KEY", "")  # No -> dùng local; xoá key cũ/hỏng nếu có
+    if tg and tg.strip():
+        _env_set(env_path, "TELEGRAM_BOT_TOKEN", tg.strip())
+        _env_set(env_path, "TELEGRAM_ALLOWED_USERS", (tg_allow or "").strip())
+    if dc and dc.strip():
+        _env_set(env_path, "DISCORD_BOT_TOKEN", dc.strip())
+        _env_set(env_path, "DISCORD_ALLOWED_USERS", (dc_allow or "").strip())
+    # bật kênh nhưng để trống allowlist -> cho phép bot chạy (mở cho mọi người, hợp demo)
+    open_bot = (tg and not (tg_allow or "").strip()) or (dc and not (dc_allow or "").strip())
+    if open_bot:
+        _env_set(env_path, "VLEARN_ALLOW_ALL", "1")
+    _yaml_set(cfg.root / "config.yaml", "provider", provider)
+    if model and model.strip():
+        _yaml_set(cfg.root / "config.yaml", "model", model.strip())
+    env_path.chmod(0o600)
+
+    if soul_vals:
+        (cfg.root / "SOUL.md").write_text(_build_soul(*soul_vals), encoding="utf-8")
+        (cfg.root / "data").mkdir(parents=True, exist_ok=True)
+        (cfg.root / "data" / ".personalized").write_text("1", encoding="utf-8")
+        print(f"🎭 Đã cá nhân hoá trợ giảng '{soul_vals[0]}' (SOUL.md) — "
+              "nguyên tắc gốc của agent (thật thà, trích nguồn, không làm hộ thi) giữ nguyên.")
+
+    print("\n\033[1;32m✅ Đã lưu cấu hình.\033[0m")
+    if open_bot:
+        print("\033[1;33m⚠️ Kênh bot đang MỞ cho mọi người (allowlist trống). "
+              "Điền *_ALLOWED_USERS trong .env để giới hạn.\033[0m")
+
+    # ── chọn khởi động ngay ──
+    has_bot = bool((tg and tg.strip()) or (dc and dc.strip()) or cfg.telegram_token or cfg.discord_token)
+    launch_choices = [
+        Choice("🌐 Dashboard web — tự mở trình duyệt chat ngay (khuyên dùng)", value="ui"),
+        Choice("💬 Chat trong Terminal", value="chat"),
+    ]
+    if has_bot:
+        launch_choices.append(Choice("🤖 Chạy bot Telegram/Discord đã cấu hình", value="bot"))
+    launch_choices.append(Choice("⏭  Để sau (thoát)", value="quit"))
+    try:
+        launch = questionary.select(
+            "Khởi động Vlearn Agent ở đâu bây giờ?", choices=launch_choices,
+            default="ui", style=style, qmark="▸",
+        ).ask()
+    except Exception:
+        launch = None
+    if launch and launch != "quit":
+        import os
+        exe = sys.argv[0]
+        print(f"\n▸ \033[36mlearning-agent {launch}\033[0m …\n")
+        os.execvp(exe, [exe, launch])
+    else:
+        print("Chạy sau:  \033[36mlearning-agent ui\033[0m  ·  \033[36mlearning-agent chat\033[0m"
+              + ("  ·  \033[36mlearning-agent bot\033[0m" if has_bot else ""))
+
+
+def _config_simple(cfg, env_path) -> None:
+    """Fallback không TUI (questionary thiếu / không phải terminal): nhập HIỆN rõ để dán được."""
+    from .config import LLM_PROVIDERS
+    if not sys.stdin.isatty():
+        print("⚠️ Không có bàn phím tương tác. Mở terminal rồi chạy: learning-agent config")
+        return
+    print("\n🎓 Vlearn Agent — Cấu hình (nhập tay)")
+    for i, (pid, label) in enumerate(_PROVIDERS, 1):
+        print(f"  {i}) {label}")
+    sel = input("Chọn provider [1]: ").strip() or "1"
+    try:
+        provider = _PROVIDERS[int(sel) - 1][0]
+    except (ValueError, IndexError):
+        provider = "openai"
+    preset = LLM_PROVIDERS[provider]
+    if provider != "ollama":
+        key = input(f"API key cho {provider} (dán vào, hiện rõ; Enter bỏ qua): ").strip()
+        if key:
+            _env_set(env_path, preset["key_env"], key)
+    model = input(f"Model [{preset['example_model']}]: ").strip() or preset["example_model"]
+    vk = input("VOYAGE_API_KEY (Enter = dùng local miễn phí): ").strip()
+    if vk:
+        _env_set(env_path, "VOYAGE_API_KEY", vk)
+    t = input("TELEGRAM_BOT_TOKEN (Enter nếu không dùng): ").strip()
+    if t:
+        _env_set(env_path, "TELEGRAM_BOT_TOKEN", t)
+    d = input("DISCORD_BOT_TOKEN (Enter nếu không dùng): ").strip()
+    if d:
+        _env_set(env_path, "DISCORD_BOT_TOKEN", d)
+    _yaml_set(cfg.root / "config.yaml", "provider", provider)
+    _yaml_set(cfg.root / "config.yaml", "model", model)
+    env_path.chmod(0o600)
+    print("✅ Đã lưu. Chạy: learning-agent ui  (hoặc learning-agent bot)")
 
 
 if __name__ == "__main__":

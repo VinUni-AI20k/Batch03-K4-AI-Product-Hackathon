@@ -10,7 +10,7 @@ from pathlib import Path
 from openai import OpenAI
 
 from .. import ingest
-from ..index import LessonIndex, Manifest, file_hash
+from ..index import Changes, LessonIndex, Manifest, file_hash
 from ..ingest.structurer import lesson_meta, note_rel_path, structure_lesson
 from ..vault import Note, Vault
 
@@ -20,6 +20,19 @@ def sync_once(cfg, vault: Vault, index: LessonIndex, verbose: bool = True) -> di
     source_dir.mkdir(parents=True, exist_ok=True)
     manifest = Manifest(cfg.path("sources", "manifest_db"))
     changes = manifest.diff(source_dir, ingest.SUPPORTED_EXTS)
+
+    # LƯỚI AN TOÀN: nhiều file "biến mất" cùng lúc gần như luôn là source_dir bị trỏ sai
+    # (ổ ngoài chưa mount, cwd sai khi chạy CLI, lỗi chuẩn hoá Unicode NFC/NFD trên macOS
+    # với tên file có dấu...) chứ hiếm khi là học viên xoá thật hàng loạt. Xoá nhầm ở đây
+    # là MẤT NOTE VĨNH VIỄN (unlink thẳng) — thà bỏ qua lượt xoá, để admin tự kiểm tra.
+    total_known = manifest.count()
+    if changes.deleted and len(changes.deleted) > max(10, total_known * 0.3):
+        if verbose:
+            print(f"🛑 AN TOÀN: {len(changes.deleted)}/{total_known} file nguồn 'biến mất' cùng lúc — "
+                  "bất thường, có thể source_dir đang trỏ sai (kiểm tra sources.dir trong config.yaml, "
+                  "ổ ngoài đã mount chưa, ký tự có dấu trong tên file). BỎ QUA xoá tự động lượt này để "
+                  "không mất dữ liệu — bài học/index KHÔNG bị đụng. Chạy lại sync khi đã chắc chắn.")
+        changes = Changes(added=changes.added, modified=changes.modified, deleted=[])
 
     llm = OpenAI(base_url=cfg.llm_base_url, api_key=cfg.llm_api_key) if cfg.llm_api_key else None
     structurer_model = cfg.get("llm", "structurer_model", default="gpt-4o-mini")

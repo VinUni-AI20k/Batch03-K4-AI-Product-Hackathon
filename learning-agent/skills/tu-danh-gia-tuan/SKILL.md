@@ -25,7 +25,8 @@ Cơ sở: người học giỏi khác người học chăm ở chỗ họ đánh
       "Tuần tới bạn muốn đổi MỘT điều gì trong cách học?"
 - [ ] 4. Từ câu trả lời: đề xuất 2–3 điều chỉnh cụ thể cho tuần tới (kỹ thuật học, thời lượng, chủ đề ưu tiên).
 - [ ] 5. `update_student_memory` ghi kết luận tuần + điều chỉnh đã thống nhất;
-      đề nghị `schedule_task` 'daily <giờ họ hay rảnh>' nếu họ muốn duy trì nhịp.
+      đề nghị `schedule_task` 'weekly <thứ> <giờ họ hay rảnh>' nếu họ muốn duy trì
+      nhịp đánh giá hằng tuần đều đặn.
 
 ## Lưu ý
 - Đây là buổi trò chuyện, không phải bài kiểm tra — nghe nhiều hơn nói. Khen tiến bộ bằng số liệu thật.

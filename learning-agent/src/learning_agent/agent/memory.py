@@ -10,6 +10,9 @@ from datetime import datetime, timezone
 from ..vault import Note, Vault
 
 
+MAX_CHARS = 3000  # khớp cỡ MEMORY.md — đủ ~40-60 dòng gần nhất, tránh phình context vô hạn
+
+
 class StudentMemory:
     def __init__(self, vault: Vault):
         self.vault = vault
@@ -18,10 +21,30 @@ class StudentMemory:
         return self.vault.path / "students" / f"{user_id}.md"
 
     def read(self, user_id: str, display_name: str = "") -> str:
+        """File trên đĩa KHÔNG giới hạn (xem đủ trong Obsidian) — nhưng phần bơm vào
+        prompt phải cap, và phải giữ dòng MỚI NHẤT (không phải cũ nhất) vì fact quan
+        trọng nhất để cá nhân hoá luôn là cái vừa ghi, không phải cái ghi đầu tiên."""
         p = self._path(user_id)
         if not p.exists():
             return f"(Học viên mới: {display_name or user_id} — chưa có hồ sơ.)"
-        return Note.load(p).body
+        body = Note.load(p).body
+        if len(body) <= MAX_CHARS:
+            return body
+        lines = body.splitlines()
+        header = lines[0] if lines and lines[0].startswith("#") else ""
+        bullets = [l for l in lines if l.startswith("- ")]
+        kept: list[str] = []
+        total = len(header) + 1
+        for line in reversed(bullets):  # từ mới nhất lùi về cũ, dừng khi chạm ngưỡng
+            if total + len(line) + 1 > MAX_CHARS:
+                break
+            kept.append(line)
+            total += len(line) + 1
+        kept.reverse()
+        omitted = len(bullets) - len(kept)
+        note = (f"\n(… {omitted} ghi chú cũ hơn đã ẩn bớt cho gọn — xem đủ trong "
+                f"vault/students/{user_id}.md)") if omitted > 0 else ""
+        return header + "\n" + "\n".join(kept) + note
 
     def append(self, user_id: str, fact: str, display_name: str = "") -> str:
         p = self._path(user_id)

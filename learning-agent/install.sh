@@ -34,16 +34,29 @@ if [[ "$INGEST" == "1" ]]; then
 fi
 
 # ── cấu hình ──
-[[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env — mở lên điền LLM key + token bot"; }
+[[ -f .env ]] || { cp .env.example .env && chmod 600 .env; say "Đã tạo .env"; }
+
+# Wizard tương tác (chọn provider + dán key). CHỈ chạy khi stdin là terminal thật (`bash install.sh`).
+# Khi cài qua `curl | bash`, stdin là ống dẫn script -> không có tty -> bỏ qua, nhắc chạy tay
+# (redirect </dev/tty làm prompt_toolkit bị EOFError, nên không dùng).
+if [ -t 0 ]; then
+  say "Cấu hình nhanh (chọn provider LLM + dán API key)"
+  learning-agent config || say "Bỏ qua wizard — chạy lại sau: learning-agent config"
+else
+  say "Cấu hình sau khi cài xong bằng lệnh:  learning-agent config"
+fi
 learning-agent onboard || true
 
 cat <<'EOF'
 
 ────────────────────────────────────────────────
-✅ Cài xong. Tiếp theo:
-  1. Mở .env điền: LLM key (theo provider trong config.yaml), TELEGRAM_BOT_TOKEN/DISCORD_BOT_TOKEN
+✅ Cài xong. Kho kiến thức (vault/) có sẵn — lần đầu chạy tự index, dùng được ngay.
+   (Đã điền key ở bước trên thì bỏ qua mục 1, chạy thẳng mục 2–3.)
+
+Tiếp theo:
+  1. (Nếu chưa điền key) mở .env: LLM key, tuỳ chọn VOYAGE_API_KEY / token bot
   2. Kích hoạt môi trường:   source .venv/bin/activate
-  3. Chạy bot:               learning-agent bot
-  4. Dashboard (cửa sổ khác): learning-agent ui   → http://127.0.0.1:8321
+  3. Dashboard chat:         learning-agent ui   → http://127.0.0.1:8321
+     (hoặc Telegram/Discord: learning-agent bot — lần đầu tự index, chờ chút)
 ────────────────────────────────────────────────
 EOF

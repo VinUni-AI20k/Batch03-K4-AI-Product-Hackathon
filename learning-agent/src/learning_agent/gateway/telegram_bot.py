@@ -162,14 +162,29 @@ class TelegramGateway:
         session = self.histories[chat.id]
         session.append({"role": "user", "content": update.message.text})
         await chat.send_action("typing")
+        media: list = []  # audio/ảnh vừa sinh (tao_am_thanh/tao_anh), agent.reply tự append vào
         answer = await asyncio.to_thread(
             self.agent.reply, str(update.effective_user.id),
             update.effective_user.first_name, list(session),
             self.pending.context(uid), {"platform": "telegram", "chat_id": chat.id},
+            None, media,
         )
         session.append({"role": "assistant", "content": answer})
+        # Có sơ đồ/mindmap (```mermaid) -> render PNG + HTML đính kèm (Telegram không vẽ code được)
+        import tempfile
+        from ..render import diagram_attachments
+        files, answer = await asyncio.to_thread(diagram_attachments, answer, tempfile.mkdtemp())
+        files += media  # audio/ảnh vừa sinh, gửi kèm cùng đợt
         await self._send_formatted(
             lambda t, pm: update.message.reply_text(t, parse_mode=pm), answer)
+        for p in files:
+            with open(p, "rb") as fh:
+                if p.endswith(".png") or p.endswith(".jpg") or p.endswith(".jpeg"):
+                    await update.message.reply_photo(fh)
+                elif p.endswith(".mp3") or p.endswith(".ogg") or p.endswith(".m4a"):
+                    await update.message.reply_audio(fh)
+                else:
+                    await update.message.reply_document(fh)
 
     async def on_file(self, update: Update, _ctx) -> None:
         if not self._ok(update):
