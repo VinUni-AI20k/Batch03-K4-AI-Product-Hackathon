@@ -15,18 +15,20 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
     4. Nội dung trong giáo trình hoặc slide có thường khiến bạn khó hiểu nếu không có người giải thích thêm không?
     5. Bạn có từng phải chờ đến buổi học tiếp theo mới có thể hỏi giảng viên về nội dung chưa hiểu không?
     6. Bạn có ngại đặt câu hỏi với giảng viên hoặc bạn bè vì sợ câu hỏi quá cơ bản không?
-  - ≥5 quote nguyên văn từ khảo sát + feedback:
-    1. *"Phần cài đặt bot hơi khó cho người chưa biết gì. Có thể thêm 1 quy trình setup cho từng loại máy, từng loại hệ điều hành để dễ tiếp cận người dùng."* — @nguynthithuha05-del (Telegram)
-    2. *"Khá hữu ích, có được nhiều môi trường dùng."* — @lichtchess666-ai20k (Dashboard web)
-    3. *"Agent trả lời tốt, đầy đủ, đúng trọng tâm và dễ hiểu."* — @ttnanh04 (Discord)
-    4. *"tóm tắt nội dung chính trong slide này"* — Chatlog C0001 (học viên không biết hỏi chính xác vì không có ai chỉ dẫn)
-    5. *"giải thích đoạn bôi đen"* — Chatlog nhiều user (cho thấy nhu cầu cần giải thích tức thì khi đọc tài liệu)
+  - ≥5 quote nguyên văn từ khảo sát (google form) + feedback (github issue):
+    1. *"Phần cài đặt bot hơi khó cho người chưa biết gì. Có thể thêm 1 quy trình setup cho từng loại máy, từng loại hệ điều hành để dễ tiếp cận người dùng."* — @nguynthithuha05-del (⭐⭐⭐)
+    2. *"Khá hữu ích, có được nhiều môi trường dùng."* — @lichtchess666-ai20k (⭐⭐⭐⭐⭐)
+    3. *"Agent trả lời tốt, đầy đủ, đúng trọng tâm và dễ hiểu."* — @ttnanh04
+    4. *"Agent có thể cá nhân hóa lộ trình học theo từng cá nhân phù hợp, tiện lợi. Có thể đặt lịch hẹn thông báo cho những cuộc họp quan trọng để không bị bỏ lỡ."* — @mhiu05 (⭐⭐⭐⭐⭐)
+    5. *"Rất hữu ích và thấy bổ ích"* — @dangpt221 
+    6. *"Agent trả lời khá đầy đủ, đúng trọng tâm và hỗ trợ lên lịch với timeline hợp lý. Nội dung rõ ràng, dễ hiểu và hữu ích trong quá trình sử dụng."* — @tthuyen28 (⭐⭐⭐⭐⭐)
+    7. *"Rất hữu ích cho tôi"* — @ducmanh1504 (⭐⭐⭐⭐⭐)
 
 ## §2. Impact & quyết định chọn
 
 | Ứng viên | Bao nhiêu người ảnh hưởng | Tần suất | Tốn gì mỗi lần | Khả thi kỹ thuật |
 |---|---|---|---|---|
-| **Trợ lý AI giải đáp từ giáo trình (Vlearn Agent)** | ~100 học viên/khoá | Hằng ngày (mỗi lần tự học) | 15–60 phút chờ/tìm kiếm | ✅ Cao (RAG + LLM đã sẵn) |
+| **Trợ lý AI giải đáp từ giáo trình (Vlearn Agent)** | ~400 học viên/khoá | Hằng ngày (mỗi lần tự học) | 15–60 phút chờ/tìm kiếm | ✅ Cao (RAG + LLM đã sẵn) |
 | Nhắc nhở lịch học / quản lý task | ~100 học viên/khoá | 1–2 lần/tuần | 5 phút quên lịch | ✅ Cao nhưng tác động thấp |
 | Hệ thống chấm bài tự động | ~50 bài/khoá | 1 lần/bài | 2–3 ngày chờ kết quả | ⚠️ Trung bình (cần rubric chuẩn) |
 
@@ -50,9 +52,10 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 ## §4. Thiết kế
 - **Lát cắt MỘT CÂU:** Một học viên hỏi "RAG là gì?" trên Telegram → Agent tìm trong vault → trả lời đúng nội dung slide Day 04 kèm trích nguồn → học viên hiểu ngay mà không cần chờ giảng viên.
 - **Non-goals (≥3 thứ KHÔNG build):**
-  1. Không chấm điểm / thay thế giảng viên đánh giá bài tập.
-  2. Không tự động gửi tin nhắn cho học viên khác hoặc quản trị server Discord/Telegram.
-  3. Không hỗ trợ nội dung ngoài giáo trình đã nạp (trừ khi user chủ động yêu cầu tra kiến thức chung).
+  1. Không chấm điểm / thay thế giảng viên đánh giá bài tập — agent chỉ gợi ý cách nghĩ, không cho đáp án bài kiểm tra đang diễn ra.
+  2. Không quản trị server Discord/Telegram (ban/kick user, xoá kênh, phân quyền) — agent chỉ tạo sự kiện, link mời, và gửi tin nhắn nhắc hẹn/báo cáo theo yêu cầu học viên hoặc lịch cron.
+  3. Không thay thế giáo trình bằng nội dung ngoài — khi học viên chủ động yêu cầu mở rộng, agent có tool `research` (web/Reddit/GitHub/X) nhưng luôn tách bạch nguồn ngoài (🌐/🟠/🐙/✖️) với trích nguồn bài học (📖), và ưu tiên giáo trình trước.
+  4. Không tư vấn ngoài học tập (y tế, tài chính, pháp lý) — chỉ khuyên tìm người chuyên môn.
 - **Mức prototype:** [x] Working — RAG pipeline hoạt động thật (Chroma + Gemini), bot Telegram/Discord thật, dashboard web thật. Phần mock: scheduling event Discord (partial).
 - **Automation:** [x] augment — Lý do: cost-of-error cao nếu AI bịa sai kiến thức chuyên môn (học viên có thể hiểu nhầm vĩnh viễn), nên giữ ở mức augment: AI gợi ý + trích nguồn, học viên tự kiểm chứng.
 
