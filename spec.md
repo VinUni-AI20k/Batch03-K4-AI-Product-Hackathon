@@ -210,6 +210,8 @@ Dưới đây là bảng phân tích kịch bản lỗi rủi ro dựa trên 4 l
       1. *Câu trả lời của AI Tutor có đủ súc tích giúp bạn tiếp thu nhanh mà không làm đứt mạch đọc slide không?*
       2. *Hệ thống cảnh báo độ tin cậy và thẻ trích dẫn nguồn có giúp bạn yên tâm và dễ dàng kiểm chứng lại thông tin không?*
       3. *Thao tác bôi đen hoặc crop hình ảnh trên slide để hỏi đáp có mượt mà và trực quan không?*
+  - **Tài liệu validation đã hoàn thiện:** [validation/feedback_log.md](validation/feedback_log.md), [validation/validation_summary.md](validation/validation_summary.md).
+  - **Reflection cá nhân đã chuẩn bị:** [reflection/nguyen-thi-tra-my-2A202601026.md](reflection/nguyen-thi-tra-my-2A202601026.md).
 
 ---
 

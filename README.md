@@ -7,6 +7,21 @@
 
 ## 👥 Thành viên nhóm & Phân công công việc
 
+- **Đào Văn Đạt – 2A202601302**: phụ trách chuẩn bị tài liệu nộp, cập nhật phần README và cấu trúc repo, phối hợp chuẩn bị nội dung demo và reflection cho mốc nộp cuối.
+- **Nguyễn Thị Trà My – 2A202601026**: phụ trách phần validation, ghi nhận feedback từ vòng user test và tổng hợp phản ánh cá nhân.
+- **Hoàng Trường Giang – 2A202601224**: phụ trách prompt engineering và xây dựng golden set.
+- **Đào Ngọc Duy – 2A202601780**: nghiên cứu yêu cầu, xây dựng spec, triển khai backend prototype và phối hợp phát triển toàn diện.
+- **Nguyễn Thị Kiều Trang – frontend**: phụ trách giao diện frontend và cấu trúc trải nghiệm người dùng.
+
+### Cấu trúc nộp repo
+- [README.md](README.md): thông tin thành viên, phân công và hướng dẫn chạy thử.
+- [spec.md](spec.md): AI Spec theo template.
+- [demo-slides.pdf](demo-slides.pdf): slide demo 6 trang.
+- [codebase/](codebase/): prototype có ghi chú phần mock và phần chạy thật.
+- [eval/](eval/): golden set và bảng kết quả chạy.
+- [validation/feedback_log.md](validation/feedback_log.md): feedback log từ vòng user test.
+- [validation/validation_summary.md](validation/validation_summary.md): tóm tắt kết quả validation.
+- [reflection/](reflection/): thư mục phản ánh cá nhân, gồm file cho từng thành viên, bao gồm [reflection/nguyen-thi-tra-my-2A202601026.md](reflection/nguyen-thi-tra-my-2A202601026.md).
 
 ---
 
@@ -128,14 +143,3 @@ Hệ thống hoạt động dựa trên mô hình **Strict Grounding RAG** khép
 
 ---
 
-## 📦 Cấu trúc Thư mục Dự án
-
-```
-DAY5_6_2A202601780_DAONGOCDUY/
-├── codebase/              # Mã nguồn prototype sản phẩm
-│   ├── backend/           # FastAPI app, schemas, grounding, prompts & gemini client
-│   └── frontend/          # React App + Vite + pdf.js + components
-├── data/                  # Dữ liệu mẫu (chatlog, bài giảng, slide)
-├── spec.md                # Bản đặc tả kỹ thuật AI Spec đầy đủ của sản phẩm
-└── README.md              # File hướng dẫn này
-```
